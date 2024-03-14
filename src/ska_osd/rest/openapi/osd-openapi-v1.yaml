@@ -26,6 +26,8 @@ paths:
         - $ref: '#/components/parameters/osd_version'
         - $ref: '#/components/parameters/source'
         - $ref: '#/components/parameters/gitlab_branch'
+        - $ref: '#/components/parameters/capabilities'
+        - $ref: '#/components/parameters/array_assembly'
       responses:
         "200":
           description: OK
@@ -64,6 +66,18 @@ components:
     gitlab_branch:
       in: query
       name: gitlab_branch
+      schema:
+        type: string
+      required: false
+    capabilities:
+      in: query
+      name: capabilities
+      schema:
+        type: string
+      required: false
+    array_assembly:
+      in: query
+      name: array_assembly
       schema:
         type: string
       required: false

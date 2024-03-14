@@ -27,6 +27,6 @@ else:
     # presume being run from gunicorn
     # use gunicorn logging level for app and module loggers
     gunicorn_logger = logging.getLogger("gunicorn.error")
-    app.logger.setLevel(gunicorn_logger.level)  # pylint: disable=no-member€
+    app.logger.setLevel(gunicorn_logger.level)
     logger = logging.getLogger("ska_osd")
     logger.setLevel(gunicorn_logger.level)

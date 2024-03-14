@@ -20,10 +20,7 @@ class OSD:
     including get_telescope_observatory_policies, get_data and get_osd_data
     """
 
-    def __init__(
-        self, capabilities: list, array_assembly: str, tmdata: TMData
-    ) -> None:
-
+    def __init__(self, capabilities: list, array_assembly: str, tmdata: TMData) -> None:
         """This is initializer method for Class OSD
 
         :param capabilities: mid or low
@@ -40,10 +37,7 @@ class OSD:
         self.tmdata = tmdata
         self.keys_list = {}
 
-    def check_capabilities(
-        self, capabilities: list = None
-    ) -> None | OSDDataException:
-
+    def check_capabilities(self, capabilities: list = None) -> None | OSDDataException:
         """This method checks if a given capability exists or not
             and raises exception
 
@@ -55,14 +49,9 @@ class OSD:
         capabilities_list = list(osd_file_mapping.keys())[:3]
 
         if capabilities is not None:
-            cap_list = [
-                i for i in capabilities if i.lower() not in capabilities_list
-            ]
+            cap_list = [i for i in capabilities if i.lower() not in capabilities_list]
 
-        if (capabilities is not None and isinstance(capabilities, list)) and (
-            cap_list
-        ):
-
+        if (capabilities is not None and isinstance(capabilities, list)) and (cap_list):
             msg = ", ".join(capabilities_list)
             cap = cap_list[0]
 
@@ -75,7 +64,6 @@ class OSD:
         capabilities: list = None,
         array_assembly: str = None,
     ) -> dict[dict[str, Any]]:
-
         """This method checks if capabilities or array assembly
             exists or not and gets it from observatory policies file and
             populates the dictionary and returns it
@@ -97,33 +85,26 @@ class OSD:
         capabilities_dict = {}
 
         if capabilities is None and array_assembly is None:
-
             capabilities_dict = self.osd_data["observatory_policy"][
                 "telescope_capabilities"
             ]
 
         elif capabilities is not None and array_assembly is None:
-
             for capability in capabilities:
-
                 capabilities_dict[capability.capitalize()] = self.osd_data[
                     "observatory_policy"
                 ]["telescope_capabilities"][capability.capitalize()]
 
         elif capabilities is None and array_assembly is not None:
-
             capabilities_dict = self.osd_data["observatory_policy"][
                 "telescope_capabilities"
             ]
 
             for key in capabilities_dict.keys():
-
                 capabilities_dict[key] = array_assembly
 
         elif capabilities is not None and array_assembly is not None:
-
             for capability in capabilities:
-
                 capabilities_dict[capability.capitalize()] = array_assembly
 
         return self.osd_data, capabilities_dict
@@ -131,7 +112,6 @@ class OSD:
     def get_capabilities_and_array_assembly(
         self, tmdata, telescope_capabilities_dict: dict, osd_data: dict
     ) -> dict[dict[str, Any]] | OSDDataException:
-
         """This method returns osd_data dictionary as
         mentioned in constant.py variable osd_file_mapping with values
         populated
@@ -147,10 +127,7 @@ class OSD:
         """
 
         for key, value in telescope_capabilities_dict.items():
-
-            data = self.get_data(
-                tmdata, capability=osd_file_mapping[key.lower()]
-            )
+            data = self.get_data(tmdata, capability=osd_file_mapping[key.lower()])
             self.keys_list = list(data.keys())
 
             self.check_array_assembly(value, self.keys_list)
@@ -171,7 +148,6 @@ class OSD:
         capability: str = None,
         array_assembly: str = None,
     ) -> dict[dict[str, Any]]:
-
         """This method is for getting data from tmdata object and returns it
             based on capability and array_assembly i.e. mid and AA0.5
 
@@ -184,11 +160,9 @@ class OSD:
         """
 
         if "observatory_policies" in capability:
-
             return tmdata[capability].get_dict()
 
         else:
-
             return [
                 tmdata[capability].get_dict()[array_assembly]
                 if array_assembly is not None
@@ -196,7 +170,6 @@ class OSD:
             ][0]
 
     def get_osd_data(self) -> dict[dict[str, Any]]:
-
         """This method calls
             get_telescope_observatory_policies function,
             get_capabilities_and_array_assembly
@@ -222,7 +195,6 @@ class OSD:
     def check_array_assembly(
         self, value: str, key_list: dict
     ) -> None | OSDDataException:
-
         """This method checks whether a array_assembly value like
             AA0.5 or AA1 in key_list dictionary exists or not and
             raises OSDDataException
@@ -231,7 +203,6 @@ class OSD:
         """
 
         if value not in key_list:
-
             raise OSDDataException(f"Keyerror {value} doesn't exists")
 
 
@@ -240,7 +211,6 @@ def check_cycle_id(
     osd_version: str = None,
     gitlab_branch: str = None,
 ) -> str:
-
     """This function checks if a given cycle exists or not
         also raises OSDDataException if gitlab_branch and osd_version
         both is given. raises OSDDataException for Cycle ID exists
@@ -255,17 +225,14 @@ def check_cycle_id(
     """
 
     if gitlab_branch is not None and osd_version is not None:
-
         msg = "either osd_version or gitlab_branch"
 
         raise OSDDataException(f"Only one parameter is needed {msg}")
 
     if gitlab_branch is not None:
-
         osd_version = gitlab_branch
 
     if cycle_id is None and osd_version is None and gitlab_branch is None:
-
         osd_version = version("ska_telmodel")
 
     versions_dict = read_json(osd_file_mapping["cycle_to_version_mapping"])
@@ -277,13 +244,11 @@ def check_cycle_id(
     string_ids = ",".join([str(i) for i in cycle_ids])
 
     if cycle_id is not None and cycle_id_exists is None:
-
         msg = f"Available IDs are {string_ids}"
 
         raise OSDDataException(f"Cycle id {cycle_id} is not valid,{msg}")
 
     elif cycle_id is not None and osd_version is None:
-
         osd_version = versions_dict[f"cycle_{cycle_id}"][0]
 
     return osd_version
@@ -295,7 +260,6 @@ def osd_tmdata_source(
     source: str = "car",
     gitlab_branch: str = None,
 ) -> str:
-
     """This function checks and returns source_uri for TMData class
 
     :param cycle_id: cycle id integer value.
@@ -309,7 +273,6 @@ def osd_tmdata_source(
     """
 
     if source not in source_list:
-
         raise OSDDataException(
             f"source is not valid available are {', '.join(source_list)}"
         )
@@ -319,13 +282,11 @@ def osd_tmdata_source(
         and isinstance(gitlab_branch, str)
         and (source == "car" or source == "file")
     ):
-
         raise OSDDataException("source is not valid.")
 
     osd_version = check_cycle_id(cycle_id, osd_version, gitlab_branch)
 
     if source == "file":
-
         return (f"file://{BASE_FOLDER_NAME}",)
 
     return (f"{source}:{BASE_URL}{osd_version}#{BASE_FOLDER_NAME}",)
@@ -336,7 +297,6 @@ def get_osd_data(
     array_assembly: str = None,
     tmdata: TMData = None,
 ) -> dict[dict[str, Any]]:
-
     """This function creates OSD class object and returns
         osd_data dictionary as json object
 

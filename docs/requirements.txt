@@ -1,0 +1,10 @@
+Sphinx<6
+sphinx-rtd-theme
+sphinx-jsonschema
+sphinx-rtd-theme
+recommonmark
+jsbeautifier
+schema
+docopt
+toolz
+appdirs

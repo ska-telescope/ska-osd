@@ -4,14 +4,13 @@ from importlib.metadata import version
 from typing import Any
 
 import pytest
-
 from ska_telmodel.data import TMData
-from ska_telmodel.osd.helper import OSDDataException
-from ska_telmodel.osd.osd import get_osd_data, osd_tmdata_source
+
+from ska_osd.osd.helper import OSDDataException
+from ska_osd.osd.osd import get_osd_data, osd_tmdata_source
 
 
 def read_json(json_file_location: str) -> dict[dict[str, Any]]:
-
     """This function returns json file object from local file system
 
     :param json_file_location: json file.
@@ -22,7 +21,7 @@ def read_json(json_file_location: str) -> dict[dict[str, Any]]:
     cwd, _ = os.path.split(__file__)
     path = os.path.join(cwd, json_file_location)
 
-    with open(path) as user_file:
+    with open(path) as user_file:  # pylint: disable=W1514
         file_contents = json.load(user_file)
 
     return file_contents
@@ -46,7 +45,6 @@ OSD_RESPONSE_WITH_CAPABILITIES_ARRAY_ASSEMBLY_PARAMETER = read_json(
 
 @pytest.fixture(scope="module")
 def tm_data():
-
     """This function is used as a fixture for tm_data object
 
     :returns: tmdata object
@@ -58,7 +56,6 @@ def tm_data():
 
 @pytest.fixture(scope="module")
 def validate_car_class():
-
     """This function is used as a fixture for osd_tmdata_source object
         with osd_version as '1.11.0'
 
@@ -70,7 +67,6 @@ def validate_car_class():
 
 @pytest.fixture(scope="module")
 def validate_gitlab_class():
-
     """This function is used as a fixture for osd_tmdata_source object
         with parameters.
 
@@ -108,8 +104,13 @@ def validate_gitlab_class():
         ),
     ],
 )
-def test_get_osd_data(capabilities, array_assembly, tmdata, expected, tm_data):
-
+def test_get_osd_data(
+    capabilities,
+    array_assembly,
+    tmdata,  # pylint: disable=W0613
+    expected,
+    tm_data,  # pylint: disable=W0621
+):
     """This test case checks the functionality of get_osd_data
         it converts the python dict into list keys and checks
         for equality with expected output.
@@ -132,7 +133,6 @@ def test_get_osd_data(capabilities, array_assembly, tmdata, expected, tm_data):
 
 
 def test_invalid_cycle_id_get_osd_data():
-
     """This test case catches the exception when cycle_id is invalid.
 
     :raises: OSDDataException for Cycle Id
@@ -140,13 +140,12 @@ def test_invalid_cycle_id_get_osd_data():
 
     with pytest.raises(
         OSDDataException,
-        match=("Cycle id 3 is not valid,Available IDs are 1,2"),
+        match="Cycle id 3 is not valid,Available IDs are 1,2",
     ):
         osd_tmdata_source(cycle_id=3)
 
 
 def test_invalid_source_get_osd_data():
-
     """This test case catches the exception when source is invalid.
 
     :raises: OSDDataException for source value.
@@ -154,13 +153,12 @@ def test_invalid_source_get_osd_data():
 
     with pytest.raises(
         OSDDataException,
-        match=("source is not valid available are file, car, gitlab"),
+        match="source is not valid available are file, car, gitlab",
     ):
         osd_tmdata_source(source="github")
 
 
 def test_invalid_source_gitlab_branch_get_osd_data():
-
     """This test case catches the exception when source is not given
         with gitlab_branch parameter.
 
@@ -169,13 +167,12 @@ def test_invalid_source_gitlab_branch_get_osd_data():
 
     with pytest.raises(
         OSDDataException,
-        match=("source is not valid."),
+        match="source is not valid.",
     ):
         osd_tmdata_source(cycle_id=2, gitlab_branch="master")
 
 
-def test_invalid_capabilities_get_osd_data(tm_data):
-
+def test_invalid_capabilities_get_osd_data(tm_data):  # pylint: disable=W0621
     """This test case catches the exception when capabilities is invalid.
 
     :raises: OSDDataException for capability value.
@@ -185,13 +182,14 @@ def test_invalid_capabilities_get_osd_data(tm_data):
 
     with pytest.raises(
         OSDDataException,
-        match=(f"Capability midd doesn't exists,Available are {msg}"),
+        match=f"Capability midd doesn't exists,Available are {msg}",
     ):
         get_osd_data(capabilities=["midd"], tmdata=tm_data)
 
 
-def test_invalid_capabilities_and_valid_array_get_osd_data(tm_data):
-
+def test_invalid_capabilities_and_valid_array_get_osd_data(
+    tm_data,
+):  # pylint: disable=W0621
     """This test case catches the exception when capabilities is invalid.
         with other parameters
 
@@ -202,15 +200,12 @@ def test_invalid_capabilities_and_valid_array_get_osd_data(tm_data):
 
     with pytest.raises(
         OSDDataException,
-        match=(f"Capability midd doesn't exists,Available are {msg}"),
+        match=f"Capability midd doesn't exists,Available are {msg}",
     ):
-        get_osd_data(
-            capabilities=["midd"], array_assembly="AA0.5", tmdata=tm_data
-        )
+        get_osd_data(capabilities=["midd"], array_assembly="AA0.5", tmdata=tm_data)
 
 
-def test_invalid_array_assembly(tm_data):
-
+def test_invalid_array_assembly(tm_data):  # pylint: disable=W0621
     """This test case catches the exception when array_assembly is invalid.
 
     :raises: OSDDataException for array_assembly value.
@@ -218,13 +213,12 @@ def test_invalid_array_assembly(tm_data):
 
     with pytest.raises(
         OSDDataException,
-        match=("Keyerror AA3 doesn't exists"),
+        match="Keyerror AA3 doesn't exists",
     ):
         get_osd_data(array_assembly="AA3", tmdata=tm_data)
 
 
-def test_set_source_car_method(validate_car_class):
-
+def test_set_source_car_method(validate_car_class):  # pylint: disable=W0621
     """This test case checks if the output of the osd_tmdata_source
         function is as expected or not.
 
@@ -232,27 +226,25 @@ def test_set_source_car_method(validate_car_class):
     """
 
     assert validate_car_class == (
-        "car://gitlab.com/ska-telescope/ska-telmodel?1.11.0#tmdata",
+        "car://gitlab.com/ska-telescope/ska-osd?1.11.0#osd_data",
     )
 
 
-def test_set_source_gitlab_method(validate_gitlab_class):
-
+def test_set_source_gitlab_method(validate_gitlab_class):  # pylint: disable=W0621
     """This test case checks if the output of the osd_tmdata_source
         function is as expected or not.
 
     :param osd_tmdata_source: validate_gitlab_class fixture.
     """
 
-    msg = "nak-776-osd-implementation-file-versioning#tmdata"
+    msg = "nak-776-osd-implementation-file-versioning#osd_data"
 
     assert validate_gitlab_class == (
-        f"gitlab://gitlab.com/ska-telescope/ska-telmodel?{msg}",
+        f"gitlab://gitlab.com/ska-telescope/ska-osd?{msg}",
     )
 
 
 def test_validate_gitlab_with_both_param():
-
     """This test case catches the exception when both osd_version and
         gitlab_branch are given.
 
@@ -261,9 +253,7 @@ def test_validate_gitlab_with_both_param():
 
     with pytest.raises(
         OSDDataException,
-        match=(
-            "Only one parameter is needed either osd_version or gitlab_branch"
-        ),
+        match="Only one parameter is needed either osd_version or gitlab_branch",
     ):
         osd_tmdata_source(
             cycle_id=1,
@@ -274,7 +264,6 @@ def test_validate_gitlab_with_both_param():
 
 
 def test_validate_gitlab_with_both_invalid_param():
-
     """This test case checks if the output of the osd_tmdata_source
     when no parameter is given and latest version is
     returned or not
@@ -282,30 +271,28 @@ def test_validate_gitlab_with_both_invalid_param():
 
     telmodel_version = version("ska_telmodel")
 
-    msg = f"ska-telmodel?{telmodel_version}#tmdata"
+    msg = f"ska-osd?{telmodel_version}#osd_data"
 
     assert osd_tmdata_source() == (f"car://gitlab.com/ska-telescope/{msg}",)
 
 
 def test_check_osd_version_method():
-
     """This test case checks if the output of the osd_tmdata_source
     when osd_version parameter is given it should return the correct URL
     """
 
-    assert osd_tmdata_source(osd_version="2.11.0") == (
-        "car://gitlab.com/ska-telescope/ska-telmodel?2.11.0#tmdata",
+    assert osd_tmdata_source(osd_version="1.0.0") == (
+        "car://gitlab.com/ska-telescope/ska-osd?1.0.0#osd_data",
     )
 
 
 def test_check_cycle_id_and_osd_version_method():
-
     """This test case checks if the output of the osd_tmdata_source
     when cycle_id and osd_version parameter is given
     it should return the correct URL
     """
 
-    msg = "ska-telmodel?1.11.0#tmdata"
+    msg = "ska-osd?1.11.0#osd_data"
 
     assert osd_tmdata_source(cycle_id=1, osd_version="1.11.0") == (
         f"car://gitlab.com/ska-telescope/{msg}",
@@ -313,36 +300,33 @@ def test_check_cycle_id_and_osd_version_method():
 
 
 def test_check_cycle_id_2_and_osd_version_method():
-
     """This test case checks if the output of the osd_tmdata_source
     when cycle_id and osd_version parameter is given
     it should return the correct URL
     """
 
-    assert osd_tmdata_source(cycle_id=2, osd_version="2.11.0") == (
-        "car://gitlab.com/ska-telescope/ska-telmodel?2.11.0#tmdata",
+    assert osd_tmdata_source(cycle_id=2, osd_version="1.0.0") == (
+        "car://gitlab.com/ska-telescope/ska-osd?1.0.0#osd_data",
     )
 
 
 def test_check_cycle_id_with_source_method():
-
     """This test case checks if the output of the osd_tmdata_source
     when cycle_id, osd_version and source parameter is given
     it should return the correct URL
     """
 
-    assert osd_tmdata_source(
-        cycle_id=2, osd_version="2.11.0", source="file"
-    ) == ("file://tmdata",)
+    assert osd_tmdata_source(cycle_id=2, osd_version="1.0.0", source="file") == (
+        "file://osd_data",
+    )
 
 
 def test_check_master_branch_method():
-
     """This test case checks if the output of the osd_tmdata_source
     when cycle_id, gitlab_branch and source parameter is given
     it should return the correct URL
     """
 
-    assert osd_tmdata_source(
-        cycle_id=2, gitlab_branch="master", source="gitlab"
-    ) == ("gitlab://gitlab.com/ska-telescope/ska-telmodel?master#tmdata",)
+    assert osd_tmdata_source(cycle_id=2, gitlab_branch="master", source="gitlab") == (
+        "gitlab://gitlab.com/ska-telescope/ska-osd?master#osd_data",
+    )

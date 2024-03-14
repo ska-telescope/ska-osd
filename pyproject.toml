@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ska-osd"
-version = "1.0.0"
+version = "1.0.0+dev"
 description = "simplest form OSD consists ofguration files that are required by OSO tools."
 authors = ["Dayanand Arade <dayanand_arade@persistent.com>"]
 license= "BSD-3-Clause"
@@ -48,6 +48,7 @@ requests-mock = "^1.9.3"
 recommonmark = "^0.7.1"
 sphinxcontrib-openapi = "^0.8.1"
 ska-ser-sphinx-theme = "^0.1.2"
+sphinx_autodoc_typehints = "^2.0.0"
 
 
 [tool.pytest.ini_options]

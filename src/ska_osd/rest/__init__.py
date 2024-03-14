@@ -5,14 +5,13 @@ from typing import Any, Dict
 import prance
 from connexion import App
 
-
-
 KUBE_NAMESPACE = os.getenv("KUBE_NAMESPACE", "ska-osd")
 ODA_MAJOR_VERSION = version("ska-osd").split(".")[0]
 API_PATH = f"{KUBE_NAMESPACE}/api/v{ODA_MAJOR_VERSION}"
 
 
-# There is a (another) issue with Connexion where it cannot validate against a spec with polymorphism,
+# There is a (another) issue with Connexion where it cannot validate
+# against a spec with polymorphism,
 # like the SBDefinition. See https://github.com/spec-first/connexion/issues/1569
 # As a quick has, this basically turns off the validation
 class CustomRequestBodyValidator:
@@ -21,6 +20,7 @@ class CustomRequestBodyValidator:
 
     def __call__(self, function):
         return function
+
 
 # Resolves the $ref in the OpenAPI spec before it is used by Connexion,
 # as Connexion can't parse them - see https://github.com/spec-first/connexion/issues/967
@@ -50,7 +50,8 @@ def init_app(open_api_spec=None):
     connexion = App(__name__, specification_dir="openapi/")
     connexion.add_api(
         open_api_spec,
-        # The base path includes the namespace which is known at runtime to avoid clashes in deployments, for example in CICD
+        # The base path includes the namespace which is known at runtime
+        # to avoid clashes in deployments, for example in CICD
         base_path=f"/{API_PATH}",
         arguments={"title": "OpenAPI ODT"},
         validator_map=validator_map,

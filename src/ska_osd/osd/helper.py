@@ -12,7 +12,6 @@ class OSDDataException(ValueError):
 
 
 def read_json(json_file_location: str) -> dict[dict[str, Any]]:
-
     """This function returns json file object from local file system
 
     :param json_file_location: json file.
@@ -21,10 +20,8 @@ def read_json(json_file_location: str) -> dict[dict[str, Any]]:
     """
 
     cwd, _ = os.path.split(__file__)
-    print("current dir------------", cwd)
     path = os.path.join(cwd, json_file_location)
-    print("current dir--path----------", path)
-    with open(path) as user_file:
+    with open(path) as user_file:  # pylint: disable=W1514
         file_contents = json.load(user_file)
 
     return file_contents

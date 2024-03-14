@@ -5,9 +5,6 @@ the ODA.
 import logging
 import os
 
-from flask import _app_ctx_stack, current_app  # pylint: disable=no-name-in-module
-
-
 LOGGER = logging.getLogger(__name__)
 
 BACKEND_VAR = "ODA_BACKEND_TYPE"
