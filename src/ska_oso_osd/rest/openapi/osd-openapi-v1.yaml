@@ -15,7 +15,7 @@ paths:
       summary: Get OSD data filter by the query parameter
       description: |
         Retrieves the OSD data which match the query parameters.
-      operationId: ska_osd.rest.api.resources.get_osd
+      operationId: ska_oso_osd.rest.api.resources.get_osd
       parameters:
         - $ref: '#/components/parameters/cycle_id'
         - $ref: '#/components/parameters/osd_version'

@@ -1,1 +1,1 @@
-"""Test package for ska_osd."""
+"""Test package for ska_oso_osd."""

@@ -6,8 +6,8 @@ from typing import Any
 import pytest
 from ska_telmodel.data import TMData
 
-from ska_osd.osd.helper import OSDDataException
-from ska_osd.osd.osd import get_osd_data, osd_tmdata_source
+from ska_oso_osd.osd.helper import OSDDataException
+from ska_oso_osd.osd.osd import get_osd_data, osd_tmdata_source
 
 
 def read_json(json_file_location: str) -> dict[dict[str, Any]]:

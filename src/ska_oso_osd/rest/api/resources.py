@@ -8,7 +8,7 @@ from http import HTTPStatus
 
 from ska_telmodel.data import TMData
 
-from ska_osd.osd.osd import get_osd_data, osd_tmdata_source
+from ska_oso_osd.osd.osd import get_osd_data, osd_tmdata_source
 
 
 def get_osd(**kwargs):
@@ -28,7 +28,7 @@ def get_osd(**kwargs):
         source=source,
         gitlab_branch=gitlab_branch,
     )
-    tm_data = TMData(source_uris=tm_data_sources, update=False)
+    tm_data = TMData(source_uris=tm_data_sources, update=True)
     tmdata_1_gitlab_data = get_osd_data(
         capabilities=[capabilities], tmdata=tm_data, array_assembly=array_assembly
     )
