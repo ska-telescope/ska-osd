@@ -73,7 +73,8 @@
         "number_pss_beams": 0,
         "number_pst_beams": 1,
         "ps_beam_bandwidth_hz": 800000.0,
-        "number_fsps": 4  
+        "number_fsps": 4,
+        "number_test_fsps": 5  
     },
   
     "AA2": {
