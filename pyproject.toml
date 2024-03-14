@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ska-osd"
-version = "1.0.0+dev"
+version = "1.0.0"
 description = "simplest form OSD consists ofguration files that are required by OSO tools."
 authors = ["Dayanand Arade <dayanand_arade@persistent.com>"]
 license= "BSD-3-Clause"
