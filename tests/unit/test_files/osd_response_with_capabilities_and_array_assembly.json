@@ -1,0 +1,67 @@
+{
+    "observatory_policy": {
+        "cycle_number": 1,
+        "cycle_description": "Science Verification",
+        "cycle_information": {
+            "cycle_id": "SKAO_2027_1",
+            "proposal_open": "20260327T12:00:00.000Z",
+            "proposal_close": "20260512T15:00:00.000z"
+        },
+        "cycle_policies": {"normal_max_hours": 100.0},
+        "telescope_capabilities": {"Mid": "AA2", "Low": "AA2"}
+    },
+    "capabilities": {
+        "mid": {
+            "AA0.5": {
+                "available_receivers": ["Band_1", "Band_2"],
+                "number_ska_dishes": 4,
+                "number_meerkat_dishes": 0,
+                "number_meerkatplus_dishes": 0,
+                "max_baseline_km": 1.5,
+                "available_bandwidth_hz": 800000.0,
+                "number_channels": 14880,
+                "number_zoom_windows": 0,
+                "number_zoom_channels": 0,
+                "number_pss_beams": 0,
+                "number_pst_beams": 0,
+                "ps_beam_bandwidth_hz": 0.0,
+                "number_fsps": 4
+            },
+            "basic_capabilities": {
+                "dish_elevation_limit_deg": 15.0,
+                "receiver_information": [
+                    {
+                        "rx_id": "Band_1",
+                        "min_frequency_hz": 350000.0,
+                        "max_frequency_hz": 1050000.0
+                    },
+                    {
+                        "rx_id": "Band_2",
+                        "min_frequency_hz": 950000.0,
+                        "max_frequency_hz": 1760000.0
+                    },
+                    {
+                        "rx_id": "Band_3",
+                        "min_frequency_hz": 1650000.0,
+                        "max_frequency_hz": 3050000.0
+                    },
+                    {
+                        "rx_id": "Band_4",
+                        "min_frequency_hz": 2800000.0,
+                        "max_frequency_hz": 5180000.0
+                    },
+                    {
+                        "rx_id": "Band_5a",
+                        "min_frequency_hz": 4600000.0,
+                        "max_frequency_hz": 8500000.0
+                    },
+                    {
+                        "rx_id": "Band_5b",
+                        "min_frequency_hz": 8300000.0,
+                        "max_frequency_hz": 15400000.0
+                    }
+                ]
+            }
+        }
+    }
+}
