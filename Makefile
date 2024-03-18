@@ -31,17 +31,6 @@ K8S_CHART_PARAMS = --set ska-oso-osd.rest.image.tag=$(VERSION)-dev.c$(CI_COMMIT_
 	--set ska-oso-osd.rest.image.registry=$(CI_REGISTRY)/ska-telescope/oso/ska-oso-osd
 endif
 
-# For the staging environment, make k8s-install-chart-car will pull the chart from CAR so we do not need to
-# change any values
-ENV_CHECK := $(shell echo $(CI_ENVIRONMENT_SLUG) | egrep 'staging')
-ifneq ($(ENV_CHECK),)
-endif
-
-# unset defaults so settings in pyproject.toml take effect
-PYTHON_SWITCHES_FOR_BLACK = --extend-exclude "(src/ska_oso_osd/generated|src/ska_oso_osd/openapi/__submodules__)"
-PYTHON_SWITCHES_FOR_ISORT =
-PYTHON_SWITCHES_FOR_PYLINT =
-
 # Restore Black's preferred line length which otherwise would be overridden by
 # System Team makefiles' 79 character default
 PYTHON_LINE_LENGTH = 88
@@ -56,47 +45,3 @@ PYTHON_LINE_LENGTH = 88
 
 # include your own private variables for custom deployment configuration
 -include PrivateRules.mak
-
-REST_POD_NAME=$(shell kubectl get pods -o name -n $(KUBE_NAMESPACE) -l app=ska-oso-osd,component=rest | cut -c 5-)
-
-k8s-pre-test:
-	kubectl exec $(REST_POD_NAME) -n $(KUBE_NAMESPACE)
-
-k8s-post-test:
-	# kubectl -n $(KUBE_NAMESPACE) exec $(REST_POD_NAME) -- rm 
-
-MINIKUBE_NFS_SHARES_ROOT ?=
-
-# openapi-generator-cli and swagger-cli have a bug where you can't specify
-# multiple supportingFiles, so we need n calls for n generated output groups
-CODEGEN_TARGETS = models \
-	supportingFiles=encoder.py \
-	supportingFiles=base_model_.py \
-	supportingFiles=typing_utils.py \
-	supportingFiles=util.py
-
-
-models:  ## generate models from OpenAPI spec
-	$(foreach var,$(CODEGEN_TARGETS),$(OCI_BUILDER)run --rm --volume "$(MINIKUBE_NFS_SHARES_ROOT)$(PWD):/local" openapitools/openapi-generator-cli \
-		generate \
-		-i /local/src/ska_oso_osd/openapi/osd-openapi-v1.yaml \
-		-g python-flask \
-		-o /local/src \
-		--package-name ska_oso_osd.generated \
-		--global-property "$(var),generateSourceCodeOnly=true" ;)
-
-#models: ## generate models from OpenAPI spec
-#	docker run --rm --volume "$(PWD):/local" swaggerapi/swagger-codegen-cli-v3 generate \
-#		-i /local/src/ska_oso_osd/swagger/osd-openapi-v1.yaml \
-#		-l python-flask \
-#		-c /local/codegen-conf.json \
-#		-o /local/src/ska_oso_osd \
-#		-Dmodels --model-package=models
-#	find ./src/ska_oso_osd/generated/models/*.py -exec sed -i "" 's/from generated/from ska_oso_osd.generated/' {} +
-
-dev-up: K8S_CHART_PARAMS = \
-	--set ska-oso-osd.rest.image.tag=$(VERSION) \
-	--set ska-oso-osd.rest.ingress.enabled=true
-dev-up: k8s-namespace ## bring up developer deployment
-
-dev-down: k8s-delete-namespace  ## tear down developer deployment
