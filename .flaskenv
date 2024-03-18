@@ -1,0 +1,2 @@
+FLASK_APP=ska_oso_osd:app
+FLASK_ENV=development
