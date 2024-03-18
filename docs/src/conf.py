@@ -4,7 +4,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath("../../src"))
 
-project = "ska-osd"
+project = "ska-oso-osd"
 copyright = "2024, SKAO"
 author = "Dayanand Arade <dayanand_arade@persistent.com>"
 release = "0.0.1"

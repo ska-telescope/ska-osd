@@ -7,8 +7,8 @@ info:
     url: https://opensource.org/licenses/BSD-3-Clause
   version: 1.0.0
 servers:
-# This default is overwritten when the application is deployed to include the actual namespace if it is different to the 'ska-osd' default
-- url: /ska-osd/api/v1/
+# This default is overwritten when the application is deployed to include the actual namespace if it is different to the 'ska-oso-osd' default
+- url: /ska-oso-osd/api/v1/
 paths:
   /osd:
     get:
