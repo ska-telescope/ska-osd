@@ -31,7 +31,8 @@ K8S_CHART_PARAMS = --set ska-oso-osd.rest.image.tag=$(VERSION)-dev.c$(CI_COMMIT_
 	--set ska-oso-osd.rest.image.registry=$(CI_REGISTRY)/ska-telescope/oso/ska-oso-osd
 endif
 
-# For the staging environment
+# For the staging environment, make k8s-install-chart-car will pull the chart from CAR so we do not need to
+# change any values
 ENV_CHECK := $(shell echo $(CI_ENVIRONMENT_SLUG) | egrep 'staging')
 ifneq ($(ENV_CHECK),)
 endif
@@ -109,6 +110,6 @@ models:  ## generate models from OpenAPI spec
 dev-up: K8S_CHART_PARAMS = \
 	--set ska-oso-osd.rest.image.tag=$(VERSION) \
 	--set ska-oso-osd.rest.ingress.enabled=true
-dev-up: k8s-namespace ## bring up developer deployment
+dev-up: k8s-namespace k8s-wait ## bring up developer deployment
 
 dev-down: k8s-delete-namespace  ## tear down developer deployment
