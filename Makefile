@@ -46,12 +46,6 @@ PYTHON_SWITCHES_FOR_PYLINT =
 # System Team makefiles' 79 character default
 PYTHON_LINE_LENGTH = 88
 
-# Set the k8s test command run inside the testing pod to only run the component
-# tests (no k8s pod deployment required for unit tests)
-K8S_TEST_TEST_COMMAND = KUBE_NAMESPACE=$(KUBE_NAMESPACE) pytest ./tests/component | tee pytest.stdout
-
-# Set python-test make target to run unit tests and not the component tests
-PYTHON_TEST_FILE = tests/unit/
 
 # include makefile to pick up the standard Make targets from the submodule
 
@@ -66,11 +60,10 @@ PYTHON_TEST_FILE = tests/unit/
 REST_POD_NAME=$(shell kubectl get pods -o name -n $(KUBE_NAMESPACE) -l app=ska-oso-osd,component=rest | cut -c 5-)
 
 k8s-pre-test:
-	kubectl exec $(REST_POD_NAME) -n $(KUBE_NAMESPACE) -- mkdir -p /var/lib/oda/prsl/prsl-1234
-	kubectl cp tests/unit/testfile_sample_proposal.json $(KUBE_NAMESPACE)/$(REST_POD_NAME):/var/lib/oda/prsl/prsl-1234/1.json
+	kubectl exec $(REST_POD_NAME) -n $(KUBE_NAMESPACE)
 
 k8s-post-test:
-	# kubectl -n $(KUBE_NAMESPACE) exec $(REST_POD_NAME) -- rm -r /var/lib/oda/prsl/
+	# kubectl -n $(KUBE_NAMESPACE) exec $(REST_POD_NAME) -- rm 
 
 MINIKUBE_NFS_SHARES_ROOT ?=
 
