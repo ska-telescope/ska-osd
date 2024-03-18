@@ -53,7 +53,7 @@ def init_app(open_api_spec=None):
         # The base path includes the namespace which is known at runtime
         # to avoid clashes in deployments, for example in CICD
         base_path=f"/{API_PATH}",
-        arguments={"title": "OpenAPI ODT"},
+        arguments={"title": "OpenAPI OSD"},
         validator_map=validator_map,
         pythonic_params=True,
     )
