@@ -25,13 +25,12 @@ jsonschema = "4.17.3"
 ska-telmodel = "^1.13.0"
 
 [tool.poetry.group.dev.dependencies]
-black = "^22.6.0"
 pylint = "^2.8.2"
 pytest = "^7.1.0"
 pytest-bdd = "^4.1.0"
 pytest-cov = "^2.10.1"
-isort = "^5.6.4"
-flake8 = "^5.0.4"
+isort = "^5.10.1"
+flake8 = "^7.0.0"
 pylint-junit = "^0.3.2"
 coverage = "^6.1.1"
 pytest-json-report = "^1.4.1"
@@ -54,12 +53,6 @@ sphinx_autodoc_typehints = "^2.0.0"
 [tool.pytest.ini_options]
 addopts = "-v"
 
-[tool.flake8]
-docstring-style = "sphinx"
-rst-directives = "literalinclude"
-rst-roles = ["py:attr", "py:class", "py:const", "py:exc", "py:func", "py:meth", "py:mod"]
-enable = "DAR104"
-max-complexity = 10
 
 # E203 and W503 conflict with black
 ignore = ["E203", "W503"]
