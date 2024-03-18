@@ -45,7 +45,6 @@ requests-mock = "^1.9.3"
 
 [tool.poetry.group.docs.dependencies]
 recommonmark = "^0.7.1"
-sphinxcontrib-openapi = "^0.8.1"
 ska-ser-sphinx-theme = "^0.1.2"
 
 
