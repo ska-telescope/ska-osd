@@ -5,8 +5,6 @@ ifndef PYTHON_SRC
 PYTHON_SRC ?= src
 endif
 
-K8S_INSTALL_CHART := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))/.make-k8s-install-chart
-
 K8S_SUPPORT := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))/.make-k8s-support
 BASE := $(shell pwd)
 K8S_HELM_REPOSITORY ?= https://artefact.skao.int/repository/helm-internal
@@ -20,7 +18,7 @@ ifeq ($(strip $(CI_JOB_ID)),)
 else
 	K8S_TEST_RUNNER ?= test-makefile-runner-$(CI_JOB_ID)##name of the pod running the k8s-tests
 endif
-K8S_TEST_RUNNER_ADD_ARGS ?=## Additional arguments passed to the K8S test runner
+K8S_TEST_RUNNER_ADD_ARGS ?= ## Additional arguments passed to the K8S test runner
 
 # LINTING_OUTPUT=$(shell helm lint charts/* | grep ERROR -c | tail -1)
 ifeq ($(strip $(PROJECT)),)
@@ -38,60 +36,17 @@ else
 	K8S_TEST_IMAGE_TO_TEST ?= $(CAR_OCI_REGISTRY_HOST)/$(NAME):$(VERSION)## docker image that will be run for testing purpose
 endif
 K8S_CHART ?= $(NAME)## selected chart
-K8S_CHARTS ?= $(K8S_CHART)## list of charts
-K8S_UMBRELLA_CHART_PATH ?= ./charts/$(K8S_CHART)/## path to umbrella chart used for testing
+K8S_CHARTS ?= $(K8S_CHART) ## list of charts
+K8S_UMBRELLA_CHART_PATH ?= ./charts/$(K8S_CHART)/ ## path to umbrella chart used for testing
 KUBE_APP ?= $(NAME)## Kubernetes app label name
-K8S_TIMEOUT ?= 360s## kubectl wait timeout - 6 minutes
-K8S_WAIT_FAIL_IF_JOB_MISSING ?= false
-K8S_CHART_PARAMS ?=## Additional helm chart parameters
-K8S_TEST_AUX_DIRS ?=## Additional directories to transfer to the testpod
+K8S_TIMEOUT ?= 360s ## kubectl wait timeout - 6 minutes
+K8S_CHART_PARAMS ?= ## Additional helm chart parameters
+K8S_TEST_AUX_DIRS ?= ## Additional directories to transfer to the testpod
 K8S_SKIP_NAMESPACE ?= false##Skips namespace related targets if set
-K8S_USE_HELMFILE ?= false##Set to install with helmfile
-K8S_HELMFILE_NAME ?= helmfile.yaml##Set the helmfile object to install (yaml, yaml.gotmpl, .d/)
-K8S_HELMFILE ?= $(realpath $(K8S_UMBRELLA_CHART_PATH))/$(K8S_HELMFILE_NAME)
-K8S_HELMFILE_ENV ?= default##Set the helmfile environment to install
-K8S_HELMFILE_DEFAULT_TO_UMBRELLA ?= false##Set to install the umbrella chart if the helmfile is not found
-HELMFILE_EXISTS ?= $(shell ls $(K8S_HELMFILE) >/dev/null 2>&1 && echo true || echo false)
-USING_HELMFILE ?= false
-ifeq ($(K8S_USE_HELMFILE),true)
-ifeq ($(HELMFILE_EXISTS),false)
-ifeq ($(K8S_HELMFILE_DEFAULT_TO_UMBRELLA),true)
-$(warning Helmfile not found at $(K8S_HELMFILE), defaulting to install $(K8S_UMBRELLA_CHART_PATH) chart)
-else
-$(error Helmfile not found at $(K8S_HELMFILE))
-endif
-else
-USING_HELMFILE := true
-endif
-endif
-
-K8S_AUTH_NAMESPACES ?= $(KUBE_NAMESPACE)
-# Create a 32 char name for the service account
-K8S_AUTH_SERVICE_ACCOUNT ?= $(K8S_AUTH_NAMESPACES)
-K8S_AUTH_SERVICE_ACCOUNT := $(shell echo "$(K8S_AUTH_SERVICE_ACCOUNT)" | sed "s|\(_\|\.\| \|/\)|-|g" | head -c 29)-sa
-K8S_AUTH_SCRIPT ?= file://$(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))/resources/namespace_auth.sh
 
 MARK ?= all## this variable sets the mark parameter in the pytest
-FILE ?=##this variable sets the execution of a single file in the pytest
+FILE ?= ##this variable sets the execution of a single file in the pytest
 COUNT ?= 1## amount of repetition for pytest-repeat
-
-K8S_DEFAULT_NAMESPACE_RESOURCES ?= all,pvc,ingress
-SKA_TANGO_OPERATOR_DEPLOYED ?= false
-K8S_NAMESPACE_HAS_OPERATOR_RESOURCES ?=
-KUBECTL_EXISTS := $(shell which kubectl 2>&1 > /dev/null && echo "true" || echo "false")
-
-ifeq ($(strip $(KUBECTL_EXISTS)),true)
-SKA_TANGO_OPERATOR_DEPLOYED:=$(shell [ $$(kubectl api-resources 2>&1 | grep tango.tango-controls.org | wc -l) -gt 0 ] && echo "true" || echo "false")## Tells if the cluster has the operator
-ifeq ($(strip $(SKA_TANGO_OPERATOR_DEPLOYED)),true)
-$(info Detected the SKA Tango Operator in the k8s cluster)
-K8S_OPERATOR_NAMESPACE_RESOURCES:=databaseds.tango.tango-controls.org,deviceservers.tango.tango-controls.org,
-ifeq ($(strip $(K8S_NAMESPACE_HAS_OPERATOR_RESOURCES)),)
-K8S_NAMESPACE_HAS_OPERATOR_RESOURCES := $(shell [ $$(kubectl get databaseds.tango.tango-controls.org,deviceservers.tango.tango-controls.org -n $(KUBE_NAMESPACE) 2>&1 | wc -l) -gt 0 ] && echo "true" || echo "false")
-endif
-endif
-endif
-
-K8S_NAMESPACE_RESOURCES ?= $(K8S_OPERATOR_NAMESPACE_RESOURCES)$(K8S_DEFAULT_NAMESPACE_RESOURCES)
 
 # ST-1258: Define a variable that allows projects importing this module
 # that override K8S_TEST_TEST_COMMAND to also define from which folder
@@ -104,18 +59,15 @@ K8S_RUN_TEST_FOLDER ?= ./
 K8S_TEST_TEST_COMMAND ?= $(PYTHON_VARS_BEFORE_PYTEST) $(PYTHON_RUNNER) \
 						pytest \
 						$(PYTHON_VARS_AFTER_PYTEST) ./tests \
-						| tee pytest.stdout ## k8s-test test command to run in container
-
+						 | tee pytest.stdout ## k8s-test test command to run in container
 # example alternative using a Makefile located in tests/
-# K8S_TEST_TARGET ?= test## Makefile target fore test in ./tests/Makefile
-# K8S_TEST_MAKE_PARAMS ?=## Parameters to pass into the make target inside k8s-test from ./tests/Makefile
+# K8S_TEST_TARGET ?= test ## Makefile target fore test in ./tests/Makefile
+# K8S_TEST_MAKE_PARAMS ?= ## Parameters to pass into the make target inside k8s-test from ./tests/Makefile
 # K8S_TEST_TEST_COMMAND ?= make -s \
 # 			$(K8S_TEST_MAKE_PARAMS) \
 # 			$(K8S_TEST_TARGET)
 
-.PHONY: k8s-vars k8s-namespace k8s-delete-namespace k8s-clean k8s-dep-build k8s-install-chart k8s-template-chart \
-k8s-uninstall-chart k8s-bounce k8s-reinstall-chart k8s-upgrade-chart k8s-wait k8s-watch k8s-describe k8s-podlogs \
-k8s-smoke-test k8s-interactive k8s-info k8s-get k8s-namespace-credentials
+.PHONY: k8s-vars k8s-namespace k8s-delete-namespace k8s-clean k8s-dep-update k8s-install-chart k8s-template-chart k8s-uninstall-chart k8s-bounce k8s-reinstall-chart k8s-upgrade-chart k8s-wait k8s-watch k8s-describe k8s-podlogs k8s-smoke-test k8s-interactive
 
 ## TARGET: k8s-chart-version
 ## SYNOPSIS: make k8s-chart-version
@@ -150,13 +102,6 @@ k8s-vars: ## Which kubernetes are we connected to
 	@echo "Charts: $(K8S_CHARTS)"
 	@echo "Chart params: $(K8S_CHART_PARAMS)"
 	@echo "kubectl wait timeout: $(K8S_TIMEOUT)"
-	@echo ""
-	@echo "Helmfile version:"
-	@helmfile --version
-ifeq ($(HELMFILE_EXISTS),true)
-	@echo "Helmfile: $(K8S_HELMFILE)"
-	@echo "Environment: $(K8S_HELMFILE_ENV)"
-endif
 
 ## TARGET: k8s-namespace
 ## SYNOPSIS: make k8s-namespace
@@ -179,30 +124,6 @@ k8s-namespace: ## create the kubernetes namespace
 			else \
 				kubectl create namespace $(KUBE_NAMESPACE); \
 			fi; \
-	fi
-
-## TARGET: k8s-namespace-credentials
-## SYNOPSIS: make k8s-namespace-credentials
-## HOOKS: none
-## VARS:
-##       K8S_NAMESPACES=<Kubernetes Namespace to add to the credentials> - default is KUBE_NAMESPACE
-##		 K8S_SERVICE_ACCOUNT=<name of the k8s service account> - default is concatenation of the namespaces with "-sa" suffix
-##
-##  Create a Kubeconfig scoped to a namespace.
-##  If you don't have enough permissions to create namespace, set K8S_SKIP_NAMESPACE flag
-
-k8s-namespace-credentials: ## create the kubernetes credentials
-	@if [ -z "$(K8S_AUTH_NAMESPACES)" ]; then \
-		echo "K8S_NAMESPACES is required!"; \
-		exit 1; \
-	elif [ -z "$(K8S_AUTH_SERVICE_ACCOUNT)" ]; then \
-		echo "K8S_SERVICE_ACCOUNT is required!"; \
-		exit 1; \
-	else \
-		echo "Creating Kubernetes credentials for:"; \
-		echo "Namespaces: $(K8S_AUTH_NAMESPACES)"; \
-		echo "Service Account: $(K8S_AUTH_SERVICE_ACCOUNT)"; \
-		curl -s $(K8S_AUTH_SCRIPT) | bash -s $(K8S_AUTH_SERVICE_ACCOUNT) $(K8S_AUTH_NAMESPACES); \
 	fi
 
 ## TARGET: k8s-delete-namespace
@@ -238,6 +159,8 @@ k8s-delete-namespace: ## delete the kubernetes namespace
 
 k8s-clean: ## clean out temp files
 	@rm -rf ./charts/*/charts/*.tgz \
+		./charts/*/Chart.lock \
+		./charts/*/requirements.lock \
 		./repository/* \
 		./.eggs \
 		./charts/build \
@@ -254,33 +177,38 @@ k8s-clean: ## clean out temp files
 		.pytest_cache \
 		.coverage
 
+k8s-pre-dep-update:
 
-## TARGET: k8s-dep-build
-## SYNOPSIS: make k8s-dep-build
-## HOOKS: k8s-pre-dep-build, k8s-post-dep-build
+k8s-post-dep-update:
+
+k8s-do-dep-update:
+	@echo "k8s-dep-update: updating dependencies"
+	@cd charts; \
+	for i in $(K8S_CHARTS); do \
+		echo "+++ Updating $${i} chart +++"; \
+		helm dependency update $${i}; \
+	done;
+
+## TARGET: k8s-dep-update
+## SYNOPSIS: make k8s-dep-update
+## HOOKS: k8s-pre-dep-update, k8s-post-dep-update
 ## VARS:
 ##       K8S_CHARTS=<list of chart names for ./charts directory> - defaults to repository name
 ##
-##  Iterate over K8S_CHARTS list of chart names and pull and build the sub-chart
+##  Iterate over K8S_CHARTS list of chart names and pull and update the sub-chart
 ##  dependencies described in each respective Chart.yaml file.
 
-k8s-pre-dep-build:
+k8s-dep-update: k8s-pre-dep-update k8s-do-dep-update k8s-post-dep-update ## update dependencies for every charts in the env var K8S_CHARTS
 
-k8s-post-dep-build:
+k8s-pre-install-chart:
 
-k8s-do-dep-build:
-	@echo "k8s-dep-build: building dependencies"
-	@cd charts; \
-	for i in $(K8S_CHARTS); do \
-		if [[ -f "$${i}/Chart.lock" ]]; then \
-			yq --indent 0 '[.dependencies.[] | select(.repository | test("^file:") | not)] | map(["helm", "repo", "add", .name, .repository] | join(" ")) | .[]' "$${i}/Chart.lock" | sh --; \
-		fi; \
-		echo "+++ Building $${i} chart +++"; \
-		helm dependency build $${i}; \
-	done;
+k8s-post-install-chart:
 
-k8s-dep-build: k8s-pre-dep-build k8s-do-dep-build k8s-post-dep-build ## build dependencies for every charts in the env var K8S_CHARTS
-
+k8s-do-install-chart: k8s-clean k8s-dep-update k8s-namespace
+	@echo "install-chart: install $(K8S_UMBRELLA_CHART_PATH) release: $(HELM_RELEASE) in Namespace: $(KUBE_NAMESPACE) with params: $(K8S_CHART_PARAMS)"
+	helm upgrade --install $(HELM_RELEASE) \
+	$(K8S_CHART_PARAMS) \
+	 $(K8S_UMBRELLA_CHART_PATH) --namespace $(KUBE_NAMESPACE)
 
 ## TARGET: k8s-install-chart
 ## SYNOPSIS: make k8s-install-chart
@@ -295,79 +223,19 @@ k8s-dep-build: k8s-pre-dep-build k8s-do-dep-build k8s-post-dep-build ## build de
 ##  Deploy an instance (HELM_RELEASE) of a given Helm Chart into a specified Kubernetes
 ##  Namespace (KUBE_NAMESPACE), with a configurable set of parameters (K8S_CHART_PARAMS).
 
-k8s-pre-install-chart:
-
-k8s-post-install-chart:
-
-ifeq ($(USING_HELMFILE),true)
-k8s-do-install-chart: k8s-clean k8s-namespace
-	@echo "install-chart: install $(K8S_HELMFILE) in Namespace: $(KUBE_NAMESPACE) with environment: $(K8S_HELMFILE_ENV) and params: $(K8S_CHART_PARAMS)"
-	helmfile sync -f $(K8S_HELMFILE) \
-	-e $(K8S_HELMFILE_ENV) \
-	-n $(KUBE_NAMESPACE) \
-	$(K8S_CHART_PARAMS)
-else
-k8s-do-install-chart: k8s-clean k8s-dep-build k8s-namespace
-	@echo "install-chart: install $(K8S_UMBRELLA_CHART_PATH) release: $(HELM_RELEASE) in Namespace: $(KUBE_NAMESPACE) with params: $(K8S_CHART_PARAMS)"
-	helm upgrade --install $(HELM_RELEASE) \
-	$(K8S_CHART_PARAMS) \
-	 $(K8S_UMBRELLA_CHART_PATH) --namespace $(KUBE_NAMESPACE)
-endif
-
 k8s-install-chart: k8s-pre-install-chart k8s-do-install-chart k8s-post-install-chart ## install the helm chart with name HELM_RELEASE and path K8S_UMBRELLA_CHART_PATH on the namespace KUBE_NAMESPACE
-
-## TARGET: k8s-install-chart-car
-## SYNOPSIS: make k8s-install-chart-car
-## HOOKS: k8s-pre-install-chart-car:, k8s-post-install-chart-car
-## VARS:
-##       KUBE_NAMESPACE=<Kubernetes Namespace to deploy to> - default is project name (directory)
-##       K8S_CHART_PARAMS=<list of additional parameters to pass to helm> - default empty
-##       K8S_CHART=chart name - default on the repository's Makefile
-##       K8S_HELM_REPOSITORY= Helm repository to retrieve the chart - defaults to 'https://artefact.skao.int/repository/helm-internal'
-##
-##  Deploys a chart from CAR(https://artefact.skao.int/repository/helm-internal)
-
-k8s-pre-install-chart-car:
-
-k8s-post-install-chart-car:
-
-ifeq ($(USING_HELMFILE),true)
-k8s-do-install-chart-car:
-	@echo "Installing from CAR is not supported yet using HELMFILE"
-	@exit 1
-else
-k8s-do-install-chart-car: k8s-clean k8s-dep-build k8s-namespace
-	@. $(K8S_INSTALL_CHART); K8S_CHART_PARAMS="$(K8S_CHART_PARAMS)" \
-	KUBE_NAMESPACE=$(KUBE_NAMESPACE) \
-	K8S_HELM_REPOSITORY=$(K8S_HELM_REPOSITORY) \
-	HELM_RELEASE=$(HELM_RELEASE) \
-	K8S_CHART=$(K8S_CHART) \
-	k8sChartInstall
-endif
-
-k8s-install-chart-car: k8s-pre-install-chart-car k8s-do-install-chart-car k8s-post-install-chart-car
 
 k8s-pre-template-chart:
 
 k8s-post-template-chart:
 
-ifeq ($(USING_HELMFILE),true)
-k8s-do-template-chart: k8s-clean
-	@echo "install-chart: install $(K8S_HELMFILE) in Namespace: $(KUBE_NAMESPACE) with environment: $(K8S_HELMFILE_ENV) and params: $(K8S_CHART_PARAMS)"
-	kubectl create ns $(KUBE_NAMESPACE) --dry-run=client -o yaml | tee manifests.yaml; \
-	helmfile template -f $(K8S_HELMFILE) \
-	-e $(K8S_HELMFILE_ENV) \
-	-n $(KUBE_NAMESPACE) \
-	$(K8S_CHART_PARAMS) | tee -a manifests.yaml
-else
-k8s-do-template-chart: k8s-clean k8s-dep-build
+k8s-do-template-chart: k8s-clean k8s-dep-update
 	@echo "template-chart: install $(K8S_UMBRELLA_CHART_PATH) release: $(HELM_RELEASE) in Namespace: $(KUBE_NAMESPACE) with params: $(K8S_CHART_PARAMS)"
 	kubectl create ns $(KUBE_NAMESPACE) --dry-run=client -o yaml | tee manifests.yaml; \
 	helm template $(HELM_RELEASE) \
 	$(K8S_CHART_PARAMS) \
 	--debug \
 	 $(K8S_UMBRELLA_CHART_PATH) --namespace $(KUBE_NAMESPACE) | tee -a manifests.yaml
-endif
 
 ## TARGET: k8s-template-chart
 ## SYNOPSIS: make k8s-template-chart
@@ -396,17 +264,9 @@ k8s-pre-uninstall-chart:
 
 k8s-post-uninstall-chart:
 
-ifeq ($(USING_HELMFILE),true)
-k8s-do-uninstall-chart:
-	@echo "uninstall-chart: uninstall $(K8S_HELMFILE) in Namespace: $(KUBE_NAMESPACE)"
-	@helmfile delete -f $(K8S_HELMFILE) \
-	-e $(K8S_HELMFILE_ENV) \
-	-n $(KUBE_NAMESPACE)
-else
 k8s-do-uninstall-chart:
 	@echo "uninstall-chart: release: $(HELM_RELEASE) in Namespace: $(KUBE_NAMESPACE)"
 	@helm uninstall  $(HELM_RELEASE) --namespace $(KUBE_NAMESPACE) || true
-endif
 
 ## TARGET: k8s-uninstall-chart
 ## SYNOPSIS: make k8s-uninstall-chart
@@ -438,9 +298,9 @@ k8s-upgrade-chart: k8s-install-chart ## upgrade the test-parent helm chart on th
 ##  the wait times outs.
 
 k8s-wait: ## wait for Jobs and Pods to be ready in KUBE_NAMESPACE
-	@. $(K8S_SUPPORT); K8S_TIMEOUT=$(K8S_TIMEOUT) \
+	@. $(K8S_SUPPORT) ; K8S_TIMEOUT=$(K8S_TIMEOUT) \
 		KUBE_APP=$(KUBE_APP) \
-		k8sWait $(KUBE_NAMESPACE) $(K8S_NAMESPACE_HAS_OPERATOR_RESOURCES) $(K8S_WAIT_FAIL_IF_JOB_MISSING)
+		k8sWait $(KUBE_NAMESPACE)
 
 ## TARGET: k8s-watch
 ## SYNOPSIS: make k8s-watch
@@ -451,20 +311,7 @@ k8s-wait: ## wait for Jobs and Pods to be ready in KUBE_NAMESPACE
 ##  watch resources in KUBE_NAMESPACE using kubectl.
 
 k8s-watch: ## watch all resources in the KUBE_NAMESPACE
-	@echo "Watching the following resources '$(K8S_NAMESPACE_RESOURCES)' for '$(KUBE_NAMESPACE)'"
-	@watch kubectl get $(K8S_NAMESPACE_RESOURCES) -n $(KUBE_NAMESPACE)
-
-## TARGET: k8s-get
-## SYNOPSIS: make k8s-get
-## HOOKS: none
-## VARS:
-##       KUBE_NAMESPACE=<Kubernetes Namespace to deploy to> - default is project name (directory)
-##
-##  get resources in KUBE_NAMESPACE using kubectl.
-
-k8s-get: ## get all resources in the KUBE_NAMESPACE
-	@echo "Getting the following resources: $(K8S_NAMESPACE_RESOURCES) for '$(KUBE_NAMESPACE)'"
-	@kubectl get $(K8S_NAMESPACE_RESOURCES) -n $(KUBE_NAMESPACE)
+	watch kubectl get all,pv,pvc,ingress -n $(KUBE_NAMESPACE)
 
 ## TARGET: k8s-describe
 ## SYNOPSIS: make k8s-describe
@@ -566,9 +413,12 @@ k8s-do-test:
 	@exit `cat build/status`
 
 k8s-do-test-runner:
+##  Cleanup
 	@rm -fr build; mkdir build
 	@find ./$(k8s_test_folder) -name "*.pyc" -type f -delete
-	@if [[ -f pyproject.toml ]]; then \
+
+##  Install requirements
+	if [[ -f pyproject.toml ]]; then \
 		poetry config virtualenvs.create false; \
 		echo 'k8s-test: installing poetry dependencies';  \
 		poetry install; \
@@ -577,15 +427,15 @@ k8s-do-test-runner:
 			pip install -qUr $(k8s_test_folder)/requirements.txt; \
 		fi; \
 	fi;
-	export PYTHONPATH=${PYTHONPATH}:/app/src$(k8s_test_src_dirs); \
-	mkdir -p build; \
-	cd $(K8S_RUN_TEST_FOLDER); \
-	set -o pipefail; \
-	$(K8S_TEST_TEST_COMMAND); \
-	echo $$? > $(BASE)/build/status; \
-	pip list > build/pip_list.txt;
-	@echo "k8s_test_command: test command exit is: $$(cat $(BASE)/build/status)"
-	@exit `cat build/status`
+
+##  Run tests
+	export PYTHONPATH=${PYTHONPATH}:/app/src$(k8s_test_src_dirs)
+	mkdir -p build
+	cd $(K8S_RUN_TEST_FOLDER) && $(K8S_TEST_TEST_COMMAND); echo $$? > $(BASE)/build/status
+
+##  Post tests reporting
+	pip list > build/pip_list.txt
+	@echo "k8s_test_command: test command exit is: $$(cat build/status)"
 
 k8s-pre-test:
 
@@ -695,28 +545,3 @@ k8s-get-size-images: ## get a list of images together with their size (both loca
 
 k8s-interactive: ## run the ipython command in the itango console available with the tango-base chart
 	@kubectl exec -it ska-tango-base-itango-console -c itango -n $(KUBE_NAMESPACE) -- itango3
-
-## TARGET: k8s-info
-## SYNOPSIS: make k8s-info
-## HOOKS: none
-## VARS:
-##       KUBE_NAMESPACE=<Target Kubernetes namespace> - default is project name (directory)
-##
-##  Displays pods, images, databaseds and helm charts that belong to a namespace.
-##  Also gives links to grafana and kibana dashboards for that namespace
-
-k8s-info:
-	@echo ***Gathering information for namespace: $(KUBE_NAMESPACE)***
-	@echo
-	@kubectl get pods -n $(KUBE_NAMESPACE) -o jsonpath="{range .items[*]}{'OCI images for pod '}{.metadata.name}:{'\n'}{range .spec.containers[*]}{'\t'}{.image}{end}{'\n'}{end}{'\n'}"
-	@DS=`kubectl get svc -n $(KUBE_NAMESPACE) -o json | jq -r '.items[] | select(.spec.ports[].port==10000) | select(.metadata.name|contains("databaseds")) | .metadata.name'`; \
-	echo DatabaseDS: $$DS
-	@echo
-	@echo Installed Helm charts:
-	@helm list -n $(KUBE_NAMESPACE) -o json | jq -r '.[] | "   " + (.name) + ":\n      Chart: " + (.chart) + "\n      App Version: " + (.app_version)'
-	@echo
-	@if [[ "$(CI_RUNNER_TAGS)" == *"ska-k8srunner-dp"* ]] || [[ "$(CI_RUNNER_TAGS)" == *"ska-k8srunner-dp-gpu-a100"* ]] ; then \
-		. $(K8S_SUPPORT) ; CLUSTER=stfc-dp-ska-monitor KUBE_NAMESPACE=$(KUBE_NAMESPACE) getDashboardLinksForNamespace ; \
-	elif [[ "$(CI_RUNNER_TAGS)" == *"k8srunner"* ]] || [[ "$(CI_RUNNER_TAGS)" == *"k8srunner-gpu-v100"* ]] ; then \
-		. $(K8S_SUPPORT) ; CLUSTER=stfc-ska-monitor KUBE_NAMESPACE=$(KUBE_NAMESPACE) getDashboardLinksForNamespace ; \
-	fi
