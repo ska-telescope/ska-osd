@@ -65,12 +65,6 @@ PYTHON_TEST_FILE = tests/unit/
 
 REST_POD_NAME=$(shell kubectl get pods -o name -n $(KUBE_NAMESPACE) -l app=ska-oso-osd,component=rest | cut -c 5-)
 
-# install helm plugin from https://github.com/helm-unittest/helm-unittest.git
-# k8s-chart-test:
-# 	mkdir -p charts/build; \
-# 	helm unittest charts/ska-oso-osd/ --with-subchart \
-# 		--output-type JUnit --output-file charts/build/chart_template_tests.xml
-
 k8s-pre-test:
 	kubectl exec $(REST_POD_NAME) -n $(KUBE_NAMESPACE) -- mkdir -p /var/lib/oda/prsl/prsl-1234
 	kubectl cp tests/unit/testfile_sample_proposal.json $(KUBE_NAMESPACE)/$(REST_POD_NAME):/var/lib/oda/prsl/prsl-1234/1.json
