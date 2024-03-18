@@ -59,8 +59,6 @@ info-staging:
 deploy-dev-environment:
   <<: *dev_env
 
-test-dev-environment:
-  <<: *dev_env
 
 stop-dev-environment:
   <<: *dev_env

@@ -8,7 +8,7 @@ CAR_OCI_REGISTRY_HOST ?= artefact.skao.int
 CAR_OCI_REGISTRY_USERNAME ?= ska-telescope
 PROJECT_NAME = ska-oso-osd
 KUBE_NAMESPACE ?= ska-oso-osd
-RELEASE_NAME ?= test
+KUBE_HOST ?= $(shell minikube ip)
 
 -include .make/base.mk
 -include .make/python.mk
