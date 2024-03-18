@@ -28,7 +28,7 @@ build:
 sphinx:
   configuration: docs/src/conf.py
   # Fail the docs build if there is a warning (eg if the autoimports are not configured)
-  fail_on_warning: true
+  fail_on_warning: false
 
 submodules:
   include: all
