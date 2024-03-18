@@ -10,9 +10,17 @@ PROJECT_NAME = ska-oso-osd
 KUBE_NAMESPACE ?= ska-oso-osd
 RELEASE_NAME ?= test
 
+-include .make/base.mk
+-include .make/python.mk
 # Set sphinx documentation build to fail on warnings (as it is configured
 # in .readthedocs.yaml as well)
 DOCS_SPHINXOPTS ?= -W --keep-going
+
+docs-pre-build:
+	poetry config virtualenvs.create false
+	poetry install --no-root --only docs
+
+.PHONY: docs-pre-build
 
 IMAGE_TO_TEST = $(CAR_OCI_REGISTRY_HOST)/$(strip $(OCI_IMAGE)):$(VERSION)
 K8S_CHART = ska-oso-osd-umbrella
@@ -51,8 +59,7 @@ K8S_TEST_TEST_COMMAND = KUBE_NAMESPACE=$(KUBE_NAMESPACE) pytest ./tests/componen
 PYTHON_TEST_FILE = tests/unit/
 
 # include makefile to pick up the standard Make targets from the submodule
--include .make/base.mk
--include .make/python.mk
+
 -include .make/oci.mk
 -include .make/k8s.mk
 
