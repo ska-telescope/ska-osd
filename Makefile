@@ -104,6 +104,6 @@ models:  ## generate models from OpenAPI spec
 dev-up: K8S_CHART_PARAMS = \
 	--set ska-oso-osd.rest.image.tag=$(VERSION) \
 	--set ska-oso-osd.rest.ingress.enabled=true
-dev-up: k8s-namespace k8s-wait ## bring up developer deployment
+dev-up: k8s-namespace ## bring up developer deployment
 
 dev-down: k8s-delete-namespace  ## tear down developer deployment
