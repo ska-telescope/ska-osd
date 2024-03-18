@@ -1904,25 +1904,6 @@ lint = ["docutils-stubs", "flake8 (>=3.5.0)", "flake8-simplify", "isort", "mypy 
 test = ["cython (>=3.0)", "filelock", "html5lib", "pytest (>=4.6)", "setuptools (>=67.0)"]
 
 [[package]]
-name = "sphinx-autodoc-typehints"
-version = "2.0.0"
-description = "Type hints (PEP 484) support for the Sphinx autodoc extension"
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "sphinx_autodoc_typehints-2.0.0-py3-none-any.whl", hash = "sha256:12c0e161f6fe191c2cdfd8fa3caea271f5387d9fbc67ebcd6f4f1f24ce880993"},
-    {file = "sphinx_autodoc_typehints-2.0.0.tar.gz", hash = "sha256:7f2cdac2e70fd9787926b6e9e541cd4ded1e838d2b46fda2a1bb0a75ec5b7f3a"},
-]
-
-[package.dependencies]
-sphinx = ">=7.1.2"
-
-[package.extras]
-docs = ["furo (>=2023.9.10)"]
-numpy = ["nptyping (>=2.5)"]
-testing = ["covdefaults (>=2.3)", "coverage (>=7.3.2)", "diff-cover (>=8.0.1)", "pytest (>=7.4.3)", "pytest-cov (>=4.1)", "sphobjinv (>=2.3.1)", "typing-extensions (>=4.8)"]
-
-[[package]]
 name = "sphinx-mdinclude"
 version = "0.5.3"
 description = "Markdown extension for Sphinx"
@@ -2299,4 +2280,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "f107eadbe428957adadb403549ba11cab090c5f4bb3596821b77b7031c5caa3a"
+content-hash = "b31fa41a9bfcb8092d5e2ba2584e70d4f24c9e25c4fe526bdf834c8825d3204b"

@@ -48,7 +48,6 @@ requests-mock = "^1.9.3"
 recommonmark = "^0.7.1"
 sphinxcontrib-openapi = "^0.8.1"
 ska-ser-sphinx-theme = "^0.1.2"
-sphinx_autodoc_typehints = "^2.0.0"
 
 
 [tool.pytest.ini_options]
