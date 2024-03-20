@@ -1,3 +1,4 @@
+
 #
 # CAR_OCI_REGISTRY_HOST, CAR_OCI_REGISTRY_USERNAME and PROJECT_NAME are combined to define
 # the Docker tag for this project. The definition below inherits the standard
@@ -8,9 +9,14 @@ CAR_OCI_REGISTRY_HOST ?= artefact.skao.int
 CAR_OCI_REGISTRY_USERNAME ?= ska-telescope
 PROJECT_NAME = ska-oso-osd
 KUBE_NAMESPACE ?= ska-oso-osd
-KUBE_HOST ?= $(shell minikube ip)
+RELEASE_NAME ?= test
 
+# include makefile to pick up the standard Make targets from the submodule
+
+-include .make/helm.mk
 -include .make/base.mk
+-include .make/oci.mk
+-include .make/k8s.mk
 -include .make/python.mk
 # Set sphinx documentation build to fail on warnings (as it is configured
 # in .readthedocs.yaml as well)
@@ -31,17 +37,52 @@ K8S_CHART_PARAMS = --set ska-oso-osd.rest.image.tag=$(VERSION)-dev.c$(CI_COMMIT_
 	--set ska-oso-osd.rest.image.registry=$(CI_REGISTRY)/ska-telescope/oso/ska-oso-osd
 endif
 
+# For the staging environment, make k8s-install-chart-car will pull the chart from CAR so we do not need to
+# change any values
+ENV_CHECK := $(shell echo $(CI_ENVIRONMENT_SLUG) | egrep 'staging')
+ifneq ($(ENV_CHECK),)
+endif
+
+# unset defaults so settings in pyproject.toml take effect
+PYTHON_SWITCHES_FOR_BLACK =
+PYTHON_SWITCHES_FOR_ISORT =
+PYTHON_SWITCHES_FOR_PYLINT =
+
 # Restore Black's preferred line length which otherwise would be overridden by
 # System Team makefiles' 79 character default
 PYTHON_LINE_LENGTH = 88
 
+# Set the k8s test command run inside the testing pod to only run the component
+# tests (no k8s pod deployment required for unit tests)
+K8S_TEST_TEST_COMMAND = KUBE_NAMESPACE=$(KUBE_NAMESPACE) pytest ./tests/component | tee pytest.stdout
 
-# include makefile to pick up the standard Make targets from the submodule
+# Set python-test make target to run unit tests and not the component tests
+PYTHON_TEST_FILE = tests/unit/
 
--include .make/oci.mk
--include .make/k8s.mk
 
--include .make/helm.mk
 
 # include your own private variables for custom deployment configuration
 -include PrivateRules.mak
+
+REST_POD_NAME=$(shell kubectl get pods -o name -n $(KUBE_NAMESPACE) -l app=ska-oso-osd,component=rest | cut -c 5-)
+
+# install helm plugin from https://github.com/helm-unittest/helm-unittest.git
+k8s-chart-test:
+	mkdir -p charts/build; \
+	helm unittest charts/ska-oso-osd/ --with-subchart \
+		--output-type JUnit --output-file charts/build/chart_template_tests.xml
+
+# k8s-pre-test:
+# 	kubectl exec $(REST_POD_NAME) -n $(KUBE_NAMESPACE) -- mkdir -p /var/lib/oda/sbd/sbd-1234
+# 	kubectl cp tests/unit/testfile_sample_mid_sb.json $(KUBE_NAMESPACE)/$(REST_POD_NAME):/var/lib/oda/sbd/sbd-1234/1.json
+
+# k8s-post-test:
+# 	kubectl -n $(KUBE_NAMESPACE) exec $(REST_POD_NAME) -- rm -r /var/lib/oda/sbd/
+
+
+dev-up: K8S_CHART_PARAMS = \
+	--set ska-oso-osd.rest.image.tag=$(VERSION) \
+	--set ska-oso-osd.rest.ingress.enabled=true
+dev-up: k8s-namespace k8s-install-chart k8s-wait ## bring up developer deployment
+
+dev-down: k8s-uninstall-chart k8s-delete-namespace  ## tear down developer deployment
