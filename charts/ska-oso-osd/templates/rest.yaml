@@ -1,7 +1,7 @@
 {{ if .Values.rest.enabled }}
 {{ if .Values.rest.ingress.enabled }}
 ---
-apiVersion: networking.k8s.io/v1
+apiVersion: networking.k8s.io/v2
 kind: Ingress
 metadata:
   name: {{ template "ska-oso-osd.name" . }}-{{ .Values.rest.component }}-{{ .Release.Name }}
@@ -26,7 +26,7 @@ spec:
                   number: 5000
 {{ end }}
 ---
-apiVersion: v1
+apiVersion: v2
 kind: Service
 metadata:
   name: {{ template "ska-oso-osd.name" . }}-{{ .Values.rest.component }}-{{ .Release.Name }}
@@ -44,7 +44,7 @@ spec:
     app: {{ template "ska-oso-osd.name" . }}
     component: {{ .Values.rest.component }}
 ---
-apiVersion: apps/v1
+apiVersion: apps/v2
 kind: Deployment
 metadata:
   name: {{ template "ska-oso-osd.name" . }}-{{ .Values.rest.component }}-{{ .Release.Name }}
