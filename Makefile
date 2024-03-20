@@ -83,6 +83,6 @@ k8s-chart-test:
 dev-up: K8S_CHART_PARAMS = \
 	--set ska-oso-osd.rest.image.tag=$(VERSION) \
 	--set ska-oso-osd.rest.ingress.enabled=true
-dev-up: k8s-namespace k8s-install-chart k8s-wait ## bring up developer deployment
+dev-up: k8s-namespace k8s-install-chart## bring up developer deployment
 
 dev-down: k8s-uninstall-chart k8s-delete-namespace  ## tear down developer deployment
