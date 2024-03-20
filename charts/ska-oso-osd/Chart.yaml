@@ -1,4 +1,4 @@
-apiVersion: v2
+apiVersion: v1
 name: ska-oso-osd
 description: A Helm chart for deploying the OSO Static data on Kubernetes
 type: application
