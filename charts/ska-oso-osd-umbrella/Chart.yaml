@@ -1,4 +1,4 @@
-apiVersion: v2
+apiVersion: v1
 name: ska-oso-osd-umbrella
 description: Helm umbrella chart for the ODT Services
 type: application
