@@ -50,6 +50,7 @@
         "max_baseline_km": 1.5,
         "available_bandwidth_hz": 800000.0,
         "number_channels": 14880,
+        "cbf_modes": ["CORR"],
         "number_zoom_windows": 0,
         "number_zoom_channels": 0,
         "number_pss_beams": 0,
@@ -68,6 +69,7 @@
         "max_baseline_km": 1.5,
         "available_bandwidth_hz": 800000.0,
         "number_channels": 14880,
+        "cbf_modes": ["CORR", "PST_BF"],
         "number_zoom_windows": 0,
         "number_zoom_channels": 0,
         "number_pss_beams": 0,
@@ -87,11 +89,12 @@
          "max_baseline_km": 110.0,
          "available_bandwidth_hz": 800000.0,
          "number_channels": 14880,
+         "cbf_modes": ["CORR", "PST_BF", "PSS_BF"],
          "number_zoom_windows": 16,  
          "number_zoom_channels": 14880, 
          "number_pss_beams": 384,
          "number_pst_beams": 6,
-        "ps_beam_bandwidth_hz": 800000.0,
+         "ps_beam_bandwidth_hz": 800000.0,
          "number_fsps": 4  
      }
 }
