@@ -59,7 +59,7 @@ K8S_TEST_TEST_COMMAND = KUBE_NAMESPACE=$(KUBE_NAMESPACE) pytest ./tests/componen
 # Set python-test make target to run unit tests and not the component tests
 PYTHON_TEST_FILE = tests/unit/
 
-
+K8S_TIMEOUT = 1060s
 
 # include your own private variables for custom deployment configuration
 -include PrivateRules.mak
