@@ -26,7 +26,7 @@ spec:
                   number: 5000
 {{ end }}
 ---
-apiVersion: v2
+apiVersion: v1
 kind: Service
 metadata:
   name: {{ template "ska-oso-osd.name" . }}-{{ .Values.rest.component }}-{{ .Release.Name }}
