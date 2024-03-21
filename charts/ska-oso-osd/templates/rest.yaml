@@ -76,7 +76,7 @@ spec:
         image: "{{ .Values.rest.image.registry }}/{{ .Values.rest.image.image }}:{{$.Values.rest.image.tag | default $.Chart.AppVersion}}"
         imagePullPolicy: {{ .Values.rest.image.pullPolicy }}
         command: [ "/bin/sh" ]
-        args: [ "-c", "poetry run gunicorn --chdir src --bind 0.0.0.0:5000 --logger-class=ska_oso_osd.wsgi.UniformLogger --log-level='{{ .Values.rest.logLevel }}' ska_oso_osd.wsgi:app" ]
+        args: [ "-c", "poetry run gunicorn --chdir src --bind 0.0.0.0:5000 --logger-class=ska_oso_osd.rest.wsgi.UniformLogger --log-level='{{ .Values.rest.logLevel }}' ska_oso_osd.rest.wsgi:app" ]
         envFrom:
           - configMapRef:
               name: {{ template "ska-oso-osd.name" . }}-{{ .Values.rest.component }}-{{ .Release.Name }}-environment
