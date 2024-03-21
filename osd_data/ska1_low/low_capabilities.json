@@ -1,11 +1,65 @@
 {
-  
     "telescope": "Low",
     "basic_capabilities": {
-},
-
-"AA0.5": {},
-"AA1": {},
-"AA2": {}
-
-}
+      "min_frequency_hz": 50000000.0,
+      "max_frequency_hz": 350000000.0
+    },
+    "AA0.5": {
+      "number_stations": 4,
+      "number_substations": 0,
+      "number_beams": 1,
+      "max_baseline_km": 3.0,
+      "available_bandwidth_hz": 75000000.0,
+      "channel_width_hz": 5400,
+      "cbf_modes": [
+        "vis",
+        "pst"
+      ],
+      "number_zoom_windows": 0,
+      "number_zoom_channels": 0,
+      "number_pss_beams": 0,
+      "number_pst_beams": 1,
+      "number_vlbi_beams": 0,
+      "ps_beam_bandwidth_hz": 75000000.0,
+      "number_fsps": 6
+    },
+    "AA1": {
+      "number_stations": 18,
+      "number_substations": 512,
+      "number_beams": 8,
+      "max_baseline_km": 6.0,
+      "available_bandwidth_hz": 75000000.0,
+      "channel_width_hz": 5400,
+      "cbf_modes": [
+        "vis",
+        "pst"
+      ],
+      "number_zoom_windows": 0,
+      "number_zoom_channels": 0,
+      "number_pss_beams": 0,
+      "number_pst_beams": 1,
+      "number_vlbi_beams": 0,
+      "ps_beam_bandwidth_hz": 75000000.0,
+      "number_fsps": 6
+    },
+    "AA2": {
+      "number_stations": 64,
+      "number_substations": 720,
+      "number_beams": 8,
+      "max_baseline_km": 40.0,
+      "available_bandwidth_hz": 150000000.0,
+      "channel_width_hz": 5400,
+      "cbf_modes": [
+        "vis",
+        "pst",
+        "pss"
+      ],
+      "number_zoom_windows": 16,
+      "number_zoom_channels": 1800,
+      "number_pss_beams": 30,
+      "number_pst_beams": 4,
+      "number_vlbi_beams": 0,
+      "ps_beam_bandwidth_hz": 118000000.0,
+      "number_fsps": 10
+    }
+  }
