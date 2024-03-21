@@ -21,7 +21,7 @@ osd_response_template = {
 }
 
 
-BASE_URL = "//gitlab.com/ska-telescope/oso/ska-oso-osd?"
+BASE_URL = "//gitlab.com/ska-telescope/ost/ska-ost-osd?"
 BASE_FOLDER_NAME = "osd_data"
 
 source_list = ["file", "car", "gitlab"]

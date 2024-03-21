@@ -5,8 +5,8 @@ from typing import Any, Dict
 import prance
 from connexion import App
 
-KUBE_NAMESPACE = os.getenv("KUBE_NAMESPACE", "ska-oso-osd")
-ODA_MAJOR_VERSION = version("ska-oso-osd").split(".")[0]
+KUBE_NAMESPACE = os.getenv("KUBE_NAMESPACE", "ska-ost-osd")
+ODA_MAJOR_VERSION = version("ska-ost-osd").split(".")[0]
 API_PATH = f"{KUBE_NAMESPACE}/api/v{ODA_MAJOR_VERSION}"
 
 

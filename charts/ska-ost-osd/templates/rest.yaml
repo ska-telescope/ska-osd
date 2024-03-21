@@ -4,10 +4,10 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ template "ska-oso-osd.name" . }}-{{ .Values.rest.component }}-{{ .Release.Name }}
+  name: {{ template "ska-ost-osd.name" . }}-{{ .Values.rest.component }}-{{ .Release.Name }}
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "ska-oso-osd.labels" . | indent 4 }}
+    {{- include "ska-ost-osd.labels" . | indent 4 }}
     component: {{ .Values.rest.component }}
     function: {{ .Values.rest.function }}
     domain: {{ .Values.rest.domain }}
@@ -22,7 +22,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{ template "ska-oso-osd.name" . }}-{{ .Values.rest.component }}-{{ .Release.Name }}
+                name: {{ template "ska-ost-osd.name" . }}-{{ .Values.rest.component }}-{{ .Release.Name }}
                 port:
                   number: 5000
 {{ end }}
@@ -30,10 +30,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "ska-oso-osd.name" . }}-{{ .Values.rest.component }}-{{ .Release.Name }}
+  name: {{ template "ska-ost-osd.name" . }}-{{ .Values.rest.component }}-{{ .Release.Name }}
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "ska-oso-osd.labels" . | indent 4 }}
+    {{- include "ska-ost-osd.labels" . | indent 4 }}
     component: {{ .Values.rest.component }}
     function: {{ .Values.rest.function }}
     domain: {{ .Values.rest.domain }}
@@ -42,16 +42,16 @@ spec:
   ports:
   - port: 5000
   selector:
-    app: {{ template "ska-oso-osd.name" . }}
+    app: {{ template "ska-ost-osd.name" . }}
     component: {{ .Values.rest.component }}
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ template "ska-oso-osd.name" . }}-{{ .Values.rest.component }}-{{ .Release.Name }}
+  name: {{ template "ska-ost-osd.name" . }}-{{ .Values.rest.component }}-{{ .Release.Name }}
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "ska-oso-osd.labels" . | indent 4 }}
+    {{- include "ska-ost-osd.labels" . | indent 4 }}
     component: {{ .Values.rest.component }}
     function: {{ .Values.rest.function }}
     domain: {{ .Values.rest.domain }}
@@ -59,13 +59,13 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: {{ template "ska-oso-osd.name" . }}
+      app: {{ template "ska-ost-osd.name" . }}
       component: {{ .Values.rest.component }}
   replicas: 1
   template:
     metadata:
       labels:
-        {{- include "ska-oso-osd.labels" . | indent 8 }}
+        {{- include "ska-ost-osd.labels" . | indent 8 }}
         component: {{ .Values.rest.component }}
         function: {{ .Values.rest.function }}
         domain: {{ .Values.rest.domain }}
@@ -76,10 +76,10 @@ spec:
         image: "{{ .Values.rest.image.registry }}/{{ .Values.rest.image.image }}:{{$.Values.rest.image.tag | default $.Chart.AppVersion}}"
         imagePullPolicy: {{ .Values.rest.image.pullPolicy }}
         command: [ "/bin/sh" ]
-        args: [ "-c", "poetry run gunicorn --chdir src --bind 0.0.0.0:5000 --logger-class=ska_oso_osd.rest.wsgi.UniformLogger --log-level='{{ .Values.rest.logLevel }}' ska_oso_osd.rest.wsgi:app" ]
+        args: [ "-c", "poetry run gunicorn --chdir src --bind 0.0.0.0:5000 --logger-class=ska_ost_osd.rest.wsgi.UniformLogger --log-level='{{ .Values.rest.logLevel }}' ska_ost_osd.rest.wsgi:app" ]
         envFrom:
           - configMapRef:
-              name: {{ template "ska-oso-osd.name" . }}-{{ .Values.rest.component }}-{{ .Release.Name }}-environment
+              name: {{ template "ska-ost-osd.name" . }}-{{ .Values.rest.component }}-{{ .Release.Name }}-environment
         ports:
           - containerPort: 5000
         resources:

@@ -1,6 +1,6 @@
-ska_oso_osd Package
+ska_ost_osd Package
 ====================
 
-.. automodule:: ska_oso_osd
+.. automodule:: ska_ost_osd
     :members:
     :special-members:

@@ -6,7 +6,7 @@ import logging
 from gunicorn import glogging
 from ska_ser_logging import configure_logging, get_default_formatter
 
-from ska_oso_osd.rest import init_app
+from ska_ost_osd.rest import init_app
 
 app = init_app()
 
@@ -28,5 +28,5 @@ else:
     # use gunicorn logging level for app and module loggers
     gunicorn_logger = logging.getLogger("gunicorn.error")
     app.logger.setLevel(gunicorn_logger.level)
-    logger = logging.getLogger("ska_oso_osd")
+    logger = logging.getLogger("ska_ost_osd")
     logger.setLevel(gunicorn_logger.level)

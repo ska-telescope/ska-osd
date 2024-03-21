@@ -5,7 +5,7 @@ minikube: true
 
 system: TM-mid
 telescope: SKA-mid
-subsystem: ska-oso-osd
+subsystem: ska-ost-osd
 
 global:
   minikube: true
@@ -18,9 +18,9 @@ rest:
   logLevel: info
   enabled: true
   image:
-    registry: artefact.skao.int
-    image: ska-oso-osd
-    tag: ~ # Defaults to the chart appVersion if not set
+    registry: registry.gitlab.com
+    image: ska-telescope/ost/ska-ost-osd/ska-ost-osd
+    tag: 0.0.1-dev.c8def91a9
     pullPolicy: IfNotPresent
   resources:
     requests:

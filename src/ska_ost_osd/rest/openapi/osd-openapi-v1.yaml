@@ -8,14 +8,14 @@ info:
   version: 1.0.0
 servers:
 # This default is overwritten when the application is deployed to include the actual namespace if it is different to the 'ska-osd' default
-- url: /ska-oso-osd/api/v1/
+- url: /ska-ost-osd/api/v1/
 paths:
   /osd:
     get:
       summary: Get OSD data filter by the query parameter
       description: |
         Retrieves the OSD data which match the query parameters.
-      operationId: ska_oso_osd.rest.api.resources.get_osd
+      operationId: ska_ost_osd.rest.api.resources.get_osd
       parameters:
         - $ref: '#/components/parameters/cycle_id'
         - $ref: '#/components/parameters/osd_version'

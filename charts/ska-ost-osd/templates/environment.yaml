@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "ska-ost-osd.name" . }}-{{ .Values.rest.component }}-{{ .Release.Name }}-environment
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "ska-ost-osd.labels" . | indent 4 }}
+    component:  {{ template "ska-ost-osd.name" . }}
+    domain: environment
+    function: ska-ost-osd-environment
+    intent: production
+data:
+  KUBE_NAMESPACE: {{ .Release.Namespace }}
+

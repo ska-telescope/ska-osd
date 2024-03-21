@@ -4,7 +4,7 @@
 image: $SKA_K8S_TOOLS_DOCKER_BUILDER_IMAGE
 
 variables:
-  CHARTS_TO_PUBLISH: ska-oso-osd
+  CHARTS_TO_PUBLISH: ska-ost-osd
   GIT_SUBMODULE_STRATEGY: recursive
   MINIKUBE: "false"
 
