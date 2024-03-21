@@ -59,7 +59,6 @@ K8S_TEST_TEST_COMMAND = KUBE_NAMESPACE=$(KUBE_NAMESPACE) pytest ./tests/componen
 # Set python-test make target to run unit tests and not the component tests
 PYTHON_TEST_FILE = tests/unit/
 
-K8S_TIMEOUT = 1060s
 
 # include your own private variables for custom deployment configuration
 -include PrivateRules.mak
@@ -71,14 +70,6 @@ k8s-chart-test:
 	mkdir -p charts/build; \
 	helm unittest charts/ska-oso-osd/ --with-subchart \
 		--output-type JUnit --output-file charts/build/chart_template_tests.xml
-
-# k8s-pre-test:
-# 	kubectl exec $(REST_POD_NAME) -n $(KUBE_NAMESPACE) -- mkdir -p /var/lib/oda/sbd/sbd-1234
-# 	kubectl cp tests/unit/testfile_sample_mid_sb.json $(KUBE_NAMESPACE)/$(REST_POD_NAME):/var/lib/oda/sbd/sbd-1234/1.json
-
-# k8s-post-test:
-# 	kubectl -n $(KUBE_NAMESPACE) exec $(REST_POD_NAME) -- rm -r /var/lib/oda/sbd/
-
 
 dev-up: K8S_CHART_PARAMS = \
 	--set ska-oso-osd.rest.image.tag=$(VERSION) \
