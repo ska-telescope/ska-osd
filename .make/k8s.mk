@@ -272,6 +272,9 @@ k8s-do-dep-build:
 	@echo "k8s-dep-build: building dependencies"
 	@cd charts; \
 	for i in $(K8S_CHARTS); do \
+		if [[ -f "$${i}/Chart.lock" ]]; then \
+			yq --indent 0 '[.dependencies.[] | select(.repository | test("^file:") | not)] | map(["helm", "repo", "add", .name, .repository] | join(" ")) | .[]' "$${i}/Chart.lock" | sh --; \
+		fi; \
 		echo "+++ Building $${i} chart +++"; \
 		helm dependency build $${i}; \
 	done;
