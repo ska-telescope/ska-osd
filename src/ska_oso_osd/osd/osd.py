@@ -1,4 +1,5 @@
 import copy
+import re
 from importlib.metadata import version
 from typing import Any
 
@@ -7,6 +8,8 @@ from ska_telmodel.data import TMData
 from .constant import (
     BASE_FOLDER_NAME,
     BASE_URL,
+    array_assembly_pattern,
+    error_msg_list,
     osd_file_mapping,
     osd_response_template,
     source_list,
@@ -55,8 +58,8 @@ class OSD:
             msg = ", ".join(capabilities_list)
             cap = cap_list[0]
 
-            raise OSDDataException(
-                f"Capability {cap} doesn't exists,Available are {msg}"
+            error_msg_list.append(
+                OSDDataException(f"Capability {cap} doesn't exists,Available are {msg}")
             )
 
     def get_telescope_observatory_policies(
@@ -132,6 +135,9 @@ class OSD:
 
             self.check_array_assembly(value, self.keys_list)
 
+            if error_msg_list:
+                return error_msg_list
+
             osd_data["capabilities"][key.lower()] = {}
 
             osd_data["capabilities"][key.lower()][value] = data[value]
@@ -203,7 +209,14 @@ class OSD:
         """
 
         if value not in key_list:
-            raise OSDDataException(f"Keyerror {value} doesn't exists")
+            msg = ", ".join(
+                key for key in key_list if re.match(array_assembly_pattern, key)
+            )
+            error_msg_list.append(
+                OSDDataException(
+                    f"Array Assembly {value} doesn't exists. Available are {msg}"
+                )
+            )
 
 
 def check_cycle_id(
@@ -227,7 +240,7 @@ def check_cycle_id(
     if gitlab_branch is not None and osd_version is not None:
         msg = "either osd_version or gitlab_branch"
 
-        raise OSDDataException(f"Only one parameter is needed {msg}")
+        error_msg_list.append(OSDDataException(f"Only one parameter is needed {msg}"))
 
     if gitlab_branch is not None:
         osd_version = gitlab_branch
@@ -246,7 +259,9 @@ def check_cycle_id(
     if cycle_id is not None and cycle_id_exists is None:
         msg = f"Available IDs are {string_ids}"
 
-        raise OSDDataException(f"Cycle id {cycle_id} is not valid,{msg}")
+        error_msg_list.append(
+            OSDDataException(f"Cycle id {cycle_id} is not valid,{msg}")
+        )
 
     elif cycle_id is not None and osd_version is None:
         osd_version = versions_dict[f"cycle_{cycle_id}"][0]
@@ -273,8 +288,10 @@ def osd_tmdata_source(
     """
 
     if source not in source_list:
-        raise OSDDataException(
-            f"source is not valid available are {', '.join(source_list)}"
+        error_msg_list.append(
+            OSDDataException(
+                f"source is not valid available are {', '.join(source_list)}"
+            )
         )
 
     if (
@@ -282,9 +299,12 @@ def osd_tmdata_source(
         and isinstance(gitlab_branch, str)
         and (source == "car" or source == "file")
     ):
-        raise OSDDataException("source is not valid.")
+        error_msg_list.append(OSDDataException("source is not valid."))
 
     osd_version = check_cycle_id(cycle_id, osd_version, gitlab_branch)
+
+    if error_msg_list:
+        return error_msg_list
 
     if source == "file":
         return (f"file://{BASE_FOLDER_NAME}",)

@@ -6,8 +6,8 @@ import prance
 from connexion import App
 
 KUBE_NAMESPACE = os.getenv("KUBE_NAMESPACE", "ska-oso-osd")
-ODA_MAJOR_VERSION = version("ska-oso-osd").split(".")[0]
-API_PATH = f"{KUBE_NAMESPACE}/api/v{ODA_MAJOR_VERSION}"
+OSD_MAJOR_VERSION = version("ska-oso-osd").split(".")[0]
+API_PATH = f"{KUBE_NAMESPACE}/api/v{OSD_MAJOR_VERSION}"
 
 
 # There is a (another) issue with Connexion where it cannot validate
@@ -35,7 +35,7 @@ def get_openapi_spec() -> Dict[str, Any]:
 
 def init_app(open_api_spec=None):
     """
-    Initialise the ODA REST application.
+    Initialise the OSD REST application.
 
     Resolving the spec is relatively time-consuming, so allow a single
     spec to be injected to all the test app instances to speed up the unit tests

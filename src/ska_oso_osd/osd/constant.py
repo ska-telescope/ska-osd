@@ -25,3 +25,5 @@ BASE_URL = "//gitlab.com/ska-telescope/oso/ska-oso-osd?"
 BASE_FOLDER_NAME = "osd_data"
 
 source_list = ["file", "car", "gitlab"]
+array_assembly_pattern = r"^AA(\d+|\d+\.\d+)"
+error_msg_list = []

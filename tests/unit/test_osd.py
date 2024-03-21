@@ -213,7 +213,7 @@ def test_invalid_array_assembly(tm_data):  # pylint: disable=W0621
 
     with pytest.raises(
         OSDDataException,
-        match="Keyerror AA3 doesn't exists",
+        match="Array Assembly AA3 doesn't exists. Available are AA0.5, AA1, AA2",
     ):
         get_osd_data(array_assembly="AA3", tmdata=tm_data)
 

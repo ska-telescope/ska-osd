@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
-  title: OSO Data Archive API
-  description: 'This OpenAPI document defines the API for the OSO Data Archive (OSD) REST service'
+  title: Observatory Static Data API
+  description: 'This OpenAPI document defines the API for the Observatory Static Data (OSD) REST service'
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
@@ -57,6 +57,8 @@ components:
       name: source
       schema:
         type: string
+        enum: [file, car, gitlab]
+        default: file
       required: false
     gitlab_branch:
       in: query
@@ -69,6 +71,7 @@ components:
       name: capabilities
       schema:
         type: string
+        enum: [ mid, low]
       required: false
     array_assembly:
       in: query
