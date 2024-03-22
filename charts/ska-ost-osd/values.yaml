@@ -18,9 +18,9 @@ rest:
   logLevel: info
   enabled: true
   image:
-    registry: artefact.skao.int
+    registry: 192.168.49.2:5000
     image: ska-ost-osd
-    tag: ~  # Defaults to the chart appVersion if not set
+    tag: latest
     pullPolicy: IfNotPresent
   resources:
     requests:
