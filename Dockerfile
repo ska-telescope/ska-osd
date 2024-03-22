@@ -25,6 +25,3 @@ RUN poetry export --format requirements.txt --output poetry-requirements.txt --w
 USER tango
 
 CMD ["python3", "-m", "ska_ost_osd.rest.wsgi"]
-
-# expose ports
-EXPOSE 9000

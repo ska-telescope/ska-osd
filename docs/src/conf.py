@@ -52,8 +52,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'developer.skatelescope.org'
-copyright = '2020, SKA Organization'
-author = 'Marco Bartolini'
+copyright = '2024, SKA Organization'
+author = 'Team Nakshatra'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

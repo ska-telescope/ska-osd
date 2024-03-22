@@ -1,4 +1,4 @@
-Welcome to ska-osd's documentation!
+Welcome to ska-ost-osd's documentation!
 ===================================
 
 .. toctree::

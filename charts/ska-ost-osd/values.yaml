@@ -1,11 +1,13 @@
-# Default values for oet.
+# Default values for osd.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 minikube: true
 
-system: TM-mid
-telescope: SKA-mid
-subsystem: ska-ost-osd
+system: OST
+subsystem: osd
+
+labels:
+  app: ska-ost-osd
 
 global:
   minikube: true
