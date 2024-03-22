@@ -1,0 +1,41 @@
+# Default values for osd.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+minikube: true
+
+system: OST
+subsystem: osd
+
+labels:
+  app: ska-ost-osd
+
+global:
+  minikube: true
+  cluster_domain: cluster.local
+
+rest:
+  component: rest
+  function: osd
+  domain: operations
+  logLevel: info
+  enabled: true
+  image:
+    registry: registry.gitlab.com
+    image: ska-telescope/ost/ska-ost-osd/ska-ost-osd
+    tag: 1.0.0-dev.c99ed0773
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu:  100m
+      memory: 1024Mi
+    limits:
+      cpu:  1000m
+      memory: 1024Mi
+  ingress:
+    enabled: true
+
+nodeSelector: {}
+
+affinity: {}
+
+tolerations: []

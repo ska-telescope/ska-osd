@@ -6,8 +6,8 @@ from typing import Any
 import pytest
 from ska_telmodel.data import TMData
 
-from ska_oso_osd.osd.helper import OSDDataException
-from ska_oso_osd.osd.osd import get_osd_data, osd_tmdata_source
+from ska_ost_osd.osd.helper import OSDDataException
+from ska_ost_osd.osd.osd import get_osd_data, osd_tmdata_source
 
 
 def read_json(json_file_location: str) -> dict[dict[str, Any]]:
@@ -226,7 +226,7 @@ def test_set_source_car_method(validate_car_class):  # pylint: disable=W0621
     """
 
     assert validate_car_class == (
-        "car://gitlab.com/ska-telescope/oso/ska-oso-osd?1.11.0#osd_data",
+        "car://gitlab.com/ska-telescope/ost/ska-ost-osd?1.11.0#osd_data",
     )
 
 
@@ -240,7 +240,7 @@ def test_set_source_gitlab_method(validate_gitlab_class):  # pylint: disable=W06
     msg = "nak-776-osd-implementation-file-versioning#osd_data"
 
     assert validate_gitlab_class == (
-        f"gitlab://gitlab.com/ska-telescope/oso/ska-oso-osd?{msg}",
+        f"gitlab://gitlab.com/ska-telescope/ost/ska-ost-osd?{msg}",
     )
 
 
@@ -271,7 +271,7 @@ def test_validate_gitlab_with_both_invalid_param():
 
     telmodel_version = version("ska_telmodel")
 
-    msg = f"oso/ska-oso-osd?{telmodel_version}#osd_data"
+    msg = f"ost/ska-ost-osd?{telmodel_version}#osd_data"
 
     assert osd_tmdata_source() == (f"car://gitlab.com/ska-telescope/{msg}",)
 
@@ -282,7 +282,7 @@ def test_check_osd_version_method():
     """
 
     assert osd_tmdata_source(osd_version="1.0.0") == (
-        "car://gitlab.com/ska-telescope/oso/ska-oso-osd?1.0.0#osd_data",
+        "car://gitlab.com/ska-telescope/ost/ska-ost-osd?1.0.0#osd_data",
     )
 
 
@@ -292,7 +292,7 @@ def test_check_cycle_id_and_osd_version_method():
     it should return the correct URL
     """
 
-    msg = "oso/ska-oso-osd?1.11.0#osd_data"
+    msg = "ost/ska-ost-osd?1.11.0#osd_data"
 
     assert osd_tmdata_source(cycle_id=1, osd_version="1.11.0") == (
         f"car://gitlab.com/ska-telescope/{msg}",
@@ -306,7 +306,7 @@ def test_check_cycle_id_2_and_osd_version_method():
     """
 
     assert osd_tmdata_source(cycle_id=2, osd_version="1.0.0") == (
-        "car://gitlab.com/ska-telescope/oso/ska-oso-osd?1.0.0#osd_data",
+        "car://gitlab.com/ska-telescope/ost/ska-ost-osd?1.0.0#osd_data",
     )
 
 
@@ -328,5 +328,5 @@ def test_check_master_branch_method():
     """
 
     assert osd_tmdata_source(cycle_id=2, gitlab_branch="master", source="gitlab") == (
-        "gitlab://gitlab.com/ska-telescope/oso/ska-oso-osd?master#osd_data",
+        "gitlab://gitlab.com/ska-telescope/ost/ska-ost-osd?master#osd_data",
     )
