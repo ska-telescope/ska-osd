@@ -18,9 +18,9 @@ rest:
   logLevel: info
   enabled: true
   image:
-    registry: 192.168.49.2:5000
-    image: ska-ost-osd
-    tag: latest
+    registry: registry.gitlab.com
+    image: ska-telescope/ost/ska-ost-osd/ska-ost-osd
+    tag: 1.0.0-dev.c2e2f89ff
     pullPolicy: IfNotPresent
   resources:
     requests:
