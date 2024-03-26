@@ -9,6 +9,6 @@ metadata:
     domain: environment
     function: ska-ost-osd-environment
     intent: production
-data:component
+data:
   KUBE_NAMESPACE: {{ .Release.Namespace }}
-  ODA_BACKEND_TYPE: {{ .Values.rest.backend.type }}
+
