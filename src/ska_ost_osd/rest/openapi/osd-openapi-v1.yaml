@@ -8,7 +8,7 @@ info:
   version: 1.0.0
 servers:
 # This default is overwritten when the application is deployed to include the actual namespace if it is different to the 'ska-osd' default
-- url: /ska-ost-osd/api/v1/
+- url: /ska-ost-osd/osd/api/v1/
 paths:
   /osd:
     get:

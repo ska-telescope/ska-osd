@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "ska-ost-osd.name" . }}-{{ .Values.rest.component }}-{{ .Release.Name }}-environment
+  name: {{ template "ska-ost-osd.name" . }}-environment-{{ .Release.Name }}
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "ska-ost-osd.labels" . | indent 4 }}
@@ -9,6 +9,6 @@ metadata:
     domain: environment
     function: ska-ost-osd-environment
     intent: production
-data:
+data:component
   KUBE_NAMESPACE: {{ .Release.Namespace }}
-
+  ODA_BACKEND_TYPE: {{ .Values.rest.backend.type }}

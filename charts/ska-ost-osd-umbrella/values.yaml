@@ -1,2 +1,7 @@
 global:
+  minikube: true
   cluster_domain: cluster.local
+
+ska-ost-osd:
+  rest:
+    enabled: true
