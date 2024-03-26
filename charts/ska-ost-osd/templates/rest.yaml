@@ -39,14 +39,15 @@ metadata:
     domain: {{ .Values.rest.domain }}
     intent: production
 spec:
-  ports:
-  - port: 5000
   selector:
     app: {{ template "ska-ost-osd.name" . }}
     component: {{ .Values.rest.component }}
+  ports:
+  - protocol: TCP
+    port: 5000
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: {{ template "ska-ost-osd.name" . }}-{{ .Values.rest.component }}-{{ .Release.Name }}
   namespace: {{ .Release.Namespace }}
@@ -61,6 +62,7 @@ spec:
     matchLabels:
       app: {{ template "ska-ost-osd.name" . }}
       component: {{ .Values.rest.component }}
+  serviceName: rest-{{ template "ska-ost-osd.name" . }}-{{ .Release.Name }}
   replicas: 1
   template:
     metadata:
@@ -72,16 +74,22 @@ spec:
         intent: production
     spec:
       containers:
-      - name: osd
+      - name: osd-rest
         image: "{{ .Values.rest.image.registry }}/{{ .Values.rest.image.image }}:{{$.Values.rest.image.tag | default $.Chart.AppVersion}}"
         imagePullPolicy: {{ .Values.rest.image.pullPolicy }}
-        command: [ "/bin/sh" ]
-        args: [ "-c", "poetry run gunicorn --chdir src --bind 0.0.0.0:5000 --logger-class=ska_ost_osd.rest.wsgi.UniformLogger --log-level='{{ .Values.rest.logLevel }}' ska_ost_osd.rest.wsgi:app" ]
+        command: ["/bin/sh"]
+        args: ["-c", "gunicorn --chdir src --bind 0.0.0.0:5000 --logger-class=ska_ost_osd.rest.wsgi.UniformLogger --log-level='{{ .Values.rest.logLevel }}' ska_ost_osd.rest.wsgi:app"]
         envFrom:
           - configMapRef:
-              name: {{ template "ska-ost-osd.name" . }}-{{ .Values.rest.component }}-{{ .Release.Name }}-environment
+              name: {{ template "ska-ost-osd.name" . }}-environment-{{ .Release.Name }}
         ports:
-          - containerPort: 5000
+          - name: osd-rest
+            containerPort: 5000
+{{ if .Values.rest.backend.filesystem.use_pv }}
+        volumeMounts:
+          - name: data
+            mountPath: {{.Values.rest.backend.filesystem.pv_mountpoint }}
+{{ end }}
         resources:
 {{ toYaml .Values.rest.resources | indent 10 }}
   {{- with .Values.nodeSelector }}
