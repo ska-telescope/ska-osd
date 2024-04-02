@@ -78,7 +78,7 @@ This framework can be access by below command:
 .. code::
 
     from ska_telmodel.data import TMData
-    from ska_oso_osd.osd.osd import osd_tmdata_source, get_osd_data
+    from ska_ost_osd.osd.osd import osd_tmdata_source, get_osd_data
 
     source_uris = osd_tmdata_source()
     tmdata = TMData(source_uris=source_uris)
@@ -98,9 +98,9 @@ array_assembly         AA0.5, AA1 or any Array Assembly
 ===================    ================================================
 
 
-.. autofunction:: ska_oso_osd.osd.osd.get_osd_data
+.. autofunction:: ska_ost_osd.osd.osd.get_osd_data
 
-.. autofunction:: ska_oso_osd.osd.osd.OSD
+.. autofunction:: ska_ost_osd.osd.osd.OSD
 
 
 API json response template
@@ -148,7 +148,7 @@ is fetched and using API json response template, a json object is returned.
 .. code:: python
 
     from ska_telmodel.data import TMData
-    from ska_oso_osd.osd.osd import osd_tmdata_source, get_osd_data
+    from ska_ost_osd.osd.osd import osd_tmdata_source, get_osd_data
 
     source_uris = osd_tmdata_source()
     tmdata = TMData(source_uris=source_uris)
@@ -164,7 +164,7 @@ using API json response template, a json object is returned.
 .. code:: python
 
     from ska_telmodel.data import TMData
-    from ska_oso_osd.osd.osd import osd_tmdata_source, get_osd_data
+    from ska_ost_osd.osd.osd import osd_tmdata_source, get_osd_data
 
     source_uris = osd_tmdata_source(cycle_id=1)
     tmdata = TMData(source_uris=source_uris)
@@ -177,7 +177,7 @@ then ``observatory_policies`` is fetched and ``array_assembly`` a json object is
 .. code:: python
 
     from ska_telmodel.data import TMData
-    from ska_oso_osd.osd.osd import osd_tmdata_source, get_osd_data
+    from ska_ost_osd.osd.osd import osd_tmdata_source, get_osd_data
 
     source_uris = osd_tmdata_source()
     tmdata = TMData(source_uris=source_uris)
@@ -190,7 +190,7 @@ then ``observatory_policies`` is fetched, then ``capabilities`` and ``array_asse
 .. code:: python
 
     from ska_telmodel.data import TMData
-    from ska_oso_osd.osd.osd import osd_tmdata_source, get_osd_data
+    from ska_ost_osd.osd.osd import osd_tmdata_source, get_osd_data
 
     source_uris = osd_tmdata_source(cycle_id=1)
     tmdata = TMData(source_uris=source_uris)

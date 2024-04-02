@@ -1,12 +1,12 @@
 import pytest
 
-from ska_oso_osd.rest import init_app
+from ska_ost_osd.rest import init_app
 
 
 @pytest.fixture
 def client():
     app = init_app()
-    with app.test_client() as client:
+    with app.test_client() as client:  # pylint: disable=W0621
         yield client
 
 
@@ -34,7 +34,7 @@ def open_api_spec():
                     "description": (
                         "Retrieves the OSD data which match the query parameters.\n"
                     ),
-                    "operationId": "ska_oso_osd.rest.api.resources.get_osd",
+                    "operationId": "ska_ost_osd.rest.api.resources.get_osd",
                     "parameters": [
                         {
                             "in": "query",

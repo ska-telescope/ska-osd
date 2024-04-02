@@ -6,7 +6,7 @@ from typing import Any
 import pytest
 from ska_telmodel.data import TMData
 
-from ska_oso_osd.osd.osd import get_osd_data, osd_tmdata_source
+from ska_ost_osd.osd.osd import get_osd_data, osd_tmdata_source
 
 
 def read_json(json_file_location: str) -> dict[dict[str, Any]]:
@@ -261,7 +261,7 @@ def test_invalid_source():
     assert expected_error_msg == "source is not valid."
 
 
-def test_invalid_get_osd_data_capability(tm_data):
+def test_invalid_get_osd_data_capability(tm_data):  # pylint: disable=W0621
     error_msgs = get_osd_data(
         capabilities=["midd"], array_assembly="AA1", tmdata=tm_data
     )
@@ -275,7 +275,7 @@ def test_invalid_get_osd_data_capability(tm_data):
     assert expected_error_msg == f"{expected_error_msg_1}"
 
 
-def test_invalid_get_osd_data_array_assembly(tm_data):
+def test_invalid_get_osd_data_array_assembly(tm_data):  # pylint: disable=W0621
     error_msgs = get_osd_data(
         capabilities=["mid"], array_assembly="AA3", tmdata=tm_data
     )

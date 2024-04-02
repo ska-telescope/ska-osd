@@ -1,21 +1,21 @@
 from unittest.mock import MagicMock, patch
 
-from ska_oso_osd.rest import get_openapi_spec, init_app
-from ska_oso_osd.rest.api.resources import validation_response
+from ska_ost_osd.rest import get_openapi_spec, init_app
+from ska_ost_osd.rest.api.resources import validation_response
 
 
 def test_init_app(open_api_spec):
-    with patch("ska_oso_osd.rest.get_openapi_spec", return_value=open_api_spec):
+    with patch("ska_ost_osd.rest.get_openapi_spec", return_value=open_api_spec):
         app = init_app()
 
-        assert app.url_map._rules_by_endpoint[
-            "/ska-oso-osd/api/v1.ska_oso_osd_rest_api_resources_get_osd"
+        assert app.url_map._rules_by_endpoint[  # pylint: disable=W0212
+            "/ska-oso-osd/api/v1.ska_ost_osd_rest_api_resources_get_osd"
         ]
 
 
 def test_get_openapi_spec(open_api_spec):
     # Patch 'prance.ResolvingParser' to return a mock spec
-    with patch("ska_oso_osd.rest.prance.ResolvingParser", autospec=True) as mock_parser:
+    with patch("ska_ost_osd.rest.prance.ResolvingParser", autospec=True) as mock_parser:
         instance = mock_parser.return_value
         instance.specification = open_api_spec
 
@@ -24,10 +24,10 @@ def test_get_openapi_spec(open_api_spec):
         assert (
             spec == open_api_spec
         ), "The specification should match the mock specification"
-        mock_parser.assert_called_once_with(
+        mock_parser.assert_called_once_with(  # pylint: disable=W0106
             (
                 "/home/shalu/Desktop/SKAO/ska-oso-osd/src/"
-                "ska_oso_osd/rest/./openapi/osd-openapi-v1.yaml"
+                "ska_ost_osd/rest/./openapi/osd-openapi-v1.yaml"
             ),
             lazy=True,
             strict=True,
@@ -35,18 +35,18 @@ def test_get_openapi_spec(open_api_spec):
 
 
 def test_init_app_client(client, open_api_spec):
-    with patch("ska_oso_osd.rest.get_openapi_spec", return_value=open_api_spec), patch(
-        "ska_oso_osd.rest.App"
+    with patch("ska_ost_osd.rest.get_openapi_spec", return_value=open_api_spec), patch(
+        "ska_ost_osd.rest.App"
     ) as mock_connexion_app:
         mock_connexion_instance = mock_connexion_app.return_value
         mock_flask_app = mock_connexion_instance.app
         mock_flask_app.test_client = MagicMock(return_value=client)
 
-        app = init_app(open_api_spec=open_api_spec)  # noqa: F841
+        app = init_app(open_api_spec=open_api_spec)  # noqa: F841, pylint: disable=W0612
 
         # Verify that the Connexion app is initialized with the correct parameters
         mock_connexion_app.assert_called_once_with(
-            "ska_oso_osd.rest", specification_dir="openapi/"
+            "ska_ost_osd.rest", specification_dir="openapi/"
         )
 
         # Verify that the API is added with the correct spec and base path

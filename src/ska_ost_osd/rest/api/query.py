@@ -1,7 +1,7 @@
 import re
 from dataclasses import dataclass
 
-from ska_oso_osd.osd.constant import error_msg_list
+from ska_ost_osd.osd.constant import error_msg_list
 
 capabilities_list = ["mid", "low"]
 osd_version_pattern = r"^\d+\.\d+\.\d+"

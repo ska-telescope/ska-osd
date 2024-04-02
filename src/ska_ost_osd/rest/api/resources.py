@@ -10,9 +10,9 @@ from http import HTTPStatus
 
 from ska_telmodel.data import TMData
 
-from ska_oso_osd.osd.helper import OSDDataException
-from ska_oso_osd.osd.osd import get_osd_data, osd_tmdata_source
-from ska_oso_osd.rest.api.query import QueryParams, QueryParamsFactory
+from ska_ost_osd.osd.helper import OSDDataException
+from ska_ost_osd.osd.osd import get_osd_data, osd_tmdata_source
+from ska_ost_osd.rest.api.query import QueryParams, QueryParamsFactory
 
 LOGGER = logging.getLogger(__name__)
 
