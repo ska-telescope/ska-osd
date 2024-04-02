@@ -69,19 +69,10 @@ def osd_validation(params_in_kwargs, kwargs: dict) -> dict:
         or params_in_kwargs("gitlab_branch")
         or params_in_kwargs("array_assembly")
     ):
-        capability = kwargs["capabilities"] if kwargs.get("capabilities") else None
         osd_version = kwargs["osd_version"] if kwargs.get("osd_version") else None
         array_assembly = (
             kwargs["array_assembly"] if kwargs.get("array_assembly") else None
         )
-
-        if capability not in capabilities_list:
-            error_msg_list.append(
-                ValueError(
-                    f"Capability {capability} doesn't exists,Available are"
-                    f" {', '.join(capabilities_list)}"
-                )
-            )
 
         if (
             params_in_kwargs("source")

@@ -46,7 +46,6 @@ def init_app(open_api_spec=None):
     validator_map = {
         "body": CustomRequestBodyValidator,
     }
-
     connexion = App(__name__, specification_dir="openapi/")
     connexion.add_api(
         open_api_spec,

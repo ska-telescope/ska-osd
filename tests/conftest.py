@@ -15,10 +15,10 @@ def open_api_spec():
     return {
         "openapi": "3.0.0",
         "info": {
-            "title": "OSO Data Archive API",
+            "title": "Observatory Static Data API",
             "description": (
-                "This OpenAPI document defines the API for the OSO Data Archive (OSD)"
-                " REST service"
+                "This OpenAPI document defines the API for the Observatory Static Data"
+                " (OSD) REST service"
             ),
             "license": {
                 "name": "BSD-3-Clause",
@@ -26,7 +26,7 @@ def open_api_spec():
             },
             "version": "1.0.0",
         },
-        "servers": [{"url": "/ska-osd/api/v1/"}],
+        "servers": [{"url": "/ska-ost-osd/api/v1/"}],
         "paths": {
             "/osd": {
                 "get": {
@@ -51,7 +51,11 @@ def open_api_spec():
                         {
                             "in": "query",
                             "name": "source",
-                            "schema": {"type": "string"},
+                            "schema": {
+                                "type": "string",
+                                "enum": ["file", "car", "gitlab"],
+                                "default": "file",
+                            },
                             "required": False,
                         },
                         {
@@ -63,7 +67,7 @@ def open_api_spec():
                         {
                             "in": "query",
                             "name": "capabilities",
-                            "schema": {"type": "string"},
+                            "schema": {"type": "string", "enum": ["mid", "low"]},
                             "required": False,
                         },
                         {
@@ -148,7 +152,11 @@ def open_api_spec():
                 "source": {
                     "in": "query",
                     "name": "source",
-                    "schema": {"type": "string"},
+                    "schema": {
+                        "type": "string",
+                        "enum": ["file", "car", "gitlab"],
+                        "default": "file",
+                    },
                     "required": False,
                 },
                 "gitlab_branch": {
@@ -160,7 +168,7 @@ def open_api_spec():
                 "capabilities": {
                     "in": "query",
                     "name": "capabilities",
-                    "schema": {"type": "string"},
+                    "schema": {"type": "string", "enum": ["mid", "low"]},
                     "required": False,
                 },
                 "array_assembly": {
@@ -295,6 +303,7 @@ def mid_osd_data():
                 "AA0.5": {
                     "available_bandwidth_hz": 800000.0,
                     "available_receivers": ["Band_1", "Band_2"],
+                    "cbf_modes": ["CORR"],
                     "max_baseline_km": 1.5,
                     "number_channels": 14880,
                     "number_fsps": 4,

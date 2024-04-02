@@ -4,12 +4,16 @@ from ska_ost_osd.rest import get_openapi_spec, init_app
 from ska_ost_osd.rest.api.resources import validation_response
 
 
+def test_get_open_api_spec(open_api_spec):
+    assert get_openapi_spec() == open_api_spec
+
+
 def test_init_app(open_api_spec):
     with patch("ska_ost_osd.rest.get_openapi_spec", return_value=open_api_spec):
         app = init_app()
 
         assert app.url_map._rules_by_endpoint[  # pylint: disable=W0212
-            "/ska-oso-osd/api/v1.ska_ost_osd_rest_api_resources_get_osd"
+            "/ska-ost-osd/api/v1.ska_ost_osd_rest_api_resources_get_osd"
         ]
 
 
@@ -32,6 +36,7 @@ def test_get_openapi_spec(open_api_spec):
             lazy=True,
             strict=True,
         ), "ResolvingParser should be called with expected arguments"
+
 
 def test_init_app_client(client, open_api_spec):
     with patch("ska_ost_osd.rest.get_openapi_spec", return_value=open_api_spec), patch(
@@ -57,7 +62,7 @@ def test_init_app_client(client, open_api_spec):
 
 def test_osd_endpoint_for(client, mid_osd_data):
     response = client.get(
-        "/ska-oso-osd/api/v1/osd",
+        "/ska-ost-osd/api/v1/osd",
         query_string={
             "cycle_id": 1,
             "source": "file",
@@ -72,7 +77,7 @@ def test_osd_endpoint_for(client, mid_osd_data):
 
 def test_invalid_osd_tmdata_source(client):
     error_msgs = client.get(
-        "/ska-oso-osd/api/v1/osd",
+        "/ska-ost-osd/api/v1/osd",
         query_string={
             "cycle_id": 3,
             "osd_version": "1..1.0",
@@ -94,7 +99,7 @@ def test_invalid_osd_tmdata_source(client):
 
 def test_invalid_osd_tmdata_source_capabilities(client):
     error_msgs = client.get(
-        "/ska-oso-osd/api/v1/osd",
+        "/ska-ost-osd/api/v1/osd",
         query_string={
             "cycle_id": 1,
             "osd_version": "1.1.0",
@@ -104,7 +109,6 @@ def test_invalid_osd_tmdata_source_capabilities(client):
         },
     )
 
-    print(error_msgs.json["detail"])
     expected_error_msg = "'midd' is not one of ['mid', 'low']"
     assert error_msgs.json["detail"].startswith(expected_error_msg)
 
@@ -119,10 +123,11 @@ def test_invalid_osd_source(client):
 
 def test_invalid_get_osd_data_capability(client):
     error_msgs = client.get(
-        "/ska-oso-osd/api/v1/osd",
+        "/ska-ost-osd/api/v1/osd",
         query_string={"capabilities": "mid", "array_assembly": "AA3"},
     )
 
+    print(error_msgs.json)
     assert (
         error_msgs.json
         == "Array Assembly AA3 doesn't exists. Available are AA0.5, AA1, AA2"
