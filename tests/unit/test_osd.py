@@ -6,6 +6,7 @@ from typing import Any
 import pytest
 from ska_telmodel.data import TMData
 
+from ska_ost_osd.osd.helper import OSDDataException
 from ska_ost_osd.osd.osd import get_osd_data, osd_tmdata_source
 
 
@@ -155,6 +156,25 @@ def test_set_source_gitlab_method(validate_gitlab_class):  # pylint: disable=W06
     assert validate_gitlab_class == (
         f"gitlab://gitlab.com/ska-telescope/ost/ska-ost-osd?{msg}",
     )
+
+
+def test_validate_gitlab_with_both_param():
+    """This test case catches the exception when both osd_version and
+        gitlab_branch are given.
+
+    :raises: OSDDataException
+    """
+
+    with pytest.raises(
+        OSDDataException,
+        match="Only one parameter is needed either osd_version or gitlab_branch",
+    ):
+        osd_tmdata_source(
+            cycle_id=1,
+            osd_version="1.11.0",
+            gitlab_branch="nak-776-osd-implementation-file-versioning",
+            source="gitlab",
+        )
 
 
 def test_validate_gitlab_with_both_invalid_param():

@@ -5,9 +5,9 @@ from typing import Any, Dict
 import prance
 from connexion import App
 
-KUBE_NAMESPACE = os.getenv("KUBE_NAMESPACE", "ska-oso-osd")
-OSD_MAJOR_VERSION = version("ska-oso-osd").split(".")[0]
-API_PATH = f"{KUBE_NAMESPACE}/api/v{OSD_MAJOR_VERSION}"
+KUBE_NAMESPACE = os.getenv("KUBE_NAMESPACE", "ska-ost-osd")
+ODA_MAJOR_VERSION = version("ska-ost-osd").split(".")[0]
+API_PATH = f"{KUBE_NAMESPACE}/api/v{ODA_MAJOR_VERSION}"
 
 
 # There is a (another) issue with Connexion where it cannot validate
@@ -53,7 +53,7 @@ def init_app(open_api_spec=None):
         # The base path includes the namespace which is known at runtime
         # to avoid clashes in deployments, for example in CICD
         base_path=f"/{API_PATH}",
-        arguments={"title": "OpenAPI ODT"},
+        arguments={"title": "OpenAPI OSD"},
         validator_map=validator_map,
         pythonic_params=True,
     )

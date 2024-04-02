@@ -50,6 +50,7 @@
         "max_baseline_km": 1.5,
         "available_bandwidth_hz": 800000.0,
         "number_channels": 14880,
+        "cbf_modes": ["CORR"],
         "number_zoom_windows": 0,
         "number_zoom_channels": 0,
         "number_pss_beams": 0,
@@ -68,6 +69,7 @@
         "max_baseline_km": 1.5,
         "available_bandwidth_hz": 800000.0,
         "number_channels": 14880,
+        "cbf_modes": ["CORR", "PST_BF"], 
         "number_zoom_windows": 0,
         "number_zoom_channels": 0,
         "number_pss_beams": 0,
@@ -79,7 +81,7 @@
   
     "AA2": {
         "available_receivers": [
-             "Band_1", "Band_2"
+             "Band_1", "Band_2", "Band_5a", "Band_5b"
          ],
          "number_ska_dishes": 64,
          "number_meerkat_dishes": 4,
@@ -87,6 +89,7 @@
          "max_baseline_km": 110.0,
          "available_bandwidth_hz": 800000.0,
          "number_channels": 14880,
+         "cbf_modes": ["CORR", "PST_BF", "PSS_BF"], 
          "number_zoom_windows": 16,  
          "number_zoom_channels": 14880, 
          "number_pss_beams": 384,
