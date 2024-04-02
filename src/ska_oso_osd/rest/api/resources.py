@@ -78,7 +78,6 @@ def get_osd_data_response(query_params, tm_data_sources):
 @error_handler
 def get_osd(**kwargs):
     query_params, error_list = get_qry_params(kwargs)
-    print(query_params, error_list)
 
     return get_osd_data_response(query_params, error_list)
 
@@ -106,10 +105,4 @@ def get_qry_params(kwargs: dict) -> QueryParams:
     :raises: TypeError if a supported QueryParams cannot be extracted
     """
 
-    try:
-        return QueryParamsFactory.from_dict(kwargs)
-    except ValueError as err:
-        return validation_response(
-            err.args[0],
-            HTTPStatus.BAD_REQUEST,
-        )
+    return QueryParamsFactory.from_dict(kwargs)

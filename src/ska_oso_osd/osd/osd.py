@@ -194,6 +194,9 @@ class OSD:
             self.capabilities, self.array_assembly
         )
 
+        if error_msg_list:
+            return error_msg_list
+
         return self.get_capabilities_and_array_assembly(
             self.tmdata, telescope_capabilities_dict, osd_data
         )
@@ -207,7 +210,6 @@ class OSD:
 
         :returns: None or raises OSDDataException
         """
-
         if value not in key_list:
             msg = ", ".join(
                 key for key in key_list if re.match(array_assembly_pattern, key)

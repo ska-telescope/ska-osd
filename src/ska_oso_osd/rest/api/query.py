@@ -50,13 +50,6 @@ class QueryParamsFactory:
 
             if field in query_fields:
                 return True
-            else:
-                error_msg_list.append(
-                    ValueError(
-                        "Parameters are missing or not currently supported for"
-                        " querying."
-                    )
-                )
 
         error_msg_list = osd_validation(  # pylint: disable=W0621
             params_in_kwargs, kwargs
@@ -69,8 +62,6 @@ def osd_validation(params_in_kwargs, kwargs: dict) -> dict:
     if params_in_kwargs("cycle_id") and params_in_kwargs("source"):
         if kwargs.get("source"):
             source = kwargs.get("source")
-        else:
-            kwargs["source"] = "file"
 
     if (
         params_in_kwargs("capabilities")
