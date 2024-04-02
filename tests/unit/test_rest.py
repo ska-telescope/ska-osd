@@ -26,7 +26,7 @@ def test_get_openapi_spec(open_api_spec):
         ), "The specification should match the mock specification"
         mock_parser.assert_called_once_with(  # pylint: disable=W0106
             (
-                "/home/shalu/Desktop/SKAO/ska-oso-osd/src/"
+                "/builds/ska-telescope/ost/ska-ost-osd"
                 "ska_ost_osd/rest/./openapi/osd-openapi-v1.yaml"
             ),
             lazy=True,
