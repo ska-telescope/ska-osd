@@ -33,7 +33,6 @@ def test_get_openapi_spec(open_api_spec):
             strict=True,
         ), "ResolvingParser should be called with expected arguments"
 
-/builds/ska-telescope/ost/ska-ost-osd/src/ska_ost_osd/rest/./openapi/osd-openapi-v1.yaml'
 def test_init_app_client(client, open_api_spec):
     with patch("ska_ost_osd.rest.get_openapi_spec", return_value=open_api_spec), patch(
         "ska_ost_osd.rest.App"
