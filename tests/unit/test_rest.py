@@ -26,14 +26,14 @@ def test_get_openapi_spec(open_api_spec):
         ), "The specification should match the mock specification"
         mock_parser.assert_called_once_with(  # pylint: disable=W0106
             (
-                "/builds/ska-telescope/ost/ska-ost-osd"
+                "/builds/ska-telescope/ost/ska-ost-osd/src/"
                 "ska_ost_osd/rest/./openapi/osd-openapi-v1.yaml"
             ),
             lazy=True,
             strict=True,
         ), "ResolvingParser should be called with expected arguments"
 
-
+/builds/ska-telescope/ost/ska-ost-osd/src/ska_ost_osd/rest/./openapi/osd-openapi-v1.yaml'
 def test_init_app_client(client, open_api_spec):
     with patch("ska_ost_osd.rest.get_openapi_spec", return_value=open_api_spec), patch(
         "ska_ost_osd.rest.App"
