@@ -226,6 +226,162 @@ then ``observatory_policies`` is fetched, then ``capabilities`` and ``array_asse
         OSDDataException: Keyerror {array_assembly value here} doesn't exists
 
 
+OSD as a service
+```````````````````
+
+1. API Endpoint
+
+.. list-table:: OSD REST resources
+   :widths: 5 15 80
+   :header-rows: 1
+
+   * - HTTP Method
+     - Resource URL
+     - Description
+   * - GET
+     - ``/api/v1/osd``
+     - **Getting Data**
+
+       Return the OSD cycle_id data.
+ 
+
+2. Query Parameters
+
+  * The API supports the following query parameters to filter the OSD data:
+
+    ===================    ================================================
+    Parameters             Description
+    ===================    ================================================
+    cycle_id               Cycle Id a integer value 1, 2, 3
+    osd_version            OSD version i.e 1.9.0, 1.12.0 in string format
+    source                 From where to get OSD data ``car`` or ``gitlab``
+    gitlab_branch          Gitlab Branch Name     
+    capabilities           Mid or Low
+    array_assembly         AA0.5, AA1 or any Array Assembly
+    ===================    ================================================
+
+
+3. For example:
+
+.. code:: python
+    
+    "/ska-ost-osd/api/v1/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
+
+
+4. CURL Example Request
+
+.. code:: python
+
+    curl -X GET "/ska-ost-osd/api/v1/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
+
+
+5. Example Response
+
+    * The API returns a JSON object containing the matched OSD data.
+
+    .. code:: python
+
+        {
+            "capabilities": {
+                "mid": {
+                    "AA0.5": {
+                        "available_bandwidth_hz": 800000.0,
+                        "available_receivers": ["Band_1", "Band_2"],
+                        "cbf_modes": ["CORR"],
+                        "max_baseline_km": 1.5,
+                        "number_channels": 14880,
+                        "number_fsps": 4,
+                        "number_meerkat_dishes": 0,
+                        "number_meerkatplus_dishes": 0,
+                        "number_pss_beams": 0,
+                        "number_pst_beams": 0,
+                        "number_ska_dishes": 4,
+                        "number_zoom_channels": 0,
+                        "number_zoom_windows": 0,
+                        "ps_beam_bandwidth_hz": 0.0,
+                    },
+                    "basic_capabilities": {
+                        "dish_elevation_limit_deg": 15.0,
+                        "receiver_information": [
+                            {
+                                "max_frequency_hz": 1050000000.0,
+                                "min_frequency_hz": 350000000.0,
+                                "rx_id": "Band_1",
+                            },
+                            {
+                                "max_frequency_hz": 1760000000.0,
+                                "min_frequency_hz": 950000000.0,
+                                "rx_id": "Band_2",
+                            },
+                            {
+                                "max_frequency_hz": 3050000000.0,
+                                "min_frequency_hz": 1650000000.0,
+                                "rx_id": "Band_3",
+                            },
+                            {
+                                "max_frequency_hz": 5180000000.0,
+                                "min_frequency_hz": 2800000000.0,
+                                "rx_id": "Band_4",
+                            },
+                            {
+                                "max_frequency_hz": 8500000000.0,
+                                "min_frequency_hz": 4600000000.0,
+                                "rx_id": "Band_5a",
+                            },
+                            {
+                                "max_frequency_hz": 15400000000.0,
+                                "min_frequency_hz": 8300000000.0,
+                                "rx_id": "Band_5b",
+                            },
+                        ],
+                    },
+                }
+            },
+            "observatory_policy": {
+                "cycle_description": "Science Verification",
+                "cycle_information": {
+                    "cycle_id": "SKAO_2027_1",
+                    "proposal_close": "20260512T15:00:00.000z",
+                    "proposal_open": "20260327T12:00:00.000Z",
+                },
+                "cycle_number": 1,
+                "cycle_policies": {"normal_max_hours": 100.0},
+                "telescope_capabilities": {"Low": "AA2", "Mid": "AA2"},
+            },
+        }
+
+
+
+Error Handling
+```````````````
+
+.. error::
+
+    if ``osd_version`` value is not valid following error will be raised.
+
+    .. code:: python
+
+        osd_version {osd_version} is not valid
+
+    if ``capabilities`` value is not valid following error will be raised.
+
+    .. code:: python
+
+        Capability {capabilities} doesn not exists. Available are low, mid
+
+
+    if ``array_assembly`` value is not valid following error will be raised.
+
+    .. code:: python
+
+        array_assembly {array_assembly} is not valid
+
+
+.. note::
+
+    All the error_messages are combined in a single string.
+    
+
 Release Steps
 ~~~~~~~~~~~~~~
 
