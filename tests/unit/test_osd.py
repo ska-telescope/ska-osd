@@ -227,6 +227,11 @@ def test_check_master_branch_method():
 
 
 def test_invalid_osd_tmdata_source():
+    """This test case checks if the output of the osd_tmdata_source
+    when cycle_id, gitlab_branch and source parameter and osd_version is given incorrect
+    it should return the appropriate error messages.
+    """
+
     error_msgs = osd_tmdata_source(
         cycle_id=3,
         osd_version="1.1.0",
@@ -249,6 +254,9 @@ def test_invalid_osd_tmdata_source():
 
 
 def test_invalid_source():
+    """This test case returns a error messgae when source is not given
+    with gitlab_branch parameter and cycle_id.
+    """
     error_msgs = osd_tmdata_source(
         cycle_id=1,
         gitlab_branch="main",
@@ -262,6 +270,13 @@ def test_invalid_source():
 
 
 def test_invalid_get_osd_data_capability(tm_data):  # pylint: disable=W0621
+    """This test case checks if the output of the get_osd_data
+    when capabilities is given incorrect with corret array_assembly
+    it should return the appropriate error messages.
+
+    :param tm_data: tm_data
+    """
+
     error_msgs = get_osd_data(
         capabilities=["midd"], array_assembly="AA1", tmdata=tm_data
     )
@@ -276,6 +291,13 @@ def test_invalid_get_osd_data_capability(tm_data):  # pylint: disable=W0621
 
 
 def test_invalid_get_osd_data_array_assembly(tm_data):  # pylint: disable=W0621
+    """This test case checks if the output of the get_osd_data
+    when array_assembly is given incorrect with corret capabilities
+    it should return the appropriate error messages.
+
+    :param tm_data: tm_data
+    """
+
     error_msgs = get_osd_data(
         capabilities=["mid"], array_assembly="AA3", tmdata=tm_data
     )

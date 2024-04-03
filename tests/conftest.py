@@ -5,6 +5,13 @@ from ska_ost_osd.rest import init_app
 
 @pytest.fixture
 def client():
+    """This fixture returns a Flask test client that can be used to make requests
+        to the application in tests. It handles setting up and tearing down the
+        application context.
+
+    :returns FlaskClient: The Flask test client
+    """
+
     app = init_app()
     with app.test_client() as client:  # pylint: disable=W0621
         yield client
@@ -12,6 +19,13 @@ def client():
 
 @pytest.fixture
 def open_api_spec():
+    """This fixture returns the expected OpenAPI specification
+        that is returned from the API. It is used to validate
+        the response in tests.
+
+    :returns dict: The OpenAPI specification
+    """
+
     return {
         "openapi": "3.0.0",
         "info": {
@@ -297,6 +311,12 @@ def open_api_spec():
 
 @pytest.fixture
 def mid_osd_data():
+    """This fixture returns the expected OpenAPI specification
+        that is returned from the API. It is used to validate
+        the response in tests.
+
+    :returns dict: The OpenAPI specification
+    """
     return {
         "capabilities": {
             "mid": {

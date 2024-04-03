@@ -5,10 +5,25 @@ from ska_ost_osd.rest.api.resources import validation_response
 
 
 def test_get_open_api_spec(open_api_spec):
+    """Test the get_open_api_spec function.
+
+    :param open_api_spec (dict): The OpenAPI specification this test expects
+        to be returned.
+    """
     assert get_openapi_spec() == open_api_spec
 
 
 def test_init_app(open_api_spec):
+    """This function tests that the Flask application can be initialized
+       properly and that the OpenAPI spec is registered as expected.
+
+    :param open_api_spec (dict): The OpenAPI specification expected to be
+       registered on the app.
+
+    :raises AssertionError: If the app fails to initialize or the wrong spec
+       is registered.
+    """
+
     with patch("ska_ost_osd.rest.get_openapi_spec", return_value=open_api_spec):
         app = init_app()
 
@@ -18,6 +33,14 @@ def test_init_app(open_api_spec):
 
 
 def test_get_openapi_spec(open_api_spec):
+    """This function tests that a valid OpenAPI specification
+       is returned when requesting the API documentation.
+
+    :params open_api_spec (dict): The expected OpenAPI specification
+
+    :raises AssertionError: If the response spec differs from expected.
+    """
+
     # Patch 'prance.ResolvingParser' to return a mock spec
     with patch("ska_ost_osd.rest.prance.ResolvingParser", autospec=True) as mock_parser:
         instance = mock_parser.return_value
@@ -39,6 +62,16 @@ def test_get_openapi_spec(open_api_spec):
 
 
 def test_init_app_client(client, open_api_spec):
+    """This function tests that the get_openapi_spec function returns
+       the expected OpenAPI specification.
+
+    :param open_api_spec (dict): The OpenAPI specification that is expected
+       to be returned.
+
+    :raises AssertionError: If the actual spec returned does not match the
+       expected spec.
+    """
+
     with patch("ska_ost_osd.rest.get_openapi_spec", return_value=open_api_spec), patch(
         "ska_ost_osd.rest.App"
     ) as mock_connexion_app:
@@ -61,6 +94,16 @@ def test_init_app_client(client, open_api_spec):
 
 
 def test_osd_endpoint_for(client, mid_osd_data):
+    """This function tests that a request to the OSD endpoint for a
+        specific OSd returns expected data for that OSD.
+
+    :param client (FlaskClient): The Flask test client.
+    :param mid_osd_data (dict): The expected data for the OSD.
+
+    :raises AssertionError: If the response does not contain the expected
+         OSD data or returns an error status code.
+    """
+
     response = client.get(
         "/ska-ost-osd/api/v1/osd",
         query_string={
@@ -76,6 +119,14 @@ def test_osd_endpoint_for(client, mid_osd_data):
 
 
 def test_invalid_osd_tmdata_source(client):
+    """This function tests that a request with an invalid OSD TM data
+       source ID returns the expected error response.
+
+    :param client (FlaskClient): The Flask test client.
+
+    :raises AssertionError: If the response does not contain the expected
+       error message.
+    """
     error_msgs = client.get(
         "/ska-ost-osd/api/v1/osd",
         query_string={
@@ -98,6 +149,15 @@ def test_invalid_osd_tmdata_source(client):
 
 
 def test_invalid_osd_tmdata_source_capabilities(client):
+    """This function tests that a request with an invalid capability
+       returns the expected error response.
+
+    :param client (FlaskClient): The Flask test client.
+
+    :raises AssertionError: If the response does not contain the
+       expected error message.
+    """
+
     error_msgs = client.get(
         "/ska-ost-osd/api/v1/osd",
         query_string={
@@ -114,20 +174,26 @@ def test_invalid_osd_tmdata_source_capabilities(client):
 
 
 def test_invalid_osd_source(client):
+    """This function tests that a request with an invalid OSD TM data source ID
+        returns the expected error response.
+
+    :param client (FlaskClient): The Flask test client.
+    """
     osd_source_link = client.get(
         "/ska-oso-osd/api/v1/osd", query_string={"cycle_id": 1, "source": "car"}
     )
-    print(osd_source_link.json)
     assert osd_source_link == osd_source_link
 
 
 def test_invalid_get_osd_data_capability(client):
+    """Test invalid OSD data capability ID
+    :param client (FlaskClient): The Flask test client.
+    """
     error_msgs = client.get(
         "/ska-ost-osd/api/v1/osd",
         query_string={"capabilities": "mid", "array_assembly": "AA3"},
     )
 
-    print(error_msgs.json)
     assert (
         error_msgs.json
         == "Array Assembly AA3 doesn't exists. Available are AA0.5, AA1, AA2"
@@ -135,6 +201,11 @@ def test_invalid_get_osd_data_capability(client):
 
 
 def test_response_body():
+    """This function tests that the response from the REST API contains
+       the expected body contents when retrieving OSD metadata.
+
+    :raises AssertionError: If the response body is invalid.
+    """
     error_msg = "Validation failed"
     response = validation_response(error_msg)
 

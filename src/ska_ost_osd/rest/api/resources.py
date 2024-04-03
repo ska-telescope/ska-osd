@@ -47,6 +47,15 @@ def error_handler(api_fn: str) -> str:
 
 @error_handler
 def get_osd_data_response(query_params, tm_data_sources):
+    """This function takes query parameters and OSd data source objects
+      to generate a response containing matching OSd data.
+
+    :param query_params (QueryParams): The query parameters.
+    :param tm_data_sources (list): A list of OSd data source objects.
+
+    :returns dict: A dictionary with OSd data satisfying the query.
+    """
+
     tm_data_sources = osd_tmdata_source(
         cycle_id=query_params.cycle_id,
         osd_version=query_params.osd_version,
@@ -77,6 +86,13 @@ def get_osd_data_response(query_params, tm_data_sources):
 
 @error_handler
 def get_osd(**kwargs):
+    """This function retrieves OSD resources based on the parameters passed.
+
+    :param kwargs (dict): Additional keyword arguments to filter results.
+    :returns dict/list: The matching OSD resources.
+    :raises ValueError: If invalid parameters are passed.
+    """
+
     query_params, error_list = get_qry_params(kwargs)
 
     return get_osd_data_response(query_params, error_list)
@@ -102,7 +118,6 @@ def get_qry_params(kwargs: dict) -> QueryParams:
 
     :param kwargs: Dict with parameters from HTTP GET request
     :return: An instance of QueryParams
-    :raises: TypeError if a supported QueryParams cannot be extracted
     """
 
     return QueryParamsFactory.from_dict(kwargs)

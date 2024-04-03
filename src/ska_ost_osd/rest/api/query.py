@@ -38,6 +38,16 @@ query_fields = [
 class QueryParamsFactory:
     @staticmethod
     def from_dict(kwargs: dict) -> QueryParams:
+        """Convert a dictionary to a QueryParams object.
+
+        :param kwargs (dict): The dictionary to convert.
+
+        :returns QueryParams: An instance of the QueryParams class populated
+            with values from the dictionary.
+
+        :raises TypeError: If kwargs is not a dictionary.
+        """
+
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
 
         def params_in_kwargs(field: str) -> bool:
@@ -59,6 +69,16 @@ class QueryParamsFactory:
 
 
 def osd_validation(params_in_kwargs, kwargs: dict) -> dict:
+    """Validate parameters passed to the OSD API.
+
+    :param params_in_kwargs (dict): The parameters passed to the API endpoint.
+    :param kwargs (dict): Additional keyword arguments.
+
+    :returns dict: The validated parameters.
+
+    :raises ValueError: If any required parameters are missing or invalid.
+    """
+
     if params_in_kwargs("cycle_id") and params_in_kwargs("source"):
         if kwargs.get("source"):
             source = kwargs.get("source")

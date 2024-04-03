@@ -1,5 +1,5 @@
 Welcome to ska-ost-osd's documentation!
-===================================
+=======================================
 
 .. toctree::
    :maxdepth: 1
