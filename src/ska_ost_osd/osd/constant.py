@@ -22,7 +22,7 @@ osd_response_template = {
 
 
 BASE_URL = "//gitlab.com/ska-telescope/ost/ska-ost-osd?"
-BASE_FOLDER_NAME = "osd_data"
+BASE_FOLDER_NAME = "tm_data"
 
 source_list = ["file", "car", "gitlab"]
 array_assembly_pattern = r"^AA(\d+|\d+\.\d+)"

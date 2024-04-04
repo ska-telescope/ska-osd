@@ -68,7 +68,7 @@ def get_osd_data_response(query_params, tm_data_sources):
         tm_data_sources.clear()
         return error_msg
 
-    tm_data = TMData(source_uris=tm_data_sources, update=True)
+    tm_data = TMData(source_uris=tm_data_sources)
 
     osd_data = get_osd_data(
         capabilities=[query_params.capabilities],

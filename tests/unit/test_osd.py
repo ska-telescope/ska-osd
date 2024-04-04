@@ -139,7 +139,7 @@ def test_set_source_car_method(validate_car_class):  # pylint: disable=W0621
     """
 
     assert validate_car_class == (
-        "car://gitlab.com/ska-telescope/ost/ska-ost-osd?1.11.0#osd_data",
+        "car://gitlab.com/ska-telescope/ost/ska-ost-osd?1.11.0#tm_data",
     )
 
 
@@ -150,7 +150,7 @@ def test_set_source_gitlab_method(validate_gitlab_class):  # pylint: disable=W06
     :param osd_tmdata_source: validate_gitlab_class fixture.
     """
 
-    msg = "nak-776-osd-implementation-file-versioning#osd_data"
+    msg = "nak-776-osd-implementation-file-versioning#tm_data"
 
     assert validate_gitlab_class == (
         f"gitlab://gitlab.com/ska-telescope/ost/ska-ost-osd?{msg}",
@@ -165,7 +165,7 @@ def test_validate_gitlab_with_both_invalid_param():
 
     telmodel_version = version("ska_telmodel")
 
-    msg = f"ost/ska-ost-osd?{telmodel_version}#osd_data"
+    msg = f"ost/ska-ost-osd?{telmodel_version}#tm_data"
 
     assert osd_tmdata_source() == (f"car://gitlab.com/ska-telescope/{msg}",)
 
@@ -176,7 +176,7 @@ def test_check_osd_version_method():
     """
 
     assert osd_tmdata_source(osd_version="1.0.0") == (
-        "car://gitlab.com/ska-telescope/ost/ska-ost-osd?1.0.0#osd_data",
+        "car://gitlab.com/ska-telescope/ost/ska-ost-osd?1.0.0#tm_data",
     )
 
 
@@ -186,7 +186,7 @@ def test_check_cycle_id_and_osd_version_method():
     it should return the correct URL
     """
 
-    msg = "ost/ska-ost-osd?1.11.0#osd_data"
+    msg = "ost/ska-ost-osd?1.11.0#tm_data"
 
     assert osd_tmdata_source(cycle_id=1, osd_version="1.11.0") == (
         f"car://gitlab.com/ska-telescope/{msg}",
@@ -200,7 +200,7 @@ def test_check_cycle_id_2_and_osd_version_method():
     """
 
     assert osd_tmdata_source(cycle_id=2, osd_version="1.0.0") == (
-        "car://gitlab.com/ska-telescope/ost/ska-ost-osd?1.0.0#osd_data",
+        "car://gitlab.com/ska-telescope/ost/ska-ost-osd?1.0.0#tm_data",
     )
 
 
@@ -211,7 +211,7 @@ def test_check_cycle_id_with_source_method():
     """
 
     assert osd_tmdata_source(cycle_id=2, osd_version="1.0.0", source="file") == (
-        "file://osd_data",
+        "file://tm_data",
     )
 
 
@@ -222,7 +222,7 @@ def test_check_master_branch_method():
     """
 
     assert osd_tmdata_source(cycle_id=2, gitlab_branch="master", source="gitlab") == (
-        "gitlab://gitlab.com/ska-telescope/ost/ska-ost-osd?master#osd_data",
+        "gitlab://gitlab.com/ska-telescope/ost/ska-ost-osd?master#tm_data",
     )
 
 
