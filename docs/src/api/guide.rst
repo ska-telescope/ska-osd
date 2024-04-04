@@ -239,7 +239,7 @@ OSD as a service
      - Resource URL
      - Description
    * - GET
-     - ``/api/v1/osd``
+     - ``/ska-ost-osd/api/v1/osd``
      - **Getting Data**
 
        Return the OSD cycle_id data.
@@ -278,6 +278,23 @@ OSD as a service
 5. Example Response
 
     * The API returns a JSON object containing the matched OSD data.
+
+        Calling API with parameters ``cycle_id``, ``source``, ``capabilities`` and ``array_assembly`` with 
+        their valid inputs will return the JSON containing the matched OSD data.
+
+    .. code:: python
+
+        client.get(
+            "/ska-ost-osd/api/v1/osd",
+            query_string={
+                "cycle_id": 1,
+                "source": "file",
+                "capabilities": "mid",
+                "array_assembly": "AA0.5",
+            },
+        )
+
+    * Response
 
     .. code:: python
 
@@ -381,7 +398,7 @@ Error Handling
 
     All the error_messages are combined in a single string.
     
-
+    
 Release Steps
 ~~~~~~~~~~~~~~
 
