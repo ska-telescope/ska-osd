@@ -61,6 +61,10 @@ PYTHON_TEST_FILE = tests/unit/
 
 REST_POD_NAME=$(shell kubectl get pods -o name -n $(KUBE_NAMESPACE) -l app=ska-ost-osd,component=rest | cut -c 5-)
 
+rest: ## start OSD REST server
+	docker run --rm -p 5000:5000 --name=$(PROJECT_NAME) $(IMAGE_TO_TEST) gunicorn --chdir src \
+		--bind 0.0.0.0:5000 --logger-class=ska_ost_osd.rest.wsgi.UniformLogger --log-level=$(LOG_LEVEL) ska_ost_osd.rest.wsgi:app
+
 # install helm plugin from https://github.com/helm-unittest/helm-unittest.git
 k8s-chart-test:
 	mkdir -p charts/build; \
