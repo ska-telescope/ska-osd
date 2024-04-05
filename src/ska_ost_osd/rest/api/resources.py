@@ -10,7 +10,6 @@ from http import HTTPStatus
 
 from ska_telmodel.data import TMData
 
-from ska_ost_osd.osd.helper import OSDDataException
 from ska_ost_osd.osd.osd import get_osd_data, osd_tmdata_source
 from ska_ost_osd.rest.api.query import QueryParams, QueryParamsFactory
 
@@ -29,16 +28,6 @@ def error_handler(api_fn: str) -> str:
     def wrapper(*args, **kwargs):
         try:
             return api_fn(*args, **kwargs)
-        except OSDDataException as err:
-            return (
-                validation_response(err.args[0], HTTPStatus.BAD_REQUEST),
-                HTTPStatus.BAD_REQUEST,
-            )
-        except ValueError as err:
-            return (
-                validation_response(err.args[0], HTTPStatus.BAD_REQUEST),
-                HTTPStatus.BAD_REQUEST,
-            )
         except Exception as err:  # pylint: disable=W0718
             return validation_response(str(err)), HTTPStatus.INTERNAL_SERVER_ERROR
 

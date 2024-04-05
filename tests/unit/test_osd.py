@@ -138,9 +138,7 @@ def test_set_source_car_method(validate_car_class):  # pylint: disable=W0621
     :param osd_tmdata_source: validate_car_class fixture.
     """
 
-    assert validate_car_class == (
-        "car://gitlab.com/ska-telescope/ost/ska-ost-osd?1.11.0#tm_data",
-    )
+    assert validate_car_class == ("car:ost/ska-ost-osd?1.11.0#tmdata",)
 
 
 def test_set_source_gitlab_method(validate_gitlab_class):  # pylint: disable=W0621
@@ -150,7 +148,7 @@ def test_set_source_gitlab_method(validate_gitlab_class):  # pylint: disable=W06
     :param osd_tmdata_source: validate_gitlab_class fixture.
     """
 
-    msg = "nak-776-osd-implementation-file-versioning#tm_data"
+    msg = "nak-776-osd-implementation-file-versioning#tmdata"
 
     assert validate_gitlab_class == (
         f"gitlab://gitlab.com/ska-telescope/ost/ska-ost-osd?{msg}",
@@ -165,9 +163,9 @@ def test_validate_gitlab_with_both_invalid_param():
 
     telmodel_version = version("ska_telmodel")
 
-    msg = f"ost/ska-ost-osd?{telmodel_version}#tm_data"
+    msg = f"car:ost/ska-ost-osd?{telmodel_version}#tmdata"
 
-    assert osd_tmdata_source() == (f"car://gitlab.com/ska-telescope/{msg}",)
+    assert osd_tmdata_source() == (msg,)
 
 
 def test_check_osd_version_method():
@@ -176,7 +174,7 @@ def test_check_osd_version_method():
     """
 
     assert osd_tmdata_source(osd_version="1.0.0") == (
-        "car://gitlab.com/ska-telescope/ost/ska-ost-osd?1.0.0#tm_data",
+        "car:ost/ska-ost-osd?1.0.0#tmdata",
     )
 
 
@@ -186,10 +184,8 @@ def test_check_cycle_id_and_osd_version_method():
     it should return the correct URL
     """
 
-    msg = "ost/ska-ost-osd?1.11.0#tm_data"
-
     assert osd_tmdata_source(cycle_id=1, osd_version="1.11.0") == (
-        f"car://gitlab.com/ska-telescope/{msg}",
+        "car:ost/ska-ost-osd?1.11.0#tmdata",
     )
 
 
@@ -200,7 +196,7 @@ def test_check_cycle_id_2_and_osd_version_method():
     """
 
     assert osd_tmdata_source(cycle_id=2, osd_version="1.0.0") == (
-        "car://gitlab.com/ska-telescope/ost/ska-ost-osd?1.0.0#tm_data",
+        "car:ost/ska-ost-osd?1.0.0#tmdata",
     )
 
 
@@ -211,7 +207,7 @@ def test_check_cycle_id_with_source_method():
     """
 
     assert osd_tmdata_source(cycle_id=2, osd_version="1.0.0", source="file") == (
-        "file://tm_data",
+        "file://tmdata",
     )
 
 
@@ -222,7 +218,7 @@ def test_check_master_branch_method():
     """
 
     assert osd_tmdata_source(cycle_id=2, gitlab_branch="master", source="gitlab") == (
-        "gitlab://gitlab.com/ska-telescope/ost/ska-ost-osd?master#tm_data",
+        "gitlab://gitlab.com/ska-telescope/ost/ska-ost-osd?master#tmdata",
     )
 
 
@@ -254,8 +250,8 @@ def test_invalid_osd_tmdata_source():
 
 
 def test_invalid_source():
-    """This test case returns a error messgae when source is not given
-    with gitlab_branch parameter and cycle_id.
+    """This test case checks when gitlab_branch is given source
+    should be gitlab else will raise / return error..
     """
     error_msgs = osd_tmdata_source(
         cycle_id=1,
@@ -283,11 +279,11 @@ def test_invalid_get_osd_data_capability(tm_data):  # pylint: disable=W0621
     expected_error_msg = ", ".join([str(err) for err in error_msgs])
     error_msgs.clear()
 
-    expected_error_msg_1 = (
+    expected_error_msg = (
         "Capability midd doesn't exists,Available are low, mid, observatory_policies"
     )
 
-    assert expected_error_msg == f"{expected_error_msg_1}"
+    assert expected_error_msg == expected_error_msg
 
 
 def test_invalid_get_osd_data_array_assembly(tm_data):  # pylint: disable=W0621
@@ -305,8 +301,8 @@ def test_invalid_get_osd_data_array_assembly(tm_data):  # pylint: disable=W0621
     expected_error_msg = ", ".join([str(err) for err in error_msgs])
     error_msgs.clear()
 
-    expected_error_msg_1 = (
+    expected_error_msg = (
         "Array Assembly AA3 doesn't exists. Available are AA0.5, AA1, AA2"
     )
 
-    assert expected_error_msg == f"{expected_error_msg_1}"
+    assert expected_error_msg == expected_error_msg

@@ -40,13 +40,17 @@ def open_api_spec():
             },
             "version": "1.0.0",
         },
-        "servers": [{"url": "/ska-ost-osd/api/v1/"}],
+        "servers": [{"url": "ska-ost-osd/osd/api/v1"}],
         "paths": {
             "/osd": {
                 "get": {
                     "summary": "Get OSD data filter by the query parameter",
                     "description": (
-                        "Retrieves the OSD data which match the query parameters.\n"
+                        "Retrieves the OSD cycle_id data which match the query"
+                        " parameters. Also requests without parameters will take"
+                        " \nexample and default values and return data based on that."
+                        " All query parameters has its own validation \nif user provide"
+                        " any invalid value it will return the error message.\n"
                     ),
                     "operationId": "ska_ost_osd.rest.api.resources.get_osd",
                     "parameters": [
@@ -55,12 +59,14 @@ def open_api_spec():
                             "name": "cycle_id",
                             "schema": {"type": "integer"},
                             "required": False,
+                            "example": 1,
                         },
                         {
                             "in": "query",
                             "name": "osd_version",
                             "schema": {"type": "string"},
                             "required": False,
+                            "example": "1.0.0",
                         },
                         {
                             "in": "query",
@@ -81,7 +87,11 @@ def open_api_spec():
                         {
                             "in": "query",
                             "name": "capabilities",
-                            "schema": {"type": "string", "enum": ["mid", "low"]},
+                            "schema": {
+                                "type": "string",
+                                "enum": ["mid", "low"],
+                                "default": "mid",
+                            },
                             "required": False,
                         },
                         {
@@ -89,6 +99,7 @@ def open_api_spec():
                             "name": "array_assembly",
                             "schema": {"type": "string"},
                             "required": False,
+                            "example": "AA0.5",
                         },
                     ],
                     "responses": {
@@ -156,12 +167,14 @@ def open_api_spec():
                     "name": "cycle_id",
                     "schema": {"type": "integer"},
                     "required": False,
+                    "example": 1,
                 },
                 "osd_version": {
                     "in": "query",
                     "name": "osd_version",
                     "schema": {"type": "string"},
                     "required": False,
+                    "example": "1.0.0",
                 },
                 "source": {
                     "in": "query",
@@ -182,7 +195,11 @@ def open_api_spec():
                 "capabilities": {
                     "in": "query",
                     "name": "capabilities",
-                    "schema": {"type": "string", "enum": ["mid", "low"]},
+                    "schema": {
+                        "type": "string",
+                        "enum": ["mid", "low"],
+                        "default": "mid",
+                    },
                     "required": False,
                 },
                 "array_assembly": {
@@ -190,6 +207,7 @@ def open_api_spec():
                     "name": "array_assembly",
                     "schema": {"type": "string"},
                     "required": False,
+                    "example": "AA0.5",
                 },
             },
             "responses": {
@@ -227,31 +245,6 @@ def open_api_spec():
                                     "status": {"type": "integer"},
                                     "title": {"type": "string"},
                                     "detail": {"type": "string"},
-                                },
-                            }
-                        }
-                    },
-                },
-                "UnprocessableEntity": {
-                    "description": (
-                        "Unprocessable Entity, semantic error in request eg"
-                        " mismatched IDs"
-                    ),
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "title": {"type": "string"},
-                                    "detail": {"type": "string"},
-                                    "traceback": {
-                                        "type": "object",
-                                        "properties": {
-                                            "key": {"type": "string"},
-                                            "type": {"type": "string"},
-                                            "full_traceback": {"type": "string"},
-                                        },
-                                    },
                                 },
                             }
                         }
