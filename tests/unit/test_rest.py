@@ -28,7 +28,7 @@ def test_init_app(open_api_spec):
         app = init_app()
 
         assert app.url_map._rules_by_endpoint[  # pylint: disable=W0212
-            "/ska-ost-osd/api/v1.ska_ost_osd_rest_api_resources_get_osd"
+            "/ska-ost-osd/osd/api/v1.ska_ost_osd_rest_api_resources_get_osd"
         ]
 
 
@@ -105,7 +105,7 @@ def test_osd_endpoint(client, mid_osd_data):
     """
 
     response = client.get(
-        "/ska-ost-osd/api/v1/osd",
+        "/ska-ost-osd/osd/api/v1/osd",
         query_string={
             "cycle_id": 1,
             "source": "file",
@@ -128,7 +128,7 @@ def test_invalid_osd_tmdata_source(client):
        error message.
     """
     error_msgs = client.get(
-        "/ska-ost-osd/api/v1/osd",
+        "/ska-ost-osd/osd/api/v1/osd",
         query_string={
             "cycle_id": 3,
             "osd_version": "1..1.0",
@@ -159,7 +159,7 @@ def test_invalid_osd_tmdata_source_capabilities(client):
     """
 
     error_msgs = client.get(
-        "/ska-ost-osd/api/v1/osd",
+        "/ska-ost-osd/osd/api/v1/osd",
         query_string={
             "cycle_id": 1,
             "osd_version": "1.1.0",
@@ -189,7 +189,7 @@ def test_invalid_array_assembly(client):
     :param client (FlaskClient): The Flask test client.
     """
     error_msgs = client.get(
-        "/ska-ost-osd/api/v1/osd",
+        "/ska-ost-osd/osd/api/v1/osd",
         query_string={"capabilities": "mid", "array_assembly": "AA3"},
     )
 

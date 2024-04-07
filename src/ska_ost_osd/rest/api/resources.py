@@ -12,7 +12,6 @@ from importlib.metadata import version
 from ska_telmodel.data import TMData
 from ska_telmodel.telvalidation import SchematicValidationError, semantic_validate
 
-from ska_ost_osd.osd.helper import OSDDataException
 from ska_ost_osd.osd.osd import get_osd_data, osd_tmdata_source
 from ska_ost_osd.rest.api.query import QueryParams, QueryParamsFactory
 

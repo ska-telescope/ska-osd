@@ -8,6 +8,7 @@ from ska_telmodel.data import TMData
 from .constant import (
     BASE_FOLDER_NAME,
     BASE_URL,
+    CAR_URL,
     array_assembly_pattern,
     error_msg_list,
     osd_file_mapping,
@@ -311,7 +312,10 @@ def osd_tmdata_source(
     if source == "file":
         return (f"file://{BASE_FOLDER_NAME}",)
 
-    return (f"{source}:{BASE_URL}{osd_version}#{BASE_FOLDER_NAME}",)
+    if source == "car":
+        return (f"{source}:{CAR_URL}{osd_version}#{BASE_FOLDER_NAME}",)
+
+    return (f"{source}:{BASE_URL}{CAR_URL}{osd_version}#{BASE_FOLDER_NAME}",)
 
 
 def get_osd_data(
