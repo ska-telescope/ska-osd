@@ -7,7 +7,7 @@ from connexion import App
 
 KUBE_NAMESPACE = os.getenv("KUBE_NAMESPACE", "ska-ost-osd")
 ODA_MAJOR_VERSION = version("ska-ost-osd").split(".")[0]
-API_PATH = f"{KUBE_NAMESPACE}/osd/api/v{ODA_MAJOR_VERSION}"
+API_PATH = f"{KUBE_NAMESPACE}/api/v{ODA_MAJOR_VERSION}"
 
 
 # There is a (another) issue with Connexion where it cannot validate

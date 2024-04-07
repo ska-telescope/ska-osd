@@ -42,17 +42,17 @@ def open_api_spec():
             },
             "version": "1.0.0",
         },
-        "servers": [{"url": "ska-ost-osd/osd/api/v1"}],
+        "servers": [{"url": "ska-ost-osd/api/v1"}],
         "paths": {
             "/osd": {
                 "get": {
                     "summary": "Get OSD data filter by the query parameter",
                     "description": (
                         "Retrieves the OSD cycle_id data which match the query"
-                        " parameters. Also requests without parameters will take"
-                        " \nexample and default values and return data based on that."
-                        " All query parameters has its own validation \nif user provide"
-                        " any invalid value it will return the error message.\n"
+                        " parameters. Also requests without parameters will"
+                        " take\nexample and default values and return data based on"
+                        " that. All query parameters has its own validation\nif user"
+                        " provide any invalid value it will return the error message.\n"
                     ),
                     "operationId": "ska_ost_osd.rest.api.resources.get_osd",
                     "parameters": [

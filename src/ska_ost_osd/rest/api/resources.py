@@ -40,6 +40,11 @@ def error_handler(api_fn: callable) -> str:
                 validation_response(err.args[0].split("\n"), HTTPStatus.BAD_REQUEST),
                 HTTPStatus.BAD_REQUEST,
             )
+        except ValueError as err:
+            return (
+                validation_response(err.args[0], HTTPStatus.BAD_REQUEST),
+                HTTPStatus.BAD_REQUEST,
+            )
         except Exception as err:  # pylint: disable=W0718
             return validation_response(str(err)), HTTPStatus.INTERNAL_SERVER_ERROR
 
