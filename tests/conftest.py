@@ -29,423 +29,442 @@ def open_api_spec():
     """
 
     return {
-        "openapi": "3.0.0",
-        "info": {
-            "title": "Observatory Static Data API",
-            "description": (
-                "This OpenAPI document defines the API for the Observatory Static Data"
-                " (OSD) REST service"
-            ),
-            "license": {
-                "name": "BSD-3-Clause",
-                "url": "https://opensource.org/licenses/BSD-3-Clause",
-            },
-            "version": "1.0.0",
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Observatory Static Data API",
+        "description": "This OpenAPI document defines the API for the Observatory Static Data (OSD) REST service",
+        "license": {
+            "name": "BSD-3-Clause",
+            "url": "https://opensource.org/licenses/BSD-3-Clause",
         },
-        "servers": [{"url": "/ska-ost-osd/api/v1/"}],
-        "paths": {
-            "/osd": {
-                "get": {
-                    "summary": "Get OSD data filter by the query parameter",
-                    "description": (
-                        "Retrieves the OSD data which match the query parameters.\n"
-                    ),
-                    "operationId": "ska_ost_osd.rest.api.resources.get_osd",
-                    "parameters": [
-                        {
-                            "in": "query",
-                            "name": "cycle_id",
-                            "schema": {"type": "integer"},
-                            "required": False,
+        "version": "1.0.0",
+    },
+    "servers": [{"url": "/ska-ost-osd/api/v1/"}],
+    "paths": {
+        "/osd": {
+            "get": {
+                "summary": "Get OSD data filter by the query parameter",
+                "description": "Retrieves the OSD data which match the query parameters.\n",
+                "operationId": "ska_ost_osd.rest.api.resources.get_osd",
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "cycle_id",
+                        "schema": {"type": "integer"},
+                        "required": False,
+                    },
+                    {
+                        "in": "query",
+                        "name": "osd_version",
+                        "schema": {"type": "string"},
+                        "required": False,
+                    },
+                    {
+                        "in": "query",
+                        "name": "source",
+                        "schema": {
+                            "type": "string",
+                            "enum": ["file", "car", "gitlab"],
+                            "default": "file",
                         },
-                        {
-                            "in": "query",
-                            "name": "osd_version",
-                            "schema": {"type": "string"},
-                            "required": False,
-                        },
-                        {
-                            "in": "query",
-                            "name": "source",
-                            "schema": {
-                                "type": "string",
-                                "enum": ["file", "car", "gitlab"],
-                                "default": "file",
-                            },
-                            "required": False,
-                        },
-                        {
-                            "in": "query",
-                            "name": "gitlab_branch",
-                            "schema": {"type": "string"},
-                            "required": False,
-                        },
-                        {
-                            "in": "query",
-                            "name": "capabilities",
-                            "schema": {"type": "string", "enum": ["mid", "low"]},
-                            "required": False,
-                        },
-                        {
-                            "in": "query",
-                            "name": "array_assembly",
-                            "schema": {"type": "string"},
-                            "required": False,
-                        },
-                    ],
-                    "responses": {
-                        "200": {
-                            "description": "OK",
-                            "content": {
-                                "application/json": {
-                                    "schema": {
-                                        "type": "array",
-                                        "items": {"type": "object"},
-                                    }
-                                }
-                            },
-                        },
-                        "400": {
-                            "description": (
-                                "Bad Request, eg validation of against OpenAPI spec"
-                                " failed"
-                            ),
-                            "content": {
-                                "application/json": {
-                                    "schema": {
-                                        "type": "object",
-                                        "properties": {
-                                            "status": {"type": "integer"},
-                                            "title": {"type": "string"},
-                                            "detail": {"type": "string"},
-                                        },
-                                    }
-                                }
-                            },
-                        },
-                        "500": {
-                            "description": "Internal Server Error",
-                            "content": {
-                                "application/json": {
-                                    "schema": {
-                                        "type": "object",
-                                        "properties": {
-                                            "title": {"type": "string"},
-                                            "detail": {"type": "string"},
-                                            "traceback": {
-                                                "type": "object",
-                                                "properties": {
-                                                    "key": {"type": "string"},
-                                                    "type": {"type": "string"},
-                                                    "full_traceback": {
-                                                        "type": "string"
-                                                    },
-                                                },
-                                            },
-                                        },
-                                    }
-                                }
-                            },
+                        "required": False,
+                    },
+                    {
+                        "in": "query",
+                        "name": "gitlab_branch",
+                        "schema": {"type": "string"},
+                        "required": False,
+                    },
+                    {
+                        "in": "query",
+                        "name": "capabilities",
+                        "schema": {"type": "string", "enum": ["mid", "low"]},
+                        "required": False,
+                    },
+                    {
+                        "in": "query",
+                        "name": "array_assembly",
+                        "schema": {"type": "string"},
+                        "required": False,
+                    },
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {"type": "array", "items": {"type": "object"}}
+                            }
                         },
                     },
-                }
-            },
-            "/semantic_validation": {
-                "post": {
-                    "summary": "Validate input json Semantically",
-                    "description": "Validate input json Semantically\n",
-                    "operationId": (
-                        "ska_ost_osd.rest.api.resources.semantically_validate_json"
-                    ),
-                    "requestBody": {
-                        "required": True,
+                    "400": {
+                        "description": "Bad Request, eg validation of against OpenAPI spec failed",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "type": "object",
-                                    "required": ["observing_command_input"],
                                     "properties": {
-                                        "observing_command_input": {
+                                        "status": {"type": "integer"},
+                                        "title": {"type": "string"},
+                                        "detail": {"type": "string"},
+                                    },
+                                }
+                            }
+                        },
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "title": {"type": "string"},
+                                        "detail": {"type": "string"},
+                                        "traceback": {
                                             "type": "object",
-                                            "description": (
-                                                "Configuration for semantic validation."
-                                            ),
-                                            "example": {
-                                                "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
-                                                "subarray_id": 1,
-                                                "dish": {
-                                                    "receptor_ids": ["SKA001", "SKA002"]
-                                                },
-                                                "sdp": {
-                                                    "interface": "https://schema.skao.int/ska-sdp-assignres/0.4",
-                                                    "execution_block": {
-                                                        "eb_id": (
-                                                            "eb-test-20220916-00000"
-                                                        ),
-                                                        "max_length": 100.0,
-                                                        "context": {},
-                                                        "beams": [
-                                                            {
-                                                                "beam_id": "vis0",
-                                                                "function": (
-                                                                    "visibilities"
-                                                                ),
-                                                            }
-                                                        ],
-                                                        "scan_types": [
-                                                            {
-                                                                "scan_type_id": (
-                                                                    ".default"
-                                                                ),
-                                                                "beams": {
-                                                                    "vis0": {
-                                                                        "channels_id": "vis_channels",
-                                                                        "polarisations_id": (
-                                                                            "all"
-                                                                        ),
-                                                                    },
-                                                                    "pss1": {
-                                                                        "field_id": (
-                                                                            "field_a"
-                                                                        ),
-                                                                        "channels_id": "pulsar_channels",
-                                                                        "polarisations_id": (
-                                                                            "all"
-                                                                        ),
-                                                                    },
-                                                                },
-                                                            },
-                                                            {
-                                                                "scan_type_id": (
-                                                                    "target:a"
-                                                                ),
-                                                                "derive_from": (
-                                                                    ".default"
-                                                                ),
-                                                                "beams": {
-                                                                    "vis0": {
-                                                                        "field_id": (
-                                                                            "field_a"
-                                                                        )
-                                                                    }
-                                                                },
-                                                            },
-                                                        ],
-                                                        "channels": [
-                                                            {
-                                                                "channels_id": (
-                                                                    "vis_channels"
-                                                                ),
-                                                                "spectral_windows": [
-                                                                    {
-                                                                        "spectral_window_id": "fsp_1_channels",
-                                                                        "count": 14880,
-                                                                        "start": 0,
-                                                                        "stride": 2,
-                                                                        "freq_min": 350000000.0,
-                                                                        "freq_max": 368000000.0,
-                                                                        "link_map": [
-                                                                            [0, 0],
-                                                                            [200, 1],
-                                                                            [744, 2],
-                                                                            [944, 3],
-                                                                        ],
-                                                                    }
-                                                                ],
-                                                            }
-                                                        ],
-                                                        "polarisations": [
-                                                            {
-                                                                "polarisations_id": (
-                                                                    "all"
-                                                                ),
-                                                                "corr_type": [
-                                                                    "XX",
-                                                                    "XY",
-                                                                    "YY",
-                                                                    "YX",
-                                                                ],
-                                                            }
-                                                        ],
-                                                        "fields": [
-                                                            {
-                                                                "field_id": "field_a",
-                                                                "phase_dir": {
-                                                                    "ra": [123, 0.1],
-                                                                    "dec": [80, 0.1],
-                                                                    "reference_time": "2023-02-16T01:23:45.678900",
-                                                                    "reference_frame": (
-                                                                        "ICRF3"
-                                                                    ),
-                                                                },
-                                                                "pointing_fqdn": "low-tmc/telstate/0/pointing",
-                                                            }
-                                                        ],
-                                                    },
-                                                    "processing_blocks": [
+                                            "properties": {
+                                                "key": {"type": "string"},
+                                                "type": {"type": "string"},
+                                                "full_traceback": {"type": "string"},
+                                            },
+                                        },
+                                    },
+                                }
+                            }
+                        },
+                    },
+                },
+            }
+        },
+        "/semantic_validation": {
+            "post": {
+                "summary": "Checks if the Command Input JSON is semantically valid",
+                "description": "Validate input json Semantically\nSemantic validation checks the meaning of the input data and ensures that it is valid in the context of the system. It checks whether the input data conforms to the business rules and logic of the system.\n",
+                "operationId": "ska_ost_osd.rest.api.resources.semantically_validate_json",
+                "requestBody": {
+                    "required": True,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["observing_command_input"],
+                                "properties": {
+                                    "observing_command_input": {
+                                        "type": "object",
+                                        "description": "Configuration for semantic validation.",
+                                        "example": {
+                                            "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
+                                            "subarray_id": 1,
+                                            "dish": {
+                                                "receptor_ids": ["SKA001", "SKA002"]
+                                            },
+                                            "sdp": {
+                                                "interface": "https://schema.skao.int/ska-sdp-assignres/0.4",
+                                                "execution_block": {
+                                                    "eb_id": "eb-test-20220916-00000",
+                                                    "max_length": 100.0,
+                                                    "context": {},
+                                                    "beams": [
                                                         {
-                                                            "pb_id": "pb-mvp01-20200325-00001",
-                                                            "script": {
-                                                                "kind": "realtime",
-                                                                "name": "vis_receive",
-                                                                "version": "0.1.0",
+                                                            "beam_id": "vis0",
+                                                            "function": "visibilities",
+                                                        }
+                                                    ],
+                                                    "scan_types": [
+                                                        {
+                                                            "scan_type_id": ".default",
+                                                            "beams": {
+                                                                "vis0": {
+                                                                    "channels_id": "vis_channels",
+                                                                    "polarisations_id": "all",
+                                                                },
+                                                                "pss1": {
+                                                                    "field_id": "field_a",
+                                                                    "channels_id": "pulsar_channels",
+                                                                    "polarisations_id": "all",
+                                                                },
                                                             },
-                                                            "parameters": {},
                                                         },
                                                         {
-                                                            "pb_id": "pb-mvp01-20200325-00002",
-                                                            "script": {
-                                                                "kind": "realtime",
-                                                                "name": "test_realtime",
-                                                                "version": "0.1.0",
-                                                            },
-                                                            "parameters": {},
-                                                        },
-                                                        {
-                                                            "pb_id": "pb-mvp01-20200325-00003",
-                                                            "script": {
-                                                                "kind": "batch",
-                                                                "name": "ical",
-                                                                "version": "0.1.0",
-                                                            },
-                                                            "parameters": {},
-                                                            "dependencies": [
-                                                                {
-                                                                    "pb_id": "pb-mvp01-20200325-00001",
-                                                                    "kind": [
-                                                                        "visibilities"
-                                                                    ],
+                                                            "scan_type_id": "target:a",
+                                                            "derive_from": ".default",
+                                                            "beams": {
+                                                                "vis0": {
+                                                                    "field_id": "field_a"
                                                                 }
-                                                            ],
-                                                            "sbi_ids": [
-                                                                "sbi-mvp01-20200325-00001"
-                                                            ],
-                                                        },
-                                                        {
-                                                            "pb_id": "pb-mvp01-20200325-00004",
-                                                            "script": {
-                                                                "kind": "batch",
-                                                                "name": "dpreb",
-                                                                "version": "0.1.0",
                                                             },
-                                                            "parameters": {},
-                                                            "dependencies": [
-                                                                {
-                                                                    "pb_id": "pb-mvp01-20200325-00003",
-                                                                    "kind": [
-                                                                        "calibration"
-                                                                    ],
-                                                                }
-                                                            ],
                                                         },
                                                     ],
-                                                    "resources": {
-                                                        "csp_links": [1, 2, 3, 4],
-                                                        "receptors": [
-                                                            "SKA001",
-                                                            "SKA002",
+                                                    "channels": [
+                                                        {
+                                                            "channels_id": "vis_channels",
+                                                            "spectral_windows": [
+                                                                {
+                                                                    "spectral_window_id": "fsp_1_channels",
+                                                                    "count": 14880,
+                                                                    "start": 0,
+                                                                    "stride": 2,
+                                                                    "freq_min": 350000000.0,
+                                                                    "freq_max": 368000000.0,
+                                                                    "link_map": [
+                                                                        [0, 0],
+                                                                        [200, 1],
+                                                                        [744, 2],
+                                                                        [944, 3],
+                                                                    ],
+                                                                }
+                                                            ],
+                                                        }
+                                                    ],
+                                                    "polarisations": [
+                                                        {
+                                                            "polarisations_id": "all",
+                                                            "corr_type": [
+                                                                "XX",
+                                                                "XY",
+                                                                "YY",
+                                                                "YX",
+                                                            ],
+                                                        }
+                                                    ],
+                                                    "fields": [
+                                                        {
+                                                            "field_id": "field_a",
+                                                            "phase_dir": {
+                                                                "ra": [123, 0.1],
+                                                                "dec": [80, 0.1],
+                                                                "reference_time": "2023-02-16T01:23:45.678900",
+                                                                "reference_frame": "ICRF3",
+                                                            },
+                                                            "pointing_fqdn": "low-tmc/telstate/0/pointing",
+                                                        }
+                                                    ],
+                                                },
+                                                "processing_blocks": [
+                                                    {
+                                                        "pb_id": "pb-mvp01-20200325-00001",
+                                                        "script": {
+                                                            "kind": "realtime",
+                                                            "name": "vis_receive",
+                                                            "version": "0.1.0",
+                                                        },
+                                                        "parameters": {},
+                                                    },
+                                                    {
+                                                        "pb_id": "pb-mvp01-20200325-00002",
+                                                        "script": {
+                                                            "kind": "realtime",
+                                                            "name": "test_realtime",
+                                                            "version": "0.1.0",
+                                                        },
+                                                        "parameters": {},
+                                                    },
+                                                    {
+                                                        "pb_id": "pb-mvp01-20200325-00003",
+                                                        "script": {
+                                                            "kind": "batch",
+                                                            "name": "ical",
+                                                            "version": "0.1.0",
+                                                        },
+                                                        "parameters": {},
+                                                        "dependencies": [
+                                                            {
+                                                                "pb_id": "pb-mvp01-20200325-00001",
+                                                                "kind": [
+                                                                    "visibilities"
+                                                                ],
+                                                            }
+                                                        ],
+                                                        "sbi_ids": [
+                                                            "sbi-mvp01-20200325-00001"
                                                         ],
                                                     },
+                                                    {
+                                                        "pb_id": "pb-mvp01-20200325-00004",
+                                                        "script": {
+                                                            "kind": "batch",
+                                                            "name": "dpreb",
+                                                            "version": "0.1.0",
+                                                        },
+                                                        "parameters": {},
+                                                        "dependencies": [
+                                                            {
+                                                                "pb_id": "pb-mvp01-20200325-00003",
+                                                                "kind": ["calibration"],
+                                                            }
+                                                        ],
+                                                    },
+                                                ],
+                                                "resources": {
+                                                    "csp_links": [1, 2, 3, 4],
+                                                    "receptors": ["SKA001", "SKA002"],
                                                 },
                                             },
                                         },
-                                        "interface": {
+                                    },
+                                    "interface": {
+                                        "type": "string",
+                                        "example": "https://schema.skao.int/ska-tmc-assignresources/2.1",
+                                    },
+                                    "sources": {
+                                        "type": "string",
+                                        "example": "car://gitlab.com/ska-telescope/ska-telmodel?1.14.1#tmdata",
+                                    },
+                                    "raise_semantic": {
+                                        "type": "boolean",
+                                        "example": True,
+                                    },
+                                    "osd_data": {
+                                        "type": "object",
+                                        "description": "Observatory data for validation.",
+                                        "example": {
+                                            "observatory_policy": {
+                                                "cycle_number": 2,
+                                                "cycle_description": "Science Verification",
+                                                "cycle_information": {
+                                                    "cycle_id": "SKAO_2027_1",
+                                                    "proposal_open": "2026-03-27T12:00:00.000Z",
+                                                    "proposal_close": "2026-05-12T15:00:00.000Z",
+                                                },
+                                                "cycle_policies": {
+                                                    "normal_max_hours": 100.0
+                                                },
+                                                "telescope_capabilities": {
+                                                    "Mid": "AA2",
+                                                    "Low": "AA2",
+                                                },
+                                            },
+                                            "capabilities": {
+                                                "mid": {
+                                                    "AA0.5": {
+                                                        "available_receivers": [
+                                                            "Band_1",
+                                                            "Band_2",
+                                                        ],
+                                                        "number_ska_dishes": 4,
+                                                        "number_meerkat_dishes": 0,
+                                                        "number_meerkatplus_dishes": 0,
+                                                        "max_baseline_km": 1.5,
+                                                        "available_bandwidth_hz": 800000.0,
+                                                        "number_channels": 14880,
+                                                        "number_zoom_windows": 0,
+                                                        "number_zoom_channels": 0,
+                                                        "number_pss_beams": 0,
+                                                        "number_pst_beams": 0,
+                                                        "ps_beam_bandwidth_hz": 0.0,
+                                                        "number_fsps": 4,
+                                                    },
+                                                    "basic_capabilities": {
+                                                        "dish_elevation_limit_deg": 15.0,
+                                                        "receiver_information": [
+                                                            {
+                                                                "rx_id": "Band_1",
+                                                                "min_frequency_hz": 350000000.0,
+                                                                "max_frequency_hz": 1050000000.0,
+                                                            },
+                                                            {
+                                                                "rx_id": "Band_2",
+                                                                "min_frequency_hz": 950000000.0,
+                                                                "max_frequency_hz": 1760000000.0,
+                                                            },
+                                                            {
+                                                                "rx_id": "Band_3",
+                                                                "min_frequency_hz": 1650000000.0,
+                                                                "max_frequency_hz": 3050000000.0,
+                                                            },
+                                                            {
+                                                                "rx_id": "Band_4",
+                                                                "min_frequency_hz": 2800000000.0,
+                                                                "max_frequency_hz": 5180000000.0,
+                                                            },
+                                                            {
+                                                                "rx_id": "Band_5a",
+                                                                "min_frequency_hz": 4600000000.0,
+                                                                "max_frequency_hz": 8500000000.0,
+                                                            },
+                                                            {
+                                                                "rx_id": "Band_5b",
+                                                                "min_frequency_hz": 8300000000.0,
+                                                                "max_frequency_hz": 15400000000.0,
+                                                            },
+                                                        ],
+                                                    },
+                                                }
+                                            },
+                                        },
+                                    },
+                                },
+                            }
+                        }
+                    },
+                },
+                "responses": {
+                    "200": {
+                        "description": "Semantic Validation Successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
                                             "type": "string",
-                                            "example": "https://schema.skao.int/ska-tmc-assignresources/2.1",
+                                            "example": "Semantic Validation Successfully",
                                         },
-                                        "sources": {
+                                        "status": {
                                             "type": "string",
-                                            "example": "car://gitlab.com/ska-telescope/ska-telmodel?1.14.1#tmdata",
+                                            "example": "success",
                                         },
-                                        "raise_semantic": {
-                                            "type": "boolean",
-                                            "example": True,
-                                        },
-                                        "osd_data": {
+                                    },
+                                }
+                            }
+                        },
+                    },
+                    "400": {
+                        "description": "Bad Request due to semantic validation errors.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "Error": {
+                                            "type": "array",
+                                            "items": {"type": "string"},
+                                        }
+                                    },
+                                    "example": {
+                                        "Error": [
+                                            "receptor_ids are too many!Current Limit is 4",
+                                            "beams are too many! Current limit is 1",
+                                            "Invalid function for beams! Currently allowed visibilities",
+                                            "spectral windows are too many! Current limit = 1",
+                                            "Invalid input for channel_count! Currently allowed 14880",
+                                            "Invalid input for freq_min",
+                                            "Invalid input for freq_max",
+                                            "freq_min should be less than freq_max",
+                                            "length of receptor_ids should be same as length of receptors",
+                                            "receptor_ids did not match receptors",
+                                        ]
+                                    },
+                                }
+                            }
+                        },
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "title": {"type": "string"},
+                                        "detail": {"type": "string"},
+                                        "traceback": {
                                             "type": "object",
-                                            "description": (
-                                                "Observatory data for validation."
-                                            ),
-                                            "example": {
-                                                "observatory_policy": {
-                                                    "cycle_number": 2,
-                                                    "cycle_description": (
-                                                        "Science Verification"
-                                                    ),
-                                                    "cycle_information": {
-                                                        "cycle_id": "SKAO_2027_1",
-                                                        "proposal_open": (
-                                                            "2026-03-27T12:00:00.000Z"
-                                                        ),
-                                                        "proposal_close": (
-                                                            "2026-05-12T15:00:00.000Z"
-                                                        ),
-                                                    },
-                                                    "cycle_policies": {
-                                                        "normal_max_hours": 100.0
-                                                    },
-                                                    "telescope_capabilities": {
-                                                        "Mid": "AA2",
-                                                        "Low": "AA2",
-                                                    },
-                                                },
-                                                "capabilities": {
-                                                    "mid": {
-                                                        "AA0.5": {
-                                                            "available_receivers": [
-                                                                "Band_1",
-                                                                "Band_2",
-                                                            ],
-                                                            "number_ska_dishes": 4,
-                                                            "number_meerkat_dishes": 0,
-                                                            "number_meerkatplus_dishes": 0,
-                                                            "max_baseline_km": 1.5,
-                                                            "available_bandwidth_hz": 800000.0,
-                                                            "number_channels": 14880,
-                                                            "number_zoom_windows": 0,
-                                                            "number_zoom_channels": 0,
-                                                            "number_pss_beams": 0,
-                                                            "number_pst_beams": 0,
-                                                            "ps_beam_bandwidth_hz": 0.0,
-                                                            "number_fsps": 4,
-                                                        },
-                                                        "basic_capabilities": {
-                                                            "dish_elevation_limit_deg": 15.0,
-                                                            "receiver_information": [
-                                                                {
-                                                                    "rx_id": "Band_1",
-                                                                    "min_frequency_hz": 350000000.0,
-                                                                    "max_frequency_hz": 1050000000.0,
-                                                                },
-                                                                {
-                                                                    "rx_id": "Band_2",
-                                                                    "min_frequency_hz": 950000000.0,
-                                                                    "max_frequency_hz": 1760000000.0,
-                                                                },
-                                                                {
-                                                                    "rx_id": "Band_3",
-                                                                    "min_frequency_hz": 1650000000.0,
-                                                                    "max_frequency_hz": 3050000000.0,
-                                                                },
-                                                                {
-                                                                    "rx_id": "Band_4",
-                                                                    "min_frequency_hz": 2800000000.0,
-                                                                    "max_frequency_hz": 5180000000.0,
-                                                                },
-                                                                {
-                                                                    "rx_id": "Band_5a",
-                                                                    "min_frequency_hz": 4600000000.0,
-                                                                    "max_frequency_hz": 8500000000.0,
-                                                                },
-                                                                {
-                                                                    "rx_id": "Band_5b",
-                                                                    "min_frequency_hz": 8300000000.0,
-                                                                    "max_frequency_hz": 15400000000.0,
-                                                                },
-                                                            ],
-                                                        },
-                                                    }
-                                                },
+                                            "properties": {
+                                                "key": {"type": "string"},
+                                                "type": {"type": "string"},
+                                                "full_traceback": {"type": "string"},
                                             },
                                         },
                                     },
@@ -453,265 +472,164 @@ def open_api_spec():
                             }
                         },
                     },
-                    "responses": {
-                        "200": {
-                            "description": "Semantic Validation Successfully",
-                            "content": {
-                                "application/json": {
-                                    "schema": {
-                                        "type": "object",
-                                        "properties": {
-                                            "message": {
-                                                "type": "string",
-                                                "example": (
-                                                    "Semantic Validation Successfully"
-                                                ),
-                                            },
-                                            "status": {
-                                                "type": "string",
-                                                "example": "success",
-                                            },
-                                        },
-                                    }
-                                }
-                            },
-                        },
-                        "400": {
-                            "description": (
-                                "Bad Request due to semantic validation errors."
-                            ),
-                            "content": {
-                                "application/json": {
-                                    "schema": {
-                                        "type": "object",
-                                        "properties": {
-                                            "Error": {
-                                                "type": "array",
-                                                "items": {"type": "string"},
-                                            }
-                                        },
-                                        "example": {
-                                            "Error": [
-                                                (
-                                                    "receptor_ids are too many!Current"
-                                                    " Limit is 4"
-                                                ),
-                                                (
-                                                    "beams are too many! Current limit"
-                                                    " is 1"
-                                                ),
-                                                (
-                                                    "Invalid function for beams!"
-                                                    " Currently allowed visibilities"
-                                                ),
-                                                (
-                                                    "spectral windows are too many!"
-                                                    " Current limit = 1"
-                                                ),
-                                                (
-                                                    "Invalid input for channel_count!"
-                                                    " Currently allowed 14880"
-                                                ),
-                                                "Invalid input for freq_min",
-                                                "Invalid input for freq_max",
-                                                "freq_min should be less than freq_max",
-                                                (
-                                                    "length of receptor_ids should be"
-                                                    " same as length of receptors"
-                                                ),
-                                                "receptor_ids did not match receptors",
-                                            ]
-                                        },
-                                    }
-                                }
-                            },
-                        },
-                        "500": {
-                            "description": "Internal Server Error",
-                            "content": {
-                                "application/json": {
-                                    "schema": {
-                                        "type": "object",
-                                        "properties": {
-                                            "title": {"type": "string"},
-                                            "detail": {"type": "string"},
-                                            "traceback": {
-                                                "type": "object",
-                                                "properties": {
-                                                    "key": {"type": "string"},
-                                                    "type": {"type": "string"},
-                                                    "full_traceback": {
-                                                        "type": "string"
-                                                    },
-                                                },
-                                            },
-                                        },
-                                    }
-                                }
-                            },
-                        },
-                    },
-                }
+                },
+            }
+        },
+    },
+    "components": {
+        "parameters": {
+            "cycle_id": {
+                "in": "query",
+                "name": "cycle_id",
+                "schema": {"type": "integer"},
+                "required": False,
+            },
+            "osd_version": {
+                "in": "query",
+                "name": "osd_version",
+                "schema": {"type": "string"},
+                "required": False,
+            },
+            "source": {
+                "in": "query",
+                "name": "source",
+                "schema": {
+                    "type": "string",
+                    "enum": ["file", "car", "gitlab"],
+                    "default": "file",
+                },
+                "required": False,
+            },
+            "gitlab_branch": {
+                "in": "query",
+                "name": "gitlab_branch",
+                "schema": {"type": "string"},
+                "required": False,
+            },
+            "capabilities": {
+                "in": "query",
+                "name": "capabilities",
+                "schema": {"type": "string", "enum": ["mid", "low"]},
+                "required": False,
+            },
+            "array_assembly": {
+                "in": "query",
+                "name": "array_assembly",
+                "schema": {"type": "string"},
+                "required": False,
             },
         },
-        "components": {
-            "parameters": {
-                "cycle_id": {
-                    "in": "query",
-                    "name": "cycle_id",
-                    "schema": {"type": "integer"},
-                    "required": False,
-                },
-                "osd_version": {
-                    "in": "query",
-                    "name": "osd_version",
-                    "schema": {"type": "string"},
-                    "required": False,
-                },
-                "source": {
-                    "in": "query",
-                    "name": "source",
-                    "schema": {
-                        "type": "string",
-                        "enum": ["file", "car", "gitlab"],
-                        "default": "file",
-                    },
-                    "required": False,
-                },
-                "gitlab_branch": {
-                    "in": "query",
-                    "name": "gitlab_branch",
-                    "schema": {"type": "string"},
-                    "required": False,
-                },
-                "capabilities": {
-                    "in": "query",
-                    "name": "capabilities",
-                    "schema": {"type": "string", "enum": ["mid", "low"]},
-                    "required": False,
-                },
-                "array_assembly": {
-                    "in": "query",
-                    "name": "array_assembly",
-                    "schema": {"type": "string"},
-                    "required": False,
-                },
-            },
-            "responses": {
-                "NotFound": {
-                    "description": "Not Found",
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "title": {"type": "string"},
-                                    "detail": {"type": "string"},
-                                    "traceback": {
-                                        "type": "object",
-                                        "properties": {
-                                            "key": {"type": "string"},
-                                            "type": {"type": "string"},
-                                            "full_traceback": {"type": "string"},
-                                        },
-                                    },
-                                },
-                            }
-                        }
-                    },
-                },
-                "BadRequest": {
-                    "description": (
-                        "Bad Request, eg validation of against OpenAPI spec failed"
-                    ),
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "status": {"type": "integer"},
-                                    "title": {"type": "string"},
-                                    "detail": {"type": "string"},
-                                },
-                            }
-                        }
-                    },
-                },
-                "UnprocessableEntity": {
-                    "description": (
-                        "Unprocessable Entity, semantic error in request eg"
-                        " mismatched IDs"
-                    ),
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "title": {"type": "string"},
-                                    "detail": {"type": "string"},
-                                    "traceback": {
-                                        "type": "object",
-                                        "properties": {
-                                            "key": {"type": "string"},
-                                            "type": {"type": "string"},
-                                            "full_traceback": {"type": "string"},
-                                        },
-                                    },
-                                },
-                            }
-                        }
-                    },
-                },
-                "InternalServerError": {
-                    "description": "Internal Server Error",
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "title": {"type": "string"},
-                                    "detail": {"type": "string"},
-                                    "traceback": {
-                                        "type": "object",
-                                        "properties": {
-                                            "key": {"type": "string"},
-                                            "type": {"type": "string"},
-                                            "full_traceback": {"type": "string"},
-                                        },
-                                    },
-                                },
-                            }
-                        }
-                    },
-                },
-            },
-            "schemas": {
-                "BadRequestResponse": {
-                    "type": "object",
-                    "properties": {
-                        "status": {"type": "integer"},
-                        "title": {"type": "string"},
-                        "detail": {"type": "string"},
-                    },
-                },
-                "ErrorResponse": {
-                    "type": "object",
-                    "properties": {
-                        "title": {"type": "string"},
-                        "detail": {"type": "string"},
-                        "traceback": {
+        "responses": {
+            "NotFound": {
+                "description": "Not Found",
+                "content": {
+                    "application/json": {
+                        "schema": {
                             "type": "object",
                             "properties": {
-                                "key": {"type": "string"},
-                                "type": {"type": "string"},
-                                "full_traceback": {"type": "string"},
+                                "title": {"type": "string"},
+                                "detail": {"type": "string"},
+                                "traceback": {
+                                    "type": "object",
+                                    "properties": {
+                                        "key": {"type": "string"},
+                                        "type": {"type": "string"},
+                                        "full_traceback": {"type": "string"},
+                                    },
+                                },
                             },
+                        }
+                    }
+                },
+            },
+            "BadRequest": {
+                "description": "Bad Request, eg validation of against OpenAPI spec failed",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "status": {"type": "integer"},
+                                "title": {"type": "string"},
+                                "detail": {"type": "string"},
+                            },
+                        }
+                    }
+                },
+            },
+            "UnprocessableEntity": {
+                "description": "Unprocessable Entity, semantic error in request eg mismatched IDs",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "title": {"type": "string"},
+                                "detail": {"type": "string"},
+                                "traceback": {
+                                    "type": "object",
+                                    "properties": {
+                                        "key": {"type": "string"},
+                                        "type": {"type": "string"},
+                                        "full_traceback": {"type": "string"},
+                                    },
+                                },
+                            },
+                        }
+                    }
+                },
+            },
+            "InternalServerError": {
+                "description": "Internal Server Error",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "title": {"type": "string"},
+                                "detail": {"type": "string"},
+                                "traceback": {
+                                    "type": "object",
+                                    "properties": {
+                                        "key": {"type": "string"},
+                                        "type": {"type": "string"},
+                                        "full_traceback": {"type": "string"},
+                                    },
+                                },
+                            },
+                        }
+                    }
+                },
+            },
+        },
+        "schemas": {
+            "BadRequestResponse": {
+                "type": "object",
+                "properties": {
+                    "status": {"type": "integer"},
+                    "title": {"type": "string"},
+                    "detail": {"type": "string"},
+                },
+            },
+            "ErrorResponse": {
+                "type": "object",
+                "properties": {
+                    "title": {"type": "string"},
+                    "detail": {"type": "string"},
+                    "traceback": {
+                        "type": "object",
+                        "properties": {
+                            "key": {"type": "string"},
+                            "type": {"type": "string"},
+                            "full_traceback": {"type": "string"},
                         },
                     },
                 },
             },
         },
-    }
+    },
+}
+
 
 
 @pytest.fixture
