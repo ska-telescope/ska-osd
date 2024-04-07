@@ -169,7 +169,7 @@ def semantically_validate_json(body: dict):
     interface: str = body.get("interface")
     raise_semantic: bool = body.get("raise_semantic")  # True
 
-    sources = (body.get("sources"),) if body.get("sources") else CAR_TELMODEL_SOURCE
+    sources = [body.get("sources")] if body.get("sources") else CAR_TELMODEL_SOURCE
     tm_data = TMData(sources)
 
     osd_data = body.get("osd_data")

@@ -303,7 +303,8 @@ This is the main function for conversion.
 Semantic Validation API Documentation
 ======================================
 The semantic validation api exposes semantic validation functionality as a service
-It allows for the semantical validation of input JSON data against a predefined schema. This document outlines the API's endpoints, request parameters, and response structures.
+It allows for the semantical validation of input JSON data against a predefined schema.
+This document outlines the API's endpoints, request parameters, and response structures.
 
 Endpoints
 ---------

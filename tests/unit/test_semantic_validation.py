@@ -18,25 +18,15 @@ def test_semantic_validate_api(client, request, json_body_to_validate, response)
     assert res.get_json() == expected_response
 
 
-@pytest.mark.parametrize(
-    "json_body_to_validate, response, key_to_delete",
-    [
-        (
-            "valid_semantic_validation_body",
-            "observing_command_input_missing_response",
-            "observing_command_input",
-        ),
-    ],
-)
 def test_semantic_validate_api_not_passing_required_keys(
-    request, client, json_body_to_validate, response, key_to_delete
+    client, observing_command_input_missing_response, valid_semantic_validation_body
 ):
     """
     Test semantic validation API response with missing input observing_command_input key
     """
-    json_body = request.getfixturevalue(json_body_to_validate)
-    del json_body[key_to_delete]
-    expected_response = request.getfixturevalue(response)
+    json_body = valid_semantic_validation_body.copy()
+    del json_body["observing_command_input"]
+    expected_response = observing_command_input_missing_response
     res = client.post("/ska-ost-osd/api/v1/semantic_validation", json=json_body)
     assert res.get_json() == expected_response
 
@@ -72,7 +62,7 @@ def test_not_passing_optional_keys(
     """
     Test semantic validation API response by not passing optional keys
     """
-    json_body = request.getfixturevalue(json_body_to_validate)
+    json_body = request.getfixturevalue(json_body_to_validate).copy()
     del json_body[key_to_delete]
     expected_response = request.getfixturevalue(response)
     res = client.post("/ska-ost-osd/api/v1/semantic_validation", json=json_body)
