@@ -28,7 +28,7 @@ def test_init_app(open_api_spec):
         app = init_app()
 
         assert app.url_map._rules_by_endpoint[  # pylint: disable=W0212
-            "/ska-ost-osd/api/v1.ska_ost_osd_rest_api_resources_get_osd"
+            "/ska-ost-osd/osd/api/v1.ska_ost_osd_rest_api_resources_get_osd"
         ]
 
 
@@ -93,9 +93,9 @@ def test_init_app_client(client, open_api_spec):
         assert call_args[1]["base_path"].startswith("/")
 
 
-def test_osd_endpoint_for(client, mid_osd_data):
+def test_osd_endpoint(client, mid_osd_data):
     """This function tests that a request to the OSD endpoint for a
-        specific OSd returns expected data for that OSD.
+        specific OSD returns expected data for that OSD.
 
     :param client (FlaskClient): The Flask test client.
     :param mid_osd_data (dict): The expected data for the OSD.
@@ -105,7 +105,7 @@ def test_osd_endpoint_for(client, mid_osd_data):
     """
 
     response = client.get(
-        "/ska-ost-osd/api/v1/osd",
+        "/ska-ost-osd/osd/api/v1/osd",
         query_string={
             "cycle_id": 1,
             "source": "file",
@@ -128,7 +128,7 @@ def test_invalid_osd_tmdata_source(client):
        error message.
     """
     error_msgs = client.get(
-        "/ska-ost-osd/api/v1/osd",
+        "/ska-ost-osd/osd/api/v1/osd",
         query_string={
             "cycle_id": 3,
             "osd_version": "1..1.0",
@@ -159,7 +159,7 @@ def test_invalid_osd_tmdata_source_capabilities(client):
     """
 
     error_msgs = client.get(
-        "/ska-ost-osd/api/v1/osd",
+        "/ska-ost-osd/osd/api/v1/osd",
         query_string={
             "cycle_id": 1,
             "osd_version": "1.1.0",
@@ -173,9 +173,8 @@ def test_invalid_osd_tmdata_source_capabilities(client):
     assert error_msgs.json["detail"].startswith(expected_error_msg)
 
 
-def test_invalid_osd_source(client):
-    """This function tests that a request with an invalid OSD TM data source ID
-        returns the expected error response.
+def test_osd_source(client):
+    """This function tests that a request with an OSD source as car .
 
     :param client (FlaskClient): The Flask test client.
     """
@@ -185,12 +184,12 @@ def test_invalid_osd_source(client):
     assert osd_source_link == osd_source_link
 
 
-def test_invalid_get_osd_data_capability(client):
-    """Test invalid OSD data capability ID
+def test_invalid_array_assembly(client):
+    """Test invalid array_assembly
     :param client (FlaskClient): The Flask test client.
     """
     error_msgs = client.get(
-        "/ska-ost-osd/api/v1/osd",
+        "/ska-ost-osd/osd/api/v1/osd",
         query_string={"capabilities": "mid", "array_assembly": "AA3"},
     )
 
