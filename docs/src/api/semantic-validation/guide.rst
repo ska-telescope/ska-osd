@@ -1,0 +1,626 @@
+
+Semantic Validation
+-------------------
+
+Semantic vs Syntactic validations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Semantic validation and syntactic validation are two types of validation techniques used in software development to
+ensure that data entered into a system is accurate and conforms to the requirements of the system.
+
+Syntactic validation checks the syntax of the input data and ensures that it adheres to the prescribed format.
+It checks whether the data entered is structured correctly and follows the expected syntax rules. For example,
+if an input field is supposed to accept only numerical data, a syntactic validation would ensure that only
+numerical characters are entered and reject any non-numeric characters.
+
+Semantic validation, on the other hand, checks the meaning of the input data and ensures that it is valid in the
+context of the system. It checks whether the input data conforms to the business rules and logic of the system.
+
+For example, if a system requires a date to be entered, a semantic validation would ensure that the date entered is
+valid, such as it's not a future date or a date that has already passed.
+
+In summary, syntactic validation checks the structure of the data, while semantic validation checks the meaning of the data. Both types of validation are important to ensure the accuracy and integrity of data entered into a system.
+
+
+Introduction
+~~~~~~~~~~~~~
+Here we have created 'Framework for semantic validation of observing setups'.
+This framework provides semantic validation which helps to prevent the users from making errors in their setups.
+This framework is supporting both MID and LOW schema validation as well as Scheduling Block(MID).
+
+For creating this framework there are some requirements and architecture have already provided.
+These are as follows:
+
+* `Configuration Schemas (Mid) <https://confluence.skatelescope.org/pages/viewpage.action?pageId=195895122>`_
+
+* `Configuration Schemas (Low) <https://confluence.skatelescope.org/display/SWSI/Configuration+Schemas#ConfigurationSchemas-OET%E2%86%92TMC(Low)>`_
+
+* `Semantic Validation architecture AA0.5 <https://confluence.skatelescope.org/pages/viewpage.action?spaceKey=SWSI&title=Semantic+Validation+architecture+AA0.5>`_
+
+
+
+JSON validator file
+~~~~~~~~~~~~~~~~~~~
+
+Three seperate JSON files have been created for Mid, Low and Scheduling Block Definition (MID) schemas to store all the parameters present in assign & configure resources
+along with its business rules and errors.
+
+* `Reference of JSON validator file (Mid) <https://gitlab.com/ska-telescope/ska-telmodel/-/blob/master/tmdata/instrument/ska1_mid/validation/mid-validation-constants.json>`_
+
+* `Reference of JSON validator file (Low) <https://gitlab.com/ska-telescope/ska-telmodel/-/blob/master/tmdata/instrument/ska1_low/validation/low-validation-constants.json>`_
+
+* `Reference of JSON validator file (SBD) <https://gitlab.com/ska-telescope/ska-telmodel/-/blob/master/tmdata/instrument/scheduling-block/validation/sbd-validation-constants.json>`_
+
+Created a seperate ``constant`` file to maintain all telvalidation constant. From there we are importing JSON validator file
+in ``semantic_validator`` for Mid, Low as well as Scheduling Block Definition (MID) schemas.
+
+Below are the commands to import JSON validator files.
+
+.. code::
+
+    from ska_telmodel.data import TMData
+
+    from .constant import (
+        LOW_VALIDATION_CONSTANT_JSON_FILE_PATH,
+        MID_VALIDATION_CONSTANT_JSON_FILE_PATH,
+        SBD_VALIDATION_CONSTANT_JSON_FILE_PATH,
+    )
+
+Created a method that accepts 'interface' as parameter. Inside that there is a dictionary named 'validation_constants'
+which have 'key' (low, mid, sbd ) and value pair. Based on the key provided it will return JSON path as 'value'.
+
+.. code::
+
+    def get_validation_data(interface: str):
+
+    """
+    :param interface: interface uri from the config.
+    """
+    validation_constants = {
+        "low": LOW_VALIDATION_CONSTANT_JSON_FILE_PATH,
+        "mid": MID_VALIDATION_CONSTANT_JSON_FILE_PATH,
+        "sbd": SBD_VALIDATION_CONSTANT_JSON_FILE_PATH,
+    }
+
+    for key, value in validation_constants.items():
+        if key in interface:
+            return value
+    # taking mid interface as default cause there is no any specific
+    # key to differentiate the interface
+    return MID_VALIDATION_CONSTANT_JSON_FILE_PATH
+
+
+Adding a new parameter in JSON validator file
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Steps to add a new parameter in JSON validator file
+
+* Locate the appropriate place in the JSON structure:
+    * Identify the parent key or object where the new parameter should be added.
+    * Determine the desired position for the new parameter within the parent key's object.
+
+* Add a new key-value pair representing the parameter:
+    * Structure of parameter should be parent-child.
+    * Specify the name of the parameter as the key, this key represents the parent_key and it
+      should contain dictionary.
+    * Add additional key-value pairs within the parent_key object for the rule and error message.
+      In this you can specify the business rule & error message to validate the specific key.
+
+Example
+
+If a user wants to add any new parameter in JSON validator file so he can take reference of this example:
+
+
+.. code::
+
+    "scan": {
+            "tmc": {
+                "scan_id": [
+                    {
+                        "rule": "scan_id == 1",
+                        "error": "Invalid input for scan_id"
+                    }
+                ]
+            }
+        },
+
+
+Let's take scan command as a dummy key which is currently not present in the JSON file.
+
+Here under scan there is a dictionary which has a key named “tmc” so scan.tmc will be the
+parent_key and under tmc we have a “scan_id” child key containing a list which should contain
+appropriate rules and error messages.
+
+
+General structure
+~~~~~~~~~~~~~~~~~~~
+
+This framework has created very dynamically and user friendly.
+If user wants to access this framework from CDM or Jupyter Notebook then
+he just has to import telvalidation package from import statement and call ``semantic_validate``
+function and pass the appropriate parameters to this function.
+If validation fails then the end user will get the list of errors.
+
+This framework can be access by below command:
+
+.. code::
+
+    from ska_telmodel.telvalidation.semantic_validator import semantic_validate
+
+
+* `Location of this framework <https://gitlab.com/ska-telescope/ska-telmodel/-/tree/master/src/ska_telmodel/telvalidation>`_
+
+
+There are some steps of this framework these are as follows:
+
+* Step 1
+    It checks the parameter in the JSON validator document which is present in tmdata package.
+
+
+* Step 2
+    There is a ``validate_json`` function which takes two parameters JSON file & config as a dictionary.
+    It is present in ``src/ska_telmodel/telvalidation/oet_tmc_validators``.
+    Here we are using an eval term to evaluate the business rules present in the JSON file and based on
+    that it raises custom errors. All the custom errors are stored in a list named ``error_msg_list``.
+    At the end this function returns a list containing all the error messages.
+
+    .. autofunction:: ska_telmodel.telvalidation.oet_tmc_validators.validate_json
+
+* Step 3
+    There is one more function ``semantic_validate`` which takes argument as
+    observing_command_input, tm_data, osd_data, interface, array_assembly and raise_semantic.
+    It is present in ``src/ska_telmodel/telvalidation/schema``.
+
+    This function first checks for the interface, if the interface is not present then
+    a warning message is logged, indicating that the ``interface`` is missing from the config.
+    Additionally, a SchematicValidationError exception is raised with the same message.
+
+    This framework allowed interface only for two commands that are ``assignresources`` &  ``configure``.
+    If a user provides an incorrect or unsupported interface value, for example if user passes the
+    interface for the scan command, the code will not be able to find a matching validation schema
+    based on that interface. As a result, the ``validate_json`` function will not be called, and the
+    ``msg_list`` variable will remain empty.
+
+    Also this function is not supporting low telescope schema validation currently.
+
+
+    .. autofunction:: ska_telmodel.telvalidation.semantic_validator.semantic_validate
+
+
+Integration of OSD API into semantic validation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Integrated OSD capabilities into semantic validation rule file currently added support for ``mid-validation-contant.json``
+file and ``sbd-validation-constants.json`` all the validation constraint are fetched from OSD API.
+* `Reference of OSD file <https://confluence.skatelescope.org/display/SWSI/Observatory+Static+Data>`_
+
+Let's take one example
+There is function ``semantic_validate()`` which takes arguments as observing_command_input, tm_data, osd_data, array_assembly, interface
+and raise_semantic. It is present in ``src/ska_telmodel/telvalidation/schema``. internally we  call function
+``get_osd_data()`` which takes mainly three arguments capabilities, array_assembly, tmdata object
+and validate command request against OSD capabilities configuration.
+
+below is code sample to call ``semantic_validate()``
+
+* scenario 1
+    Import 'SchematicValidationError' from 'ska_telmodel' which contains all the customized error messages
+    in string format.
+
+    .. code-block:: python
+
+        from ska_telmodel.data import TMData
+        from ska_telmodel.telvalidation.semantic_validator import SchematicValidationError
+        tmdata = TMData()
+        try:
+            semantic_validate(observing_command_input, tm_data, osd_data, array_assembly, interface, raise_semantic)
+        except SchematicValidationError as exc:
+            raise exc
+
+* scenario 2
+    If client wants to consume both OSD and semantic validation framework together for different scenarios
+    in that case they can use both as specified below in the example.
+    please note that in this scenario data get validated semantically with provided OSD version.
+    If there is no version provided to the OSD call then data would get semantically validated with
+    latest OSD configuration.
+    e.g
+
+    .. code-block:: python
+
+        from ska_telmodel.data import TMData
+        from ska_telmodel.telvalidation.semantic_validator import SchematicValidationError
+        from ska_telmodel.osd.osd import get_osd_data
+        osd_data = get_osd_data()
+        tmdata = TMData()
+        try:
+            semantic_validate(observing_command_input, tm_data, array_assembly, interface, raise_semantic, osd_data)
+        except SchematicValidationError as exc:
+            raise exc
+
+
+========================    ================================================================================
+Parameters                   Description
+========================    ================================================================================
+observing_command_input      dictionary containing details of command input which needs semantic validation.
+tm_data                      telemodel tm_data object using which we can load semantic validate json files.
+array_assembly               Array assembly contains AA0.5 or AA0.1.
+interface                    interface uri in observing_command_input.
+raise_semantic               True(default) would need user to catch somewhere the SchematicValidationError.
+osd_data                     osd_data which can be create at client side and passed externally
+========================    ================================================================================
+
+
+How the rules are worked after get constraints values from OSD
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Consider we are applying semantic validation rule on dish i.e length of receptor_ids <= 4.
+This constraints value 4 is fetched from OSD by referring key ``number_ska_dishes``.
+
+.. code::
+
+    "dish": {
+                "receptor_ids": [
+                    {
+                        "rule": "(0 < length(receptor_ids) <= number_ska_dishes)",
+                        "error": "receptor_ids are too many!Current Limit is {number_ska_dishes}"
+                    }
+                ]
+            },
+
+Limitation
+~~~~~~~~~~~
+
+* 1
+    currently we are having directly dependency on OSD key's, means developer/Observatory scientist
+    always needs to remember those constraints keys and put into rule files.
+
+* 2
+    OSD version and semantic validation rule file version should be same.
+
+if OSD keys got removed/changed and those are not in validation rule file
+it will raise SchemanticValdidationKeyError saying ``Invalid rule and error key passed``
+
+
+
+
+
+Target visibility validation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+There are ra and dec parameters in configure resources, to validate these parameters we have created a
+separate module named ``coordinates_conversion`` which converts Right Ascension and Declination to
+Azimuth and Altitude.
+This module contains a function ``ra_dec_to_az_el`` which has logic for this conversion.
+This function has been imported in the ``validate_target_is_visible`` function which is
+present in the ``oet_tmc_validators`` module.
+
+.. autofunction:: ska_telmodel.telvalidation.oet_tmc_validators.validate_target_is_visible
+
+
+This is the main function for conversion.
+
+.. autofunction:: ska_telmodel.telvalidation.coordinates_conversion.ra_dec_to_az_el
+
+
+Semantic Validation API Documentation
+======================================
+The semantic validation api exposes semantic validation functionality as a service
+It allows for the semantical validation of input JSON data against a predefined schema. This document outlines the API's endpoints, request parameters, and response structures.
+
+Endpoints
+---------
+
+POST /semantic_validation
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**Summary**: Validate input JSON semantically.
+
+**Description**: This endpoint accepts JSON data for semantic validation and returns validation results.
+
+**Request**
+
+- **Content Type**: ``application/json``
+- **Schema**: See `SemanticValidationRequest` schema.
+
+**Request Body**:
+
+The request body should be structure with following parameters:
+
+.. list-table::
+   :widths: 25 10 15 40 25
+   :header-rows: 1
+
+   * - Property
+     - Type
+     - Required
+     - Description
+     - Example
+   * - ``observing_command_input``
+     - object
+     - Yes
+     - Input JSON to be validated.
+     - Refer below Semantic Validation Request schema
+   * - ``interface``
+     - string
+     - No
+     - Interface version of the input JSON.
+     - ``"https://schema.skao.int/ska-tmc-assignresources/2.1"``
+   * - ``sources``
+     - string
+     - No
+     - TMData source.
+     - ``"car://gitlab.com/ska-telescope/ska-telmodel?1.14.1#tmdata"``
+   * - ``raise_semantic``
+     - boolean
+     - No
+     - Whether to raise a semantic validation error.
+     - ``true``
+   * - ``osd_data``
+     - object
+     - No
+     - Observatory static data.
+     - Refer below Semantic Validation Request schema
+
+This table outlines the expected structure of the JSON object in the request body.
+
+
+**Responses**
+
+- **200 OK**
+
+  - **Description**: Semantic validation successful.
+  - **Content Type**: ``application/json``
+  - **Schema**: See `Semantic Validation Success Response` schema.
+
+- **400 Bad Request**
+
+  - **Description**: Bad request due to semantic validation error.
+  - **Content Type**: ``application/json``
+  - **Schema**: See `Semantic Validation Error Response` schema.
+
+- **500 Internal Server Error**
+
+  - **Description**: Internal server error.
+
+
+Schemas
+-------
+
+Semantic Validation Request
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: json
+
+    {
+  "observing_command_input": {
+  "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
+  "subarray_id": 1,
+  "dish": {
+    "receptor_ids": [
+      "SKA001",
+      "SKA002"
+    ]
+  },
+  "sdp": {
+    "interface": "https://schema.skao.int/ska-sdp-assignres/0.4",
+    "execution_block": {
+      "eb_id": "eb-test-20220916-00000",
+      "max_length": 100.0,
+      "context": {},
+      "beams": [{
+          "beam_id": "vis0",
+          "function": "visibilities"
+      }],
+      "scan_types": [{
+        "scan_type_id": ".default",
+        "beams": {
+          "vis0": {
+            "channels_id": "vis_channels",
+            "polarisations_id": "all"
+          },
+          "pss1": {
+            "field_id": "field_a",
+            "channels_id": "pulsar_channels",
+            "polarisations_id": "all"
+          }
+        }
+      }, {
+        "scan_type_id": "target:a",
+        "derive_from": ".default",
+        "beams": {
+          "vis0": {
+            "field_id": "field_a"
+          }
+        }
+      }],
+      "channels": [{
+        "channels_id": "vis_channels",
+        "spectral_windows": [{
+          "spectral_window_id": "fsp_1_channels",
+          "count": 14880,
+          "start": 0,
+          "stride": 2,
+          "freq_min": 350000000.0,
+          "freq_max": 368000000.0,
+          "link_map": [[0, 0], [200, 1], [744, 2], [944, 3]]
+        }]
+      }],
+      "polarisations": [{
+        "polarisations_id": "all",
+        "corr_type": ["XX", "XY", "YY", "YX"]
+      }],
+      "fields": [{
+        "field_id": "field_a",
+        "phase_dir": {
+          "ra": [123, 0.1],
+          "dec": [80, 0.1],
+          "reference_time": "2023-02-16T01:23:45.678900",
+          "reference_frame": "ICRF3"
+        },
+        "pointing_fqdn": "low-tmc/telstate/0/pointing"
+      }]
+    },
+    "processing_blocks": [
+      {
+        "pb_id": "pb-mvp01-20200325-00001",
+        "script": {
+          "kind": "realtime",
+          "name": "vis_receive",
+          "version": "0.1.0"
+        },
+        "parameters": {
+        }
+      },
+      {
+        "pb_id": "pb-mvp01-20200325-00002",
+        "script": {
+          "kind": "realtime",
+          "name": "test_realtime",
+          "version": "0.1.0"
+        },
+        "parameters": {
+        }
+      },
+      {
+        "pb_id": "pb-mvp01-20200325-00003",
+        "script": {
+          "kind": "batch",
+          "name": "ical",
+          "version": "0.1.0"
+        },
+        "parameters": {
+        },
+        "dependencies": [
+          {
+            "pb_id": "pb-mvp01-20200325-00001",
+            "kind": [
+              "visibilities"
+            ]
+          }
+        ],
+        "sbi_ids": ["sbi-mvp01-20200325-00001"]
+      },
+      {
+        "pb_id": "pb-mvp01-20200325-00004",
+        "script": {
+          "kind": "batch",
+          "name": "dpreb",
+          "version": "0.1.0"
+        },
+        "parameters": {
+        },
+        "dependencies": [
+          {
+            "pb_id": "pb-mvp01-20200325-00003",
+            "kind": [
+              "calibration"
+            ]
+          }
+        ]
+      }
+    ],
+    "resources": {
+      "csp_links": [1, 2, 3, 4],
+      "receptors": [
+              "SKA001",
+              "SKA002"
+      ]
+    }
+  }},
+  "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
+  "raise_semantic": true,
+  "osd_data" : {
+    "observatory_policy": {
+        "cycle_number": 2,
+        "cycle_description": "Science Verification",
+        "cycle_information": {
+            "cycle_id": "SKAO_2027_1",
+            "proposal_open": "20260327T12:00:00.000Z",
+            "proposal_close": "20260512T15:00:00.000z"
+        },
+        "cycle_policies": {"normal_max_hours": 100.0},
+        "telescope_capabilities": {"Mid": "AA2", "Low": "AA2"}
+    },
+    "capabilities": {
+        "mid": {
+            "AA0.5": {
+                "available_receivers": ["Band_1", "Band_2"],
+                "number_ska_dishes": 4,
+                "number_meerkat_dishes": 0,
+                "number_meerkatplus_dishes": 0,
+                "max_baseline_km": 1.5,
+                "available_bandwidth_hz": 800000.0,
+                "number_channels": 14880,
+                "number_zoom_windows": 0,
+                "number_zoom_channels": 0,
+                "number_pss_beams": 0,
+                "number_pst_beams": 0,
+                "ps_beam_bandwidth_hz": 0.0,
+                "number_fsps": 4
+            },
+            "basic_capabilities": {
+                "dish_elevation_limit_deg": 15.0,
+                "receiver_information": [
+                    {
+                        "rx_id": "Band_1",
+                        "min_frequency_hz": 350000000.0,
+                        "max_frequency_hz": 1050000000.0
+                    },
+                    {
+                        "rx_id": "Band_2",
+                        "min_frequency_hz": 950000000.0,
+                        "max_frequency_hz": 1760000000.0
+                    },
+                    {
+                        "rx_id": "Band_3",
+                        "min_frequency_hz": 1650000000.0,
+                        "max_frequency_hz": 3050000000.0
+                    },
+                    {
+                        "rx_id": "Band_4",
+                        "min_frequency_hz": 2800000000.0,
+                        "max_frequency_hz": 5180000000.0
+                    },
+                    {
+                        "rx_id": "Band_5a",
+                        "min_frequency_hz": 4600000000.0,
+                        "max_frequency_hz": 8500000000.0
+                    },
+                    {
+                        "rx_id": "Band_5b",
+                        "min_frequency_hz": 8300000000.0,
+                        "max_frequency_hz": 15400000000.0
+                    }
+                ]
+            }
+        }
+    } }}
+
+
+Semantic Validation Success Response
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: json
+
+    {
+      "message": "Semantic Validation Successfully",
+      "status": "success"
+    }
+
+Semantic Validation Error Response
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: json
+
+        {
+            "Error": [
+                    "receptor_ids are too many!Current Limit is 4",
+                    "beams are too many! Current limit is 1",
+                    "Invalid function for beams! Currently allowed visibilities",
+                    "spectral windows are too many! Current limit = 1",
+                    "Invalid input for channel_count! Currently allowed 14880",
+                    "Invalid input for freq_min",
+                    "Invalid input for freq_max",
+                    "freq_min should be less than freq_max",
+                    "length of receptor_ids should be same as length of receptors",
+                    "receptor_ids did not match receptors",
+                    ]
+        }
