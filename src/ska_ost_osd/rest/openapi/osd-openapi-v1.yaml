@@ -36,7 +36,33 @@ paths:
           $ref: '#/components/responses/BadRequest'
         "500":
           $ref: '#/components/responses/InternalServerError'
-
+  /semantic_validation:
+    post:
+      summary: Validate input json Semantically
+      description: |
+        Validate input json Semantically
+      operationId: ska_ost_osd.rest.api.resources.semantically_validate_json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './semantic-validation-openapi-v1.yaml#/components/schemas/SemanticValidationRequest'
+      responses:
+        '200':
+          description: Semantic Validation Successfully
+          content:
+            application/json:
+              schema:
+                $ref: './semantic-validation-openapi-v1.yaml#/components/schemas/SemanticValidationSuccessResponse'
+        '400':
+          description: Bad Request due to semantic validation errors.
+          content:
+            application/json:
+              schema:
+                $ref: './semantic-validation-openapi-v1.yaml#/components/schemas/SemanticValidationErrorResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
 components:
   parameters:
@@ -80,7 +106,7 @@ components:
         type: string
       required: false
 
-    
+
   responses:
     NotFound:
       description: Not Found
