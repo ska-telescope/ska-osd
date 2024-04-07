@@ -36,19 +36,9 @@ def error_handler(api_fn: callable) -> str:
     def wrapper(*args, **kwargs):
         try:
             return api_fn(*args, **kwargs)
-        except OSDDataException as err:
-            return (
-                validation_response(err.args[0], HTTPStatus.BAD_REQUEST),
-                HTTPStatus.BAD_REQUEST,
-            )
         except SchematicValidationError as err:
             return (
                 validation_response(err.args[0].split("\n"), HTTPStatus.BAD_REQUEST),
-                HTTPStatus.BAD_REQUEST,
-            )
-        except ValueError as err:
-            return (
-                validation_response(err.args[0], HTTPStatus.BAD_REQUEST),
                 HTTPStatus.BAD_REQUEST,
             )
         except Exception as err:  # pylint: disable=W0718
