@@ -286,3 +286,17 @@ def test_not_passing_optional_keys(
     expected_response = request.getfixturevalue(response)
     res = client.post("/ska-ost-osd/api/v1/semantic_validation", json=json_body)
     assert res.get_json() == expected_response
+
+
+def test_wrong_values_and_no_observing_command_input(
+    wrong_semantic_validation_parameter_value_response,
+    wrong_semantic_validation_parameter_body,
+    client,
+):
+    """
+    Test semantic validation API response with wrong values
+    """
+    json_body = wrong_semantic_validation_parameter_body
+    expected_response = wrong_semantic_validation_parameter_value_response
+    res = client.post("/ska-ost-osd/api/v1/semantic_validation", json=json_body)
+    assert res.get_json() == expected_response

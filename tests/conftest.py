@@ -258,12 +258,8 @@ def open_api_spec():
                                                                         "count": 14880,
                                                                         "start": 0,
                                                                         "stride": 2,
-                                                                        "freq_min": (
-                                                                            350000000.0
-                                                                        ),
-                                                                        "freq_max": (
-                                                                            368000000.0
-                                                                        ),
+                                                                        "freq_min": 350000000.0,
+                                                                        "freq_max": 368000000.0,
                                                                         "link_map": [
                                                                             [0, 0],
                                                                             [200, 1],
@@ -418,13 +414,9 @@ def open_api_spec():
                                                             ],
                                                             "number_ska_dishes": 4,
                                                             "number_meerkat_dishes": 0,
-                                                            "number_meerkatplus_dishes": (
-                                                                0
-                                                            ),
+                                                            "number_meerkatplus_dishes": 0,
                                                             "max_baseline_km": 1.5,
-                                                            "available_bandwidth_hz": (
-                                                                800000.0
-                                                            ),
+                                                            "available_bandwidth_hz": 800000.0,
                                                             "number_channels": 14880,
                                                             "number_zoom_windows": 0,
                                                             "number_zoom_channels": 0,
@@ -434,63 +426,37 @@ def open_api_spec():
                                                             "number_fsps": 4,
                                                         },
                                                         "basic_capabilities": {
-                                                            "dish_elevation_limit_deg": (
-                                                                15.0
-                                                            ),
+                                                            "dish_elevation_limit_deg": 15.0,
                                                             "receiver_information": [
                                                                 {
                                                                     "rx_id": "Band_1",
-                                                                    "min_frequency_hz": (
-                                                                        350000000.0
-                                                                    ),
-                                                                    "max_frequency_hz": (
-                                                                        1050000000.0
-                                                                    ),
+                                                                    "min_frequency_hz": 350000000.0,
+                                                                    "max_frequency_hz": 1050000000.0,
                                                                 },
                                                                 {
                                                                     "rx_id": "Band_2",
-                                                                    "min_frequency_hz": (
-                                                                        950000000.0
-                                                                    ),
-                                                                    "max_frequency_hz": (
-                                                                        1760000000.0
-                                                                    ),
+                                                                    "min_frequency_hz": 950000000.0,
+                                                                    "max_frequency_hz": 1760000000.0,
                                                                 },
                                                                 {
                                                                     "rx_id": "Band_3",
-                                                                    "min_frequency_hz": (
-                                                                        1650000000.0
-                                                                    ),
-                                                                    "max_frequency_hz": (
-                                                                        3050000000.0
-                                                                    ),
+                                                                    "min_frequency_hz": 1650000000.0,
+                                                                    "max_frequency_hz": 3050000000.0,
                                                                 },
                                                                 {
                                                                     "rx_id": "Band_4",
-                                                                    "min_frequency_hz": (
-                                                                        2800000000.0
-                                                                    ),
-                                                                    "max_frequency_hz": (
-                                                                        5180000000.0
-                                                                    ),
+                                                                    "min_frequency_hz": 2800000000.0,
+                                                                    "max_frequency_hz": 5180000000.0,
                                                                 },
                                                                 {
                                                                     "rx_id": "Band_5a",
-                                                                    "min_frequency_hz": (
-                                                                        4600000000.0
-                                                                    ),
-                                                                    "max_frequency_hz": (
-                                                                        8500000000.0
-                                                                    ),
+                                                                    "min_frequency_hz": 4600000000.0,
+                                                                    "max_frequency_hz": 8500000000.0,
                                                                 },
                                                                 {
                                                                     "rx_id": "Band_5b",
-                                                                    "min_frequency_hz": (
-                                                                        8300000000.0
-                                                                    ),
-                                                                    "max_frequency_hz": (
-                                                                        15400000000.0
-                                                                    ),
+                                                                    "min_frequency_hz": 8300000000.0,
+                                                                    "max_frequency_hz": 15400000000.0,
                                                                 },
                                                             ],
                                                         },
@@ -511,15 +477,14 @@ def open_api_spec():
                                     "schema": {
                                         "type": "object",
                                         "properties": {
-                                            "message": {
+                                            "status": {"type": "integer", "example": 0},
+                                            "details": {
                                                 "type": "string",
-                                                "example": (
-                                                    "Semantic Validation Successfully"
-                                                ),
+                                                "example": "JSON is semantically valid",
                                             },
-                                            "status": {
+                                            "title": {
                                                 "type": "string",
-                                                "example": "success",
+                                                "example": "Semantic validation",
                                             },
                                         },
                                     }
@@ -535,13 +500,15 @@ def open_api_spec():
                                     "schema": {
                                         "type": "object",
                                         "properties": {
-                                            "Error": {
+                                            "detail": {
                                                 "type": "array",
                                                 "items": {"type": "string"},
-                                            }
+                                            },
+                                            "status": {"type": "integer"},
+                                            "title": {"type": "string"},
                                         },
                                         "example": {
-                                            "Error": [
+                                            "detail": [
                                                 (
                                                     "receptor_ids are too many!Current"
                                                     " Limit is 4"
@@ -570,7 +537,9 @@ def open_api_spec():
                                                     " same as length of receptors"
                                                 ),
                                                 "receptor_ids did not match receptors",
-                                            ]
+                                            ],
+                                            "status": 0,
+                                            "title": "Semantic Validation Error",
                                         },
                                     }
                                 }
@@ -1297,6 +1266,15 @@ def observing_command_input_missing_response():
         },
         400,
     ]
+
+
+@pytest.fixture
+def wrong_semantic_validation_parameter_body():
+    return {
+        "interface": "https://schemka-tmc-assignresources/2.1",
+        "raise_semantic": "123",
+        "sources": "car://gitlab.com/ska-telescope14.1#tmdata",
+    }
 
 
 @pytest.fixture
