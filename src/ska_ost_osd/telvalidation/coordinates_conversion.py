@@ -82,7 +82,7 @@ def ra_dec_to_az_el(
     el_limit: float,
     tm_data: TMData,
     time_format: str = "iso",
-    if_set: bool = False,
+    if_set: bool = False,  # pylint: disable=unused-argument
     time_scale: str = "utc",
     coord_frame: str = "icrs",
     prec: float = 0.0001,

@@ -19,7 +19,6 @@ from .helper import OSDDataException, read_json
 
 
 class OSD:
-
     """OSD Class for initialing OSD related variables and methods
     including get_telescope_observatory_policies, get_data and get_osd_data
     """
@@ -171,9 +170,11 @@ class OSD:
 
         else:
             return [
-                tmdata[capability].get_dict()[array_assembly]
-                if array_assembly is not None
-                else tmdata[capability].get_dict()
+                (
+                    tmdata[capability].get_dict()[array_assembly]
+                    if array_assembly is not None
+                    else tmdata[capability].get_dict()
+                )
             ][0]
 
     def get_osd_data(self) -> dict[dict[str, Any]]:

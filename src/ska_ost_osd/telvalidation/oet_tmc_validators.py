@@ -267,6 +267,7 @@ def apply_validation_rule(
                     error_msgs.append(rule_data["error"])  # Append the error message
             except KeyError as key_error:
                 logging.error(key_error)
+                # pylint: disable=raise-missing-from
                 raise SchemanticValdidationKeyError(
                     message="Invalid rule and error key passed"
                 )

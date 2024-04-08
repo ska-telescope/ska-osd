@@ -75,9 +75,10 @@ def test_init_app_client(client, open_api_spec):
        expected spec.
     """
 
-    with patch("ska_ost_osd.rest.get_openapi_spec", return_value=open_api_spec), patch(
-        "ska_ost_osd.rest.App"
-    ) as mock_connexion_app:
+    with (
+        patch("ska_ost_osd.rest.get_openapi_spec", return_value=open_api_spec),
+        patch("ska_ost_osd.rest.App") as mock_connexion_app,
+    ):
         mock_connexion_instance = mock_connexion_app.return_value
         mock_flask_app = mock_connexion_instance.app
         mock_flask_app.test_client = MagicMock(return_value=client)

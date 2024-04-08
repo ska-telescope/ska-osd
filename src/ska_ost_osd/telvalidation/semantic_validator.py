@@ -327,6 +327,7 @@ def semantic_validate(
     # which when appear in message indicate no error
     # success_keys=["Success!","Is visible?Yes","1","2"]
     if msg is not None and msg != "":
+        # pylint: disable=logging-not-lazy
         logging.error(
             """Also following errors were encountered
               during semantic validations:\n"""

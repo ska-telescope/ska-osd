@@ -33,7 +33,6 @@ sources = [
     "car:ska-telmodel-data?main",
 ]
 
-
 capabilities = {
     "observatory_policy": {
         "cycle_number": 2,
@@ -103,9 +102,30 @@ capabilities = {
 }
 
 
+# pylint: disable=redefined-outer-name
 @pytest.fixture(scope="module")
 def tm_data():
     return TMData(sources)
+
+
+@pytest.fixture
+def sbd_valid_request_json_path():
+    """
+    Pytest fixture to return path to resource allocation JSON file
+    for SBD
+    """
+    config = load_string_from_file("test_files/testfile_valid_mid_sbd.json")
+    return config
+
+
+@pytest.fixture
+def sbd_invalid_request_json_path():
+    """
+    Pytest fixture to return path to resource allocation JSON file
+    for SBD
+    """
+    config = load_string_from_file("test_files/testfile_invalid_mid_sbd.json")
+    return config
 
 
 def load_string_from_file(filename):
@@ -143,7 +163,6 @@ VALID_LOW_CONFIGURE_JSON = load_string_from_file(
 INVALID_LOW_CONFIGURE_JSON = load_string_from_file(
     "test_files/testfile_invalid_low_configure.json"
 )
-
 
 INVALID_MID_VALIDATE_CONSTANT = {
     "AA0.5": {
@@ -550,16 +569,6 @@ def test_tmc_low_configure_invalid_inputs(mock, tm_data):
         )
 
 
-@pytest.fixture
-def sbd_valid_request_json_path():
-    """
-    Pytest fixture to return path to resource allocation JSON file
-    for SBD
-    """
-    config = load_string_from_file("test_files/testfile_valid_mid_sbd.json")
-    return config
-
-
 @patch("ska_telmodel.telvalidation.semantic_validator.fetch_capabilities_from_osd")
 def test_sbd_valid_inputs(mock, sbd_valid_request_json_path, tm_data):
     osd_capabilities = capabilities["capabilities"]["mid"]
@@ -568,16 +577,6 @@ def test_sbd_valid_inputs(mock, sbd_valid_request_json_path, tm_data):
         osd_capabilities["basic_capabilities"],
     )
     assert semantic_validate(sbd_valid_request_json_path, tm_data=tm_data), True
-
-
-@pytest.fixture
-def sbd_invalid_request_json_path():
-    """
-    Pytest fixture to return path to resource allocation JSON file
-    for SBD
-    """
-    config = load_string_from_file("test_files/testfile_invalid_mid_sbd.json")
-    return config
 
 
 @patch("ska_telmodel.telvalidation.semantic_validator.fetch_capabilities_from_osd")
