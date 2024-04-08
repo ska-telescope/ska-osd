@@ -40,7 +40,7 @@ def open_api_spec():
             },
             "version": "1.0.0",
         },
-        "servers": [{"url": "ska-ost-osd/osd/api/v1"}],
+        "servers": [{"url": "/ska-ost-osd/osd/api/v1/"}],
         "paths": {
             "/osd": {
                 "get": {
