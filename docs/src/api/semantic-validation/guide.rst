@@ -145,7 +145,7 @@ This framework can be access by below command:
 
 .. code::
 
-    from ska_telmodel.telvalidation.semantic_validator import semantic_validate
+    from ska_ost_osd.telvalidation.semantic_validator import semantic_validate
 
 
 * `Location of this framework <https://gitlab.com/ska-telescope/ska-telmodel/-/tree/master/src/ska_telmodel/telvalidation>`_
@@ -164,7 +164,7 @@ There are some steps of this framework these are as follows:
     that it raises custom errors. All the custom errors are stored in a list named ``error_msg_list``.
     At the end this function returns a list containing all the error messages.
 
-    .. autofunction:: ska_telmodel.telvalidation.oet_tmc_validators.validate_json
+    .. autofunction:: ska_ost_osd.telvalidation.oet_tmc_validators.validate_json
 
 * Step 3
     There is one more function ``semantic_validate`` which takes argument as
@@ -184,7 +184,7 @@ There are some steps of this framework these are as follows:
     Also this function is not supporting low telescope schema validation currently.
 
 
-    .. autofunction:: ska_telmodel.telvalidation.semantic_validator.semantic_validate
+    .. autofunction:: ska_ost_osd.telvalidation.semantic_validator.semantic_validate
 
 
 Integration of OSD API into semantic validation
@@ -208,7 +208,7 @@ below is code sample to call ``semantic_validate()``
     .. code-block:: python
 
         from ska_telmodel.data import TMData
-        from ska_telmodel.telvalidation.semantic_validator import SchematicValidationError
+        from ska_ost_osd.telvalidation.semantic_validator import SchematicValidationError
         tmdata = TMData()
         try:
             semantic_validate(observing_command_input, tm_data, osd_data, array_assembly, interface, raise_semantic)
@@ -226,7 +226,7 @@ below is code sample to call ``semantic_validate()``
     .. code-block:: python
 
         from ska_telmodel.data import TMData
-        from ska_telmodel.telvalidation.semantic_validator import SchematicValidationError
+        from ska_ost_osd.telvalidation.semantic_validator import SchematicValidationError
         from ska_telmodel.osd.osd import get_osd_data
         osd_data = get_osd_data()
         tmdata = TMData()
@@ -292,12 +292,12 @@ This module contains a function ``ra_dec_to_az_el`` which has logic for this con
 This function has been imported in the ``validate_target_is_visible`` function which is
 present in the ``oet_tmc_validators`` module.
 
-.. autofunction:: ska_telmodel.telvalidation.oet_tmc_validators.validate_target_is_visible
+.. autofunction:: ska_ost_osd.telvalidation.oet_tmc_validators.validate_target_is_visible
 
 
 This is the main function for conversion.
 
-.. autofunction:: ska_telmodel.telvalidation.coordinates_conversion.ra_dec_to_az_el
+.. autofunction:: ska_ost_osd.telvalidation.coordinates_conversion.ra_dec_to_az_el
 
 
 Semantic Validation API Documentation

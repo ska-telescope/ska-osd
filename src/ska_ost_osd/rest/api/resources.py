@@ -5,15 +5,16 @@ See the operationId fields of the Open API spec for the specific mappings.
 """
 
 import logging
+import re
 from functools import wraps
 from http import HTTPStatus
 from importlib.metadata import version
 
 from ska_telmodel.data import TMData
-from ska_telmodel.telvalidation import SchematicValidationError, semantic_validate
 
 from ska_ost_osd.osd.osd import get_osd_data, osd_tmdata_source
 from ska_ost_osd.rest.api.query import QueryParams, QueryParamsFactory
+from ska_ost_osd.telvalidation import SchematicValidationError, semantic_validate
 
 LOGGER = logging.getLogger(__name__)
 
@@ -37,12 +38,22 @@ def error_handler(api_fn: callable) -> str:
             return api_fn(*args, **kwargs)
         except SchematicValidationError as err:
             return (
-                validation_response(err.args[0].split("\n"), HTTPStatus.BAD_REQUEST),
-                HTTPStatus.BAD_REQUEST,
+                validation_response(
+                    status=0,
+                    error_msg=err.args[0].split("\n"),
+                    title="Semantic Validation Error",
+                    http_status=HTTPStatus.OK,
+                ),
+                HTTPStatus.OK,
             )
         except ValueError as err:
             return (
-                validation_response(err.args[0], HTTPStatus.BAD_REQUEST),
+                validation_response(
+                    status=-1,
+                    error_msg=err.args[0],
+                    title="Value Error",
+                    http_status=HTTPStatus.BAD_REQUEST,
+                ),
                 HTTPStatus.BAD_REQUEST,
             )
         except Exception as err:  # pylint: disable=W0718
@@ -105,12 +116,15 @@ def get_osd(**kwargs):
 
 
 def validation_response(
-    error_msg: str, http_status: HTTPStatus = HTTPStatus.UNPROCESSABLE_ENTITY
+    error_msg: str,
+    status: int = 0,
+    title: str = "Below Error have occoured kindly check",
+    http_status: HTTPStatus = HTTPStatus.UNPROCESSABLE_ENTITY,
 ):
     """
     Creates an error response in the case that our validation has failed.
     """
-    response_body = {"Error": error_msg}
+    response_body = {"detail": error_msg, "title": title, "status": status}
 
     return response_body, http_status
 
@@ -155,23 +169,47 @@ def semantically_validate_json(body: dict):
     :raises: SemanticValidationError: If the input JSON is not
              semantically valid semantic and raise semantic is true
     """
-
+    error_details = {}
     observing_command_input = body.get("observing_command_input")
     if observing_command_input is None:
-        raise ValueError("observing_command_input is missing")
+        error_details["observing_command_output"] = "observing_command_input is missing"
 
-    interface: str = body.get("interface")
+    interface: str = body.get("interface")  # check if interface is None
+    if interface:
+        pattern = r"^https://schema\.skao\.int/[a-zA-Z-]+/\d+\.\d+$"
+        if not re.match(pattern, interface):
+            error_details["interface"] = "interface is not valid"
+
     raise_semantic: bool = body.get("raise_semantic")  # True
+    if raise_semantic and not isinstance(raise_semantic, bool):
+        error_details["raise_semantic"] = "raise_semantic is not a boolean value "
 
-    sources = [body.get("sources")] if body.get("sources") else CAR_TELMODEL_SOURCE
-    tm_data = TMData(sources)
+    sources = (
+        [body.get("sources")] if body.get("sources") else CAR_TELMODEL_SOURCE
+    )  # check source
+    tm_data = {}
+
+    try:
+        tm_data = TMData(sources)
+    except RuntimeError as err:
+        error_details["sources"] = err.args[0]
 
     osd_data = body.get("osd_data")
-    semantic_validate(
-        observing_command_input=observing_command_input,
-        tm_data=tm_data,
-        raise_semantic=raise_semantic,
-        interface=interface,
-        osd_data=osd_data,
+    if error_details:
+        raise ValueError(error_details)
+
+    print(
+        "semantic_validate func output:",
+        semantic_validate(
+            observing_command_input=observing_command_input,
+            tm_data=tm_data,
+            raise_semantic=raise_semantic,
+            interface=interface,
+            osd_data=osd_data,
+        ),
     )
-    return {"status": "success", "message": "JSON is semantically valid"}, HTTPStatus.OK
+    return {
+        "status": 0,
+        "details": "JSON is semantically valid",
+        "title": "Semantic validation",
+    }, HTTPStatus.OK

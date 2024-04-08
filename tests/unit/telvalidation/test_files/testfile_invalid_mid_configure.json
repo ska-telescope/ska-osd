@@ -1,0 +1,117 @@
+{
+    "interface": "https://schema.skao.int/ska-tmc-configure/2.1",
+    "pointing": {
+      "target": {
+        "reference_frame": "ICRS",
+        "target_name": "Polaris Australis",
+        "ra": "21:08:47.92",
+        "dec": "-88:57:22.9"
+      }
+    },
+    "dish": {
+      "receiver_band": "5c"
+    },
+    "csp": {
+      "interface": "https://schema.skao.int/ska-csp-configure/2.0",
+      "subarray": {
+        "subarray_name": "science period 23"
+      },
+      "common": {
+        "config_id": "sbi-mvp01-20200325-00001-science_A",
+        "frequency_band": "1",
+        "subarray_id": 1,
+        "band_5_tuning": [5.85, 7.25]
+      },
+      "cbf": {
+        "fsp": [
+          {
+            "fsp_id": 6,
+            "function_mode": "VLBI",
+            "frequency_slice_id": 1,
+            "integration_factor": 1,
+            "zoom_factor": 1,
+            "channel_averaging_map": [
+              [
+                0,
+                2
+              ],
+              [
+                744,
+                0
+              ]
+            ],
+            "channel_offset": 0,
+            "output_link_map": [
+              [
+                0,
+                0
+              ],
+              [
+                200,
+                1
+              ]
+            ]
+          },
+          {
+            "fsp_id": 9,
+            "function_mode": "VLBI",
+            "frequency_slice_id": 3,
+            "integration_factor": 1,
+            "zoom_factor": 1,
+            "channel_averaging_map": [
+              [
+                0,
+                2
+              ],
+              [
+                744,
+                0
+              ]
+            ],
+            "channel_offset": 744,
+            "output_link_map": [
+              [
+                0,
+                4
+              ],
+              [
+                200,
+                5
+              ]
+            ],
+            "zoom_window_tuning": 4700000
+          },
+          {
+            "fsp_id": 8,
+            "function_mode": "VLBI",
+            "frequency_slice_id": 3,
+            "integration_factor": 1,
+            "zoom_factor": 1
+          },
+          {
+            "fsp_id": 7,
+            "function_mode": "VLBI",
+            "frequency_slice_id": 3,
+            "integration_factor": 1,
+            "zoom_factor": 1
+          },
+          {
+            "fsp_id": 5,
+            "function_mode": "VLBI",
+            "frequency_slice_id": 3,
+            "integration_factor": 1,
+            "zoom_factor": 1
+          }
+        ]
+      }
+    },
+    
+    "sdp": {
+      "interface": "https://schema.skao.int/ska-sdp-configure/0.4",
+      "scan_type": "science_A"
+    },
+    "tmc": {
+      "scan_duration": 10.0
+    }
+  }
+  

@@ -988,7 +988,11 @@ def valid_semantic_validation_body():
 
 @pytest.fixture
 def valid_semantic_validation_response():
-    return {"message": "JSON is semantically valid", "status": "success"}
+    return {
+        "status": 0,
+        "details": "JSON is semantically valid",
+        "title": "Semantic validation",
+    }
 
 
 @pytest.fixture
@@ -1228,7 +1232,7 @@ def invalid_semantic_validation_body():
 def invalid_semantic_validation_response():
     return [
         {
-            "Error": [
+            "detail": [
                 "receptor_ids are too many!Current Limit is 4",
                 "beams are too many! Current limit is 1",
                 "Invalid function for beams! Currently allowed visibilities",
@@ -1239,12 +1243,43 @@ def invalid_semantic_validation_response():
                 "freq_min should be less than freq_max",
                 "length of receptor_ids should be same as length of receptors",
                 "receptor_ids did not match receptors",
-            ]
+            ],
+            "status": 0,
+            "title": "Semantic Validation Error",
+        },
+        200,
+    ]
+
+
+@pytest.fixture
+def observing_command_input_missing_response():
+    return [
+        {
+            "detail": {
+                "observing_command_output": "observing_command_input is missing"
+            },
+            "status": -1,
+            "title": "Value Error",
         },
         400,
     ]
 
 
 @pytest.fixture
-def observing_command_input_missing_response():
-    return [{"Error": "observing_command_input is missing"}, 400]
+def wrong_semantic_validation_parameter_value_response():
+    return [
+        {
+            "detail": {
+                "interface": "interface is not valid",
+                "observing_command_output": "observing_command_input is missing",
+                "raise_semantic": "raise_semantic is not a boolean value ",
+                "sources": (
+                    "gitlab://gitlab.com/ska-telescope14.1?~default~#tmdata not found"
+                    " in SKA CAR - make sure to add tmdata CI!"
+                ),
+            },
+            "status": -1,
+            "title": "Value Error",
+        },
+        400,
+    ]
