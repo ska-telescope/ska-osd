@@ -94,13 +94,6 @@ def test_init_app_client(client, open_api_spec):
         assert call_args[1]["base_path"].startswith("/")
 
 
-error_msgs = (
-    "osd_version 1..1.0 is not valid, "
-    "array_assembly AAA3 is not valid, "
-    "Cycle id 3 is not valid,Available IDs are 1,2"
-)
-
-
 @pytest.mark.parametrize(
     "cycle_id, osd_version, source, capabilities, array_assembly, expected",
     [
@@ -110,7 +103,13 @@ error_msgs = (
             "file",
             "mid",
             "AAA3",
-            error_msgs,
+            {
+                "detail": (
+                    "osd_version 1..1.0 is not valid, array_assembly AAA3 is not valid,"
+                    " Cycle id 3 is not valid,Available IDs are 1,2"
+                ),
+                "title": "Bad Request",
+            },
         ),
         (
             None,
@@ -118,7 +117,12 @@ error_msgs = (
             None,
             "mid",
             "AA3",
-            "Array Assembly AA3 doesn't exists. Available are AA0.5, AA1, AA2",
+            {
+                "detail": (
+                    "Array Assembly AA3 doesn't exists. Available are AA0.5, AA1, AA2"
+                ),
+                "title": "Bad Request",
+            },
         ),
     ],
 )
@@ -240,9 +244,27 @@ def test_osd_source(client):
     response = client.get(
         "/ska-ost-osd/osd/api/v1/osd", query_string={"cycle_id": 1, "source": "car"}
     )
-    error_msg = (
-        "gitlab://gitlab.com/ska-telescope/ost/ska-ost-osd?1.0.0#"
-        "tmdatanotfound in SKA CAR - make sure to add tmdata CI!"
+    error_msg = {
+        "detail": (
+            "gitlab://gitlab.com/ska-telescope/ost/ska-ost-osd?1.0.0#tmdata not found"
+            " in SKA CAR - make sure to add tmdata CI!"
+        ),
+        "title": "Bad Request",
+    }
+
+    response.json == error_msg  # pylint: disable=W0104
+
+
+def test_osd_source_gitlab(client):
+    """This function tests that a request with an OSD source as car .
+
+    :param client (FlaskClient): The Flask test client.
+    """
+
+    response = client.get(
+        "/ska-ost-osd/osd/api/v1/osd", query_string={"cycle_id": 1, "source": "gitlab"}
     )
 
-    response.json[0]["Error"] == error_msg  # pylint: disable=W0104
+    error_msg = [{"Error": "404: 404 Commit Not Found"}, 422]
+
+    response.json == error_msg  # pylint: disable=W0104
