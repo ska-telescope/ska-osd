@@ -129,105 +129,8 @@ Low                       file content of ``low_capabilities.json`` with ``basic
 ======================    ============================================================================================================
 
 
-API Usage
-~~~~~~~~~~~
-
-There are two functions - 
-
-1. ``osd_tmdata_source`` function only returns a source_uris based on parameters, which is then passed to TMData class which returns tmdata object based on source uri.
-
-2. ``get_osd_data`` function receives this tmdata with two other parameters and returns above mentioned json object.
-
-If no parameters are provided to the functions ``osd_tmdata_source`` and ``get_osd_data`` then latest version with cycle id is fetched from 
-``cycle_gitlab_release_version_mapping.json`` file. 
-
-After that ``observatory_policies`` will be fetched and from there ``capabilities``and ``array_assembly`` 
-is fetched and using API json response template, a json object is returned.
-
-
-.. code:: python
-
-    from ska_telmodel.data import TMData
-    from ska_ost_osd.osd.osd import osd_tmdata_source, get_osd_data
-
-    source_uris = osd_tmdata_source()
-    tmdata = TMData(source_uris=source_uris)
-    osd_data = get_osd_data(tmdata=tmdata)
-
-
-Calling API with only one parameter ``cycle_id`` to the function ``osd_tmdata_source`` and no parameters to the ``get_osd_data``. 
-first it will check if the cycle id is valid or not, and will fetch latest version stored in the ``cycle_gitlab_release_version_mapping.json`` file. 
-
-After that ``observatory_policies`` will be fetched and from there ``capabilities`` and ``array_assembly`` is fetched and 
-using API json response template, a json object is returned.
-
-.. code:: python
-
-    from ska_telmodel.data import TMData
-    from ska_ost_osd.osd.osd import osd_tmdata_source, get_osd_data
-
-    source_uris = osd_tmdata_source(cycle_id=1)
-    tmdata = TMData(source_uris=source_uris)
-    osd_data = get_osd_data(tmdata=tmdata)
-
-
-Another way of calling ``get_osd_data`` function with parameter ``capabilities`` and no parameters to the ``osd_tmdata_source``. latest version and cycle_id will be fetched.
-then ``observatory_policies`` is fetched and ``array_assembly`` a json object is returned for latest cycle id, version for capabilities ``mid``. 
-
-.. code:: python
-
-    from ska_telmodel.data import TMData
-    from ska_ost_osd.osd.osd import osd_tmdata_source, get_osd_data
-
-    source_uris = osd_tmdata_source()
-    tmdata = TMData(source_uris=source_uris)
-    osd_data = get_osd_data(capabilities=['mid'], tmdata=tmdata)
-
-
-Calling ``osd_tmdata_source`` with parameter ``cycle_id`` and ``get_osd_data`` with ``capabilities`` and ``array_assembly``. cycle id is checked valid or not 
-then ``observatory_policies`` is fetched, then ``capabilities`` and ``array_assembly`` is returned in json object.
-
-.. code:: python
-
-    from ska_telmodel.data import TMData
-    from ska_ost_osd.osd.osd import osd_tmdata_source, get_osd_data
-
-    source_uris = osd_tmdata_source(cycle_id=1)
-    tmdata = TMData(source_uris=source_uris)
-    osd_data = get_osd_data(capabilities=['mid'], array_assembly="AA0.5", tmdata=tmdata)
-
-
-.. note::
-
-    If source is not provided in the ``get_osd_data`` function call, the default is set to ``car``. API will fetch data from Car Gitlab repo.
-    other option is ``file``. if ``gitlab_branch`` parameter is provided to the ``osd_tmdata_source`` source is set to the ``gitlab``.
-
-
-.. warning::
-
-    If ``cycle_id`` value is not valid following exception will be raised.
-
-    .. code:: python
-
-        OSDDataException: Cycle id {cycle_id value here} is not valid,Available IDs are {list of cycle_ids present in the json file}
-
-
-    If ``capabilities`` value is not valid following exception will be raised.
-
-    .. code:: python
-
-        OSDDataException: Capability {capability value here} doesn't exists,Available are low, mid, observatory_policies
-
-
-    If ``array_assembly`` value is not valid following exception will be raised.
-
-    .. code:: python
-
-        OSDDataException: Keyerror {array_assembly value here} doesn't exists
-
-
 OSD as a service
-```````````````````
+~~~~~~~~~~~~~~~~~
 
 1. API Endpoint
 
@@ -239,7 +142,7 @@ OSD as a service
      - Resource URL
      - Description
    * - GET
-     - ``/ska-ost-osd/api/v1/osd``
+     - ``/ska-ost-osd/osd/api/v1/osd``
      - **Getting Data**
 
        Return the OSD cycle_id data.
@@ -265,14 +168,14 @@ OSD as a service
 
 .. code:: python
     
-    "/ska-ost-osd/api/v1/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
+    "/ska-ost-osd/osd/api/v1/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
 
 
 4. CURL Example Request
 
 .. code:: python
 
-    curl -X GET "/ska-ost-osd/api/v1/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
+    curl -X GET "/ska-ost-osd/osd/api/v1/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
 
 
 5. Example Response
@@ -285,7 +188,7 @@ OSD as a service
     .. code:: python
 
         client.get(
-            "/ska-ost-osd/api/v1/osd",
+            "/ska-ost-osd/osd/api/v1/osd",
             query_string={
                 "cycle_id": 1,
                 "source": "file",

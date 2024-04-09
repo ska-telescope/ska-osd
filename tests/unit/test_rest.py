@@ -1,5 +1,7 @@
 from unittest.mock import MagicMock, patch
 
+import pytest
+
 from ska_ost_osd.rest import get_openapi_spec, init_app
 from ska_ost_osd.rest.api.resources import validation_response
 
@@ -41,7 +43,6 @@ def test_get_openapi_spec(open_api_spec):
     :raises AssertionError: If the response spec differs from expected.
     """
 
-    # Patch 'prance.ResolvingParser' to return a mock spec
     with patch("ska_ost_osd.rest.prance.ResolvingParser", autospec=True) as mock_parser:
         instance = mock_parser.return_value
         instance.specification = open_api_spec
@@ -79,7 +80,7 @@ def test_init_app_client(client, open_api_spec):
         mock_flask_app = mock_connexion_instance.app
         mock_flask_app.test_client = MagicMock(return_value=client)
 
-        app = init_app(open_api_spec=open_api_spec)  # noqa: F841, pylint: disable=W0612
+        init_app(open_api_spec=open_api_spec)
 
         # Verify that the Connexion app is initialized with the correct parameters
         mock_connexion_app.assert_called_once_with(
@@ -91,6 +92,70 @@ def test_init_app_client(client, open_api_spec):
         call_args = mock_connexion_instance.add_api.call_args
         assert call_args[0][0] == open_api_spec
         assert call_args[1]["base_path"].startswith("/")
+
+
+error_msgs = (
+    "osd_version 1..1.0 is not valid, "
+    "array_assembly AAA3 is not valid, "
+    "Cycle id 3 is not valid,Available IDs are 1,2"
+)
+
+
+@pytest.mark.parametrize(
+    "cycle_id, osd_version, source, capabilities, array_assembly, expected",
+    [
+        (
+            3,
+            "1..1.0",
+            "file",
+            "mid",
+            "AAA3",
+            error_msgs,
+        ),
+        (
+            None,
+            None,
+            None,
+            "mid",
+            "AA3",
+            "Array Assembly AA3 doesn't exists. Available are AA0.5, AA1, AA2",
+        ),
+    ],
+)
+def test_invalid_osd_tmdata_source(
+    cycle_id,
+    osd_version,
+    source,
+    capabilities,
+    array_assembly,
+    expected,
+    client,
+):
+    """This test case checks the functionality of OSD API
+        It will validate all params and retunr expected output.
+
+    :param cycle_id,: 1, 2
+    :param osd_version,: 1.0.0
+    :param source,: File, Car and Gitlab
+    :param capabilities: Mid or Low
+    :param array_assembly: Array Assembly AA0.5, AA1
+    :param expected: output of OSD API
+    :param client: Flask test client
+
+    :returns: assert equals values
+    """
+
+    response = client.get(
+        "/ska-ost-osd/osd/api/v1/osd",
+        query_string={
+            "cycle_id": cycle_id,
+            "osd_version": osd_version,
+            "source": source,
+            "capabilities": capabilities,
+            "array_assembly": array_assembly,
+        },
+    )
+    assert response.json == expected
 
 
 def test_osd_endpoint(client, mid_osd_data):
@@ -118,36 +183,6 @@ def test_osd_endpoint(client, mid_osd_data):
     assert response.json == mid_osd_data
 
 
-def test_invalid_osd_tmdata_source(client):
-    """This function tests that a request with an invalid OSD TM data
-       source ID returns the expected error response.
-
-    :param client (FlaskClient): The Flask test client.
-
-    :raises AssertionError: If the response does not contain the expected
-       error message.
-    """
-    error_msgs = client.get(
-        "/ska-ost-osd/osd/api/v1/osd",
-        query_string={
-            "cycle_id": 3,
-            "osd_version": "1..1.0",
-            "source": "file",
-            "capabilities": "mid",
-            "array_assembly": "AAA3",
-        },
-    )
-
-    expected_error_msg_1 = "osd_version 1..1.0 is not valid"
-    expected_error_msg_2 = "array_assembly AAA3 is not valid"
-    expected_error_msg_3 = "Cycle id 3 is not valid,Available IDs are 1,2"
-
-    assert (
-        error_msgs.json
-        == f"{expected_error_msg_1}, {expected_error_msg_2}, {expected_error_msg_3}"
-    )
-
-
 def test_invalid_osd_tmdata_source_capabilities(client):
     """This function tests that a request with an invalid capability
        returns the expected error response.
@@ -158,7 +193,7 @@ def test_invalid_osd_tmdata_source_capabilities(client):
        expected error message.
     """
 
-    error_msgs = client.get(
+    error_msgs = client.get(  # pylint: disable=W0621
         "/ska-ost-osd/osd/api/v1/osd",
         query_string={
             "cycle_id": 1,
@@ -173,40 +208,41 @@ def test_invalid_osd_tmdata_source_capabilities(client):
     assert error_msgs.json["detail"].startswith(expected_error_msg)
 
 
-def test_osd_source(client):
-    """This function tests that a request with an OSD source as car .
-
-    :param client (FlaskClient): The Flask test client.
-    """
-    osd_source_link = client.get(
-        "/ska-oso-osd/api/v1/osd", query_string={"cycle_id": 1, "source": "car"}
-    )
-    assert osd_source_link == osd_source_link
-
-
-def test_invalid_array_assembly(client):
-    """Test invalid array_assembly
-    :param client (FlaskClient): The Flask test client.
-    """
-    error_msgs = client.get(
-        "/ska-ost-osd/osd/api/v1/osd",
-        query_string={"capabilities": "mid", "array_assembly": "AA3"},
-    )
-
-    assert (
-        error_msgs.json
-        == "Array Assembly AA3 doesn't exists. Available are AA0.5, AA1, AA2"
-    )
-
-
-def test_response_body():
+def test_response_body(client):
     """This function tests that the response from the REST API contains
        the expected body contents when retrieving OSD metadata.
 
     :raises AssertionError: If the response body is invalid.
     """
-    error_msg = "Validation failed"
-    response = validation_response(error_msg)
 
-    expected = {"Error": error_msg}
-    assert response[0] == expected
+    response = client.get(
+        "/ska-ost-osd/osd/api/v1/osd",
+        query_string={
+            "cycle_id": 3,
+            "source": "file",
+            "capabilities": "mid",
+            "array_assembly": "AA0.5",
+        },
+    )
+
+    error_msg = response.json
+    expected_response = validation_response(error_msg)
+
+    assert expected_response[0] == {"Error": error_msg}
+
+
+def test_osd_source(client):
+    """This function tests that a request with an OSD source as car .
+
+    :param client (FlaskClient): The Flask test client.
+    """
+
+    response = client.get(
+        "/ska-ost-osd/osd/api/v1/osd", query_string={"cycle_id": 1, "source": "car"}
+    )
+    error_msg = (
+        "gitlab://gitlab.com/ska-telescope/ost/ska-ost-osd?1.0.0#"
+        "tmdatanotfound in SKA CAR - make sure to add tmdata CI!"
+    )
+
+    response.json[0]["Error"] == error_msg  # pylint: disable=W0104

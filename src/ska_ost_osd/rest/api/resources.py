@@ -4,16 +4,14 @@ Functions which the HTTP requests to individual resources are mapped to.
 See the operationId fields of the Open API spec for the specific mappings.
 """
 
-import logging
 from functools import wraps
 from http import HTTPStatus
 
 from ska_telmodel.data import TMData
 
+from ska_ost_osd.osd.constant import error_msg_list
 from ska_ost_osd.osd.osd import get_osd_data, osd_tmdata_source
 from ska_ost_osd.rest.api.query import QueryParams, QueryParamsFactory
-
-LOGGER = logging.getLogger(__name__)
 
 
 def error_handler(api_fn: str) -> str:
@@ -52,9 +50,10 @@ def get_osd_data_response(query_params, tm_data_sources):
         gitlab_branch=query_params.gitlab_branch,
     )
 
-    if isinstance(tm_data_sources, list):
+    if error_msg_list:
         error_msg = ", ".join([str(err) for err in tm_data_sources])
         tm_data_sources.clear()
+
         return error_msg
 
     tm_data = TMData(source_uris=tm_data_sources)
@@ -65,9 +64,10 @@ def get_osd_data_response(query_params, tm_data_sources):
         array_assembly=query_params.array_assembly,
     )
 
-    if isinstance(osd_data, list):
+    if error_msg_list:
         error_msg = ", ".join([str(err.message) for err in osd_data])
         osd_data.clear()
+
         return error_msg
 
     return osd_data

@@ -235,17 +235,14 @@ def test_invalid_osd_tmdata_source():
         source="github",
     )
 
-    expected_error_msg = ", ".join([str(err) for err in error_msgs])
+    expected_error_msg = "\n".join([str(err) for err in error_msgs])
     error_msgs.clear()
-    expected_error_msg_1 = "source is not valid available are file, car, gitlab"
-    expected_error_msg_2 = (
-        "Only one parameter is needed either osd_version or gitlab_branch"
-    )
-    expected_error_msg_3 = "Cycle id 3 is not valid,Available IDs are 1,2"
 
     assert (
         expected_error_msg
-        == f"{expected_error_msg_1}, {expected_error_msg_2}, {expected_error_msg_3}"
+        == "source is not valid available are file, car, gitlab\n"
+        "Only one parameter is needed either osd_version or gitlab_branch\n"
+        "Cycle id 3 is not valid,Available IDs are 1,2"
     )
 
 
@@ -276,14 +273,14 @@ def test_invalid_get_osd_data_capability(tm_data):  # pylint: disable=W0621
     error_msgs = get_osd_data(
         capabilities=["midd"], array_assembly="AA1", tmdata=tm_data
     )
-    expected_error_msg = ", ".join([str(err) for err in error_msgs])
+    actual_error_msg = ", ".join([str(err) for err in error_msgs])
     error_msgs.clear()
 
     expected_error_msg = (
         "Capability midd doesn't exists,Available are low, mid, observatory_policies"
     )
 
-    assert expected_error_msg == expected_error_msg
+    assert actual_error_msg == expected_error_msg
 
 
 def test_invalid_get_osd_data_array_assembly(tm_data):  # pylint: disable=W0621
@@ -298,11 +295,11 @@ def test_invalid_get_osd_data_array_assembly(tm_data):  # pylint: disable=W0621
         capabilities=["mid"], array_assembly="AA3", tmdata=tm_data
     )
 
-    expected_error_msg = ", ".join([str(err) for err in error_msgs])
+    actual_error_msg = ", ".join([str(err) for err in error_msgs])
     error_msgs.clear()
 
     expected_error_msg = (
         "Array Assembly AA3 doesn't exists. Available are AA0.5, AA1, AA2"
     )
 
-    assert expected_error_msg == expected_error_msg
+    assert actual_error_msg == expected_error_msg

@@ -1,11 +1,11 @@
 import re
 from dataclasses import dataclass
 
-from ska_ost_osd.osd.constant import error_msg_list
-
-capabilities_list = ["mid", "low"]
-osd_version_pattern = r"^\d+\.\d+\.\d+"
-array_assembly_pattern = r"^AA(\d+|\d+\.\d+)"
+from ska_ost_osd.osd.constant import (
+    array_assembly_pattern,
+    error_msg_list,
+    osd_version_pattern,
+)
 
 
 @dataclass
@@ -17,6 +17,16 @@ class QueryParams:
 
 @dataclass
 class UserQuery(QueryParams):
+    """
+    Class to represent a user query.
+
+    This class stores parameters for querying OSD data. It inherits
+    from the QueryParams base class to validate and parse query
+    string parameters.
+
+    :param QueryParams: abstract class
+    """
+
     cycle_id: int = None
     osd_version: str = None
     source: str = None
@@ -83,11 +93,13 @@ def osd_validation(params_in_kwargs, kwargs: dict) -> dict:
         if kwargs.get("source"):
             source = kwargs.get("source")
 
-    if (
-        params_in_kwargs("capabilities")
-        or params_in_kwargs("osd_version")
-        or params_in_kwargs("gitlab_branch")
-        or params_in_kwargs("array_assembly")
+    if any(
+        [
+            params_in_kwargs("capabilities"),
+            params_in_kwargs("osd_version"),
+            params_in_kwargs("gitlab_branch"),
+            params_in_kwargs("array_assembly"),
+        ]
     ):
         osd_version = kwargs["osd_version"] if kwargs.get("osd_version") else None
         array_assembly = (

@@ -26,5 +26,7 @@ CAR_URL = "ost/ska-ost-osd?"
 BASE_FOLDER_NAME = "tmdata"
 
 source_list = ["file", "car", "gitlab"]
+capabilities_list = ["mid", "low"]
+osd_version_pattern = r"^\d+\.\d+\.\d+"
 array_assembly_pattern = r"^AA(\d+|\d+\.\d+)"
 error_msg_list = []
