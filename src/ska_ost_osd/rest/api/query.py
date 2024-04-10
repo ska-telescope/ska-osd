@@ -49,7 +49,7 @@ class QueryParamsFactory:
         """
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
-        err_msg_dict = {"err_msg": []}
+        query_err_msg_list = []
 
         def params_in_kwargs(allowed_fields: set) -> bool:
             """
@@ -89,14 +89,12 @@ class QueryParamsFactory:
                 if source != "gitlab" and not re.match(
                     OSD_VERSION_PATTERN, osd_version
                 ):
-                    err_msg_dict["err_msg"].append(
-                        f"osd_version {osd_version} is not valid"
-                    )
+                    query_err_msg_list.append(f"osd_version {osd_version} is not valid")
 
             if array_assembly is not None:
                 if not re.match(ARRAY_ASSEMBLY_PATTERN, array_assembly):
-                    err_msg_dict["err_msg"].append(
+                    query_err_msg_list.append(
                         f"array_assembly {array_assembly} is not valid"
                     )
 
-        return UserQuery(**kwargs), err_msg_dict
+        return UserQuery(**kwargs), query_err_msg_list

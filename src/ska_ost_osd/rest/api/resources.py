@@ -60,25 +60,22 @@ def get_osd_data_response(query_params, tm_data_sources) -> dict:
         source=query_params.source,
         gitlab_branch=query_params.gitlab_branch,
     )
-    if tm_data_sources and error_msg:
-        error_msg.extend(tm_data_sources)
+
+    error_msg.extend(tm_data_sources)
+
+    if error_msg:
         return ", ".join([str(err) for err in error_msg])
-    elif error_msg:
-        return ", ".join([str(err) for err in error_msg])
-    elif tm_data_sources:
-        return ", ".join([str(err) for err in tm_data_sources])
 
     tm_data_src = TMData(source_uris=tm_data)
 
-    osd_data, error_msg_osd_dt = get_osd_data(
+    osd_data, error_msg_osd = get_osd_data(
         capabilities=[query_params.capabilities],
         tmdata=tm_data_src,
         array_assembly=query_params.array_assembly,
     )
 
-    if error_msg_osd_dt:
-        error_msg = ", ".join([str(err) for err in error_msg_osd_dt])
-        return error_msg
+    if error_msg_osd:
+        return ", ".join([str(err) for err in error_msg_osd])
 
     return osd_data
 
@@ -93,7 +90,7 @@ def get_osd(**kwargs) -> dict:
     """
 
     query_params, error_list = get_qry_params(kwargs)
-    return get_osd_data_response(query_params, error_list.get("err_msg", None))
+    return get_osd_data_response(query_params, error_list)
 
 
 def validation_response(

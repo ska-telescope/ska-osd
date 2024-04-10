@@ -125,13 +125,15 @@ class OSD:
         :returns: osd_data dictionary with values populated or
                 raises OSDDataException Keyerror
         """
-        err_msg_list = []
+        cap_err_msg_list = []
+
         for key, value in telescope_capabilities_dict.items():
             data = self.get_data(tmdata, capability=osd_file_mapping[key.lower()])
             self.keys_list = list(data.keys())
             err_msg = self.check_array_assembly(value, self.keys_list)
+
             if err_msg:
-                err_msg_list.append(err_msg)
+                cap_err_msg_list.append(err_msg)
             else:
                 osd_data["capabilities"][key.lower()] = {}
 
@@ -141,7 +143,7 @@ class OSD:
                     "basic_capabilities"
                 ]
 
-        return osd_data, err_msg_list
+        return osd_data, cap_err_msg_list
 
     def get_data(
         self,
@@ -180,11 +182,13 @@ class OSD:
                 raises OSDDataException
         """
 
-        err_msg_list = []
+        osd_err_msg_list = []
+
         capabilities_and_array_assembly = None
         chk_capabilities = self.check_capabilities(self.capabilities)
+
         if chk_capabilities:
-            err_msg_list.append(chk_capabilities)
+            osd_err_msg_list.append(chk_capabilities)
         else:
             (
                 osd_data,
@@ -199,8 +203,9 @@ class OSD:
                 self.tmdata, telescope_capabilities_dict, osd_data
             )
             if err_msg:
-                err_msg_list.extend(err_msg)
-        return capabilities_and_array_assembly, err_msg_list
+                osd_err_msg_list.extend(err_msg)
+
+        return capabilities_and_array_assembly, osd_err_msg_list
 
     def check_array_assembly(self, value: str, key_list: dict) -> None:
         """This method checks whether a array_assembly value like
@@ -233,11 +238,12 @@ def check_cycle_id(
     :returns: osd_version in string format i.e 1.9.0
             or raises OSDDataException
     """
-    error_msg_list = []
+    cycle_error_msg_list = []
+
     if gitlab_branch is not None and osd_version is not None:
         msg = "either osd_version or gitlab_branch"
 
-        error_msg_list.append(f"Only one parameter is needed {msg}")
+        cycle_error_msg_list.append(f"Only one parameter is needed {msg}")
 
     if gitlab_branch is not None:
         osd_version = gitlab_branch
@@ -256,12 +262,12 @@ def check_cycle_id(
     if cycle_id is not None and cycle_id_exists is None:
         msg = f"Available IDs are {string_ids}"
 
-        error_msg_list.append(f"Cycle id {cycle_id} is not valid,{msg}")
+        cycle_error_msg_list.append(f"Cycle id {cycle_id} is not valid,{msg}")
 
     elif cycle_id is not None and osd_version is None:
         osd_version = versions_dict[f"cycle_{cycle_id}"][0]
 
-    return osd_version, error_msg_list
+    return osd_version, cycle_error_msg_list
 
 
 def osd_tmdata_source(
@@ -281,34 +287,35 @@ def osd_tmdata_source(
 
     :returns: source_uris as a string or raises exception
     """
-    error_msg_list = []
+    source_error_msg_list = []
+
     if source not in SOURCES:
-        error_msg_list.append(f"source is not valid available are {', '.join(SOURCES)}")
+        source_error_msg_list.append(
+            f"source is not valid available are {', '.join(SOURCES)}"
+        )
 
     if (
         gitlab_branch
         and isinstance(gitlab_branch, str)
         and (source == "car" or source == "file")
     ):
-        error_msg_list.append("source is not valid.")
+        source_error_msg_list.append("source is not valid.")
 
-    osd_version, cycle_related_error_msg = check_cycle_id(
+    osd_version, cycle_error_msg_list = check_cycle_id(
         cycle_id, osd_version, gitlab_branch
     )
 
-    if error_msg_list and cycle_related_error_msg:
-        error_msg_list.extend(cycle_related_error_msg)
-    elif cycle_related_error_msg:
-        error_msg_list = cycle_related_error_msg
+    source_error_msg_list.extend(cycle_error_msg_list)
 
     source_url = (f"{source}:{BASE_URL}{CAR_URL}{osd_version}#{BASE_FOLDER_NAME}",)
+
     if source == "file":
         source_url = (f"file://{BASE_FOLDER_NAME}",)
 
     if source == "car":
         source_url = (f"{source}:{CAR_URL}{osd_version}#{BASE_FOLDER_NAME}",)
 
-    return source_url, error_msg_list
+    return source_url, source_error_msg_list
 
 
 def get_osd_data(
@@ -326,10 +333,10 @@ def get_osd_data(
 
     :returns: json object
     """
-    osd_data, error_msg = OSD(
+    osd_data, data_error_msg_list = OSD(
         capabilities=capabilities,
         array_assembly=array_assembly,
         tmdata=tmdata,
     ).get_osd_data()
 
-    return osd_data, error_msg
+    return osd_data, data_error_msg_list
