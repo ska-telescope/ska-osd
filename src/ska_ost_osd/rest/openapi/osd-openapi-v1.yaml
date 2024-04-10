@@ -1,20 +1,22 @@
 openapi: 3.0.0
 info:
-  title: OSO Data Archive API
-  description: 'This OpenAPI document defines the API for the OSO Data Archive (OSD) REST service'
+  title: Observatory Static Data API
+  description: 'This OpenAPI document defines the API for the Observatory Static Data (OSD) REST service'
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
   version: 1.0.0
 servers:
 # This default is overwritten when the application is deployed to include the actual namespace if it is different to the 'ska-osd' default
-- url: /ska-ost-osd/api/v1/
+- url: /ska-ost-osd/osd/api/v1/
 paths:
   /osd:
     get:
       summary: Get OSD data filter by the query parameter
       description: |
-        Retrieves the OSD data which match the query parameters.
+        Retrieves the OSD cycle_id data which match the query parameters. Also requests without parameters will take 
+        example and default values and return data based on that. All query parameters has its own validation 
+        if user provide any invalid value it will return the error message.
       operationId: ska_ost_osd.rest.api.resources.get_osd
       parameters:
         - $ref: '#/components/parameters/cycle_id'
@@ -46,17 +48,21 @@ components:
       schema:
         type: integer
       required: false
+      example: 1
     osd_version:
       in: query
       name: osd_version
       schema:
         type: string
       required: false
+      example: 1.0.0
     source:
       in: query
       name: source
       schema:
         type: string
+        enum: [file, car, gitlab]
+        default: file
       required: false
     gitlab_branch:
       in: query
@@ -69,6 +75,8 @@ components:
       name: capabilities
       schema:
         type: string
+        enum: [ mid, low]
+        default: mid
       required: false
     array_assembly:
       in: query
@@ -76,6 +84,7 @@ components:
       schema:
         type: string
       required: false
+      example: AA0.5
 
     
   responses:
@@ -91,12 +100,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/BadRequestResponse'
-    UnprocessableEntity:
-      description: Unprocessable Entity, semantic error in request eg mismatched IDs
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
     InternalServerError:
       description: Internal Server Error
       content:

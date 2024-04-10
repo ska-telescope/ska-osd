@@ -1,5 +1,5 @@
 """
-ODA REST server entry point.
+OSD REST server entry point.
 """
 import logging
 

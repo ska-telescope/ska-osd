@@ -1,17 +1,20 @@
 import copy
+import re
 from importlib.metadata import version
 from typing import Any
 
 from ska_telmodel.data import TMData
 
 from .constant import (
+    ARRAY_ASSEMBLY_PATTERN,
     BASE_FOLDER_NAME,
     BASE_URL,
+    CAR_URL,
+    SOURCES,
     osd_file_mapping,
     osd_response_template,
-    source_list,
 )
-from .helper import OSDDataException, read_json
+from .helper import read_json
 
 
 class OSD:
@@ -37,7 +40,7 @@ class OSD:
         self.tmdata = tmdata
         self.keys_list = {}
 
-    def check_capabilities(self, capabilities: list = None) -> None | OSDDataException:
+    def check_capabilities(self, capabilities: list = None) -> None:
         """This method checks if a given capability exists or not
             and raises exception
 
@@ -55,9 +58,7 @@ class OSD:
             msg = ", ".join(capabilities_list)
             cap = cap_list[0]
 
-            raise OSDDataException(
-                f"Capability {cap} doesn't exists,Available are {msg}"
-            )
+            return f"Capability {cap} doesn't exists,Available are {msg}"
 
     def get_telescope_observatory_policies(
         self,
@@ -75,7 +76,6 @@ class OSD:
         :returns: returns dictionary of osd data and
             dictionary of capabilities and array assembly
         """
-
         self.osd_data["observatory_policy"] = self.get_data(
             self.tmdata,
             capability=osd_file_mapping["observatory_policies"],
@@ -111,7 +111,7 @@ class OSD:
 
     def get_capabilities_and_array_assembly(
         self, tmdata, telescope_capabilities_dict: dict, osd_data: dict
-    ) -> dict[dict[str, Any]] | OSDDataException:
+    ) -> dict[dict[str, Any]]:
         """This method returns osd_data dictionary as
         mentioned in constant.py variable osd_file_mapping with values
         populated
@@ -125,22 +125,25 @@ class OSD:
         :returns: osd_data dictionary with values populated or
                 raises OSDDataException Keyerror
         """
+        cap_err_msg_list = []
 
         for key, value in telescope_capabilities_dict.items():
             data = self.get_data(tmdata, capability=osd_file_mapping[key.lower()])
             self.keys_list = list(data.keys())
+            err_msg = self.check_array_assembly(value, self.keys_list)
 
-            self.check_array_assembly(value, self.keys_list)
+            if err_msg:
+                cap_err_msg_list.append(err_msg)
+            else:
+                osd_data["capabilities"][key.lower()] = {}
 
-            osd_data["capabilities"][key.lower()] = {}
+                osd_data["capabilities"][key.lower()][value] = data[value]
 
-            osd_data["capabilities"][key.lower()][value] = data[value]
+                osd_data["capabilities"][key.lower()]["basic_capabilities"] = data[
+                    "basic_capabilities"
+                ]
 
-            osd_data["capabilities"][key.lower()]["basic_capabilities"] = data[
-                "basic_capabilities"
-            ]
-
-        return osd_data
+        return osd_data, cap_err_msg_list
 
     def get_data(
         self,
@@ -179,31 +182,43 @@ class OSD:
                 raises OSDDataException
         """
 
-        self.check_capabilities(self.capabilities)
+        osd_err_msg_list = []
 
-        (
-            osd_data,
-            telescope_capabilities_dict,
-        ) = self.get_telescope_observatory_policies(
-            self.capabilities, self.array_assembly
-        )
+        capabilities_and_array_assembly = None
+        chk_capabilities = self.check_capabilities(self.capabilities)
 
-        return self.get_capabilities_and_array_assembly(
-            self.tmdata, telescope_capabilities_dict, osd_data
-        )
+        if chk_capabilities:
+            osd_err_msg_list.append(chk_capabilities)
+        else:
+            (
+                osd_data,
+                telescope_capabilities_dict,
+            ) = self.get_telescope_observatory_policies(
+                self.capabilities, self.array_assembly
+            )
+            (
+                capabilities_and_array_assembly,
+                err_msg,
+            ) = self.get_capabilities_and_array_assembly(
+                self.tmdata, telescope_capabilities_dict, osd_data
+            )
+            if err_msg:
+                osd_err_msg_list.extend(err_msg)
 
-    def check_array_assembly(
-        self, value: str, key_list: dict
-    ) -> None | OSDDataException:
+        return capabilities_and_array_assembly, osd_err_msg_list
+
+    def check_array_assembly(self, value: str, key_list: dict) -> None:
         """This method checks whether a array_assembly value like
             AA0.5 or AA1 in key_list dictionary exists or not and
             raises OSDDataException
 
         :returns: None or raises OSDDataException
         """
-
         if value not in key_list:
-            raise OSDDataException(f"Keyerror {value} doesn't exists")
+            msg = ", ".join(
+                key for key in key_list if re.match(ARRAY_ASSEMBLY_PATTERN, key)
+            )
+            return f"Array Assembly {value} doesn't exists. Available are {msg}"
 
 
 def check_cycle_id(
@@ -223,11 +238,12 @@ def check_cycle_id(
     :returns: osd_version in string format i.e 1.9.0
             or raises OSDDataException
     """
+    cycle_error_msg_list = []
 
     if gitlab_branch is not None and osd_version is not None:
         msg = "either osd_version or gitlab_branch"
 
-        raise OSDDataException(f"Only one parameter is needed {msg}")
+        cycle_error_msg_list.append(f"Only one parameter is needed {msg}")
 
     if gitlab_branch is not None:
         osd_version = gitlab_branch
@@ -246,12 +262,12 @@ def check_cycle_id(
     if cycle_id is not None and cycle_id_exists is None:
         msg = f"Available IDs are {string_ids}"
 
-        raise OSDDataException(f"Cycle id {cycle_id} is not valid,{msg}")
+        cycle_error_msg_list.append(f"Cycle id {cycle_id} is not valid,{msg}")
 
     elif cycle_id is not None and osd_version is None:
         osd_version = versions_dict[f"cycle_{cycle_id}"][0]
 
-    return osd_version
+    return osd_version, cycle_error_msg_list
 
 
 def osd_tmdata_source(
@@ -271,10 +287,11 @@ def osd_tmdata_source(
 
     :returns: source_uris as a string or raises exception
     """
+    source_error_msg_list = []
 
-    if source not in source_list:
-        raise OSDDataException(
-            f"source is not valid available are {', '.join(source_list)}"
+    if source not in SOURCES:
+        source_error_msg_list.append(
+            f"source is not valid available are {', '.join(SOURCES)}"
         )
 
     if (
@@ -282,14 +299,23 @@ def osd_tmdata_source(
         and isinstance(gitlab_branch, str)
         and (source == "car" or source == "file")
     ):
-        raise OSDDataException("source is not valid.")
+        source_error_msg_list.append("source is not valid.")
 
-    osd_version = check_cycle_id(cycle_id, osd_version, gitlab_branch)
+    osd_version, cycle_error_msg_list = check_cycle_id(
+        cycle_id, osd_version, gitlab_branch
+    )
+
+    source_error_msg_list.extend(cycle_error_msg_list)
+
+    source_url = (f"{source}:{BASE_URL}{CAR_URL}{osd_version}#{BASE_FOLDER_NAME}",)
 
     if source == "file":
-        return (f"file://{BASE_FOLDER_NAME}",)
+        source_url = (f"file://{BASE_FOLDER_NAME}",)
 
-    return (f"{source}:{BASE_URL}{osd_version}#{BASE_FOLDER_NAME}",)
+    if source == "car":
+        source_url = (f"{source}:{CAR_URL}{osd_version}#{BASE_FOLDER_NAME}",)
+
+    return source_url, source_error_msg_list
 
 
 def get_osd_data(
@@ -307,9 +333,10 @@ def get_osd_data(
 
     :returns: json object
     """
-
-    return OSD(
+    osd_data, data_error_msg_list = OSD(
         capabilities=capabilities,
         array_assembly=array_assembly,
         tmdata=tmdata,
     ).get_osd_data()
+
+    return osd_data, data_error_msg_list

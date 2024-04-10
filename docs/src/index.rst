@@ -1,12 +1,11 @@
 Welcome to ska-ost-osd's documentation!
-===================================
+=======================================
 
 .. toctree::
    :maxdepth: 1
-   :caption: Contents:
+   :caption: Usage
 
-   api/index
-
+   api/guide
 
 Indices and tables
 ==================

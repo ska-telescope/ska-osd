@@ -21,7 +21,19 @@ osd_response_template = {
 }
 
 
-BASE_URL = "//gitlab.com/ska-telescope/ost/ska-ost-osd?"
-BASE_FOLDER_NAME = "osd_data"
+BASE_URL = "//gitlab.com/ska-telescope/"
+CAR_URL = "ost/ska-ost-osd?"
+BASE_FOLDER_NAME = "tmdata"
 
-source_list = ["file", "car", "gitlab"]
+SOURCES = ("file", "car", "gitlab")
+CAPABILITIES = ("mid", "low")
+OSD_VERSION_PATTERN = r"^\d+\.\d+\.\d+"
+ARRAY_ASSEMBLY_PATTERN = r"^AA(\d+|\d+\.\d+)"
+QUERY_FIELDS = [
+    "cycle_id",
+    "osd_version",
+    "source",
+    "gitlab_branch",
+    "capabilities",
+    "array_assembly",
+]

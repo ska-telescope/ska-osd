@@ -7,7 +7,7 @@ from connexion import App
 
 KUBE_NAMESPACE = os.getenv("KUBE_NAMESPACE", "ska-ost-osd")
 ODA_MAJOR_VERSION = version("ska-ost-osd").split(".")[0]
-API_PATH = f"{KUBE_NAMESPACE}/api/v{ODA_MAJOR_VERSION}"
+API_PATH = f"{KUBE_NAMESPACE}/osd/api/v{ODA_MAJOR_VERSION}"
 
 
 # There is a (another) issue with Connexion where it cannot validate
@@ -35,7 +35,7 @@ def get_openapi_spec() -> Dict[str, Any]:
 
 def init_app(open_api_spec=None):
     """
-    Initialise the ODA REST application.
+    Initialise the OSD REST application.
 
     Resolving the spec is relatively time-consuming, so allow a single
     spec to be injected to all the test app instances to speed up the unit tests
@@ -46,7 +46,6 @@ def init_app(open_api_spec=None):
     validator_map = {
         "body": CustomRequestBodyValidator,
     }
-
     connexion = App(__name__, specification_dir="openapi/")
     connexion.add_api(
         open_api_spec,
