@@ -29,7 +29,6 @@ SOURCES = ("file", "car", "gitlab")
 CAPABILITIES = ("mid", "low")
 OSD_VERSION_PATTERN = r"^\d+\.\d+\.\d+"
 ARRAY_ASSEMBLY_PATTERN = r"^AA(\d+|\d+\.\d+)"
-ERROR_MSG_LIST = []
 QUERY_FIELDS = [
     "cycle_id",
     "osd_version",

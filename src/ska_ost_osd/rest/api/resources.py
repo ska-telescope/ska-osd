@@ -9,7 +9,6 @@ from http import HTTPStatus
 
 from ska_telmodel.data import TMData
 
-from ska_ost_osd.osd.constant import ERROR_MSG_LIST
 from ska_ost_osd.osd.osd import get_osd_data, osd_tmdata_source
 from ska_ost_osd.rest.api.query import QueryParams, QueryParamsFactory
 
@@ -30,10 +29,10 @@ def error_handler(api_fn: str) -> str:
                 return error_response(api_response, HTTPStatus.BAD_REQUEST)
             return api_response
 
-        except RuntimeError as err:  # pylint: disable=W0718
+        except RuntimeError as err:
             return error_response(str(err), HTTPStatus.UNPROCESSABLE_ENTITY)
 
-        except ValueError as err:  # pylint: disable=W0718
+        except ValueError as err:
             return error_response(str(err), HTTPStatus.UNPROCESSABLE_ENTITY)
 
         except Exception as err:  # pylint: disable=W0718
@@ -53,31 +52,30 @@ def get_osd_data_response(query_params, tm_data_sources):
     :returns dict: A dictionary with OSd data satisfying the query.
     """
 
-    tm_data_sources = osd_tmdata_source(
+    tm_data, error_msg = osd_tmdata_source(
         cycle_id=query_params.cycle_id,
         osd_version=query_params.osd_version,
         source=query_params.source,
         gitlab_branch=query_params.gitlab_branch,
     )
+    if tm_data_sources and error_msg:
+        error_msg.extend(tm_data_sources)
+        return ", ".join([str(err) for err in error_msg])
+    elif error_msg:
+        return ", ".join([str(err) for err in error_msg])
+    elif tm_data_sources:
+        return ", ".join([str(err) for err in tm_data_sources])
 
-    if ERROR_MSG_LIST:
-        error_msg = ", ".join([str(err) for err in tm_data_sources])
-        tm_data_sources.clear()
+    tm_data_src = TMData(source_uris=tm_data)
 
-        return error_msg
-
-    tm_data = TMData(source_uris=tm_data_sources)
-
-    osd_data = get_osd_data(
+    osd_data, error_msg_osd_dt = get_osd_data(
         capabilities=[query_params.capabilities],
-        tmdata=tm_data,
+        tmdata=tm_data_src,
         array_assembly=query_params.array_assembly,
     )
 
-    if ERROR_MSG_LIST:
-        error_msg = ", ".join([str(err) for err in osd_data])
-        osd_data.clear()
-
+    if error_msg_osd_dt:
+        error_msg = ", ".join([str(err) for err in error_msg_osd_dt])
         return error_msg
 
     return osd_data
@@ -93,8 +91,7 @@ def get_osd(**kwargs):
     """
 
     query_params, error_list = get_qry_params(kwargs)
-
-    return get_osd_data_response(query_params, error_list)
+    return get_osd_data_response(query_params, error_list.get("err_msg", None))
 
 
 def validation_response(

@@ -3,7 +3,6 @@ from dataclasses import dataclass
 
 from ska_ost_osd.osd.constant import (
     ARRAY_ASSEMBLY_PATTERN,
-    ERROR_MSG_LIST,
     OSD_VERSION_PATTERN,
     QUERY_FIELDS,
 )
@@ -50,6 +49,7 @@ class QueryParamsFactory:
         """
 
         kwargs = {k: v for k, v in kwargs.items() if v is not None}
+        err_msg_dict = {"err_msg": []}
 
         def params_in_kwargs(allowed_fields: set) -> bool:
             """
@@ -91,12 +91,14 @@ class QueryParamsFactory:
                 if source != "gitlab" and not re.match(
                     OSD_VERSION_PATTERN, osd_version
                 ):
-                    ERROR_MSG_LIST.append(f"osd_version {osd_version} is not valid")
+                    err_msg_dict["err_msg"].append(
+                        f"osd_version {osd_version} is not valid"
+                    )
 
             if array_assembly is not None:
                 if not re.match(ARRAY_ASSEMBLY_PATTERN, array_assembly):
-                    ERROR_MSG_LIST.append(
+                    err_msg_dict["err_msg"].append(
                         f"array_assembly {array_assembly} is not valid"
                     )
 
-        return UserQuery(**kwargs), ERROR_MSG_LIST
+        return UserQuery(**kwargs), err_msg_dict

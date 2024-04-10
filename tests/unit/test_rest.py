@@ -105,8 +105,8 @@ def test_init_app_client(client, open_api_spec):
             "AAA3",
             {
                 "detail": (
-                    "osd_version 1..1.0 is not valid, array_assembly AAA3 is not valid,"
-                    " Cycle id 3 is not valid,Available IDs are 1,2"
+                    "Cycle id 3 is not valid,Available IDs are 1,2, osd_version 1..1.0"
+                    " is not valid, array_assembly AAA3 is not valid"
                 ),
                 "title": "Bad Request",
             },
@@ -114,7 +114,7 @@ def test_init_app_client(client, open_api_spec):
         (
             None,
             None,
-            None,
+            "file",
             "mid",
             "AA3",
             {
@@ -172,7 +172,6 @@ def test_osd_endpoint(client, mid_osd_data):
     :raises AssertionError: If the response does not contain the expected
          OSD data or returns an error status code.
     """
-
     response = client.get(
         "/ska-ost-osd/osd/api/v1/osd",
         query_string={
@@ -197,7 +196,7 @@ def test_invalid_osd_tmdata_source_capabilities(client):
        expected error message.
     """
 
-    error_msgs = client.get(  # pylint: disable=W0621
+    error_msgs = client.get(
         "/ska-ost-osd/osd/api/v1/osd",
         query_string={
             "cycle_id": 1,
