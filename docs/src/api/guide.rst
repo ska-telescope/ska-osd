@@ -142,7 +142,7 @@ OSD as a service
      - Resource URL
      - Description
    * - GET
-     - ``/ska-ost-osd/osd/api/v1/osd``
+     - ``/ska-ost-osd/osd/api/v1/osd/``
      - **Getting Data**
 
        Return the OSD cycle_id data.

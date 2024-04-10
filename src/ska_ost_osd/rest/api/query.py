@@ -78,10 +78,8 @@ class QueryParamsFactory:
                 params_in_kwargs("array_assembly"),
             ]
         ):
-            osd_version = kwargs["osd_version"] if kwargs.get("osd_version") else None
-            array_assembly = (
-                kwargs["array_assembly"] if kwargs.get("array_assembly") else None
-            )
+            osd_version = kwargs.get("osd_version", None)
+            array_assembly = kwargs.get("array_assembly", None)
 
             if (
                 params_in_kwargs("source")

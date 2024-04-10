@@ -19,6 +19,8 @@ def error_handler(api_fn: str) -> str:
 
     :param api_fn: A function which accepts an entity identifier and returns
         an HTTP response
+
+    :return str: A string containing the error message and HTTP status code.
     """
 
     @wraps(api_fn)
@@ -42,14 +44,14 @@ def error_handler(api_fn: str) -> str:
 
 
 @error_handler
-def get_osd_data_response(query_params, tm_data_sources):
-    """This function takes query parameters and OSd data source objects
-      to generate a response containing matching OSd data.
+def get_osd_data_response(query_params, tm_data_sources) -> dict:
+    """This function takes query parameters and OSD data source objects
+      to generate a response containing matching OSD data.
 
     :param query_params (QueryParams): The query parameters.
-    :param tm_data_sources (list): A list of OSd data source objects.
+    :param tm_data_sources (list): A list of OSD data source objects.
 
-    :returns dict: A dictionary with OSd data satisfying the query.
+    :returns dict: A dictionary with OSD data satisfying the query.
     """
 
     tm_data, error_msg = osd_tmdata_source(
@@ -82,7 +84,7 @@ def get_osd_data_response(query_params, tm_data_sources):
 
 
 @error_handler
-def get_osd(**kwargs):
+def get_osd(**kwargs) -> dict:
     """This function retrieves OSD resources based on the parameters passed.
 
     :param kwargs (dict): Additional keyword arguments to filter results.
@@ -96,9 +98,13 @@ def get_osd(**kwargs):
 
 def validation_response(
     error_msg: str, http_status: HTTPStatus = HTTPStatus.UNPROCESSABLE_ENTITY
-):
+) -> dict:
     """
     Creates an error response in the case that our validation has failed.
+
+    :param error_msg: The error message if validation fails
+    :param http_status: The HTTP status code to return
+    :return: HTTP response server error
     """
     response_body = {"Error": error_msg}
 
@@ -124,6 +130,9 @@ def error_response(
 ) -> dict:
     """
     Creates a general server error response from an exception
+
+    :param e: The raised exception
+    :param http_status: The HTTP status code
 
     :return: HTTP response server error
     """
