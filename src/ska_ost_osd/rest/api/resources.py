@@ -16,7 +16,7 @@ from ska_ost_osd.osd.osd import get_osd_data, osd_tmdata_source
 from ska_ost_osd.rest.api.query import QueryParams, QueryParamsFactory
 from ska_ost_osd.telvalidation import SchematicValidationError, semantic_validate
 
-LOGGER = logging.getLogger(__name__)
+#LOGGER = logging.getLogger(__name__)
 
 TELMODEL_LIB_VERSION = version("ska_telmodel")
 CAR_TELMODEL_SOURCE = (
@@ -30,12 +30,20 @@ def error_handler(api_fn: callable) -> str:
 
     :param api_fn: A function which accepts an entity identifier and returns
         an HTTP response
+
+    :return str: A string containing the error message and HTTP status code.
     """
 
     @wraps(api_fn)
     def wrapper(*args, **kwargs):
         try:
-            return api_fn(*args, **kwargs)
+            # import pdb
+            # pdb.set_trace()
+# <<<<<<< HEAD
+            api_response = api_fn(*args, **kwargs)
+            if isinstance(api_response, str):
+                return validation_response(status=-1, error_msg=api_response, http_status=HTTPStatus.BAD_REQUEST,title=HTTPStatus.BAD_REQUEST.phrase)
+            return api_response
         except SchematicValidationError as err:
             return (
                 validation_response(
@@ -56,53 +64,59 @@ def error_handler(api_fn: callable) -> str:
                 ),
                 HTTPStatus.BAD_REQUEST,
             )
+# =======
+        except RuntimeError as err:
+            return validation_response(status=-1, error_msg=str(err), http_status=HTTPStatus.UNPROCESSABLE_ENTITY,title=HTTPStatus.UNPROCESSABLE_ENTITY.phrase)
+
+        # except ValueError as err:
+        #     return error_response(str(err), HTTPStatus.UNPROCESSABLE_ENTITY)
+
+# >>>>>>> main
         except Exception as err:  # pylint: disable=W0718
-            return validation_response(str(err)), HTTPStatus.INTERNAL_SERVER_ERROR
+            return validation_response(status=-1, error_msg=str(err), http_status=HTTPStatus.INTERNAL_SERVER_ERROR,title=HTTPStatus.INTERNAL_SERVER_ERROR.phrase)
 
     return wrapper
 
 
 @error_handler
-def get_osd_data_response(query_params, tm_data_sources):
-    """This function takes query parameters and OSd data source objects
-      to generate a response containing matching OSd data.
+def get_osd_data_response(query_params, tm_data_sources) -> dict:
+    """This function takes query parameters and OSD data source objects
+      to generate a response containing matching OSD data.
 
     :param query_params (QueryParams): The query parameters.
-    :param tm_data_sources (list): A list of OSd data source objects.
+    :param tm_data_sources (list): A list of OSD data source objects.
 
-    :returns dict: A dictionary with OSd data satisfying the query.
+    :returns dict: A dictionary with OSD data satisfying the query.
     """
 
-    tm_data_sources = osd_tmdata_source(
+    tm_data, error_msg = osd_tmdata_source(
         cycle_id=query_params.cycle_id,
         osd_version=query_params.osd_version,
         source=query_params.source,
         gitlab_branch=query_params.gitlab_branch,
     )
 
-    if isinstance(tm_data_sources, list):
-        error_msg = ", ".join([str(err) for err in tm_data_sources])
-        tm_data_sources.clear()
-        return error_msg
+    error_msg.extend(tm_data_sources)
 
-    tm_data = TMData(source_uris=tm_data_sources)
+    if error_msg:
+        return ", ".join([str(err) for err in error_msg])
 
-    osd_data = get_osd_data(
+    tm_data_src = TMData(source_uris=tm_data)
+
+    osd_data, error_msg_osd = get_osd_data(
         capabilities=[query_params.capabilities],
-        tmdata=tm_data,
+        tmdata=tm_data_src,
         array_assembly=query_params.array_assembly,
     )
 
-    if isinstance(osd_data, list):
-        error_msg = ", ".join([str(err.message) for err in osd_data])
-        osd_data.clear()
-        return error_msg
+    if error_msg_osd:
+        return ", ".join([str(err) for err in error_msg_osd])
 
     return osd_data
 
 
 @error_handler
-def get_osd(**kwargs):
+def get_osd(**kwargs) -> dict:
     """This function retrieves OSD resources based on the parameters passed.
 
     :param kwargs (dict): Additional keyword arguments to filter results.
@@ -111,18 +125,21 @@ def get_osd(**kwargs):
     """
 
     query_params, error_list = get_qry_params(kwargs)
-
     return get_osd_data_response(query_params, error_list)
 
 
 def validation_response(
     error_msg: str,
     status: int = 0,
-    title: str = "Below Error have occoured kindly check",
-    http_status: HTTPStatus = HTTPStatus.UNPROCESSABLE_ENTITY,
-):
+    title: str = HTTPStatus.INTERNAL_SERVER_ERROR.phrase,
+    http_status: HTTPStatus = HTTPStatus.INTERNAL_SERVER_ERROR,
+) -> dict:
     """
     Creates an error response in the case that our validation has failed.
+
+    :param error_msg: The error message if validation fails
+    :param http_status: The HTTP status code to return
+    :return: HTTP response server error
     """
     response_body = {"detail": error_msg, "title": title, "status": status}
 
@@ -213,3 +230,22 @@ def semantically_validate_json(body: dict):
         "details": "JSON is semantically valid",
         "title": "Semantic validation",
     }, HTTPStatus.OK
+
+# def error_response(
+#     e: Exception, http_status: HTTPStatus = HTTPStatus.INTERNAL_SERVER_ERROR
+# ) -> dict:
+#     """
+#     Creates a general server error response from an exception
+#
+#     :param e: The raised exception
+#     :param http_status: The HTTP status code
+#
+#     :return: HTTP response server error
+#     """
+#     response_body = {
+#         "title": http_status.phrase,
+#         "detail": f"{e}",
+#     }
+#
+#     return response_body, http_status
+
