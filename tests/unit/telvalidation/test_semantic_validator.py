@@ -7,12 +7,6 @@ from unittest.mock import patch
 import pytest
 from ska_telmodel.data import TMData
 from ska_telmodel.schema import example_by_uri
-from ska_telmodel.tmc.version import (
-    low_tmc_assignresources_uri,
-    low_tmc_configure_uri,
-    tmc_assignresources_uri,
-    tmc_configure_uri,
-)
 
 from ska_ost_osd.telvalidation.oet_tmc_validators import (
     validate_json,
@@ -33,6 +27,7 @@ sources = [
     "file://tmdata",
     "car:ska-telmodel-data?main",
 ]
+
 
 capabilities = {
     "observatory_policy": {
@@ -98,35 +93,67 @@ capabilities = {
                     },
                 ],
             },
-        }
+        },
+        "low": {
+            "AA0.5": {
+                "number_stations": 4,
+                "number_substations": 0,
+                "number_beams": 1,
+                "max_baseline_km": 3.0,
+                "available_bandwidth_hz": 75000000.0,
+                "channel_width_hz": 5400,
+                "cbf_modes": ["vis", "pst"],
+                "number_zoom_windows": 0,
+                "number_zoom_channels": 0,
+                "number_pss_beams": 0,
+                "number_pst_beams": 1,
+                "number_vlbi_beams": 0,
+                "ps_beam_bandwidth_hz": 75000000.0,
+                "number_fsps": 6,
+            },
+            "basic_capabilities": {
+                "dish_elevation_limit_deg": 15.0,
+                "receiver_information": [
+                    {
+                        "rx_id": "Band_1",
+                        "min_frequency_hz": 350000000.0,
+                        "max_frequency_hz": 1050000000.0,
+                    },
+                    {
+                        "rx_id": "Band_2",
+                        "min_frequency_hz": 950000000.0,
+                        "max_frequency_hz": 1760000000.0,
+                    },
+                    {
+                        "rx_id": "Band_3",
+                        "min_frequency_hz": 1650000000.0,
+                        "max_frequency_hz": 3050000000.0,
+                    },
+                    {
+                        "rx_id": "Band_4",
+                        "min_frequency_hz": 2800000000.0,
+                        "max_frequency_hz": 5180000000.0,
+                    },
+                    {
+                        "rx_id": "Band_5a",
+                        "min_frequency_hz": 4600000000.0,
+                        "max_frequency_hz": 8500000000.0,
+                    },
+                    {
+                        "rx_id": "Band_5b",
+                        "min_frequency_hz": 8300000000.0,
+                        "max_frequency_hz": 15400000000.0,
+                    },
+                ],
+            },
+        },
     },
 }
 
 
-# pylint: disable=redefined-outer-name
 @pytest.fixture(scope="module")
 def tm_data():
     return TMData(sources)
-
-
-@pytest.fixture
-def sbd_valid_request_json_path():
-    """
-    Pytest fixture to return path to resource allocation JSON file
-    for SBD
-    """
-    config = load_string_from_file("test_files/testfile_valid_mid_sbd.json")
-    return config
-
-
-@pytest.fixture
-def sbd_invalid_request_json_path():
-    """
-    Pytest fixture to return path to resource allocation JSON file
-    for SBD
-    """
-    config = load_string_from_file("test_files/testfile_invalid_mid_sbd.json")
-    return config
 
 
 def load_string_from_file(filename):
@@ -165,6 +192,7 @@ INVALID_LOW_CONFIGURE_JSON = load_string_from_file(
     "test_files/testfile_invalid_low_configure.json"
 )
 
+
 INVALID_MID_VALIDATE_CONSTANT = {
     "AA0.5": {
         "assign_resource": {
@@ -194,14 +222,17 @@ ARRAY_ASSEMBLY = "AA0.5"
 
 
 @patch("ska_ost_osd.telvalidation.semantic_validator.fetch_capabilities_from_osd")
-def test_tmc_assignresources_valid_inputs(mock1, tm_data):
+def test_tmc_assignresources_valid_inputs(mock1, tm_data):  # pylint: disable=W0621
+    """
+    Test semantic validate assign resource command with valid inputs.
+    """
     osd_capabilities = capabilities["capabilities"]["mid"]
     mock1.return_value = (
         osd_capabilities[ARRAY_ASSEMBLY],
         osd_capabilities["basic_capabilities"],
     )
-    assign_ver = tmc_assignresources_uri(2, 1)
     config = VALID_MID_ASSIGN_JSON
+    interface = config["interface"]
     del config["interface"]  # to test use of interface key
     # sample values that pass semantic only
 
@@ -212,20 +243,23 @@ def test_tmc_assignresources_valid_inputs(mock1, tm_data):
     ):
         semantic_validate(config, tm_data)
 
-    config["interface"] = assign_ver
+    config["interface"] = interface
 
     assert semantic_validate(config, tm_data=tm_data), True
 
 
 @patch("ska_ost_osd.telvalidation.semantic_validator.fetch_capabilities_from_osd")
-def test_tmc_assignresources_invalid_inputs(mock2, tm_data):
+def test_tmc_assignresources_invalid_inputs(mock2, tm_data):  # pylint: disable=W0621
+    """
+    Test semantic validate assign resource command with invalid inputs.
+    """
     osd_capabilities = capabilities["capabilities"]["mid"]
     mock2.return_value = (
         osd_capabilities[ARRAY_ASSEMBLY],
         osd_capabilities["basic_capabilities"],
     )
-    assign_ver = tmc_assignresources_uri(2, 1)
     config = INVALID_MID_ASSIGN_JSON
+    interface = config["interface"]
     del config["interface"]  # to test use of interface key
     # sample values that pass semantic only
 
@@ -236,7 +270,7 @@ def test_tmc_assignresources_invalid_inputs(mock2, tm_data):
     ):
         semantic_validate(config, tm_data)
 
-    config["interface"] = assign_ver
+    config["interface"] = interface
 
     try:
         semantic_validate(config, tm_data=tm_data)
@@ -258,7 +292,7 @@ def test_tmc_assignresources_invalid_inputs(mock2, tm_data):
 
 
 @patch("ska_ost_osd.telvalidation.semantic_validator.fetch_capabilities_from_osd")
-def test_tmc_configure_valid_inputs(cnf_mock, tm_data):
+def test_tmc_configure_valid_inputs(cnf_mock, tm_data):  # pylint: disable=W0621
     """Test validations by modifying appropriately
     the fields from default example
     """
@@ -267,8 +301,8 @@ def test_tmc_configure_valid_inputs(cnf_mock, tm_data):
         osd_capabilities[ARRAY_ASSEMBLY],
         osd_capabilities["basic_capabilities"],
     )
-    configure_ver = tmc_configure_uri(2, 1)
     config = VALID_MID_CONFIGURE_JSON
+    interface = config["interface"]
     del config["interface"]  # to test use of interface key
     # sample values that pass semantic only
 
@@ -279,13 +313,13 @@ def test_tmc_configure_valid_inputs(cnf_mock, tm_data):
     ):
         semantic_validate(config, tm_data)
 
-    config["interface"] = configure_ver
+    config["interface"] = interface
 
     assert semantic_validate(config, tm_data=tm_data)
 
 
 @patch("ska_ost_osd.telvalidation.semantic_validator.fetch_capabilities_from_osd")
-def test_tmc_configure_invalid_inputs(mock, tm_data):
+def test_tmc_configure_invalid_inputs(mock, tm_data):  # pylint: disable=W0621
     """Test validations by modifying appropriately
     the fields from default example
     """
@@ -294,8 +328,8 @@ def test_tmc_configure_invalid_inputs(mock, tm_data):
         osd_capabilities[ARRAY_ASSEMBLY],
         osd_capabilities["basic_capabilities"],
     )
-    configure_ver = tmc_configure_uri(2, 1)
     config = INVALID_MID_CONFIGURE_JSON
+    interface = config["interface"]
     del config["interface"]  # to test use of interface key
     # sample values that pass semantic only
 
@@ -306,7 +340,7 @@ def test_tmc_configure_invalid_inputs(mock, tm_data):
     ):
         semantic_validate(config, tm_data)
 
-    config["interface"] = configure_ver
+    config["interface"] = interface
 
     try:
         semantic_validate(config, tm_data=tm_data)
@@ -326,6 +360,9 @@ def test_tmc_configure_invalid_inputs(mock, tm_data):
 
 @patch("ska_ost_osd.telvalidation.semantic_validator.fetch_capabilities_from_osd")
 def test_validate_scemantic_json_input_keys(mock6):
+    """
+    Test if error is raised when invalid key is passed.
+    """
     osd_capabilities = capabilities["capabilities"]["mid"]
     mock6.return_value = (
         osd_capabilities[ARRAY_ASSEMBLY],
@@ -350,7 +387,8 @@ def test_tmc_configure_ra_dec():
     possible to be observed at given time
     """
     # check for a src which is always below 15 degrees for mid telescope
-    configure_ver = tmc_configure_uri(2, 1)
+    config = INVALID_MID_CONFIGURE_JSON
+    configure_ver = config["interface"]
     config = example_by_uri(configure_ver)
     # check no error is raised for a src which
     # is always above 15 degrees for mid telescope
@@ -447,19 +485,19 @@ class TestTargetVisibility(unittest.TestCase):
 
 
 @patch("ska_ost_osd.telvalidation.semantic_validator.fetch_capabilities_from_osd")
-def test_tmc_low_assignresources_valid_inputs(mock, tm_data):
+def test_tmc_low_assignresources_valid_inputs(mock, tm_data):  # pylint: disable=W0621
     """
     Test to verify valid inputs for low assign resource command
     """
+    osd_capabilities = capabilities["capabilities"]["low"]
     mock.return_value = (
-        {},
-        {},
+        osd_capabilities[ARRAY_ASSEMBLY],
+        osd_capabilities["basic_capabilities"],
     )
-    assign_ver = low_tmc_assignresources_uri(3, 2)
     config = VALID_LOW_ASSIGN_JSON
-    del config["interface"]  # to test use of interface key
+    interface = config["interface"]
     # sample values that pass semantic only
-
+    del config["interface"]  # to test use of interface key
     with pytest.raises(
         SchematicValidationError,
         match="""interface is missing from observing_command_input.
@@ -467,23 +505,24 @@ def test_tmc_low_assignresources_valid_inputs(mock, tm_data):
     ):
         semantic_validate(config, tm_data)
 
-    config["interface"] = assign_ver
+    config["interface"] = interface
 
     assert semantic_validate(config, tm_data=tm_data), True
 
 
 @patch("ska_ost_osd.telvalidation.semantic_validator.fetch_capabilities_from_osd")
-def test_tmc_low_assignresources_invalid_inputs(mock, tm_data):
+def test_tmc_low_assignresources_invalid_inputs(mock, tm_data):  # pylint: disable=W0621
     """
     Test to verify spectral window value in assign resource
     command value for semantic validation
     """
+    osd_capabilities = capabilities["capabilities"]["low"]
     mock.return_value = (
-        {},
-        {},
+        osd_capabilities[ARRAY_ASSEMBLY],
+        osd_capabilities["basic_capabilities"],
     )
-    assign_ver = low_tmc_assignresources_uri(3, 2)
     config = INVALID_LOW_ASSIGN_JSON
+    interface = config["interface"]
     del config["interface"]  # to test use of interface key
     # sample values that pass semantic only
 
@@ -494,7 +533,7 @@ def test_tmc_low_assignresources_invalid_inputs(mock, tm_data):
     ):
         semantic_validate(config, tm_data)
 
-    config["interface"] = assign_ver
+    config["interface"] = interface
 
     try:
         semantic_validate(config, tm_data=tm_data)
@@ -509,43 +548,44 @@ def test_tmc_low_assignresources_invalid_inputs(mock, tm_data):
 
 
 @patch("ska_ost_osd.telvalidation.semantic_validator.fetch_capabilities_from_osd")
-def test_tmc_low_configure_valid_inputs(mock, tm_data):
+def test_tmc_low_configure_valid_inputs(mock, tm_data):  # pylint: disable=W0621
     """
     Test to verify function_mode  value in configure
     command input for semantic validation
     """
+    osd_capabilities = capabilities["capabilities"]["low"]
     mock.return_value = (
-        {},
-        {},
+        osd_capabilities[ARRAY_ASSEMBLY],
+        osd_capabilities["basic_capabilities"],
     )
-    configure_ver = low_tmc_configure_uri(3, 1)
     config = VALID_LOW_CONFIGURE_JSON
-    del config["interface"]  # to test use of interface key
     # sample values that pass semantic only
-
+    interface = config["interface"]
+    del config["interface"]  # to test use of interface key
     with pytest.raises(
         SchematicValidationError,
         match="""interface is missing from observing_command_input.
         Please provide interface='...' explicitly""",
     ):
         semantic_validate(config, tm_data)
-    config["interface"] = configure_ver
+    config["interface"] = interface
 
     assert semantic_validate(config, tm_data)
 
 
 @patch("ska_ost_osd.telvalidation.semantic_validator.fetch_capabilities_from_osd")
-def test_tmc_low_configure_invalid_inputs(mock, tm_data):
+def test_tmc_low_configure_invalid_inputs(mock, tm_data):  # pylint: disable=W0621
     """
     Test to verify fsp_ids value in assign resource
     command input for semantic validation
     """
+    osd_capabilities = capabilities["capabilities"]["low"]
     mock.return_value = (
-        {},
-        {},
+        osd_capabilities[ARRAY_ASSEMBLY],
+        osd_capabilities["basic_capabilities"],
     )
-    configure_ver = low_tmc_configure_uri(3, 1)
     config = INVALID_LOW_CONFIGURE_JSON
+    interface = config["interface"]
     del config["interface"]  # to test use of interface key
     # sample values that pass semantic only
 
@@ -555,7 +595,7 @@ def test_tmc_low_configure_invalid_inputs(mock, tm_data):
         Please provide interface='...' explicitly""",
     ):
         semantic_validate(config, tm_data)
-    config["interface"] = configure_ver
+    config["interface"] = interface
 
     try:
         semantic_validate(config, tm_data=tm_data)
@@ -563,15 +603,27 @@ def test_tmc_low_configure_invalid_inputs(mock, tm_data):
     except SchematicValidationError as error:
         assert (
             error.message
-            == "stations are too many! Current limit is 6\n"
+            == "stations are too many! Current limit is 4\n"
             "Invalid input for function mode! Currently allowed vis\n"
             "The fsp_ids should all be distinct\n"
             "fsp_ids are too many!Current Limit is 6"
         )
 
 
+@pytest.fixture
+def sbd_valid_request_json_path():
+    """
+    Pytest fixture to return path to resource allocation JSON file
+    for SBD
+    """
+    config = load_string_from_file("test_files/testfile_valid_mid_sbd.json")
+    return config
+
+
 @patch("ska_ost_osd.telvalidation.semantic_validator.fetch_capabilities_from_osd")
-def test_sbd_valid_inputs(mock, sbd_valid_request_json_path, tm_data):
+def test_sbd_valid_inputs(
+    mock, sbd_valid_request_json_path, tm_data
+):  # pylint: disable=W0621
     osd_capabilities = capabilities["capabilities"]["mid"]
     mock.return_value = (
         osd_capabilities[ARRAY_ASSEMBLY],
@@ -580,8 +632,20 @@ def test_sbd_valid_inputs(mock, sbd_valid_request_json_path, tm_data):
     assert semantic_validate(sbd_valid_request_json_path, tm_data=tm_data), True
 
 
+@pytest.fixture
+def sbd_invalid_request_json_path():
+    """
+    Pytest fixture to return path to resource allocation JSON file
+    for SBD
+    """
+    config = load_string_from_file("test_files/testfile_invalid_mid_sbd.json")
+    return config
+
+
 @patch("ska_ost_osd.telvalidation.semantic_validator.fetch_capabilities_from_osd")
-def test_sbd_invalid_inputs(mock, sbd_invalid_request_json_path, tm_data):
+def test_sbd_invalid_inputs(
+    mock, sbd_invalid_request_json_path, tm_data
+):  # pylint: disable=W0621
     osd_capabilities = capabilities["capabilities"]["mid"]
     mock.return_value = (
         osd_capabilities[ARRAY_ASSEMBLY],
@@ -684,7 +748,7 @@ def test_search_and_return_value_from_basic_capabilities():
     assert [{"min_frequency_hz": ["test"]}], result
 
 
-@patch("ska_telmodel.osd.osd.get_osd_data")
+@patch("ska_ost_osd.osd.osd.get_osd_data")
 def test_fetch_capabilities_from_osd_based_on_client_based_osd_data(mock1):
     """
     test case to verify if client passed osd data from semantic_validate method

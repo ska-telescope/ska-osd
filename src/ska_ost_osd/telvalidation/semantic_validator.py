@@ -65,7 +65,7 @@ def fetch_capabilities_from_osd(
     if osd_data:
         fetched_osd_data = osd_data
     else:
-        from ska_telmodel.osd.osd import get_osd_data
+        from ska_ost_osd.osd.osd import get_osd_data
 
         fetched_osd_data = get_osd_data(
             capabilities=[telescope],
@@ -248,7 +248,6 @@ def validate_command_input(
     :return list of error messages in case of validation failed
     """
     semantic_validate_data = tm_data[get_validation_data(interface)].get_dict()
-
     # call OSD API and fetch capabilities and basic capabilities
     capabilities, basic_capabilities = fetch_capabilities_from_osd(
         telescope=semantic_validate_data["telescope"],

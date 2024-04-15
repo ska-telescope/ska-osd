@@ -1,13 +1,13 @@
 {
-    "telescope":"low",
+    "telescope": "low",
     "AA0.5": {
         "assign_resource": {
             "sdp": {
                 "execution_block": {
                     "parent_key_rule": [
                         {
-                            "rule": "length(beams) == 1",
-                            "error": "beams are too many! Current limit is 1"
+                            "rule": "length(beams) == number_beams",
+                            "error": "beams are too many! Current limit is {number_beams}"
                         }
                     ],
                     "beams": {
@@ -27,8 +27,7 @@
                         ]
                     }
                 }
-
-          }
+            }
         },
         "configure": {
             "csp": {
@@ -36,8 +35,8 @@
                     "stations": {
                         "stns": [
                             {
-                                "rule": "0 < length(stns) <= 6",
-                                "error": "stations are too many! Current limit is 6"
+                                "rule": "0 < length(stns) <= number_stations",
+                                "error": "stations are too many! Current limit is {number_stations}"
                             }
                         ]
                     },
@@ -50,14 +49,13 @@
                                 }
                             ],
                             "fsp_ids": [
-                             
                                 {
                                     "rule": "length(fsp_ids,is_distinct=True) == length(fsp_ids)",
                                     "error": "The fsp_ids should all be distinct"
                                 },
                                 {
-                                    "rule": "(0 < length(fsp_ids) <= 6)",
-                                    "error": "fsp_ids are too many!Current Limit is 6"
+                                    "rule": "(0 < length(fsp_ids) <= number_fsps)",
+                                    "error": "fsp_ids are too many!Current Limit is {number_fsps}"
                                 }
                             ]
                         }
