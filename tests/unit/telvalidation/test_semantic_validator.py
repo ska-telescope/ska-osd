@@ -7,25 +7,26 @@ from unittest.mock import patch
 import pytest
 from ska_telmodel.data import TMData
 from ska_telmodel.schema import example_by_uri
-from ska_telmodel.telvalidation.oet_tmc_validators import (
-    validate_json,
-    validate_target_is_visible,
-)
-from ska_telmodel.telvalidation.schematic_validation_exceptions import (
-    SchemanticValdidationKeyError,
-    SchematicValidationError,
-)
-from ska_telmodel.telvalidation.semantic_validator import (
-    fetch_capabilities_from_osd,
-    fetch_matched_capabilities_from_basic_capabilities,
-    search_and_return_value_from_basic_capabilities,
-    semantic_validate,
-)
 from ska_telmodel.tmc.version import (
     low_tmc_assignresources_uri,
     low_tmc_configure_uri,
     tmc_assignresources_uri,
     tmc_configure_uri,
+)
+
+from ska_ost_osd.telvalidation.oet_tmc_validators import (
+    validate_json,
+    validate_target_is_visible,
+)
+from ska_ost_osd.telvalidation.schematic_validation_exceptions import (
+    SchemanticValdidationKeyError,
+    SchematicValidationError,
+)
+from ska_ost_osd.telvalidation.semantic_validator import (
+    fetch_capabilities_from_osd,
+    fetch_matched_capabilities_from_basic_capabilities,
+    search_and_return_value_from_basic_capabilities,
+    semantic_validate,
 )
 
 sources = [
@@ -192,7 +193,7 @@ INPUT_COMMAND_CONFIG = {
 ARRAY_ASSEMBLY = "AA0.5"
 
 
-@patch("ska_telmodel.telvalidation.semantic_validator.fetch_capabilities_from_osd")
+@patch("ska_ost_osd.telvalidation.semantic_validator.fetch_capabilities_from_osd")
 def test_tmc_assignresources_valid_inputs(mock1, tm_data):
     osd_capabilities = capabilities["capabilities"]["mid"]
     mock1.return_value = (
@@ -216,7 +217,7 @@ def test_tmc_assignresources_valid_inputs(mock1, tm_data):
     assert semantic_validate(config, tm_data=tm_data), True
 
 
-@patch("ska_telmodel.telvalidation.semantic_validator.fetch_capabilities_from_osd")
+@patch("ska_ost_osd.telvalidation.semantic_validator.fetch_capabilities_from_osd")
 def test_tmc_assignresources_invalid_inputs(mock2, tm_data):
     osd_capabilities = capabilities["capabilities"]["mid"]
     mock2.return_value = (
@@ -256,7 +257,7 @@ def test_tmc_assignresources_invalid_inputs(mock2, tm_data):
         )
 
 
-@patch("ska_telmodel.telvalidation.semantic_validator.fetch_capabilities_from_osd")
+@patch("ska_ost_osd.telvalidation.semantic_validator.fetch_capabilities_from_osd")
 def test_tmc_configure_valid_inputs(cnf_mock, tm_data):
     """Test validations by modifying appropriately
     the fields from default example
@@ -283,7 +284,7 @@ def test_tmc_configure_valid_inputs(cnf_mock, tm_data):
     assert semantic_validate(config, tm_data=tm_data)
 
 
-@patch("ska_telmodel.telvalidation.semantic_validator.fetch_capabilities_from_osd")
+@patch("ska_ost_osd.telvalidation.semantic_validator.fetch_capabilities_from_osd")
 def test_tmc_configure_invalid_inputs(mock, tm_data):
     """Test validations by modifying appropriately
     the fields from default example
@@ -323,7 +324,7 @@ def test_tmc_configure_invalid_inputs(mock, tm_data):
         )
 
 
-@patch("ska_telmodel.telvalidation.semantic_validator.fetch_capabilities_from_osd")
+@patch("ska_ost_osd.telvalidation.semantic_validator.fetch_capabilities_from_osd")
 def test_validate_scemantic_json_input_keys(mock6):
     osd_capabilities = capabilities["capabilities"]["mid"]
     mock6.return_value = (
@@ -410,7 +411,7 @@ class TestTargetVisibility(unittest.TestCase):
                 ra, dec, telescope, "asd", self.tm_data, observing_time
             )
 
-    @patch("ska_telmodel.telvalidation.oet_tmc_validators.ra_dec_to_az_el")
+    @patch("ska_ost_osd.telvalidation.oet_tmc_validators.ra_dec_to_az_el")
     def test_temp_list_length_less_than_3(self, mock_ra_dec_to_az_el):
         # Mock ra_dec_to_az_el to return temp_list with length < 3
         mock_ra_dec_to_az_el.return_value = [180, 60]
@@ -445,7 +446,7 @@ class TestTargetVisibility(unittest.TestCase):
         )
 
 
-@patch("ska_telmodel.telvalidation.semantic_validator.fetch_capabilities_from_osd")
+@patch("ska_ost_osd.telvalidation.semantic_validator.fetch_capabilities_from_osd")
 def test_tmc_low_assignresources_valid_inputs(mock, tm_data):
     """
     Test to verify valid inputs for low assign resource command
@@ -471,7 +472,7 @@ def test_tmc_low_assignresources_valid_inputs(mock, tm_data):
     assert semantic_validate(config, tm_data=tm_data), True
 
 
-@patch("ska_telmodel.telvalidation.semantic_validator.fetch_capabilities_from_osd")
+@patch("ska_ost_osd.telvalidation.semantic_validator.fetch_capabilities_from_osd")
 def test_tmc_low_assignresources_invalid_inputs(mock, tm_data):
     """
     Test to verify spectral window value in assign resource
@@ -507,7 +508,7 @@ def test_tmc_low_assignresources_invalid_inputs(mock, tm_data):
         )
 
 
-@patch("ska_telmodel.telvalidation.semantic_validator.fetch_capabilities_from_osd")
+@patch("ska_ost_osd.telvalidation.semantic_validator.fetch_capabilities_from_osd")
 def test_tmc_low_configure_valid_inputs(mock, tm_data):
     """
     Test to verify function_mode  value in configure
@@ -533,7 +534,7 @@ def test_tmc_low_configure_valid_inputs(mock, tm_data):
     assert semantic_validate(config, tm_data)
 
 
-@patch("ska_telmodel.telvalidation.semantic_validator.fetch_capabilities_from_osd")
+@patch("ska_ost_osd.telvalidation.semantic_validator.fetch_capabilities_from_osd")
 def test_tmc_low_configure_invalid_inputs(mock, tm_data):
     """
     Test to verify fsp_ids value in assign resource
@@ -569,7 +570,7 @@ def test_tmc_low_configure_invalid_inputs(mock, tm_data):
         )
 
 
-@patch("ska_telmodel.telvalidation.semantic_validator.fetch_capabilities_from_osd")
+@patch("ska_ost_osd.telvalidation.semantic_validator.fetch_capabilities_from_osd")
 def test_sbd_valid_inputs(mock, sbd_valid_request_json_path, tm_data):
     osd_capabilities = capabilities["capabilities"]["mid"]
     mock.return_value = (
@@ -579,7 +580,7 @@ def test_sbd_valid_inputs(mock, sbd_valid_request_json_path, tm_data):
     assert semantic_validate(sbd_valid_request_json_path, tm_data=tm_data), True
 
 
-@patch("ska_telmodel.telvalidation.semantic_validator.fetch_capabilities_from_osd")
+@patch("ska_ost_osd.telvalidation.semantic_validator.fetch_capabilities_from_osd")
 def test_sbd_invalid_inputs(mock, sbd_invalid_request_json_path, tm_data):
     osd_capabilities = capabilities["capabilities"]["mid"]
     mock.return_value = (
