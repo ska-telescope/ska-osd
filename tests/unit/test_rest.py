@@ -111,7 +111,7 @@ def test_init_app_client(client, open_api_spec):
                     " is not valid, array_assembly AAA3 is not valid"
                 ),
                 "title": "Bad Request",
-                "status": -1
+                "status": -1,
             },
         ),
         (
@@ -125,7 +125,7 @@ def test_init_app_client(client, open_api_spec):
                     "Array Assembly AA3 doesn't exists. Available are AA0.5, AA1, AA2"
                 ),
                 "title": "Bad Request",
-                "status": -1
+                "status": -1,
             },
         ),
     ],
@@ -190,39 +190,6 @@ def test_osd_endpoint(client, mid_osd_data):
     assert response.json == mid_osd_data
 
 
-# <<<<<<< HEAD
-# def test_invalid_osd_tmdata_source(client):
-#     """This function tests that a request with an invalid OSD TM data
-#        source ID returns the expected error response.
-#
-#     :param client (FlaskClient): The Flask test client.
-#
-#     :raises AssertionError: If the response does not contain the expected
-#        error message.
-#     """
-#     error_msgs = client.get(
-#         "/ska-ost-osd/api/v1/osd",
-#         query_string={
-#             "cycle_id": 3,
-#             "osd_version": "1..1.0",
-#             "source": "file",
-#             "capabilities": "mid",
-#             "array_assembly": "AAA3",
-#         },
-#     )
-#
-#     expected_error_msg_1 = "osd_version 1..1.0 is not valid"
-#     expected_error_msg_2 = "array_assembly AAA3 is not valid"
-#     expected_error_msg_3 = "Cycle id 3 is not valid,Available IDs are 1,2"
-#
-#     assert (
-#         error_msgs.json
-#         == f"{expected_error_msg_1}, {expected_error_msg_2}, {expected_error_msg_3}"
-#     )
-#
-#
-# =======
-# >>>>>>> main
 def test_invalid_osd_tmdata_source_capabilities(client):
     """This function tests that a request with an invalid capability
        returns the expected error response.
@@ -247,44 +214,14 @@ def test_invalid_osd_tmdata_source_capabilities(client):
     expected_error_msg = "'midd' is not one of ['mid', 'low']"
     assert error_msgs.json["detail"].startswith(expected_error_msg)
 
-#
-# <<<<<<< HEAD
-# def test_osd_source(client):
-#     """This function tests that a request with an OSD source as car .
-#
-#     :param client (FlaskClient): The Flask test client.
-#     """
-#     osd_source_link = client.get(
-#         "/ska-oso-osd/api/v1/osd", query_string={"cycle_id": 1, "source": "car"}
-#     )
-#     assert osd_source_link == osd_source_link
-#
-#
-# def test_invalid_array_assembly(client):
-#     """Test invalid array_assembly
-#     :param client (FlaskClient): The Flask test client.
-#     """
-#     error_msgs = client.get(
-#         "/ska-ost-osd/api/v1/osd",
-#         query_string={"capabilities": "mid", "array_assembly": "AA3"},
-#     )
-#
-#     assert (
-#         error_msgs.json
-#         == "Array Assembly AA3 doesn't exists. Available are AA0.5, AA1, AA2"
-#     )
-#
-#
-# def test_response_body():
-# =======
-def test_response_body(client):
-# >>>>>>> main
+
+def test_response_body():
     """This function tests that the response from the REST API contains
        the expected body contents when retrieving OSD metadata.
 
     :raises AssertionError: If the response body is invalid.
     """
-# <<<<<<< HEAD
+
     error_msg = "Validation failed"
     response = validation_response(
         error_msg=error_msg,
@@ -312,8 +249,7 @@ def test_osd_source(client):
         ),
         "title": "Bad Request",
     }
-    import pdb
-    pdb.set_trace()
+
     response.json == error_msg  # pylint: disable=W0104
 
 
@@ -328,15 +264,16 @@ def test_osd_source_gitlab(client):
     )
 
     error_msg = [
-  {
-    "detail": "404: 404 Commit Not Found",
-    "status": 0,
-    "title": "Internal Server Error"
-  },
-  500
-]
+        {
+            "detail": "404: 404 Commit Not Found",
+            "status": 0,
+            "title": "Internal Server Error",
+        },
+        500,
+    ]
 
     response.json == error_msg  # pylint: disable=W0104
+
 
 @pytest.mark.parametrize(
     "json_body_to_validate, response",
@@ -418,21 +355,3 @@ def test_wrong_values_and_no_observing_command_input(
     expected_response = wrong_semantic_validation_parameter_value_response
     res = client.post("/ska-ost-osd/api/v1/semantic_validation", json=json_body)
     assert res.get_json() == expected_response
-# =======
-#
-#     response = client.get(
-#         "/ska-ost-osd/api/v1/osd",
-#         query_string={
-#             "cycle_id": 3,
-#             "source": "file",
-#             "capabilities": "mid",
-#             "array_assembly": "AA0.5",
-#         },
-#     )
-#
-#     error_msg = response.json
-#     expected_response = validation_response(error_msg)
-#
-#     assert expected_response[0] == {"Error": error_msg}
-
-# >>>>>>> main

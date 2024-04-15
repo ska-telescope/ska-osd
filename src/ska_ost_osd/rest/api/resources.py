@@ -4,7 +4,6 @@ Functions which the HTTP requests to individual resources are mapped to.
 See the operationId fields of the Open API spec for the specific mappings.
 """
 
-import logging
 import re
 from functools import wraps
 from http import HTTPStatus
@@ -15,8 +14,6 @@ from ska_telmodel.data import TMData
 from ska_ost_osd.osd.osd import get_osd_data, osd_tmdata_source
 from ska_ost_osd.rest.api.query import QueryParams, QueryParamsFactory
 from ska_ost_osd.telvalidation import SchematicValidationError, semantic_validate
-
-#LOGGER = logging.getLogger(__name__)
 
 TELMODEL_LIB_VERSION = version("ska_telmodel")
 CAR_TELMODEL_SOURCE = (
@@ -37,12 +34,14 @@ def error_handler(api_fn: callable) -> str:
     @wraps(api_fn)
     def wrapper(*args, **kwargs):
         try:
-            # import pdb
-            # pdb.set_trace()
-# <<<<<<< HEAD
             api_response = api_fn(*args, **kwargs)
             if isinstance(api_response, str):
-                return validation_response(status=-1, error_msg=api_response, http_status=HTTPStatus.BAD_REQUEST,title=HTTPStatus.BAD_REQUEST.phrase)
+                return validation_response(
+                    status=-1,
+                    error_msg=api_response,
+                    http_status=HTTPStatus.BAD_REQUEST,
+                    title=HTTPStatus.BAD_REQUEST.phrase,
+                )
             return api_response
         except SchematicValidationError as err:
             return (
@@ -64,16 +63,22 @@ def error_handler(api_fn: callable) -> str:
                 ),
                 HTTPStatus.BAD_REQUEST,
             )
-# =======
+
         except RuntimeError as err:
-            return validation_response(status=-1, error_msg=str(err), http_status=HTTPStatus.UNPROCESSABLE_ENTITY,title=HTTPStatus.UNPROCESSABLE_ENTITY.phrase)
+            return validation_response(
+                status=-1,
+                error_msg=str(err),
+                http_status=HTTPStatus.UNPROCESSABLE_ENTITY,
+                title=HTTPStatus.UNPROCESSABLE_ENTITY.phrase,
+            )
 
-        # except ValueError as err:
-        #     return error_response(str(err), HTTPStatus.UNPROCESSABLE_ENTITY)
-
-# >>>>>>> main
         except Exception as err:  # pylint: disable=W0718
-            return validation_response(status=-1, error_msg=str(err), http_status=HTTPStatus.INTERNAL_SERVER_ERROR,title=HTTPStatus.INTERNAL_SERVER_ERROR.phrase)
+            return validation_response(
+                status=-1,
+                error_msg=str(err),
+                http_status=HTTPStatus.INTERNAL_SERVER_ERROR,
+                title=HTTPStatus.INTERNAL_SERVER_ERROR.phrase,
+            )
 
     return wrapper
 
@@ -215,37 +220,16 @@ def semantically_validate_json(body: dict):
     if error_details:
         raise ValueError(error_details)
 
-    print(
-        "semantic_validate func output:",
-        semantic_validate(
-            observing_command_input=observing_command_input,
-            tm_data=tm_data,
-            raise_semantic=raise_semantic,
-            interface=interface,
-            osd_data=osd_data,
-        ),
+    semantic_validate(
+        observing_command_input=observing_command_input,
+        tm_data=tm_data,
+        raise_semantic=raise_semantic,
+        interface=interface,
+        osd_data=osd_data,
     )
+
     return {
         "status": 0,
         "details": "JSON is semantically valid",
         "title": "Semantic validation",
     }, HTTPStatus.OK
-
-# def error_response(
-#     e: Exception, http_status: HTTPStatus = HTTPStatus.INTERNAL_SERVER_ERROR
-# ) -> dict:
-#     """
-#     Creates a general server error response from an exception
-#
-#     :param e: The raised exception
-#     :param http_status: The HTTP status code
-#
-#     :return: HTTP response server error
-#     """
-#     response_body = {
-#         "title": http_status.phrase,
-#         "detail": f"{e}",
-#     }
-#
-#     return response_body, http_status
-
