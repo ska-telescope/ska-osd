@@ -77,3 +77,7 @@ dev-up: K8S_CHART_PARAMS = \
 dev-up: k8s-namespace k8s-install-chart k8s-wait ## bring up developer deployment
 
 dev-down: k8s-uninstall-chart k8s-delete-namespace  ## tear down developer deployment
+
+osd-pre-release:
+
+	@./src/ska_ost_osd/osd/resource/release.sh $(VERSION)
