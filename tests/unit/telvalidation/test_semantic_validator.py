@@ -758,7 +758,7 @@ def test_fetch_capabilities_from_osd_based_on_client_based_osd_data(mock1):
     )
     expected_1 = (
         {
-            "available_receivers": ["Band_1", "Band_2"],
+            "available_receivers": {"min_frequency_hz": ["test"]},
             "number_ska_dishes": 4,
             "number_meerkat_dishes": 0,
             "number_meerkatplus_dishes": 0,
@@ -771,41 +771,15 @@ def test_fetch_capabilities_from_osd_based_on_client_based_osd_data(mock1):
             "number_pst_beams": 0,
             "ps_beam_bandwidth_hz": 0.0,
             "number_fsps": 4,
+            "basic_capabilities": {"min_frequency_hz": {"test": "test"}},
         },
         {
             "dish_elevation_limit_deg": 15.0,
-            "receiver_information": [
-                {
-                    "rx_id": "Band_1",
-                    "min_frequency_hz": 350000000.0,
-                    "max_frequency_hz": 1050000000.0,
-                },
-                {
-                    "rx_id": "Band_2",
-                    "min_frequency_hz": 950000000.0,
-                    "max_frequency_hz": 1760000000.0,
-                },
-                {
-                    "rx_id": "Band_3",
-                    "min_frequency_hz": 1650000000.0,
-                    "max_frequency_hz": 3050000000.0,
-                },
-                {
-                    "rx_id": "Band_4",
-                    "min_frequency_hz": 2800000000.0,
-                    "max_frequency_hz": 5180000000.0,
-                },
-                {
-                    "rx_id": "Band_5a",
-                    "min_frequency_hz": 4600000000.0,
-                    "max_frequency_hz": 8500000000.0,
-                },
-                {
-                    "rx_id": "Band_5b",
-                    "min_frequency_hz": 8300000000.0,
-                    "max_frequency_hz": 15400000000.0,
-                },
-            ],
+            "receiver_information": {
+                "rx_id": {"Band_1": {"min_frequency_hz": 350000000.0}},
+                "min_frequency_hz": 350000000.0,
+                "max_frequency_hz": 1050000000.0,
+            },
         },
     )
     assert result == expected_1
