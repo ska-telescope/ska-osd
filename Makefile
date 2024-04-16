@@ -18,6 +18,7 @@ RELEASE_NAME ?= test
 -include .make/oci.mk
 -include .make/k8s.mk
 -include .make/python.mk
+-include .make/tmdata.mk
 # Set sphinx documentation build to fail on warnings (as it is configured
 # in .readthedocs.yaml as well)
 DOCS_SPHINXOPTS ?= -W --keep-going
