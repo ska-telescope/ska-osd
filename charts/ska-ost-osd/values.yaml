@@ -22,7 +22,7 @@ rest:
   image:
     registry: registry.gitlab.com
     image: ska-telescope/ost/ska-ost-osd/ska-ost-osd
-    tag: 1.0.0+dev.ceceb19fb
+    tag: 1.0.0-dev.ceceb19fb
     pullPolicy: IfNotPresent
   resources:
     requests:
