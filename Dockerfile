@@ -13,7 +13,7 @@ WORKDIR /app
 
 # Copy poetry.lock* in case it doesn't exist in the repo
 COPY pyproject.toml poetry.lock* ./
-COPY tmdata /app/src/
+COPY tmdata ./app/src/
 
 # Install runtime dependencies and the app
 RUN poetry config virtualenvs.create false
