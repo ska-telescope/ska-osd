@@ -22,7 +22,7 @@ rest:
   image:
     registry: registry.gitlab.com
     image: ska-telescope/ost/ska-ost-osd/ska-ost-osd
-    tag: 1.0.0-dev.c9b13dc0a
+    tag: 1.0.0-dev.c6c1bce28
     pullPolicy: IfNotPresent
   resources:
     requests:
