@@ -917,7 +917,7 @@ def valid_semantic_validation_body():
             },
         },
         "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
-        "sources": "car://gitlab.com/ska-telescope/ska-telmodel?1.14.1#tmdata",
+        "sources": "gitlab://gitlab.com/ska-telescope/ost/ska-ost-osd?nak-849-exposing-semantic-validation-service#tmdata",
         "raise_semantic": True,
         "osd_data": {
             "observatory_policy": {

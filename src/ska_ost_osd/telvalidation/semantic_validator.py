@@ -67,7 +67,7 @@ def fetch_capabilities_from_osd(
     else:
         from ska_ost_osd.osd.osd import get_osd_data
 
-        fetched_osd_data = get_osd_data(
+        fetched_osd_data, _ = get_osd_data(
             capabilities=[telescope],
             array_assembly=array_assembly,
             tmdata=tm_data,
