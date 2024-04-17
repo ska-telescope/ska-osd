@@ -1,0 +1,68 @@
+{
+    "telescope": "low",
+    "AA0.5": {
+        "assign_resource": {
+            "sdp": {
+                "execution_block": {
+                    "parent_key_rule": [
+                        {
+                            "rule": "length(beams) == number_beams",
+                            "error": "beams are too many! Current limit is {number_beams}"
+                        }
+                    ],
+                    "beams": {
+                        "function": [
+                            {
+                                "rule": "function == 'visibilities'",
+                                "error": "Invalid function for beams! Currently allowed visibilities"
+                            }
+                        ]
+                    },
+                    "channels": {
+                        "spectral_windows": [
+                            {
+                                "rule": "length(spectral_windows) == 1",
+                                "error": "spectral windows are too many! Current limit = 1"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "configure": {
+            "csp": {
+                "lowcbf": {
+                    "stations": {
+                        "stns": [
+                            {
+                                "rule": "0 < length(stns) <= number_stations",
+                                "error": "stations are too many! Current limit is {number_stations}"
+                            }
+                        ]
+                    },
+                    "vis": {
+                        "fsp": {
+                            "function_mode": [
+                                {
+                                    "rule": "function_mode == 'vis'",
+                                    "error": "Invalid input for function mode! Currently allowed vis"
+                                }
+                            ],
+                            "fsp_ids": [
+                                {
+                                    "rule": "length(fsp_ids,is_distinct=True) == length(fsp_ids)",
+                                    "error": "The fsp_ids should all be distinct"
+                                },
+                                {
+                                    "rule": "(0 < length(fsp_ids) <= number_fsps)",
+                                    "error": "fsp_ids are too many!Current Limit is {number_fsps}"
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "AA1": {}
+}
