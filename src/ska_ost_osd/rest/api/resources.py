@@ -28,7 +28,7 @@ def error_handler(api_fn: str) -> str:
         try:
             api_response = api_fn(*args, **kwargs)
             if isinstance(api_response, str):
-                return error_response_new(err)
+                return error_response(api_response, HTTPStatus.BAD_REQUEST)
             return api_response
 
         except RuntimeError as err:
