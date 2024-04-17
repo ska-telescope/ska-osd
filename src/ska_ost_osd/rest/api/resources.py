@@ -207,7 +207,7 @@ def semantically_validate_json(body: dict):
     tm_data = {}
 
     try:
-        tm_data = TMData(sources)
+        tm_data = TMData(sources, update=True)
     except RuntimeError as err:
         error_details["sources"] = err.args[0]
 
