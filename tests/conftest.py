@@ -3,6 +3,15 @@ import pytest
 from ska_ost_osd.rest import init_app
 
 # flake8: noqa E501
+# pylint: disable=W0621
+
+
+@pytest.fixture
+def tmdata_source():
+    """
+    TMData source URL fixture
+    """
+    return "gitlab://gitlab.com/ska-telescope/ost/ska-ost-osd?nak-849-exposing-semantic-validation-service#tmdata"
 
 
 @pytest.fixture
@@ -42,7 +51,7 @@ def open_api_spec():
             },
             "version": "1.0.0",
         },
-        "servers": [{"url": "ska-ost-osd/api/v1"}],
+        "servers": [{"url": "ska-ost-osd/osd/api/v1"}],
         "paths": {
             "/osd": {
                 "get": {
@@ -794,7 +803,7 @@ def mid_osd_data():
 
 
 @pytest.fixture
-def valid_semantic_validation_body():
+def valid_semantic_validation_body(tmdata_source):
     return {
         "observing_command_input": {
             "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
@@ -917,7 +926,7 @@ def valid_semantic_validation_body():
             },
         },
         "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
-        "sources": "gitlab://gitlab.com/ska-telescope/ost/ska-ost-osd?nak-849-exposing-semantic-validation-service#tmdata",
+        "sources": tmdata_source,
         "raise_semantic": True,
         "osd_data": {
             "observatory_policy": {
@@ -1295,3 +1304,129 @@ def wrong_semantic_validation_parameter_value_response():
         },
         400,
     ]
+
+
+@pytest.fixture
+def valid_only_observing_command_input_in_request_body():
+    return {
+        "observing_command_input": {
+            "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
+            "subarray_id": 1,
+            "dish": {"receptor_ids": ["SKA001", "SKA002"]},
+            "sdp": {
+                "interface": "https://schema.skao.int/ska-sdp-assignres/0.4",
+                "execution_block": {
+                    "eb_id": "eb-test-20220916-00000",
+                    "max_length": 100.0,
+                    "context": {},
+                    "beams": [{"beam_id": "vis0", "function": "visibilities"}],
+                    "scan_types": [
+                        {
+                            "scan_type_id": ".default",
+                            "beams": {
+                                "vis0": {
+                                    "channels_id": "vis_channels",
+                                    "polarisations_id": "all",
+                                },
+                                "pss1": {
+                                    "field_id": "field_a",
+                                    "channels_id": "pulsar_channels",
+                                    "polarisations_id": "all",
+                                },
+                            },
+                        },
+                        {
+                            "scan_type_id": "target:a",
+                            "derive_from": ".default",
+                            "beams": {"vis0": {"field_id": "field_a"}},
+                        },
+                    ],
+                    "channels": [
+                        {
+                            "channels_id": "vis_channels",
+                            "spectral_windows": [
+                                {
+                                    "spectral_window_id": "fsp_1_channels",
+                                    "count": 14880,
+                                    "start": 0,
+                                    "stride": 2,
+                                    "freq_min": 350000000.0,
+                                    "freq_max": 368000000.0,
+                                    "link_map": [[0, 0], [200, 1], [744, 2], [944, 3]],
+                                }
+                            ],
+                        }
+                    ],
+                    "polarisations": [
+                        {
+                            "polarisations_id": "all",
+                            "corr_type": ["XX", "XY", "YY", "YX"],
+                        }
+                    ],
+                    "fields": [
+                        {
+                            "field_id": "field_a",
+                            "phase_dir": {
+                                "ra": [123, 0.1],
+                                "dec": [80, 0.1],
+                                "reference_time": "2023-02-16T01:23:45.678900",
+                                "reference_frame": "ICRF3",
+                            },
+                            "pointing_fqdn": "low-tmc/telstate/0/pointing",
+                        }
+                    ],
+                },
+                "processing_blocks": [
+                    {
+                        "pb_id": "pb-mvp01-20200325-00001",
+                        "script": {
+                            "kind": "realtime",
+                            "name": "vis_receive",
+                            "version": "0.1.0",
+                        },
+                        "parameters": {},
+                    },
+                    {
+                        "pb_id": "pb-mvp01-20200325-00002",
+                        "script": {
+                            "kind": "realtime",
+                            "name": "test_realtime",
+                            "version": "0.1.0",
+                        },
+                        "parameters": {},
+                    },
+                    {
+                        "pb_id": "pb-mvp01-20200325-00003",
+                        "script": {"kind": "batch", "name": "ical", "version": "0.1.0"},
+                        "parameters": {},
+                        "dependencies": [
+                            {
+                                "pb_id": "pb-mvp01-20200325-00001",
+                                "kind": ["visibilities"],
+                            }
+                        ],
+                        "sbi_ids": ["sbi-mvp01-20200325-00001"],
+                    },
+                    {
+                        "pb_id": "pb-mvp01-20200325-00004",
+                        "script": {
+                            "kind": "batch",
+                            "name": "dpreb",
+                            "version": "0.1.0",
+                        },
+                        "parameters": {},
+                        "dependencies": [
+                            {
+                                "pb_id": "pb-mvp01-20200325-00003",
+                                "kind": ["calibration"],
+                            }
+                        ],
+                    },
+                ],
+                "resources": {
+                    "csp_links": [1, 2, 3, 4],
+                    "receptors": ["SKA001", "SKA002"],
+                },
+            },
+        }
+    }

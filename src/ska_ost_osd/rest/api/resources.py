@@ -7,18 +7,13 @@ See the operationId fields of the Open API spec for the specific mappings.
 import re
 from functools import wraps
 from http import HTTPStatus
-from importlib.metadata import version
 
 from ska_telmodel.data import TMData
 
 from ska_ost_osd.osd.osd import get_osd_data, osd_tmdata_source
 from ska_ost_osd.rest.api.query import QueryParams, QueryParamsFactory
 from ska_ost_osd.telvalidation import SchematicValidationError, semantic_validate
-
-TELMODEL_LIB_VERSION = version("ska_telmodel")
-CAR_TELMODEL_SOURCE = (
-    f"car://gitlab.com/ska-telescope/ska-telmodel?{TELMODEL_LIB_VERSION}#tmdata",
-)
+from ska_ost_osd.telvalidation.constant import CAR_TELMODEL_SOURCE
 
 
 def error_handler(api_fn: callable) -> str:
@@ -176,7 +171,7 @@ def semantically_validate_json(body: dict):
              -observing_command_input: (required) Input JSON to be validated
              -interface: Interface version of the input JSON
              -raise_semantic: (Optional Default True) Raise semantic errors or not
-             -sources: (Optional) TMData source
+             -sources: (Optional) TMData source URL (gitlab/car) for Semantic Validation
              -osd_data: (Optional) OSD data to be used for semantic validation
 
     :returns: Flask.Response: A Flask response object that contains the validation

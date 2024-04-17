@@ -1,6 +1,8 @@
 """
   created file to maintain televalidation constant
 """
+# flake8: noqa E501
+
 MID_VALIDATION_CONSTANT_JSON_FILE_PATH = (
     "instrument/ska1_mid/validation/mid-validation-constants.json"
 )
@@ -16,3 +18,7 @@ LOW_LAYOUT_CONSTANT_JSON_FILE_PATH = "instrument/ska1_low/layout/low-layout.json
 SKA_LOW_TELESCOPE = "low"
 SKA_MID_TELESCOPE = "mid"
 SKA_SBD = "sbd"
+
+CAR_TELMODEL_SOURCE = (
+    "gitlab://gitlab.com/ska-telescope/ost/ska-ost-osd?nak-849-exposing-semantic-validation-service#tmdata",
+)
