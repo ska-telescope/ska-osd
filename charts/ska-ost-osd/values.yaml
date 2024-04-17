@@ -20,9 +20,9 @@ rest:
   logLevel: info
   enabled: true
   image:
-    registry: registry.gitlab.com
-    image: ska-telescope/ost/ska-ost-osd/ska-ost-osd
-    tag: 1.0.0-dev.c99ed0773
+    registry: artefact.skao.int
+    image: ska-ost-osd
+    tag: ~ # Defaults to the chart appVersion if not set
     pullPolicy: IfNotPresent
   resources:
     requests:

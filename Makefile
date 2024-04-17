@@ -18,6 +18,7 @@ RELEASE_NAME ?= test
 -include .make/oci.mk
 -include .make/k8s.mk
 -include .make/python.mk
+-include .make/tmdata.mk
 # Set sphinx documentation build to fail on warnings (as it is configured
 # in .readthedocs.yaml as well)
 DOCS_SPHINXOPTS ?= -W --keep-going
@@ -77,3 +78,7 @@ dev-up: K8S_CHART_PARAMS = \
 dev-up: k8s-namespace k8s-install-chart k8s-wait ## bring up developer deployment
 
 dev-down: k8s-uninstall-chart k8s-delete-namespace  ## tear down developer deployment
+
+osd-pre-release:
+
+	@./src/ska_ost_osd/osd/resource/release.sh $(VERSION)
