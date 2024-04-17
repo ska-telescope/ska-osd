@@ -1,0 +1,140 @@
+{
+    "telescope":"mid",
+    "AA0.5": {
+        "dish_elevation_limit": {
+            "min": 15
+        },
+        "assign_resource": {
+            "dish": {
+                "receptor_ids": [
+                    {
+                        "rule": "(0 < length(receptor_ids) <= number_ska_dishes)",
+                        "error": "receptor_ids are too many!Current Limit is {number_ska_dishes}"
+                    }
+                ]
+            },
+            "sdp": {
+                "execution_block": {
+                    "parent_key_rule": [
+                        {
+                            "rule": "length(beams) == 1",
+                            "error": "beams are too many! Current limit is 1"
+                        }
+                    ],
+                    "beams": {
+                        "function": [
+                            {
+                                "rule": "function == 'visibilities'",
+                                "error": "Invalid function for beams! Currently allowed visibilities"
+                            }
+                        ]
+                    },
+                    "channels": {
+                        "parent_key_rule": [
+                            {
+                                "rule": "length(spectral_windows) == 1",
+                                "error": "spectral windows are too many! Current limit = 1" 
+                            }
+                        ],
+                        "spectral_windows": {
+                            "count": [
+                                {
+                                    "rule": "count == number_channels",
+                                    "error": "Invalid input for channel_count! Currently allowed {number_channels}" 
+                                }
+                            ],
+                            "freq_min": [
+                                {
+                                    "rule": "min_frequency_hz <= freq_min <= max_frequency_hz",
+                                    "error": "Invalid input for freq_min"
+                                }
+                            ],
+                            "freq_max": [
+                                {
+                                    "rule": "min_frequency_hz <= freq_max <= max_frequency_hz",
+                                    "error": "Invalid input for freq_max"                                
+                                },
+                                {
+                                    "rule": "value(freq_min) < value(freq_max)",
+                                    "error": "freq_min should be less than freq_max",
+                                    "dependency_key": "freq_min"                     
+                                }
+                            ]
+                        }
+                    }
+                },
+                "resources": {
+                    "receptors": [
+                        {
+                            "rule": "length(receptor_ids)==length(receptors)",
+                            "dependency_key": "receptor_ids",
+                            "error": "length of receptor_ids should be same as length of receptors"
+                        },
+                        {
+                            "rule": "set(value(receptor_ids)).difference(set(value(receptors)))",
+                            "dependency_key": "receptor_ids",
+                            "error": "receptor_ids did not match receptors"
+                        }
+                    ]
+                }
+            }
+        },
+        "configure": {
+            "dish": {
+                "receiver_band": [
+                    {
+                        "rule": "receiver_band in ['1','2']",
+                        "error": "Invalid input for receiver_band! Currently allowed [1,2]"
+                    }
+                ]
+            },
+            "csp": {
+                "cbf": {
+                    "parent_key_rule": [
+                        {
+                            "rule": "length(fsp)<=number_fsps",
+                            "error": "FSPs are too many!Current Limit = {number_fsps}"
+                        }
+                    ],
+                    "fsp": {
+                        "fsp_id": [
+                            {
+                                "rule": "fsp_id <= number_fsps",
+                                "error": "Invalid input for fsp_id!"
+                            }
+                        ],
+                        "function_mode": [
+                            {
+                                "rule": "function_mode == 'CORR'",
+                                "error": "Invalid input for function_mode"
+                            }
+                        ],
+                        "zoom_factor": [
+                            {
+                                "rule": "zoom_factor == 0",
+                                "error": "Invalid input for zoom_factor"
+                            }
+                        ],
+                        "frequency_slice_id": [
+                            {
+                                "rule": "value(fsp_id)==value(frequency_slice_id)",
+                                "dependency_key": "fsp_id",
+                                "error": "frequency_slice_id did not match fsp_id"
+                            }
+                        ]
+                    }
+                },
+                "common": {
+                    "frequency_band": [
+                        {
+                            "rule": "value(receiver_band)==value(frequency_band)",
+                            "dependency_key": "receiver_band",
+                            "error": "frequency_band did not match receiver_band"
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "AA1": {}
+}
