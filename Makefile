@@ -64,7 +64,7 @@ REST_POD_NAME=$(shell kubectl get pods -o name -n $(KUBE_NAMESPACE) -l app=ska-o
 
 rest: ## start OSD REST server
 	docker run --rm -p 5000:5000 --name=$(PROJECT_NAME) $(IMAGE_TO_TEST) gunicorn --chdir src \
-		--bind 0.0.0.0:5000 --logger-class=ska_ost_osd.rest.wsgi.UniformLogger --log-level=$(LOG_LEVEL) ska_ost_osd.rest.wsgi:app
+		--bind 0.0.0.0:5000 --logger-class=src.ska_ost_osd.rest.wsgi.UniformLogger --log-level=$(LOG_LEVEL) src.ska_ost_osd.rest.wsgi:app
 
 # install helm plugin from https://github.com/helm-unittest/helm-unittest.git
 k8s-chart-test:
@@ -78,3 +78,7 @@ dev-up: K8S_CHART_PARAMS = \
 dev-up: k8s-namespace k8s-install-chart k8s-wait ## bring up developer deployment
 
 dev-down: k8s-uninstall-chart k8s-delete-namespace  ## tear down developer deployment
+
+osd-pre-release:
+
+	@./src/ska_ost_osd/osd/resource/release.sh $(VERSION)

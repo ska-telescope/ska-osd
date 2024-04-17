@@ -2,13 +2,13 @@
 
 base_path=$(dirname "$(readlink -f "release.sh")")
 
-observatory_file_location="$base_path/tmdata/osd_data/observatory_policies.json"
-version_mapping_file_location="$base_path/src/ska_telmodel/osd/version_mapping/cycle_gitlab_release_version_mapping.json"
+observatory_file_location="$base_path/tmdata/observatory_policies.json"
+version_mapping_file_location="$base_path/src/ska_ost_osd/osd/version_mapping/cycle_gitlab_release_version_mapping.json"
 
 function CheckFileExists (){
 
     if [ -f $1 ]; then
-        return 0  
+        return 0
     else
         echo $1 "Doesn't Exists"
         return 1
