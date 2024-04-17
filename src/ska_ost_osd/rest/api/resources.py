@@ -38,7 +38,7 @@ def error_handler(api_fn: str) -> str:
             return error_response(str(err), HTTPStatus.UNPROCESSABLE_ENTITY)
 
         except Exception as err:  # pylint: disable=W0718
-            return validation_response(str(err)), HTTPStatus.INTERNAL_SERVER_ERROR
+            return error_response_new(err)
 
     return wrapper
 
@@ -91,6 +91,26 @@ def get_osd(**kwargs) -> dict:
 
     query_params, error_list = get_qry_params(kwargs)
     return get_osd_data_response(query_params, error_list)
+
+def error_response_new(
+    e: Exception, http_status: HTTPStatus = HTTPStatus.INTERNAL_SERVER_ERROR
+) -> dict:
+    """
+    Creates a general server error response from an exception
+
+    :return: HTTP response server error
+    """
+    response_body = {
+        "title": http_status.phrase,
+        "detail": f"{e.args[0]}",
+        "traceback": {
+            "key": repr(e.args[0]),
+            "type": str(type(e)),
+            "full_traceback": traceback.format_exc(),
+        },
+    }
+
+    return response_body, http_status
 
 
 def validation_response(
