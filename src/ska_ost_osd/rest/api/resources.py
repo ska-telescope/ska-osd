@@ -28,14 +28,14 @@ def error_handler(api_fn: str) -> str:
         try:
             api_response = api_fn(*args, **kwargs)
             if isinstance(api_response, str):
-                return error_response(api_response, HTTPStatus.BAD_REQUEST)
+                return error_response_new(err)
             return api_response
 
         except RuntimeError as err:
-            return error_response(str(err), HTTPStatus.UNPROCESSABLE_ENTITY)
+            return error_response_new(err)
 
         except ValueError as err:
-            return error_response(str(err), HTTPStatus.UNPROCESSABLE_ENTITY)
+            return error_response_new(err)
 
         except Exception as err:  # pylint: disable=W0718
             return error_response_new(err)
