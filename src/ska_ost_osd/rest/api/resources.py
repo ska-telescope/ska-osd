@@ -6,6 +6,7 @@ See the operationId fields of the Open API spec for the specific mappings.
 
 from functools import wraps
 from http import HTTPStatus
+import traceback
 
 from ska_telmodel.data import TMData
 
