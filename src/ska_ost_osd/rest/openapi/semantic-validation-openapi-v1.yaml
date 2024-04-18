@@ -170,7 +170,7 @@ components:
         status:
           type: integer
           example: 0
-        details:
+        detail:
           type: string
           example: "JSON is semantically valid"
         title:

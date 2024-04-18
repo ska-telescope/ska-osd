@@ -33,7 +33,7 @@ def error_handler(api_fn: callable) -> str:
             if isinstance(api_response, str):
                 return validation_response(
                     status=-1,
-                    error_msg=api_response,
+                    detail=api_response,
                     http_status=HTTPStatus.BAD_REQUEST,
                     title=HTTPStatus.BAD_REQUEST.phrase,
                 )
@@ -42,7 +42,7 @@ def error_handler(api_fn: callable) -> str:
             return (
                 validation_response(
                     status=0,
-                    error_msg=err.args[0].split("\n"),
+                    detail=err.args[0].split("\n"),
                     title="Semantic Validation Error",
                     http_status=HTTPStatus.OK,
                 ),
@@ -52,7 +52,7 @@ def error_handler(api_fn: callable) -> str:
             return (
                 validation_response(
                     status=-1,
-                    error_msg=err.args[0],
+                    detail=err.args[0],
                     title="Value Error",
                     http_status=HTTPStatus.BAD_REQUEST,
                 ),
@@ -62,7 +62,7 @@ def error_handler(api_fn: callable) -> str:
         except RuntimeError as err:
             return validation_response(
                 status=-1,
-                error_msg=str(err),
+                detail=str(err),
                 http_status=HTTPStatus.UNPROCESSABLE_ENTITY,
                 title=HTTPStatus.UNPROCESSABLE_ENTITY.phrase,
             )
@@ -70,7 +70,7 @@ def error_handler(api_fn: callable) -> str:
         except Exception as err:  # pylint: disable=W0718
             return validation_response(
                 status=-1,
-                error_msg=str(err),
+                detail=str(err),
                 http_status=HTTPStatus.INTERNAL_SERVER_ERROR,
                 title=HTTPStatus.INTERNAL_SERVER_ERROR.phrase,
             )
@@ -129,7 +129,7 @@ def get_osd(**kwargs) -> dict:
 
 
 def validation_response(
-    error_msg: str,
+    detail: str,
     status: int = 0,
     title: str = HTTPStatus.INTERNAL_SERVER_ERROR.phrase,
     http_status: HTTPStatus = HTTPStatus.INTERNAL_SERVER_ERROR,
@@ -137,11 +137,11 @@ def validation_response(
     """
     Creates an error response in the case that our validation has failed.
 
-    :param error_msg: The error message if validation fails
+    :param detail: The error message if validation fails
     :param http_status: The HTTP status code to return
     :return: HTTP response server error
     """
-    response_body = {"detail": error_msg, "title": title, "status": status}
+    response_body = {"status": status, "detail": detail, "title": title}
 
     return response_body, http_status
 
@@ -223,8 +223,11 @@ def semantically_validate_json(body: dict):
         osd_data=osd_data,
     )
 
-    return {
-        "status": 0,
-        "details": "JSON is semantically valid",
-        "title": "Semantic validation",
-    }, HTTPStatus.OK
+    return validation_response(
+        **{
+            "status": 0,
+            "detail": "JSON is semantically valid",
+            "title": "Semantic validation",
+            "http_status": HTTPStatus.OK,
+        }
+    )

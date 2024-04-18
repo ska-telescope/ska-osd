@@ -224,7 +224,7 @@ def test_response_body():
 
     error_msg = "Validation failed"
     response = validation_response(
-        error_msg=error_msg,
+        detail=error_msg,
         status=0,
         title="Validation Error",
         http_status=HTTPStatus.OK,
