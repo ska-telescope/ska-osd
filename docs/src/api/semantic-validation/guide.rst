@@ -307,10 +307,10 @@ It allows for the semantical validation of input JSON data against a predefined 
 This document outlines the API's endpoints, request parameters, and response structures.
 
 Endpoints
----------
+~~~~~~~~~
 
 POST /semantic_validation
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+==========================
 
 **Summary**: Validate input JSON semantically.
 
@@ -367,13 +367,13 @@ This table outlines the expected structure of the JSON object in the request bod
 
 - **200 OK**
 
-  - **Description**: Semantic validation successful.
+  - **Description**: Input JSON Semantically Valid or Not
   - **Content Type**: ``application/json``
   - **Schema**: See `Semantic Validation Success Response` schema.
 
 - **400 Bad Request**
 
-  - **Description**: Bad request due to semantic validation error.
+  - **Description**: Bad request due to incorrect values passed for parameters.
   - **Content Type**: ``application/json``
   - **Schema**: See `Semantic Validation Error Response` schema.
 
@@ -383,10 +383,10 @@ This table outlines the expected structure of the JSON object in the request bod
 
 
 Schemas
--------
+~~~~~~~
 
 Semantic Validation Request
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+============================
 
 .. code-block:: json
 
@@ -597,31 +597,54 @@ Semantic Validation Request
 
 
 Semantic Validation Success Response
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+======================================
+For Semantically Valid JSON
 
 .. code-block:: json
 
-    {
-      "message": "Semantic Validation Successfully",
-      "status": "success"
+     {
+        "title": "Semantic validation Successful"
+        "status": 0,
+        "details": "JSON is semantically valid",
     }
 
+
+For Semantically Invalid JSON
+
+.. code-block:: json
+
+     {
+            "title": "Semantic Validation Error",
+            "status": 0,
+            "detail": [
+                "receptor_ids are too many!Current Limit is 4",
+                "beams are too many! Current limit is 1",
+                "Invalid function for beams! Currently allowed visibilities",
+                "spectral windows are too many! Current limit = 1",
+                "Invalid input for channel_count! Currently allowed 14880",
+                "Invalid input for freq_min",
+                "Invalid input for freq_max",
+                "freq_min should be less than freq_max",
+                "length of receptor_ids should be same as length of receptors",
+                "receptor_ids did not match receptors",
+            ]
+        }
+
 Semantic Validation Error Response
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+======================================
 
 .. code-block:: json
 
         {
-            "Error": [
-                    "receptor_ids are too many!Current Limit is 4",
-                    "beams are too many! Current limit is 1",
-                    "Invalid function for beams! Currently allowed visibilities",
-                    "spectral windows are too many! Current limit = 1",
-                    "Invalid input for channel_count! Currently allowed 14880",
-                    "Invalid input for freq_min",
-                    "Invalid input for freq_max",
-                    "freq_min should be less than freq_max",
-                    "length of receptor_ids should be same as length of receptors",
-                    "receptor_ids did not match receptors",
-                    ]
+            "title": "Value Error",
+            "status": -1,
+            "detail": {
+                "interface": "interface is not valid",
+                "observing_command_output": "observing_command_input is missing",
+                "raise_semantic": "raise_semantic is not a boolean value ",
+                "sources":
+                    "gitlab://gitlab.com/ska-telescope14.1?~default~#tmdata not found"
+                    " in SKA CAR - make sure to add tmdata CI!"
+                ,
+            }
         }

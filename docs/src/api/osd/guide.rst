@@ -2,9 +2,9 @@
 OSD Model
 -------------------
 
-In its simplest form OSD consists of a set of science domain configuration files that are required by the OSO tools. 
-These configuration files hold slowly changing information that is used to configure the science domain behavior of each tool. 
-E.g. tools such as the PPT and ODT can use the information for constructing GUIs and validating setups, the Planning Tool can use it to inform itself of the capabilities available. 
+In its simplest form OSD consists of a set of science domain configuration files that are required by the OSO tools.
+These configuration files hold slowly changing information that is used to configure the science domain behavior of each tool.
+E.g. tools such as the PPT and ODT can use the information for constructing GUIs and validating setups, the Planning Tool can use it to inform itself of the capabilities available.
 The idea of OSD is to provide a single source of truth for these data.
 
 
@@ -110,10 +110,10 @@ API json response template
 
     {
     "observatory_policy": {
-      "cycle_number": 1, 
+      "cycle_number": 1,
     "telescope_capabilities": []},
     "capabilities": {
-      "mid": {}, 
+      "mid": {},
       "low": {}}
     }
 
@@ -129,10 +129,11 @@ Low                       file content of ``low_capabilities.json`` with ``basic
 ======================    ============================================================================================================
 
 
-OSD as a service
+Endpoints
 ~~~~~~~~~~~~~~~~~
 
-1. API Endpoint
+GET /osd
+==========================
 
 .. list-table:: OSD REST resources
    :widths: 5 15 80
@@ -146,9 +147,9 @@ OSD as a service
      - **Getting Data**
 
        Return the OSD cycle_id data.
- 
 
-2. Query Parameters
+
+1. Query Parameters
 
   * The API supports the following query parameters to filter the OSD data:
 
@@ -158,31 +159,31 @@ OSD as a service
     cycle_id               Cycle Id a integer value 1, 2, 3
     osd_version            OSD version i.e 1.9.0, 1.12.0 in string format
     source                 From where to get OSD data ``car`` or ``gitlab``
-    gitlab_branch          Gitlab Branch Name     
+    gitlab_branch          Gitlab Branch Name
     capabilities           Mid or Low
     array_assembly         AA0.5, AA1 or any Array Assembly
     ===================    ================================================
 
 
-3. For example:
+2. For example:
 
 .. code:: python
-    
+
     "/ska-ost-osd/osd/api/v1/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
 
 
-4. CURL Example Request
+3. CURL Example Request
 
 .. code:: python
 
     curl -X GET "/ska-ost-osd/osd/api/v1/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
 
 
-5. Example Response
+4. Example Response
 
     * The API returns a JSON object containing the matched OSD data.
 
-        Calling API with parameters ``cycle_id``, ``source``, ``capabilities`` and ``array_assembly`` with 
+        Calling API with parameters ``cycle_id``, ``source``, ``capabilities`` and ``array_assembly`` with
         their valid inputs will return the JSON containing the matched OSD data.
 
     .. code:: python
@@ -300,8 +301,8 @@ Error Handling
 .. note::
 
     All the error_messages are combined in a single string.
-    
-    
+
+
 Release Steps
 ~~~~~~~~~~~~~~
 
@@ -314,13 +315,13 @@ Release Steps
 2. Check the Current Version
 
 .. code:: bash
-    
+
     make show-version
 
 3. Bump the Version
 
 .. code:: bash
-    
+
     make bump-patch-release
 
 4. Run below command for OSD release
@@ -328,11 +329,11 @@ Release Steps
 Created a target called ``osd-pre-release`` in Makefile which will run when ska_telmodel is released.
 also added a ``release.sh`` file inside ``osd`` ``resources`` folder which has two functions ``GetCycleId`` and ``UpdateAndAddValue``
 
-``GetCycleId`` function gets ``cycle_number`` from ``observatory_policies.json`` file and triggers next function ``UpdateAndAddValue`` 
-which updates or add cycle_id values in version mapping json file. 
+``GetCycleId`` function gets ``cycle_number`` from ``observatory_policies.json`` file and triggers next function ``UpdateAndAddValue``
+which updates or add cycle_id values in version mapping json file.
 
 .. code:: bash
-    
+
     make osd-pre-release
 
 5. Set the Release
