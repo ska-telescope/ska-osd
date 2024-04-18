@@ -85,7 +85,7 @@ This framework can be access by below command:
     osd_data = get_osd_data(tmdata=tmdata)
 
 
-* `Location of this framework <https://gitlab.com/ska-telescope/ska-telmodel/-/tree/master/src/ska_telmodel/telvalidation>`_
+* `Location of this framework <https://gitlab.com/ska-telescope/ska-ost-osd/-/tree/master/src/ska_ost_osd/telvalidation>`_
 
 ===================    ================================================
 Parameters             Description
@@ -326,7 +326,7 @@ Release Steps
 
 4. Run below command for OSD release
 
-Created a target called ``osd-pre-release`` in Makefile which will run when ska_telmodel is released.
+Created a target called ``osd-pre-release`` in Makefile which will run when ska_ost_osd is released.
 also added a ``release.sh`` file inside ``osd`` ``resources`` folder which has two functions ``GetCycleId`` and ``UpdateAndAddValue``
 
 ``GetCycleId`` function gets ``cycle_number`` from ``observatory_policies.json`` file and triggers next function ``UpdateAndAddValue``

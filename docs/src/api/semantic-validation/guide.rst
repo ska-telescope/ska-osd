@@ -45,11 +45,11 @@ JSON validator file
 Three seperate JSON files have been created for Mid, Low and Scheduling Block Definition (MID) schemas to store all the parameters present in assign & configure resources
 along with its business rules and errors.
 
-* `Reference of JSON validator file (Mid) <https://gitlab.com/ska-telescope/ska-telmodel/-/blob/master/tmdata/instrument/ska1_mid/validation/mid-validation-constants.json>`_
+* `Reference of JSON validator file (Mid) <https://gitlab.com/ska-telescope/ska-ost-osd/-/blob/master/tmdata/instrument/ska1_mid/validation/mid-validation-constants.json>`_
 
-* `Reference of JSON validator file (Low) <https://gitlab.com/ska-telescope/ska-telmodel/-/blob/master/tmdata/instrument/ska1_low/validation/low-validation-constants.json>`_
+* `Reference of JSON validator file (Low) <https://gitlab.com/ska-telescope/ska-ost-osd/-/blob/master/tmdata/instrument/ska1_low/validation/low-validation-constants.json>`_
 
-* `Reference of JSON validator file (SBD) <https://gitlab.com/ska-telescope/ska-telmodel/-/blob/master/tmdata/instrument/scheduling-block/validation/sbd-validation-constants.json>`_
+* `Reference of JSON validator file (SBD) <https://gitlab.com/ska-telescope/ska-ost-osd/-/blob/master/tmdata/instrument/scheduling-block/validation/sbd-validation-constants.json>`_
 
 Created a seperate ``constant`` file to maintain all telvalidation constant. From there we are importing JSON validator file
 in ``semantic_validator`` for Mid, Low as well as Scheduling Block Definition (MID) schemas.
@@ -148,7 +148,7 @@ This framework can be access by below command:
     from ska_ost_osd.telvalidation.semantic_validator import semantic_validate
 
 
-* `Location of this framework <https://gitlab.com/ska-telescope/ska-telmodel/-/tree/master/src/ska_telmodel/telvalidation>`_
+* `Location of this framework <https://gitlab.com/ska-telescope/ska-ost-osd/-/tree/master/src/ska_ost_osd/telvalidation>`_
 
 
 There are some steps of this framework these are as follows:
@@ -159,7 +159,7 @@ There are some steps of this framework these are as follows:
 
 * Step 2
     There is a ``validate_json`` function which takes two parameters JSON file & config as a dictionary.
-    It is present in ``src/ska_telmodel/telvalidation/oet_tmc_validators``.
+    It is present in ``src/ska_ost_osd/telvalidation/oet_tmc_validators``.
     Here we are using an eval term to evaluate the business rules present in the JSON file and based on
     that it raises custom errors. All the custom errors are stored in a list named ``error_msg_list``.
     At the end this function returns a list containing all the error messages.
@@ -169,7 +169,7 @@ There are some steps of this framework these are as follows:
 * Step 3
     There is one more function ``semantic_validate`` which takes argument as
     observing_command_input, tm_data, osd_data, interface, array_assembly and raise_semantic.
-    It is present in ``src/ska_telmodel/telvalidation/schema``.
+    It is present in ``src/ska_ost_osd/telvalidation/schema``.
 
     This function first checks for the interface, if the interface is not present then
     a warning message is logged, indicating that the ``interface`` is missing from the config.
@@ -195,14 +195,14 @@ file and ``sbd-validation-constants.json`` all the validation constraint are fet
 
 Let's take one example
 There is function ``semantic_validate()`` which takes arguments as observing_command_input, tm_data, osd_data, array_assembly, interface
-and raise_semantic. It is present in ``src/ska_telmodel/telvalidation/schema``. internally we  call function
+and raise_semantic. It is present in ``src/ska_ost_osd/telvalidation/schema``. internally we  call function
 ``get_osd_data()`` which takes mainly three arguments capabilities, array_assembly, tmdata object
 and validate command request against OSD capabilities configuration.
 
 below is code sample to call ``semantic_validate()``
 
 * scenario 1
-    Import 'SchematicValidationError' from 'ska_telmodel' which contains all the customized error messages
+    Import 'SchematicValidationError' from 'ska_ost_osd' which contains all the customized error messages
     in string format.
 
     .. code-block:: python
@@ -227,7 +227,7 @@ below is code sample to call ``semantic_validate()``
 
         from ska_telmodel.data import TMData
         from ska_ost_osd.telvalidation.semantic_validator import SchematicValidationError
-        from ska_telmodel.osd.osd import get_osd_data
+        from ska_ost_osd.osd.osd import get_osd_data
         osd_data = get_osd_data()
         tmdata = TMData()
         try:
@@ -348,7 +348,7 @@ The request body should be structure with following parameters:
      - string
      - No
      - TMData source.
-     - ``"car://gitlab.com/ska-telescope/ska-telmodel?1.14.1#tmdata"``
+     - ``"car://gitlab.com/ska-telescope/ska-ost-osd?1.14.1#tmdata"``
    * - ``raise_semantic``
      - boolean
      - No
