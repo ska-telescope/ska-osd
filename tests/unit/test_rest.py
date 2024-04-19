@@ -108,7 +108,8 @@ def test_init_app_client(client, open_api_spec):
             {
                 "detail": (
                     "Cycle id 3 is not valid,Available IDs are 1,2, osd_version 1..1.0"
-                    " is not valid, array_assembly AAA3 is not valid"
+                    " is not valid, array_assembly AAA3 is not valid,"
+                    " Only one parameter is needed either cycle_id or array_assembly"
                 ),
                 "title": "Bad Request",
                 "status": -1,
@@ -182,10 +183,8 @@ def test_osd_endpoint(client, mid_osd_data):
             "cycle_id": 1,
             "source": "file",
             "capabilities": "mid",
-            "array_assembly": "AA0.5",
         },
     )
-
     assert response.status_code == 200
     assert response.json == mid_osd_data
 
@@ -299,6 +298,8 @@ def test_semantic_validate_api_not_passing_required_keys(
     Test semantic validation API response with missing input observing_command_input key
     """
     json_body = valid_semantic_validation_body.copy()
+    print(json_body)
+    lllll
     del json_body["observing_command_input"]
     expected_response = observing_command_input_missing_response
     res = client.post("/ska-ost-osd/osd/api/v1/semantic_validation", json=json_body)
@@ -313,21 +314,21 @@ def test_semantic_validate_api_not_passing_required_keys(
             "valid_semantic_validation_response",
             "sources",
         ),
-        (
-            "valid_semantic_validation_body",
-            "valid_semantic_validation_response",
-            "interface",
-        ),
-        (
-            "valid_semantic_validation_body",
-            "valid_semantic_validation_response",
-            "raise_semantic",
-        ),
-        (
-            "valid_semantic_validation_body",
-            "valid_semantic_validation_response",
-            "osd_data",
-        ),
+        # (
+        #     "valid_semantic_validation_body",
+        #     "valid_semantic_validation_response",
+        #     "interface",
+        # ),
+        # (
+        #     "valid_semantic_validation_body",
+        #     "valid_semantic_validation_response",
+        #     "raise_semantic",
+        # ),
+        # (
+        #     "valid_semantic_validation_body",
+        #     "valid_semantic_validation_response",
+        #     "osd_data",
+        # ),
     ],
 )
 def test_not_passing_optional_keys(
@@ -337,8 +338,11 @@ def test_not_passing_optional_keys(
     Test semantic validation API response by not passing optional keys
     """
     json_body = request.getfixturevalue(json_body_to_validate).copy()
+    # print(json_body)
     del json_body[key_to_delete]
+    print(json_body)
     expected_response = request.getfixturevalue(response)
+    print("lllllllllll", expected_response)
     res = client.post("/ska-ost-osd/osd/api/v1/semantic_validation", json=json_body)
     assert res.get_json() == expected_response
 

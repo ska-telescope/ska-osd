@@ -80,6 +80,7 @@ class QueryParamsFactory:
         ):
             osd_version = kwargs.get("osd_version", None)
             array_assembly = kwargs.get("array_assembly", None)
+            cycle_id = kwargs.get("cycle_id", None)
 
             if (
                 params_in_kwargs("source")
@@ -96,5 +97,15 @@ class QueryParamsFactory:
                     query_err_msg_list.append(
                         f"array_assembly {array_assembly} is not valid"
                     )
+        
+            if (
+                cycle_id is not None
+                and array_assembly is not None
+            ):
+                msg = "either cycle_id or array_assembly"
+                query_err_msg_list.append(
+                        f"Only one parameter is needed {msg}"
+                    )
+                
 
         return UserQuery(**kwargs), query_err_msg_list
