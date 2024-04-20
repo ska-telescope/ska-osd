@@ -87,15 +87,15 @@ This framework can be access by below command:
 
 * `Location of this framework <https://gitlab.com/ska-telescope/ska-ost-osd/-/tree/master/src/ska_ost_osd/telvalidation>`_
 
-===================    ================================================
+===================    ============================================================
 Parameters             Description
-===================    ================================================
+===================    ============================================================
 cycle_id               Cycle Id a integer value 1, 2, 3
 osd_version            OSD version i.e 1.9.0, 1.12.0 in string format
-source                 From where to get OSD data ``car`` or ``gitlab``
+source                 From where to get OSD data ``car`` or ``gitlab`` or ``file``
 capabilities           Mid or Low
 array_assembly         AA0.5, AA1 or any Array Assembly
-===================    ================================================
+===================    ============================================================
 
 
 .. autofunction:: ska_ost_osd.osd.osd.get_osd_data
@@ -153,16 +153,16 @@ GET /osd
 
   * The API supports the following query parameters to filter the OSD data:
 
-    ===================    ================================================
+    ===================    ============================================================
     Parameters             Description
-    ===================    ================================================
+    ===================    ============================================================
     cycle_id               Cycle Id a integer value 1, 2, 3
     osd_version            OSD version i.e 1.9.0, 1.12.0 in string format
-    source                 From where to get OSD data ``car`` or ``gitlab``
+    source                 From where to get OSD data ``car`` or ``gitlab`` or ``file``
     gitlab_branch          Gitlab Branch Name
     capabilities           Mid or Low
     array_assembly         AA0.5, AA1 or any Array Assembly
-    ===================    ================================================
+    ===================    ============================================================
 
 
 2. For example:
@@ -194,7 +194,6 @@ GET /osd
                 "cycle_id": 1,
                 "source": "file",
                 "capabilities": "mid",
-                "array_assembly": "AA0.5",
             },
         )
 
@@ -203,72 +202,86 @@ GET /osd
     .. code:: python
 
         {
-            "capabilities": {
+             "capabilities": {
                 "mid": {
-                    "AA0.5": {
-                        "available_bandwidth_hz": 800000.0,
-                        "available_receivers": ["Band_1", "Band_2"],
-                        "cbf_modes": ["CORR"],
-                        "max_baseline_km": 1.5,
-                        "number_channels": 14880,
-                        "number_fsps": 4,
-                        "number_meerkat_dishes": 0,
-                        "number_meerkatplus_dishes": 0,
-                        "number_pss_beams": 0,
-                        "number_pst_beams": 0,
-                        "number_ska_dishes": 4,
-                        "number_zoom_channels": 0,
-                        "number_zoom_windows": 0,
-                        "ps_beam_bandwidth_hz": 0.0,
+                "AA2": {
+                    "available_bandwidth_hz": 800000,
+                    "available_receivers": [
+                    "Band_1",
+                    "Band_2",
+                    "Band_5a",
+                    "Band_5b"
+                    ],
+                    "cbf_modes": [
+                    "CORR",
+                    "PST_BF",
+                    "PSS_BF"
+                    ],
+                    "max_baseline_km": 110,
+                    "number_channels": 14880,
+                    "number_fsps": 4,
+                    "number_meerkat_dishes": 4,
+                    "number_meerkatplus_dishes": 0,
+                    "number_pss_beams": 384,
+                    "number_pst_beams": 6,
+                    "number_ska_dishes": 64,
+                    "number_zoom_channels": 14880,
+                    "number_zoom_windows": 16,
+                    "ps_beam_bandwidth_hz": 800000
+                },
+                "basic_capabilities": {
+                    "dish_elevation_limit_deg": 15,
+                    "receiver_information": [
+                    {
+                        "max_frequency_hz": 1050000000,
+                        "min_frequency_hz": 350000000,
+                        "rx_id": "Band_1"
                     },
-                    "basic_capabilities": {
-                        "dish_elevation_limit_deg": 15.0,
-                        "receiver_information": [
-                            {
-                                "max_frequency_hz": 1050000000.0,
-                                "min_frequency_hz": 350000000.0,
-                                "rx_id": "Band_1",
-                            },
-                            {
-                                "max_frequency_hz": 1760000000.0,
-                                "min_frequency_hz": 950000000.0,
-                                "rx_id": "Band_2",
-                            },
-                            {
-                                "max_frequency_hz": 3050000000.0,
-                                "min_frequency_hz": 1650000000.0,
-                                "rx_id": "Band_3",
-                            },
-                            {
-                                "max_frequency_hz": 5180000000.0,
-                                "min_frequency_hz": 2800000000.0,
-                                "rx_id": "Band_4",
-                            },
-                            {
-                                "max_frequency_hz": 8500000000.0,
-                                "min_frequency_hz": 4600000000.0,
-                                "rx_id": "Band_5a",
-                            },
-                            {
-                                "max_frequency_hz": 15400000000.0,
-                                "min_frequency_hz": 8300000000.0,
-                                "rx_id": "Band_5b",
-                            },
-                        ],
+                    {
+                        "max_frequency_hz": 1760000000,
+                        "min_frequency_hz": 950000000,
+                        "rx_id": "Band_2"
                     },
+                    {
+                        "max_frequency_hz": 3050000000,
+                        "min_frequency_hz": 1650000000,
+                        "rx_id": "Band_3"
+                    },
+                    {
+                        "max_frequency_hz": 5180000000,
+                        "min_frequency_hz": 2800000000,
+                        "rx_id": "Band_4"
+                    },
+                    {
+                        "max_frequency_hz": 8500000000,
+                        "min_frequency_hz": 4600000000,
+                        "rx_id": "Band_5a"
+                    },
+                    {
+                        "max_frequency_hz": 15400000000,
+                        "min_frequency_hz": 8300000000,
+                        "rx_id": "Band_5b"
+                    }
+                    ]
+                }
                 }
             },
             "observatory_policy": {
                 "cycle_description": "Science Verification",
                 "cycle_information": {
-                    "cycle_id": "SKAO_2027_1",
-                    "proposal_close": "20260512T15:00:00.000z",
-                    "proposal_open": "20260327T12:00:00.000Z",
+                "cycle_id": "SKAO_2027_1",
+                "proposal_close": "20260512T15:00:00.000z",
+                "proposal_open": "20260327T12:00:00.000Z"
                 },
                 "cycle_number": 1,
-                "cycle_policies": {"normal_max_hours": 100.0},
-                "telescope_capabilities": {"Low": "AA2", "Mid": "AA2"},
-            },
+                "cycle_policies": {
+                "normal_max_hours": 100
+                },
+                "telescope_capabilities": {
+                "Low": "AA2",
+                "Mid": "AA2"
+                }
+            }
         }
 
 

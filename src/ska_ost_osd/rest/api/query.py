@@ -97,15 +97,9 @@ class QueryParamsFactory:
                     query_err_msg_list.append(
                         f"array_assembly {array_assembly} is not valid"
                     )
-        
-            if (
-                cycle_id is not None
-                and array_assembly is not None
-            ):
+
+            if cycle_id is not None and array_assembly is not None:
                 msg = "either cycle_id or array_assembly"
-                query_err_msg_list.append(
-                        f"Only one parameter is needed {msg}"
-                    )
-                
+                query_err_msg_list.append(f"Only one parameter is needed {msg}")
 
         return UserQuery(**kwargs), query_err_msg_list
