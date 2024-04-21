@@ -54,7 +54,7 @@ osd_get_api_rules = {
         "capabilities",
         "array_assembly",
     },
-    "required_fields": {"capabilities"},
+    "required_fields": {},
     "required_combinations": {},
     "forbidden_combinations": {
         "gitlab_branch_and_osd_version": ["gitlab_branch", "osd_version"],
