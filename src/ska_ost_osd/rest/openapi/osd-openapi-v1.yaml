@@ -42,8 +42,7 @@ paths:
     post:
       summary: Checks if the Command Input JSON is semantically valid
       description: |
-        Validate input json Semantically
-        Semantic validation checks the meaning of the input data and ensures that it is valid in the context of the system. It checks whether the input data conforms to the business rules and logic of the system.
+        Validate input json Semantically with the business logic defined in the rul files
       operationId: ska_ost_osd.rest.api.resources.semantically_validate_json
       requestBody:
         required: true
