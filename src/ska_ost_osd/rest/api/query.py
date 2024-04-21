@@ -124,7 +124,7 @@ class JsonValidator:
         """
         Validate required fields.
         """
-        
+
         missing_fields = set(self.validation_rules["required_fields"]) - set(self.input_fields.keys())
         if missing_fields:
             self.errors[
