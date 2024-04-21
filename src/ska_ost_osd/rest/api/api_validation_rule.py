@@ -57,8 +57,7 @@ osd_get_api_rules = {
     "required_fields": {"capabilities"},
     "required_combinations": {},
     "forbidden_combinations": {
-        #"gitlab_branch_and_osd_version": ["gitlab_branch", "osd_version"],
-        #"cycle_id_and_array_assembly": ["cycle_id", "array_assembly"],
+        "gitlab_branch_and_osd_version": ["gitlab_branch", "osd_version"],;
     },
     "field_rules": {
         "cycle_id": [
