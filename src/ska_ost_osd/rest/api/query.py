@@ -82,7 +82,8 @@ class JsonValidator:
 
         :param input_fields (Dict[str, Any]): Input fields to validate.
         :param validation_rules: Validation rules.
-        :param create_instance_func (Type[QueryParams]): Factory function to create an instance of QueryParams.
+        :param create_instance_func (Type[QueryParams]): Factory function to create
+                                                        an instance of QueryParams.
         :param raise_exception (bool): Flag to raise exception on validation error.
         :return: Instance of QueryParams.
         """
@@ -125,7 +126,9 @@ class JsonValidator:
         Validate required fields.
         """
 
-        missing_fields = set(self.validation_rules["required_fields"]) - set(self.input_fields.keys())
+        missing_fields = set(self.validation_rules["required_fields"]) - set(
+            self.input_fields.keys()
+        )
         if missing_fields:
             self.errors[
                 "missing_required_fields"
@@ -193,7 +196,8 @@ class BaseValidationRules(metaclass=RestrictiveMeta):
     """
     Base class for defining validation rules for input data.
 
-    This class serves as a foundation for defining validation rules that can be applied to various types of input data.
+    This class serves as a foundation for defining validation rules that can be
+    applied to various types of input data.
     """
 
     def __init__(
@@ -210,8 +214,10 @@ class BaseValidationRules(metaclass=RestrictiveMeta):
         :param valid_fields (Set[str]): Set of valid fields.
         :param field_rules (Dict[str, Any]): Dictionary containing field rules.
         :param required_fields (Set[str]): Set of required fields.
-        :param required_combinations (Dict[str, Any]): Dictionary containing required field combinations.
-        :param forbidden_combinations (Dict[str, Any]): Dictionary containing forbidden field combinations.
+        :param required_combinations (Dict[str, Any]): Dictionary containing required
+         field combinations.
+        :param forbidden_combinations (Dict[str, Any]): Dictionary containing forbidden
+        field combinations.
 
         """
         self.valid_fields = valid_fields
@@ -230,7 +236,8 @@ class BaseValidationRules(metaclass=RestrictiveMeta):
         Process input fields and create an instance of QueryParams.
 
         :param input_fields (Dict[str, Any]): Input fields to validate.
-        :param create_instance_func (Type[QueryParams]): Factory function to create an instance of QueryParams.
+        :param create_instance_func (Type[QueryParams]): Factory function to create an
+        instance of QueryParams.
         :param raise_exception (bool): Flag to raise exception on validation error.
         :return: Instance of QueryParams.
         """
@@ -255,14 +262,17 @@ class SemanticValidationBodyParamsValidator(BaseValidationRules):
         """
         Initialize SemanticValidationBodyParamsValidator class.
 
-        Initializes validation rules for SemanticValidationBodyParamsValidator using custom rules from api_validation_rules.
+        Initializes validation rules for SemanticValidationBodyParamsValidator using
+         custom rules from api_validation_rules.
 
         Instance Variables:
             valid_fields (Set[str]): Set of valid fields.
             field_rules (Dict[str, Any]): Dictionary containing field rules.
             required_fields (Set[str]): Set of required fields.
-            required_combinations (Dict[str, Any]): Dictionary containing required field combinations.
-            forbidden_combinations (Dict[str, Any]): Dictionary containing forbidden field combinations.
+            required_combinations (Dict[str, Any]): Dictionary containing required
+                                                    field combinations.
+            forbidden_combinations (Dict[str, Any]): Dictionary containing forbidden
+                                                        field combinations.
         """
         self.valid_fields = semantic_validation_rules["valid_fields"]
         self.field_rules = semantic_validation_rules["field_rules"]
@@ -290,14 +300,17 @@ class OSDQueryParamsValidator(BaseValidationRules):
         """
         Initialize OSDQueryParamsValidator class.
 
-        Initializes validation rules for OSDQueryParamsValidator using custom rules from api_validation_rules.
+        Initializes validation rules for OSDQueryParamsValidator using custom rules
+         from api_validation_rules.
 
         Instance Variables:
             valid_fields (Set[str]): Set of valid fields.
             field_rules (Dict[str, Any]): Dictionary containing field rules.
             required_fields (Set[str]): Set of required fields.
-            required_combinations (Dict[str, Any]): Dictionary containing required field combinations.
-            forbidden_combinations (Dict[str, Any]): Dictionary containing forbidden field combinations.
+            required_combinations (Dict[str, Any]): Dictionary containing required
+                                                    field combinations.
+            forbidden_combinations (Dict[str, Any]): Dictionary containing forbidden
+                                                     field combinations.
         """
         # Define validation rules for OSDQueryParamsValidator
         self.valid_fields = osd_get_api_rules["valid_fields"]

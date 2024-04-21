@@ -188,7 +188,9 @@ def semantically_validate_json(body: dict):
         raise ValueError(error_details)
 
     semantic_validate(
-        observing_command_input=validated_semantic_validation_obj.observing_command_input,
+        observing_command_input=(
+            validated_semantic_validation_obj.observing_command_input
+        ),
         tm_data=tm_data,
         raise_semantic=validated_semantic_validation_obj.raise_semantic,
         interface=validated_semantic_validation_obj.interface,

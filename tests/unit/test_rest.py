@@ -111,10 +111,14 @@ def test_init_app_client(client, open_api_spec):
                         "value AAA3 for array_assembly value is not valid"
                     ),
                     "cycle_id": "Cycle id 3 is not valid,Available IDs are 1,2",
+                    "cycle_id_and_array_assembly": (
+                        "Combination cycle_id_and_array_assembly should not be present"
+                        " together."
+                    ),
                     "osd_version": "value 1..1.0 for osd_version is not valid",
                 },
-                "title": "Value Error",
                 "status": -1,
+                "title": "Value Error",
             },
         ),
         (
@@ -182,7 +186,6 @@ def test_osd_endpoint(client, mid_osd_data):
     response = client.get(
         "/ska-ost-osd/osd/api/v1/osd",
         query_string={
-            "cycle_id": 1,
             "source": "file",
             "capabilities": "mid",
             "array_assembly": "AA0.5",
