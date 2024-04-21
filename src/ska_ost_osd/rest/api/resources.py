@@ -3,15 +3,18 @@ Functions which the HTTP requests to individual resources are mapped to.
 
 See the operationId fields of the Open API spec for the specific mappings.
 """
-
-import re
 from functools import wraps
 from http import HTTPStatus
 
 from ska_telmodel.data import TMData
 
 from ska_ost_osd.osd.osd import get_osd_data, osd_tmdata_source
-from ska_ost_osd.rest.api.query import QueryParams, QueryParamsFactory
+from ska_ost_osd.rest.api.query import (
+    OSDQueryParamsValidator,
+    OSDUserQuery,
+    SemanticValidationBodyParams,
+    SemanticValidationBodyParamsValidator,
+)
 from ska_ost_osd.telvalidation import SchematicValidationError, semantic_validate
 from ska_ost_osd.telvalidation.constant import CAR_TELMODEL_SOURCE
 
@@ -39,24 +42,19 @@ def error_handler(api_fn: callable) -> str:
                 )
             return api_response
         except SchematicValidationError as err:
-            return (
-                validation_response(
-                    status=0,
-                    detail=err.args[0].split("\n"),
-                    title="Semantic Validation Error",
-                    http_status=HTTPStatus.OK,
-                ),
-                HTTPStatus.OK,
+            return validation_response(
+                status=0,
+                detail=err.args[0].split("\n"),
+                title="Semantic Validation Error",
+                http_status=HTTPStatus.OK,
             )
+
         except ValueError as err:
-            return (
-                validation_response(
-                    status=-1,
-                    detail=err.args[0],
-                    title="Value Error",
-                    http_status=HTTPStatus.BAD_REQUEST,
-                ),
-                HTTPStatus.BAD_REQUEST,
+            return validation_response(
+                status=-1,
+                detail=err.args[0],
+                title="Value Error",
+                http_status=HTTPStatus.BAD_REQUEST,
             )
 
         except RuntimeError as err:
@@ -79,7 +77,7 @@ def error_handler(api_fn: callable) -> str:
 
 
 @error_handler
-def get_osd_data_response(query_params, tm_data_sources) -> dict:
+def get_osd(**kwargs) -> dict:
     """This function takes query parameters and OSD data source objects
       to generate a response containing matching OSD data.
 
@@ -89,23 +87,32 @@ def get_osd_data_response(query_params, tm_data_sources) -> dict:
     :returns dict: A dictionary with OSD data satisfying the query.
     """
 
-    tm_data, error_msg = osd_tmdata_source(
-        cycle_id=query_params.cycle_id,
-        osd_version=query_params.osd_version,
-        source=query_params.source,
-        gitlab_branch=query_params.gitlab_branch,
+    error_msg = {}
+    query_params, error = OSDQueryParamsValidator().process_input(
+        kwargs, OSDUserQuery, False
     )
+    error_msg.update(error)
 
-    error_msg.extend(tm_data_sources)
+    tm_data_source, error = osd_tmdata_source(
+        cycle_id=kwargs.get("cycle_id"),
+        osd_version=kwargs.get("osd_version"),
+        source=kwargs.get("source"),
+        gitlab_branch=kwargs.get("gitlab_branch"),
+    )
+    for x in error:
+        if "source" in x:
+            error_msg["source"] = x
+        if "Cycle" in x:
+            error_msg["cycle_id"] = x
 
     if error_msg:
-        return ", ".join([str(err) for err in error_msg])
+        raise ValueError(error_msg)
 
-    tm_data_src = TMData(source_uris=tm_data)
+    tm_data = TMData(source_uris=tm_data_source)
 
     osd_data, error_msg_osd = get_osd_data(
         capabilities=[query_params.capabilities],
-        tmdata=tm_data_src,
+        tmdata=tm_data,
         array_assembly=query_params.array_assembly,
     )
 
@@ -113,19 +120,6 @@ def get_osd_data_response(query_params, tm_data_sources) -> dict:
         return ", ".join([str(err) for err in error_msg_osd])
 
     return osd_data
-
-
-@error_handler
-def get_osd(**kwargs) -> dict:
-    """This function retrieves OSD resources based on the parameters passed.
-
-    :param kwargs (dict): Additional keyword arguments to filter results.
-    :returns dict/list: The matching OSD resources.
-    :raises ValueError: If invalid parameters are passed.
-    """
-
-    query_params, error_list = get_qry_params(kwargs)
-    return get_osd_data_response(query_params, error_list)
 
 
 def validation_response(
@@ -144,20 +138,6 @@ def validation_response(
     response_body = {"status": status, "detail": detail, "title": title}
 
     return response_body, http_status
-
-
-def get_qry_params(kwargs: dict) -> QueryParams:
-    """
-    Convert the parameters from the request into QueryParams.
-
-    Currently only a single instance of QueryParams is supported, so
-    subsequent parameters will be ignored.
-
-    :param kwargs: Dict with parameters from HTTP GET request
-    :return: An instance of QueryParams
-    """
-
-    return QueryParamsFactory.from_dict(kwargs)
 
 
 @error_handler
@@ -186,23 +166,16 @@ def semantically_validate_json(body: dict):
     :raises: SemanticValidationError: If the input JSON is not
              semantically valid semantic and raise semantic is true
     """
-    error_details = {}
-    observing_command_input = body.get("observing_command_input")
-    if observing_command_input is None:
-        error_details["observing_command_output"] = "observing_command_input is missing"
-
-    interface: str = body.get("interface")  # check if interface is None
-    if interface:
-        pattern = r"^https://schema\.skao\.int/[a-zA-Z-]+/\d+\.\d+$"
-        if not re.match(pattern, interface):
-            error_details["interface"] = "interface is not valid"
-
-    raise_semantic: bool = body.get("raise_semantic")  # True
-    if raise_semantic and not isinstance(raise_semantic, bool):
-        error_details["raise_semantic"] = "raise_semantic is not a boolean value "
-
+    (
+        validated_semantic_validation_obj,
+        error_details,
+    ) = SemanticValidationBodyParamsValidator().process_input(
+        body, SemanticValidationBodyParams, True
+    )
     sources = (
-        [body.get("sources")] if body.get("sources") else CAR_TELMODEL_SOURCE
+        [validated_semantic_validation_obj.sources]
+        if validated_semantic_validation_obj.sources
+        else CAR_TELMODEL_SOURCE
     )  # check source
     tm_data = {}
 
@@ -211,16 +184,15 @@ def semantically_validate_json(body: dict):
     except RuntimeError as err:
         error_details["sources"] = err.args[0]
 
-    osd_data = body.get("osd_data")
     if error_details:
         raise ValueError(error_details)
 
     semantic_validate(
-        observing_command_input=observing_command_input,
+        observing_command_input=validated_semantic_validation_obj.observing_command_input,
         tm_data=tm_data,
-        raise_semantic=raise_semantic,
-        interface=interface,
-        osd_data=osd_data,
+        raise_semantic=validated_semantic_validation_obj.raise_semantic,
+        interface=validated_semantic_validation_obj.interface,
+        osd_data=validated_semantic_validation_obj.osd_data,
     )
 
     return validation_response(

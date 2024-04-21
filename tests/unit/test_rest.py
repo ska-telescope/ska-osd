@@ -106,11 +106,14 @@ def test_init_app_client(client, open_api_spec):
             "mid",
             "AAA3",
             {
-                "detail": (
-                    "Cycle id 3 is not valid,Available IDs are 1,2, osd_version 1..1.0"
-                    " is not valid, array_assembly AAA3 is not valid"
-                ),
-                "title": "Bad Request",
+                "detail": {
+                    "array_assembly": (
+                        "value AAA3 for array_assembly value is not valid"
+                    ),
+                    "cycle_id": "Cycle id 3 is not valid,Available IDs are 1,2",
+                    "osd_version": "value 1..1.0 for osd_version is not valid",
+                },
+                "title": "Value Error",
                 "status": -1,
             },
         ),

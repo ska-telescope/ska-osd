@@ -1,6 +1,7 @@
 """
   created file to maintain televalidation constant
 """
+
 # flake8: noqa E501
 
 MID_VALIDATION_CONSTANT_JSON_FILE_PATH = (
@@ -22,3 +23,5 @@ SKA_SBD = "sbd"
 CAR_TELMODEL_SOURCE = (
     "gitlab://gitlab.com/ska-telescope/ost/ska-ost-osd?nak-849-exposing-semantic-validation-service#tmdata",
 )
+
+INTERFACE_PATTERN = r"^https://schema\.skao\.int/[a-zA-Z-]+/\d+\.\d+$"

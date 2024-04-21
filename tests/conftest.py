@@ -1183,39 +1183,35 @@ def invalid_semantic_validation_body():
 
 @pytest.fixture
 def invalid_semantic_validation_response():
-    return [
-        {
-            "detail": [
-                "receptor_ids are too many!Current Limit is 4",
-                "beams are too many! Current limit is 1",
-                "Invalid function for beams! Currently allowed visibilities",
-                "spectral windows are too many! Current limit = 1",
-                "Invalid input for channel_count! Currently allowed 14880",
-                "Invalid input for freq_min",
-                "Invalid input for freq_max",
-                "freq_min should be less than freq_max",
-                "length of receptor_ids should be same as length of receptors",
-                "receptor_ids did not match receptors",
-            ],
-            "status": 0,
-            "title": "Semantic Validation Error",
-        },
-        200,
-    ]
+    return {
+        "detail": [
+            "receptor_ids are too many!Current Limit is 4",
+            "beams are too many! Current limit is 1",
+            "Invalid function for beams! Currently allowed visibilities",
+            "spectral windows are too many! Current limit = 1",
+            "Invalid input for channel_count! Currently allowed 14880",
+            "Invalid input for freq_min",
+            "Invalid input for freq_max",
+            "freq_min should be less than freq_max",
+            "length of receptor_ids should be same as length of receptors",
+            "receptor_ids did not match receptors",
+        ],
+        "status": 0,
+        "title": "Semantic Validation Error",
+    }
 
 
 @pytest.fixture
 def observing_command_input_missing_response():
-    return [
-        {
-            "detail": {
-                "observing_command_output": "observing_command_input is missing"
-            },
-            "status": -1,
-            "title": "Value Error",
+    return {
+        "detail": {
+            "missing_required_fields": (
+                "Missing required fields: observing_command_input"
+            )
         },
-        400,
-    ]
+        "status": -1,
+        "title": "Value Error",
+    }
 
 
 @pytest.fixture
@@ -1229,22 +1225,20 @@ def wrong_semantic_validation_parameter_body():
 
 @pytest.fixture
 def wrong_semantic_validation_parameter_value_response():
-    return [
-        {
-            "detail": {
-                "interface": "interface is not valid",
-                "observing_command_output": "observing_command_input is missing",
-                "raise_semantic": "raise_semantic is not a boolean value ",
-                "sources": (
-                    "gitlab://gitlab.com/ska-telescope14.1?~default~#tmdata not found"
-                    " in SKA CAR - make sure to add tmdata CI!"
-                ),
-            },
-            "status": -1,
-            "title": "Value Error",
+    return {
+        "detail": {
+            "interface": (
+                "value https://schemka-tmc-assignresources/2.1 for interface is not"
+                " valid"
+            ),
+            "missing_required_fields": (
+                "Missing required fields: observing_command_input"
+            ),
+            "raise_semantic": "value 123 for raise_semantic is not a boolean value ",
         },
-        400,
-    ]
+        "status": -1,
+        "title": "Value Error",
+    }
 
 
 @pytest.fixture
