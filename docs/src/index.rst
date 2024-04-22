@@ -5,7 +5,8 @@ Welcome to ska-ost-osd's documentation!
    :maxdepth: 1
    :caption: Usage
 
-   api/guide
+   api/osd/guide
+   api/semantic-validation/guide
 
 Indices and tables
 ==================

@@ -8,14 +8,14 @@ info:
   version: 1.0.0
 servers:
 # This default is overwritten when the application is deployed to include the actual namespace if it is different to the 'ska-osd' default
-- url: /ska-ost-osd/osd/api/v1/
+- url: ska-ost-osd/osd/api/v1
 paths:
   /osd:
     get:
       summary: Get OSD data filter by the query parameter
       description: |
-        Retrieves the OSD cycle_id data which match the query parameters. Also requests without parameters will take 
-        example and default values and return data based on that. All query parameters has its own validation 
+        Retrieves the OSD cycle_id data which match the query parameters. Also requests without parameters will take
+        example and default values and return data based on that. All query parameters has its own validation
         if user provide any invalid value it will return the error message.
       operationId: ska_ost_osd.rest.api.resources.get_osd
       parameters:
@@ -38,7 +38,34 @@ paths:
           $ref: '#/components/responses/BadRequest'
         "500":
           $ref: '#/components/responses/InternalServerError'
-
+  /semantic_validation:
+    post:
+      summary: Checks if the Command Input JSON is semantically valid
+      description: |
+        Validate input json Semantically
+        Semantic validation checks the meaning of the input data and ensures that it is valid in the context of the system. It checks whether the input data conforms to the business rules and logic of the system.
+      operationId: ska_ost_osd.rest.api.resources.semantically_validate_json
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './semantic-validation-openapi-v1.yaml#/components/schemas/SemanticValidationRequest'
+      responses:
+        '200':
+          description: Semantic Validation Successfully
+          content:
+            application/json:
+              schema:
+                $ref: './semantic-validation-openapi-v1.yaml#/components/schemas/SemanticValidationSuccessResponse'
+        '400':
+          description: Bad Request due to semantic validation errors.
+          content:
+            application/json:
+              schema:
+                $ref: './semantic-validation-openapi-v1.yaml#/components/schemas/SemanticValidationErrorResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
 components:
   parameters:
@@ -86,7 +113,7 @@ components:
       required: false
       example: AA0.5
 
-    
+
   responses:
     NotFound:
       description: Not Found

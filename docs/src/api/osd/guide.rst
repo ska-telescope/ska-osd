@@ -2,9 +2,9 @@
 OSD Model
 -------------------
 
-In its simplest form OSD consists of a set of science domain configuration files that are required by the OSO tools. 
-These configuration files hold slowly changing information that is used to configure the science domain behavior of each tool. 
-E.g. tools such as the PPT and ODT can use the information for constructing GUIs and validating setups, the Planning Tool can use it to inform itself of the capabilities available. 
+In its simplest form OSD consists of a set of science domain configuration files that are required by the OSO tools.
+These configuration files hold slowly changing information that is used to configure the science domain behavior of each tool.
+E.g. tools such as the PPT and ODT can use the information for constructing GUIs and validating setups, the Planning Tool can use it to inform itself of the capabilities available.
 The idea of OSD is to provide a single source of truth for these data.
 
 
@@ -85,17 +85,17 @@ This framework can be access by below command:
     osd_data = get_osd_data(tmdata=tmdata)
 
 
-* `Location of this framework <https://gitlab.com/ska-telescope/ska-telmodel/-/tree/master/src/ska_telmodel/telvalidation>`_
+* `Location of this framework <https://gitlab.com/ska-telescope/ska-ost-osd/-/tree/master/src/ska_ost_osd/telvalidation>`_
 
-===================    ================================================
+===================    ============================================================
 Parameters             Description
-===================    ================================================
+===================    ============================================================
 cycle_id               Cycle Id a integer value 1, 2, 3
 osd_version            OSD version i.e 1.9.0, 1.12.0 in string format
-source                 From where to get OSD data ``car`` or ``gitlab``
+source                 From where to get OSD data ``car`` or ``gitlab`` or ``file``
 capabilities           Mid or Low
 array_assembly         AA0.5, AA1 or any Array Assembly
-===================    ================================================
+===================    ============================================================
 
 
 .. autofunction:: ska_ost_osd.osd.osd.get_osd_data
@@ -110,10 +110,10 @@ API json response template
 
     {
     "observatory_policy": {
-      "cycle_number": 1, 
+      "cycle_number": 1,
     "telescope_capabilities": []},
     "capabilities": {
-      "mid": {}, 
+      "mid": {},
       "low": {}}
     }
 
@@ -129,10 +129,11 @@ Low                       file content of ``low_capabilities.json`` with ``basic
 ======================    ============================================================================================================
 
 
-OSD as a service
+Endpoints
 ~~~~~~~~~~~~~~~~~
 
-1. API Endpoint
+GET /osd
+==========================
 
 .. list-table:: OSD REST resources
    :widths: 5 15 80
@@ -146,43 +147,43 @@ OSD as a service
      - **Getting Data**
 
        Return the OSD cycle_id data.
- 
 
-2. Query Parameters
+
+1. Query Parameters
 
   * The API supports the following query parameters to filter the OSD data:
 
-    ===================    ================================================
+    ===================    ============================================================
     Parameters             Description
-    ===================    ================================================
+    ===================    ============================================================
     cycle_id               Cycle Id a integer value 1, 2, 3
     osd_version            OSD version i.e 1.9.0, 1.12.0 in string format
-    source                 From where to get OSD data ``car`` or ``gitlab``
-    gitlab_branch          Gitlab Branch Name     
+    source                 From where to get OSD data ``car`` or ``gitlab`` or ``file``
+    gitlab_branch          Gitlab Branch Name
     capabilities           Mid or Low
     array_assembly         AA0.5, AA1 or any Array Assembly
-    ===================    ================================================
+    ===================    ============================================================
 
 
-3. For example:
+2. For example:
 
 .. code:: python
-    
+
     "/ska-ost-osd/osd/api/v1/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
 
 
-4. CURL Example Request
+3. CURL Example Request
 
 .. code:: python
 
     curl -X GET "/ska-ost-osd/osd/api/v1/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
 
 
-5. Example Response
+4. Example Response
 
     * The API returns a JSON object containing the matched OSD data.
 
-        Calling API with parameters ``cycle_id``, ``source``, ``capabilities`` and ``array_assembly`` with 
+        Calling API with parameters ``cycle_id``, ``source``, ``capabilities``
         their valid inputs will return the JSON containing the matched OSD data.
 
     .. code:: python
@@ -193,7 +194,6 @@ OSD as a service
                 "cycle_id": 1,
                 "source": "file",
                 "capabilities": "mid",
-                "array_assembly": "AA0.5",
             },
         )
 
@@ -202,74 +202,106 @@ OSD as a service
     .. code:: python
 
         {
-            "capabilities": {
+             "capabilities": {
                 "mid": {
-                    "AA0.5": {
-                        "available_bandwidth_hz": 800000.0,
-                        "available_receivers": ["Band_1", "Band_2"],
-                        "cbf_modes": ["CORR"],
-                        "max_baseline_km": 1.5,
-                        "number_channels": 14880,
-                        "number_fsps": 4,
-                        "number_meerkat_dishes": 0,
-                        "number_meerkatplus_dishes": 0,
-                        "number_pss_beams": 0,
-                        "number_pst_beams": 0,
-                        "number_ska_dishes": 4,
-                        "number_zoom_channels": 0,
-                        "number_zoom_windows": 0,
-                        "ps_beam_bandwidth_hz": 0.0,
+                "AA2": {
+                    "available_bandwidth_hz": 800000000.0,
+                    "available_receivers": [
+                    "Band_1",
+                    "Band_2",
+                    "Band_5a",
+                    "Band_5b"
+                    ],
+                    "cbf_modes": [
+                    "CORR",
+                    "PST_BF",
+                    "PSS_BF"
+                    ],
+                    "max_baseline_km": 110.0,
+                    "number_channels": 14880,
+                    "number_fsps": 4,
+                    "number_meerkat_dishes": 4,
+                    "number_meerkatplus_dishes": 0,
+                    "number_pss_beams": 384,
+                    "number_pst_beams": 6,
+                    "number_ska_dishes": 64,
+                    "number_zoom_channels": 14880,
+                    "number_zoom_windows": 16,
+                    "ps_beam_bandwidth_hz": 800000000.0
+                },
+                "basic_capabilities": {
+                    "dish_elevation_limit_deg": 15,
+                    "receiver_information": [
+                    {
+                        "max_frequency_hz": 1050000000,
+                        "min_frequency_hz": 350000000,
+                        "rx_id": "Band_1"
                     },
-                    "basic_capabilities": {
-                        "dish_elevation_limit_deg": 15.0,
-                        "receiver_information": [
-                            {
-                                "max_frequency_hz": 1050000000.0,
-                                "min_frequency_hz": 350000000.0,
-                                "rx_id": "Band_1",
-                            },
-                            {
-                                "max_frequency_hz": 1760000000.0,
-                                "min_frequency_hz": 950000000.0,
-                                "rx_id": "Band_2",
-                            },
-                            {
-                                "max_frequency_hz": 3050000000.0,
-                                "min_frequency_hz": 1650000000.0,
-                                "rx_id": "Band_3",
-                            },
-                            {
-                                "max_frequency_hz": 5180000000.0,
-                                "min_frequency_hz": 2800000000.0,
-                                "rx_id": "Band_4",
-                            },
-                            {
-                                "max_frequency_hz": 8500000000.0,
-                                "min_frequency_hz": 4600000000.0,
-                                "rx_id": "Band_5a",
-                            },
-                            {
-                                "max_frequency_hz": 15400000000.0,
-                                "min_frequency_hz": 8300000000.0,
-                                "rx_id": "Band_5b",
-                            },
-                        ],
+                    {
+                        "max_frequency_hz": 1760000000,
+                        "min_frequency_hz": 950000000,
+                        "rx_id": "Band_2"
                     },
+                    {
+                        "max_frequency_hz": 3050000000,
+                        "min_frequency_hz": 1650000000,
+                        "rx_id": "Band_3"
+                    },
+                    {
+                        "max_frequency_hz": 5180000000,
+                        "min_frequency_hz": 2800000000,
+                        "rx_id": "Band_4"
+                    },
+                    {
+                        "max_frequency_hz": 8500000000,
+                        "min_frequency_hz": 4600000000,
+                        "rx_id": "Band_5a"
+                    },
+                    {
+                        "max_frequency_hz": 15400000000,
+                        "min_frequency_hz": 8300000000,
+                        "rx_id": "Band_5b"
+                    }
+                    ]
+                }
                 }
             },
             "observatory_policy": {
                 "cycle_description": "Science Verification",
                 "cycle_information": {
-                    "cycle_id": "SKAO_2027_1",
-                    "proposal_close": "20260512T15:00:00.000z",
-                    "proposal_open": "20260327T12:00:00.000Z",
+                "cycle_id": "SKAO_2027_1",
+                "proposal_close": "20260512T15:00:00.000z",
+                "proposal_open": "20260327T12:00:00.000Z"
                 },
                 "cycle_number": 1,
-                "cycle_policies": {"normal_max_hours": 100.0},
-                "telescope_capabilities": {"Low": "AA2", "Mid": "AA2"},
-            },
+                "cycle_policies": {
+                "normal_max_hours": 100
+                },
+                "telescope_capabilities": {
+                "Low": "AA2",
+                "Mid": "AA2"
+                }
+            }
         }
 
+
+5. Scenarios
+
+    1. If no parameters are provided to the API then latest version with 
+       cycle id is fetched from ``cycle_gitlab_release_version_mapping.json`` file.
+
+    2. Calling API with only one parameter cycle_id and no other parameter. First it will check if the 
+       cycle id is valid or not, and will fetch latest version stored in the 
+       ``cycle_gitlab_release_version_mapping.json`` file.
+    
+    3. If source is not provided in the API call, the default is set to file. API will 
+       fetch data from file. other option is car and gitlab. 
+       If ``source`` is 'gitlab' and ``gitlab_branch`` is 'main' then it will fetch data from main branch.
+       If ``source`` is 'car' then API will fetch data from Car Gitlab repo.
+    
+    4. If ``osd_verison`` and ``gitlab_branch`` are given together then API will return appropriate error message.
+
+    5. If ``cycle_id`` and ``array_assembly`` are provided together then API will return appropriate error message.
 
 
 Error Handling
@@ -300,8 +332,8 @@ Error Handling
 .. note::
 
     All the error_messages are combined in a single string.
-    
-    
+
+
 Release Steps
 ~~~~~~~~~~~~~~
 
@@ -314,25 +346,25 @@ Release Steps
 2. Check the Current Version
 
 .. code:: bash
-    
+
     make show-version
 
 3. Bump the Version
 
 .. code:: bash
-    
+
     make bump-patch-release
 
 4. Run below command for OSD release
 
-Created a target called ``osd-pre-release`` in Makefile which will run when ska_telmodel is released.
+Created a target called ``osd-pre-release`` in Makefile which will run when ska_ost_osd is released.
 also added a ``release.sh`` file inside ``osd`` ``resources`` folder which has two functions ``GetCycleId`` and ``UpdateAndAddValue``
 
-``GetCycleId`` function gets ``cycle_number`` from ``observatory_policies.json`` file and triggers next function ``UpdateAndAddValue`` 
-which updates or add cycle_id values in version mapping json file. 
+``GetCycleId`` function gets ``cycle_number`` from ``observatory_policies.json`` file and triggers next function ``UpdateAndAddValue``
+which updates or add cycle_id values in version mapping json file.
 
 .. code:: bash
-    
+
     make osd-pre-release
 
 5. Set the Release

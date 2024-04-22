@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -73,9 +74,10 @@ def test_init_app_client(client, open_api_spec):
        expected spec.
     """
 
-    with patch("ska_ost_osd.rest.get_openapi_spec", return_value=open_api_spec), patch(
-        "ska_ost_osd.rest.App"
-    ) as mock_connexion_app:
+    with (
+        patch("ska_ost_osd.rest.get_openapi_spec", return_value=open_api_spec),
+        patch("ska_ost_osd.rest.App") as mock_connexion_app,
+    ):
         mock_connexion_instance = mock_connexion_app.return_value
         mock_flask_app = mock_connexion_instance.app
         mock_flask_app.test_client = MagicMock(return_value=client)
@@ -104,11 +106,19 @@ def test_init_app_client(client, open_api_spec):
             "mid",
             "AAA3",
             {
-                "detail": (
-                    "Cycle id 3 is not valid,Available IDs are 1,2, osd_version 1..1.0"
-                    " is not valid, array_assembly AAA3 is not valid"
-                ),
-                "title": "Bad Request",
+                "detail": {
+                    "array_assembly": (
+                        "value AAA3 for array_assembly value is not valid"
+                    ),
+                    "cycle_id": "Cycle id 3 is not valid,Available IDs are 1,2",
+                    "cycle_id_and_array_assembly": (
+                        "Combination cycle_id_and_array_assembly should not be present"
+                        " together."
+                    ),
+                    "osd_version": "value 1..1.0 for osd_version is not valid",
+                },
+                "status": -1,
+                "title": "Value Error",
             },
         ),
         (
@@ -122,6 +132,7 @@ def test_init_app_client(client, open_api_spec):
                     "Array Assembly AA3 doesn't exists. Available are AA0.5, AA1, AA2"
                 ),
                 "title": "Bad Request",
+                "status": -1,
             },
         ),
     ],
@@ -175,7 +186,6 @@ def test_osd_endpoint(client, mid_osd_data):
     response = client.get(
         "/ska-ost-osd/osd/api/v1/osd",
         query_string={
-            "cycle_id": 1,
             "source": "file",
             "capabilities": "mid",
             "array_assembly": "AA0.5",
@@ -211,27 +221,22 @@ def test_invalid_osd_tmdata_source_capabilities(client):
     assert error_msgs.json["detail"].startswith(expected_error_msg)
 
 
-def test_response_body(client):
+def test_response_body():
     """This function tests that the response from the REST API contains
        the expected body contents when retrieving OSD metadata.
 
     :raises AssertionError: If the response body is invalid.
     """
 
-    response = client.get(
-        "/ska-ost-osd/osd/api/v1/osd",
-        query_string={
-            "cycle_id": 3,
-            "source": "file",
-            "capabilities": "mid",
-            "array_assembly": "AA0.5",
-        },
+    error_msg = "Validation failed"
+    response = validation_response(
+        detail=error_msg,
+        status=0,
+        title="Validation Error",
+        http_status=HTTPStatus.OK,
     )
-
-    error_msg = response.json
-    expected_response = validation_response(error_msg)
-
-    assert expected_response[0] == {"Error": error_msg}
+    expected = {"detail": "Validation failed", "title": "Validation Error", "status": 0}
+    assert response[0] == expected
 
 
 def test_osd_source(client):
@@ -264,6 +269,109 @@ def test_osd_source_gitlab(client):
         "/ska-ost-osd/osd/api/v1/osd", query_string={"cycle_id": 1, "source": "gitlab"}
     )
 
-    error_msg = [{"Error": "404: 404 Commit Not Found"}, 422]
+    error_msg = [
+        {
+            "detail": "404: 404 Commit Not Found",
+            "status": 0,
+            "title": "Internal Server Error",
+        },
+        500,
+    ]
 
     response.json == error_msg  # pylint: disable=W0104
+
+
+@pytest.mark.parametrize(
+    "json_body_to_validate, response",
+    [
+        ("valid_semantic_validation_body", "valid_semantic_validation_response"),
+        ("invalid_semantic_validation_body", "invalid_semantic_validation_response"),
+    ],
+)
+def test_semantic_validate_api(client, request, json_body_to_validate, response):
+    """
+    Test semantic validation API with valid and invalid JSON
+    """
+    json_body = request.getfixturevalue(json_body_to_validate)
+    expected_response = request.getfixturevalue(response)
+    res = client.post("/ska-ost-osd/osd/api/v1/semantic_validation", json=json_body)
+    assert res.get_json() == expected_response
+
+
+def test_semantic_validate_api_not_passing_required_keys(
+    client, observing_command_input_missing_response, valid_semantic_validation_body
+):
+    """
+    Test semantic validation API response with missing input observing_command_input key
+    """
+    json_body = valid_semantic_validation_body.copy()
+    del json_body["observing_command_input"]
+    expected_response = observing_command_input_missing_response
+    res = client.post("/ska-ost-osd/osd/api/v1/semantic_validation", json=json_body)
+    assert res.get_json() == expected_response
+
+
+@pytest.mark.parametrize(
+    "json_body_to_validate, response, key_to_delete",
+    [
+        (
+            "valid_semantic_validation_body",
+            "valid_semantic_validation_response",
+            "sources",
+        ),
+        (
+            "valid_semantic_validation_body",
+            "valid_semantic_validation_response",
+            "interface",
+        ),
+        (
+            "valid_semantic_validation_body",
+            "valid_semantic_validation_response",
+            "raise_semantic",
+        ),
+        (
+            "valid_semantic_validation_body",
+            "valid_semantic_validation_response",
+            "osd_data",
+        ),
+    ],
+)
+def test_not_passing_optional_keys(
+    request, client, json_body_to_validate, response, key_to_delete
+):
+    """
+    Test semantic validation API response by not passing optional keys
+    """
+    json_body = request.getfixturevalue(json_body_to_validate).copy()
+    del json_body[key_to_delete]
+    expected_response = request.getfixturevalue(response)
+    res = client.post("/ska-ost-osd/osd/api/v1/semantic_validation", json=json_body)
+    assert res.get_json() == expected_response
+
+
+def test_wrong_values_and_no_observing_command_input(
+    wrong_semantic_validation_parameter_value_response,
+    wrong_semantic_validation_parameter_body,
+    client,
+):
+    """
+    Test semantic validation API response with wrong values
+    """
+    json_body = wrong_semantic_validation_parameter_body
+    expected_response = wrong_semantic_validation_parameter_value_response
+    res = client.post("/ska-ost-osd/osd/api/v1/semantic_validation", json=json_body)
+    assert res.get_json() == expected_response
+
+
+def test_passing_only_required_keys(
+    client,
+    valid_only_observing_command_input_in_request_body,
+    valid_semantic_validation_response,
+):
+    """
+    Test semantic validation API response with only required keys
+    """
+    json_body = valid_only_observing_command_input_in_request_body
+    expected_response = valid_semantic_validation_response
+    res = client.post("/ska-ost-osd/osd/api/v1/semantic_validation", json=json_body)
+    assert res.get_json() == expected_response
