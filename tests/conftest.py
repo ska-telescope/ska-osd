@@ -736,7 +736,7 @@ def mid_osd_data():
         "capabilities": {
             "mid": {
                 "AA0.5": {
-                    "available_bandwidth_hz": 800000.0,
+                    "available_bandwidth_hz": 800000000.0,
                     "available_receivers": ["Band_1", "Band_2"],
                     "cbf_modes": ["CORR"],
                     "max_baseline_km": 1.5,

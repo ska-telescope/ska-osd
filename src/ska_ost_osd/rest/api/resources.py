@@ -177,25 +177,23 @@ def semantically_validate_json(body: dict):
         if validated_semantic_validation_obj.sources
         else CAR_TELMODEL_SOURCE
     )  # check source
-    tm_data = {}
 
     try:
         tm_data = TMData(sources, update=True)
+        semantic_validate(
+            observing_command_input=(
+                validated_semantic_validation_obj.observing_command_input
+            ),
+            tm_data=tm_data,
+            raise_semantic=validated_semantic_validation_obj.raise_semantic,
+            interface=validated_semantic_validation_obj.interface,
+            osd_data=validated_semantic_validation_obj.osd_data,
+        )
     except RuntimeError as err:
         error_details["sources"] = err.args[0]
 
     if error_details:
         raise ValueError(error_details)
-
-    semantic_validate(
-        observing_command_input=(
-            validated_semantic_validation_obj.observing_command_input
-        ),
-        tm_data=tm_data,
-        raise_semantic=validated_semantic_validation_obj.raise_semantic,
-        interface=validated_semantic_validation_obj.interface,
-        osd_data=validated_semantic_validation_obj.osd_data,
-    )
 
     return validation_response(
         **{
