@@ -21,7 +21,7 @@ SKA_MID_TELESCOPE = "mid"
 SKA_SBD = "sbd"
 
 CAR_TELMODEL_SOURCE = (
-    "gitlab://gitlab.com/ska-telescope/ost/ska-ost-osd?nak-849-exposing-semantic-validation-service#tmdata",
+    "car:ost/ska-ost-osd?main",
 )
 
 INTERFACE_PATTERN = r"^https://schema\.skao\.int/[a-zA-Z-]+/\d+\.\d+$"
