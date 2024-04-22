@@ -11,7 +11,7 @@ def tmdata_source():
     """
     TMData source URL fixture
     """
-    return "gitlab://gitlab.com/ska-telescope/ost/ska-ost-osd?nak-849-exposing-semantic-validation-service#tmdata"
+    return "file://tmdata"
 
 
 @pytest.fixture
