@@ -318,7 +318,6 @@ class OSDQueryParamsValidator(BaseValidationRules):
         self.required_fields = osd_get_api_rules["required_fields"]
         self.required_combinations = osd_get_api_rules["required_combinations"]
         self.forbidden_combinations = osd_get_api_rules["forbidden_combinations"]
-        self.a = 1
         # Initialize BaseValidationRules with these validation rules
         super().__init__(
             self.valid_fields,
