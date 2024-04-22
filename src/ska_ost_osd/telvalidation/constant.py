@@ -20,8 +20,6 @@ SKA_LOW_TELESCOPE = "low"
 SKA_MID_TELESCOPE = "mid"
 SKA_SBD = "sbd"
 
-CAR_TELMODEL_SOURCE = (
-    "car:ost/ska-ost-osd?main",
-)
+CAR_TELMODEL_SOURCE = ("car:ost/ska-ost-osd?main",)
 
 INTERFACE_PATTERN = r"^https://schema\.skao\.int/[a-zA-Z-]+/\d+\.\d+$"
