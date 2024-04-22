@@ -183,7 +183,7 @@ GET /osd
 
     * The API returns a JSON object containing the matched OSD data.
 
-        Calling API with parameters ``cycle_id``, ``source``, ``capabilities`` and ``array_assembly`` with
+        Calling API with parameters ``cycle_id``, ``source``, ``capabilities``
         their valid inputs will return the JSON containing the matched OSD data.
 
     .. code:: python
@@ -205,7 +205,7 @@ GET /osd
              "capabilities": {
                 "mid": {
                 "AA2": {
-                    "available_bandwidth_hz": 800000,
+                    "available_bandwidth_hz": 800000000.0,
                     "available_receivers": [
                     "Band_1",
                     "Band_2",
@@ -217,7 +217,7 @@ GET /osd
                     "PST_BF",
                     "PSS_BF"
                     ],
-                    "max_baseline_km": 110,
+                    "max_baseline_km": 110.0,
                     "number_channels": 14880,
                     "number_fsps": 4,
                     "number_meerkat_dishes": 4,
@@ -227,7 +227,7 @@ GET /osd
                     "number_ska_dishes": 64,
                     "number_zoom_channels": 14880,
                     "number_zoom_windows": 16,
-                    "ps_beam_bandwidth_hz": 800000
+                    "ps_beam_bandwidth_hz": 800000000.0
                 },
                 "basic_capabilities": {
                     "dish_elevation_limit_deg": 15,
