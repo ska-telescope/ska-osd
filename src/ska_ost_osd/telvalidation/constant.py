@@ -1,7 +1,7 @@
 """
   created file to maintain televalidation constant
 """
-from importlib.metadata import version
+
 
 # flake8: noqa E501
 
