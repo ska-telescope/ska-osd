@@ -1,6 +1,7 @@
 """
   created file to maintain televalidation constant
 """
+from importlib.metadata import version
 
 # flake8: noqa E501
 
@@ -20,6 +21,6 @@ SKA_LOW_TELESCOPE = "low"
 SKA_MID_TELESCOPE = "mid"
 SKA_SBD = "sbd"
 
-CAR_TELMODEL_SOURCE = ("car:ost/ska-ost-osd?main",)
+CAR_TELMODEL_SOURCE = ("car:ost/ska-ost-osd?main#tmdata",)
 
 INTERFACE_PATTERN = r"^https://schema\.skao\.int/[a-zA-Z-]+/\d+\.\d+$"
