@@ -1,6 +1,7 @@
 import pytest
 
 from ska_ost_osd.rest import init_app
+from ska_ost_osd.telvalidation.constant import CAR_TELMODEL_SOURCE
 
 # flake8: noqa E501
 # pylint: disable=W0621
@@ -11,7 +12,7 @@ def tmdata_source():
     """
     TMData source URL fixture
     """
-    return "gitlab://gitlab.com/ska-telescope/ost/ska-ost-osd?nak-849-exposing-semantic-validation-service#tmdata"
+    return CAR_TELMODEL_SOURCE[0]
 
 
 @pytest.fixture

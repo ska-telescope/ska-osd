@@ -369,7 +369,7 @@ def test_passing_only_required_keys(
     valid_semantic_validation_response,
 ):
     """
-    Test semantic validation API response with only required keys
+    Test semantic validation API response with only required keys.
     """
     json_body = valid_only_observing_command_input_in_request_body
     expected_response = valid_semantic_validation_response

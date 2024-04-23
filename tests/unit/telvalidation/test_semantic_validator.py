@@ -8,6 +8,7 @@ import pytest
 from ska_telmodel.data import TMData
 from ska_telmodel.schema import example_by_uri
 
+from ska_ost_osd.telvalidation.constant import CAR_TELMODEL_SOURCE
 from ska_ost_osd.telvalidation.oet_tmc_validators import (
     validate_json,
     validate_target_is_visible,
@@ -24,7 +25,7 @@ from ska_ost_osd.telvalidation.semantic_validator import (
 )
 
 sources = [
-    "file://tmdata",
+    CAR_TELMODEL_SOURCE[0],
     "car:ska-telmodel-data?main",
 ]
 
