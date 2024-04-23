@@ -1,5 +1,12 @@
-# Version History
+############
+Change Log
+############
 
-## unreleased
+All notable changes to this project will be documented in this file.
+This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
-* Bootstrap repo with ska-cookiecutter-pypackage
+1.0.0
+******
+
+* Decoupled and added of Semantic Validation and OSD functionalities from ska-telmodel
+* The functionalities have been exposed as a service
