@@ -9,7 +9,7 @@ def client():
         to the application in tests. It handles setting up and tearing down the
         application context.
 
-    :returns FlaskClient: The Flask test client
+    :returns FlaskClient: The Flask test client fixed
     """
 
     app = init_app()
