@@ -3,7 +3,6 @@ import pytest
 from ska_ost_osd.rest import init_app
 from ska_ost_osd.telvalidation.constant import CAR_TELMODEL_SOURCE
 
-
 # flake8: noqa E501
 # pylint: disable=W0621
 
