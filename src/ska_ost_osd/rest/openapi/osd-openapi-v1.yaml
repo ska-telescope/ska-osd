@@ -1,14 +1,14 @@
 openapi: 3.0.0
 info:
   title: Observatory Static Data API
-  description: 'This OpenAPI document defines the API for the Observatory Static Data (OSD) REST service'
+  description: "This OpenAPI document defines the API for the Observatory Static Data (OSD) REST service"
   license:
     name: BSD-3-Clause
     url: https://opensource.org/licenses/BSD-3-Clause
-  version: 1.0.0
+  version: 1.0.2
 servers:
-# This default is overwritten when the application is deployed to include the actual namespace if it is different to the 'ska-osd' default
-- url: ska-ost-osd/osd/api/v1
+  # This default is overwritten when the application is deployed to include the actual namespace if it is different to the 'ska-osd' default
+  - url: ska-ost-osd/osd/api/v1
 paths:
   /osd:
     get:
@@ -19,12 +19,12 @@ paths:
         if user provide any invalid value it will return the error message.
       operationId: ska_ost_osd.rest.api.resources.get_osd
       parameters:
-        - $ref: '#/components/parameters/cycle_id'
-        - $ref: '#/components/parameters/osd_version'
-        - $ref: '#/components/parameters/source'
-        - $ref: '#/components/parameters/gitlab_branch'
-        - $ref: '#/components/parameters/capabilities'
-        - $ref: '#/components/parameters/array_assembly'
+        - $ref: "#/components/parameters/cycle_id"
+        - $ref: "#/components/parameters/osd_version"
+        - $ref: "#/components/parameters/source"
+        - $ref: "#/components/parameters/gitlab_branch"
+        - $ref: "#/components/parameters/capabilities"
+        - $ref: "#/components/parameters/array_assembly"
       responses:
         "200":
           description: OK
@@ -35,9 +35,9 @@ paths:
                 items:
                   type: object
         "400":
-          $ref: '#/components/responses/BadRequest'
+          $ref: "#/components/responses/BadRequest"
         "500":
-          $ref: '#/components/responses/InternalServerError'
+          $ref: "#/components/responses/InternalServerError"
   /semantic_validation:
     post:
       summary: Checks if the Command Input JSON is semantically valid
@@ -50,22 +50,22 @@ paths:
         content:
           application/json:
             schema:
-              $ref: './semantic-validation-openapi-v1.yaml#/components/schemas/SemanticValidationRequest'
+              $ref: "./semantic-validation-openapi-v1.yaml#/components/schemas/SemanticValidationRequest"
       responses:
-        '200':
+        "200":
           description: Semantic Validation Successfully
           content:
             application/json:
               schema:
-                $ref: './semantic-validation-openapi-v1.yaml#/components/schemas/SemanticValidationSuccessResponse'
-        '400':
+                $ref: "./semantic-validation-openapi-v1.yaml#/components/schemas/SemanticValidationSuccessResponse"
+        "400":
           description: Bad Request due to semantic validation errors.
           content:
             application/json:
               schema:
-                $ref: './semantic-validation-openapi-v1.yaml#/components/schemas/SemanticValidationErrorResponse'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "./semantic-validation-openapi-v1.yaml#/components/schemas/SemanticValidationErrorResponse"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
 components:
   parameters:
@@ -102,7 +102,7 @@ components:
       name: capabilities
       schema:
         type: string
-        enum: [ mid, low]
+        enum: [mid, low]
         default: mid
       required: false
     array_assembly:
@@ -113,26 +113,25 @@ components:
       required: false
       example: AA0.5
 
-
   responses:
     NotFound:
       description: Not Found
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
     BadRequest:
       description: Bad Request, eg validation of against OpenAPI spec failed
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/BadRequestResponse'
+            $ref: "#/components/schemas/BadRequestResponse"
     InternalServerError:
       description: Internal Server Error
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
   schemas:
     BadRequestResponse:
       type: object
