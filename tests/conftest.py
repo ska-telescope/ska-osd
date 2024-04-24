@@ -50,7 +50,7 @@ def open_api_spec():
                 "name": "BSD-3-Clause",
                 "url": "https://opensource.org/licenses/BSD-3-Clause",
             },
-            "version": "1.0.0",
+            "version": "1.0.2",
         },
         "servers": [{"url": "ska-ost-osd/osd/api/v1"}],
         "paths": {
