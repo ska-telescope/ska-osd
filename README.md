@@ -27,7 +27,7 @@ poetry install
 poetry shell
 ```
 
-To build a new Docker image for the OET, run
+To build a new Docker image for the OSD, run
 
 ```
 make oci-build

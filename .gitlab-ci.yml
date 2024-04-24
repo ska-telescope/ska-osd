@@ -102,6 +102,7 @@ include:
     file: "gitlab-ci/includes/changelog.gitlab-ci.yml"
   # release notes
   - project: "ska-telescope/templates-repository"
+    file: "gitlab-ci/includes/release.gitlab-ci.yml"
   # deploy steps
   - project: "ska-telescope/templates-repository"
     file: "gitlab-ci/includes/deploy.gitlab-ci.yml"
