@@ -1,4 +1,3 @@
-
 OSD Model
 -------------------
 
@@ -374,4 +373,3 @@ which updates or add cycle_id values in version mapping json file.
 .. warning::
 
     This is a very crucial part for OSD, without this some functionality may break and exceptions and errors will be raised.
-

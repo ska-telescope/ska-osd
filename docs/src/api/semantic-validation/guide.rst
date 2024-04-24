@@ -1,4 +1,3 @@
-
 Semantic Validation
 -------------------
 
@@ -649,3 +648,4 @@ Semantic Validation Error Response
                 ,
             }
         }
+
