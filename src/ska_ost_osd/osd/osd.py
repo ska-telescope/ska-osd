@@ -204,22 +204,25 @@ class OSD:
             osd_err_msg_list.append(chk_capabilities)
         else: #ml_debug here is the logic which generates observation policy and capabilities and array assembly
             telescope_capabilities_dict = {}
-            osd_data = {"capabilities":{}}
+            #not needed osd_data = {"capabilities":{}}
 
             # if not self.array_assembly: #if not capabilities then only observation policy should be returned
             #     (osd_data, telescope_capabilities_dict,) = self.get_telescope_observatory_policies(self.capabilities, self.array_assembly)
                     # output telescope_capabilities_dict = {"MID": "AA2"}
 
-            if not self.array_assembly: #if not capabilities then only observation policy should be returned
-                if self.cycle_id: #it will set the array assembly AA2 in telescope_capabilities_dict
-                    (osd_data, telescope_capabilities_dict,) = self.get_telescope_observatory_policies(self.capabilities, self.array_assembly)
+            #if not self.array_assembly: #if not capabilities then only observation policy should be returned
+                # if self.cycle_id: #it will set the array assembly AA2 in telescope_capabilities_dict
+                #     (osd_data, telescope_capabilities_dict,) = self.get_telescope_observatory_policies(self.capabilities, self.array_assembly)
+            (osd_data, telescope_capabilities_dict,) = self.get_telescope_observatory_policies(self.capabilities, self.array_assembly)
 
+            if not self.cycle_id:
+                del osd_data["observatory_policy"]
+                # else: #if cycle id present then need to set all 3 capabilities in telescope_capabilities_dict
+                #    #(osd_data, telescope_capabilities_dict,) = self.get_telescope_observatory_policies(self.capabilities, self.array_assembly)
+                #    telescope_capabilities_dict = {"MID": ["AA2","AA0.5"]}
+            # else:
+            #     telescope_capabilities_dict[self.capabilities[0]] = self.array_assembly
 
-                else: #if cycle id present then need to set all 3 capabilities in telescope_capabilities_dict
-                   #(osd_data, telescope_capabilities_dict,) = self.get_telescope_observatory_policies(self.capabilities, self.array_assembly)
-                   telescope_capabilities_dict = {"MID": ["AA2","AA0.5"]}
-            else:
-                telescope_capabilities_dict[self.capabilities[0]] = self.array_assembly
             (capabilities_and_array_assembly, err_msg,) = self.get_capabilities_and_array_assembly(self.tmdata, telescope_capabilities_dict, osd_data)
             if err_msg:
                 osd_err_msg_list.extend(err_msg)
@@ -287,7 +290,7 @@ def check_cycle_id(
 
     elif cycle_id is not None and cycle_id_exists and osd_version is not None:
         if osd_version not in versions_dict[f"cycle_{cycle_id}"]:
-            cycle_error_msg_list.append(f"Invalid Version for {cycle_id} Available are {versions_dict[f'cycle_{cycle_id}']}")
+            cycle_error_msg_list.append(f"Invalid OSD Version {osd_version} Valid OSD Versions are {versions_dict[f'cycle_{cycle_id}']}")
 
 
     return osd_version, cycle_error_msg_list

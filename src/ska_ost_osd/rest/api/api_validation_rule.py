@@ -60,9 +60,7 @@ osd_get_api_rules = {
         "gitlab_branch_and_osd_version": ["gitlab_branch", "osd_version"],
         "cycle_id_and_array_assembly": ["cycle_id", "array_assembly"],
     },
-    "either_required_fields": {
-        "capability_or_cycle_id":["capabilities","cycle_id"]
-    },
+
     "field_rules": {
         "cycle_id": [
             FieldRule(

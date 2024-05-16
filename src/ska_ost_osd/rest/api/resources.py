@@ -94,13 +94,17 @@ def get_osd(**kwargs) -> dict:
 
     osd_version, cycle_error_msg_list = check_cycle_id(query_params.cycle_id, query_params.osd_version, query_params.gitlab_branch)
     if cycle_error_msg_list:
-        raise ValueError(cycle_error_msg_list)
+        for x in cycle_error_msg_list:
+            if "Cycle" in x:
+                error_msg["cycle_id"] = x
+
+        #error_msg["cycle_id"] = cycle_error_msg_list
     tm_data_source, error = osd_tmdata_source(cycle_id=kwargs.get("cycle_id"), osd_version=kwargs.get("osd_version"), source=kwargs.get("source"), gitlab_branch=kwargs.get("gitlab_branch"),)
     for x in error:
         if "source" in x:
             error_msg["source"] = x
-        if "Cycle" in x:
-            error_msg["cycle_id"] = x
+        # if "Cycle" in x:
+        #     error_msg["cycle_id"] = x
 
     if error_msg:
         raise ValueError(error_msg)
@@ -159,17 +163,8 @@ def semantically_validate_json(body: dict):
     :raises: SemanticValidationError: If the input JSON is not
              semantically valid semantic and raise semantic is true
     """
-    (
-        validated_semantic_validation_obj,
-        error_details,
-    ) = SemanticValidationBodyParamsValidator().process_input(
-        body, SemanticValidationBodyParams, True
-    )
-    sources = (
-        [validated_semantic_validation_obj.sources]
-        if validated_semantic_validation_obj.sources
-        else CAR_TELMODEL_SOURCE
-    )  # check source
+    (validated_semantic_validation_obj, error_details,) = SemanticValidationBodyParamsValidator().process_input(body, SemanticValidationBodyParams, True)
+    sources = ([validated_semantic_validation_obj.sources] if validated_semantic_validation_obj.sources else CAR_TELMODEL_SOURCE)  # check source
 
     try:
         tm_data = TMData(sources, update=True)

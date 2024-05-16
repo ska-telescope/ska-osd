@@ -161,9 +161,9 @@ def test_validate_gitlab_with_both_invalid_param():
     returned or not
     """
 
-    telmodel_version = version("ska_telmodel")
+    ost_osd_version = version("ska_ost_osd")
 
-    msg = f"car:ost/ska-ost-osd?{telmodel_version}#tmdata"
+    msg = f"car:ost/ska-ost-osd?{ost_osd_version}#tmdata"
     tm_data_src, _ = osd_tmdata_source()
 
     assert tm_data_src == (msg,)
@@ -251,7 +251,7 @@ def test_invalid_source():
 
     expected_error_msg = ", ".join([str(err) for err in error_msgs])
 
-    assert expected_error_msg == "source is not valid."
+    assert expected_error_msg == "source is not valid., Invalid OSD Version main Valid OSD Versions are ['1.0.2']"
 
 
 def test_invalid_get_osd_data_capability(tm_data):  # pylint: disable=W0621

@@ -169,15 +169,6 @@ class JsonValidator:
             if all(k in self.input_fields for k in keys):
                 self.errors[comb_name] = f"Combination {comb_name} should not be present together."
 
-        #either required
-        # "either_required_combination": {
-        #     "capability_or_cycle_id": ["capabilities", "cycle_id"]
-        # },
-        for comb_name, keys in self.validation_rules["either_required_fields"].items():
-            print("****************",comb_name,keys,self.input_fields)
-            if not any(k in self.input_fields for k in keys):
-                self.errors[comb_name] = f"One of these keys  {comb_name} should be present."
-
 
 
 
@@ -215,7 +206,6 @@ class BaseValidationRules(metaclass=RestrictiveMeta):
         required_fields: Set[str],
         required_combinations: Dict[str, Any],
         forbidden_combinations: Dict[str, Any],
-        either_required_fields: Dict[str, Any]
     ):
         """
         Initialize BaseValidationRules class.
@@ -234,7 +224,6 @@ class BaseValidationRules(metaclass=RestrictiveMeta):
         self.required_fields = required_fields
         self.required_combinations = required_combinations
         self.forbidden_combinations = forbidden_combinations
-        self.either_required_fields = either_required_fields
 
     def process_input(
         self,
@@ -257,7 +246,6 @@ class BaseValidationRules(metaclass=RestrictiveMeta):
             "required_fields": self.required_fields,
             "required_combinations": self.required_combinations,
             "forbidden_combinations": self.forbidden_combinations,
-            "either_required_fields": self.either_required_fields
         }
         return JsonValidator().process_input(
             input_fields, validation_rules, create_instance_func, raise_exception
@@ -292,14 +280,12 @@ class SemanticValidationBodyParamsValidator(BaseValidationRules):
         self.forbidden_combinations = semantic_validation_rules[
             "forbidden_combinations"
         ]
-        self.either_required_fields = osd_get_api_rules["either_required_fields"]
         super().__init__(
             self.valid_fields,
             self.field_rules,
             self.required_fields,
             self.required_combinations,
-            self.forbidden_combinations,
-            self.either_required_fields
+            self.forbidden_combinations
         )
 
 
@@ -330,13 +316,13 @@ class OSDQueryParamsValidator(BaseValidationRules):
         self.required_fields = osd_get_api_rules["required_fields"]
         self.required_combinations = osd_get_api_rules["required_combinations"]
         self.forbidden_combinations = osd_get_api_rules["forbidden_combinations"]
-        self.either_required_fields = osd_get_api_rules["either_required_fields"]
+
         # Initialize BaseValidationRules with these valibdation rules
         super().__init__(
             self.valid_fields,
             self.field_rules,
             self.required_fields,
             self.required_combinations,
-            self.forbidden_combinations,
-            self.either_required_fields
+            self.forbidden_combinations
+
         )
