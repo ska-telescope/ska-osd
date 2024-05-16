@@ -29,6 +29,7 @@ class OSD:
         :param array_assembly: in mid there are
             AA0.5, AA2 and AA1 you can give any one
         :param tmdata: TMData class object
+        :param cycle_id: cycle_id
 
         :returns: None
         """
@@ -86,10 +87,6 @@ class OSD:
 
         elif capabilities is not None and array_assembly is None:
             for capability in capabilities:
-                #ml_debug_my_code
-                # if self.cycle_id:
-                #     capabilities_dict[capability.capitalize()]
-                #ml_debug_comment from here the array_assembly is set to AA2 if no array assembly given
                 capabilities_dict[capability.capitalize()] = self.osd_data["observatory_policy"]["telescope_capabilities"][capability.capitalize()]
 
         elif capabilities is None and array_assembly is not None:
@@ -123,21 +120,14 @@ class OSD:
         cap_err_msg_list = []
 
         for key, value in telescope_capabilities_dict.items():
-            #ml_debug capabilities full file logic change point
-            data = self.get_data(tmdata, capability=osd_file_mapping[key.lower()]) #here we are getting all data for AA2, AA0.5 and AA1
+            data = self.get_data(tmdata, capability=osd_file_mapping[key.lower()])
             self.keys_list = list(data.keys())
             err_msg = None
-            if self.array_assembly: # will check array assembly if given by user
+            if self.array_assembly:
                 err_msg = self.check_array_assembly(value, self.keys_list)
 
-            # import pdb
-            # pdb.set_trace()
             if err_msg:
                 cap_err_msg_list.append(err_msg)
-            # else:
-            #     osd_data["capabilities"][key.lower()] = {}
-            #     osd_data["capabilities"][key.lower()][value] = data[value]
-            #     osd_data["capabilities"][key.lower()]["basic_capabilities"] = data["basic_capabilities"]
             else:
                 osd_data["capabilities"][key.lower()] = {}
                 osd_data["capabilities"][key.lower()]["basic_capabilities"] = data["basic_capabilities"]
@@ -172,15 +162,9 @@ class OSD:
             return tmdata[capability].get_dict()
 
         else:
-            #ml_debug_commented
-            # return [
-            #     (tmdata[capability].get_dict()[array_assembly] if array_assembly is not None else tmdata[capability].get_dict())][0]
-            # import pdb
-            # pdb.set_trace()
-
             if array_assembly:
                 return tmdata[capability].get_dict()[array_assembly]
-            else: #no array_assembly means full file to be returend
+            else:
                 return tmdata[capability].get_dict()
 
 
@@ -202,26 +186,11 @@ class OSD:
 
         if chk_capabilities:
             osd_err_msg_list.append(chk_capabilities)
-        else: #ml_debug here is the logic which generates observation policy and capabilities and array assembly
-            telescope_capabilities_dict = {}
-            #not needed osd_data = {"capabilities":{}}
-
-            # if not self.array_assembly: #if not capabilities then only observation policy should be returned
-            #     (osd_data, telescope_capabilities_dict,) = self.get_telescope_observatory_policies(self.capabilities, self.array_assembly)
-                    # output telescope_capabilities_dict = {"MID": "AA2"}
-
-            #if not self.array_assembly: #if not capabilities then only observation policy should be returned
-                # if self.cycle_id: #it will set the array assembly AA2 in telescope_capabilities_dict
-                #     (osd_data, telescope_capabilities_dict,) = self.get_telescope_observatory_policies(self.capabilities, self.array_assembly)
+        else:
             (osd_data, telescope_capabilities_dict,) = self.get_telescope_observatory_policies(self.capabilities, self.array_assembly)
 
             if not self.cycle_id:
                 del osd_data["observatory_policy"]
-                # else: #if cycle id present then need to set all 3 capabilities in telescope_capabilities_dict
-                #    #(osd_data, telescope_capabilities_dict,) = self.get_telescope_observatory_policies(self.capabilities, self.array_assembly)
-                #    telescope_capabilities_dict = {"MID": ["AA2","AA0.5"]}
-            # else:
-            #     telescope_capabilities_dict[self.capabilities[0]] = self.array_assembly
 
             (capabilities_and_array_assembly, err_msg,) = self.get_capabilities_and_array_assembly(self.tmdata, telescope_capabilities_dict, osd_data)
             if err_msg:
@@ -274,8 +243,6 @@ def check_cycle_id(
         osd_version = version("ska_ost_osd")
 
     versions_dict = read_json(osd_file_mapping["cycle_to_version_mapping"])
-    # import pdb
-    # pdb.set_trace()
     cycle_ids = [int(key.split("_")[-1]) for key in versions_dict]
     cycle_id_exists = [cycle_id if cycle_id in cycle_ids else None][0]
     string_ids = ",".join([str(i) for i in cycle_ids])
@@ -352,7 +319,6 @@ def get_osd_data(
 
     :returns: json object
     """
-    #debug_ml osd_data, data_error_msg_list = OSD(capabilities=capabilities, array_assembly=array_assembly, tmdata=tmdata,).get_osd_data()
     obj1 = OSD(capabilities=capabilities, array_assembly=array_assembly, tmdata=tmdata,cycle_id=cycle_id)
     osd_data, data_error_msg_list = obj1.get_osd_data()
 

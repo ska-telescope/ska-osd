@@ -86,8 +86,6 @@ def get_osd(**kwargs) -> dict:
 
     :returns dict: A dictionary with OSD data satisfying the query.
     """
-    # import pdb
-    # pdb.set_trace()
     error_msg = {}
     query_params, error = OSDQueryParamsValidator().process_input(kwargs, OSDUserQuery, False)
     error_msg.update(error)
@@ -98,13 +96,12 @@ def get_osd(**kwargs) -> dict:
             if "Cycle" in x:
                 error_msg["cycle_id"] = x
 
-        #error_msg["cycle_id"] = cycle_error_msg_list
+
     tm_data_source, error = osd_tmdata_source(cycle_id=kwargs.get("cycle_id"), osd_version=kwargs.get("osd_version"), source=kwargs.get("source"), gitlab_branch=kwargs.get("gitlab_branch"),)
     for x in error:
         if "source" in x:
             error_msg["source"] = x
-        # if "Cycle" in x:
-        #     error_msg["cycle_id"] = x
+
 
     if error_msg:
         raise ValueError(error_msg)
