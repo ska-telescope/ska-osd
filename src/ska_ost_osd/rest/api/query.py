@@ -281,6 +281,7 @@ class SemanticValidationBodyParamsValidator(BaseValidationRules):
         self.forbidden_combinations = semantic_validation_rules[
             "forbidden_combinations"
         ]
+
         super().__init__(
             self.valid_fields,
             self.field_rules,
@@ -317,8 +318,7 @@ class OSDQueryParamsValidator(BaseValidationRules):
         self.required_fields = osd_get_api_rules["required_fields"]
         self.required_combinations = osd_get_api_rules["required_combinations"]
         self.forbidden_combinations = osd_get_api_rules["forbidden_combinations"]
-
-        # Initialize BaseValidationRules with these valibdation rules
+        # Initialize BaseValidationRules with these validation rules
         super().__init__(
             self.valid_fields,
             self.field_rules,

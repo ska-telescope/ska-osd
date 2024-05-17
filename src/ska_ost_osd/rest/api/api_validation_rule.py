@@ -64,10 +64,7 @@ osd_get_api_rules = {
         "cycle_id": [
             FieldRule(
                 lambda value: isinstance(value, int), "cycle_id must be an integer"
-            ),
-            FieldRule(
-                lambda value: isinstance(value, int), "cycle_id must be an integer"
-            ),
+            )
         ],
         "osd_version": [
             FieldRule(
