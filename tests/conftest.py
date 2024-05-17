@@ -791,6 +791,7 @@ def mid_osd_data():
         }
     }
 
+
 @pytest.fixture
 def valid_observing_command_input():
     return {

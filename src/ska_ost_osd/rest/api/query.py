@@ -162,15 +162,16 @@ class JsonValidator:
         """
         for comb_name, keys in self.validation_rules["required_combinations"].items():
             if not all(k in self.input_fields for k in keys):
-                self.errors[comb_name] = f"Combination {comb_name} is required but missing one or more keys."
+                self.errors[
+                    comb_name
+                ] = f"Combination {comb_name} is required but missing one or more keys."
 
         # Forbidden combinations
         for comb_name, keys in self.validation_rules["forbidden_combinations"].items():
             if all(k in self.input_fields for k in keys):
-                self.errors[comb_name] = f"Combination {comb_name} should not be present together."
-
-
-
+                self.errors[
+                    comb_name
+                ] = f"Combination {comb_name} should not be present together."
 
 
 class RestrictiveMeta(type):
@@ -285,7 +286,7 @@ class SemanticValidationBodyParamsValidator(BaseValidationRules):
             self.field_rules,
             self.required_fields,
             self.required_combinations,
-            self.forbidden_combinations
+            self.forbidden_combinations,
         )
 
 
@@ -323,6 +324,5 @@ class OSDQueryParamsValidator(BaseValidationRules):
             self.field_rules,
             self.required_fields,
             self.required_combinations,
-            self.forbidden_combinations
-
+            self.forbidden_combinations,
         )

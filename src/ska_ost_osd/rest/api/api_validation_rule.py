@@ -60,7 +60,6 @@ osd_get_api_rules = {
         "gitlab_branch_and_osd_version": ["gitlab_branch", "osd_version"],
         "cycle_id_and_array_assembly": ["cycle_id", "array_assembly"],
     },
-
     "field_rules": {
         "cycle_id": [
             FieldRule(
@@ -68,7 +67,7 @@ osd_get_api_rules = {
             ),
             FieldRule(
                 lambda value: isinstance(value, int), "cycle_id must be an integer"
-            )
+            ),
         ],
         "osd_version": [
             FieldRule(
