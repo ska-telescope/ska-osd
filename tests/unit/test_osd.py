@@ -251,7 +251,11 @@ def test_invalid_source():
 
     expected_error_msg = ", ".join([str(err) for err in error_msgs])
 
-    assert expected_error_msg == "source is not valid., Invalid OSD Version main Valid OSD Versions are ['1.0.2']"
+    assert (
+        expected_error_msg
+        == "source is not valid., Invalid OSD Version main Valid OSD Versions are"
+        " ['1.0.2']"
+    )
 
 
 def test_invalid_get_osd_data_capability(tm_data):  # pylint: disable=W0621
