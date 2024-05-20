@@ -235,7 +235,7 @@ def test_invalid_osd_tmdata_source():
         expected_error_msg
         == "source is not valid available are file, car, gitlab\n"
         "Only one parameter is needed either osd_version or gitlab_branch\n"
-        "Cycle id 3 is not valid,Available IDs are 1,2"
+        "Cycle id 3 is not valid,Available IDs are 1"
     )
 
 

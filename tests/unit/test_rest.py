@@ -110,7 +110,7 @@ def test_init_app_client(client, open_api_spec):
                     "array_assembly": (
                         "value AAA3 for array_assembly value is not valid"
                     ),
-                    "cycle_id": "Cycle id 3 is not valid,Available IDs are 1,2",
+                    "cycle_id": "Cycle id 3 is not valid,Available IDs are 1",
                     "cycle_id_and_array_assembly": (
                         "Combination cycle_id_and_array_assembly should not be present"
                         " together."

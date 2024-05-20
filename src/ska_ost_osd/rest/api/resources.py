@@ -99,6 +99,8 @@ def get_osd(**kwargs) -> dict:
         for x in cycle_error_msg_list:
             if "Cycle" in x:
                 error_msg["cycle_id"] = x
+            if "Invalid OSD Version" in x:
+                error_msg["osd_version"] = x
 
     tm_data_source, error = osd_tmdata_source(
         cycle_id=kwargs.get("cycle_id"),
