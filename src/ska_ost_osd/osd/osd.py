@@ -53,7 +53,7 @@ class OSD:
 
         capabilities_list = list(osd_file_mapping.keys())[:3]
         cap_list = None
-        if not None in capabilities:
+        if None not in capabilities:
             cap_list = [i for i in capabilities if i.lower() not in capabilities_list]
 
         if (capabilities is not None and isinstance(capabilities, list)) and (cap_list):
@@ -91,7 +91,7 @@ class OSD:
                 "telescope_capabilities"
             ]
 
-        elif not None in capabilities and array_assembly is None:
+        elif None not in capabilities and array_assembly is None:
             for capability in capabilities:
                 capabilities_dict[capability.capitalize()] = self.osd_data[
                     "observatory_policy"
@@ -105,7 +105,7 @@ class OSD:
             for key in capabilities_dict.keys():
                 capabilities_dict[key] = array_assembly
 
-        elif not None in capabilities and array_assembly is not None:
+        elif None not in capabilities and array_assembly is not None:
             for capability in capabilities:
                 capabilities_dict[capability.capitalize()] = array_assembly
 
