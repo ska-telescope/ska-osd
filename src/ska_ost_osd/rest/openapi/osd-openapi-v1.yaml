@@ -103,7 +103,6 @@ components:
       schema:
         type: string
         enum: [ mid, low]
-        default: mid
       required: false
     array_assembly:
       in: query

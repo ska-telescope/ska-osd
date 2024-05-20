@@ -99,11 +99,7 @@ def open_api_spec():
                         {
                             "in": "query",
                             "name": "capabilities",
-                            "schema": {
-                                "type": "string",
-                                "enum": ["mid", "low"],
-                                "default": "mid",
-                            },
+                            "schema": {"type": "string", "enum": ["mid", "low"]},
                             "required": False,
                         },
                         {

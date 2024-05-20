@@ -167,6 +167,11 @@ class JsonValidator:
                 ] = f"Combination {comb_name} is required but missing one or more keys."
 
         # Forbidden combinations
+        for comb_name, keys in self.validation_rules["either_combination"].items():
+            if not any(k in self.input_fields for k in keys):
+                self.errors[comb_name] = f"Either one {comb_name} should be present."
+
+        # Forbidden combinations
         for comb_name, keys in self.validation_rules["forbidden_combinations"].items():
             if all(k in self.input_fields for k in keys):
                 self.errors[
@@ -206,6 +211,7 @@ class BaseValidationRules(metaclass=RestrictiveMeta):
         field_rules: Dict[str, Any],
         required_fields: Set[str],
         required_combinations: Dict[str, Any],
+        either_combination: Dict[str, Any],
         forbidden_combinations: Dict[str, Any],
     ):
         """
@@ -224,6 +230,7 @@ class BaseValidationRules(metaclass=RestrictiveMeta):
         self.field_rules = field_rules
         self.required_fields = required_fields
         self.required_combinations = required_combinations
+        self.either_combination = either_combination
         self.forbidden_combinations = forbidden_combinations
 
     def process_input(
@@ -247,6 +254,7 @@ class BaseValidationRules(metaclass=RestrictiveMeta):
             "required_fields": self.required_fields,
             "required_combinations": self.required_combinations,
             "forbidden_combinations": self.forbidden_combinations,
+            "either_combination": self.either_combination,
         }
         return JsonValidator().process_input(
             input_fields, validation_rules, create_instance_func, raise_exception
@@ -278,6 +286,7 @@ class SemanticValidationBodyParamsValidator(BaseValidationRules):
         self.field_rules = semantic_validation_rules["field_rules"]
         self.required_fields = semantic_validation_rules["required_fields"]
         self.required_combinations = semantic_validation_rules["required_combinations"]
+        self.either_combination = semantic_validation_rules["either_combination"]
         self.forbidden_combinations = semantic_validation_rules[
             "forbidden_combinations"
         ]
@@ -287,6 +296,7 @@ class SemanticValidationBodyParamsValidator(BaseValidationRules):
             self.field_rules,
             self.required_fields,
             self.required_combinations,
+            self.either_combination,
             self.forbidden_combinations,
         )
 
@@ -317,6 +327,7 @@ class OSDQueryParamsValidator(BaseValidationRules):
         self.field_rules = osd_get_api_rules["field_rules"]
         self.required_fields = osd_get_api_rules["required_fields"]
         self.required_combinations = osd_get_api_rules["required_combinations"]
+        self.either_combination = osd_get_api_rules["either_combination"]
         self.forbidden_combinations = osd_get_api_rules["forbidden_combinations"]
         # Initialize BaseValidationRules with these validation rules
         super().__init__(
@@ -324,5 +335,6 @@ class OSDQueryParamsValidator(BaseValidationRules):
             self.field_rules,
             self.required_fields,
             self.required_combinations,
+            self.either_combination,
             self.forbidden_combinations,
         )

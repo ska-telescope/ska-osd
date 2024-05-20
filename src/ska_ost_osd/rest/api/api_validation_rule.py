@@ -18,6 +18,7 @@ semantic_validation_rules = {
     "required_fields": {"observing_command_input"},
     "required_combinations": {},
     "forbidden_combinations": {},
+    "either_combination": {},
     "field_rules": {
         "interface": [
             FieldRule(
@@ -60,6 +61,7 @@ osd_get_api_rules = {
         "gitlab_branch_and_osd_version": ["gitlab_branch", "osd_version"],
         "cycle_id_and_array_assembly": ["cycle_id", "array_assembly"],
     },
+    "either_combination": {"cycle_id_or_capabilities": ["cycle_id", "capabilities"]},
     "field_rules": {
         "cycle_id": [
             FieldRule(
