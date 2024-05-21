@@ -126,6 +126,55 @@ def test_init_app_client(client, open_api_spec):
                 "status": -1,
             },
         ),
+        (
+            1,
+            None,
+            None,
+            None,
+            "AA0.5",
+            {
+                "detail": {
+                    "cycle_id_and_array_assembly": (
+                        "Combination cycle_id_and_array_assembly should not be present"
+                        " together."
+                    )
+                },
+                "status": -1,
+                "title": "Value Error",
+            },
+        ),
+        (
+            None,
+            None,
+            None,
+            None,
+            None,
+            {
+                "detail": {
+                    "cycle_id_or_capabilities": (
+                        "Either one cycle_id_or_capabilities should be present."
+                    )
+                },
+                "status": -1,
+                "title": "Value Error",
+            },
+        ),
+        (
+            1,
+            "3.0.7",
+            None,
+            ["mid"],
+            None,
+            {
+                "detail": {
+                    "osd_version": (
+                        "Invalid OSD Version 3.0.7 Valid OSD Versions are ['1.0.2']"
+                    )
+                },
+                "status": -1,
+                "title": "Value Error",
+            },
+        ),
     ],
 )
 def test_invalid_osd_tmdata_source(
