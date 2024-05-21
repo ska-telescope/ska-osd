@@ -8,7 +8,7 @@ from http import HTTPStatus
 
 from ska_telmodel.data import TMData
 
-from ska_ost_osd.osd.osd import get_osd_data, osd_tmdata_source
+from ska_ost_osd.osd.osd import check_cycle_id, get_osd_data, osd_tmdata_source
 from ska_ost_osd.rest.api.query import (
     OSDQueryParamsValidator,
     OSDUserQuery,
@@ -86,12 +86,21 @@ def get_osd(**kwargs) -> dict:
 
     :returns dict: A dictionary with OSD data satisfying the query.
     """
-
     error_msg = {}
     query_params, error = OSDQueryParamsValidator().process_input(
         kwargs, OSDUserQuery, False
     )
     error_msg.update(error)
+
+    _, cycle_error_msg_list = check_cycle_id(
+        query_params.cycle_id, query_params.osd_version, query_params.gitlab_branch
+    )
+    if cycle_error_msg_list:
+        for x in cycle_error_msg_list:
+            if "Cycle" in x:
+                error_msg["cycle_id"] = x
+            if "Invalid OSD Version" in x:
+                error_msg["osd_version"] = x
 
     tm_data_source, error = osd_tmdata_source(
         cycle_id=kwargs.get("cycle_id"),
@@ -102,8 +111,6 @@ def get_osd(**kwargs) -> dict:
     for x in error:
         if "source" in x:
             error_msg["source"] = x
-        if "Cycle" in x:
-            error_msg["cycle_id"] = x
 
     if error_msg:
         raise ValueError(error_msg)
@@ -111,9 +118,10 @@ def get_osd(**kwargs) -> dict:
     tm_data = TMData(source_uris=tm_data_source)
 
     osd_data, error_msg_osd = get_osd_data(
-        capabilities=[query_params.capabilities],
+        capabilities=[query_params.capabilities] if query_params.capabilities else None,
         tmdata=tm_data,
         array_assembly=query_params.array_assembly,
+        cycle_id=query_params.cycle_id,
     )
 
     if error_msg_osd:

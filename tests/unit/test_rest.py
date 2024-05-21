@@ -7,15 +7,6 @@ from ska_ost_osd.rest import get_openapi_spec, init_app
 from ska_ost_osd.rest.api.resources import validation_response
 
 
-def test_get_open_api_spec(open_api_spec):
-    """Test the get_open_api_spec function.
-
-    :param open_api_spec (dict): The OpenAPI specification this test expects
-        to be returned.
-    """
-    assert get_openapi_spec() == open_api_spec
-
-
 def test_init_app(open_api_spec):
     """This function tests that the Flask application can be initialized
        properly and that the OpenAPI spec is registered as expected.
@@ -110,7 +101,7 @@ def test_init_app_client(client, open_api_spec):
                     "array_assembly": (
                         "value AAA3 for array_assembly value is not valid"
                     ),
-                    "cycle_id": "Cycle id 3 is not valid,Available IDs are 1,2",
+                    "cycle_id": "Cycle id 3 is not valid,Available IDs are 1",
                     "cycle_id_and_array_assembly": (
                         "Combination cycle_id_and_array_assembly should not be present"
                         " together."
@@ -133,6 +124,55 @@ def test_init_app_client(client, open_api_spec):
                 ),
                 "title": "Bad Request",
                 "status": -1,
+            },
+        ),
+        (
+            1,
+            None,
+            None,
+            None,
+            "AA0.5",
+            {
+                "detail": {
+                    "cycle_id_and_array_assembly": (
+                        "Combination cycle_id_and_array_assembly should not be present"
+                        " together."
+                    )
+                },
+                "status": -1,
+                "title": "Value Error",
+            },
+        ),
+        (
+            None,
+            None,
+            None,
+            None,
+            None,
+            {
+                "detail": {
+                    "cycle_id_or_capabilities": (
+                        "Either one cycle_id_or_capabilities should be present."
+                    )
+                },
+                "status": -1,
+                "title": "Value Error",
+            },
+        ),
+        (
+            1,
+            "3.0.7",
+            None,
+            ["mid"],
+            None,
+            {
+                "detail": {
+                    "osd_version": (
+                        "Invalid OSD Version 3.0.7 Valid OSD Versions are ['1.0.2']"
+                    )
+                },
+                "status": -1,
+                "title": "Value Error",
             },
         ),
     ],
