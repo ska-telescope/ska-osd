@@ -7,7 +7,7 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 1.0.3
 ******
-* Improvement in data extraction from OSD API.
+* Improve API level validation for OSD API's
 
 1.0.2
 ******
