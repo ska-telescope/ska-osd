@@ -82,7 +82,7 @@ def validate_gitlab_class():
 @pytest.mark.parametrize(
     "capabilities, array_assembly, tmdata, expected",
     [
-        ([None], None, tm_data, DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER),
+        (None, None, tm_data, DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER),
         (
             ["mid"],
             None,
@@ -90,7 +90,7 @@ def validate_gitlab_class():
             OSD_RESPONSE_WITH_ONLY_CAPABILITIES_PARAMETER,
         ),
         (
-            [None],
+            None,
             "AA0.5",
             tm_data,
             OSD_RESPONSE_WITH_ONLY_ARRAY_ASSEMBLY_PARAMETER,

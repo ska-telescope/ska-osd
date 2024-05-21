@@ -118,7 +118,7 @@ def get_osd(**kwargs) -> dict:
     tm_data = TMData(source_uris=tm_data_source)
 
     osd_data, error_msg_osd = get_osd_data(
-        capabilities=[query_params.capabilities],
+        capabilities=[query_params.capabilities] if query_params.capabilities else None,
         tmdata=tm_data,
         array_assembly=query_params.array_assembly,
         cycle_id=query_params.cycle_id,
