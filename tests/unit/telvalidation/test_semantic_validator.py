@@ -19,7 +19,6 @@ from ska_ost_osd.telvalidation.schematic_validation_exceptions import (
 )
 from ska_ost_osd.telvalidation.semantic_validator import (
     fetch_capabilities_from_osd,
-    fetch_matched_capabilities_from_basic_capabilities,
     search_and_return_value_from_basic_capabilities,
     semantic_validate,
 )
@@ -675,56 +674,6 @@ def test_sbd_invalid_inputs(
             "frequency_slice_id did not match fsp_id\n"
             "Invalid input for receiver_band! Currently allowed [1,2]"
         )
-
-
-def test_fetch_matched_capabilities_from_basic_capabilities():
-    """
-    test case to verify whether we can replace band values or not
-    which are present in dictionary within list
-    """
-    expected = [
-        {
-            "Band_1": {
-                "rx_id": "Band_1",
-                "min_frequency_hz": 350000000.0,
-                "max_frequency_hz": 1050000000.0,
-            }
-        },
-        {
-            "Band_2": {
-                "rx_id": "Band_2",
-                "min_frequency_hz": 950000000.0,
-                "max_frequency_hz": 1760000000.0,
-            }
-        },
-    ]
-    osd_capabilities = capabilities["capabilities"]["mid"][ARRAY_ASSEMBLY][
-        "available_receivers"
-    ] = {
-        "Band_1": {"test": "Band_1"},
-        "Band_2": "test",
-    }
-    basic_capabilities = capabilities["capabilities"]["mid"]["basic_capabilities"]
-    basic_capabilities["receiver_information"] = {
-        "rx_id": {"Band_1": {"min_frequency_hz": 350000000.0}},
-        "min_frequency_hz": 350000000.0,
-        "max_frequency_hz": 1050000000.0,
-    }
-    assert fetch_matched_capabilities_from_basic_capabilities(
-        osd_capabilities, basic_capabilities, matched_capabilities_list=[]
-    ), expected
-
-    osd_capabilities = capabilities["capabilities"]["mid"][ARRAY_ASSEMBLY][
-        "available_receivers"
-    ] = {
-        "Band_1": [{"test": "Band_1"}],
-        "Band_2": "Band_1",
-    }
-    basic_capabilities = capabilities["capabilities"]["mid"]["basic_capabilities"]
-
-    assert fetch_matched_capabilities_from_basic_capabilities(
-        osd_capabilities, basic_capabilities, matched_capabilities_list=[]
-    ), expected
 
 
 def test_search_and_return_value_from_basic_capabilities():

@@ -81,6 +81,34 @@ def fetch_capabilities_from_osd(
     return {}, {}
 
 
+def search_nested_dict(data, key_to_find):
+    """
+    Efficiently search a nested dictionary and list structure to find the value
+    for the given key.
+
+    Args:
+        data (dict or list): The nested data structure to search.
+        key_to_find (str): The key to search for.
+
+    Returns:
+        The value associated with the given key, or None if the key is not found.
+    """
+    stack = [(data, [])]
+    while stack:
+        current, path = stack.pop()
+        if isinstance(current, dict):
+            if key_to_find in current.values():
+                return current
+            for key, value in current.items():
+                if isinstance(value, (dict, list)):
+                    stack.append((value, path + [key]))
+        elif isinstance(current, list):
+            for item in reversed(current):
+                if isinstance(item, (dict, list)):
+                    stack.append((item, path))
+    return None
+
+
 def search_matched_key_data_from_basic_capabilities(
     basic_capabilities: dict, search_key: str
 ) -> dict:
@@ -157,6 +185,9 @@ def replace_values_after_matched_from_basic_capabilities(
     return capabilities
 
 
+# refer search_nested_dictmethod and restructure below code
+
+
 def fetch_matched_capabilities_from_basic_capabilities(
     capabilities: dict,
     basic_capabilities: dict,
@@ -200,34 +231,27 @@ def fetch_matched_capabilities_from_basic_capabilities(
     : return: matched value from basic capabilities
     """
 
-    if isinstance(capabilities, dict):
-        for key, value in capabilities.items():
-            if isinstance(value, dict):
-                fetch_matched_capabilities_from_basic_capabilities(
-                    value, basic_capabilities, matched_capabilities_list
-                )
-            if isinstance(value, list):
-                for item in value:
-                    if isinstance(item, dict):
-                        fetch_matched_capabilities_from_basic_capabilities(
-                            value,
-                            basic_capabilities,
-                            matched_capabilities_list,
-                        )
-                    else:
-                        # search key into basic capabilities
-                        matched_values = (
-                            search_matched_key_data_from_basic_capabilities(
-                                basic_capabilities, item
-                            )
-                        )
-                        if matched_values:
-                            matched_capabilities_list.append({item: matched_values[0]})
-            matched_values = search_matched_key_data_from_basic_capabilities(
-                basic_capabilities, key
-            )
-            if matched_values:
-                matched_capabilities_list.append({key: matched_values[0]})
+    stack = [(capabilities, [])]
+    while stack:
+        current, path = stack.pop()
+        if isinstance(current, dict):
+            for key, value in current.items():
+                if isinstance(key, (str, int)) and isinstance(value, (str, int)):
+                    matched_values = search_nested_dict(basic_capabilities, key)
+                    if matched_values:
+                        matched_capabilities_list.append({key: matched_values})
+                if isinstance(value, (dict, list)):
+                    stack.append((value, path + [key]))
+
+        elif isinstance(current, list):
+            for item in reversed(current):
+                if isinstance(item, (dict, list)):
+                    stack.append((item, path))
+                else:
+                    # search key into basic capabilities
+                    matched_values = search_nested_dict(basic_capabilities, item)
+                    if matched_values:
+                        matched_capabilities_list.append({item: matched_values})
     return matched_capabilities_list
 
 
