@@ -81,7 +81,7 @@ def fetch_capabilities_from_osd(
     return {}, {}
 
 
-def search_nested_dict(data, key_to_find):
+def search_nested_dict(data: list | dict, key_to_find: str) -> dict | None:
     """
     Efficiently search a nested dictionary and list structure to find the value
     for the given key.
