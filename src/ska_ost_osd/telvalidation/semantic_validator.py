@@ -185,9 +185,6 @@ def replace_values_after_matched_from_basic_capabilities(
     return capabilities
 
 
-# refer search_nested_dictmethod and restructure below code
-
-
 def fetch_matched_capabilities_from_basic_capabilities(
     capabilities: dict,
     basic_capabilities: dict,

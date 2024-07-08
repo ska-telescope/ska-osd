@@ -158,6 +158,12 @@ def git_tm_data():
     return TMData(sources)
 
 
+# re-defined TMData for local file source
+@pytest.fixture(scope="module")
+def tm_data():
+    return TMData(local_source)
+
+
 def load_string_from_file(filename):
     """
     Return a file from the current directory as a string
@@ -225,13 +231,13 @@ ARRAY_ASSEMBLY = "AA0.5"
 
 @patch("ska_ost_osd.telvalidation.semantic_validator.fetch_capabilities_from_osd")
 def test_tmc_assignresources_valid_inputs_point_to_git_source(
-    mock1, git_tm_data
+    fetch_capabilities, git_tm_data
 ):  # pylint: disable=W0621
     """
     Test semantic validate assign resource command with valid inputs.
     """
     osd_capabilities = capabilities["capabilities"]["mid"]
-    mock1.return_value = (
+    fetch_capabilities.return_value = (
         osd_capabilities[ARRAY_ASSEMBLY],
         osd_capabilities["basic_capabilities"],
     )
@@ -250,12 +256,6 @@ def test_tmc_assignresources_valid_inputs_point_to_git_source(
     config["interface"] = interface
 
     assert semantic_validate(config, tm_data=git_tm_data), True
-
-
-# re-defined TMData for local file source
-@pytest.fixture(scope="module")
-def tm_data():
-    return TMData(local_source)
 
 
 @patch("ska_ost_osd.telvalidation.semantic_validator.fetch_capabilities_from_osd")
