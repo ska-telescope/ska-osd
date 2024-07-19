@@ -6,8 +6,8 @@ Integrated OSD API function to fetch rule constraints values.
 """
 
 
-import copy
 import logging
+from typing import Any, Dict, List, Optional, Tuple
 
 from ska_telmodel.data import TMData
 
@@ -19,18 +19,18 @@ from .constant import (
     SKA_MID_TELESCOPE,
     SKA_SBD,
 )
-from .oet_tmc_validators import (
-    search_and_return_value_from_basic_capabilities,
-    validate_json,
-)
+from .oet_tmc_validators import validate_json
 from .schematic_validation_exceptions import SchematicValidationError
 
 logging.getLogger("telvalidation")
 
 
-def get_validation_data(interface: str):
+def get_validation_data(interface: str) -> Optional[str]:
     """
-    :param interface: interface uri from the observing_command_input.
+    Get the validation constant JSON file path based on the provided interface URI.
+
+    :param interface: str, the interface URI from the observing command input.
+    :return: str, the validation constant JSON file path, or None if not found.
     """
     validation_constants = {
         SKA_LOW_TELESCOPE: LOW_VALIDATION_CONSTANT_JSON_FILE_PATH,
@@ -43,41 +43,42 @@ def get_validation_data(interface: str):
             return value
     # taking mid interface as default cause there is no any specific
     # key to differentiate the interface
-    return MID_VALIDATION_CONSTANT_JSON_FILE_PATH
+    return validation_constants.get(SKA_MID_TELESCOPE)
 
 
 def fetch_capabilities_from_osd(
     telescope: str,
     array_assembly: str,
-    tm_data: TMData = None,
-    osd_data: dict = None,
-) -> dict:
+    tm_data: Optional[Dict] = None,
+    osd_data: Optional[Dict] = None,
+) -> Tuple[Dict, Dict]:
     """
-    method to fetch capabilities and basic capabilities from OSD
-    OSD is data storage for Observatory constant.
-    :param telescope: str defined telescope mid or low
-    :specific capabilities: str specific capabilities contains AAO.5, AA0.1
-    :param osd_data: osd_data dict which passed externally.
-    :returns: str capabilities and basic capabilities.
+    Fetch capabilities and basic capabilities from the Observatory State Database (OSD).
+
+    :param telescope: str, the telescope identifier (e.g., 'mid' or 'low').
+    :param array_assembly: str, the specific capabilities (e.g., 'AAO.5', 'AA0.1').
+    :param tm_data: Optional[Dict], the telemodel data object.
+    :param osd_data: Optional[Dict], the OSD data dictionary passed externally.
+    :returns: A tuple containing the capabilities and basic capabilities dictionaries.
     """
-    osd_capabilities = {}
-    fetched_osd_data = {}
+    from ska_ost_osd.osd.osd import get_osd_data
+
     if osd_data:
         fetched_osd_data = osd_data
     else:
-        from ska_ost_osd.osd.osd import get_osd_data
-
         fetched_osd_data, _ = get_osd_data(
             capabilities=[telescope],
             array_assembly=array_assembly,
             tmdata=tm_data,
         )
-    if fetched_osd_data and telescope in fetched_osd_data["capabilities"]:
-        osd_capabilities = fetched_osd_data["capabilities"][telescope]
+
+    capabilities = fetched_osd_data.get("capabilities", {}).get(telescope, {})
+    if capabilities:
         return (
-            osd_capabilities[array_assembly],
-            osd_capabilities["basic_capabilities"],
+            capabilities.get(array_assembly, {}),
+            capabilities.get("basic_capabilities", {}),
         )
+
     return {}, {}
 
 
@@ -93,6 +94,9 @@ def search_nested_dict(data: list | dict, key_to_find: str) -> dict | None:
     Returns:
         The value associated with the given key, or None if the key is not found.
     """
+    if data is None:
+        return None
+
     stack = [(data, [])]
     while stack:
         current, path = stack.pop()
@@ -109,86 +113,34 @@ def search_nested_dict(data: list | dict, key_to_find: str) -> dict | None:
     return None
 
 
-def search_matched_key_data_from_basic_capabilities(
-    basic_capabilities: dict, search_key: str
-) -> dict:
+def replace_nested_value(nested_dict: Dict, path: List[str], new_value: Any) -> None:
     """
-    This method is returns matched data from basic capabilities based on
-    search key.
-    e.g "basic_capabilities": {
-                "receiver_information": [
-                    {
-                        "rx_id": "Band_1",
-                        "min_frequency_hz": 350000000.0,
-                        "max_frequency_hz": 1050000000.0,
-                    }]
-                }
-    consider 'Band_1' is search key once it matched result
-    contains entire dict.
-    {
-        "rx_id": "Band_1",
-        "min_frequency_hz": 350000000.0,
-        "max_frequency_hz": 1050000000.0,
-    }
-    : param basic_capabilities: dict basic capabilities from OSD
-    : param search_key: key needs to be searched
-    : return: entire dict or list around matched keys
-    """
-    search_result = search_and_return_value_from_basic_capabilities(
-        basic_capabilities=basic_capabilities,
-        search_key=search_key,
-        rule=None,
-        result=[],
-    )
-    return search_result
+    Replace the value of a nested key in a dictionary.
 
-
-def replace_values_after_matched_from_basic_capabilities(
-    matched_capabilities: dict, capabilities: dict
-) -> dict:
+    :param nested_dict: Dict, the dictionary to modify.
+    :param path: List[str], the path to the key to replace, represented as a list of keys.
+    :param new_value: Any, the new value to assign to the key.
+    :raises KeyError: If any key in the path is not found in the nested dictionary.
+    :raises TypeError: If the path does not lead to a dictionary.
     """
-    This method return new capabilities dict after replaced
-    from basic_capabilities
-    refer capabilities dict from test_semantic_validator.py
-    before replacement of available_receivers
-    "AA0.5": {
-                "available_receivers": ["Band_1", "Band_2"]
-            }
-    after replaced available_receiver value from basic capabilities
-    "AA0.5": {
-                "available_receivers": [{
-                        "rx_id": "Band_1",
-                        "min_frequency_hz": 350000000.0,
-                        "max_frequency_hz": 1050000000.0,
-                    },
-                    {
-                        "rx_id": "Band_2",
-                        "min_frequency_hz": 950000000.0,
-                        "max_frequency_hz": 1760000000.0,
-                    }]
-            }
+    current = nested_dict
+    for key in path[:-1]:
+        if not isinstance(current, dict) or key not in current:
+            raise KeyError(f"Key '{key}' not found in the nested dictionary.")
+        current = current[key]
 
-    : param matched_capabilities: matched capabilities from basic capabilities
-    : param: original capabilities needs to be replaced
-    """
-    for key, value in capabilities.items():
-        if isinstance(value, list):
-            temp_list = []
-            for data in value:
-                mapped_values = [
-                    value[data] for value in matched_capabilities if data in value
-                ]
-                if mapped_values:
-                    temp_list.append(mapped_values[0])
-            if temp_list:
-                capabilities[key] = temp_list
-    return capabilities
+    if not isinstance(current, dict):
+        raise TypeError("The path does not lead to a dictionary.")
+
+    last_key = path[-1]
+    if last_key not in current:
+        raise KeyError(f"Key '{last_key}' not found in the nested dictionary.")
+
+    current[last_key] = new_value
 
 
 def fetch_matched_capabilities_from_basic_capabilities(
-    capabilities: dict,
-    basic_capabilities: dict,
-    matched_capabilities_list: list,
+    capabilities: dict, basic_capabilities: dict
 ) -> list:
     """
     This methods returns matched capabilities data list based
@@ -227,8 +179,9 @@ def fetch_matched_capabilities_from_basic_capabilities(
     : param matched_capabilities_list: replaceable data list
     : return: matched value from basic capabilities
     """
-
+    clone_capabilities = capabilities.copy()
     stack = [(capabilities, [])]
+    replacible_values = []
     while stack:
         current, path = stack.pop()
         if isinstance(current, dict):
@@ -236,7 +189,7 @@ def fetch_matched_capabilities_from_basic_capabilities(
                 if isinstance(key, (str, int)) and isinstance(value, (str, int)):
                     matched_values = search_nested_dict(basic_capabilities, key)
                     if matched_values:
-                        matched_capabilities_list.append({key: matched_values})
+                        replacible_values.append(matched_values)
                 if isinstance(value, (dict, list)):
                     stack.append((value, path + [key]))
 
@@ -248,8 +201,9 @@ def fetch_matched_capabilities_from_basic_capabilities(
                     # search key into basic capabilities
                     matched_values = search_nested_dict(basic_capabilities, item)
                     if matched_values:
-                        matched_capabilities_list.append({item: matched_values})
-    return matched_capabilities_list
+                        replacible_values.append(matched_values)
+    replace_nested_value(clone_capabilities, path, replacible_values)
+    return clone_capabilities
 
 
 def validate_command_input(
@@ -276,83 +230,63 @@ def validate_command_input(
         tm_data=tm_data,
         osd_data=osd_data,
     )
-    copied_capabilities = copy.deepcopy(capabilities)
-    # after fetching data from OSD storage matching and replacing json values
-    # for further use cases
-    matched_capabilities = fetch_matched_capabilities_from_basic_capabilities(
-        capabilities=capabilities,
-        basic_capabilities=basic_capabilities,
-        matched_capabilities_list=[],
-    )
-    osd_capabilities = replace_values_after_matched_from_basic_capabilities(
-        matched_capabilities, copied_capabilities
-    )
-
     msg_list = validate_json(
         semantic_validate_data[array_assembly],
         command_input_json_config=observing_command_input,
-        error_msg_list=[],
-        parent_key=None,
-        capabilities=osd_capabilities,
+        capabilities=fetch_matched_capabilities_from_basic_capabilities(
+            capabilities=capabilities, basic_capabilities=basic_capabilities
+        ),
     )
 
     return msg_list
 
 
 def semantic_validate(
-    observing_command_input: dict,
-    tm_data: TMData,
+    observing_command_input: Dict,
+    tm_data: Dict,
     array_assembly: str = "AA0.5",
-    interface: str = None,
+    interface: Optional[str] = None,
     raise_semantic: bool = True,
-    osd_data: dict = None,
-) -> any:
+    osd_data: Optional[Dict] = None,
+) -> bool:
     """
-    This method is entry point for semantic validation which can be consumed by
+    This method is the entry point for semantic validation, which can be consumed by
     other libraries like CDM.
-    :param observing_command_input: dictionary containing details
-    of the command which needs validation.
-    This is same as for ska_telmodel.schema.validate.
-    If command available as json string
-    first convert to dictionary by json.loads.
-    :param tm_data: telemodel tm data object using which
-    we can load semantic validate json.
-    :param osd_data: osd_data dict which passed externally
-    :param interface: interface uri in full only provide if
-    missing in observing_command_input
-    :param array_assembly: Array assembly like AA0.5, AA0.1
-    :param raise_semantic: True(default) would need user
-    to catch somewhere the SchematicValidationError.
+
+    :param observing_command_input: dictionary containing details of the command which needs validation.
+    This is the same as for ska_telmodel.schema.validate.
+    If the command is available as a JSON string, first convert it to a dictionary using json.loads.
+    :param tm_data: telemodel tm data object using which we can load the semantic validation JSON.
+    :param osd_data: osd_data dict which is passed externally.
+    :param interface: interface URI in full, only provide if missing in observing_command_input.
+    :param array_assembly: Array assembly like AA0.5, AA0.1.
+    :param raise_semantic: True (default) would require the user to catch the SchematicValidationError somewhere.
     Set False to only log the error messages.
-    :returns: msg: if semantic validation fail returns error message containing
-    all combined error which arises else returns True.
+    :returns: True if semantic validation passes, False otherwise.
     """
-    # fetching interface value from observing_command_input
-    version = observing_command_input.get("interface")
-    if version is None:
-        version = interface
-    # if still version remain null
-    if version is None:
-        message = """interface is missing from observing_command_input.
-        Please provide interface='...' explicitly"""
+    version = observing_command_input.get("interface") or interface
+
+    if not version:
+        message = (
+            "Interface is missing from observing_command_input. Please provide"
+            " interface='...' explicitly."
+        )
         logging.warning(message)
         raise SchematicValidationError(message)
-    msg = ""
+
     msg_list = validate_command_input(
         observing_command_input, tm_data, version, array_assembly, osd_data
     )
-    msg_list = [k for k in msg_list if k is not None]
-    msg = "\n".join(msg_list) if msg_list else msg
-    # add in the list the specific substrings
-    # which when appear in message indicate no error
-    # success_keys=["Success!","Is visible?Yes","1","2"]
-    if msg is not None and msg != "":
-        # pylint: disable=logging-not-lazy
+    msg_list = [msg for msg in msg_list if msg]  # Remove None values
+
+    if msg_list:
+        msg = "\n".join(msg_list)
         logging.error(
-            """Also following errors were encountered
-              during semantic validations:\n"""
-            + msg
+            "Also following errors were encountered during semantic"
+            f" validations:\n{msg}"
         )
-        if raise_semantic is True:
+        if raise_semantic:
             raise SchematicValidationError(msg)
+        return False
+
     return True

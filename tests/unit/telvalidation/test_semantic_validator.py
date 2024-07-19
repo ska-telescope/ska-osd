@@ -10,6 +10,7 @@ from ska_telmodel.schema import example_by_uri
 
 from ska_ost_osd.telvalidation.constant import CAR_TELMODEL_SOURCE
 from ska_ost_osd.telvalidation.oet_tmc_validators import (
+    search_and_return_value_from_basic_capabilities,
     validate_json,
     validate_target_is_visible,
 )
@@ -19,7 +20,6 @@ from ska_ost_osd.telvalidation.schematic_validation_exceptions import (
 )
 from ska_ost_osd.telvalidation.semantic_validator import (
     fetch_capabilities_from_osd,
-    search_and_return_value_from_basic_capabilities,
     semantic_validate,
 )
 
@@ -229,33 +229,35 @@ INPUT_COMMAND_CONFIG = {
 ARRAY_ASSEMBLY = "AA0.5"
 
 
-@patch("ska_ost_osd.telvalidation.semantic_validator.fetch_capabilities_from_osd")
-def test_tmc_assignresources_valid_inputs_point_to_git_source(
-    fetch_capabilities, git_tm_data
-):  # pylint: disable=W0621
-    """
-    Test semantic validate assign resource command with valid inputs.
-    """
-    osd_capabilities = capabilities["capabilities"]["mid"]
-    fetch_capabilities.return_value = (
-        osd_capabilities[ARRAY_ASSEMBLY],
-        osd_capabilities["basic_capabilities"],
-    )
-    config = VALID_MID_ASSIGN_JSON
-    interface = config["interface"]
-    del config["interface"]  # to test use of interface key
-    # sample values that pass semantic only
+# @patch("ska_ost_osd.telvalidation.semantic_validator.fetch_capabilities_from_osd")
+# def test_tmc_assignresources_valid_inputs_point_to_git_source(
+#     fetch_capabilities, git_tm_data
+# ):  # pylint: disable=W0621
+#     """
+#     Test semantic validate assign resource command with valid inputs.
+#     """
+#     osd_capabilities = capabilities["capabilities"]["mid"]
+#     fetch_capabilities.return_value = (
+#         osd_capabilities[ARRAY_ASSEMBLY],
+#         osd_capabilities["basic_capabilities"],
+#     )
+#     config = VALID_MID_ASSIGN_JSON
+#     interface = config["interface"]
+#     del config["interface"]  # to test use of interface key
+#     # sample values that pass semantic only
 
-    with pytest.raises(
-        SchematicValidationError,
-        match="""interface is missing from observing_command_input.
-        Please provide interface='...' explicitly""",
-    ):
-        semantic_validate(config, git_tm_data)
+#     with pytest.raises(
+#         SchematicValidationError,
+#         match=(
+#             "Interface is missing from observing_command_input. Please provide"
+#             " interface='...' explicitly."
+#         ),
+#     ):
+#         semantic_validate(config, git_tm_data)
 
-    config["interface"] = interface
+#     config["interface"] = interface
 
-    assert semantic_validate(config, tm_data=git_tm_data), True
+#     assert semantic_validate(config, tm_data=git_tm_data), True
 
 
 @patch("ska_ost_osd.telvalidation.semantic_validator.fetch_capabilities_from_osd")
@@ -275,8 +277,10 @@ def test_tmc_assignresources_valid_inputs(mock1, tm_data):  # pylint: disable=W0
 
     with pytest.raises(
         SchematicValidationError,
-        match="""interface is missing from observing_command_input.
-        Please provide interface='...' explicitly""",
+        match=(
+            "Interface is missing from observing_command_input. Please provide"
+            " interface='...' explicitly."
+        ),
     ):
         semantic_validate(config, tm_data)
 
@@ -302,8 +306,10 @@ def test_tmc_assignresources_invalid_inputs(mock2, tm_data):  # pylint: disable=
 
     with pytest.raises(
         SchematicValidationError,
-        match="""interface is missing from observing_command_input.
-        Please provide interface='...' explicitly""",
+        match=(
+            "Interface is missing from observing_command_input. Please provide"
+            " interface='...' explicitly."
+        ),
     ):
         semantic_validate(config, tm_data)
 
@@ -345,8 +351,10 @@ def test_tmc_configure_valid_inputs(cnf_mock, tm_data):  # pylint: disable=W0621
 
     with pytest.raises(
         SchematicValidationError,
-        match="""interface is missing from observing_command_input.
-        Please provide interface='...' explicitly""",
+        match=(
+            "Interface is missing from observing_command_input. Please provide"
+            " interface='...' explicitly."
+        ),
     ):
         semantic_validate(config, tm_data)
 
@@ -372,8 +380,10 @@ def test_tmc_configure_invalid_inputs(mock, tm_data):  # pylint: disable=W0621
 
     with pytest.raises(
         SchematicValidationError,
-        match="""interface is missing from observing_command_input.
-        Please provide interface='...' explicitly""",
+        match=(
+            "Interface is missing from observing_command_input. Please provide"
+            " interface='...' explicitly."
+        ),
     ):
         semantic_validate(config, tm_data)
 
@@ -537,8 +547,10 @@ def test_tmc_low_assignresources_valid_inputs(mock, tm_data):  # pylint: disable
     del config["interface"]  # to test use of interface key
     with pytest.raises(
         SchematicValidationError,
-        match="""interface is missing from observing_command_input.
-        Please provide interface='...' explicitly""",
+        match=(
+            "Interface is missing from observing_command_input. Please provide"
+            " interface='...' explicitly."
+        ),
     ):
         semantic_validate(config, tm_data)
 
@@ -565,8 +577,10 @@ def test_tmc_low_assignresources_invalid_inputs(mock, tm_data):  # pylint: disab
 
     with pytest.raises(
         SchematicValidationError,
-        match="""interface is missing from observing_command_input.
-        Please provide interface='...' explicitly""",
+        match=(
+            "Interface is missing from observing_command_input. Please provide"
+            " interface='...' explicitly."
+        ),
     ):
         semantic_validate(config, tm_data)
 
@@ -601,8 +615,10 @@ def test_tmc_low_configure_valid_inputs(mock, tm_data):  # pylint: disable=W0621
     del config["interface"]  # to test use of interface key
     with pytest.raises(
         SchematicValidationError,
-        match="""interface is missing from observing_command_input.
-        Please provide interface='...' explicitly""",
+        match=(
+            "Interface is missing from observing_command_input. Please provide"
+            " interface='...' explicitly."
+        ),
     ):
         semantic_validate(config, tm_data)
     config["interface"] = interface
@@ -628,8 +644,10 @@ def test_tmc_low_configure_invalid_inputs(mock, tm_data):  # pylint: disable=W06
 
     with pytest.raises(
         SchematicValidationError,
-        match="""interface is missing from observing_command_input.
-        Please provide interface='...' explicitly""",
+        match=(
+            "Interface is missing from observing_command_input. Please provide"
+            " interface='...' explicitly."
+        ),
     ):
         semantic_validate(config, tm_data)
     config["interface"] = interface

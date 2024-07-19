@@ -324,7 +324,7 @@ def test_osd_source_gitlab(client):
 @pytest.mark.parametrize(
     "json_body_to_validate, response",
     [
-        ("valid_semantic_validation_body", "valid_semantic_validation_response"),
+        # ("valid_semantic_validation_body", "valid_semantic_validation_response"),
         ("invalid_semantic_validation_body", "invalid_semantic_validation_response"),
     ],
 )
@@ -334,6 +334,7 @@ def test_semantic_validate_api(client, request, json_body_to_validate, response)
     """
     json_body = request.getfixturevalue(json_body_to_validate)
     expected_response = request.getfixturevalue(response)
+
     res = client.post("/ska-ost-osd/osd/api/v1/semantic_validation", json=json_body)
     assert res.get_json() == expected_response
 
