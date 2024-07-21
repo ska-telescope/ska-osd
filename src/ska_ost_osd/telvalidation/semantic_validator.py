@@ -19,7 +19,7 @@ from .constant import (
     SKA_MID_TELESCOPE,
     SKA_SBD,
 )
-from .oet_tmc_validators import validate_json
+from .oet_tmc_validators import clear_semantic_variable_data, validate_json
 from .schematic_validation_exceptions import SchematicValidationError
 
 logging.getLogger("telvalidation")
@@ -265,6 +265,7 @@ def semantic_validate(
     Set False to only log the error messages.
     :returns: True if semantic validation passes, False otherwise.
     """
+    clear_semantic_variable_data()
     version = observing_command_input.get("interface") or interface
 
     if not version:

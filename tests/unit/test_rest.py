@@ -321,6 +321,7 @@ def test_osd_source_gitlab(client):
     response.json == error_msg  # pylint: disable=W0104
 
 
+@patch("ska_ost_osd.rest.api.resources.get_tmdata_sources")
 @pytest.mark.parametrize(
     "json_body_to_validate, response",
     [
@@ -328,10 +329,13 @@ def test_osd_source_gitlab(client):
         ("invalid_semantic_validation_body", "invalid_semantic_validation_response"),
     ],
 )
-def test_semantic_validate_api(client, request, json_body_to_validate, response):
+def test_semantic_validate_api(
+    mock_tmdata, client, request, json_body_to_validate, response
+):
     """
     Test semantic validation API with valid and invalid JSON
     """
+    mock_tmdata.return_value = ["file://tmdata"]
     json_body = request.getfixturevalue(json_body_to_validate)
     expected_response = request.getfixturevalue(response)
 
@@ -352,6 +356,7 @@ def test_semantic_validate_api_not_passing_required_keys(
     assert res.get_json() == expected_response
 
 
+@patch("ska_ost_osd.rest.api.resources.get_tmdata_sources")
 @pytest.mark.parametrize(
     "json_body_to_validate, response, key_to_delete",
     [
@@ -378,11 +383,12 @@ def test_semantic_validate_api_not_passing_required_keys(
     ],
 )
 def test_not_passing_optional_keys(
-    request, client, json_body_to_validate, response, key_to_delete
+    mock_tmdata, request, client, json_body_to_validate, response, key_to_delete
 ):
     """
     Test semantic validation API response by not passing optional keys
     """
+    mock_tmdata.return_value = ["file://tmdata"]
     json_body = request.getfixturevalue(json_body_to_validate).copy()
     del json_body[key_to_delete]
     expected_response = request.getfixturevalue(response)
@@ -404,7 +410,9 @@ def test_wrong_values_and_no_observing_command_input(
     assert res.get_json() == expected_response
 
 
+@patch("ska_ost_osd.rest.api.resources.get_tmdata_sources")
 def test_passing_only_required_keys(
+    mock_tmdata,
     client,
     valid_only_observing_command_input_in_request_body,
     valid_semantic_validation_response,
@@ -412,6 +420,7 @@ def test_passing_only_required_keys(
     """
     Test semantic validation API response with only required keys.
     """
+    mock_tmdata.return_value = ["file://tmdata"]
     json_body = valid_only_observing_command_input_in_request_body
     expected_response = valid_semantic_validation_response
     res = client.post("/ska-ost-osd/osd/api/v1/semantic_validation", json=json_body)

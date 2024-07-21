@@ -148,6 +148,10 @@ def validation_response(
     return response_body, http_status
 
 
+def get_tmdata_sources(source):
+    return [source] if source else CAR_TELMODEL_SOURCE  # check source
+
+
 @error_handler
 def semantically_validate_json(body: dict):
     """
@@ -180,11 +184,7 @@ def semantically_validate_json(body: dict):
     ) = SemanticValidationBodyParamsValidator().process_input(
         body, SemanticValidationBodyParams, True
     )
-    sources = (
-        [validated_semantic_validation_obj.sources]
-        if validated_semantic_validation_obj.sources
-        else CAR_TELMODEL_SOURCE
-    )  # check source
+    sources = get_tmdata_sources(validated_semantic_validation_obj.sources)
 
     try:
         tm_data = TMData(sources, update=True)

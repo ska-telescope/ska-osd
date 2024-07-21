@@ -309,7 +309,6 @@ def validate_json(
     # initially declared empty values for error messages list, last parent dict
     # and parent key
     error_msg_list = []
-    clear_semantic_variable_data()
     for key, value in semantic_validate_constant_json.items():
         if isinstance(value, list):
             # if validation key present in multiple dict parent_key
