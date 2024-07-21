@@ -15,10 +15,9 @@ OSD capabilities.
 
 import logging
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Union
 
 import astropy.units as u
-import simpleeval
 from astropy.time import Time
 from simpleeval import EvalWithCompoundTypes
 
@@ -39,16 +38,19 @@ logging.getLogger("telvalidation")
 from collections import deque
 
 
-def get_value_based_on_key(nested_data: Dict, path: List) -> Any:
+def get_value_based_on_key(nested_data: Union[Dict, List], path: List) -> Any:
     """
-    Retrieve a value from a nested dictionary or list of dictionaries based on a given path.
+    Retrieve a value from a nested dictionary or
+    list of dictionaries based on a given path.
 
     Args:
-        nested_data (dict or list): The nested dictionary or list of dictionaries to search.
+        nested_data (dict or list): The nested dictionary or
+        list of dictionaries to search.
         path (list): A list of keys representing the path to the desired value.
 
     Returns:
-        The value at the specified path, or None if the path is invalid or the value is not found.
+        The value at the specified path, or None if the path is invalid
+        or the value is not found.
     """
     stack = deque()
     stack.append((nested_data, path))
@@ -98,7 +100,8 @@ def search_and_return_value_from_basic_capabilities(
     basic_capabilities: dict, search_key: str, rule: str
 ) -> list:
     """
-    This function returns a list of matched key-value dictionaries based on the rule value.
+    This function returns a list of matched key-value dictionaries
+    based on the rule value.
 
     Example:
     The updated structure of basic capabilities and rule is below:
@@ -119,9 +122,11 @@ def search_and_return_value_from_basic_capabilities(
         }
     ]
 
-    min_frequency_hz and max_frequency_hz rule constraints are matched from
-    capabilities, hence the output list becomes [{"min_frequency_hz": 350000000.0,
-                                                  "max_frequency_hz": 1050000000.0}]
+    min_frequency_hz and max_frequency_hz rule constraints
+    are matched from
+    capabilities, hence the output list becomes
+    [{"min_frequency_hz": 350000000.0,
+    "max_frequency_hz": 1050000000.0}]
 
     :param basic_capabilities: Capabilities from OSD
     :param search_key: Keys from the rule file
@@ -160,12 +165,16 @@ def apply_validation_rule(
     capabilities: Dict,
 ) -> str:
     """
-    Evaluate validation rules using simpleeval and return an error message if the input is invalid.
+    Evaluate validation rules using simpleeval and
+    return an error message if the input is invalid.
 
     :param key: str, the user input key for search.
-    :param value: List[Dict[str, Union[str, Dict]]], a list of dictionaries containing the rule and error.
-    :param command_input_json_config: Dict, the command input JSON from the operator.
-    :param parent_key: str, the parent key to identify the correct child key.
+    :param value: List[Dict[str, Union[str, Dict]]],
+    a list of dictionaries containing the rule and error.
+    :param command_input_json_config: Dict,
+    the command input JSON from the operator.
+    :param parent_key: str, the parent key to
+    identify the correct child key.
     :param capabilities: Dict, the capabilities dictionary.
     :return: str, the error message after applying the rule.
     """
@@ -192,7 +201,7 @@ def apply_validation_rule(
                     error_msgs.append(error_msg)
             except KeyError as key_error:
                 logging.error(key_error)
-                raise SchemanticValdidationKeyError(
+                raise SchemanticValdidationKeyError(  # pylint: disable=W0707
                     message="Invalid rule and error key passed"
                 )
 
@@ -219,14 +228,14 @@ def evaluate_rule(
     """
     names = {}
     eval_new_data = []
-    eval = EvalWithCompoundTypes()
-    eval.functions["len"] = len
+    simple_eval = EvalWithCompoundTypes()
+    simple_eval.functions["len"] = len
     if len(rule_key_dict) > 1:
         for i in rule_key_dict:
             names = {key: res_value}
             names = {**names, **i}
-            eval.names = names
-            eval_data = eval.eval(rule_data["rule"])
+            simple_eval.names = names
+            eval_data = simple_eval.eval(rule_data["rule"])
             if eval_data is False or (
                 not isinstance(eval_data, bool) and len(eval_data) > 0
             ):
@@ -251,8 +260,8 @@ def evaluate_rule(
             names = {key: res_value}
             names = {**names, **rule_key_dict_new}
 
-        eval.names = names
-        eval_data = eval.eval(rule_data["rule"])
+        simple_eval.names = names
+        eval_data = simple_eval.eval(rule_data["rule"])
 
         if isinstance(eval_data, set) and len(eval_data) == 0:
             eval_new_data.append(True)

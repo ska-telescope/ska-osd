@@ -194,12 +194,15 @@ mid_sbd_expected_result_for_invalid_data = (
     ],
 )
 def test_semantic_validate_para(
-    mock_fetch_capabilities, config, telescope, expected_result, is_exception, tm_data
+    mock_fetch_capabilities,
+    config,
+    telescope,
+    expected_result,
+    is_exception,
+    tm_data,  # pylint: disable=W0621
 ):
     """
     Parameterized test case to verify semantic validation for different inputs.
-    """
-    """
     Test semantic validate assign resource command with valid inputs.
     """
     if telescope == "MID":

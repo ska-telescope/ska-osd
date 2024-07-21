@@ -118,9 +118,11 @@ def replace_nested_value(nested_dict: Dict, path: List[str], new_value: Any) -> 
     Replace the value of a nested key in a dictionary.
 
     :param nested_dict: Dict, the dictionary to modify.
-    :param path: List[str], the path to the key to replace, represented as a list of keys.
+    :param path: List[str], the path to the key to replace,
+    represented as a list of keys.
     :param new_value: Any, the new value to assign to the key.
-    :raises KeyError: If any key in the path is not found in the nested dictionary.
+    :raises KeyError: If any key in the path is
+    not found in the nested dictionary.
     :raises TypeError: If the path does not lead to a dictionary.
     """
     current = nested_dict
@@ -251,17 +253,22 @@ def semantic_validate(
     osd_data: Optional[Dict] = None,
 ) -> bool:
     """
-    This method is the entry point for semantic validation, which can be consumed by
-    other libraries like CDM.
+    This method is the entry point for semantic validation,
+    which can be consumed by other libraries like CDM.
 
-    :param observing_command_input: dictionary containing details of the command which needs validation.
-    This is the same as for ska_telmodel.schema.validate.
-    If the command is available as a JSON string, first convert it to a dictionary using json.loads.
-    :param tm_data: telemodel tm data object using which we can load the semantic validation JSON.
+    :param observing_command_input: dictionary containing details
+    of the command which needs validation.This is the same as
+    for ska_telmodel.schema.validate.
+    If the command is available as a JSON string,
+    first convert it to a dictionary using json.loads.
+    :param tm_data: telemodel tm data object using
+    which we can load the semantic validation JSON.
     :param osd_data: osd_data dict which is passed externally.
-    :param interface: interface URI in full, only provide if missing in observing_command_input.
+    :param interface: interface URI in full,
+    only provide if missing in observing_command_input.
     :param array_assembly: Array assembly like AA0.5, AA0.1.
-    :param raise_semantic: True (default) would require the user to catch the SchematicValidationError somewhere.
+    :param raise_semantic: True (default) would require
+    the user to catch the SchematicValidationError somewhere.
     Set False to only log the error messages.
     :returns: True if semantic validation passes, False otherwise.
     """
@@ -284,8 +291,8 @@ def semantic_validate(
     if msg_list:
         msg = "\n".join(msg_list)
         logging.error(
-            "Also following errors were encountered during semantic"
-            f" validations:\n{msg}"
+            "Also following errors were encountered during semantic %s",
+            "validations:\n{msg}",
         )
         if raise_semantic:
             raise SchematicValidationError(msg)
