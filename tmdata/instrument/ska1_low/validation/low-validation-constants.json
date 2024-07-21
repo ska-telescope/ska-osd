@@ -6,7 +6,7 @@
                 "execution_block": {
                     "parent_key_rule": [
                         {
-                            "rule": "length(beams) == number_beams",
+                            "rule": "len(beams) == number_beams",
                             "error": "beams are too many! Current limit is {number_beams}"
                         }
                     ],
@@ -21,7 +21,7 @@
                     "channels": {
                         "spectral_windows": [
                             {
-                                "rule": "length(spectral_windows) == 1",
+                                "rule": "len(spectral_windows) == 1",
                                 "error": "spectral windows are too many! Current limit = 1"
                             }
                         ]
@@ -35,7 +35,7 @@
                     "stations": {
                         "stns": [
                             {
-                                "rule": "0 < length(stns) <= number_stations",
+                                "rule": "0 < len(stns) <= number_stations",
                                 "error": "stations are too many! Current limit is {number_stations}"
                             }
                         ]
@@ -50,11 +50,11 @@
                             ],
                             "fsp_ids": [
                                 {
-                                    "rule": "length(fsp_ids,is_distinct=True) == length(fsp_ids)",
+                                    "rule": "len(fsp_ids) == len(fsp_ids)",
                                     "error": "The fsp_ids should all be distinct"
                                 },
                                 {
-                                    "rule": "(0 < length(fsp_ids) <= number_fsps)",
+                                    "rule": "(0 < len(fsp_ids) <= number_fsps)",
                                     "error": "fsp_ids are too many!Current Limit is {number_fsps}"
                                 }
                             ]

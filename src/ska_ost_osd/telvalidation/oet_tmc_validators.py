@@ -15,6 +15,7 @@ OSD capabilities.
 
 import logging
 from datetime import datetime
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import astropy.units as u
 import simpleeval
@@ -33,75 +34,64 @@ from .schematic_validation_exceptions import (
 )
 
 logging.getLogger("telvalidation")
-SEMANTIC_DATA_GLOBAL_CONSTANT = {}
 
 
-def get_value_based_on_key(
-    input_command_data: dict,
-    search_key: str,
-    item_populated_list: list,
-    parent_key_for_search: str,
-    comparison_parent_key: str,
-) -> list:
+from collections import deque
+
+
+def get_value_based_on_key(nested_data: Dict, path: List) -> Any:
     """
-    This function return value which we have to apply semantic validation
-    e.g "dish": {
-                "receptor_ids": ["0001", "0002"]
-            }
-    here we are fetching receptor_ids for semantic validation
+    Retrieve a value from a nested dictionary or list of dictionaries based on a given path.
 
-    :param input_command_data: dictionary containing details of the command
-        which needs validation.
+    Args:
+        nested_data (dict or list): The nested dictionary or list of dictionaries to search.
+        path (list): A list of keys representing the path to the desired value.
 
-    :param search_key: string containing keys of all parameters
-        which needs validation.
-
-    :param item_populated_list: list containing all the search values
-
-    :param parent_key_for_search: supporting key to identify proper semantic
-        validation key
-
-    :param comparison_parent_key: help to compare parent values.
-
-    :returns: item_populated list
-
+    Returns:
+        The value at the specified path, or None if the path is invalid or the value is not found.
     """
-    for key, item in input_command_data.items():
-        if (
-            parent_key_for_search
-            and isinstance(key, str)
-            and key == search_key
-            and parent_key_for_search == comparison_parent_key
-        ):
-            item_populated_list.append(item)
-        elif isinstance(item, dict):
-            get_value_based_on_key(
-                item,
-                search_key,
-                item_populated_list,
-                parent_key_for_search,
-                comparison_parent_key=key,
-            )
-        elif isinstance(item, list) and [val for val in item if isinstance(val, dict)]:
-            for new_val in item:
-                get_value_based_on_key(
-                    new_val,
-                    search_key,
-                    item_populated_list,
-                    parent_key_for_search,
-                    comparison_parent_key=key,
-                )
-    # fetch single matched command input value consider for dish
-    # "dish": {
-    #            "receptor_ids": ["0001", "0002"]
-    #        }
-    # for receptor_ids it will return ["0001","0002"]
-    # value appended list contains
-    # multiple value so picked up 0th index value
-    item_populated = (
-        item_populated_list[0] if len(item_populated_list) > 0 else item_populated_list
-    )
-    return item_populated
+    stack = deque()
+    stack.append((nested_data, path))
+
+    while stack:
+        current_data, remaining_path = stack.pop()
+
+        if not remaining_path:
+            return current_data
+
+        current_key = remaining_path[0]
+        remaining_path = remaining_path[1:]
+
+        if isinstance(current_data, dict):
+            if current_key in current_data:
+                stack.append((current_data[current_key], remaining_path))
+            else:
+                # Check if the current key exists in any nested dictionary
+                for value in current_data.values():
+                    if isinstance(value, dict):
+                        stack.append((value, [current_key] + remaining_path))
+                    elif isinstance(value, list):
+                        for item in value:
+                            if isinstance(item, dict):
+                                stack.append((item, [current_key] + remaining_path))
+        elif isinstance(current_data, list):
+            for item in current_data:
+                if isinstance(item, dict) and current_key in item:
+                    value = item[current_key]
+                    if not remaining_path:
+                        return value
+                    elif isinstance(remaining_path[0], int):
+                        # Handle case where the next key is an integer (list index)
+                        next_key = remaining_path[0]
+                        remaining_path = remaining_path[1:]
+                        if isinstance(value, list) and next_key < len(value):
+                            stack.append((value, [next_key] + remaining_path))
+                    else:
+                        stack.append((value, remaining_path))
+        else:
+            return None
+
+    return None
 
 
 def search_and_return_value_from_basic_capabilities(
@@ -161,18 +151,6 @@ def search_and_return_value_from_basic_capabilities(
 
     return result
 
-from typing import Dict, List, Union
-
-
-def get_nested_value(nested_dict, path):
-    current = nested_dict
-    for key in path:
-        if isinstance(current, dict) and key in current:
-            current = current[key]
-        else:
-            return None
-    return current
-
 
 def apply_validation_rule(
     key: str,
@@ -191,22 +169,9 @@ def apply_validation_rule(
     :param capabilities: Dict, the capabilities dictionary.
     :return: str, the error message after applying the rule.
     """
-    res_value = get_value_based_on_key(
-        command_input_json_config,
-        key,
-        item_populated_list=[],
-        parent_key_for_search=parent_key,
-        comparison_parent_key=None,
-    )
-
+    res_value = get_value_based_on_key(command_input_json_config, [parent_key, key])
     if res_value:
-        SEMANTIC_DATA_GLOBAL_CONSTANT.update({key: res_value})
-        eval_functions = simpleeval.DEFAULT_FUNCTIONS.copy()
-        # write code using simpleeval for calculating lenght of string
-        eval_functions.update(
-            length=return_length,
-            value=return_value_from_global_constant,
-        )
+        add_semantic_variables({key: res_value})
         error_msgs = []
 
         for rule_data in value:
@@ -221,10 +186,7 @@ def apply_validation_rule(
                     res_value,
                     rule_data,
                     rule_key_dict,
-                    eval_functions,
-                    command_input_json_config,
                 )
-                print(eval_result)
                 if eval_result and True not in eval_result:
                     error_msg = format_error_message(rule_data, rule_key_dict)
                     error_msgs.append(error_msg)
@@ -244,8 +206,6 @@ def evaluate_rule(
     res_value: Union[str, List],
     rule_data: Dict[str, Union[str, Dict]],
     rule_key_dict: List[Dict],
-    eval_functions: Dict,
-    command_input_json_config: Dict,
 ) -> bool:
     """
     Evaluate a single validation rule using simpleeval.
@@ -259,12 +219,12 @@ def evaluate_rule(
     """
     names = {}
     eval_new_data = []
+    eval = EvalWithCompoundTypes()
+    eval.functions["len"] = len
     if len(rule_key_dict) > 1:
         for i in rule_key_dict:
             names = {key: res_value}
             names = {**names, **i}
-            eval = EvalWithCompoundTypes()
-            eval.functions["len"] = len
             eval.names = names
             eval_data = eval.eval(rule_data["rule"])
             if eval_data is False or (
@@ -273,7 +233,6 @@ def evaluate_rule(
                 eval_new_data.append(False)
             else:
                 eval_new_data.append(True)
-
     else:
         if rule_key_dict:
             rule_key_dict_new = rule_key_dict[0]
@@ -281,24 +240,19 @@ def evaluate_rule(
             rule_key_dict_new = {}
 
         if "dependency_key" in rule_data:
-            dependency_value = get_nested_value(
-                command_input_json_config, rule_data["dependency_key"]
-            )
-
+            dependency_values = get_semantic_variables()
             names = {
-                key: key,
-                rule_data["dependency_key"]: rule_data["dependency_key"],
+                key: res_value,
+                rule_data["dependency_key"]: dependency_values[
+                    rule_data["dependency_key"]
+                ],
             }
-        elif isinstance(res_value, list):
-            names = {key: key}
-            names = {**names, **rule_key_dict_new}
         else:
             names = {key: res_value}
             names = {**names, **rule_key_dict_new}
 
-        eval_data = EvalWithCompoundTypes(functions=eval_functions, names=names).eval(
-            rule_data["rule"]
-        )
+        eval.names = names
+        eval_data = eval.eval(rule_data["rule"])
 
         if isinstance(eval_data, set) and len(eval_data) == 0:
             eval_new_data.append(True)
@@ -326,156 +280,77 @@ def format_error_message(
     return rule_data["error"]
 
 
-# def validate_json(
-#     semantic_validate_constant_json: dict,
-#     command_input_json_config: dict,
-#     error_msg_list: list,
-#     parent_key: str,
-#     capabilities: dict,
-# ) -> list:
-#     """
-#     This function is written to matching key's from user input command
-#     and validation constant rules those and present in mid, low
-#     and SBD validation constant json.
-#     e.g consider one of the assign resource command dish rule
-#     from constant json.
-#     here we are just mapping rule dish of receptor_ids to
-#     user assign resource command input payload.
-#     :param semantic_validate_constant_json: json containing all the parameters
-#     along with its business semantic validation rules and error message.
-#     :param command_input_json_config: dictionary containing
-#     details of the command input which needs validation.
-#     This is same as for ska_telmodel.schema.validate.
-#     :param parent_key: temp key to store parent key, means if same semantic
-#     validation key present in 2 places this will help to identify
-#     correct parent.
-#     :param capabilities: defined key, value structure pair from OSD API
-#     :returns: error_msg_list: list containing all combined error which arises
-#     due to semantic validation.
-#     """
-#     # initially declared empty values for error messages list, last parent dict
-#     # and parent key
-#     for key, value in semantic_validate_constant_json.items():
-#         if isinstance(value, list):
-#             # if validation key present in multiple dict parent_key
-#             # helps to populate current child
-#             rule_result = apply_validation_rule(
-#                 key=key,
-#                 value=value,
-#                 command_input_json_config=command_input_json_config,
-#                 parent_key=parent_key,
-#                 capabilities=capabilities,
-#             )
-#             if rule_result:
-#                 error_msg_list.append(rule_result)
-
-#         elif isinstance(value, dict):
-#             # added extra key as rule parent to perform rule validation
-#             # on child
-#             # e.g semantic rule suggest calculate beams length but beams
-#             # is having array of element, in this case parent_rule_key
-#             # key helps to apply rule on child]
-#             if "parent_key_rule" in value:
-#                 rule_key = list(value.keys())[1]
-#                 rule_result = apply_validation_rule(
-#                     key=rule_key,
-#                     value=value["parent_key_rule"],
-#                     command_input_json_config=command_input_json_config,
-#                     parent_key=key,
-#                     capabilities=capabilities,
-#                 )
-#                 if rule_result:
-#                     error_msg_list.append(rule_result)
-#             parent_key = key
-#             validate_json(
-#                 value,
-#                 command_input_json_config,
-#                 error_msg_list,
-#                 parent_key,
-#                 capabilities,
-#             )
-#     return error_msg_list
-
-
 def validate_json(
     semantic_validate_constant_json: dict,
     command_input_json_config: dict,
+    parent_key: str,
     capabilities: dict,
 ) -> list:
     """
-    This function matches keys from the user input command with the validation constant rules
-    present in the mid, low, and SBD validation constant JSON.
-
-    For example, consider the dish rule of the receptor_ids for the assign resource command
-    from the constant JSON. Here, we map the rule for dish.receptor_ids to the user's
-    assign resource command input payload.
-
-    :param semantic_validate_constant_json: JSON containing all parameters along with
-        their business semantic validation rules and error messages.
-    :param command_input_json_config: Dictionary containing details of the command input
-        that needs validation (same as for ska_telmodel.schema.validate).
-    :param capabilities: Defined key-value structure pair from the OSD API.
-    :returns: error_msg_list: List containing all combined errors arising due to semantic validation.
+    This function is written to matching key's from user input command
+    and validation constant rules those and present in mid, low
+    and SBD validation constant json.
+    e.g consider one of the assign resource command dish rule
+    from constant json.
+    here we are just mapping rule dish of receptor_ids to
+    user assign resource command input payload.
+    :param semantic_validate_constant_json: json containing all the parameters
+    along with its business semantic validation rules and error message.
+    :param command_input_json_config: dictionary containing
+    details of the command input which needs validation.
+    This is same as for ska_telmodel.schema.validate.
+    :param parent_key: temp key to store parent key, means if same semantic
+    validation key present in 2 places this will help to identify
+    correct parent.
+    :param capabilities: defined key, value structure pair from OSD API
+    :returns: error_msg_list: list containing all combined error which arises
+    due to semantic validation.
     """
+    # initially declared empty values for error messages list, last parent dict
+    # and parent key
     error_msg_list = []
-    stack = [(semantic_validate_constant_json, "")]
+    clear_semantic_variable_data()
+    for key, value in semantic_validate_constant_json.items():
+        if isinstance(value, list):
+            # if validation key present in multiple dict parent_key
+            # helps to populate current child
+            rule_result = apply_validation_rule(
+                key=key,
+                value=value,
+                command_input_json_config=command_input_json_config,
+                parent_key=parent_key,
+                capabilities=capabilities,
+            )
+            if rule_result:
+                error_msg_list.append(rule_result)
 
-    while stack:
-        current_dict, parent_key = stack.pop()
-
-        for key, value in current_dict.items():
-            if isinstance(value, list):
+        elif isinstance(value, dict):
+            # added extra key as rule parent to perform rule validation
+            # on child
+            # e.g semantic rule suggest calculate beams length but beams
+            # is having array of element, in this case parent_rule_key
+            # key helps to apply rule on child]
+            if "parent_key_rule" in value:
+                rule_key = list(value.keys())[1]
                 rule_result = apply_validation_rule(
-                    key=key,
-                    value=value,
+                    key=rule_key,
+                    value=value["parent_key_rule"],
                     command_input_json_config=command_input_json_config,
-                    parent_key=parent_key,
+                    parent_key=key,
                     capabilities=capabilities,
                 )
                 if rule_result:
                     error_msg_list.append(rule_result)
-
-            elif isinstance(value, dict):
-                if "parent_key_rule" in value:
-                    rule_key = list(value.keys())[1]
-                    rule_result = apply_validation_rule(
-                        key=rule_key,
-                        value=value["parent_key_rule"],
-                        command_input_json_config=command_input_json_config,
-                        parent_key=key,
-                        capabilities=capabilities,
-                    )
-                    if rule_result:
-                        error_msg_list.append(rule_result)
-
-                stack.append((value, key))
-
+            parent_key = key
+            error_msg_list.extend(
+                validate_json(
+                    value,
+                    command_input_json_config,
+                    parent_key,
+                    capabilities,
+                )
+            )
     return error_msg_list
-
-
-
-
-def return_length(key, is_distinct=False):
-    """
-    this function is created to just return length of element.
-    simpleeval library not supported default length on list, tuple, set
-    so we need to create separate method and pass it simpleeval as a function.
-    :param key: semantic validate key.
-    """
-    print("SEMANTIC_DATA_GLOBAL_CONSTANT", key)
-    if is_distinct:
-        return len(set(SEMANTIC_DATA_GLOBAL_CONSTANT[key]))
-
-    return len(SEMANTIC_DATA_GLOBAL_CONSTANT[key])
-
-
-def return_value_from_global_constant(key):
-    """
-    this fucntion is created to just return value of element from semantic
-    data global constant.
-    :param key: semantic validate key.
-    """
-    return SEMANTIC_DATA_GLOBAL_CONSTANT[key]
 
 
 def validate_target_is_visible(
@@ -529,3 +404,18 @@ def validate_target_is_visible(
         )
         logging.error(error_message)
         raise SchematicValidationError(error_message)
+
+
+_semantic_validate_data = {}
+
+
+def add_semantic_variables(semantic_object: Any):
+    _semantic_validate_data.update(semantic_object)
+
+
+def get_semantic_variables():
+    return _semantic_validate_data
+
+
+def clear_semantic_variable_data():
+    _semantic_validate_data.clear()

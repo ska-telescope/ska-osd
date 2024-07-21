@@ -8,7 +8,7 @@
             "dish": {
                 "receptor_ids": [
                     {
-                        "rule": "(0 < length(receptor_ids) <= number_ska_dishes)",
+                        "rule": "(0 < len(receptor_ids) <= number_ska_dishes)",
                         "error": "receptor_ids are too many!Current Limit is {number_ska_dishes}"
                     }
                 ]
@@ -17,7 +17,7 @@
                 "execution_block": {
                     "parent_key_rule": [
                         {
-                            "rule": "length(beams) == 1",
+                            "rule": "len(beams) == 1",
                             "error": "beams are too many! Current limit is 1"
                         }
                     ],
@@ -32,7 +32,7 @@
                     "channels": {
                         "parent_key_rule": [
                             {
-                                "rule": "length(spectral_windows) == 1",
+                                "rule": "len(spectral_windows) == 1",
                                 "error": "spectral windows are too many! Current limit = 1" 
                             }
                         ],
@@ -55,7 +55,7 @@
                                     "error": "Invalid input for freq_max"                                
                                 },
                                 {
-                                    "rule": "value(freq_min) < value(freq_max)",
+                                    "rule": "freq_min < freq_max",
                                     "error": "freq_min should be less than freq_max",
                                     "dependency_key": "freq_min"                     
                                 }
@@ -66,12 +66,12 @@
                 "resources": {
                     "receptors": [
                         {
-                            "rule": "length(receptor_ids)==length(receptors)",
+                            "rule": "len(receptor_ids)==len(receptors)",
                             "dependency_key": "receptor_ids",
                             "error": "length of receptor_ids should be same as length of receptors"
                         },
                         {
-                            "rule": "set(value(receptor_ids)).difference(set(value(receptors)))",
+                            "rule": "set(receptor_ids).difference(set(receptors))",
                             "dependency_key": "receptor_ids",
                             "error": "receptor_ids did not match receptors"
                         }
@@ -92,7 +92,7 @@
                 "cbf": {
                     "parent_key_rule": [
                         {
-                            "rule": "length(fsp)<=number_fsps",
+                            "rule": "len(fsp)<=number_fsps",
                             "error": "FSPs are too many!Current Limit = {number_fsps}"
                         }
                     ],
@@ -117,7 +117,7 @@
                         ],
                         "frequency_slice_id": [
                             {
-                                "rule": "value(fsp_id)==value(frequency_slice_id)",
+                                "rule": "fsp_id==frequency_slice_id",
                                 "dependency_key": "fsp_id",
                                 "error": "frequency_slice_id did not match fsp_id"
                             }
@@ -127,7 +127,7 @@
                 "common": {
                     "frequency_band": [
                         {
-                            "rule": "value(receiver_band)==value(frequency_band)",
+                            "rule": "receiver_band==frequency_band",
                             "dependency_key": "receiver_band",
                             "error": "frequency_band did not match receiver_band"
                         }

@@ -233,6 +233,7 @@ def validate_command_input(
     msg_list = validate_json(
         semantic_validate_data[array_assembly],
         command_input_json_config=observing_command_input,
+        parent_key=None,
         capabilities=fetch_matched_capabilities_from_basic_capabilities(
             capabilities=capabilities, basic_capabilities=basic_capabilities
         ),

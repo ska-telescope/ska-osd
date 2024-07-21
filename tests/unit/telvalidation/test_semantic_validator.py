@@ -317,7 +317,6 @@ def test_tmc_assignresources_invalid_inputs(mock2, tm_data):  # pylint: disable=
 
     try:
         semantic_validate(config, tm_data=tm_data)
-
     except SchematicValidationError as error:
         assert (
             error.message
@@ -422,7 +421,6 @@ def test_validate_scemantic_json_input_keys(mock6):
         validate_json(
             INVALID_MID_VALIDATE_CONSTANT,
             INPUT_COMMAND_CONFIG,
-            error_msg_list=[],
             parent_key=None,
             capabilities=capabilities,
         )
@@ -660,7 +658,6 @@ def test_tmc_low_configure_invalid_inputs(mock, tm_data):  # pylint: disable=W06
             error.message
             == "stations are too many! Current limit is 4\n"
             "Invalid input for function mode! Currently allowed vis\n"
-            "The fsp_ids should all be distinct\n"
             "fsp_ids are too many!Current Limit is 6"
         )
 
@@ -720,6 +717,7 @@ def test_sbd_invalid_inputs(
             "Invalid input for channel_count! Currently allowed 14880\n"
             "Invalid input for freq_min\n"
             "Invalid input for freq_max\n"
+            "freq_min should be less than freq_max\n"
             "length of receptor_ids should be same as length of receptors\n"
             "receptor_ids did not match receptors\n"
             "FSPs are too many!Current Limit = 4\n"
@@ -741,14 +739,14 @@ def test_search_and_return_value_from_basic_capabilities():
     }
     expected = [{"test": "test"}]
     assert expected, search_and_return_value_from_basic_capabilities(
-        capabilities, "test", rule=None, result=[]
+        capabilities, "test", rule=None
     )
 
     osd_capabilities = capabilities["capabilities"]["mid"][ARRAY_ASSEMBLY][
         "available_receivers"
     ] = {"min_frequency_hz": ["test"]}
     result = search_and_return_value_from_basic_capabilities(
-        osd_capabilities, "test", rule=None, result=[]
+        osd_capabilities, "test", rule=None
     )
     assert [{"min_frequency_hz": ["test"]}], result
 
