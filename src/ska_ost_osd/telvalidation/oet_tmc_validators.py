@@ -96,7 +96,7 @@ def get_value_based_on_key(nested_data: Union[Dict, List], path: List) -> Any:
     return None
 
 
-def search_and_return_value_from_basic_capabilities(
+def get_matched_rule_constraint_from_osd(
     basic_capabilities: dict, search_key: str, rule: str
 ) -> list:
     """
@@ -185,7 +185,7 @@ def apply_validation_rule(
 
         for rule_data in value:
             try:
-                rule_key_dict = search_and_return_value_from_basic_capabilities(
+                osd_base_constraint = get_matched_rule_constraint_from_osd(
                     basic_capabilities=capabilities,
                     search_key=None,
                     rule=rule_data["rule"],
@@ -194,10 +194,10 @@ def apply_validation_rule(
                     key,
                     res_value,
                     rule_data,
-                    rule_key_dict,
+                    osd_base_constraint,
                 )
                 if eval_result and True not in eval_result:
-                    error_msg = format_error_message(rule_data, rule_key_dict)
+                    error_msg = format_error_message(rule_data, osd_base_constraint)
                     error_msgs.append(error_msg)
             except KeyError as key_error:
                 logging.error(key_error)
@@ -214,7 +214,7 @@ def evaluate_rule(
     key: str,
     res_value: Union[str, List],
     rule_data: Dict[str, Union[str, Dict]],
-    rule_key_dict: List[Dict],
+    osd_base_constraint: List[Dict],
 ) -> bool:
     """
     Evaluate a single validation rule using simpleeval.
@@ -222,7 +222,8 @@ def evaluate_rule(
     :param key: str, the user input key for search.
     :param res_value: Union[str, List], the value of the key.
     :param rule_data: Dict[str, Union[str, Dict]], the rule and error data.
-    :param rule_key_dict: List[Dict], the list of dictionaries containing the rule keys.
+    :param osd_base_constraint: List[Dict], the list of dictionaries
+    containing the rule keys.
     :param eval_functions: Dict, the dictionary of functions for simpleeval.
     :return: bool, True if the rule is satisfied, False otherwise.
     """
@@ -230,8 +231,8 @@ def evaluate_rule(
     eval_new_data = []
     simple_eval = EvalWithCompoundTypes()
     simple_eval.functions["len"] = len
-    if len(rule_key_dict) > 1:
-        for i in rule_key_dict:
+    if len(osd_base_constraint) > 1:
+        for i in osd_base_constraint:
             names = {key: res_value}
             names = {**names, **i}
             simple_eval.names = names
@@ -243,10 +244,10 @@ def evaluate_rule(
             else:
                 eval_new_data.append(True)
     else:
-        if rule_key_dict:
-            rule_key_dict_new = rule_key_dict[0]
+        if osd_base_constraint:
+            osd_base_constraint_value = osd_base_constraint[0]
         else:
-            rule_key_dict_new = {}
+            osd_base_constraint_value = {}
 
         if "dependency_key" in rule_data:
             dependency_values = get_semantic_variables()
@@ -258,7 +259,7 @@ def evaluate_rule(
             }
         else:
             names = {key: res_value}
-            names = {**names, **rule_key_dict_new}
+            names = {**names, **osd_base_constraint_value}
 
         simple_eval.names = names
         eval_data = simple_eval.eval(rule_data["rule"])

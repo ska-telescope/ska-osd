@@ -82,10 +82,12 @@ def fetch_capabilities_from_osd(
     return {}, {}
 
 
-def search_nested_dict(data: list | dict, key_to_find: str) -> dict | None:
+def get_matched_values_from_basic_capabilities(
+    data: list | dict, key_to_find: str
+) -> dict | None:
     """
     Efficiently search a nested dictionary and list structure to find the value
-    for the given key.
+    for the given key from basic capabilities.
 
     Args:
         data (dict or list): The nested data structure to search.
@@ -113,9 +115,12 @@ def search_nested_dict(data: list | dict, key_to_find: str) -> dict | None:
     return None
 
 
-def replace_nested_value(nested_dict: Dict, path: List[str], new_value: Any) -> None:
+def replace_matched_capabilities_values(
+    nested_dict: Dict, path: List[str], new_value: Any
+) -> None:
     """
-    Replace the value of a nested key in a dictionary.
+    Replace the value in capabilities data which matched from
+    basic capabilities.
 
     :param nested_dict: Dict, the dictionary to modify.
     :param path: List[str], the path to the key to replace,
@@ -149,7 +154,7 @@ def fetch_matched_capabilities_from_basic_capabilities(
     on basic capabilities.
     e.g after fetching capabilities and basic_capabilities from OSD needs
     to rearrange some data between basic capabilities and capabilities
-    so that we can easily search rule value.
+    so that we can easily decided mapping between rules.
     here Band_1 (min and max) frequency present in basic capabilities so
     value fetched according.
     capabilities = {
@@ -189,7 +194,9 @@ def fetch_matched_capabilities_from_basic_capabilities(
         if isinstance(current, dict):
             for key, value in current.items():
                 if isinstance(key, (str, int)) and isinstance(value, (str, int)):
-                    matched_values = search_nested_dict(basic_capabilities, key)
+                    matched_values = get_matched_values_from_basic_capabilities(
+                        basic_capabilities, key
+                    )
                     if matched_values:
                         replacible_values.append(matched_values)
                 if isinstance(value, (dict, list)):
@@ -201,10 +208,12 @@ def fetch_matched_capabilities_from_basic_capabilities(
                     stack.append((item, path))
                 else:
                     # search key into basic capabilities
-                    matched_values = search_nested_dict(basic_capabilities, item)
+                    matched_values = get_matched_values_from_basic_capabilities(
+                        basic_capabilities, item
+                    )
                     if matched_values:
                         replacible_values.append(matched_values)
-    replace_nested_value(clone_capabilities, path, replacible_values)
+    replace_matched_capabilities_values(clone_capabilities, path, replacible_values)
     return clone_capabilities
 
 

@@ -10,7 +10,7 @@ from ska_telmodel.schema import example_by_uri
 
 from ska_ost_osd.telvalidation.constant import CAR_TELMODEL_SOURCE
 from ska_ost_osd.telvalidation.oet_tmc_validators import (
-    search_and_return_value_from_basic_capabilities,
+    get_matched_rule_constraint_from_osd,
     validate_json,
     validate_target_is_visible,
 )
@@ -372,7 +372,7 @@ def sbd_invalid_request_json_path():
     return config
 
 
-def test_search_and_return_value_from_basic_capabilities():
+def test_get_matched_rule_constraint_from_osd():
     """
     test case to verify whether we can fetch frequency values or not
     which are present in dictionary within list
@@ -381,16 +381,14 @@ def test_search_and_return_value_from_basic_capabilities():
         "min_frequency_hz": {"test": "test"},
     }
     expected = [{"test": "test"}]
-    assert expected, search_and_return_value_from_basic_capabilities(
+    assert expected, get_matched_rule_constraint_from_osd(
         capabilities, "test", rule=None
     )
 
     osd_capabilities = capabilities["capabilities"]["mid"][ARRAY_ASSEMBLY][
         "available_receivers"
     ] = {"min_frequency_hz": ["test"]}
-    result = search_and_return_value_from_basic_capabilities(
-        osd_capabilities, "test", rule=None
-    )
+    result = get_matched_rule_constraint_from_osd(osd_capabilities, "test", rule=None)
     assert [{"min_frequency_hz": ["test"]}], result
 
 
