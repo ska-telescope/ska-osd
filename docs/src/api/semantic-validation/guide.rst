@@ -258,7 +258,7 @@ This constraints value 4 is fetched from OSD by referring key ``number_ska_dishe
     "dish": {
                 "receptor_ids": [
                     {
-                        "rule": "(0 < length(receptor_ids) <= number_ska_dishes)",
+                        "rule": "(0 < len(receptor_ids) <= number_ska_dishes)",
                         "error": "receptor_ids are too many!Current Limit is {number_ska_dishes}"
                     }
                 ]

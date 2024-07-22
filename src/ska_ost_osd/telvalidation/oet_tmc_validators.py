@@ -7,7 +7,7 @@ payload which provided for execution of specific command.
 Rule file contains constraints and those values are fetched from
 OSD capabilities.
 e.g: in rule file below is rule and error messages.
-"rule": "(0 < length(receptor_ids) <= number_ska_dishes)"
+"rule": "(0 < len(receptor_ids) <= number_ska_dishes)"
 "error": "receptor_ids are too many!Current Limit is {number_ska_dishes}"
 here 'number_ska_dishes' constraints value fetched from
 OSD capabilities.
@@ -38,7 +38,7 @@ logging.getLogger("telvalidation")
 from collections import deque
 
 
-def get_value_based_on_key(nested_data: Union[Dict, List], path: List) -> Any:
+def get_value_based_on_provided_path(nested_data: Union[Dict, List], path: List) -> Any:
     """
     Retrieve a value from a nested dictionary or
     list of dictionaries based on a given path.
@@ -47,6 +47,8 @@ def get_value_based_on_key(nested_data: Union[Dict, List], path: List) -> Any:
         nested_data (dict or list): The nested dictionary or
         list of dictionaries to search.
         path (list): A list of keys representing the path to the desired value.
+        e.g: This help to retrieve element from dict
+        based on given path like ['a', 'b', 'c']
 
     Returns:
         The value at the specified path, or None if the path is invalid
@@ -178,7 +180,9 @@ def apply_validation_rule(
     :param capabilities: Dict, the capabilities dictionary.
     :return: str, the error message after applying the rule.
     """
-    res_value = get_value_based_on_key(command_input_json_config, [parent_key, key])
+    res_value = get_value_based_on_provided_path(
+        command_input_json_config, [parent_key, key]
+    )
     if res_value:
         add_semantic_variables({key: res_value})
         error_msgs = []
@@ -231,15 +235,15 @@ def evaluate_rule(
     eval_new_data = []
     simple_eval = EvalWithCompoundTypes()
     simple_eval.functions["len"] = len
+
     if len(osd_base_constraint) > 1:
+        # if found multiple constraints values from OSD
         for i in osd_base_constraint:
             names = {key: res_value}
             names = {**names, **i}
             simple_eval.names = names
             eval_data = simple_eval.eval(rule_data["rule"])
-            if eval_data is False or (
-                not isinstance(eval_data, bool) and len(eval_data) > 0
-            ):
+            if not eval_data:
                 eval_new_data.append(False)
             else:
                 eval_new_data.append(True)
@@ -263,14 +267,9 @@ def evaluate_rule(
 
         simple_eval.names = names
         eval_data = simple_eval.eval(rule_data["rule"])
-
-        if isinstance(eval_data, set) and len(eval_data) == 0:
-            eval_new_data.append(True)
-        if isinstance(eval_data, set) and len(eval_data) > 0:
-            eval_new_data.append(False)
-        else:
-            eval_new_data.append(bool(eval_data))
-
+        eval_new_data = (
+            [not bool(eval_data)] if isinstance(eval_data, set) else [bool(eval_data)]
+        )
     return eval_new_data
 
 

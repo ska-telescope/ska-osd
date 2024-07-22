@@ -5,6 +5,12 @@ Change Log
 All notable changes to this project will be documented in this file.
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
+
+*****
+* Removed complex code and increase readability
+* Fixed independance semantic validation call issue.
+* Modified test cases added parameterized test cases.
+
 1.0.3
 ******
 * Improve API level validation for OSD API's
