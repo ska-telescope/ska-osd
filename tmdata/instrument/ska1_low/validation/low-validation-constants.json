@@ -50,7 +50,7 @@
                             ],
                             "fsp_ids": [
                                 {
-                                    "rule": "len(fsp_ids) == len(fsp_ids)",
+                                    "rule": "len(set(fsp_ids)) == len(fsp_ids)",
                                     "error": "The fsp_ids should all be distinct"
                                 },
                                 {

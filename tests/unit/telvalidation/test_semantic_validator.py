@@ -142,6 +142,7 @@ mid_configure_expected_result_for_invalid_data = (
 low_configure_expected_result_for_invalid_data = (
     "stations are too many! Current limit is 4\n"
     "Invalid input for function mode! Currently allowed vis\n"
+    "The fsp_ids should all be distinct\n"
     "fsp_ids are too many!Current Limit is 6"
 )
 
