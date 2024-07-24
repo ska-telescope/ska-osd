@@ -325,7 +325,7 @@ def test_osd_source_gitlab(client):
 @pytest.mark.parametrize(
     "json_body_to_validate, response",
     [
-        # ("valid_semantic_validation_body", "valid_semantic_validation_response"),
+        ("valid_semantic_validation_body", "valid_semantic_validation_response"),
         ("invalid_semantic_validation_body", "invalid_semantic_validation_response"),
     ],
 )

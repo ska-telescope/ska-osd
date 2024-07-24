@@ -7,7 +7,7 @@ Integrated OSD API function to fetch rule constraints values.
 
 
 import logging
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Optional
 
 from ska_telmodel.data import TMData
 
@@ -49,9 +49,9 @@ def get_validation_data(interface: str) -> Optional[str]:
 def fetch_capabilities_from_osd(
     telescope: str,
     array_assembly: str,
-    tm_data: Optional[Dict] = None,
-    osd_data: Optional[Dict] = None,
-) -> Tuple[Dict, Dict]:
+    tm_data: Optional[dict] = None,
+    osd_data: Optional[dict] = None,
+) -> tuple[dict, dict]:
     """
     Fetch capabilities and basic capabilities from the Observatory State Database (OSD).
 
@@ -116,7 +116,7 @@ def get_matched_values_from_basic_capabilities(
 
 
 def replace_matched_capabilities_values(
-    nested_dict: Dict, path: List[str], new_value: Any
+    nested_dict: dict, path: list[str], new_value: Any
 ) -> None:
     """
     Replace the value in capabilities data which matched from
@@ -254,12 +254,12 @@ def validate_command_input(
 
 
 def semantic_validate(
-    observing_command_input: Dict,
-    tm_data: Dict,
+    observing_command_input: dict,
+    tm_data: dict,
     array_assembly: str = "AA0.5",
     interface: Optional[str] = None,
     raise_semantic: bool = True,
-    osd_data: Optional[Dict] = None,
+    osd_data: Optional[dict] = None,
 ) -> bool:
     """
     This method is the entry point for semantic validation,

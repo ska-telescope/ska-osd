@@ -15,7 +15,7 @@ OSD capabilities.
 
 import logging
 from datetime import datetime
-from typing import Any, Dict, List, Union
+from typing import Any, Union
 
 import astropy.units as u
 from astropy.time import Time
@@ -38,7 +38,7 @@ logging.getLogger("telvalidation")
 from collections import deque
 
 
-def get_value_based_on_provided_path(nested_data: Union[Dict, List], path: List) -> Any:
+def get_value_based_on_provided_path(nested_data: Union[dict, list], path: list) -> Any:
     """
     Retrieve a value from a nested dictionary or
     list of dictionaries based on a given path.
@@ -161,23 +161,23 @@ def get_matched_rule_constraint_from_osd(
 
 def apply_validation_rule(
     key: str,
-    value: List[Dict[str, Union[str, Dict]]],
-    command_input_json_config: Dict,
+    value: list[dict[str, Union[str, dict]]],
+    command_input_json_config: dict,
     parent_key: str,
-    capabilities: Dict,
+    capabilities: dict,
 ) -> str:
     """
     Evaluate validation rules using simpleeval and
     return an error message if the input is invalid.
 
     :param key: str, the user input key for search.
-    :param value: List[Dict[str, Union[str, Dict]]],
+    :param value: list[dict[str, Union[str, dict]]],
     a list of dictionaries containing the rule and error.
-    :param command_input_json_config: Dict,
+    :param command_input_json_config: dict,
     the command input JSON from the operator.
     :param parent_key: str, the parent key to
     identify the correct child key.
-    :param capabilities: Dict, the capabilities dictionary.
+    :param capabilities: dict, the capabilities dictionary.
     :return: str, the error message after applying the rule.
     """
     res_value = get_value_based_on_provided_path(
@@ -216,19 +216,19 @@ def apply_validation_rule(
 
 def evaluate_rule(
     key: str,
-    res_value: Union[str, List],
-    rule_data: Dict[str, Union[str, Dict]],
-    osd_base_constraint: List[Dict],
+    res_value: Union[str, list],
+    rule_data: dict[str, Union[str, dict]],
+    osd_base_constraint: list[dict],
 ) -> bool:
     """
     Evaluate a single validation rule using simpleeval.
 
     :param key: str, the user input key for search.
-    :param res_value: Union[str, List], the value of the key.
-    :param rule_data: Dict[str, Union[str, Dict]], the rule and error data.
-    :param osd_base_constraint: List[Dict], the list of dictionaries
+    :param res_value: Union[str, list], the value of the key.
+    :param rule_data: dict[str, Union[str, dict]], the rule and error data.
+    :param osd_base_constraint: list[dict], the list of dictionaries
     containing the rule keys.
-    :param eval_functions: Dict, the dictionary of functions for simpleeval.
+    :param eval_functions: dict, the dictionary of functions for simpleeval.
     :return: bool, True if the rule is satisfied, False otherwise.
     """
     names = {}
@@ -274,13 +274,13 @@ def evaluate_rule(
 
 
 def format_error_message(
-    rule_data: Dict[str, Union[str, Dict]], rule_key_dict: List[Dict]
+    rule_data: dict[str, Union[str, dict]], rule_key_dict: list[dict]
 ) -> str:
     """
     Format the error message for a failed validation rule.
 
-    :param rule_data: Dict[str, Union[str, Dict]], the rule and error data.
-    :param rule_key_dict: List[Dict], the list of dictionaries containing the rule keys.
+    :param rule_data: dict[str, Union[str, dict]], the rule and error data.
+    :param rule_key_dict: list[dict], the list of dictionaries containing the rule keys.
     :return: str, the formatted error message.
     """
     if rule_key_dict:
