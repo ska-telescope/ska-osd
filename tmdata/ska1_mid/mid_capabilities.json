@@ -47,13 +47,14 @@
         "available_bandwidth_hz": 800000000.0,
         "number_channels": 14880,
         "cbf_modes": [
-            "CORR"
+            "correlation",
+            "pst"
         ],
         "number_zoom_windows": 0,
         "number_zoom_channels": 0,
         "number_pss_beams": 0,
-        "number_pst_beams": 0,
-        "ps_beam_bandwidth_hz": 0.0,
+        "number_pst_beams": 1,
+        "ps_beam_bandwidth_hz": 400000000.0,
         "number_fsps": 4
     },
     "AA1": {
@@ -70,8 +71,8 @@
         "available_bandwidth_hz": 800000000.0,
         "number_channels": 14880,
         "cbf_modes": [
-            "CORR",
-            "PST_BF"
+            "correlation",
+            "pst"
         ],
         "number_zoom_windows": 0,
         "number_zoom_channels": 0,
@@ -94,9 +95,9 @@
         "available_bandwidth_hz": 800000000.0,
         "number_channels": 14880,
         "cbf_modes": [
-            "CORR",
-            "PST_BF",
-            "PSS_BF"
+            "correlation",
+            "pst",
+            "pss"
         ],
         "number_zoom_windows": 16,
         "number_zoom_channels": 14880,
