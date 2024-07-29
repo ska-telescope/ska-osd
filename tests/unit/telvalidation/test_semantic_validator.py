@@ -124,6 +124,8 @@ mid_expected_result_for_invalid_data = (
 )
 
 low_expected_result_for_invalid_data = (
+    "Invalid input for station_id! Currently allowed [345, 350, 352, 431]\n"
+    "station_id in aperture_id should be same as station_id\n"
     "beams are too many! Current limit is 1\n"
     "Invalid function for beams! Currently allowed visibilities\n"
     "spectral windows are too many! Current limit = 1"

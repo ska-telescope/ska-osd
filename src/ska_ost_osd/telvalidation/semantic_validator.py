@@ -213,7 +213,8 @@ def fetch_matched_capabilities_from_basic_capabilities(
                     )
                     if matched_values:
                         replacible_values.append(matched_values)
-    replace_matched_capabilities_values(clone_capabilities, path, replacible_values)
+    if replacible_values and path:
+        replace_matched_capabilities_values(clone_capabilities, path, replacible_values)
     return clone_capabilities
 
 

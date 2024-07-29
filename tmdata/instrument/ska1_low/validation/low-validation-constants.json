@@ -2,6 +2,25 @@
     "telescope": "low",
     "AA0.5": {
         "assign_resource": {
+            "mccs": {
+                "subarray_beams": {
+                    "apertures": {
+                        "station_id": [
+                            {
+                                "rule": "station_id in number_station_ids",
+                                "error": "Invalid input for station_id! Currently allowed {number_station_ids}"
+                            }
+                        ],
+                        "aperture_id": [
+                            {
+                                "rule": "station_id == int(re.search(r'\\d+', aperture_id).group())",
+                                "dependency_key": "station_id",
+                                "error": "station_id in aperture_id should be same as station_id"
+                            }
+                        ]
+                    }
+                }
+            },
             "sdp": {
                 "execution_block": {
                     "parent_key_rule": [
