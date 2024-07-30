@@ -6,14 +6,14 @@
     "interface": "https://schema.skao.int/ska-low-mccs-controller-allocate/3.0",
     "subarray_beams": [
       {
-        "subarray_beam_id": 1,
+        "subarray_beam_id": 50,
         "apertures": [
           {
             "station_id": 123,
-            "aperture_id": "AP445.01"
+            "aperture_id": "DF445.01"
           }
         ],
-        "number_of_channels": 8
+        "number_of_channels": 1
       }
     ]
   },
