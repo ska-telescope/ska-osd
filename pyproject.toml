@@ -5,6 +5,15 @@ description = "simplest form OSD consists ofguration files that are required by 
 authors =  ["Team Nakshatra"]
 license= "BSD-3-Clause"
 readme = "README.md"
+repository = "https://gitlab.com/ska-telescope/ost/ska-ost-osd"
+documentation = "https://developer.skao.int/projects/ska-ost-osd/en/latest"
+packages = [
+    { include = "ska_ost_osd", from = "src" }
+]
+include = [
+    { path = 'tests' }
+]
+
 
 [[tool.poetry.source]]
 name = 'skao'
