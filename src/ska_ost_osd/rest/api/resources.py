@@ -10,7 +10,7 @@ from pydantic import ValidationError
 from ska_telmodel.data import TMData
 
 from ska_ost_osd.osd.osd import get_osd_using_tmdata
-from ska_ost_osd.rest.api.pyndantic_validator import OSDModelError
+from ska_ost_osd.osd.osd_schema_validator import OSDModelError
 from ska_ost_osd.telvalidation import SchematicValidationError, semantic_validate
 from ska_ost_osd.telvalidation.constant import CAR_TELMODEL_SOURCE
 

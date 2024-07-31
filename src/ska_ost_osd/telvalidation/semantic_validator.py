@@ -12,7 +12,10 @@ from typing import Any, Optional
 from pydantic import ValidationError
 from ska_telmodel.data import TMData
 
-from ska_ost_osd.rest.api.pyndantic_validator import SemanticModel, SemanticModelError
+from ska_ost_osd.telvalidation.semantic_schema_validator import (
+    SemanticModel,
+    SemanticModelError,
+)
 
 from .constant import (
     LOW_VALIDATION_CONSTANT_JSON_FILE_PATH,

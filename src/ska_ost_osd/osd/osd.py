@@ -5,7 +5,7 @@ from typing import Any, Optional
 
 from ska_telmodel.data import TMData
 
-from ska_ost_osd.rest.api.pyndantic_validator import OSDModel, OSDModelError
+from ska_ost_osd.osd.osd_schema_validator import OSDModel, OSDModelError
 
 from .constant import (
     ARRAY_ASSEMBLY_PATTERN,
