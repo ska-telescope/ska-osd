@@ -1,9 +1,11 @@
 import copy
 import re
 from importlib.metadata import version
-from typing import Any
+from typing import Any, Optional
 
 from ska_telmodel.data import TMData
+
+from ska_ost_osd.rest.api.pyndantic_validator import OSDModel, OSDModelError
 
 from .constant import (
     ARRAY_ASSEMBLY_PATTERN,
@@ -128,7 +130,6 @@ class OSD:
                 raises OSDDataException Keyerror
         """
         cap_err_msg_list = []
-
         for key, value in telescope_capabilities_dict.items():
             data = self.get_data(tmdata, capability=osd_file_mapping[key.lower()])
             self.keys_list = list(data.keys())
@@ -137,7 +138,9 @@ class OSD:
                 err_msg = self.check_array_assembly(value, self.keys_list)
 
             if err_msg:
-                cap_err_msg_list.append(err_msg)
+                cap_err_msg_list.append(
+                    {"msg": err_msg, "value": f"{value},{self.keys_list}"}
+                )
             else:
                 osd_data["capabilities"][key.lower()] = {}
                 osd_data["capabilities"][key.lower()]["basic_capabilities"] = data[
@@ -197,7 +200,9 @@ class OSD:
         chk_capabilities = self.check_capabilities(self.capabilities)
 
         if chk_capabilities:
-            osd_err_msg_list.append(chk_capabilities)
+            osd_err_msg_list.append(
+                {"msg": chk_capabilities, "value": self.capabilities}
+            )
         else:
             (
                 osd_data,
@@ -256,7 +261,12 @@ def check_cycle_id(
     if gitlab_branch is not None and osd_version is not None:
         msg = "either osd_version or gitlab_branch"
 
-        cycle_error_msg_list.append(f"Only one parameter is needed {msg}")
+        cycle_error_msg_list.append(
+            {
+                "msg": f"Only one parameter is needed {msg}",
+                "value": f"{osd_version}, {gitlab_branch}",
+            }
+        )
 
     if gitlab_branch is not None:
         osd_version = gitlab_branch
@@ -270,8 +280,12 @@ def check_cycle_id(
     string_ids = ",".join([str(i) for i in cycle_ids])
 
     if cycle_id is not None and cycle_id_exists is None:
-        msg = f"Available IDs are {string_ids}"
-        cycle_error_msg_list.append(f"Cycle id {cycle_id} is not valid,{msg}")
+        cycle_error_msg_list.append(
+            {
+                "value": f"{cycle_id}, {string_ids}",
+                "msg": f"Cycle {cycle_id} is not valid,Available IDs are {string_ids}",
+            }
+        )
 
     elif cycle_id is not None and osd_version is None:
         osd_version = versions_dict[f"cycle_{cycle_id}"][0]
@@ -279,8 +293,13 @@ def check_cycle_id(
     elif cycle_id is not None and cycle_id_exists and osd_version is not None:
         if osd_version not in versions_dict[f"cycle_{cycle_id}"]:
             cycle_error_msg_list.append(
-                f"Invalid OSD Version {osd_version} Valid OSD Versions are"
-                f" {versions_dict[f'cycle_{cycle_id}']}"
+                {
+                    "msg": (
+                        f"Invalid OSD Version {osd_version} Valid OSD Versions are"
+                        f" {versions_dict[f'cycle_{cycle_id}']}"
+                    ),
+                    "value": osd_version,
+                }
             )
 
     return osd_version, cycle_error_msg_list
@@ -307,7 +326,10 @@ def osd_tmdata_source(
 
     if source not in SOURCES:
         source_error_msg_list.append(
-            f"source is not valid available are {', '.join(SOURCES)}"
+            {
+                "msg": f"source is not valid available are {', '.join(SOURCES)}",
+                "value": SOURCES,
+            }
         )
 
     if (
@@ -315,7 +337,7 @@ def osd_tmdata_source(
         and isinstance(gitlab_branch, str)
         and (source == "car" or source == "file")
     ):
-        source_error_msg_list.append("source is not valid.")
+        source_error_msg_list.append({"msg": "source is not valid.", "value": source})
 
     osd_version, cycle_error_msg_list = check_cycle_id(
         cycle_id, osd_version, gitlab_branch
@@ -358,3 +380,77 @@ def get_osd_data(
     ).get_osd_data()
 
     return osd_data, data_error_msg_list
+
+
+def get_osd_using_tmdata(
+    cycle_id: Optional[int] = None,
+    osd_version: Optional[str] = None,
+    source: Optional[str] = None,
+    gitlab_branch: Optional[str] = None,
+    capabilities: Optional[str] = None,
+    array_assembly: Optional[str] = None,
+) -> dict:
+    """
+    Retrieve OSD data using TMData.
+
+    Args:
+        cycle_id (int, optional): Cycle ID.
+        osd_version (str, optional): OSD version.
+        source (str, optional): Source.
+        gitlab_branch (str, optional): GitLab branch.
+        capabilities (str, optional): Capabilities.
+        array_assembly (str, optional): Array assembly.
+
+    Returns:
+        Dict[Dict[str, Any]]: OSD data.
+
+    Raises:
+        ValueError: If any validation or processing errors occur.
+    """
+    errors = []
+
+    try:
+        OSDModel(
+            source=source,
+            cycle_id=cycle_id,
+            osd_version=osd_version,
+            capabilities=capabilities,
+            array_assembly=array_assembly,
+        )
+    except OSDModelError as error:
+        errors.extend(error.args[0])
+
+    _, cycle_errors = check_cycle_id(
+        cycle_id=cycle_id,
+        osd_version=osd_version,
+        gitlab_branch=gitlab_branch,
+    )
+    if cycle_errors:
+        errors.extend(cycle_errors)
+    if cycle_errors:
+        raise ValueError(errors)
+    tm_data_source, error = osd_tmdata_source(
+        cycle_id=cycle_id,
+        osd_version=osd_version,
+        source=source,
+        gitlab_branch=gitlab_branch,
+    )
+
+    if error:
+        errors.extend(error)
+
+    if errors:
+        raise ValueError(errors)
+
+    tm_data = TMData(source_uris=tm_data_source)
+
+    osd_data, osd_errors = get_osd_data(
+        capabilities=[capabilities] if capabilities else None,
+        tmdata=tm_data,
+        array_assembly=array_assembly,
+        cycle_id=cycle_id,
+    )
+    errors.extend(osd_errors)
+    if errors:
+        raise ValueError(errors)
+    return osd_data

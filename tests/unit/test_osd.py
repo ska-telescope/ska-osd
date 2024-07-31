@@ -229,14 +229,17 @@ def test_invalid_osd_tmdata_source():
         gitlab_branch="main",
         source="github",
     )
-    expected_error_msg = "\n".join([str(err) for err in error_msgs])
-
-    assert (
-        expected_error_msg
-        == "source is not valid available are file, car, gitlab\n"
-        "Only one parameter is needed either osd_version or gitlab_branch\n"
-        "Cycle id 3 is not valid,Available IDs are 1"
-    )
+    assert error_msgs == [
+        {
+            "msg": "source is not valid available are file, car, gitlab",
+            "value": ("file", "car", "gitlab"),
+        },
+        {
+            "msg": "Only one parameter is needed either osd_version or gitlab_branch",
+            "value": "1.1.0, main",
+        },
+        {"value": "3, 1", "msg": "Cycle 3 is not valid,Available IDs are 1"},
+    ]
 
 
 def test_invalid_source():
@@ -248,14 +251,13 @@ def test_invalid_source():
         gitlab_branch="main",
         source="file",
     )
-
-    expected_error_msg = ", ".join([str(err) for err in error_msgs])
-
-    assert (
-        expected_error_msg
-        == "source is not valid., Invalid OSD Version main Valid OSD Versions are"
-        " ['1.0.2']"
-    )
+    assert error_msgs == [
+        {"msg": "source is not valid.", "value": "file"},
+        {
+            "msg": "Invalid OSD Version main Valid OSD Versions are ['1.0.2']",
+            "value": "main",
+        },
+    ]
 
 
 def test_invalid_get_osd_data_capability(tm_data):  # pylint: disable=W0621
@@ -269,13 +271,15 @@ def test_invalid_get_osd_data_capability(tm_data):  # pylint: disable=W0621
     _, error_msgs = get_osd_data(
         capabilities=["midd"], array_assembly="AA1", tmdata=tm_data
     )
-    actual_error_msg = ", ".join([str(err) for err in error_msgs])
-
-    expected_error_msg = (
-        "Capability midd doesn't exists,Available are low, mid, observatory_policies"
-    )
-
-    assert actual_error_msg == expected_error_msg
+    assert error_msgs == [
+        {
+            "msg": (
+                "Capability midd doesn't exists,Available are low, mid,"
+                " observatory_policies"
+            ),
+            "value": ["midd"],
+        }
+    ]
 
 
 def test_invalid_get_osd_data_array_assembly(tm_data):  # pylint: disable=W0621
@@ -289,11 +293,9 @@ def test_invalid_get_osd_data_array_assembly(tm_data):  # pylint: disable=W0621
     _, error_msgs = get_osd_data(
         capabilities=["mid"], array_assembly="AA3", tmdata=tm_data
     )
-
-    actual_error_msg = ", ".join([str(err) for err in error_msgs])
-
-    expected_error_msg = (
-        "Array Assembly AA3 doesn't exists. Available are AA0.5, AA1, AA2"
-    )
-
-    assert actual_error_msg == expected_error_msg
+    assert error_msgs == [
+        {
+            "msg": "Array Assembly AA3 doesn't exists. Available are AA0.5, AA1, AA2",
+            "value": "AA3,['telescope', 'basic_capabilities', 'AA0.5', 'AA1', 'AA2']",
+        }
+    ]

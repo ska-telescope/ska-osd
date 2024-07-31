@@ -805,11 +805,12 @@ def invalid_semantic_validation_response():
 @pytest.fixture
 def observing_command_input_missing_response():
     return {
-        "detail": {
-            "missing_required_fields": (
-                "Missing required fields: observing_command_input"
-            )
-        },
+        "detail": [
+            {
+                "msg": "Input should be a valid dictionary",
+                "value": "observing_command_input",
+            }
+        ],
         "status": -1,
         "title": "Value Error",
     }
@@ -827,16 +828,15 @@ def wrong_semantic_validation_parameter_body():
 @pytest.fixture
 def wrong_semantic_validation_parameter_value_response():
     return {
-        "detail": {
-            "interface": (
-                "value https://schemka-tmc-assignresources/2.1 for interface is not"
-                " valid"
-            ),
-            "missing_required_fields": (
-                "Missing required fields: observing_command_input"
-            ),
-            "raise_semantic": "value 123 for raise_semantic is not a boolean value ",
-        },
+        "detail": [
+            {
+                "msg": (
+                    "gitlab://gitlab.com/ska-telescope14.1?~default~#tmdata not found"
+                    " in SKA CAR - make sure to add tmdata CI!"
+                ),
+                "value": ["car://gitlab.com/ska-telescope14.1#tmdata"],
+            }
+        ],
         "status": -1,
         "title": "Value Error",
     }

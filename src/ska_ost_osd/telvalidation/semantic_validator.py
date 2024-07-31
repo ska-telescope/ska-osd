@@ -9,7 +9,10 @@ Integrated OSD API function to fetch rule constraints values.
 import logging
 from typing import Any, Optional
 
+from pydantic import ValidationError
 from ska_telmodel.data import TMData
+
+from ska_ost_osd.rest.api.pyndantic_validator import SemanticModel, SemanticModelError
 
 from .constant import (
     LOW_VALIDATION_CONSTANT_JSON_FILE_PATH,
@@ -281,6 +284,19 @@ def semantic_validate(
     Set False to only log the error messages.
     :returns: True if semantic validation passes, False otherwise.
     """
+    try:
+        SemanticModel(
+            observing_command_input=observing_command_input,
+            tm_data=tm_data,
+            array_assembly=array_assembly,
+            interface=interface,
+            raise_semantic=raise_semantic,
+            osd_data=osd_data,
+        )
+    except ValidationError as err:
+        raise err
+    except SemanticModelError as semantic_error:
+        raise semantic_error
     clear_semantic_variable_data()
     version = observing_command_input.get("interface") or interface
 
