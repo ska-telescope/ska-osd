@@ -260,6 +260,7 @@ def validate_command_input(
                 capabilities=capabilities, basic_capabilities=basic_capabilities
             ),
         )
+        print("kkkkkkkkkkkkkk", msg_list)
     else:
         msg_list = validate_json(
             semantic_validate_data[array_assembly],

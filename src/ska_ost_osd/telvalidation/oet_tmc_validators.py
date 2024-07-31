@@ -265,6 +265,7 @@ def evaluate_rule(
             }
         else:
             names = {key: res_value}
+            print("aaaaaaaaaaaaaaa", names)
             names = {**names, **osd_base_constraint_value}
 
         simple_eval.names = names

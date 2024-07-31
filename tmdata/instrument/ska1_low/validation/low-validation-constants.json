@@ -154,6 +154,12 @@
                         }
                     },
                     "timing_beams": {
+                        "beams": [
+                            {
+                                "rule": "len(beams) == 1",
+                                "error": "beams are too many!Current Limit is 1"
+                            }
+                        ],
                         "fsp": {
                             "firmware": [
                                 {
@@ -161,13 +167,7 @@
                                     "error": "Invalid input for firmware! Currently allowed pst"
                                 }
                             ]
-                        },
-                        "beams": [
-                            {
-                                "rule": "len(beams) == 1",
-                                "error": "beams are too many!Current Limit is 1"
-                            }
-                        ]  
+                        }   
                     }
                 },
                 "pst": {

@@ -156,7 +156,10 @@ low_configure_expected_result_for_invalid_data = (
     "stations are too many! Current limit is 4\n"
     "Invalid input for firmware! Currently allowed vis\n"
     "The fsp_ids should all be distinct\n"
-    "fsp_ids are too many!Current Limit is 6"
+    "fsp_ids are too many!Current Limit is 6\n"
+    "beams are too many!Current Limit is 1\n"
+    "Invalid input for firmware! Currently allowed pst\n"
+    "beams are too many! Current limit is 1"
 )
 
 
