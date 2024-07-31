@@ -152,7 +152,31 @@
                                 }
                             ]
                         }
+                    },
+                    "timing_beams": {
+                        "fsp": {
+                            "firmware": [
+                                {
+                                    "rule": "firmware == 'pst'",
+                                    "error": "Invalid input for firmware! Currently allowed pst"
+                                }
+                            ]
+                        },
+                        "beams": [
+                            {
+                                "rule": "len(beams) == 1",
+                                "error": "beams are too many!Current Limit is 1"
+                            }
+                        ]  
                     }
+                },
+                "pst": {
+                    "beams": [
+                        {
+                            "rule": "len(beams) == number_pst_beams",
+                            "error": "beams are too many! Current limit is {number_pst_beams}"
+                        }
+                    ]
                 }
             }
         }
