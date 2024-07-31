@@ -89,39 +89,36 @@
                 ]
             },
             "csp": {
-                "cbf": {
-                    "parent_key_rule": [
-                        {
-                            "rule": "len(fsp)<=number_fsps",
-                            "error": "FSPs are too many!Current Limit = {number_fsps}"
+                "midcbf": {
+                    "correlation": {
+                        "processing_regions": {
+                            "fsp_ids": [
+                                {
+                                    "rule": "len(set(fsp_ids)) == len(fsp_ids)",
+                                    "error": "The fsp_ids should all be distinct"
+                                },
+                                {
+                                    "rule": "(0 < len(fsp_ids) <= number_fsps)",
+                                    "error": "fsp_ids are too many!Current Limit is {number_fsps}"
+                                }
+                            ],
+                            "channel_width": [
+                                    {
+                                    "rule": "channel_width == 13440",
+                                    "error": "Invalid input for channel_width! Currently allowed 13440"
+                                    }
+                            ],
+                            "channel_count": [
+                                {
+                                    "rule": "1 <= channel_count <= 58982",
+                                    "error": "channel_count must be between 1 to 58982"
+                                },
+                                {
+                                    "rule": "(channel_count % 20) == 0",
+                                    "error": "channel_count must be a multiple of 20"
+                                }
+                            ]
                         }
-                    ],
-                    "fsp": {
-                        "fsp_id": [
-                            {
-                                "rule": "fsp_id <= number_fsps",
-                                "error": "Invalid input for fsp_id!"
-                            }
-                        ],
-                        "function_mode": [
-                            {
-                                "rule": "function_mode == 'CORR'",
-                                "error": "Invalid input for function_mode"
-                            }
-                        ],
-                        "zoom_factor": [
-                            {
-                                "rule": "zoom_factor == 0",
-                                "error": "Invalid input for zoom_factor"
-                            }
-                        ],
-                        "frequency_slice_id": [
-                            {
-                                "rule": "fsp_id==frequency_slice_id",
-                                "dependency_key": "fsp_id",
-                                "error": "frequency_slice_id did not match fsp_id"
-                            }
-                        ]
                     }
                 },
                 "common": {

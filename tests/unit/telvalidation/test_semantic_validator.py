@@ -131,11 +131,11 @@ low_expected_result_for_invalid_data = (
 
 mid_configure_expected_result_for_invalid_data = (
     "Invalid input for receiver_band! Currently allowed [1,2]\n"
-    "FSPs are too many!Current Limit = 4\n"
-    "Invalid input for fsp_id!\n"
-    "Invalid input for function_mode\n"
-    "Invalid input for zoom_factor\n"
-    "frequency_slice_id did not match fsp_id\n"
+    "The fsp_ids should all be distinct\n"
+    "fsp_ids are too many!Current Limit is 4\n"
+    "Invalid input for channel_width! Currently allowed 13440\n"
+    "channel_count must be between 1 to 58982\n"
+    "channel_count must be a multiple of 20\n"
     "frequency_band did not match receiver_band"
 )
 
