@@ -6,6 +6,14 @@ from typing import Any, Optional
 from ska_telmodel.data import TMData
 
 from ska_ost_osd.osd.osd_schema_validator import OSDModel, OSDModelError
+from ska_ost_osd.osd.validation_messages import (CYCLE_ERROR_MESSAGE,
+CYCLE_ID_ERROR_MESSAGE,
+CAPABILITY_DOESNOT_EXIST_ERROR_MESSAGE,
+ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE,
+OSD_VERSION_ERROR_MESSAGE,
+GITLAB_BRANCH_ERROR_MESSAGE,
+SOURCE_ERROR_MESSAGE
+)
 
 from .constant import (
     ARRAY_ASSEMBLY_PATTERN,
@@ -236,7 +244,7 @@ class OSD:
             msg = ", ".join(
                 key for key in key_list if re.match(ARRAY_ASSEMBLY_PATTERN, key)
             )
-            return f"Array Assembly {value} doesn't exists. Available are {msg}"
+            return ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE.format(value, msg)
 
 
 def check_cycle_id(
