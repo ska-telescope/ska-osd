@@ -177,6 +177,7 @@ low_sbd_expected_result_for_invalid_data = (
     "Invalid input for zoom_factor"
 )
 
+
 @patch("ska_ost_osd.telvalidation.semantic_validator.fetch_capabilities_from_osd")
 @pytest.mark.parametrize(
     "config, telescope, expected_result, is_exception",
