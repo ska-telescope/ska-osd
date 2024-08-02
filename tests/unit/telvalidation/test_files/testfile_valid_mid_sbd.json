@@ -160,6 +160,11 @@
             "beam_id": "vis0",
             "function": "visibilities"
   
+          },
+          {
+            "beam_id": "vis0",
+            "function": "visibilities"
+  
           }
         ],
         "scan_types": [

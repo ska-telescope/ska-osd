@@ -14,10 +14,12 @@ from ska_telmodel.data import TMData
 from .constant import (
     LOW_VALIDATION_CONSTANT_JSON_FILE_PATH,
     MID_VALIDATION_CONSTANT_JSON_FILE_PATH,
-    SBD_VALIDATION_CONSTANT_JSON_FILE_PATH,
+    MID_SBD_VALIDATION_CONSTANT_JSON_FILE_PATH,
+    LOW_SBD_VALIDATION_CONSTANT_JSON_FILE_PATH,
     SKA_LOW_TELESCOPE,
     SKA_MID_TELESCOPE,
-    SKA_SBD,
+    SKA_MID_SBD,
+    SKA_LOW_SBD
 )
 from .oet_tmc_validators import clear_semantic_variable_data, validate_json
 from .schematic_validation_exceptions import SchematicValidationError
@@ -35,12 +37,16 @@ def get_validation_data(interface: str) -> Optional[str]:
     validation_constants = {
         SKA_LOW_TELESCOPE: LOW_VALIDATION_CONSTANT_JSON_FILE_PATH,
         SKA_MID_TELESCOPE: MID_VALIDATION_CONSTANT_JSON_FILE_PATH,
-        SKA_SBD: SBD_VALIDATION_CONSTANT_JSON_FILE_PATH,
+        SKA_MID_SBD: MID_SBD_VALIDATION_CONSTANT_JSON_FILE_PATH,
+        SKA_LOW_SBD: LOW_SBD_VALIDATION_CONSTANT_JSON_FILE_PATH
     }
 
     for key, value in validation_constants.items():
+        # print(telescope)
         if key in interface:
             return value
+        # elif key in telescope:
+        #     return value
     # taking mid interface as default cause there is no any specific
     # key to differentiate the interface
     return validation_constants.get(SKA_MID_TELESCOPE)
@@ -213,7 +219,8 @@ def fetch_matched_capabilities_from_basic_capabilities(
                     )
                     if matched_values:
                         replacible_values.append(matched_values)
-    replace_matched_capabilities_values(clone_capabilities, path, replacible_values)
+    if replacible_values and path:
+        replace_matched_capabilities_values(clone_capabilities, path, replacible_values)
     return clone_capabilities
 
 
@@ -234,6 +241,7 @@ def validate_command_input(
     :return list of error messages in case of validation failed
     """
     semantic_validate_data = tm_data[get_validation_data(interface)].get_dict()
+    print("kkkkkkkkkkkkk", semantic_validate_data)
     # call OSD API and fetch capabilities and basic capabilities
     capabilities, basic_capabilities = fetch_capabilities_from_osd(
         telescope=semantic_validate_data["telescope"],

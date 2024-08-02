@@ -66,6 +66,8 @@ VALID_MID_CONFIGURE_JSON = load_string_from_file(
 )
 VALID_MID_SBD_JSON = load_string_from_file("test_files/testfile_valid_mid_sbd.json")
 INVALID_MID_SBD_JSON = load_string_from_file("test_files/testfile_invalid_mid_sbd.json")
+VALID_LOW_SBD_JSON = load_string_from_file("test_files/testfile_valid_low_sbd.json")
+INVALID_LOW_SBD_JSON = load_string_from_file("test_files/testfile_invalid_low_sbd.json")
 INVALID_MID_CONFIGURE_JSON = load_string_from_file(
     "test_files/testfile_invalid_mid_configure.json"
 )
@@ -166,6 +168,14 @@ mid_sbd_expected_result_for_invalid_data = (
     "Invalid input for receiver_band! Currently allowed [1,2]"
 )
 
+low_sbd_expected_result_for_invalid_data = (
+    "subarray_beam_id must be between 1 and 48\n"
+    "number_of_channels must be between 8 and 384\n"
+    "Invalid input for station_id! Currently allowed [345, 350, 352, 431]\n"
+    "The logical_fsp_ids should all be distinct\n"
+    "logical_fsp_ids are too many!Current Limit is 6\n"
+    "Invalid input for zoom_factor"
+)
 
 @patch("ska_ost_osd.telvalidation.semantic_validator.fetch_capabilities_from_osd")
 @pytest.mark.parametrize(
@@ -191,6 +201,8 @@ mid_sbd_expected_result_for_invalid_data = (
         ),
         (VALID_MID_SBD_JSON, "MID", True, False),
         (INVALID_MID_SBD_JSON, "MID", mid_sbd_expected_result_for_invalid_data, True),
+        (VALID_LOW_SBD_JSON, "LOW", True, False),
+        (INVALID_LOW_SBD_JSON, "LOW", low_sbd_expected_result_for_invalid_data, True),
         # Add more test cases here
     ],
 )
