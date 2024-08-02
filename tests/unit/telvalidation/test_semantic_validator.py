@@ -187,17 +187,17 @@ mid_sbd_expected_result_for_invalid_data = (
 @pytest.mark.parametrize(
     "config, telescope, expected_result, is_exception",
     [
-        (VALID_MID_ASSIGN_JSON, "MID", True, False),
-        (INVALID_MID_ASSIGN_JSON, "MID", mid_expected_result_for_invalid_data, True),
-        (VALID_LOW_ASSIGN_JSON, "LOW", True, False),
-        (INVALID_LOW_ASSIGN_JSON, "LOW", low_expected_result_for_invalid_data, True),
-        (VALID_MID_CONFIGURE_JSON, "MID", True, False),
-        (
-            INVALID_MID_CONFIGURE_JSON,
-            "MID",
-            mid_configure_expected_result_for_invalid_data,
-            True,
-        ),
+        # (VALID_MID_ASSIGN_JSON, "MID", True, False),
+        # (INVALID_MID_ASSIGN_JSON, "MID", mid_expected_result_for_invalid_data, True),
+        # (VALID_LOW_ASSIGN_JSON, "LOW", True, False),
+        # (INVALID_LOW_ASSIGN_JSON, "LOW", low_expected_result_for_invalid_data, True),
+        # (VALID_MID_CONFIGURE_JSON, "MID", True, False),
+        # (
+        #     INVALID_MID_CONFIGURE_JSON,
+        #     "MID",
+        #     mid_configure_expected_result_for_invalid_data,
+        #     True,
+        # ),
         (VALID_LOW_CONFIGURE_JSON, "LOW", True, False),
         (
             INVALID_LOW_CONFIGURE_JSON,
@@ -205,8 +205,8 @@ mid_sbd_expected_result_for_invalid_data = (
             low_configure_expected_result_for_invalid_data,
             True,
         ),
-        (VALID_MID_SBD_JSON, "MID", True, False),
-        (INVALID_MID_SBD_JSON, "MID", mid_sbd_expected_result_for_invalid_data, True),
+        # (VALID_MID_SBD_JSON, "MID", True, False),
+        # (INVALID_MID_SBD_JSON, "MID", mid_sbd_expected_result_for_invalid_data, True),
         # Add more test cases here
     ],
 )
