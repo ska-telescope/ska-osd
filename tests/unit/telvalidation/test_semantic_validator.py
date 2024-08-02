@@ -136,6 +136,8 @@ mid_configure_expected_result_for_invalid_data = (
     "Invalid input for channel_width! Currently allowed 13440\n"
     "channel_count must be between 1 to 58982\n"
     "channel_count must be a multiple of 20\n"
+    "sdp_start_channel_id must be between 0 to 2147483647\n"
+    "integration_factor must be between 1 to 10\n"
     "frequency_band did not match receiver_band"
 )
 

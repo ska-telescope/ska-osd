@@ -30,15 +30,15 @@
                   "start_freq": 350000000,
                   "channel_width": 13000,
                   "channel_count": 58989,
-                  "sdp_start_channel_id": 0,
-                  "integration_factor": 1
+                  "sdp_start_channel_id": 214748364722,
+                  "integration_factor": 11
               }, {
                   "fsp_ids": [1, 2, 2, 4, 5],
                   "start_freq": 548437600,
                   "channel_width": 13000,
                   "channel_count": 58989,
-                  "sdp_start_channel_id": 1,
-                  "integration_factor": 10
+                  "sdp_start_channel_id": -1,
+                  "integration_factor": 12
               }]
           },
           "vlbi": {}

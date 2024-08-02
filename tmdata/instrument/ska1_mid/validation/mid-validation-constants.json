@@ -117,6 +117,18 @@
                                     "rule": "(channel_count % 20) == 0",
                                     "error": "channel_count must be a multiple of 20"
                                 }
+                            ],
+                            "sdp_start_channel_id": [
+                                {
+                                    "rule": "0 <= sdp_start_channel_id <= 2147483647",
+                                    "error": "sdp_start_channel_id must be between 0 to 2147483647"
+                                }
+                            ],
+                            "integration_factor": [
+                                {
+                                    "rule": "1 <= integration_factor <= 10",
+                                    "error": "integration_factor must be between 1 to 10"
+                                }
                             ]
                         }
                     }
