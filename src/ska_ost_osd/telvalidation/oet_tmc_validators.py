@@ -39,10 +39,10 @@ logging.getLogger("telvalidation")
 from collections import deque
 
 
-def get_value_based_on_provided_path(nested_data: Union[dict, list], path: list) -> list:
+def get_value_based_on_provided_path(nested_data: Union[dict, list], path: list) -> Any:
     """
-    Retrieve a list of keys representing the path to the desired value
-    in a nested dictionary or list of dictionaries based on a given path.
+    Retrieve a value from a nested dictionary or
+    list of dictionaries based on a given path.
 
     Args:
         nested_data (dict or list): The nested dictionary or
@@ -52,65 +52,52 @@ def get_value_based_on_provided_path(nested_data: Union[dict, list], path: list)
         based on given path like ['a', 'b', 'c']
 
     Returns:
-        A list of keys representing the path to the desired value, or an empty
-        list if the path is invalid or the value is not found.
+        The value at the specified path, or None if the path is invalid
+        or the value is not found.
     """
     stack = deque()
-    stack.append((nested_data, path, []))
+    stack.append((nested_data, path))
 
     while stack:
-        current_data, remaining_path, key_path = stack.pop()
+        current_data, remaining_path = stack.pop()
 
         if not remaining_path:
-            return key_path
+            return current_data
 
         current_key = remaining_path[0]
         remaining_path = remaining_path[1:]
 
         if isinstance(current_data, dict):
-            if '.' in current_key:
-                # Handle dot-separated keys
-                keys = current_key.split('.')
-                for k in keys:
-                    if k in current_data:
-                        key_path.append(k)
-                        current_data = current_data[k]
-                    else:
-                        return []
-                stack.append((current_data, remaining_path, key_path))
-            elif current_key in current_data:
-                key_path.append(current_key)
-                stack.append((current_data[current_key], remaining_path, key_path))
+            if current_key in current_data:
+                stack.append((current_data[current_key], remaining_path))
             else:
                 # Check if the current key exists in any nested dictionary
                 for value in current_data.values():
-                    if isinstance(value, (dict, list)):
-                        stack.append((value, [current_key] + remaining_path, key_path[:]))
+                    if isinstance(value, dict):
+                        stack.append((value, [current_key] + remaining_path))
+                    elif isinstance(value, list):
+                        for item in value:
+                            if isinstance(item, dict):
+                                stack.append((item, [current_key] + remaining_path))
         elif isinstance(current_data, list):
             for item in current_data:
-                if isinstance(item, dict):
-                    if current_key in item:
-                        value = item[current_key]
-                        key_path.append(current_key)
-                        if not remaining_path:
-                            print("key_path", key_path)
-                            return key_path
-                        
-                        elif isinstance(remaining_path[0], int):
-                            # Handle case where the next key is an integer (list index)
-                            next_key = remaining_path[0]
-                            remaining_path = remaining_path[1:]
-                            if isinstance(value, list) and next_key < len(value):
-                                key_path.append(str(next_key))
-                                stack.append((value, remaining_path, key_path))
-                        else:
-                            stack.append((value, remaining_path, key_path))
+                if isinstance(item, dict) and current_key in item:
+                    value = item[current_key]
+                    if not remaining_path:
+                        return value
+                    elif isinstance(remaining_path[0], int):
+                        # Handle case where the next key is an integer (list index)
+                        next_key = remaining_path[0]
+                        remaining_path = remaining_path[1:]
+                        if isinstance(value, list) and next_key < len(value):
+                            stack.append((value, [next_key] + remaining_path))
                     else:
-                        stack.append((item, [current_key] + remaining_path, key_path[:]))
+                        stack.append((value, remaining_path))
         else:
-            return []
+            return None
 
-    return []
+    return None
+
 
 def get_matched_rule_constraint_from_osd(
     basic_capabilities: dict, search_key: str, rule: str
@@ -177,7 +164,7 @@ def apply_validation_rule(
     key: str,
     value: list[dict[str, Union[str, dict]]],
     command_input_json_config: dict,
-    parent_key: str,
+    parent_path: str,
     capabilities: dict,
 ) -> str:
     """
@@ -194,11 +181,8 @@ def apply_validation_rule(
     :param capabilities: dict, the capabilities dictionary.
     :return: str, the error message after applying the rule.
     """
-    res_value = get_value_based_on_provided_path(
-        command_input_json_config, [parent_key, key]
-    )
-    print("res_value", res_value)
-    print("parent_keyyyyyy", parent_key, key)
+    res_value = get_value_based_on_provided_path(command_input_json_config, parent_path)
+
     if res_value:
         add_semantic_variables({key: res_value})
         error_msgs = []
@@ -309,126 +293,61 @@ def format_error_message(
 def validate_json(
     semantic_validate_constant_json: dict,
     command_input_json_config: dict,
-    parent_key: str,
-    capabilities: dict,
+    parent_path: list = None,
+    capabilities: dict = None,
 ) -> list:
     """
-    This function is written to matching key's from user input command
-    and validation constant rules those and present in mid, low
-    and SBD validation constant json.
-    e.g consider one of the assign resource command dish rule
-    from constant json.
-    here we are just mapping rule dish of receptor_ids to
-    user assign resource command input payload.
-    :param semantic_validate_constant_json: json containing all the parameters
-    along with its business semantic validation rules and error message.
-    :param command_input_json_config: dictionary containing
-    details of the command input which needs validation.
-    This is same as for ska_telmodel.schema.validate.
-    :param parent_key: temp key to store parent key, means if same semantic
-    validation key present in 2 places this will help to identify
-    correct parent.
-    :param capabilities: defined key, value structure pair from OSD API
-    :returns: error_msg_list: list containing all combined error which arises
-    due to semantic validation.
+    This function is written to match keys from the user input command
+    and validation constant rules present in mid, low, and SBD validation constant JSON.
+    e.g., consider one of the assign resource command dish rules from the constant JSON.
+    Here, we are mapping the rule dish of receptor_ids to the user assign resource
+    command input payload.
+
+    :param semantic_validate_constant_json: JSON containing all the parameters
+     along with its business semantic validation rules and error messages.
+    :param command_input_json_config: Dictionary containing details of the command input
+     which needs validation.
+    This is the same as for ska_telmodel.schema.validate.
+    :param parent_path: List representing the current parent path.
+    :param capabilities: Defined key-value structure pair from the OSD API.
+    :return: error_msg_list: List containing all combined errors arising due
+     to semantic validation.
     """
-    # initially declared empty values for error messages list, last parent dict
-    # and parent key
     error_msg_list = []
     for key, value in semantic_validate_constant_json.items():
-        # current_key = f"{parent_key}. {key}" if parent_key else key
-        
+        current_path = parent_path + [key]
+
         if isinstance(value, list):
-            # if validation key present in multiple dict parent_key
-            # helps to populate current child
             rule_result = apply_validation_rule(
                 key=key,
                 value=value,
                 command_input_json_config=command_input_json_config,
-                parent_key=parent_key,
+                parent_path=current_path,
                 capabilities=capabilities,
             )
-            print("@@@@@@@@@@@@@@@@@@@@2", rule_result)
             if rule_result:
                 error_msg_list.append(rule_result)
-
         elif isinstance(value, dict):
-            # added extra key as rule parent to perform rule validation
-            # on child
-            # e.g semantic rule suggest calculate beams length but beams
-            # is having array of element, in this case parent_rule_key
-            # key helps to apply rule on child]
-            new_parent_key = f"{parent_key}.{key}" if parent_key else key
             if "parent_key_rule" in value:
                 rule_key = list(value.keys())[1]
                 rule_result = apply_validation_rule(
                     key=rule_key,
                     value=value["parent_key_rule"],
                     command_input_json_config=command_input_json_config,
-                    parent_key=key,
+                    parent_path=current_path + [rule_key],
                     capabilities=capabilities,
                 )
                 if rule_result:
                     error_msg_list.append(rule_result)
-                
-            parent_key = key
-            
-            
             error_msg_list.extend(
                 validate_json(
                     value,
                     command_input_json_config,
-                    new_parent_key,
+                    current_path,
                     capabilities,
                 )
             )
-            
     return error_msg_list
-
-
-# def validate_json(semantic_validation_constant_json, command_input_json_config, parent_keys=None, capabilities=None):
-#     """
-#     This function validates the user's input JSON against the semantic validation constant JSON.
-
-#     Args:
-#         semantic_validation_constant_json (dict): The semantic validation constant JSON containing the validation rules.
-#         command_input_json_config (dict): The user's command input JSON to be validated.
-#         parent_keys (list, optional): The list of parent keys representing the path to the current level. Default is None.
-#         capabilities (dict, optional): A dictionary containing capabilities. Default is None.
-
-#     Returns:
-#         list: A list of error messages if any validation rules are violated, or an empty list if the input JSON is valid.
-#     """
-#     error_msgs = []
-#     for key, value in semantic_validation_constant_json.items():
-#         current_parent_keys = parent_keys + [key] if parent_keys else [key]
-#         print("current_parent_keys", current_parent_keys, key)
-#         if isinstance(value, list):
-#             error_msg = apply_validation_rule(key, value, command_input_json_config, tuple(current_parent_keys), capabilities)
-#             if error_msg:
-#                 error_msgs.append(error_msg)
-#             print("valuuuuuuuuuuuuuuuuueeeeee", error_msg)
-#             llllll
-#             # import pdb; pdb.set_trace()
-#         elif isinstance(value, dict):
-#             if "parent_key_rule" in value:
-#                 rule_key = list(value.keys())[1]
-#                 rule_result = apply_validation_rule(
-#                     key=rule_key,
-#                     value=value["parent_key_rule"],
-#                     command_input_json_config=command_input_json_config,
-#                     parent_key=tuple(current_parent_keys),
-#                     capabilities=capabilities,
-#                 )
-#                 if rule_result:
-#                     error_msgs.append(rule_result)
-#             else:
-#                 error_msgs.extend(validate_json(value, command_input_json_config, current_parent_keys, capabilities))
-#                 error_msg = apply_validation_rule(key, value, command_input_json_config, tuple(current_parent_keys), capabilities)
-#                 if error_msg:
-#                     error_msgs.append(error_msg)
-                
-#     return error_msgs
 
 
 def validate_target_is_visible(

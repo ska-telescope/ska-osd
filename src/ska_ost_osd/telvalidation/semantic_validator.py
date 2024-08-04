@@ -242,34 +242,24 @@ def validate_command_input(
         tm_data=tm_data,
         osd_data=osd_data,
     )
+
+    matched_capabilities = fetch_matched_capabilities_from_basic_capabilities(
+        capabilities=capabilities, basic_capabilities=basic_capabilities
+    )
+
     if "assignresources" in interface:
-        msg_list = validate_json(
-            semantic_validate_data[array_assembly]["assign_resource"],
-            command_input_json_config=observing_command_input,
-            parent_key=None,
-            capabilities=fetch_matched_capabilities_from_basic_capabilities(
-                capabilities=capabilities, basic_capabilities=basic_capabilities
-            ),
-        )
+        validation_data = semantic_validate_data[array_assembly]["assign_resource"]
     elif "configure" in interface:
-        msg_list = validate_json(
-            semantic_validate_data[array_assembly]["configure"],
-            command_input_json_config=observing_command_input,
-            parent_key=None,
-            capabilities=fetch_matched_capabilities_from_basic_capabilities(
-                capabilities=capabilities, basic_capabilities=basic_capabilities
-            ),
-        )
-        print("kkkkkkkkkkkkkk", msg_list)
+        validation_data = semantic_validate_data[array_assembly]["configure"]
     else:
-        msg_list = validate_json(
-            semantic_validate_data[array_assembly],
-            command_input_json_config=observing_command_input,
-            parent_key=None,
-            capabilities=fetch_matched_capabilities_from_basic_capabilities(
-                capabilities=capabilities, basic_capabilities=basic_capabilities
-            ),
-        )
+        validation_data = semantic_validate_data[array_assembly]
+
+    msg_list = validate_json(
+        validation_data,
+        command_input_json_config=observing_command_input,
+        parent_path=[],
+        capabilities=matched_capabilities,
+    )
 
     return msg_list
 

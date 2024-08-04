@@ -84,20 +84,16 @@ INVALID_LOW_CONFIGURE_JSON = load_string_from_file(
 capabilities = load_string_from_file("test_files/testfile_capabilities.json")
 
 INVALID_MID_VALIDATE_CONSTANT = {
-    "AA0.5": {
-        "assign_resource": {
-            "dish": {
-                "receptor_ids": [
-                    {
-                        "rules": "(0 < len(receptor_ids) <= 0)",
-                        "error": (
-                            "receptor_ids are                             too"
-                            " many!Current Limit is 4"
-                        ),
-                    }
-                ]
+    "dish": {
+        "receptor_ids": [
+            {
+                "rules": "(0 < len(receptor_ids) <= 0)",
+                "error": (
+                    "receptor_ids are                             too"
+                    " many!Current Limit is 4"
+                ),
             }
-        }
+        ]
     }
 }
 
@@ -167,7 +163,7 @@ mid_sbd_expected_result_for_invalid_data = (
     "receptor_ids are too many!Current Limit is 4\n"
     "beams are too many! Current limit is 1\n"
     "Invalid function for beams! Currently allowed visibilities\n"
-    "spectral windows are too many! Current limit = 1\n"
+    "spectral windows are many! Current limit = 1\n"
     "Invalid input for channel_count! Currently allowed 14880\n"
     "Invalid input for freq_min\n"
     "Invalid input for freq_max\n"
@@ -187,17 +183,17 @@ mid_sbd_expected_result_for_invalid_data = (
 @pytest.mark.parametrize(
     "config, telescope, expected_result, is_exception",
     [
-        # (VALID_MID_ASSIGN_JSON, "MID", True, False),
-        # (INVALID_MID_ASSIGN_JSON, "MID", mid_expected_result_for_invalid_data, True),
-        # (VALID_LOW_ASSIGN_JSON, "LOW", True, False),
-        # (INVALID_LOW_ASSIGN_JSON, "LOW", low_expected_result_for_invalid_data, True),
-        # (VALID_MID_CONFIGURE_JSON, "MID", True, False),
-        # (
-        #     INVALID_MID_CONFIGURE_JSON,
-        #     "MID",
-        #     mid_configure_expected_result_for_invalid_data,
-        #     True,
-        # ),
+        (VALID_MID_ASSIGN_JSON, "MID", True, False),
+        (INVALID_MID_ASSIGN_JSON, "MID", mid_expected_result_for_invalid_data, True),
+        (VALID_LOW_ASSIGN_JSON, "LOW", True, False),
+        (INVALID_LOW_ASSIGN_JSON, "LOW", low_expected_result_for_invalid_data, True),
+        (VALID_MID_CONFIGURE_JSON, "MID", True, False),
+        (
+            INVALID_MID_CONFIGURE_JSON,
+            "MID",
+            mid_configure_expected_result_for_invalid_data,
+            True,
+        ),
         (VALID_LOW_CONFIGURE_JSON, "LOW", True, False),
         (
             INVALID_LOW_CONFIGURE_JSON,
@@ -205,8 +201,8 @@ mid_sbd_expected_result_for_invalid_data = (
             low_configure_expected_result_for_invalid_data,
             True,
         ),
-        # (VALID_MID_SBD_JSON, "MID", True, False),
-        # (INVALID_MID_SBD_JSON, "MID", mid_sbd_expected_result_for_invalid_data, True),
+        (VALID_MID_SBD_JSON, "MID", True, False),
+        (INVALID_MID_SBD_JSON, "MID", mid_sbd_expected_result_for_invalid_data, True),
         # Add more test cases here
     ],
 )
@@ -271,7 +267,7 @@ def test_validate_scemantic_json_input_keys(mock6):
         validate_json(
             INVALID_MID_VALIDATE_CONSTANT,
             INPUT_COMMAND_CONFIG,
-            parent_key=None,
+            parent_path=[],
             capabilities=capabilities,
         )
 
