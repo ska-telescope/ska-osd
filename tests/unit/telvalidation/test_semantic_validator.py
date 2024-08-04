@@ -163,7 +163,7 @@ mid_sbd_expected_result_for_invalid_data = (
     "receptor_ids are too many!Current Limit is 4\n"
     "beams are too many! Current limit is 1\n"
     "Invalid function for beams! Currently allowed visibilities\n"
-    "spectral windows are many! Current limit = 1\n"
+    "spectral windows are too many! Current limit = 1\n"
     "Invalid input for channel_count! Currently allowed 14880\n"
     "Invalid input for freq_min\n"
     "Invalid input for freq_max\n"
