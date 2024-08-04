@@ -4,6 +4,13 @@ from typing import List, Optional
 from pydantic import BaseModel, model_validator
 
 from ska_ost_osd.osd.constant import ARRAY_ASSEMBLY_PATTERN, OSD_VERSION_PATTERN
+from ska_ost_osd.osd.osd_validation_messages import (
+    ARRAY_ASSEMBLY_INVALID_ERROR_MESSAGE,
+    CYCLE_ID_CAPABILITIES_ERROR_MESSAGE,
+    CYCLE_ID_GITLAB_BRANCH_ERROR_MESSAGE,
+    GITLAB_BRANCH_ERROR_MESSAGE,
+    OSD_VERSION_INVALID_ERROR_MESSAGE,
+)
 
 
 class OSDModelError(Exception):
@@ -36,15 +43,13 @@ class OSDModel(BaseModel):
         if gitlab_branch and osd_version:
             errors.append(
                 {
-                    "msg": "gitlab_branch and osd_version cannot be used together",
-                    "value": f"{gitlab_branch}, {osd_version}",
+                    "msg": GITLAB_BRANCH_ERROR_MESSAGE,
                 }
             )
         if cycle_id and array_assembly:
             errors.append(
                 {
-                    "msg": "cycle_id and array_assembly cannot be used together",
-                    "value": f"{cycle_id}, {array_assembly}",
+                    "msg": CYCLE_ID_GITLAB_BRANCH_ERROR_MESSAGE,
                 }
             )
 
@@ -52,19 +57,18 @@ class OSDModel(BaseModel):
         if not (cycle_id or capabilities):
             errors.append(
                 {
-                    "msg": "Either cycle_id or capabilities must be provided",
-                    "value": f"{cycle_id}, {capabilities}",
+                    "msg": CYCLE_ID_CAPABILITIES_ERROR_MESSAGE,
                 }
             )
 
         # Validate patterns
         if osd_version and not re.match(OSD_VERSION_PATTERN, osd_version):
             errors.append(
-                {"msg": "osd_version value is not valid", "value": osd_version}
+                {"msg": OSD_VERSION_INVALID_ERROR_MESSAGE.format(osd_version)}
             )
         if array_assembly and not re.match(ARRAY_ASSEMBLY_PATTERN, array_assembly):
             errors.append(
-                {"msg": "array_assembly value is not valid", "value": array_assembly}
+                {"msg": ARRAY_ASSEMBLY_INVALID_ERROR_MESSAGE.format(array_assembly)}
             )
         if errors:
             raise OSDModelError(errors)

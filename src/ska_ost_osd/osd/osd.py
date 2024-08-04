@@ -6,13 +6,14 @@ from typing import Any, Optional
 from ska_telmodel.data import TMData
 
 from ska_ost_osd.osd.osd_schema_validator import OSDModel, OSDModelError
-from ska_ost_osd.osd.validation_messages import (CYCLE_ERROR_MESSAGE,
-CYCLE_ID_ERROR_MESSAGE,
-CAPABILITY_DOESNOT_EXIST_ERROR_MESSAGE,
-ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE,
-OSD_VERSION_ERROR_MESSAGE,
-GITLAB_BRANCH_ERROR_MESSAGE,
-SOURCE_ERROR_MESSAGE
+from ska_ost_osd.osd.osd_validation_messages import (
+    ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE,
+    AVAILABLE_SOURCE_ERROR_MESSAGE,
+    CAPABILITY_DOESNOT_EXIST_ERROR_MESSAGE,
+    CYCLE_ERROR_MESSAGE,
+    CYCLE_ID_ERROR_MESSAGE,
+    OSD_VERSION_ERROR_MESSAGE,
+    SOURCE_ERROR_MESSAGE,
 )
 
 from .constant import (
@@ -70,7 +71,7 @@ class OSD:
             msg = ", ".join(capabilities_list)
             cap = cap_list[0]
 
-            return f"Capability {cap} doesn't exists,Available are {msg}"
+            return CAPABILITY_DOESNOT_EXIST_ERROR_MESSAGE.format(cap, msg)
 
     def get_telescope_observatory_policies(
         self,
@@ -146,9 +147,7 @@ class OSD:
                 err_msg = self.check_array_assembly(value, self.keys_list)
 
             if err_msg:
-                cap_err_msg_list.append(
-                    {"msg": err_msg, "value": f"{value},{self.keys_list}"}
-                )
+                cap_err_msg_list.append({"msg": err_msg})
             else:
                 osd_data["capabilities"][key.lower()] = {}
                 osd_data["capabilities"][key.lower()]["basic_capabilities"] = data[
@@ -208,9 +207,7 @@ class OSD:
         chk_capabilities = self.check_capabilities(self.capabilities)
 
         if chk_capabilities:
-            osd_err_msg_list.append(
-                {"msg": chk_capabilities, "value": self.capabilities}
-            )
+            osd_err_msg_list.append({"msg": chk_capabilities})
         else:
             (
                 osd_data,
@@ -267,12 +264,9 @@ def check_cycle_id(
     cycle_error_msg_list = []
 
     if gitlab_branch is not None and osd_version is not None:
-        msg = "either osd_version or gitlab_branch"
-
         cycle_error_msg_list.append(
             {
-                "msg": f"Only one parameter is needed {msg}",
-                "value": f"{osd_version}, {gitlab_branch}",
+                "msg": CYCLE_ERROR_MESSAGE,
             }
         )
 
@@ -290,8 +284,7 @@ def check_cycle_id(
     if cycle_id is not None and cycle_id_exists is None:
         cycle_error_msg_list.append(
             {
-                "value": f"{cycle_id}, {string_ids}",
-                "msg": f"Cycle {cycle_id} is not valid,Available IDs are {string_ids}",
+                "msg": CYCLE_ID_ERROR_MESSAGE.format(cycle_id, string_ids),
             }
         )
 
@@ -303,10 +296,10 @@ def check_cycle_id(
             cycle_error_msg_list.append(
                 {
                     "msg": (
-                        f"Invalid OSD Version {osd_version} Valid OSD Versions are"
-                        f" {versions_dict[f'cycle_{cycle_id}']}"
-                    ),
-                    "value": osd_version,
+                        OSD_VERSION_ERROR_MESSAGE.format(
+                            osd_version, versions_dict[f"cycle_{cycle_id}"]
+                        )
+                    )
                 }
             )
 
@@ -333,11 +326,9 @@ def osd_tmdata_source(
     source_error_msg_list = []
 
     if source not in SOURCES:
+        source_msg = ", ".join(SOURCES)
         source_error_msg_list.append(
-            {
-                "msg": f"source is not valid available are {', '.join(SOURCES)}",
-                "value": SOURCES,
-            }
+            {"msg": AVAILABLE_SOURCE_ERROR_MESSAGE.format(source_msg)}
         )
 
     if (
@@ -345,7 +336,7 @@ def osd_tmdata_source(
         and isinstance(gitlab_branch, str)
         and (source == "car" or source == "file")
     ):
-        source_error_msg_list.append({"msg": "source is not valid.", "value": source})
+        source_error_msg_list.append({"msg": SOURCE_ERROR_MESSAGE.format(source)})
 
     osd_version, cycle_error_msg_list = check_cycle_id(
         cycle_id, osd_version, gitlab_branch

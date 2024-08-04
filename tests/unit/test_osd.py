@@ -231,14 +231,12 @@ def test_invalid_osd_tmdata_source():
     )
     assert error_msgs == [
         {
-            "msg": "source is not valid available are file, car, gitlab",
-            "value": ("file", "car", "gitlab"),
+            "msg": "Source is not valid available are file, car, gitlab",
         },
         {
             "msg": "Only one parameter is needed either osd_version or gitlab_branch",
-            "value": "1.1.0, main",
         },
-        {"value": "3, 1", "msg": "Cycle 3 is not valid,Available IDs are 1"},
+        {"msg": "Cycle 3 is not valid,Available IDs are 1"},
     ]
 
 
@@ -252,11 +250,8 @@ def test_invalid_source():
         source="file",
     )
     assert error_msgs == [
-        {"msg": "source is not valid.", "value": "file"},
-        {
-            "msg": "Invalid OSD Version main Valid OSD Versions are ['1.0.2']",
-            "value": "main",
-        },
+        {"msg": "Source file is not valid"},
+        {"msg": "OSD Version main is not valid,Available OSD Versions are ['1.0.2']"},
     ]
 
 
@@ -274,10 +269,9 @@ def test_invalid_get_osd_data_capability(tm_data):  # pylint: disable=W0621
     assert error_msgs == [
         {
             "msg": (
-                "Capability midd doesn't exists,Available are low, mid,"
+                "Capability midd is not valid,Available Capabilities are low, mid,"
                 " observatory_policies"
-            ),
-            "value": ["midd"],
+            )
         }
     ]
 
@@ -295,7 +289,9 @@ def test_invalid_get_osd_data_array_assembly(tm_data):  # pylint: disable=W0621
     )
     assert error_msgs == [
         {
-            "msg": "Array Assembly AA3 doesn't exists. Available are AA0.5, AA1, AA2",
-            "value": "AA3,['telescope', 'basic_capabilities', 'AA0.5', 'AA1', 'AA2']",
+            "msg": (
+                "Array Assembly AA3 is not valid,Available Array Assemblies are AA0.5,"
+                " AA1, AA2"
+            )
         }
     ]
