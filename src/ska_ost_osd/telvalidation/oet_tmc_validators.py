@@ -328,6 +328,11 @@ def validate_json(
             if rule_result:
                 error_msg_list.append(rule_result)
         elif isinstance(value, dict):
+            # added extra key as rule parent to perform rule validation
+            # on child
+            # e.g semantic rule suggest calculate beams length but beams
+            # is having array of element, in this case parent_rule_key
+            # key helps to apply rule on child
             if "parent_key_rule" in value:
                 rule_key = list(value.keys())[1]
                 rule_result = apply_validation_rule(
