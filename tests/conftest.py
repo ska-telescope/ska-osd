@@ -429,12 +429,23 @@ def open_api_spec():
                                                             "max_baseline_km": 1.5,
                                                             "available_bandwidth_hz": 800000.0,
                                                             "number_channels": 14880,
+                                                            "cbf_modes": [
+                                                                "correlation",
+                                                                "pst",
+                                                            ],
                                                             "number_zoom_windows": 0,
                                                             "number_zoom_channels": 0,
                                                             "number_pss_beams": 0,
-                                                            "number_pst_beams": 0,
-                                                            "ps_beam_bandwidth_hz": 0.0,
+                                                            "number_pst_beams": 1,
+                                                            "ps_beam_bandwidth_hz": 400000000.0,
                                                             "number_fsps": 4,
+                                                            "allowed_channel_width_values": [
+                                                                13440
+                                                            ],
+                                                            "allowed_channel_count_range": [
+                                                                1,
+                                                                58982,
+                                                            ],
                                                         },
                                                         "basic_capabilities": {
                                                             "dish_elevation_limit_deg": 15.0,
