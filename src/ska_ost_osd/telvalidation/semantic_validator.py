@@ -44,10 +44,9 @@ def get_validation_data(interface: str, telescope: str) -> Optional[str]:
     }
 
     for key, value in validation_constants.items():
-        if key in interface:
+        if key in interface or key == telescope:
             return value
-        elif key == telescope:
-            return value
+
     # taking mid interface as default cause there is no any specific
     # key to differentiate the interface
     return validation_constants.get(SKA_MID_TELESCOPE)
@@ -256,12 +255,13 @@ def validate_command_input(
         capabilities=capabilities, basic_capabilities=basic_capabilities
     )
 
-    if ASSIGN_RESOURCE in interface:
-        validation_data = semantic_validate_data[array_assembly]["assign_resource"]
-    elif CONFIGURE in interface:
-        validation_data = semantic_validate_data[array_assembly]["configure"]
-    else:
-        validation_data = semantic_validate_data[array_assembly]["sbd"]
+    validation_data = semantic_validate_data[array_assembly].get(
+        "assign_resource"
+        if ASSIGN_RESOURCE in interface
+        else "configure"
+        if CONFIGURE in interface
+        else "sbd"
+    )
 
     msg_list = validate_json(
         validation_data,

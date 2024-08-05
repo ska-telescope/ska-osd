@@ -86,16 +86,20 @@ INVALID_LOW_CONFIGURE_JSON = load_string_from_file(
 capabilities = load_string_from_file("test_files/testfile_capabilities.json")
 
 INVALID_MID_VALIDATE_CONSTANT = {
-    "dish": {
-        "receptor_ids": [
-            {
-                "rules": "(0 < len(receptor_ids) <= 0)",
-                "error": (
-                    "receptor_ids are                             too"
-                    " many!Current Limit is 4"
-                ),
+    "AA0.5": {
+        "assign_resource": {
+            "dish": {
+                "receptor_ids": [
+                    {
+                        "rules": "(0 < len(receptor_ids) <= 0)",
+                        "error": (
+                            "receptor_ids are                             too"
+                            " many!Current Limit is 4"
+                        ),
+                    }
+                ]
             }
-        ]
+        }
     }
 }
 
@@ -262,7 +266,7 @@ def test_validate_scemantic_json_input_keys(mock6):
         match="Invalid rule and error key passed",
     ):
         validate_json(
-            INVALID_MID_VALIDATE_CONSTANT,
+            INVALID_MID_VALIDATE_CONSTANT["AA0.5"]["assign_resource"],
             INPUT_COMMAND_CONFIG,
             parent_path_list=[],
             capabilities=capabilities,
@@ -370,16 +374,6 @@ class TestTargetVisibility(unittest.TestCase):
             validate_target_is_visible(ra, dec, telescope, "target_low", self.tm_data),
             expected_output,
         )
-
-
-@pytest.fixture
-def sbd_invalid_request_json_path():
-    """
-    Pytest fixture to return path to resource allocation JSON file
-    for SBD
-    """
-    config = load_string_from_file("test_files/testfile_invalid_mid_sbd.json")
-    return config
 
 
 def test_get_matched_rule_constraint_from_osd():
