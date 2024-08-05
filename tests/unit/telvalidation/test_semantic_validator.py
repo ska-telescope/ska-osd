@@ -86,20 +86,16 @@ INVALID_LOW_CONFIGURE_JSON = load_string_from_file(
 capabilities = load_string_from_file("test_files/testfile_capabilities.json")
 
 INVALID_MID_VALIDATE_CONSTANT = {
-    "AA0.5": {
-        "assign_resource": {
-            "dish": {
-                "receptor_ids": [
-                    {
-                        "rules": "(0 < len(receptor_ids) <= 0)",
-                        "error": (
-                            "receptor_ids are                             too"
-                            " many!Current Limit is 4"
-                        ),
-                    }
-                ]
+    "dish": {
+        "receptor_ids": [
+            {
+                "rules": "(0 < len(receptor_ids) <= 0)",
+                "error": (
+                    "receptor_ids are                             too"
+                    " many!Current Limit is 4"
+                ),
             }
-        }
+        ]
     }
 }
 
@@ -268,7 +264,7 @@ def test_validate_scemantic_json_input_keys(mock6):
         validate_json(
             INVALID_MID_VALIDATE_CONSTANT,
             INPUT_COMMAND_CONFIG,
-            parent_key=None,
+            parent_path=[],
             capabilities=capabilities,
         )
 
