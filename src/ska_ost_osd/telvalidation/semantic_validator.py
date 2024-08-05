@@ -12,6 +12,8 @@ from typing import Any, Optional
 from ska_telmodel.data import TMData
 
 from .constant import (
+    ASSIGN_RESOURCE,
+    CONFIGURE,
     LOW_SBD_VALIDATION_CONSTANT_JSON_FILE_PATH,
     LOW_VALIDATION_CONSTANT_JSON_FILE_PATH,
     MID_SBD_VALIDATION_CONSTANT_JSON_FILE_PATH,
@@ -254,9 +256,9 @@ def validate_command_input(
         capabilities=capabilities, basic_capabilities=basic_capabilities
     )
 
-    if "assignresources" in interface:
+    if ASSIGN_RESOURCE in interface:
         validation_data = semantic_validate_data[array_assembly]["assign_resource"]
-    elif "configure" in interface:
+    elif CONFIGURE in interface:
         validation_data = semantic_validate_data[array_assembly]["configure"]
     else:
         validation_data = semantic_validate_data[array_assembly]["sbd"]
@@ -264,7 +266,7 @@ def validate_command_input(
     msg_list = validate_json(
         validation_data,
         command_input_json_config=observing_command_input,
-        parent_path=[],
+        parent_path_list=[],
         capabilities=matched_capabilities,
     )
 

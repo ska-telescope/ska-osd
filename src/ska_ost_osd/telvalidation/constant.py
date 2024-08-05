@@ -25,6 +25,9 @@ SKA_MID_TELESCOPE = "mid"
 SKA_MID_SBD = "ska_mid"
 SKA_LOW_SBD = "ska_low"
 
+ASSIGN_RESOURCE = "assignresources"
+CONFIGURE = "configure"
+
 CAR_TELMODEL_SOURCE = ("car:ost/ska-ost-osd?main#tmdata",)
 
 INTERFACE_PATTERN = r"^https://schema\.skao\.int/[a-zA-Z-]+/\d+\.\d+$"

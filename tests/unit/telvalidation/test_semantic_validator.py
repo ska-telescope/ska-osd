@@ -264,7 +264,7 @@ def test_validate_scemantic_json_input_keys(mock6):
         validate_json(
             INVALID_MID_VALIDATE_CONSTANT,
             INPUT_COMMAND_CONFIG,
-            parent_path=[],
+            parent_path_list=[],
             capabilities=capabilities,
         )
 
