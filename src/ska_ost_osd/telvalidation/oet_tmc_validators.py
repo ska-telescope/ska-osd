@@ -279,7 +279,7 @@ def evaluate_rule(
         else:
             osd_base_constraint_value = {}
 
-        names = {key: res_value}
+        names = {key_to_validate: res_value}
         names = {**names, **osd_base_constraint_value}
         names = update_names_with_dependencies(rule_data, names)
 

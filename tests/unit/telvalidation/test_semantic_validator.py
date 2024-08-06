@@ -87,16 +87,20 @@ capabilities = load_string_from_file("test_files/testfile_capabilities.json")
 
 # This is dummy constant json for testing "Invalid rule and error key passed" scenario.
 INVALID_MID_VALIDATE_CONSTANT = {
-    "dish": {
-        "receptor_ids": [
-            {
-                "rules": "(0 < len(receptor_ids) <= 0)",
-                "error": (
-                    "receptor_ids are                             too"
-                    " many!Current Limit is 4"
-                ),
+    "AA0.5": {
+        "assign_resource": {
+            "dish": {
+                "receptor_ids": [
+                    {
+                        "rules": "(0 < len(receptor_ids) <= 0)",
+                        "error": (
+                            "receptor_ids are                             too"
+                            " many!Current Limit is 4"
+                        ),
+                    }
+                ]
             }
-        ]
+        }
     }
 }
 
