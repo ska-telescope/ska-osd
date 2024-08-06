@@ -213,7 +213,8 @@ def fetch_matched_capabilities_from_basic_capabilities(
                     )
                     if matched_values:
                         replacible_values.append(matched_values)
-    replace_matched_capabilities_values(clone_capabilities, path, replacible_values)
+    if replacible_values and path:
+        replace_matched_capabilities_values(clone_capabilities, path, replacible_values)
     return clone_capabilities
 
 
@@ -241,14 +242,33 @@ def validate_command_input(
         tm_data=tm_data,
         osd_data=osd_data,
     )
-    msg_list = validate_json(
-        semantic_validate_data[array_assembly],
-        command_input_json_config=observing_command_input,
-        parent_key=None,
-        capabilities=fetch_matched_capabilities_from_basic_capabilities(
-            capabilities=capabilities, basic_capabilities=basic_capabilities
-        ),
-    )
+    if "assignresources" in interface:
+        msg_list = validate_json(
+            semantic_validate_data[array_assembly]["assign_resource"],
+            command_input_json_config=observing_command_input,
+            parent_key=None,
+            capabilities=fetch_matched_capabilities_from_basic_capabilities(
+                capabilities=capabilities, basic_capabilities=basic_capabilities
+            ),
+        )
+    elif "configure" in interface:
+        msg_list = validate_json(
+            semantic_validate_data[array_assembly]["configure"],
+            command_input_json_config=observing_command_input,
+            parent_key=None,
+            capabilities=fetch_matched_capabilities_from_basic_capabilities(
+                capabilities=capabilities, basic_capabilities=basic_capabilities
+            ),
+        )
+    else:
+        msg_list = validate_json(
+            semantic_validate_data[array_assembly],
+            command_input_json_config=observing_command_input,
+            parent_key=None,
+            capabilities=fetch_matched_capabilities_from_basic_capabilities(
+                capabilities=capabilities, basic_capabilities=basic_capabilities
+            ),
+        )
 
     return msg_list
 

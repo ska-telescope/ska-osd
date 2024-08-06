@@ -124,6 +124,11 @@ mid_expected_result_for_invalid_data = (
 )
 
 low_expected_result_for_invalid_data = (
+    "subarray_beam_id must be between 1 and 48\n"
+    "number_of_channels must be between 8 and 384\n"
+    "Invalid input for station_id! Currently allowed [345, 350, 352, 431]\n"
+    "Initials of aperture_id should be AP\n"
+    "station_id in aperture_id should be same as station_id\n"
     "beams are too many! Current limit is 1\n"
     "Invalid function for beams! Currently allowed visibilities\n"
     "spectral windows are too many! Current limit = 1"
@@ -140,8 +145,16 @@ mid_configure_expected_result_for_invalid_data = (
 )
 
 low_configure_expected_result_for_invalid_data = (
+    "subarray_beam_id must be between 1 and 48\n"
+    "update_rate must be greater than or equal to 0.0\n"
+    "start_channel must be greater than 2 and less than 504\n"
+    "number_of_channels must be greater than 8 and less than 384\n"
+    "Initials of aperture_id should be AP\n"
+    "Invalid reference frame! Currently allowed  [“topocentric”, “ICRS”, “galactic”]\n"
+    "c1 must be between 0.0 and 360.0\n"
+    "c2 must be between -90.0 and 90.0\n"
     "stations are too many! Current limit is 4\n"
-    "Invalid input for function mode! Currently allowed vis\n"
+    "Invalid input for firmware! Currently allowed vis\n"
     "The fsp_ids should all be distinct\n"
     "fsp_ids are too many!Current Limit is 6"
 )

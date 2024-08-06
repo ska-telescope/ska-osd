@@ -14,6 +14,7 @@ OSD capabilities.
 """
 
 import logging
+import re
 from datetime import datetime
 from typing import Any, Union
 
@@ -235,6 +236,7 @@ def evaluate_rule(
     eval_new_data = []
     simple_eval = EvalWithCompoundTypes()
     simple_eval.functions["len"] = len
+    simple_eval.functions["re"] = re
 
     if len(osd_base_constraint) > 1:
         # if found multiple constraints values from OSD
