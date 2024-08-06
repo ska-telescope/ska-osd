@@ -5,6 +5,15 @@ description = "simplest form OSD consists ofguration files that are required by 
 authors =  ["Team Nakshatra"]
 license= "BSD-3-Clause"
 readme = "README.md"
+repository = "https://gitlab.com/ska-telescope/ost/ska-ost-osd"
+documentation = "https://developer.skao.int/projects/ska-ost-osd/en/latest"
+packages = [
+    { include = "ska_ost_osd", from = "src" }
+]
+include = [
+    { path = 'tests' }
+]
+
 
 [[tool.poetry.source]]
 name = 'skao'
@@ -26,11 +35,12 @@ python-dateutil = "^2.8.2"
 ska-ser-skuid = "^3.3.3"
 # Pinning older version because of https://github.com/python-openapi/openapi-spec-validator/issues/201
 jsonschema = "4.17.3"
-ska-telmodel = "^1.15.1"
-pydantic = "^2.7.0"
-pydantic-core = "^2.18.1"
+ska-telmodel = "^1.19.1"
 astropy = "^5.1"
 simpleeval = "^0.9.13"
+pydantic = "^2.7.0"
+pydantic-core = "^2.18.1"
+
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.6.0"
