@@ -213,7 +213,8 @@ def fetch_matched_capabilities_from_basic_capabilities(
                     )
                     if matched_values:
                         replacible_values.append(matched_values)
-    replace_matched_capabilities_values(clone_capabilities, path, replacible_values)
+    if replacible_values and path:
+        replace_matched_capabilities_values(clone_capabilities, path, replacible_values)
     return clone_capabilities
 
 
@@ -241,13 +242,23 @@ def validate_command_input(
         tm_data=tm_data,
         osd_data=osd_data,
     )
+
+    matched_capabilities = fetch_matched_capabilities_from_basic_capabilities(
+        capabilities=capabilities, basic_capabilities=basic_capabilities
+    )
+
+    if "assignresources" in interface:
+        validation_data = semantic_validate_data[array_assembly]["assign_resource"]
+    elif "configure" in interface:
+        validation_data = semantic_validate_data[array_assembly]["configure"]
+    else:
+        validation_data = semantic_validate_data[array_assembly]
+
     msg_list = validate_json(
-        semantic_validate_data[array_assembly],
+        validation_data,
         command_input_json_config=observing_command_input,
-        parent_key=None,
-        capabilities=fetch_matched_capabilities_from_basic_capabilities(
-            capabilities=capabilities, basic_capabilities=basic_capabilities
-        ),
+        parent_path=[],
+        capabilities=matched_capabilities,
     )
 
     return msg_list
