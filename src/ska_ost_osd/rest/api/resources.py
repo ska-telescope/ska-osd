@@ -178,7 +178,6 @@ def semantically_validate_json(body: dict):
 
 
 def handle_validation_error(err: object) -> list:
-    # write docstring for function
     """
     This function handles validation errors and returns a list of error details.
     :param err: error raised from exception
