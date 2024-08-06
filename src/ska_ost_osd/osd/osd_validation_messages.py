@@ -10,7 +10,7 @@ OSD_VERSION_ERROR_MESSAGE = "OSD Version {} is not valid,Available OSD Versions 
 GITLAB_BRANCH_ERROR_MESSAGE = "gitlab_branch and osd_version cannot be used together"
 SOURCE_ERROR_MESSAGE = "Source {} is not valid"
 AVAILABLE_SOURCE_ERROR_MESSAGE = "Source is not valid available are {}"
-CYCLE_ID_GITLAB_BRANCH_ERROR_MESSAGE = (
+CYCLE_ID_ARRAY_ASSEMBLY_ERROR_MESSAGE = (
     "Cycle_id and Array_assembly cannot be used together"
 )
 CYCLE_ID_CAPABILITIES_ERROR_MESSAGE = "Either cycle_id or capabilities must be provided"

@@ -805,12 +805,7 @@ def invalid_semantic_validation_response():
 @pytest.fixture
 def observing_command_input_missing_response():
     return {
-        "detail": [
-            {
-                "msg": "Input should be a valid dictionary",
-                "value": "observing_command_input",
-            }
-        ],
+        "detail": ["Input should be a valid dictionary"],
         "status": -1,
         "title": "Value Error",
     }
@@ -829,13 +824,10 @@ def wrong_semantic_validation_parameter_body():
 def wrong_semantic_validation_parameter_value_response():
     return {
         "detail": [
-            {
-                "msg": (
-                    "gitlab://gitlab.com/ska-telescope14.1?~default~#tmdata not found"
-                    " in SKA CAR - make sure to add tmdata CI!"
-                ),
-                "value": ["car://gitlab.com/ska-telescope14.1#tmdata"],
-            }
+            (
+                "gitlab://gitlab.com/ska-telescope14.1?~default~#tmdata not found"
+                " in SKA CAR - make sure to add tmdata CI!"
+            ),
         ],
         "status": -1,
         "title": "Value Error",

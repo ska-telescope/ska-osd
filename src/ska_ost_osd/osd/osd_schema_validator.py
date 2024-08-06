@@ -6,8 +6,8 @@ from pydantic import BaseModel, model_validator
 from ska_ost_osd.osd.constant import ARRAY_ASSEMBLY_PATTERN, OSD_VERSION_PATTERN
 from ska_ost_osd.osd.osd_validation_messages import (
     ARRAY_ASSEMBLY_INVALID_ERROR_MESSAGE,
+    CYCLE_ID_ARRAY_ASSEMBLY_ERROR_MESSAGE,
     CYCLE_ID_CAPABILITIES_ERROR_MESSAGE,
-    CYCLE_ID_GITLAB_BRANCH_ERROR_MESSAGE,
     GITLAB_BRANCH_ERROR_MESSAGE,
     OSD_VERSION_INVALID_ERROR_MESSAGE,
 )
@@ -43,7 +43,7 @@ class OSDModel(BaseModel):
         if gitlab_branch and osd_version:
             errors.append(GITLAB_BRANCH_ERROR_MESSAGE)
         if cycle_id and array_assembly:
-            errors.append(CYCLE_ID_GITLAB_BRANCH_ERROR_MESSAGE)
+            errors.append(CYCLE_ID_ARRAY_ASSEMBLY_ERROR_MESSAGE)
 
         # Validate either combination
         if not (cycle_id or capabilities):

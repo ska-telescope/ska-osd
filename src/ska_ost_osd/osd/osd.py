@@ -69,9 +69,7 @@ class OSD:
 
         if (capabilities is not None and isinstance(capabilities, list)) and (cap_list):
             msg = ", ".join(capabilities_list)
-            cap = cap_list[0]
-
-            return CAPABILITY_DOESNOT_EXIST_ERROR_MESSAGE.format(cap, msg)
+            return CAPABILITY_DOESNOT_EXIST_ERROR_MESSAGE.format(cap_list[0], msg)
 
     def get_telescope_observatory_policies(
         self,
@@ -416,7 +414,6 @@ def get_osd_using_tmdata(
     )
     if cycle_errors:
         errors.extend(cycle_errors)
-    if cycle_errors:
         raise ValueError(errors)
     tm_data_source, error = osd_tmdata_source(
         cycle_id=cycle_id,
