@@ -251,6 +251,7 @@ def validate_command_input(
         tm_data=tm_data,
         osd_data=osd_data,
     )
+
     matched_capabilities = fetch_matched_capabilities_from_basic_capabilities(
         capabilities=capabilities, basic_capabilities=basic_capabilities
     )

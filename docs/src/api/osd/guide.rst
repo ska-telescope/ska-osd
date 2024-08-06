@@ -180,7 +180,7 @@ GET /osd
 
 4. Example Response
 
-    * The API returns a JSON object containing the matched OSD data.
+    * The API returns a JSON object containing the matched OSD data for default AA2.
 
         Calling API with parameters ``cycle_id``, ``source``, ``capabilities``
         their valid inputs will return the JSON containing the matched OSD data.
@@ -204,29 +204,32 @@ GET /osd
              "capabilities": {
                 "mid": {
                 "AA2": {
-                    "available_bandwidth_hz": 800000000.0,
                     "available_receivers": [
                     "Band_1",
                     "Band_2",
                     "Band_5a",
                     "Band_5b"
-                    ],
-                    "cbf_modes": [
-                    "CORR",
-                    "PST_BF",
-                    "PSS_BF"
-                    ],
-                    "max_baseline_km": 110.0,
-                    "number_channels": 14880,
-                    "number_fsps": 4,
-                    "number_meerkat_dishes": 4,
-                    "number_meerkatplus_dishes": 0,
-                    "number_pss_beams": 384,
-                    "number_pst_beams": 6,
-                    "number_ska_dishes": 64,
-                    "number_zoom_channels": 14880,
-                    "number_zoom_windows": 16,
-                    "ps_beam_bandwidth_hz": 800000000.0
+                ],
+                "number_ska_dishes": 64,
+                "number_meerkat_dishes": 4,
+                "number_meerkatplus_dishes": 0,
+                "max_baseline_km": 110.0,
+                "available_bandwidth_hz": 800000.0,
+                "number_channels": 14880,
+                "cbf_modes": [
+                    "correlation",
+                    "pst",
+                    "pss"
+                ],
+                "number_zoom_windows": 16,
+                "number_zoom_channels": 14880,
+                "number_pss_beams": 384,
+                "number_pst_beams": 6,
+                "ps_beam_bandwidth_hz": 800000.0,
+                "number_fsps": 27,
+                "allowed_channel_width_values": [210, 420, 840, 1680, 3360, 6720, 13440, 26880, 40320, 53760, 80640, 107520, 161280, 215040, 322560, 416640, 430080, 645120],
+                "allowed_channel_count_range_min": 1,
+                "allowed_channel_count_range_max": 214748647
                 },
                 "basic_capabilities": {
                     "dish_elevation_limit_deg": 15,

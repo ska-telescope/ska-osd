@@ -14,6 +14,7 @@ OSD capabilities.
 """
 
 import logging
+import re
 from datetime import datetime
 from typing import Any, Union
 
@@ -214,6 +215,27 @@ def apply_validation_rule(
     return ""
 
 
+def update_names_with_dependencies(rule_data: dict, names: dict) -> dict:
+    """
+    Update the 'names' dictionary with dependency values from rule_data.
+
+    :param key:rule_data (dict): A dictionary containing rule data,
+     including a "dependency_key" key.
+    :param key:names (dict): A dictionary to be updated with dependency values.
+
+    :return: dict: The updated 'names' dictionary with dependency values.
+    """
+    if "dependency_key" in rule_data:
+        dependency_values = get_semantic_variables()
+        for dependency_value in rule_data["dependency_key"]:
+            names.update(
+                {
+                    dependency_value: dependency_values[dependency_value],
+                }
+            )
+    return names
+
+
 def evaluate_rule(
     key_to_validate: str,
     res_value: Union[str, list],
@@ -235,14 +257,18 @@ def evaluate_rule(
     eval_new_data = []
     simple_eval = EvalWithCompoundTypes()
     simple_eval.functions["len"] = len
+    simple_eval.functions["re"] = re
 
     if len(osd_base_constraint) > 1:
         # if found multiple constraints values from OSD
         for i in osd_base_constraint:
             names = {key_to_validate: res_value}
             names = {**names, **i}
+            names = update_names_with_dependencies(rule_data, names)
+
             simple_eval.names = names
             eval_data = simple_eval.eval(rule_data["rule"])
+
             if not eval_data:
                 eval_new_data.append(False)
             else:
@@ -253,17 +279,9 @@ def evaluate_rule(
         else:
             osd_base_constraint_value = {}
 
-        if "dependency_key" in rule_data:
-            dependency_values = get_semantic_variables()
-            names = {
-                key_to_validate: res_value,
-                rule_data["dependency_key"]: dependency_values[
-                    rule_data["dependency_key"]
-                ],
-            }
-        else:
-            names = {key_to_validate: res_value}
-            names = {**names, **osd_base_constraint_value}
+        names = {key: res_value}
+        names = {**names, **osd_base_constraint_value}
+        names = update_names_with_dependencies(rule_data, names)
 
         simple_eval.names = names
         eval_data = simple_eval.eval(rule_data["rule"])
@@ -327,6 +345,11 @@ def validate_json(
             if rule_result:
                 error_msg_list.append(rule_result)
         elif isinstance(value, dict):
+            # added extra key as rule parent to perform rule validation
+            # on child
+            # e.g semantic rule suggest calculate beams length but beams
+            # is having array of element, in this case parent_rule_key
+            # key helps to apply rule on child
             if "parent_key_rule" in value:
                 rule_key = list(value.keys())[1]
                 rule_result = apply_validation_rule(

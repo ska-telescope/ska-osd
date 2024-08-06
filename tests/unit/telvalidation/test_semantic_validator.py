@@ -87,20 +87,16 @@ capabilities = load_string_from_file("test_files/testfile_capabilities.json")
 
 # This is dummy constant json for testing "Invalid rule and error key passed" scenario.
 INVALID_MID_VALIDATE_CONSTANT = {
-    "AA0.5": {
-        "assign_resource": {
-            "dish": {
-                "receptor_ids": [
-                    {
-                        "rules": "(0 < len(receptor_ids) <= 0)",
-                        "error": (
-                            "receptor_ids are                             too"
-                            " many!Current Limit is 4"
-                        ),
-                    }
-                ]
+    "dish": {
+        "receptor_ids": [
+            {
+                "rules": "(0 < len(receptor_ids) <= 0)",
+                "error": (
+                    "receptor_ids are                             too"
+                    " many!Current Limit is 4"
+                ),
             }
-        }
+        ]
     }
 }
 
@@ -127,6 +123,11 @@ mid_expected_result_for_invalid_data = (
 )
 
 low_expected_result_for_invalid_data = (
+    "subarray_beam_id must be between 1 and 48\n"
+    "number_of_channels must be between 8 and 384\n"
+    "Invalid input for station_id! Currently allowed [345, 350, 352, 431]\n"
+    "Initials of aperture_id should be AP\n"
+    "station_id in aperture_id should be same as station_id\n"
     "beams are too many! Current limit is 1\n"
     "Invalid function for beams! Currently allowed visibilities\n"
     "spectral windows are too many! Current limit = 1"
@@ -134,19 +135,35 @@ low_expected_result_for_invalid_data = (
 
 mid_configure_expected_result_for_invalid_data = (
     "Invalid input for receiver_band! Currently allowed [1,2]\n"
-    "FSPs are too many!Current Limit = 4\n"
-    "Invalid input for fsp_id!\n"
-    "Invalid input for function_mode\n"
-    "Invalid input for zoom_factor\n"
-    "frequency_slice_id did not match fsp_id\n"
+    "The fsp_ids should all be distinct\n"
+    "fsp_ids are too many!Current Limit is 4\n"
+    "Invalid input for channel_width! Currently allowed [13440]\n"
+    "channel_count must be between 1 to 58982\n"
+    "channel_count must be a multiple of 20\n"
+    "Invalid input for start_freq\n"
+    "Invalid input for start_freq\n"
+    "sdp_start_channel_id must be between 0 to 2147483647\n"
+    "integration_factor must be between 1 to 10\n"
     "frequency_band did not match receiver_band"
 )
 
 low_configure_expected_result_for_invalid_data = (
+    "subarray_beam_id must be between 1 and 48\n"
+    "update_rate must be greater than or equal to 0.0\n"
+    "start_channel must be greater than 2 and less than 504\n"
+    "number_of_channels must be greater than or equal to 8 and less"
+    " than or equal to 384\n"
+    "Initials of aperture_id should be AP\n"
+    "Invalid reference frame! Currently allowed  [“topocentric”, “ICRS”, “galactic”]\n"
+    "c1 must be between 0.0 and 360.0\n"
+    "c2 must be between -90.0 and 90.0\n"
     "stations are too many! Current limit is 4\n"
-    "Invalid input for function mode! Currently allowed vis\n"
+    "Invalid input for firmware! Currently allowed vis\n"
     "The fsp_ids should all be distinct\n"
-    "fsp_ids are too many!Current Limit is 6"
+    "fsp_ids are too many!Current Limit is 6\n"
+    "beams are too many!Current Limit is 1\n"
+    "Invalid input for firmware! Currently allowed pst\n"
+    "beams are too many! Current limit is 1"
 )
 
 
