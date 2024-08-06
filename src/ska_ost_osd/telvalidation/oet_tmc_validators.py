@@ -214,7 +214,7 @@ def apply_validation_rule(
     return ""
 
 
-def update_names_with_dependencies(rule_data, names):
+def update_names_with_dependencies(rule_data: dict, names: dict) -> dict:
     """
     Update the 'names' dictionary with dependency values from rule_data.
 
