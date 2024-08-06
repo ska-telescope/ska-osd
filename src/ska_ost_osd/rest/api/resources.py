@@ -94,9 +94,6 @@ def get_osd(**kwargs) -> dict:
         )
     except (OSDModelError, ValueError) as error:
         raise error
-    except Exception as error:
-        raise ValueError(f"An unexpected error occurred: {error}") from error
-
     return osd_data
 
 
@@ -159,7 +156,7 @@ def semantically_validate_json(body: dict):
 
     try:
         tm_data = TMData(sources, update=True)
-        validate_observing_command(
+        semantic_validate(
             observing_command_input=body.get("observing_command_input"),
             tm_data=tm_data,
             raise_semantic=body.get("raise_semantic"),
@@ -191,30 +188,3 @@ def handle_validation_error(err: object) -> list:
         return [err.args[0]]
     elif isinstance(err, ValidationError):
         return [error["msg"] for error in err.errors()]
-
-
-def validate_observing_command(
-    observing_command_input: dict,
-    tm_data: object,
-    raise_semantic: bool,
-    interface: str,
-    osd_data: dict,
-) -> any:
-    """
-    This function validates the observing command input against the provided rules.
-    :param observing_command_input: Input JSON to be validated
-    :param tm_data: TMData object containing the telmodel data
-    :param raise_semantic: Raise semantic errors or not
-    :param interface: Interface version of the input JSON
-    :param osd_data: OSD data to be used for semantic validation
-
-    :raises: SemanticValidationError: If the input JSON is not semantically valid
-    """
-    # write docstring for function
-    semantic_validate(
-        observing_command_input=observing_command_input,
-        tm_data=tm_data,
-        raise_semantic=raise_semantic,
-        interface=interface,
-        osd_data=osd_data,
-    )
