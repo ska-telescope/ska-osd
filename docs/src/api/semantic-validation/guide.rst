@@ -41,14 +41,16 @@ These are as follows:
 JSON validator file
 ~~~~~~~~~~~~~~~~~~~
 
-Three seperate JSON files have been created for Mid, Low and Scheduling Block Definition (MID) schemas to store all the parameters present in assign & configure resources
+Four seperate JSON files have been created for Mid, Low and Scheduling Block Definition (MID & LOW) schemas to store all the parameters present in assign & configure resources
 along with its business rules and errors.
 
-* `Reference of JSON validator file (Mid) <https://gitlab.com/ska-telescope/ska-ost-osd/-/blob/master/tmdata/instrument/ska1_mid/validation/mid-validation-constants.json>`_
+* `Reference of JSON validator file (Mid) <https://gitlab.com/ska-telescope/ost/ska-ost-osd/-/blob/main/tmdata/instrument/ska1_mid/validation/mid-validation-constants.json?ref_type=heads>`_
 
-* `Reference of JSON validator file (Low) <https://gitlab.com/ska-telescope/ska-ost-osd/-/blob/master/tmdata/instrument/ska1_low/validation/low-validation-constants.json>`_
+* `Reference of JSON validator file (Low) <https://gitlab.com/ska-telescope/ost/ska-ost-osd/-/blob/main/tmdata/instrument/ska1_low/validation/low-validation-constants.json?ref_type=heads>`_
 
-* `Reference of JSON validator file (SBD) <https://gitlab.com/ska-telescope/ska-ost-osd/-/blob/master/tmdata/instrument/scheduling-block/validation/sbd-validation-constants.json>`_
+* `Reference of JSON validator file (SBD-Mid) <https://gitlab.com/ska-telescope/ost/ska-ost-osd/-/blob/main/tmdata/instrument/scheduling-block/validation/mid_sbd-validation-constants?ref_type=heads>`_
+
+* `Reference of JSON validator file (SBD-Low) <https://gitlab.com/ska-telescope/ost/ska-ost-osd/-/blob/main/tmdata/instrument/scheduling-block/validation/low_sbd-validation-constants?ref_type=heads>`_
 
 Created a seperate ``constant`` file to maintain all telvalidation constant. From there we are importing JSON validator file
 in ``semantic_validator`` for Mid, Low as well as Scheduling Block Definition (MID) schemas.
@@ -62,31 +64,38 @@ Below are the commands to import JSON validator files.
     from .constant import (
         LOW_VALIDATION_CONSTANT_JSON_FILE_PATH,
         MID_VALIDATION_CONSTANT_JSON_FILE_PATH,
-        SBD_VALIDATION_CONSTANT_JSON_FILE_PATH,
+        MID_SBD_VALIDATION_CONSTANT_JSON_FILE_PATH,
+        LOW_SBD_VALIDATION_CONSTANT_JSON_FILE_PATH,
     )
 
-Created a method that accepts 'interface' as parameter. Inside that there is a dictionary named 'validation_constants'
-which have 'key' (low, mid, sbd ) and value pair. Based on the key provided it will return JSON path as 'value'.
+Created a method that accepts 'interface' and 'telescope' as parameters. Inside that there is a dictionary named 'validation_constants'
+which have 'key' (SKA_LOW_TELESCOPE, SKA_MID_TELESCOPE, SKA_MID_SBD, SKA_LOW_SBD) and value pair. Based on the key provided it will return JSON path as 'value'.
+These keys are imported from constant.py.
 
 .. code::
 
-    def get_validation_data(interface: str):
-
+    def get_validation_data(interface: str, telescope: str) -> Optional[str]:
     """
-    :param interface: interface uri from the config.
+    Get the validation constant JSON file path based on the provided interface URI.
+
+    :param interface: str, the interface URI from the observing command input.
+    :return: str, the validation constant JSON file path, or None if not found.
     """
     validation_constants = {
-        "low": LOW_VALIDATION_CONSTANT_JSON_FILE_PATH,
-        "mid": MID_VALIDATION_CONSTANT_JSON_FILE_PATH,
-        "sbd": SBD_VALIDATION_CONSTANT_JSON_FILE_PATH,
+        SKA_LOW_TELESCOPE: LOW_VALIDATION_CONSTANT_JSON_FILE_PATH,
+        SKA_MID_TELESCOPE: MID_VALIDATION_CONSTANT_JSON_FILE_PATH,
+        SKA_MID_SBD: MID_SBD_VALIDATION_CONSTANT_JSON_FILE_PATH,
+        SKA_LOW_SBD: LOW_SBD_VALIDATION_CONSTANT_JSON_FILE_PATH,
     }
 
     for key, value in validation_constants.items():
-        if key in interface:
+        if key in interface or key == telescope:
             return value
+        
     # taking mid interface as default cause there is no any specific
     # key to differentiate the interface
-    return MID_VALIDATION_CONSTANT_JSON_FILE_PATH
+    return validation_constants.get(SKA_MID_TELESCOPE)
+
 
 
 Adding a new parameter in JSON validator file
