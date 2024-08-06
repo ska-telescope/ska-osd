@@ -181,7 +181,7 @@ def handle_validation_error(err: object) -> list:
     """
     This function handles validation errors and returns a list of error details.
     :param err: error raised from exception
-
+    :returns: List of errors
     """
     if isinstance(err, RuntimeError):
         return [err.args[0]]
