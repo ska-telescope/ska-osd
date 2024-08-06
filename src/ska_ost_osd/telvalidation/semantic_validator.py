@@ -12,12 +12,16 @@ from typing import Any, Optional
 from ska_telmodel.data import TMData
 
 from .constant import (
+    ASSIGN_RESOURCE,
+    CONFIGURE,
+    LOW_SBD_VALIDATION_CONSTANT_JSON_FILE_PATH,
     LOW_VALIDATION_CONSTANT_JSON_FILE_PATH,
+    MID_SBD_VALIDATION_CONSTANT_JSON_FILE_PATH,
     MID_VALIDATION_CONSTANT_JSON_FILE_PATH,
-    SBD_VALIDATION_CONSTANT_JSON_FILE_PATH,
+    SKA_LOW_SBD,
     SKA_LOW_TELESCOPE,
+    SKA_MID_SBD,
     SKA_MID_TELESCOPE,
-    SKA_SBD,
 )
 from .oet_tmc_validators import clear_semantic_variable_data, validate_json
 from .schematic_validation_exceptions import SchematicValidationError
@@ -25,7 +29,7 @@ from .schematic_validation_exceptions import SchematicValidationError
 logging.getLogger("telvalidation")
 
 
-def get_validation_data(interface: str) -> Optional[str]:
+def get_validation_data(interface: str, telescope: str) -> Optional[str]:
     """
     Get the validation constant JSON file path based on the provided interface URI.
 
@@ -35,12 +39,14 @@ def get_validation_data(interface: str) -> Optional[str]:
     validation_constants = {
         SKA_LOW_TELESCOPE: LOW_VALIDATION_CONSTANT_JSON_FILE_PATH,
         SKA_MID_TELESCOPE: MID_VALIDATION_CONSTANT_JSON_FILE_PATH,
-        SKA_SBD: SBD_VALIDATION_CONSTANT_JSON_FILE_PATH,
+        SKA_MID_SBD: MID_SBD_VALIDATION_CONSTANT_JSON_FILE_PATH,
+        SKA_LOW_SBD: LOW_SBD_VALIDATION_CONSTANT_JSON_FILE_PATH,
     }
 
     for key, value in validation_constants.items():
-        if key in interface:
+        if key in interface or key == telescope:
             return value
+
     # taking mid interface as default cause there is no any specific
     # key to differentiate the interface
     return validation_constants.get(SKA_MID_TELESCOPE)
@@ -222,6 +228,7 @@ def validate_command_input(
     observing_command_input: dict,
     tm_data: TMData,
     interface: str,
+    telescope: str,
     array_assembly: str,
     osd_data: dict,
 ) -> list:
@@ -234,7 +241,9 @@ def validate_command_input(
     :param osd_data: osd_data dict which passed externally
     :return list of error messages in case of validation failed
     """
-    semantic_validate_data = tm_data[get_validation_data(interface)].get_dict()
+    semantic_validate_data = tm_data[
+        get_validation_data(interface, telescope)
+    ].get_dict()
     # call OSD API and fetch capabilities and basic capabilities
     capabilities, basic_capabilities = fetch_capabilities_from_osd(
         telescope=semantic_validate_data["telescope"],
@@ -247,17 +256,18 @@ def validate_command_input(
         capabilities=capabilities, basic_capabilities=basic_capabilities
     )
 
-    if "assignresources" in interface:
-        validation_data = semantic_validate_data[array_assembly]["assign_resource"]
-    elif "configure" in interface:
-        validation_data = semantic_validate_data[array_assembly]["configure"]
-    else:
-        validation_data = semantic_validate_data[array_assembly]
+    validation_data = semantic_validate_data[array_assembly].get(
+        "assign_resource"
+        if ASSIGN_RESOURCE in interface
+        else "configure"
+        if CONFIGURE in interface
+        else "sbd"
+    )
 
     msg_list = validate_json(
         validation_data,
         command_input_json_config=observing_command_input,
-        parent_path=[],
+        parent_path_list=[],
         capabilities=matched_capabilities,
     )
 
@@ -294,6 +304,7 @@ def semantic_validate(
     """
     clear_semantic_variable_data()
     version = observing_command_input.get("interface") or interface
+    telescope = observing_command_input.get("telescope")
 
     if not version:
         message = (
@@ -304,7 +315,7 @@ def semantic_validate(
         raise SchematicValidationError(message)
 
     msg_list = validate_command_input(
-        observing_command_input, tm_data, version, array_assembly, osd_data
+        observing_command_input, tm_data, version, telescope, array_assembly, osd_data
     )
     msg_list = [msg for msg in msg_list if msg]  # Remove None values
 
