@@ -85,6 +85,7 @@ INVALID_LOW_CONFIGURE_JSON = load_string_from_file(
 )
 capabilities = load_string_from_file("test_files/testfile_capabilities.json")
 
+# This is dummy constant json for testing "Invalid rule and error key passed" scenario.
 INVALID_MID_VALIDATE_CONSTANT = {
     "AA0.5": {
         "assign_resource": {
