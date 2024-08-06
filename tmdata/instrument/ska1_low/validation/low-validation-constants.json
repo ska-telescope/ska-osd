@@ -30,7 +30,7 @@
                             },
                             {
                                 "rule": "station_id == int(re.search(r'\\d+', aperture_id).group())",
-                                "dependency_key": "station_id",
+                                "dependency_key": ["station_id"],
                                 "error": "station_id in aperture_id should be same as station_id"
                             }
                         ]
