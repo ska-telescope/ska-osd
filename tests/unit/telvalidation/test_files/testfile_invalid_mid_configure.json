@@ -1,117 +1,55 @@
 {
-    "interface": "https://schema.skao.int/ska-tmc-configure/2.1",
-    "pointing": {
+  "interface": "https://schema.skao.int/ska-tmc-configure/4.0",
+  "transaction_id": "",
+  "pointing": {
       "target": {
-        "reference_frame": "ICRS",
-        "target_name": "Polaris Australis",
-        "ra": "21:08:47.92",
-        "dec": "-88:57:22.9"
-      }
-    },
-    "dish": {
-      "receiver_band": "5c"
-    },
-    "csp": {
-      "interface": "https://schema.skao.int/ska-csp-configure/2.0",
-      "subarray": {
-        "subarray_name": "science period 23"
+          "reference_frame": "ICRS",
+          "target_name": "Polaris Australis",
+          "ra": "21:08:47.92",
+          "dec": "-88:57:22.9",
+          "ca_offset_arcsec": 0.0,
+          "ie_offset_arcsec": 0.0
       },
+      "correction": "UPDATE"
+  },
+  "dish": {
+      "receiver_band": "3"
+  },
+  "csp": {
+      "interface": "https://schema.skao.int/ska-csp-configurescan/4.0",
       "common": {
-        "config_id": "sbi-mvp01-20200325-00001-science_A",
-        "frequency_band": "1",
-        "subarray_id": 1,
-        "band_5_tuning": [5.85, 7.25]
+          "config_id": "sbi-mvp01-20200325-00001-science_A",
+          "frequency_band": "1"
       },
-      "cbf": {
-        "fsp": [
-          {
-            "fsp_id": 6,
-            "function_mode": "VLBI",
-            "frequency_slice_id": 1,
-            "integration_factor": 1,
-            "zoom_factor": 1,
-            "channel_averaging_map": [
-              [
-                0,
-                2
-              ],
-              [
-                744,
-                0
-              ]
-            ],
-            "channel_offset": 0,
-            "output_link_map": [
-              [
-                0,
-                0
-              ],
-              [
-                200,
-                1
-              ]
-            ]
+      "midcbf": {
+          "frequency_band_offset_stream1": 80,
+          "correlation": {
+              "processing_regions": [{
+                  "fsp_ids": [1, 2, 2, 4, 5],
+                  "receptors": ["SKA063", "SKA001", "SKA100"],
+                  "start_freq": 1050000000000,
+                  "channel_width": 13000,
+                  "channel_count": 58989,
+                  "sdp_start_channel_id": 214748364722,
+                  "integration_factor": 11
+              }, {
+                  "fsp_ids": [1, 2, 2, 4, 5],
+                  "start_freq": 54843760000,
+                  "channel_width": 13000,
+                  "channel_count": 58989,
+                  "sdp_start_channel_id": -1,
+                  "integration_factor": 12
+              }]
           },
-          {
-            "fsp_id": 9,
-            "function_mode": "VLBI",
-            "frequency_slice_id": 3,
-            "integration_factor": 1,
-            "zoom_factor": 1,
-            "channel_averaging_map": [
-              [
-                0,
-                2
-              ],
-              [
-                744,
-                0
-              ]
-            ],
-            "channel_offset": 744,
-            "output_link_map": [
-              [
-                0,
-                4
-              ],
-              [
-                200,
-                5
-              ]
-            ],
-            "zoom_window_tuning": 4700000
-          },
-          {
-            "fsp_id": 8,
-            "function_mode": "VLBI",
-            "frequency_slice_id": 3,
-            "integration_factor": 1,
-            "zoom_factor": 1
-          },
-          {
-            "fsp_id": 7,
-            "function_mode": "VLBI",
-            "frequency_slice_id": 3,
-            "integration_factor": 1,
-            "zoom_factor": 1
-          },
-          {
-            "fsp_id": 5,
-            "function_mode": "VLBI",
-            "frequency_slice_id": 3,
-            "integration_factor": 1,
-            "zoom_factor": 1
-          }
-        ]
+          "vlbi": {}
       }
-    },
-    
-    "sdp": {
+  },
+  "sdp": {
       "interface": "https://schema.skao.int/ska-sdp-configure/0.4",
-      "scan_type": "science_A"
-    },
-    "tmc": {
-      "scan_duration": 10.0
-    }
+      "scan_type": "target:a"
+  },
+  "tmc": {
+      "scan_duration": 10.0,
+      "partial_configuration": false
   }
-  
+}

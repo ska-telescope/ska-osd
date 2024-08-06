@@ -57,7 +57,7 @@
                                 {
                                     "rule": "freq_min < freq_max",
                                     "error": "freq_min should be less than freq_max",
-                                    "dependency_key": "freq_min"                     
+                                    "dependency_key": ["freq_min"]                     
                                 }
                             ]
                         }
@@ -67,12 +67,12 @@
                     "receptors": [
                         {
                             "rule": "len(receptor_ids)==len(receptors)",
-                            "dependency_key": "receptor_ids",
+                            "dependency_key": ["receptor_ids"],
                             "error": "length of receptor_ids should be same as length of receptors"
                         },
                         {
                             "rule": "set(receptor_ids).difference(set(receptors))",
-                            "dependency_key": "receptor_ids",
+                            "dependency_key": ["receptor_ids"],
                             "error": "receptor_ids did not match receptors"
                         }
                     ]
@@ -89,46 +89,66 @@
                 ]
             },
             "csp": {
-                "cbf": {
-                    "parent_key_rule": [
-                        {
-                            "rule": "len(fsp)<=number_fsps",
-                            "error": "FSPs are too many!Current Limit = {number_fsps}"
+                "midcbf": {
+                    "correlation": {
+                        "processing_regions": {
+                            "fsp_ids": [
+                                {
+                                    "rule": "len(set(fsp_ids)) == len(fsp_ids)",
+                                    "error": "The fsp_ids should all be distinct"
+                                },
+                                {
+                                    "rule": "(0 < len(fsp_ids) <= number_fsps)",
+                                    "error": "fsp_ids are too many!Current Limit is {number_fsps}"
+                                }
+                            ],
+                            "channel_width": [
+                                    {
+                                    "rule": "channel_width in allowed_channel_width_values",
+                                    "error": "Invalid input for channel_width! Currently allowed {allowed_channel_width_values}"
+                                    }
+                            ],
+                            "channel_count": [
+                                {
+                                    "rule": "allowed_channel_count_range_min <= channel_count <= allowed_channel_count_range_max",
+                                    "error": "channel_count must be between {allowed_channel_count_range_min} to {allowed_channel_count_range_max}"
+                                },
+                                {
+                                    "rule": "(channel_count % 20) == 0",
+                                    "error": "channel_count must be a multiple of 20"
+                                }
+                            ],
+                            "start_freq": [
+                                {
+                                    "rule": "min_frequency_hz <= start_freq <= max_frequency_hz",
+                                    "error": "Invalid input for start_freq"
+                                },
+                                {
+                                    "rule": "min_frequency_hz <= ((start_freq - channel_width/2) + channel_width*channel_count) <= max_frequency_hz",
+                                    "dependency_key": ["channel_width", "channel_count"],
+                                    "error": "Invalid input for start_freq"
+                                }
+                            ],
+                            "sdp_start_channel_id": [
+                                {
+                                    "rule": "0 <= sdp_start_channel_id <= 2147483647",
+                                    "error": "sdp_start_channel_id must be between 0 to 2147483647"
+                                }
+                            ],
+                            "integration_factor": [
+                                {
+                                    "rule": "1 <= integration_factor <= 10",
+                                    "error": "integration_factor must be between 1 to 10"
+                                }
+                            ]
                         }
-                    ],
-                    "fsp": {
-                        "fsp_id": [
-                            {
-                                "rule": "fsp_id <= number_fsps",
-                                "error": "Invalid input for fsp_id!"
-                            }
-                        ],
-                        "function_mode": [
-                            {
-                                "rule": "function_mode == 'CORR'",
-                                "error": "Invalid input for function_mode"
-                            }
-                        ],
-                        "zoom_factor": [
-                            {
-                                "rule": "zoom_factor == 0",
-                                "error": "Invalid input for zoom_factor"
-                            }
-                        ],
-                        "frequency_slice_id": [
-                            {
-                                "rule": "fsp_id==frequency_slice_id",
-                                "dependency_key": "fsp_id",
-                                "error": "frequency_slice_id did not match fsp_id"
-                            }
-                        ]
                     }
                 },
                 "common": {
                     "frequency_band": [
                         {
                             "rule": "receiver_band==frequency_band",
-                            "dependency_key": "receiver_band",
+                            "dependency_key": ["receiver_band"],
                             "error": "frequency_band did not match receiver_band"
                         }
                     ]

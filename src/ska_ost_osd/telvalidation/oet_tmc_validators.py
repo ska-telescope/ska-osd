@@ -214,6 +214,27 @@ def apply_validation_rule(
     return ""
 
 
+def update_names_with_dependencies(rule_data: dict, names: dict) -> dict:
+    """
+    Update the 'names' dictionary with dependency values from rule_data.
+
+    :param key:rule_data (dict): A dictionary containing rule data,
+     including a "dependency_key" key.
+    :param key:names (dict): A dictionary to be updated with dependency values.
+
+    :return: dict: The updated 'names' dictionary with dependency values.
+    """
+    if "dependency_key" in rule_data:
+        dependency_values = get_semantic_variables()
+        for dependency_value in rule_data["dependency_key"]:
+            names.update(
+                {
+                    dependency_value: dependency_values[dependency_value],
+                }
+            )
+    return names
+
+
 def evaluate_rule(
     key: str,
     res_value: Union[str, list],
@@ -242,8 +263,11 @@ def evaluate_rule(
         for i in osd_base_constraint:
             names = {key: res_value}
             names = {**names, **i}
+            names = update_names_with_dependencies(rule_data, names)
+
             simple_eval.names = names
             eval_data = simple_eval.eval(rule_data["rule"])
+
             if not eval_data:
                 eval_new_data.append(False)
             else:
@@ -254,17 +278,9 @@ def evaluate_rule(
         else:
             osd_base_constraint_value = {}
 
-        if "dependency_key" in rule_data:
-            dependency_values = get_semantic_variables()
-            names = {
-                key: res_value,
-                rule_data["dependency_key"]: dependency_values[
-                    rule_data["dependency_key"]
-                ],
-            }
-        else:
-            names = {key: res_value}
-            names = {**names, **osd_base_constraint_value}
+        names = {key: res_value}
+        names = {**names, **osd_base_constraint_value}
+        names = update_names_with_dependencies(rule_data, names)
 
         simple_eval.names = names
         eval_data = simple_eval.eval(rule_data["rule"])
