@@ -89,10 +89,9 @@ These keys are imported from constant.py.
     }
 
     for key, value in validation_constants.items():
-        if key in interface:
+        if key in interface or key == telescope:
             return value
-        elif key == telescope:
-            return value
+        
     # taking mid interface as default cause there is no any specific
     # key to differentiate the interface
     return validation_constants.get(SKA_MID_TELESCOPE)

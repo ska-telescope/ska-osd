@@ -180,7 +180,7 @@ GET /osd
 
 4. Example Response
 
-    * The API returns a JSON object containing the matched OSD data.
+    * The API returns a JSON object containing the matched OSD data for default AA2.
 
         Calling API with parameters ``cycle_id``, ``source``, ``capabilities``
         their valid inputs will return the JSON containing the matched OSD data.
@@ -228,7 +228,8 @@ GET /osd
                 "ps_beam_bandwidth_hz": 800000.0,
                 "number_fsps": 27,
                 "allowed_channel_width_values": [210, 420, 840, 1680, 3360, 6720, 13440, 26880, 40320, 53760, 80640, 107520, 161280, 215040, 322560, 416640, 430080, 645120],
-                "allowed_channel_count_range": [1, 214748647]
+                "allowed_channel_count_range_min": 1,
+                "allowed_channel_count_range_max": 214748647
                 },
                 "basic_capabilities": {
                     "dish_elevation_limit_deg": 15,
