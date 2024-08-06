@@ -81,7 +81,7 @@
           },
           "timing_beams": {
               "fsp": {
-                  "firmware": "pst",
+                  "firmware": "pulsar_search",
                   "fsp_ids": [1,
                   2,
                   3,
@@ -91,11 +91,18 @@
                   7
                 ]
               },
-              "beams": [{
+              "beams": [
+                {
                   "pst_beam_id": 1,
                   "stn_beam_id": 1,
                   "stn_weights": [0.9, 1.0, 1.0, 1.0, 0.9, 1.0]
-              }]
+                },
+                {
+                  "pst_beam_id": 2,
+                  "stn_beam_id": 2,
+                  "stn_weights": [0.9, 1.0, 1.0, 1.0, 0.9, 1.0]
+                }
+             ]
           }
       },
       "pst": {
@@ -146,7 +153,11 @@
                       "oversampling_ratio": [4, 3]
                   }]
               }
-          }]
+          },
+          {
+            "beam_id": 1
+          }
+        ]
       }
   },
   "tmc": {

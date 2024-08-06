@@ -84,20 +84,16 @@ INVALID_LOW_CONFIGURE_JSON = load_string_from_file(
 capabilities = load_string_from_file("test_files/testfile_capabilities.json")
 
 INVALID_MID_VALIDATE_CONSTANT = {
-    "AA0.5": {
-        "assign_resource": {
-            "dish": {
-                "receptor_ids": [
-                    {
-                        "rules": "(0 < len(receptor_ids) <= 0)",
-                        "error": (
-                            "receptor_ids are                             too"
-                            " many!Current Limit is 4"
-                        ),
-                    }
-                ]
+    "dish": {
+        "receptor_ids": [
+            {
+                "rules": "(0 < len(receptor_ids) <= 0)",
+                "error": (
+                    "receptor_ids are                             too"
+                    " many!Current Limit is 4"
+                ),
             }
-        }
+        ]
     }
 }
 
@@ -148,7 +144,8 @@ low_configure_expected_result_for_invalid_data = (
     "subarray_beam_id must be between 1 and 48\n"
     "update_rate must be greater than or equal to 0.0\n"
     "start_channel must be greater than 2 and less than 504\n"
-    "number_of_channels must be greater than 8 and less than 384\n"
+    "number_of_channels must be greater than or equal to 8 and less"
+    " than or equal to 384\n"
     "Initials of aperture_id should be AP\n"
     "Invalid reference frame! Currently allowed  [“topocentric”, “ICRS”, “galactic”]\n"
     "c1 must be between 0.0 and 360.0\n"
@@ -156,7 +153,10 @@ low_configure_expected_result_for_invalid_data = (
     "stations are too many! Current limit is 4\n"
     "Invalid input for firmware! Currently allowed vis\n"
     "The fsp_ids should all be distinct\n"
-    "fsp_ids are too many!Current Limit is 6"
+    "fsp_ids are too many!Current Limit is 6\n"
+    "beams are too many!Current Limit is 1\n"
+    "Invalid input for firmware! Currently allowed pst\n"
+    "beams are too many! Current limit is 1"
 )
 
 
@@ -268,7 +268,7 @@ def test_validate_scemantic_json_input_keys(mock6):
         validate_json(
             INVALID_MID_VALIDATE_CONSTANT,
             INPUT_COMMAND_CONFIG,
-            parent_key=None,
+            parent_path=[],
             capabilities=capabilities,
         )
 

@@ -88,8 +88,8 @@
                         ],
                         "number_of_channels": [
                             {
-                                "rule": "8 < number_of_channels < 384",
-                                "error": "number_of_channels must be greater than 8 and less than 384"
+                                "rule": "8 <= number_of_channels <= 384",
+                                "error": "number_of_channels must be greater than or equal to 8 and less than or equal to 384"
                             }
                         ]
                     },
@@ -152,7 +152,31 @@
                                 }
                             ]
                         }
+                    },
+                    "timing_beams": {
+                        "beams": [
+                            {
+                                "rule": "len(beams) == 1",
+                                "error": "beams are too many!Current Limit is 1"
+                            }
+                        ],
+                        "fsp": {
+                            "firmware": [
+                                {
+                                    "rule": "firmware == 'pst'",
+                                    "error": "Invalid input for firmware! Currently allowed pst"
+                                }
+                            ]
+                        }   
                     }
+                },
+                "pst": {
+                    "beams": [
+                        {
+                            "rule": "len(beams) == number_pst_beams",
+                            "error": "beams are too many! Current limit is {number_pst_beams}"
+                        }
+                    ]
                 }
             }
         }
