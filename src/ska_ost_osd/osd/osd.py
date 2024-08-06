@@ -147,7 +147,7 @@ class OSD:
                 err_msg = self.check_array_assembly(value, self.keys_list)
 
             if err_msg:
-                cap_err_msg_list.append({"msg": err_msg})
+                cap_err_msg_list.append(err_msg)
             else:
                 osd_data["capabilities"][key.lower()] = {}
                 osd_data["capabilities"][key.lower()]["basic_capabilities"] = data[
@@ -207,7 +207,7 @@ class OSD:
         chk_capabilities = self.check_capabilities(self.capabilities)
 
         if chk_capabilities:
-            osd_err_msg_list.append({"msg": chk_capabilities})
+            osd_err_msg_list.append(chk_capabilities)
         else:
             (
                 osd_data,
@@ -265,9 +265,7 @@ def check_cycle_id(
 
     if gitlab_branch is not None and osd_version is not None:
         cycle_error_msg_list.append(
-            {
-                "msg": CYCLE_ERROR_MESSAGE,
-            }
+            CYCLE_ERROR_MESSAGE,
         )
 
     if gitlab_branch is not None:
@@ -283,9 +281,7 @@ def check_cycle_id(
 
     if cycle_id is not None and cycle_id_exists is None:
         cycle_error_msg_list.append(
-            {
-                "msg": CYCLE_ID_ERROR_MESSAGE.format(cycle_id, string_ids),
-            }
+            CYCLE_ID_ERROR_MESSAGE.format(cycle_id, string_ids),
         )
 
     elif cycle_id is not None and osd_version is None:
@@ -294,13 +290,9 @@ def check_cycle_id(
     elif cycle_id is not None and cycle_id_exists and osd_version is not None:
         if osd_version not in versions_dict[f"cycle_{cycle_id}"]:
             cycle_error_msg_list.append(
-                {
-                    "msg": (
-                        OSD_VERSION_ERROR_MESSAGE.format(
-                            osd_version, versions_dict[f"cycle_{cycle_id}"]
-                        )
-                    )
-                }
+                OSD_VERSION_ERROR_MESSAGE.format(
+                    osd_version, versions_dict[f"cycle_{cycle_id}"]
+                )
             )
 
     return osd_version, cycle_error_msg_list
@@ -327,16 +319,14 @@ def osd_tmdata_source(
 
     if source not in SOURCES:
         source_msg = ", ".join(SOURCES)
-        source_error_msg_list.append(
-            {"msg": AVAILABLE_SOURCE_ERROR_MESSAGE.format(source_msg)}
-        )
+        source_error_msg_list.append(AVAILABLE_SOURCE_ERROR_MESSAGE.format(source_msg))
 
     if (
         gitlab_branch
         and isinstance(gitlab_branch, str)
         and (source == "car" or source == "file")
     ):
-        source_error_msg_list.append({"msg": SOURCE_ERROR_MESSAGE.format(source)})
+        source_error_msg_list.append(SOURCE_ERROR_MESSAGE.format(source))
 
     osd_version, cycle_error_msg_list = check_cycle_id(
         cycle_id, osd_version, gitlab_branch
