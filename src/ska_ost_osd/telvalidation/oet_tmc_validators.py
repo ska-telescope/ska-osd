@@ -184,7 +184,7 @@ def apply_validation_rule(
     res_value = get_value_based_on_provided_path(
         command_input_json_config, parent_path_list
     )
-    if res_value:
+    if res_value or isinstance(res_value, list | dict | tuple | set):
         add_semantic_variables({key_to_validate: res_value})
         error_msgs = []
 
