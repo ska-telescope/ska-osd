@@ -168,7 +168,7 @@ def test_init_app_client(client, open_api_spec):
             {
                 "detail": {
                     "osd_version": (
-                        "Invalid OSD Version 3.0.7 Valid OSD Versions are ['1.0.2']"
+                        "Invalid OSD Version 3.0.7 Valid OSD Versions are ['1.1.0']"
                     )
                 },
                 "status": -1,
