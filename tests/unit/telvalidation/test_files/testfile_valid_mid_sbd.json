@@ -251,7 +251,7 @@
             "spectral_windows": [
               {
                 "spectral_window_id": "pulsar_fsp_channels",
-                "count": 744,
+                "count": 14880,
                 "start": 0,
                 "freq_min": 350000000,
                 "freq_max": 368000000

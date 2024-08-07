@@ -2,6 +2,11 @@ import pytest
 
 from ska_ost_osd.rest import init_app
 from ska_ost_osd.telvalidation.constant import CAR_TELMODEL_SOURCE
+from tests.unit.telvalidation.test_semantic_validator import (
+    INVALID_MID_ASSIGN_JSON,
+    MID_OSD_DATA_JSON,
+    VALID_MID_ASSIGN_JSON,
+)
 
 # flake8: noqa E501
 # pylint: disable=W0621
@@ -424,12 +429,21 @@ def open_api_spec():
                                                             "max_baseline_km": 1.5,
                                                             "available_bandwidth_hz": 800000.0,
                                                             "number_channels": 14880,
+                                                            "cbf_modes": [
+                                                                "correlation",
+                                                                "pst",
+                                                            ],
                                                             "number_zoom_windows": 0,
                                                             "number_zoom_channels": 0,
                                                             "number_pss_beams": 0,
-                                                            "number_pst_beams": 0,
-                                                            "ps_beam_bandwidth_hz": 0.0,
+                                                            "number_pst_beams": 1,
+                                                            "ps_beam_bandwidth_hz": 400000000.0,
                                                             "number_fsps": 4,
+                                                            "allowed_channel_width_values": [
+                                                                13440
+                                                            ],
+                                                            "allowed_channel_count_range_min": 1,
+                                                            "allowed_channel_count_range_max": 58982,
                                                         },
                                                         "basic_capabilities": {
                                                             "dish_elevation_limit_deg": 15.0,
@@ -729,187 +743,17 @@ def mid_osd_data():
 
     :returns dict: The OpenAPI specification
     """
-    return {
-        "capabilities": {
-            "mid": {
-                "AA0.5": {
-                    "available_bandwidth_hz": 800000000.0,
-                    "available_receivers": ["Band_1", "Band_2"],
-                    "cbf_modes": ["CORR"],
-                    "max_baseline_km": 1.5,
-                    "number_channels": 14880,
-                    "number_fsps": 4,
-                    "number_meerkat_dishes": 0,
-                    "number_meerkatplus_dishes": 0,
-                    "number_pss_beams": 0,
-                    "number_pst_beams": 0,
-                    "number_ska_dishes": 4,
-                    "number_zoom_channels": 0,
-                    "number_zoom_windows": 0,
-                    "ps_beam_bandwidth_hz": 0.0,
-                },
-                "basic_capabilities": {
-                    "dish_elevation_limit_deg": 15.0,
-                    "receiver_information": [
-                        {
-                            "max_frequency_hz": 1050000000.0,
-                            "min_frequency_hz": 350000000.0,
-                            "rx_id": "Band_1",
-                        },
-                        {
-                            "max_frequency_hz": 1760000000.0,
-                            "min_frequency_hz": 950000000.0,
-                            "rx_id": "Band_2",
-                        },
-                        {
-                            "max_frequency_hz": 3050000000.0,
-                            "min_frequency_hz": 1650000000.0,
-                            "rx_id": "Band_3",
-                        },
-                        {
-                            "max_frequency_hz": 5180000000.0,
-                            "min_frequency_hz": 2800000000.0,
-                            "rx_id": "Band_4",
-                        },
-                        {
-                            "max_frequency_hz": 8500000000.0,
-                            "min_frequency_hz": 4600000000.0,
-                            "rx_id": "Band_5a",
-                        },
-                        {
-                            "max_frequency_hz": 15400000000.0,
-                            "min_frequency_hz": 8300000000.0,
-                            "rx_id": "Band_5b",
-                        },
-                    ],
-                },
-            }
-        }
-    }
+    return MID_OSD_DATA_JSON
 
 
 @pytest.fixture
 def valid_observing_command_input():
-    return {
-        "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
-        "subarray_id": 1,
-        "dish": {"receptor_ids": ["SKA001", "SKA002"]},
-        "sdp": {
-            "interface": "https://schema.skao.int/ska-sdp-assignres/0.4",
-            "execution_block": {
-                "eb_id": "eb-test-20220916-00000",
-                "max_length": 100.0,
-                "context": {},
-                "beams": [{"beam_id": "vis0", "function": "visibilities"}],
-                "scan_types": [
-                    {
-                        "scan_type_id": ".default",
-                        "beams": {
-                            "vis0": {
-                                "channels_id": "vis_channels",
-                                "polarisations_id": "all",
-                            },
-                            "pss1": {
-                                "field_id": "field_a",
-                                "channels_id": "pulsar_channels",
-                                "polarisations_id": "all",
-                            },
-                        },
-                    },
-                    {
-                        "scan_type_id": "target:a",
-                        "derive_from": ".default",
-                        "beams": {"vis0": {"field_id": "field_a"}},
-                    },
-                ],
-                "channels": [
-                    {
-                        "channels_id": "vis_channels",
-                        "spectral_windows": [
-                            {
-                                "spectral_window_id": "fsp_1_channels",
-                                "count": 14880,
-                                "start": 0,
-                                "stride": 2,
-                                "freq_min": 350000000.0,
-                                "freq_max": 368000000.0,
-                                "link_map": [[0, 0], [200, 1], [744, 2], [944, 3]],
-                            }
-                        ],
-                    }
-                ],
-                "polarisations": [
-                    {
-                        "polarisations_id": "all",
-                        "corr_type": ["XX", "XY", "YY", "YX"],
-                    }
-                ],
-                "fields": [
-                    {
-                        "field_id": "field_a",
-                        "phase_dir": {
-                            "ra": [123, 0.1],
-                            "dec": [80, 0.1],
-                            "reference_time": "2023-02-16T01:23:45.678900",
-                            "reference_frame": "ICRF3",
-                        },
-                        "pointing_fqdn": "low-tmc/telstate/0/pointing",
-                    }
-                ],
-            },
-            "processing_blocks": [
-                {
-                    "pb_id": "pb-mvp01-20200325-00001",
-                    "script": {
-                        "kind": "realtime",
-                        "name": "vis_receive",
-                        "version": "0.1.0",
-                    },
-                    "parameters": {},
-                },
-                {
-                    "pb_id": "pb-mvp01-20200325-00002",
-                    "script": {
-                        "kind": "realtime",
-                        "name": "test_realtime",
-                        "version": "0.1.0",
-                    },
-                    "parameters": {},
-                },
-                {
-                    "pb_id": "pb-mvp01-20200325-00003",
-                    "script": {"kind": "batch", "name": "ical", "version": "0.1.0"},
-                    "parameters": {},
-                    "dependencies": [
-                        {
-                            "pb_id": "pb-mvp01-20200325-00001",
-                            "kind": ["visibilities"],
-                        }
-                    ],
-                    "sbi_ids": ["sbi-mvp01-20200325-00001"],
-                },
-                {
-                    "pb_id": "pb-mvp01-20200325-00004",
-                    "script": {
-                        "kind": "batch",
-                        "name": "dpreb",
-                        "version": "0.1.0",
-                    },
-                    "parameters": {},
-                    "dependencies": [
-                        {
-                            "pb_id": "pb-mvp01-20200325-00003",
-                            "kind": ["calibration"],
-                        }
-                    ],
-                },
-            ],
-            "resources": {
-                "csp_links": [1, 2, 3, 4],
-                "receptors": ["SKA001", "SKA002"],
-            },
-        },
-    }
+    return VALID_MID_ASSIGN_JSON
+
+
+@pytest.fixture
+def invalid_observing_command_input():
+    return INVALID_MID_ASSIGN_JSON
 
 
 @pytest.fixture
@@ -935,235 +779,15 @@ def valid_semantic_validation_response():
 
 
 @pytest.fixture
-def invalid_semantic_validation_body():
+def invalid_semantic_validation_body(
+    tmdata_source, mid_osd_data, invalid_observing_command_input
+):
     return {
-        "observing_command_input": {
-            "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
-            "subarray_id": 1,
-            "dish": {
-                "receptor_ids": [
-                    "SKA001",
-                    "SKA002",
-                    "SKA003",
-                    "SKA004",
-                    "SKA005",
-                    "SKA006",
-                ]
-            },
-            "sdp": {
-                "interface": "https://schema.skao.int/ska-sdp-assignres/0.4",
-                "execution_block": {
-                    "eb_id": "eb-test-20220916-00000",
-                    "max_length": 100.0,
-                    "context": {},
-                    "beams": [
-                        {"beam_id": "vis0", "function": "pulsar timing"},
-                        {
-                            "beam_id": "pss1",
-                            "search_beam_id": 1,
-                            "function": "pulsar search",
-                        },
-                    ],
-                    "scan_types": [
-                        {
-                            "scan_type_id": ".default",
-                            "beams": {
-                                "vis0": {
-                                    "channels_id": "vis_channels",
-                                    "polarisations_id": "all",
-                                },
-                                "pss1": {
-                                    "field_id": "field_a",
-                                    "channels_id": "pulsar_channels",
-                                    "polarisations_id": "all",
-                                },
-                            },
-                        },
-                        {
-                            "scan_type_id": "target:a",
-                            "derive_from": ".default",
-                            "beams": {"vis0": {"field_id": "field_a"}},
-                        },
-                    ],
-                    "channels": [
-                        {
-                            "channels_id": "vis_channels",
-                            "spectral_windows": [
-                                {
-                                    "spectral_window_id": "fsp_1_channels",
-                                    "count": 744,
-                                    "start": 0,
-                                    "stride": 2,
-                                    "freq_min": 50000000000000.0,
-                                    "freq_max": 49880000000000.0,
-                                    "link_map": [[0, 0], [200, 1], [744, 2], [944, 3]],
-                                },
-                                {
-                                    "spectral_window_id": "fsp_2_channels",
-                                    "count": 744,
-                                    "start": 2000,
-                                    "stride": 1,
-                                    "freq_min": 36000000.0,
-                                    "freq_max": 49880000000000.0,
-                                    "link_map": [[2000, 4], [2200, 5]],
-                                },
-                            ],
-                        },
-                        {
-                            "channels_id": "pulsar_channels",
-                            "spectral_windows": [
-                                {
-                                    "spectral_window_id": "pulsar_fsp_channels",
-                                    "count": 744,
-                                    "start": 0,
-                                    "freq_min": 35000000.0,
-                                    "freq_max": 3680049880000000000.0,
-                                }
-                            ],
-                        },
-                    ],
-                    "polarisations": [
-                        {
-                            "polarisations_id": "all",
-                            "corr_type": ["XX", "XY", "YY", "YX"],
-                        }
-                    ],
-                    "fields": [
-                        {
-                            "field_id": "field_a",
-                            "phase_dir": {
-                                "ra": [123, 0.1],
-                                "dec": [80, 0.1],
-                                "reference_time": "2023-02-16T01:23:45.678900",
-                                "reference_frame": "ICRF3",
-                            },
-                            "pointing_fqdn": "low-tmc/telstate/0/pointing",
-                        }
-                    ],
-                },
-                "processing_blocks": [
-                    {
-                        "pb_id": "pb-mvp01-20200325-00001",
-                        "script": {
-                            "kind": "realtime",
-                            "name": "vis_receive",
-                            "version": "0.1.0",
-                        },
-                        "parameters": {},
-                    },
-                    {
-                        "pb_id": "pb-mvp01-20200325-00002",
-                        "script": {
-                            "kind": "realtime",
-                            "name": "test_realtime",
-                            "version": "0.1.0",
-                        },
-                        "parameters": {},
-                    },
-                    {
-                        "pb_id": "pb-mvp01-20200325-00003",
-                        "script": {"kind": "batch", "name": "ical", "version": "0.1.0"},
-                        "parameters": {},
-                        "dependencies": [
-                            {
-                                "pb_id": "pb-mvp01-20200325-00001",
-                                "kind": ["visibilities"],
-                            }
-                        ],
-                        "sbi_ids": ["sbi-mvp01-20200325-00001"],
-                    },
-                    {
-                        "pb_id": "pb-mvp01-20200325-00004",
-                        "script": {
-                            "kind": "batch",
-                            "name": "dpreb",
-                            "version": "0.1.0",
-                        },
-                        "parameters": {},
-                        "dependencies": [
-                            {
-                                "pb_id": "pb-mvp01-20200325-00003",
-                                "kind": ["calibration"],
-                            }
-                        ],
-                    },
-                ],
-                "resources": {
-                    "csp_links": [1, 2, 3, 4],
-                    "receptors": ["FS4", "FS8", "FS16", "FS17", "FS22"],
-                    "receive_nodes": 10,
-                },
-            },
-        },
+        "observing_command_input": invalid_observing_command_input,
         "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
+        "sources": tmdata_source,
         "raise_semantic": True,
-        "osd_data": {
-            "observatory_policy": {
-                "cycle_number": 2,
-                "cycle_description": "Science Verification",
-                "cycle_information": {
-                    "cycle_id": "SKAO_2027_1",
-                    "proposal_open": "20260327T12:00:00.000Z",
-                    "proposal_close": "20260512T15:00:00.000z",
-                },
-                "cycle_policies": {"normal_max_hours": 100.0},
-                "telescope_capabilities": {"Mid": "AA2", "Low": "AA2"},
-            },
-            "capabilities": {
-                "mid": {
-                    "AA0.5": {
-                        "available_receivers": ["Band_1", "Band_2"],
-                        "number_ska_dishes": 4,
-                        "number_meerkat_dishes": 0,
-                        "number_meerkatplus_dishes": 0,
-                        "max_baseline_km": 1.5,
-                        "available_bandwidth_hz": 800000.0,
-                        "number_channels": 14880,
-                        "number_zoom_windows": 0,
-                        "number_zoom_channels": 0,
-                        "number_pss_beams": 0,
-                        "number_pst_beams": 0,
-                        "ps_beam_bandwidth_hz": 0.0,
-                        "number_fsps": 4,
-                    },
-                    "basic_capabilities": {
-                        "dish_elevation_limit_deg": 15.0,
-                        "receiver_information": [
-                            {
-                                "rx_id": "Band_1",
-                                "min_frequency_hz": 350000000.0,
-                                "max_frequency_hz": 1050000000.0,
-                            },
-                            {
-                                "rx_id": "Band_2",
-                                "min_frequency_hz": 950000000.0,
-                                "max_frequency_hz": 1760000000.0,
-                            },
-                            {
-                                "rx_id": "Band_3",
-                                "min_frequency_hz": 1650000000.0,
-                                "max_frequency_hz": 3050000000.0,
-                            },
-                            {
-                                "rx_id": "Band_4",
-                                "min_frequency_hz": 2800000000.0,
-                                "max_frequency_hz": 5180000000.0,
-                            },
-                            {
-                                "rx_id": "Band_5a",
-                                "min_frequency_hz": 4600000000.0,
-                                "max_frequency_hz": 8500000000.0,
-                            },
-                            {
-                                "rx_id": "Band_5b",
-                                "min_frequency_hz": 8300000000.0,
-                                "max_frequency_hz": 15400000000.0,
-                            },
-                        ],
-                    },
-                }
-            },
-        },
+        "osd_data": mid_osd_data,
     }
 
 

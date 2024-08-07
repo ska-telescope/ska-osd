@@ -242,70 +242,23 @@
       "channels": [
         {
           "channels_id": "vis_channels",
-          "spectral_windows": [
-            {
-              "spectral_window_id": "fsp_1_channels",
-              "count": 744,
-              "start": 0,
-              "stride": 2,
-              "freq_min": 150000000,
-              "freq_max": 12800000000,
-              "link_map": [
-                [
-                  0,
-                  0
-                ],
-                [
-                  200,
-                  1
-                ],
-                [
-                  744,
-                  2
-                ],
-                [
-                  944,
-                  3
-                ]
-              ]
-            },
-            {
-              "spectral_window_id": "fsp_2_channels",
-              "count": 744,
-              "start": 2000,
-              "stride": 1,
-              "freq_min": 360000000,
-              "freq_max": 368000000,
-              "link_map": [
-                [
-                  2000,
-                  4
-                ],
-                [
-                  2200,
-                  5
-                ]
-              ]
-            },
-            {
-              "spectral_window_id": "zoom_window_1",
-              "count": 744,
-              "start": 4000,
-              "stride": 1,
-              "freq_min": 360000000,
-              "freq_max": 361000000,
-              "link_map": [
-                [
-                  4000,
-                  6
-                ],
-                [
-                  4200,
-                  7
-                ]
-              ]
-            }
-          ]
+          "spectral_windows": [{
+            "spectral_window_id": "fsp_1_channels",
+            "count": 744,
+            "start": 0,
+            "stride": 2,
+            "freq_min": 50000000000000.0,
+            "freq_max": 49880000000000.0,
+            "link_map": [[0, 0], [200, 1], [744, 2], [944, 3]]
+          }, {
+            "spectral_window_id": "fsp_2_channels",
+            "count": 744,
+            "start": 2000,
+            "stride": 1,
+            "freq_min": 36000000.0,
+            "freq_max": 49880000000000.0,
+            "link_map": [[2000, 4], [2200, 5]]
+          }]
         },
         {
           "channels_id": "pulsar_channels",
@@ -314,8 +267,8 @@
               "spectral_window_id": "pulsar_fsp_channels",
               "count": 744,
               "start": 0,
-              "freq_min": 350000000,
-              "freq_max": 368000000
+              "freq_min": 35000000.0,
+              "freq_max": 36800
             }
           ]
         }
