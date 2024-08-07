@@ -47,14 +47,18 @@
         "available_bandwidth_hz": 800000000.0,
         "number_channels": 14880,
         "cbf_modes": [
-            "CORR"
+            "correlation",
+            "pst"
         ],
         "number_zoom_windows": 0,
         "number_zoom_channels": 0,
         "number_pss_beams": 0,
-        "number_pst_beams": 0,
-        "ps_beam_bandwidth_hz": 0.0,
-        "number_fsps": 4
+        "number_pst_beams": 1,
+        "ps_beam_bandwidth_hz": 400000000.0,
+        "number_fsps": 4,
+        "allowed_channel_width_values": [13440],
+        "allowed_channel_count_range_min": 1,
+        "allowed_channel_count_range_max": 58982
     },
     "AA1": {
         "available_receivers": [
@@ -70,15 +74,17 @@
         "available_bandwidth_hz": 800000000.0,
         "number_channels": 14880,
         "cbf_modes": [
-            "CORR",
-            "PST_BF"
+            "correlation",
+            "pst"
         ],
         "number_zoom_windows": 0,
         "number_zoom_channels": 0,
         "number_pss_beams": 0,
         "number_pst_beams": 1,
         "ps_beam_bandwidth_hz": 400000000.0,
-        "number_fsps": 4
+        "number_fsps": 8,
+        "allowed_channel_count_range_min": 1,
+        "allowed_channel_count_range_max": 58982
     },
     "AA2": {
         "available_receivers": [
@@ -94,15 +100,18 @@
         "available_bandwidth_hz": 800000000.0,
         "number_channels": 14880,
         "cbf_modes": [
-            "CORR",
-            "PST_BF",
-            "PSS_BF"
+            "correlation",
+            "pst",
+            "pss"
         ],
         "number_zoom_windows": 16,
         "number_zoom_channels": 14880,
         "number_pss_beams": 384,
         "number_pst_beams": 6,
         "ps_beam_bandwidth_hz": 800000000.0,
-        "number_fsps": 4
+        "number_fsps": 27,
+        "allowed_channel_width_values": [210, 420, 840, 1680, 3360, 6720, 13440, 26880, 40320, 53760, 80640, 107520, 161280, 215040, 322560, 416640, 430080, 645120],
+        "allowed_channel_count_range_min": 1,
+        "allowed_channel_count_range_max": 214748647
     }
 }

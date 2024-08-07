@@ -14,6 +14,7 @@ OSD capabilities.
 """
 
 import logging
+import re
 from datetime import datetime
 from typing import Any, Union
 
@@ -160,34 +161,34 @@ def get_matched_rule_constraint_from_osd(
 
 
 def apply_validation_rule(
-    key: str,
-    value: list[dict[str, Union[str, dict]]],
+    key_to_validate: str,
+    validation_data: list[dict[str, Union[str, dict]]],
     command_input_json_config: dict,
-    parent_key: str,
+    parent_path_list: list,
     capabilities: dict,
 ) -> str:
     """
     Evaluate validation rules using simpleeval and
     return an error message if the input is invalid.
 
-    :param key: str, the user input key for search.
-    :param value: list[dict[str, Union[str, dict]]],
+    :param key_to_validate: str, the user input data for validation.
+    :param validation_data: list[dict[str, Union[str, dict]]],
     a list of dictionaries containing the rule and error.
     :param command_input_json_config: dict,
     the command input JSON from the operator.
-    :param parent_key: str, the parent key to
-    identify the correct child key.
+    :param parent_path_list: list, representing the current parent path
+    to identify the correct child key.
     :param capabilities: dict, the capabilities dictionary.
     :return: str, the error message after applying the rule.
     """
     res_value = get_value_based_on_provided_path(
-        command_input_json_config, [parent_key, key]
+        command_input_json_config, parent_path_list
     )
-    if res_value:
-        add_semantic_variables({key: res_value})
+    if res_value or isinstance(res_value, list | dict | tuple | set):
+        add_semantic_variables({key_to_validate: res_value})
         error_msgs = []
 
-        for rule_data in value:
+        for rule_data in validation_data:
             try:
                 osd_base_constraint = get_matched_rule_constraint_from_osd(
                     basic_capabilities=capabilities,
@@ -195,7 +196,7 @@ def apply_validation_rule(
                     rule=rule_data["rule"],
                 )
                 eval_result = evaluate_rule(
-                    key,
+                    key_to_validate,
                     res_value,
                     rule_data,
                     osd_base_constraint,
@@ -214,8 +215,29 @@ def apply_validation_rule(
     return ""
 
 
+def update_names_with_dependencies(rule_data: dict, names: dict) -> dict:
+    """
+    Update the 'names' dictionary with dependency values from rule_data.
+
+    :param key:rule_data (dict): A dictionary containing rule data,
+     including a "dependency_key" key.
+    :param key:names (dict): A dictionary to be updated with dependency values.
+
+    :return: dict: The updated 'names' dictionary with dependency values.
+    """
+    if "dependency_key" in rule_data:
+        dependency_values = get_semantic_variables()
+        for dependency_value in rule_data["dependency_key"]:
+            names.update(
+                {
+                    dependency_value: dependency_values[dependency_value],
+                }
+            )
+    return names
+
+
 def evaluate_rule(
-    key: str,
+    key_to_validate: str,
     res_value: Union[str, list],
     rule_data: dict[str, Union[str, dict]],
     osd_base_constraint: list[dict],
@@ -223,7 +245,7 @@ def evaluate_rule(
     """
     Evaluate a single validation rule using simpleeval.
 
-    :param key: str, the user input key for search.
+    :param key_to_validate: str, the user input key for search.
     :param res_value: Union[str, list], the value of the key.
     :param rule_data: dict[str, Union[str, dict]], the rule and error data.
     :param osd_base_constraint: list[dict], the list of dictionaries
@@ -235,14 +257,18 @@ def evaluate_rule(
     eval_new_data = []
     simple_eval = EvalWithCompoundTypes()
     simple_eval.functions["len"] = len
+    simple_eval.functions["re"] = re
 
     if len(osd_base_constraint) > 1:
         # if found multiple constraints values from OSD
         for i in osd_base_constraint:
-            names = {key: res_value}
+            names = {key_to_validate: res_value}
             names = {**names, **i}
+            names = update_names_with_dependencies(rule_data, names)
+
             simple_eval.names = names
             eval_data = simple_eval.eval(rule_data["rule"])
+
             if not eval_data:
                 eval_new_data.append(False)
             else:
@@ -253,17 +279,9 @@ def evaluate_rule(
         else:
             osd_base_constraint_value = {}
 
-        if "dependency_key" in rule_data:
-            dependency_values = get_semantic_variables()
-            names = {
-                key: res_value,
-                rule_data["dependency_key"]: dependency_values[
-                    rule_data["dependency_key"]
-                ],
-            }
-        else:
-            names = {key: res_value}
-            names = {**names, **osd_base_constraint_value}
+        names = {key_to_validate: res_value}
+        names = {**names, **osd_base_constraint_value}
+        names = update_names_with_dependencies(rule_data, names)
 
         simple_eval.names = names
         eval_data = simple_eval.eval(rule_data["rule"])
@@ -292,69 +310,62 @@ def format_error_message(
 def validate_json(
     semantic_validate_constant_json: dict,
     command_input_json_config: dict,
-    parent_key: str,
-    capabilities: dict,
+    parent_path_list: list = None,
+    capabilities: dict = None,
 ) -> list:
     """
-    This function is written to matching key's from user input command
-    and validation constant rules those and present in mid, low
-    and SBD validation constant json.
-    e.g consider one of the assign resource command dish rule
-    from constant json.
-    here we are just mapping rule dish of receptor_ids to
-    user assign resource command input payload.
-    :param semantic_validate_constant_json: json containing all the parameters
-    along with its business semantic validation rules and error message.
-    :param command_input_json_config: dictionary containing
-    details of the command input which needs validation.
-    This is same as for ska_telmodel.schema.validate.
-    :param parent_key: temp key to store parent key, means if same semantic
-    validation key present in 2 places this will help to identify
-    correct parent.
-    :param capabilities: defined key, value structure pair from OSD API
-    :returns: error_msg_list: list containing all combined error which arises
-    due to semantic validation.
+    This function is written to match keys from the user input command
+    and validation constant rules present in mid, low, and SBD validation constant JSON.
+    e.g., consider one of the assign resource command dish rules from the constant JSON.
+    Here, we are mapping the rule dish of receptor_ids to the user assign resource
+    command input payload.
+
+    :param semantic_validate_constant_json: JSON containing all the parameters
+     along with its business semantic validation rules and error messages.
+    :param command_input_json_config: Dictionary containing details of the command input
+     which needs validation.
+    This is the same as for ska_telmodel.schema.validate.
+    :param parent_path_list: List representing the current parent path.
+    :param capabilities: Defined key-value structure pair from the OSD API.
+    :return: error_msg_list: List containing all combined errors arising due
+     to semantic validation.
     """
-    # initially declared empty values for error messages list, last parent dict
-    # and parent key
     error_msg_list = []
     for key, value in semantic_validate_constant_json.items():
+        current_path = parent_path_list + [key]
+
         if isinstance(value, list):
-            # if validation key present in multiple dict parent_key
-            # helps to populate current child
             rule_result = apply_validation_rule(
-                key=key,
-                value=value,
+                key_to_validate=key,
+                validation_data=value,
                 command_input_json_config=command_input_json_config,
-                parent_key=parent_key,
+                parent_path_list=current_path,
                 capabilities=capabilities,
             )
             if rule_result:
                 error_msg_list.append(rule_result)
-
         elif isinstance(value, dict):
             # added extra key as rule parent to perform rule validation
             # on child
             # e.g semantic rule suggest calculate beams length but beams
             # is having array of element, in this case parent_rule_key
-            # key helps to apply rule on child]
+            # key helps to apply rule on child
             if "parent_key_rule" in value:
                 rule_key = list(value.keys())[1]
                 rule_result = apply_validation_rule(
-                    key=rule_key,
-                    value=value["parent_key_rule"],
+                    key_to_validate=rule_key,
+                    validation_data=value["parent_key_rule"],
                     command_input_json_config=command_input_json_config,
-                    parent_key=key,
+                    parent_path_list=current_path + [rule_key],
                     capabilities=capabilities,
                 )
                 if rule_result:
                     error_msg_list.append(rule_result)
-            parent_key = key
             error_msg_list.extend(
                 validate_json(
                     value,
                     command_input_json_config,
-                    parent_key,
+                    current_path,
                     capabilities,
                 )
             )

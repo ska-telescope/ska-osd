@@ -20,12 +20,19 @@
                 "max_baseline_km": 1.5,
                 "available_bandwidth_hz": 800000.0,
                 "number_channels": 14880,
+                "cbf_modes": [
+                    "correlation",
+                    "pst"
+                ],
                 "number_zoom_windows": 0,
                 "number_zoom_channels": 0,
                 "number_pss_beams": 0,
-                "number_pst_beams": 0,
-                "ps_beam_bandwidth_hz": 0.0,
-                "number_fsps": 4
+                "number_pst_beams": 1,
+                "ps_beam_bandwidth_hz": 400000000.0,
+                "number_fsps": 4,
+                "allowed_channel_width_values": [13440],
+                "allowed_channel_count_range_min": 1,
+                "allowed_channel_count_range_max": 58982
             },
             "basic_capabilities": {
                 "dish_elevation_limit_deg": 15.0,
@@ -66,6 +73,7 @@
         "low": {
             "AA0.5": {
                 "number_stations": 4,
+                "number_station_ids": [345, 350, 352, 431],
                 "number_substations": 0,
                 "number_beams": 1,
                 "max_baseline_km": 3.0,

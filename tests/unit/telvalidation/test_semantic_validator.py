@@ -66,6 +66,8 @@ VALID_MID_CONFIGURE_JSON = load_string_from_file(
 )
 VALID_MID_SBD_JSON = load_string_from_file("test_files/testfile_valid_mid_sbd.json")
 INVALID_MID_SBD_JSON = load_string_from_file("test_files/testfile_invalid_mid_sbd.json")
+VALID_LOW_SBD_JSON = load_string_from_file("test_files/testfile_valid_low_sbd.json")
+INVALID_LOW_SBD_JSON = load_string_from_file("test_files/testfile_invalid_low_sbd.json")
 INVALID_MID_CONFIGURE_JSON = load_string_from_file(
     "test_files/testfile_invalid_mid_configure.json"
 )
@@ -83,6 +85,7 @@ INVALID_LOW_CONFIGURE_JSON = load_string_from_file(
 )
 capabilities = load_string_from_file("test_files/testfile_capabilities.json")
 
+# This is dummy constant json for testing "Invalid rule and error key passed" scenario.
 INVALID_MID_VALIDATE_CONSTANT = {
     "AA0.5": {
         "assign_resource": {
@@ -124,6 +127,11 @@ mid_expected_result_for_invalid_data = (
 )
 
 low_expected_result_for_invalid_data = (
+    "subarray_beam_id must be between 1 and 48\n"
+    "number_of_channels must be between 8 and 384\n"
+    "Invalid input for station_id! Currently allowed [345, 350, 352, 431]\n"
+    "Initials of aperture_id should be AP\n"
+    "station_id in aperture_id should be same as station_id\n"
     "beams are too many! Current limit is 1\n"
     "Invalid function for beams! Currently allowed visibilities\n"
     "spectral windows are too many! Current limit = 1"
@@ -131,19 +139,35 @@ low_expected_result_for_invalid_data = (
 
 mid_configure_expected_result_for_invalid_data = (
     "Invalid input for receiver_band! Currently allowed [1,2]\n"
-    "FSPs are too many!Current Limit = 4\n"
-    "Invalid input for fsp_id!\n"
-    "Invalid input for function_mode\n"
-    "Invalid input for zoom_factor\n"
-    "frequency_slice_id did not match fsp_id\n"
+    "The fsp_ids should all be distinct\n"
+    "fsp_ids are too many!Current Limit is 4\n"
+    "Invalid input for channel_width! Currently allowed [13440]\n"
+    "channel_count must be between 1 to 58982\n"
+    "channel_count must be a multiple of 20\n"
+    "Invalid input for start_freq\n"
+    "Invalid input for start_freq\n"
+    "sdp_start_channel_id must be between 0 to 2147483647\n"
+    "integration_factor must be between 1 to 10\n"
     "frequency_band did not match receiver_band"
 )
 
 low_configure_expected_result_for_invalid_data = (
+    "subarray_beam_id must be between 1 and 48\n"
+    "update_rate must be greater than or equal to 0.0\n"
+    "start_channel must be greater than 2 and less than 504\n"
+    "number_of_channels must be greater than or equal to 8 and less"
+    " than or equal to 384\n"
+    "Initials of aperture_id should be AP\n"
+    "Invalid reference frame! Currently allowed  [“topocentric”, “ICRS”, “galactic”]\n"
+    "c1 must be between 0.0 and 360.0\n"
+    "c2 must be between -90.0 and 90.0\n"
     "stations are too many! Current limit is 4\n"
-    "Invalid input for function mode! Currently allowed vis\n"
+    "Invalid input for firmware! Currently allowed vis\n"
     "The fsp_ids should all be distinct\n"
-    "fsp_ids are too many!Current Limit is 6"
+    "fsp_ids are too many!Current Limit is 6\n"
+    "beams are too many!Current Limit is 1\n"
+    "Invalid input for firmware! Currently allowed pst\n"
+    "beams are too many! Current limit is 1"
 )
 
 
@@ -164,6 +188,15 @@ mid_sbd_expected_result_for_invalid_data = (
     "Invalid input for zoom_factor\n"
     "frequency_slice_id did not match fsp_id\n"
     "Invalid input for receiver_band! Currently allowed [1,2]"
+)
+
+low_sbd_expected_result_for_invalid_data = (
+    "subarray_beam_id must be between 1 and 48\n"
+    "number_of_channels must be between 8 and 384\n"
+    "Invalid input for station_id! Currently allowed [345, 350, 352, 431]\n"
+    "The logical_fsp_ids should all be distinct\n"
+    "logical_fsp_ids are too many!Current Limit is 6\n"
+    "Invalid input for zoom_factor"
 )
 
 
@@ -191,6 +224,8 @@ mid_sbd_expected_result_for_invalid_data = (
         ),
         (VALID_MID_SBD_JSON, "MID", True, False),
         (INVALID_MID_SBD_JSON, "MID", mid_sbd_expected_result_for_invalid_data, True),
+        (VALID_LOW_SBD_JSON, "LOW", True, False),
+        (INVALID_LOW_SBD_JSON, "LOW", low_sbd_expected_result_for_invalid_data, True),
         # Add more test cases here
     ],
 )
@@ -253,9 +288,9 @@ def test_validate_scemantic_json_input_keys(mock6):
         match="Invalid rule and error key passed",
     ):
         validate_json(
-            INVALID_MID_VALIDATE_CONSTANT,
+            INVALID_MID_VALIDATE_CONSTANT["AA0.5"]["assign_resource"],
             INPUT_COMMAND_CONFIG,
-            parent_key=None,
+            parent_path_list=[],
             capabilities=capabilities,
         )
 
@@ -361,16 +396,6 @@ class TestTargetVisibility(unittest.TestCase):
             validate_target_is_visible(ra, dec, telescope, "target_low", self.tm_data),
             expected_output,
         )
-
-
-@pytest.fixture
-def sbd_invalid_request_json_path():
-    """
-    Pytest fixture to return path to resource allocation JSON file
-    for SBD
-    """
-    config = load_string_from_file("test_files/testfile_invalid_mid_sbd.json")
-    return config
 
 
 def test_get_matched_rule_constraint_from_osd():

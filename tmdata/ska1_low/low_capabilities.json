@@ -6,11 +6,17 @@
     },
     "AA0.5": {
       "number_stations": 4,
+      "number_station_ids": [
+        345, 
+        350, 
+        352, 
+        431
+      ],
       "number_substations": 0,
       "number_beams": 1,
       "max_baseline_km": 3.0,
       "available_bandwidth_hz": 75000000.0,
-      "channel_width_hz": 5400,
+      "channel_width_hz": 5425.34722,
       "cbf_modes": [
         "vis",
         "pst"
@@ -29,7 +35,7 @@
       "number_beams": 8,
       "max_baseline_km": 6.0,
       "available_bandwidth_hz": 75000000.0,
-      "channel_width_hz": 5400,
+      "channel_width_hz": 5425.34722,
       "cbf_modes": [
         "vis",
         "pst"
@@ -48,7 +54,7 @@
       "number_beams": 8,
       "max_baseline_km": 40.0,
       "available_bandwidth_hz": 150000000.0,
-      "channel_width_hz": 5400,
+      "channel_width_hz": 5425.34722,
       "cbf_modes": [
         "vis",
         "pst",
