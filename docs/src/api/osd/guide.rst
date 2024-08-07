@@ -142,7 +142,7 @@ GET /osd
      - Resource URL
      - Description
    * - GET
-     - ``/ska-ost-osd/osd/api/v1/osd/``
+     - ``/ska-ost-osd/osd/api/{MAJOR_VERSION}/osd/``
      - **Getting Data**
 
        Return the OSD cycle_id data.
@@ -168,14 +168,14 @@ GET /osd
 
 .. code:: python
 
-    "/ska-ost-osd/osd/api/v1/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
+    "/ska-ost-osd/osd/api/{MAJOR_VERSION}/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
 
 
 3. CURL Example Request
 
 .. code:: python
 
-    curl -X GET "/ska-ost-osd/osd/api/v1/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
+    curl -X GET "/ska-ost-osd/osd/api/{MAJOR_VERSION}/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
 
 
 4. Example Response
@@ -188,7 +188,7 @@ GET /osd
     .. code:: python
 
         client.get(
-            "/ska-ost-osd/osd/api/v1/osd",
+            "/ska-ost-osd/osd/api/{MAJOR_VERSION}/osd",
             query_string={
                 "cycle_id": 1,
                 "source": "file",

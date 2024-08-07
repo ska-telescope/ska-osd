@@ -55,9 +55,9 @@ def open_api_spec():
                 "name": "BSD-3-Clause",
                 "url": "https://opensource.org/licenses/BSD-3-Clause",
             },
-            "version": "1.0.2",
+            "version": "2.0.0",
         },
-        "servers": [{"url": "ska-ost-osd/osd/api/v1"}],
+        "servers": [{"url": "ska-ost-osd/osd/api/v2"}],
         "paths": {
             "/osd": {
                 "get": {
