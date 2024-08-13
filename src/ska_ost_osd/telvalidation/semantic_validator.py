@@ -276,7 +276,7 @@ def validate_command_input(
 
 def semantic_validate(
     observing_command_input: dict,
-    tm_data: TMData,
+    tm_data: dict,
     array_assembly: str = "AA0.5",
     interface: Optional[str] = None,
     raise_semantic: bool = True,
