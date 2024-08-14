@@ -22,7 +22,7 @@ def test_init_app(open_api_spec):
         app = init_app()
 
         assert app.url_map._rules_by_endpoint[  # pylint: disable=W0212
-            "/ska-ost-osd/osd/api/v1.ska_ost_osd_rest_api_resources_get_osd"
+            "/ska-ost-osd/osd/api/v2.ska_ost_osd_rest_api_resources_get_osd"
         ]
 
 
@@ -155,7 +155,7 @@ def test_init_app_client(client, open_api_spec):
             {
                 "detail": [
                     "OSD Version 3.0.7 is not valid,Available OSD Versions are"
-                    " ['1.0.2']"
+                    " ['2.0.0']"
                 ],
                 "status": -1,
                 "title": "Value Error",
@@ -187,7 +187,7 @@ def test_invalid_osd_tmdata_source(
     """
 
     response = client.get(
-        "/ska-ost-osd/osd/api/v1/osd",
+        "/ska-ost-osd/osd/api/v2/osd",
         query_string={
             "cycle_id": cycle_id,
             "osd_version": osd_version,
@@ -210,7 +210,7 @@ def test_osd_endpoint(client, mid_osd_data):
          OSD data or returns an error status code.
     """
     response = client.get(
-        "/ska-ost-osd/osd/api/v1/osd",
+        "/ska-ost-osd/osd/api/v2/osd",
         query_string={
             "source": "file",
             "capabilities": "mid",
@@ -233,7 +233,7 @@ def test_invalid_osd_tmdata_source_capabilities(client):
     """
 
     error_msgs = client.get(
-        "/ska-ost-osd/osd/api/v1/osd",
+        "/ska-ost-osd/osd/api/v2/osd",
         query_string={
             "cycle_id": 1,
             "osd_version": "1.1.0",
@@ -272,7 +272,7 @@ def test_osd_source(client):
     """
 
     response = client.get(
-        "/ska-ost-osd/osd/api/v1/osd", query_string={"cycle_id": 1, "source": "car"}
+        "/ska-ost-osd/osd/api/v2/osd", query_string={"cycle_id": 1, "source": "car"}
     )
     error_msg = {
         "detail": (
@@ -292,7 +292,7 @@ def test_osd_source_gitlab(client):
     """
 
     response = client.get(
-        "/ska-ost-osd/osd/api/v1/osd", query_string={"cycle_id": 1, "source": "gitlab"}
+        "/ska-ost-osd/osd/api/v2/osd", query_string={"cycle_id": 1, "source": "gitlab"}
     )
 
     error_msg = [
@@ -325,7 +325,7 @@ def test_semantic_validate_api(
     json_body = request.getfixturevalue(json_body_to_validate)
     expected_response = request.getfixturevalue(response)
 
-    res = client.post("/ska-ost-osd/osd/api/v1/semantic_validation", json=json_body)
+    res = client.post("/ska-ost-osd/osd/api/v2/semantic_validation", json=json_body)
     assert res.get_json() == expected_response
 
 
@@ -338,7 +338,7 @@ def test_semantic_validate_api_not_passing_required_keys(
     json_body = valid_semantic_validation_body.copy()
     del json_body["observing_command_input"]
     expected_response = observing_command_input_missing_response
-    res = client.post("/ska-ost-osd/osd/api/v1/semantic_validation", json=json_body)
+    res = client.post("/ska-ost-osd/osd/api/v2/semantic_validation", json=json_body)
     assert res.get_json() == expected_response
 
 
@@ -378,7 +378,7 @@ def test_not_passing_optional_keys(
     json_body = request.getfixturevalue(json_body_to_validate).copy()
     del json_body[key_to_delete]
     expected_response = request.getfixturevalue(response)
-    res = client.post("/ska-ost-osd/osd/api/v1/semantic_validation", json=json_body)
+    res = client.post("/ska-ost-osd/osd/api/v2/semantic_validation", json=json_body)
     assert res.get_json() == expected_response
 
 
@@ -392,7 +392,7 @@ def test_wrong_values_and_no_observing_command_input(
     """
     json_body = wrong_semantic_validation_parameter_body
     expected_response = wrong_semantic_validation_parameter_value_response
-    res = client.post("/ska-ost-osd/osd/api/v1/semantic_validation", json=json_body)
+    res = client.post("/ska-ost-osd/osd/api/v2/semantic_validation", json=json_body)
     assert res.get_json() == expected_response
 
 
@@ -409,5 +409,5 @@ def test_passing_only_required_keys(
     mock_tmdata.return_value = ["file://tmdata"]
     json_body = valid_only_observing_command_input_in_request_body
     expected_response = valid_semantic_validation_response
-    res = client.post("/ska-ost-osd/osd/api/v1/semantic_validation", json=json_body)
+    res = client.post("/ska-ost-osd/osd/api/v2/semantic_validation", json=json_body)
     assert res.get_json() == expected_response
