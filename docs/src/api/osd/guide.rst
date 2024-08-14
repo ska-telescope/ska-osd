@@ -306,6 +306,12 @@ GET /osd
     5. If ``cycle_id`` and ``array_assembly`` are provided together then API will return appropriate error message.
 
 
+.. note::
+
+    OSD supports backward compatibility for all existing released verisons. If someone wants to retrieve older version then 
+    they just need to point out that specific version in osd_verison.
+
+
 Error Handling
 ```````````````
 
