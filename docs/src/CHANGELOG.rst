@@ -5,6 +5,11 @@ Change Log
 All notable changes to this project will be documented in this file.
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
+2.0.1
+*****
+* Added CHANGELOG.rst into doc folder.
+* Fixed liniting issue for CDM.
+
 2.0.0
 *****
 * Removed complex code and increase readability
