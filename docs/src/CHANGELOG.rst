@@ -8,7 +8,8 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 2.0.1
 *****
 * Added CHANGELOG.rst into doc folder.
-* Fixed linting issue for CDM.
+* Reverted ArgumentType of "TMData" in function "semantic_validate" and ReturnType of semantic_validate function 
+  which had been changed during refactoring and causing linting issue in CDM.
 
 2.0.0
 *****
