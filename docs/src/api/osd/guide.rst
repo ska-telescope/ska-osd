@@ -62,8 +62,11 @@ General Structure
 
 .. note::
 
-    Created a separate JSON file for mapping ``cycle_id`` to version number ``cycle_gitlab_release_version_mapping.json`` inside ``version_mapping`` folder.
-
+    * Created a separate JSON file for mapping ``cycle_id`` to version number ``cycle_gitlab_release_version_mapping.json`` inside ``version_mapping`` folder.
+    
+    * OSD supports backward compatibility for all existing released verisons. If someone wants to retrieve older version then 
+      they just need to point out that specific version in ``osd_verison``.
+      
 .. note::
 
     Created a bash script ``release.sh`` in ``resource`` folder.
