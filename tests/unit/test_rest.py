@@ -97,17 +97,12 @@ def test_init_app_client(client, open_api_spec):
             "mid",
             "AAA3",
             {
-                "detail": {
-                    "array_assembly": (
-                        "value AAA3 for array_assembly value is not valid"
-                    ),
-                    "cycle_id": "Cycle id 3 is not valid,Available IDs are 1",
-                    "cycle_id_and_array_assembly": (
-                        "Combination cycle_id_and_array_assembly should not be present"
-                        " together."
-                    ),
-                    "osd_version": "value 1..1.0 for osd_version is not valid",
-                },
+                "detail": [
+                    "Cycle_id and Array_assembly cannot be used together",
+                    "osd_version 1..1.0 is not valid",
+                    "array_assembly AAA3 is not valid",
+                    "Cycle 3 is not valid,Available IDs are 1",
+                ],
                 "status": -1,
                 "title": "Value Error",
             },
@@ -119,10 +114,11 @@ def test_init_app_client(client, open_api_spec):
             "mid",
             "AA3",
             {
-                "detail": (
-                    "Array Assembly AA3 doesn't exists. Available are AA0.5, AA1, AA2"
-                ),
-                "title": "Bad Request",
+                "detail": [
+                    "Array Assembly AA3 is not valid,Available Array Assemblies"
+                    " are AA0.5, AA1, AA2"
+                ],
+                "title": "Value Error",
                 "status": -1,
             },
         ),
@@ -133,12 +129,7 @@ def test_init_app_client(client, open_api_spec):
             None,
             "AA0.5",
             {
-                "detail": {
-                    "cycle_id_and_array_assembly": (
-                        "Combination cycle_id_and_array_assembly should not be present"
-                        " together."
-                    )
-                },
+                "detail": ["Cycle_id and Array_assembly cannot be used together"],
                 "status": -1,
                 "title": "Value Error",
             },
@@ -150,11 +141,7 @@ def test_init_app_client(client, open_api_spec):
             None,
             None,
             {
-                "detail": {
-                    "cycle_id_or_capabilities": (
-                        "Either one cycle_id_or_capabilities should be present."
-                    )
-                },
+                "detail": ["Either cycle_id or capabilities must be provided"],
                 "status": -1,
                 "title": "Value Error",
             },
@@ -166,12 +153,10 @@ def test_init_app_client(client, open_api_spec):
             ["mid"],
             None,
             {
-                "detail": {
-                    "osd_version": (
-                        "Invalid OSD Version 3.0.7 Valid OSD Versions are ['1.0.0',"
-                        " '1.0.1', '1.0.2', '1.0.3', '2.0.0', '2.0.1']"
-                    )
-                },
+                "detail": [
+                    "OSD Version 3.0.7 is not valid,Available OSD Versions are"
+                    " ['1.0.0', '1.0.1', '1.0.2', '1.0.3', '2.0.0', '2.0.1']"
+                ],
                 "status": -1,
                 "title": "Value Error",
             },
