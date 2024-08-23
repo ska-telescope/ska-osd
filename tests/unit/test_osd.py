@@ -229,14 +229,11 @@ def test_invalid_osd_tmdata_source():
         gitlab_branch="main",
         source="github",
     )
-    expected_error_msg = "\n".join([str(err) for err in error_msgs])
-
-    assert (
-        expected_error_msg
-        == "source is not valid available are file, car, gitlab\n"
-        "Only one parameter is needed either osd_version or gitlab_branch\n"
-        "Cycle id 3 is not valid,Available IDs are 1"
-    )
+    assert error_msgs == [
+        "Source is not valid available are file, car, gitlab",
+        "Only one parameter is needed either osd_version or gitlab_branch",
+        "Cycle 3 is not valid,Available IDs are 1",
+    ]
 
 
 def test_invalid_source():
@@ -253,8 +250,8 @@ def test_invalid_source():
 
     assert (
         expected_error_msg
-        == "source is not valid., Invalid OSD Version main Valid OSD Versions are"
-        " ['1.0.0', '1.0.1', '1.0.2', '1.0.3', '2.0.0', '2.0.1']"
+        == "Source file is not valid, OSD Version main is not valid,Available OSD"
+        " Versions are ['1.0.0', '1.0.1', '1.0.2', '1.0.3', '2.0.0', '2.0.1']"
     )
 
 
@@ -269,13 +266,10 @@ def test_invalid_get_osd_data_capability(tm_data):  # pylint: disable=W0621
     _, error_msgs = get_osd_data(
         capabilities=["midd"], array_assembly="AA1", tmdata=tm_data
     )
-    actual_error_msg = ", ".join([str(err) for err in error_msgs])
-
-    expected_error_msg = (
-        "Capability midd doesn't exists,Available are low, mid, observatory_policies"
-    )
-
-    assert actual_error_msg == expected_error_msg
+    assert error_msgs == [
+        "Capability midd is not valid,Available Capabilities are low, mid,"
+        " observatory_policies"
+    ]
 
 
 def test_invalid_get_osd_data_array_assembly(tm_data):  # pylint: disable=W0621
@@ -289,11 +283,6 @@ def test_invalid_get_osd_data_array_assembly(tm_data):  # pylint: disable=W0621
     _, error_msgs = get_osd_data(
         capabilities=["mid"], array_assembly="AA3", tmdata=tm_data
     )
-
-    actual_error_msg = ", ".join([str(err) for err in error_msgs])
-
-    expected_error_msg = (
-        "Array Assembly AA3 doesn't exists. Available are AA0.5, AA1, AA2"
-    )
-
-    assert actual_error_msg == expected_error_msg
+    assert error_msgs == [
+        "Array Assembly AA3 is not valid,Available Array Assemblies are AA0.5, AA1, AA2"
+    ]

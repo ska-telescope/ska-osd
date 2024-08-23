@@ -6,15 +6,11 @@ See the operationId fields of the Open API spec for the specific mappings.
 from functools import wraps
 from http import HTTPStatus
 
+from pydantic import ValidationError
 from ska_telmodel.data import TMData
 
-from ska_ost_osd.osd.osd import check_cycle_id, get_osd_data, osd_tmdata_source
-from ska_ost_osd.rest.api.query import (
-    OSDQueryParamsValidator,
-    OSDUserQuery,
-    SemanticValidationBodyParams,
-    SemanticValidationBodyParamsValidator,
-)
+from ska_ost_osd.osd.osd import get_osd_using_tmdata
+from ska_ost_osd.osd.osd_schema_validator import OSDModelError
 from ska_ost_osd.telvalidation import SchematicValidationError, semantic_validate
 from ska_ost_osd.telvalidation.constant import CAR_TELMODEL_SOURCE
 
@@ -86,47 +82,18 @@ def get_osd(**kwargs) -> dict:
 
     :returns dict: A dictionary with OSD data satisfying the query.
     """
-    error_msg = {}
-    query_params, error = OSDQueryParamsValidator().process_input(
-        kwargs, OSDUserQuery, False
-    )
-    error_msg.update(error)
-
-    _, cycle_error_msg_list = check_cycle_id(
-        query_params.cycle_id, query_params.osd_version, query_params.gitlab_branch
-    )
-    if cycle_error_msg_list:
-        for x in cycle_error_msg_list:
-            if "Cycle" in x:
-                error_msg["cycle_id"] = x
-            if "Invalid OSD Version" in x:
-                error_msg["osd_version"] = x
-
-    tm_data_source, error = osd_tmdata_source(
-        cycle_id=kwargs.get("cycle_id"),
-        osd_version=kwargs.get("osd_version"),
-        source=kwargs.get("source"),
-        gitlab_branch=kwargs.get("gitlab_branch"),
-    )
-    for x in error:
-        if "source" in x:
-            error_msg["source"] = x
-
-    if error_msg:
-        raise ValueError(error_msg)
-
-    tm_data = TMData(source_uris=tm_data_source)
-
-    osd_data, error_msg_osd = get_osd_data(
-        capabilities=[query_params.capabilities] if query_params.capabilities else None,
-        tmdata=tm_data,
-        array_assembly=query_params.array_assembly,
-        cycle_id=query_params.cycle_id,
-    )
-
-    if error_msg_osd:
-        return ", ".join([str(err) for err in error_msg_osd])
-
+    try:
+        cycle_id = kwargs.get("cycle_id")
+        osd_version = kwargs.get("osd_version")
+        source = kwargs.get("source")
+        gitlab_branch = kwargs.get("gitlab_branch")
+        capabilities = kwargs.get("capabilities")
+        array_assembly = kwargs.get("array_assembly")
+        osd_data = get_osd_using_tmdata(
+            cycle_id, osd_version, source, gitlab_branch, capabilities, array_assembly
+        )
+    except (OSDModelError, ValueError) as error:
+        raise error
     return osd_data
 
 
@@ -178,36 +145,45 @@ def semantically_validate_json(body: dict):
     :raises: SemanticValidationError: If the input JSON is not
              semantically valid semantic and raise semantic is true
     """
-    (
-        validated_semantic_validation_obj,
-        error_details,
-    ) = SemanticValidationBodyParamsValidator().process_input(
-        body, SemanticValidationBodyParams, True
-    )
-    sources = get_tmdata_sources(validated_semantic_validation_obj.sources)
+
+    error_details = []
+
+    sources = body.get("sources")
+    if sources and not isinstance(sources, str):
+        error_details.append("sources must be a string")
+    else:
+        sources = get_tmdata_sources(sources)
 
     try:
         tm_data = TMData(sources, update=True)
         semantic_validate(
-            observing_command_input=(
-                validated_semantic_validation_obj.observing_command_input
-            ),
+            observing_command_input=body.get("observing_command_input"),
             tm_data=tm_data,
-            raise_semantic=validated_semantic_validation_obj.raise_semantic,
-            interface=validated_semantic_validation_obj.interface,
-            osd_data=validated_semantic_validation_obj.osd_data,
+            raise_semantic=body.get("raise_semantic"),
+            interface=body.get("interface"),
+            osd_data=body.get("osd_data"),
         )
-    except RuntimeError as err:
-        error_details["sources"] = err.args[0]
+    except (RuntimeError, ValidationError) as err:
+        error_details.extend(handle_validation_error(err))
 
     if error_details:
         raise ValueError(error_details)
 
     return validation_response(
-        **{
-            "status": 0,
-            "detail": "JSON is semantically valid",
-            "title": "Semantic validation",
-            "http_status": HTTPStatus.OK,
-        }
+        status=0,
+        detail="JSON is semantically valid",
+        title="Semantic validation",
+        http_status=HTTPStatus.OK,
     )
+
+
+def handle_validation_error(err: object) -> list:
+    """
+    This function handles validation errors and returns a list of error details.
+    :param err: error raised from exception
+    :returns: List of errors
+    """
+    if isinstance(err, RuntimeError):
+        return [err.args[0]]
+    elif isinstance(err, ValidationError):
+        return [error["msg"] for error in err.errors()]
