@@ -33,7 +33,6 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 * Fixed RTD documentation issue.
 * Fixed minor variable names.
 
-
 1.0.0
 ******
 

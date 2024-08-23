@@ -382,7 +382,9 @@ def open_api_spec():
                                         },
                                         "sources": {
                                             "type": "string",
-                                            "example": "car://gitlab.com/ska-telescope/ska-telmodel?1.14.1#tmdata",
+                                            "example": (
+                                                "car:ost/ska-ost-osd?2.0.0#tmdata"
+                                            ),
                                         },
                                         "raise_semantic": {
                                             "type": "boolean",

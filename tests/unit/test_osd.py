@@ -251,7 +251,7 @@ def test_invalid_source():
     assert (
         expected_error_msg
         == "Source file is not valid, OSD Version main is not valid,Available OSD"
-        " Versions are ['2.0.0']"
+        " Versions are ['1.0.0', '1.0.1', '1.0.2', '1.0.3', '2.0.0', '2.0.1']"
     )
 
 

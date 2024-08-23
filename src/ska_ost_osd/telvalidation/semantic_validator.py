@@ -282,12 +282,12 @@ def validate_command_input(
 
 def semantic_validate(
     observing_command_input: dict,
-    tm_data: dict,
+    tm_data: TMData,
     array_assembly: str = "AA0.5",
     interface: Optional[str] = None,
     raise_semantic: bool = True,
     osd_data: Optional[dict] = None,
-) -> bool:
+) -> Any:
     """
     This method is the entry point for semantic validation,
     which can be consumed by other libraries like CDM.
