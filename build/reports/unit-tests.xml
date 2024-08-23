@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="5" skipped="0" tests="56" time="20.218" timestamp="2024-04-20T16:11:05.938746" hostname="PSL-F5KJ863"><testcase classname="tests.unit.test_osd" name="test_get_osd_data[None-None-tm_data-expected0]" time="0.003" /><testcase classname="tests.unit.test_osd" name="test_get_osd_data[capabilities1-None-tm_data-expected1]" time="0.001" /><testcase classname="tests.unit.test_osd" name="test_get_osd_data[None-AA0.5-tm_data-expected2]" time="0.001" /><testcase classname="tests.unit.test_osd" name="test_get_osd_data[capabilities3-AA0.5-tm_data-expected3]" time="0.002" /><testcase classname="tests.unit.test_osd" name="test_set_source_car_method" time="0.001" /><testcase classname="tests.unit.test_osd" name="test_set_source_gitlab_method" time="0.001" /><testcase classname="tests.unit.test_osd" name="test_validate_gitlab_with_both_invalid_param" time="0.002" /><testcase classname="tests.unit.test_osd" name="test_check_osd_version_method" time="0.001" /><testcase classname="tests.unit.test_osd" name="test_check_cycle_id_and_osd_version_method" time="0.001" /><testcase classname="tests.unit.test_osd" name="test_check_cycle_id_2_and_osd_version_method" time="0.001" /><testcase classname="tests.unit.test_osd" name="test_check_cycle_id_with_source_method" time="0.001" /><testcase classname="tests.unit.test_osd" name="test_check_master_branch_method" time="0.001" /><testcase classname="tests.unit.test_osd" name="test_invalid_osd_tmdata_source" time="0.001" /><testcase classname="tests.unit.test_osd" name="test_invalid_source" time="0.001" /><testcase classname="tests.unit.test_osd" name="test_invalid_get_osd_data_capability" time="0.001" /><testcase classname="tests.unit.test_osd" name="test_invalid_get_osd_data_array_assembly" time="0.001" /><testcase classname="tests.unit.test_rest" name="test_get_open_api_spec" time="0.187" /><testcase classname="tests.unit.test_rest" name="test_init_app" time="0.038" /><testcase classname="tests.unit.test_rest" name="test_get_openapi_spec" time="0.025"><failure message="AssertionError: expected call not found.&#10;Expected: ResolvingParser('/builds/ska-telescope/ost/ska-ost-osd/src/ska_ost_osd/rest/./openapi/osd-openapi-v1.yaml', lazy=True, strict=True)&#10;Actual: ResolvingParser('/home/sagar/Projects/ska-ost-osd/src/ska_ost_osd/rest/./openapi/osd-openapi-v1.yaml', lazy=True, strict=True)&#10;&#10;pytest introspection follows:&#10;&#10;Args:&#10;assert ('/home/sagar...api-v1.yaml',) == ('/builds/ska...api-v1.yaml',)&#10;  At index 0 diff: '/home/sagar/Projects/ska-ost-osd/src/ska_ost_osd/rest/./openapi/osd-openapi-v1.yaml' != '/builds/ska-telescope/ost/ska-ost-osd/src/ska_ost_osd/rest/./openapi/osd-openapi-v1.yaml'&#10;  Full diff:&#10;  - ('/builds/ska-telescope/ost/ska-ost-osd/src/ska_ost_osd/rest/./openapi/osd-openapi-v1.yaml',)&#10;  ?    ^^^^^^  - ^ --- --------&#10;  + ('/home/sagar/Projects/ska-ost-osd/src/ska_ost_osd/rest/./openapi/osd-openapi-v1.yaml',)&#10;  ?    ^^^^   ^^^^^^^^^^">self = &lt;MagicMock name='ResolvingParser' spec='ResolvingParser' id='126410746746848'&gt;, args = ('/builds/ska-telescope/ost/ska-ost-osd/src/ska_ost_osd/rest/./openapi/osd-openapi-v1.yaml',)
+kwargs = {'lazy': True, 'strict': True}, expected = call('', ('/builds/ska-telescope/ost/ska-ost-osd/src/ska_ost_osd/rest/./openapi/osd-openapi-v1.yaml',), {'lazy': True, 'strict': True})
+actual = call('', ('/home/sagar/Projects/ska-ost-osd/src/ska_ost_osd/rest/./openapi/osd-openapi-v1.yaml',), {'lazy': True, 'strict': True})
+_error_message = &lt;function NonCallableMock.assert_called_with.&lt;locals&gt;._error_message at 0x72f84bb8bb50&gt;, cause = None
+
+    def assert_called_with(self, /, *args, **kwargs):
+        """assert that the last call was made with the specified arguments.
+    
+        Raises an AssertionError if the args and keyword args passed in are
+        different to the last call to the mock."""
+        if self.call_args is None:
+            expected = self._format_mock_call_signature(args, kwargs)
+            actual = 'not called.'
+            error_message = ('expected call not found.\nExpected: %s\nActual: %s'
+                    % (expected, actual))
+            raise AssertionError(error_message)
+    
+        def _error_message():
+            msg = self._format_mock_failure_message(args, kwargs)
+            return msg
+        expected = self._call_matcher(_Call((args, kwargs), two=True))
+        actual = self._call_matcher(self.call_args)
+        if actual != expected:
+            cause = expected if isinstance(expected, Exception) else None
+&gt;           raise AssertionError(_error_message()) from cause
+E           AssertionError: expected call not found.
+E           Expected: ResolvingParser('/builds/ska-telescope/ost/ska-ost-osd/src/ska_ost_osd/rest/./openapi/osd-openapi-v1.yaml', lazy=True, strict=True)
+E           Actual: ResolvingParser('/home/sagar/Projects/ska-ost-osd/src/ska_ost_osd/rest/./openapi/osd-openapi-v1.yaml', lazy=True, strict=True)
+
+/usr/lib/python3.10/unittest/mock.py:929: AssertionError
+
+During handling of the above exception, another exception occurred:
+
+self = &lt;MagicMock name='ResolvingParser' spec='ResolvingParser' id='126410746746848'&gt;, args = ('/builds/ska-telescope/ost/ska-ost-osd/src/ska_ost_osd/rest/./openapi/osd-openapi-v1.yaml',)
+kwargs = {'lazy': True, 'strict': True}
+
+    def assert_called_once_with(self, /, *args, **kwargs):
+        """assert that the mock was called exactly once and that that call was
+        with the specified arguments."""
+        if not self.call_count == 1:
+            msg = ("Expected '%s' to be called once. Called %s times.%s"
+                   % (self._mock_name or 'mock',
+                      self.call_count,
+                      self._calls_repr()))
+            raise AssertionError(msg)
+&gt;       return self.assert_called_with(*args, **kwargs)
+E       AssertionError: expected call not found.
+E       Expected: ResolvingParser('/builds/ska-telescope/ost/ska-ost-osd/src/ska_ost_osd/rest/./openapi/osd-openapi-v1.yaml', lazy=True, strict=True)
+E       Actual: ResolvingParser('/home/sagar/Projects/ska-ost-osd/src/ska_ost_osd/rest/./openapi/osd-openapi-v1.yaml', lazy=True, strict=True)
+E       
+E       pytest introspection follows:
+E       
+E       Args:
+E       assert ('/home/sagar...api-v1.yaml',) == ('/builds/ska...api-v1.yaml',)
+E         At index 0 diff: '/home/sagar/Projects/ska-ost-osd/src/ska_ost_osd/rest/./openapi/osd-openapi-v1.yaml' != '/builds/ska-telescope/ost/ska-ost-osd/src/ska_ost_osd/rest/./openapi/osd-openapi-v1.yaml'
+E         Full diff:
+E         - ('/builds/ska-telescope/ost/ska-ost-osd/src/ska_ost_osd/rest/./openapi/osd-openapi-v1.yaml',)
+E         ?    ^^^^^^  - ^ --- --------
+E         + ('/home/sagar/Projects/ska-ost-osd/src/ska_ost_osd/rest/./openapi/osd-openapi-v1.yaml',)
+E         ?    ^^^^   ^^^^^^^^^^
+
+/usr/lib/python3.10/unittest/mock.py:941: AssertionError
+
+During handling of the above exception, another exception occurred:
+
+open_api_spec = {'components': {'parameters': {'array_assembly': {'example': 'AA0.5', 'in': 'query', 'name': 'array_assembly', 'requir... due to semantic validation errors.'}, '500': {'content': {...}, 'description': 'Internal Server Error'}}, ...}}}, ...}
+
+    def test_get_openapi_spec(open_api_spec):
+        """This function tests that a valid OpenAPI specification
+           is returned when requesting the API documentation.
+    
+        :params open_api_spec (dict): The expected OpenAPI specification
+    
+        :raises AssertionError: If the response spec differs from expected.
+        """
+    
+        with patch("ska_ost_osd.rest.prance.ResolvingParser", autospec=True) as mock_parser:
+            instance = mock_parser.return_value
+            instance.specification = open_api_spec
+    
+            spec = get_openapi_spec()
+    
+            assert (
+                spec == open_api_spec
+            ), "The specification should match the mock specification"
+&gt;           mock_parser.assert_called_once_with(  # pylint: disable=W0106
+                (
+                    "/builds/ska-telescope/ost/ska-ost-osd/src/"
+                    "ska_ost_osd/rest/./openapi/osd-openapi-v1.yaml"
+                ),
+                lazy=True,
+                strict=True,
+            ), "ResolvingParser should be called with expected arguments"
+E           AssertionError: expected call not found.
+E           Expected: ResolvingParser('/builds/ska-telescope/ost/ska-ost-osd/src/ska_ost_osd/rest/./openapi/osd-openapi-v1.yaml', lazy=True, strict=True)
+E           Actual: ResolvingParser('/home/sagar/Projects/ska-ost-osd/src/ska_ost_osd/rest/./openapi/osd-openapi-v1.yaml', lazy=True, strict=True)
+E           
+E           pytest introspection follows:
+E           
+E           Args:
+E           assert ('/home/sagar...api-v1.yaml',) == ('/builds/ska...api-v1.yaml',)
+E             At index 0 diff: '/home/sagar/Projects/ska-ost-osd/src/ska_ost_osd/rest/./openapi/osd-openapi-v1.yaml' != '/builds/ska-telescope/ost/ska-ost-osd/src/ska_ost_osd/rest/./openapi/osd-openapi-v1.yaml'
+E             Full diff:
+E             - ('/builds/ska-telescope/ost/ska-ost-osd/src/ska_ost_osd/rest/./openapi/osd-openapi-v1.yaml',)
+E             ?    ^^^^^^  - ^ --- --------
+E             + ('/home/sagar/Projects/ska-ost-osd/src/ska_ost_osd/rest/./openapi/osd-openapi-v1.yaml',)
+E             ?    ^^^^   ^^^^^^^^^^
+
+tests/unit/test_rest.py:56: AssertionError</failure></testcase><testcase classname="tests.unit.test_rest" name="test_init_app_client" time="0.090" /><testcase classname="tests.unit.test_rest" name="test_invalid_osd_tmdata_source[3-1..1.0-file-mid-AAA3-expected0]" time="0.092" /><testcase classname="tests.unit.test_rest" name="test_invalid_osd_tmdata_source[None-None-file-mid-AA3-expected1]" time="0.093" /><testcase classname="tests.unit.test_rest" name="test_osd_endpoint" time="0.090" /><testcase classname="tests.unit.test_rest" name="test_invalid_osd_tmdata_source_capabilities" time="0.089" /><testcase classname="tests.unit.test_rest" name="test_response_body" time="0.001" /><testcase classname="tests.unit.test_rest" name="test_osd_source" time="0.155" /><testcase classname="tests.unit.test_rest" name="test_osd_source_gitlab" time="0.092" /><testcase classname="tests.unit.test_rest" name="test_semantic_validate_api[valid_semantic_validation_body-valid_semantic_validation_response]" time="1.838"><failure message="assert {'detail': &quot;'...Server Error'} == {'detail': 'J...c validation'}&#10;  Differing items:&#10;  {'title': 'Internal Server Error'} != {'title': 'Semantic validation'}&#10;  {'detail': &quot;'AA0.5'&quot;} != {'detail': 'JSON is semantically valid'}&#10;  {'status': -1} != {'status': 0}&#10;  Full diff:&#10;    {&#10;  -  'detail': 'JSON is semantically valid',...&#10;  &#10;  ...Full output truncated (8 lines hidden), use '-vv' to show">client = &lt;FlaskClient &lt;Flask 'ska_ost_osd.rest'&gt;&gt;, request = &lt;FixtureRequest for &lt;Function test_semantic_validate_api[valid_semantic_validation_body-valid_semantic_validation_response]&gt;&gt;
+json_body_to_validate = 'valid_semantic_validation_body', response = 'valid_semantic_validation_response'
+
+    @pytest.mark.parametrize(
+        "json_body_to_validate, response",
+        [
+            ("valid_semantic_validation_body", "valid_semantic_validation_response"),
+            ("invalid_semantic_validation_body", "invalid_semantic_validation_response"),
+        ],
+    )
+    def test_semantic_validate_api(client, request, json_body_to_validate, response):
+        """
+        Test semantic validation API with valid and invalid JSON
+        """
+        json_body = request.getfixturevalue(json_body_to_validate)
+        expected_response = request.getfixturevalue(response)
+        res = client.post("/ska-ost-osd/osd/api/v1/semantic_validation", json=json_body)
+&gt;       assert res.get_json() == expected_response
+E       assert {'detail': "'...Server Error'} == {'detail': 'J...c validation'}
+E         Differing items:
+E         {'title': 'Internal Server Error'} != {'title': 'Semantic validation'}
+E         {'detail': "'AA0.5'"} != {'detail': 'JSON is semantically valid'}
+E         {'status': -1} != {'status': 0}
+E         Full diff:
+E           {
+E         -  'detail': 'JSON is semantically valid',...
+E         
+E         ...Full output truncated (8 lines hidden), use '-vv' to show
+
+tests/unit/test_rest.py:291: AssertionError</failure></testcase><testcase classname="tests.unit.test_rest" name="test_semantic_validate_api[invalid_semantic_validation_body-invalid_semantic_validation_response]" time="1.466" /><testcase classname="tests.unit.test_rest" name="test_semantic_validate_api_not_passing_required_keys" time="1.478" /><testcase classname="tests.unit.test_rest" name="test_not_passing_optional_keys[valid_semantic_validation_body-valid_semantic_validation_response-sources]" time="1.496"><failure message="assert {'detail': &quot;'...Server Error'} == {'detail': 'J...c validation'}&#10;  Differing items:&#10;  {'title': 'Internal Server Error'} != {'title': 'Semantic validation'}&#10;  {'detail': &quot;'AA0.5'&quot;} != {'detail': 'JSON is semantically valid'}&#10;  {'status': -1} != {'status': 0}&#10;  Full diff:&#10;    {&#10;  -  'detail': 'JSON is semantically valid',...&#10;  &#10;  ...Full output truncated (8 lines hidden), use '-vv' to show">request = &lt;FixtureRequest for &lt;Function test_not_passing_optional_keys[valid_semantic_validation_body-valid_semantic_validation_response-sources]&gt;&gt;
+client = &lt;FlaskClient &lt;Flask 'ska_ost_osd.rest'&gt;&gt;, json_body_to_validate = 'valid_semantic_validation_body', response = 'valid_semantic_validation_response', key_to_delete = 'sources'
+
+    @pytest.mark.parametrize(
+        "json_body_to_validate, response, key_to_delete",
+        [
+            (
+                "valid_semantic_validation_body",
+                "valid_semantic_validation_response",
+                "sources",
+            ),
+            (
+                "valid_semantic_validation_body",
+                "valid_semantic_validation_response",
+                "interface",
+            ),
+            (
+                "valid_semantic_validation_body",
+                "valid_semantic_validation_response",
+                "raise_semantic",
+            ),
+            (
+                "valid_semantic_validation_body",
+                "valid_semantic_validation_response",
+                "osd_data",
+            ),
+        ],
+    )
+    def test_not_passing_optional_keys(
+        request, client, json_body_to_validate, response, key_to_delete
+    ):
+        """
+        Test semantic validation API response by not passing optional keys
+        """
+        json_body = request.getfixturevalue(json_body_to_validate).copy()
+        del json_body[key_to_delete]
+        expected_response = request.getfixturevalue(response)
+        res = client.post("/ska-ost-osd/osd/api/v1/semantic_validation", json=json_body)
+&gt;       assert res.get_json() == expected_response
+E       assert {'detail': "'...Server Error'} == {'detail': 'J...c validation'}
+E         Differing items:
+E         {'title': 'Internal Server Error'} != {'title': 'Semantic validation'}
+E         {'detail': "'AA0.5'"} != {'detail': 'JSON is semantically valid'}
+E         {'status': -1} != {'status': 0}
+E         Full diff:
+E           {
+E         -  'detail': 'JSON is semantically valid',...
+E         
+E         ...Full output truncated (8 lines hidden), use '-vv' to show
+
+tests/unit/test_rest.py:342: AssertionError</failure></testcase><testcase classname="tests.unit.test_rest" name="test_not_passing_optional_keys[valid_semantic_validation_body-valid_semantic_validation_response-interface]" time="1.452"><failure message="assert {'detail': &quot;'...Server Error'} == {'detail': 'J...c validation'}&#10;  Differing items:&#10;  {'title': 'Internal Server Error'} != {'title': 'Semantic validation'}&#10;  {'detail': &quot;'AA0.5'&quot;} != {'detail': 'JSON is semantically valid'}&#10;  {'status': -1} != {'status': 0}&#10;  Full diff:&#10;    {&#10;  -  'detail': 'JSON is semantically valid',...&#10;  &#10;  ...Full output truncated (8 lines hidden), use '-vv' to show">request = &lt;FixtureRequest for &lt;Function test_not_passing_optional_keys[valid_semantic_validation_body-valid_semantic_validation_response-interface]&gt;&gt;
+client = &lt;FlaskClient &lt;Flask 'ska_ost_osd.rest'&gt;&gt;, json_body_to_validate = 'valid_semantic_validation_body', response = 'valid_semantic_validation_response', key_to_delete = 'interface'
+
+    @pytest.mark.parametrize(
+        "json_body_to_validate, response, key_to_delete",
+        [
+            (
+                "valid_semantic_validation_body",
+                "valid_semantic_validation_response",
+                "sources",
+            ),
+            (
+                "valid_semantic_validation_body",
+                "valid_semantic_validation_response",
+                "interface",
+            ),
+            (
+                "valid_semantic_validation_body",
+                "valid_semantic_validation_response",
+                "raise_semantic",
+            ),
+            (
+                "valid_semantic_validation_body",
+                "valid_semantic_validation_response",
+                "osd_data",
+            ),
+        ],
+    )
+    def test_not_passing_optional_keys(
+        request, client, json_body_to_validate, response, key_to_delete
+    ):
+        """
+        Test semantic validation API response by not passing optional keys
+        """
+        json_body = request.getfixturevalue(json_body_to_validate).copy()
+        del json_body[key_to_delete]
+        expected_response = request.getfixturevalue(response)
+        res = client.post("/ska-ost-osd/osd/api/v1/semantic_validation", json=json_body)
+&gt;       assert res.get_json() == expected_response
+E       assert {'detail': "'...Server Error'} == {'detail': 'J...c validation'}
+E         Differing items:
+E         {'title': 'Internal Server Error'} != {'title': 'Semantic validation'}
+E         {'detail': "'AA0.5'"} != {'detail': 'JSON is semantically valid'}
+E         {'status': -1} != {'status': 0}
+E         Full diff:
+E           {
+E         -  'detail': 'JSON is semantically valid',...
+E         
+E         ...Full output truncated (8 lines hidden), use '-vv' to show
+
+tests/unit/test_rest.py:342: AssertionError</failure></testcase><testcase classname="tests.unit.test_rest" name="test_not_passing_optional_keys[valid_semantic_validation_body-valid_semantic_validation_response-raise_semantic]" time="1.435"><failure message="assert {'detail': &quot;'...Server Error'} == {'detail': 'J...c validation'}&#10;  Differing items:&#10;  {'title': 'Internal Server Error'} != {'title': 'Semantic validation'}&#10;  {'detail': &quot;'AA0.5'&quot;} != {'detail': 'JSON is semantically valid'}&#10;  {'status': -1} != {'status': 0}&#10;  Full diff:&#10;    {&#10;  -  'detail': 'JSON is semantically valid',...&#10;  &#10;  ...Full output truncated (8 lines hidden), use '-vv' to show">request = &lt;FixtureRequest for &lt;Function test_not_passing_optional_keys[valid_semantic_validation_body-valid_semantic_validation_response-raise_semantic]&gt;&gt;
+client = &lt;FlaskClient &lt;Flask 'ska_ost_osd.rest'&gt;&gt;, json_body_to_validate = 'valid_semantic_validation_body', response = 'valid_semantic_validation_response', key_to_delete = 'raise_semantic'
+
+    @pytest.mark.parametrize(
+        "json_body_to_validate, response, key_to_delete",
+        [
+            (
+                "valid_semantic_validation_body",
+                "valid_semantic_validation_response",
+                "sources",
+            ),
+            (
+                "valid_semantic_validation_body",
+                "valid_semantic_validation_response",
+                "interface",
+            ),
+            (
+                "valid_semantic_validation_body",
+                "valid_semantic_validation_response",
+                "raise_semantic",
+            ),
+            (
+                "valid_semantic_validation_body",
+                "valid_semantic_validation_response",
+                "osd_data",
+            ),
+        ],
+    )
+    def test_not_passing_optional_keys(
+        request, client, json_body_to_validate, response, key_to_delete
+    ):
+        """
+        Test semantic validation API response by not passing optional keys
+        """
+        json_body = request.getfixturevalue(json_body_to_validate).copy()
+        del json_body[key_to_delete]
+        expected_response = request.getfixturevalue(response)
+        res = client.post("/ska-ost-osd/osd/api/v1/semantic_validation", json=json_body)
+&gt;       assert res.get_json() == expected_response
+E       assert {'detail': "'...Server Error'} == {'detail': 'J...c validation'}
+E         Differing items:
+E         {'title': 'Internal Server Error'} != {'title': 'Semantic validation'}
+E         {'detail': "'AA0.5'"} != {'detail': 'JSON is semantically valid'}
+E         {'status': -1} != {'status': 0}
+E         Full diff:
+E           {
+E         -  'detail': 'JSON is semantically valid',...
+E         
+E         ...Full output truncated (8 lines hidden), use '-vv' to show
+
+tests/unit/test_rest.py:342: AssertionError</failure></testcase><testcase classname="tests.unit.test_rest" name="test_not_passing_optional_keys[valid_semantic_validation_body-valid_semantic_validation_response-osd_data]" time="1.519" /><testcase classname="tests.unit.test_rest" name="test_wrong_values_and_no_observing_command_input" time="0.614" /><testcase classname="tests.unit.test_rest" name="test_passing_only_required_keys" time="1.598" /><testcase classname="tests.unit.telvalidation.test_semantic_validator" name="test_tmc_assignresources_valid_inputs" time="0.011" /><testcase classname="tests.unit.telvalidation.test_semantic_validator" name="test_tmc_assignresources_invalid_inputs" time="0.007" /><testcase classname="tests.unit.telvalidation.test_semantic_validator" name="test_tmc_configure_valid_inputs" time="0.007" /><testcase classname="tests.unit.telvalidation.test_semantic_validator" name="test_tmc_configure_invalid_inputs" time="0.005" /><testcase classname="tests.unit.telvalidation.test_semantic_validator" name="test_validate_scemantic_json_input_keys" time="0.002" /><testcase classname="tests.unit.telvalidation.test_semantic_validator" name="test_tmc_configure_ra_dec" time="0.001" /><testcase classname="tests.unit.telvalidation.test_semantic_validator.TestTargetVisibility" name="test_target_is_visible_low" time="2.578" /><testcase classname="tests.unit.telvalidation.test_semantic_validator.TestTargetVisibility" name="test_target_is_visible_low_with_utc" time="1.271" /><testcase classname="tests.unit.telvalidation.test_semantic_validator.TestTargetVisibility" name="test_target_is_visible_mid" time="1.184" /><testcase classname="tests.unit.telvalidation.test_semantic_validator.TestTargetVisibility" name="test_target_is_visible_unknown_name" time="0.002" /><testcase classname="tests.unit.telvalidation.test_semantic_validator.TestTargetVisibility" name="test_temp_list_length_less_than_3" time="0.003" /><testcase classname="tests.unit.telvalidation.test_semantic_validator" name="test_tmc_low_assignresources_valid_inputs" time="0.003" /><testcase classname="tests.unit.telvalidation.test_semantic_validator" name="test_tmc_low_assignresources_invalid_inputs" time="0.004" /><testcase classname="tests.unit.telvalidation.test_semantic_validator" name="test_tmc_low_configure_valid_inputs" time="0.003" /><testcase classname="tests.unit.telvalidation.test_semantic_validator" name="test_tmc_low_configure_invalid_inputs" time="0.003" /><testcase classname="tests.unit.telvalidation.test_semantic_validator" name="test_sbd_valid_inputs" time="0.009" /><testcase classname="tests.unit.telvalidation.test_semantic_validator" name="test_sbd_invalid_inputs" time="0.010" /><testcase classname="tests.unit.telvalidation.test_semantic_validator" name="test_fetch_matched_capabilities_from_basic_capabilities" time="0.001" /><testcase classname="tests.unit.telvalidation.test_semantic_validator" name="test_search_and_return_value_from_basic_capabilities" time="0.001" /><testcase classname="tests.unit.telvalidation.test_semantic_validator" name="test_fetch_capabilities_from_osd_based_on_client_based_osd_data" time="0.001" /></testsuite></testsuites>
