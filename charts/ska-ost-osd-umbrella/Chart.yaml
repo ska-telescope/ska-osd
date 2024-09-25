@@ -2,10 +2,10 @@ apiVersion: v2
 name: ska-ost-osd-umbrella
 description: Helm umbrella chart for the OSD Services
 type: application
-version: 2.0.1
-appVersion: 2.0.1
+version: 2.1.0
+appVersion: 2.1.0
 icon: https://www.skatelescope.org/wp-content/uploads/2016/07/09545_NEW_LOGO_2014.png
 dependencies:
   - name: ska-ost-osd
-    version: 2.0.1
+    version: 2.1.0
     repository: file://../ska-ost-osd

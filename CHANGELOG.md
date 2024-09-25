@@ -5,10 +5,15 @@ Change Log
 All notable changes to this project will be documented in this file.
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
-unreleased
+2.1.0
 **************
 * Verify OSD version mapping behaviour along with remove hard coded error messages checks from OSD code.
 * Combined osd and semantic API input validations.
+* Updated the telmodel tag to 0.19.4
+
+unreleased
+**************
+
 
 2.0.1
 *****
