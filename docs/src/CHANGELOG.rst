@@ -5,6 +5,15 @@ Change Log
 All notable changes to this project will be documented in this file.
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
+2.1.0
+**************
+* Verify OSD version mapping behaviour along with remove hard coded error messages checks from OSD code.
+* Combined osd and semantic API input validations.
+* Updated the telmodel tag to 0.19.4
+  - TMC-Mid Configure v4.1: Added pointing.groups to bring OSO/TMC-Mid pointing interface up to date with ADR-63 (sky coordinates), ADR-106 (tracking and mapping), and ADR-94 (holography).
+  - TMC-Mid Configure v4.1: Deprecated pointing.target
+  - SKB-462 resolved
+
 2.0.1
 *****
 * Added CHANGELOG.rst into doc folder.
