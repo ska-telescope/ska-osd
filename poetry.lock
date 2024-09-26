@@ -2490,26 +2490,27 @@ name = "ska-telmodel"
 version = "1.19.4"
 description = "SKA telescope model library"
 optional = false
-python-versions = "^3.10.0"
-files = []
-develop = false
+python-versions = ">=3.10.0,<4.0.0"
+files = [
+    {file = "ska_telmodel-1.19.4-py3-none-any.whl", hash = "sha256:ad26e1b51516226cf7ca97f07692bebf2a8c18ce5ee9ae02cc21574f07951c58"},
+    {file = "ska_telmodel-1.19.4.tar.gz", hash = "sha256:0fb9a0c6b913f8b1f6cf8b8ccdad0ad368b1f31bcd2cdeb60da49a99781c199c"},
+]
 
 [package.dependencies]
-appdirs = "^1.4.4"
-filelock = "^3.15.4"
-gitpython = "^3.1.41"
-overrides = ">= 7.7.0"
-python-gitlab = "^3.8.0"
-pyyaml = "^6.0"
-schema = "^0.7.5"
-tomli = "^2.0.1"
-toolz = "^0.12.0"
+appdirs = ">=1.4.4,<2.0.0"
+filelock = ">=3.15.4,<4.0.0"
+gitpython = ">=3.1.41,<4.0.0"
+overrides = ">=7.7.0"
+python-gitlab = ">=3.8.0,<4.0.0"
+pyyaml = ">=6.0,<7.0"
+schema = ">=0.7.5,<0.8.0"
+tomli = ">=2.0.1,<3.0.0"
+toolz = ">=0.12.0,<0.13.0"
 
 [package.source]
-type = "git"
-url = "https://gitlab.com/ska-telescope/ska-telmodel.git"
-reference = "hm-529"
-resolved_reference = "5dba5fadcbe6aafd4da473f2ba31cd8f886340cf"
+type = "legacy"
+url = "https://artefact.skao.int/repository/pypi-internal/simple"
+reference = "skao"
 
 [[package]]
 name = "smmap"
@@ -3093,4 +3094,4 @@ reference = "PyPI-public"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "5ffc77d90ae98476bd7268f2cc835c7a5e2ba419c3d1c827f9cc6568628b2db1"
+content-hash = "6fe6934a3e0075ab24684476a374ca9098b81398f14bbe2ea282147754de45bd"
