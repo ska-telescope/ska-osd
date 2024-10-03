@@ -25,9 +25,16 @@ function GetCycleId ()
 
 function UpdateAndAddValue ()
 {
-    key_exists=$(jq --arg new_cycle_id "$new_cycle_id" --arg version "$1" --arg file_location "$version_mapping_file_location" 'select(has($new_cycle_id))[$new_cycle_id] = [$version]' $version_mapping_file_location > tmp.json && mv tmp.json $version_mapping_file_location)
-    key_not_exists=$(jq --arg new_cycle_id "$new_cycle_id" --arg version "$1" --arg file_location "$version_mapping_file_location" '[.] | map(. + {($new_cycle_id): [$version]}) | .[0]' $version_mapping_file_location  > tmp.json && mv tmp.json $version_mapping_file_location)
+    jq --arg new_cycle_id "$new_cycle_id" --arg version "$1" '
+        if has($new_cycle_id) then
+            .[$new_cycle_id] += [$version] | 
+            .[$new_cycle_id] = (.[$new_cycle_id] | unique)
+        else
+            .[$new_cycle_id] = [$version]
+        end
+    ' "$version_mapping_file_location" > tmp.json && mv tmp.json "$version_mapping_file_location"
 }
+
 
 CheckFileExists $observatory_file_location
 

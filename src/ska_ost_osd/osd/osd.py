@@ -93,34 +93,24 @@ class OSD:
             array_assembly=array_assembly,
         )
 
-        capabilities_dict = {}
+        telescope_capabilities = self.osd_data["observatory_policy"].get(
+            "telescope_capabilities", {}
+        )
 
         if not capabilities and not array_assembly:
-            capabilities_dict = self.osd_data["observatory_policy"][
-                "telescope_capabilities"
-            ]
-
-        elif capabilities and not array_assembly:
-            for capability in capabilities:
-                capabilities_dict[capability.capitalize()] = self.osd_data[
-                    "observatory_policy"
-                ]["telescope_capabilities"][capability.capitalize()]
-
-        elif not capabilities and array_assembly:
-            capabilities_dict = self.osd_data["observatory_policy"][
-                "telescope_capabilities"
-            ]
-
-            for key in capabilities_dict.keys():
-                capabilities_dict[key] = array_assembly
-
-        elif capabilities and array_assembly:
-            for capability in capabilities:
-                capabilities_dict[capability.capitalize()] = array_assembly
+            capabilities_dict = telescope_capabilities
+        else:
+            capabilities = [cap.capitalize() for cap in capabilities]
+            if array_assembly:
+                capabilities_dict = {cap: array_assembly for cap in capabilities}
+            else:
+                capabilities_dict = {
+                    cap: telescope_capabilities.get(cap, {}) for cap in capabilities
+                }
 
         return self.osd_data, capabilities_dict
 
-    def get_capabilities_and_array_assembly(
+    def __get_capabilities_and_array_assembly(
         self, tmdata, telescope_capabilities_dict: dict, osd_data: dict
     ) -> dict[dict[str, Any]]:
         """This method returns osd_data dictionary as
@@ -220,7 +210,7 @@ class OSD:
             (
                 capabilities_and_array_assembly,
                 err_msg,
-            ) = self.get_capabilities_and_array_assembly(
+            ) = self.__get_capabilities_and_array_assembly(
                 self.tmdata, telescope_capabilities_dict, osd_data
             )
             if err_msg:

@@ -66,6 +66,15 @@ To uninstall the chart, run
 make k8s-uninstall-chart
 ```
 
+### Release a new version
+
+This is a very crucial part for OSD, without this some functionality may break and exceptions and errors will be raised.
+
+```
+make osd-pre-release
+```
+
+
 # Deployments from CICD
 
 ### Deploying to non-production environments

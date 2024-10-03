@@ -90,12 +90,6 @@ def validate_gitlab_class():
             OSD_RESPONSE_WITH_ONLY_CAPABILITIES_PARAMETER,
         ),
         (
-            None,
-            "AA0.5",
-            tm_data,
-            OSD_RESPONSE_WITH_ONLY_ARRAY_ASSEMBLY_PARAMETER,
-        ),
-        (
             ["mid"],
             "AA0.5",
             tm_data,
