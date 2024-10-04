@@ -16,6 +16,8 @@ COPY tmdata /app/src/tmdata
 
 # Install runtime dependencies and the app
 RUN poetry config virtualenvs.create false
+
+RUN pip install poetry==1.8.3
 # Developers may want to add --dev to the poetry export for testing inside a container
 RUN poetry export --format requirements.txt --output poetry-requirements.txt --without-hashes && \
     pip install -r poetry-requirements.txt && \
