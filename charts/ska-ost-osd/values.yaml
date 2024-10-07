@@ -5,6 +5,7 @@ minikube: true
 
 system: OST
 subsystem: osd
+semantic_validation: true
 
 labels:
   app: ska-ost-osd

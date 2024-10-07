@@ -7,6 +7,7 @@ Integrated OSD API function to fetch rule constraints values.
 
 
 import logging
+from os import environ
 from typing import Any, Optional
 
 from pydantic import ValidationError
@@ -33,6 +34,8 @@ from .oet_tmc_validators import clear_semantic_variable_data, validate_json
 from .schematic_validation_exceptions import SchematicValidationError
 
 logging.getLogger("telvalidation")
+
+SEMANTIC_VALIDATION = environ.get("SEMANTIC_VALIDATION", "true")
 
 
 def get_validation_data(interface: str, telescope: str) -> Optional[str]:
@@ -308,44 +311,50 @@ def semantic_validate(
     Set False to only log the error messages.
     :returns: True if semantic validation passes, False otherwise.
     """
-    try:
-        SemanticModel(
-            observing_command_input=observing_command_input,
-            tm_data=tm_data,
-            array_assembly=array_assembly,
-            interface=interface,
-            raise_semantic=raise_semantic,
-            osd_data=osd_data,
-        )
-    except ValidationError as err:
-        raise err
-    except SemanticModelError as semantic_error:
-        raise semantic_error
-    clear_semantic_variable_data()
-    version = observing_command_input.get("interface") or interface
-    telescope = observing_command_input.get("telescope")
+    if SEMANTIC_VALIDATION == "true":
+        try:
+            SemanticModel(
+                observing_command_input=observing_command_input,
+                tm_data=tm_data,
+                array_assembly=array_assembly,
+                interface=interface,
+                raise_semantic=raise_semantic,
+                osd_data=osd_data,
+            )
+        except ValidationError as err:
+            raise err
+        except SemanticModelError as semantic_error:
+            raise semantic_error
+        clear_semantic_variable_data()
+        version = observing_command_input.get("interface") or interface
+        telescope = observing_command_input.get("telescope")
 
-    if not version:
-        message = (
-            "Interface is missing from observing_command_input. Please provide"
-            " interface='...' explicitly."
-        )
-        logging.warning(message)
-        raise SchematicValidationError(message)
+        if not version:
+            message = (
+                "Interface is missing from observing_command_input. Please provide"
+                " interface='...' explicitly."
+            )
+            logging.warning(message)
+            raise SchematicValidationError(message)
 
-    msg_list = validate_command_input(
-        observing_command_input, tm_data, version, telescope, array_assembly, osd_data
-    )
-    msg_list = [msg for msg in msg_list if msg]  # Remove None values
-
-    if msg_list:
-        msg = "\n".join(msg_list)
-        logging.error(
-            "Also following errors were encountered during semantic %s",
-            "validations:\n{msg}",
+        msg_list = validate_command_input(
+            observing_command_input,
+            tm_data,
+            version,
+            telescope,
+            array_assembly,
+            osd_data,
         )
-        if raise_semantic:
-            raise SchematicValidationError(msg)
-        return False
+        msg_list = [msg for msg in msg_list if msg]  # Remove None values
+
+        if msg_list:
+            msg = "\n".join(msg_list)
+            logging.error(
+                "Also following errors were encountered during semantic %s",
+                "validations:\n{msg}",
+            )
+            if raise_semantic:
+                raise SchematicValidationError(msg)
+            return False
 
     return True

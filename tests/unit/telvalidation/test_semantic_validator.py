@@ -19,6 +19,7 @@ from ska_ost_osd.telvalidation.schematic_validation_exceptions import (
     SchematicValidationError,
 )
 from ska_ost_osd.telvalidation.semantic_validator import (
+    SEMANTIC_VALIDATION,
     fetch_capabilities_from_osd,
     semantic_validate,
 )
@@ -253,24 +254,25 @@ def test_semantic_validate_para(
     del config["interface"]  # to test use of interface key
     # sample values that pass semantic only
 
-    with pytest.raises(
-        SchematicValidationError,
-        match=(
-            "Interface is missing from observing_command_input. Please provide"
-            " interface='...' explicitly."
-        ),
-    ):
-        semantic_validate(config, tm_data)
+    if SEMANTIC_VALIDATION == "true":
+        with pytest.raises(
+            SchematicValidationError,
+            match=(
+                "Interface is missing from observing_command_input. Please provide"
+                " interface='...' explicitly."
+            ),
+        ):
+            semantic_validate(config, tm_data)
 
-    config["interface"] = interface
+        config["interface"] = interface
 
-    if not is_exception:
-        assert semantic_validate(config, tm_data=tm_data), expected_result
-    else:
-        try:
-            semantic_validate(config, tm_data=tm_data)
-        except SchematicValidationError as error:
-            assert error.message == expected_result
+        if not is_exception:
+            assert semantic_validate(config, tm_data=tm_data), expected_result
+        else:
+            try:
+                semantic_validate(config, tm_data=tm_data)
+            except SchematicValidationError as error:
+                assert error.message == expected_result
 
 
 @patch("ska_ost_osd.telvalidation.semantic_validator.fetch_capabilities_from_osd")
@@ -283,16 +285,17 @@ def test_validate_scemantic_json_input_keys(mock6):
         osd_capabilities[ARRAY_ASSEMBLY],
         osd_capabilities["basic_capabilities"],
     )
-    with pytest.raises(
-        SchemanticValdidationKeyError,
-        match="Invalid rule and error key passed",
-    ):
-        validate_json(
-            INVALID_MID_VALIDATE_CONSTANT["AA0.5"]["assign_resource"],
-            INPUT_COMMAND_CONFIG,
-            parent_path_list=[],
-            capabilities=capabilities,
-        )
+    if SEMANTIC_VALIDATION == "true":
+        with pytest.raises(
+            SchemanticValdidationKeyError,
+            match="Invalid rule and error key passed",
+        ):
+            validate_json(
+                INVALID_MID_VALIDATE_CONSTANT["AA0.5"]["assign_resource"],
+                INPUT_COMMAND_CONFIG,
+                parent_path_list=[],
+                capabilities=capabilities,
+            )
 
 
 def test_tmc_configure_ra_dec():

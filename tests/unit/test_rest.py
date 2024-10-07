@@ -5,6 +5,7 @@ import pytest
 
 from ska_ost_osd.rest import get_openapi_spec, init_app
 from ska_ost_osd.rest.api.resources import validation_response
+from ska_ost_osd.telvalidation.semantic_validator import SEMANTIC_VALIDATION
 from tests.conftest import BASE_API_URL
 
 
@@ -326,8 +327,9 @@ def test_semantic_validate_api(
     json_body = request.getfixturevalue(json_body_to_validate)
     expected_response = request.getfixturevalue(response)
 
-    res = client.post(f"{BASE_API_URL}/semantic_validation", json=json_body)
-    assert res.get_json() == expected_response
+    if SEMANTIC_VALIDATION == "true":
+        res = client.post(f"{BASE_API_URL}/semantic_validation", json=json_body)
+        assert res.get_json() == expected_response
 
 
 def test_semantic_validate_api_not_passing_required_keys(
