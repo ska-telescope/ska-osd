@@ -195,6 +195,31 @@ There are some steps of this framework these are as follows:
     .. autofunction:: ska_ost_osd.telvalidation.semantic_validator.semantic_validate
 
 
+
+Ability to turn Semantic Validation off/on in real-time
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+To turn semantic validation off/on in real-time user need to create environment variable into helm charts. 
+This will allow user to control semantic validation in real-time.
+
+Here are the steps to do this:
+  * Identify the chart: First, determine which chart(s) you want to modify. This could be your main 
+    application chart or a specific component chart.
+  
+  * Open the values.yaml file in your chart directory and add a new entry for the semantic validation flag:
+    This allows users to configure the value when installing or upgrading the chart.
+
+    .. code::
+
+        semantic_validation: true
+
+  * Add path of environment variable into environment.yaml file.
+
+    .. code::
+      
+        SEMANTIC_VALIDATION: {{ .Values.semantic_validation | quote }}
+
+
+
 Integration of OSD API into semantic validation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Integrated OSD capabilities into semantic validation rule file currently added support for ``mid-validation-contant.json``
