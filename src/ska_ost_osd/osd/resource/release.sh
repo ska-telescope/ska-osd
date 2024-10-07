@@ -35,7 +35,6 @@ function UpdateAndAddValue ()
     ' "$version_mapping_file_location" > tmp.json && mv tmp.json "$version_mapping_file_location"
 }
 
-
 CheckFileExists $observatory_file_location
 
 if [ $? -eq 0 ]; then

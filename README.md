@@ -69,6 +69,7 @@ make k8s-uninstall-chart
 ### Release a new version
 
 This is a very crucial part for OSD, without this some functionality may break and exceptions and errors will be raised.
+Run Below command from Command line.
 
 ```
 make osd-pre-release
