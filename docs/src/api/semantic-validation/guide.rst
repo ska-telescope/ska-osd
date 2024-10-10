@@ -201,23 +201,24 @@ Ability to turn Semantic Validation off/on in real-time
 To turn semantic validation off/on in real-time user need to create environment variable into helm charts. 
 This will allow user to control semantic validation in real-time.
 
-Here are the steps to do this:
-  * Identify the chart: First, determine which chart(s) you want to modify. This could be your main 
-    application chart or a specific component chart.
-  
-  * Open the values.yaml file in your chart directory and add a new entry for the semantic validation flag:
-    This allows users to configure the value when installing or upgrading the chart.
+The purpose of this environment variable, is likely to control whether semantic validation 
+should be performed in the program. By using an environment variable, the behavior can be easily 
+changed without modifying the code itself, which is useful for different deployment environments or testing scenarios.
 
-    .. code::
+Steps to add and change the SEMANTIC_VALIDATION environment variable:
 
-        semantic_validation: true
+   * Setting the environment variable:
 
-  * Add path of environment variable into environment.yaml file.
+      .. code::
 
-    .. code::
+            from os import environ
+            SEMANTIC_VALIDATION = environ.get("SEMANTIC_VALIDATION", "true")
+
+   * Changing the value: User can change the value by running below command with a different value.
+
+      .. code::
       
-        SEMANTIC_VALIDATION: {{ .Values.semantic_validation | quote }}
-
+            export SEMANTIC_VALIDATION="false"
 
 
 Integration of OSD API into semantic validation

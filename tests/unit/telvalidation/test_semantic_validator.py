@@ -250,11 +250,12 @@ def test_semantic_validate_para(
         osd_capabilities[ARRAY_ASSEMBLY],
         osd_capabilities["basic_capabilities"],
     )
-    interface = config["interface"]
-    del config["interface"]  # to test use of interface key
-    # sample values that pass semantic only
 
+    interface = config["interface"]
     if SEMANTIC_VALIDATION == "true":
+        del config["interface"]  # to test use of interface key
+        # sample values that pass semantic only
+
         with pytest.raises(
             SchematicValidationError,
             match=(
