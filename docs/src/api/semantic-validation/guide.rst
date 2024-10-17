@@ -205,20 +205,20 @@ The purpose of this environment variable, is likely to control whether semantic 
 should be performed in the program. By using an environment variable, the behavior can be easily 
 changed without modifying the code itself, which is useful for different deployment environments or testing scenarios.
 
-Steps to add and change the SEMANTIC_VALIDATION environment variable:
+Steps to add and change the VALIDATION_STRICTNESS environment variable:
 
    * Setting the environment variable:
 
       .. code::
 
             from os import environ
-            SEMANTIC_VALIDATION = environ.get("SEMANTIC_VALIDATION", "true")
+            VALIDATION_STRICTNESS = environ.get("VALIDATION_STRICTNESS", "2")
 
    * Changing the value: User can change the value by running below command with a different value.
 
       .. code::
       
-            export SEMANTIC_VALIDATION="false"
+            export VALIDATION_STRICTNESS="1"
 
 
 Integration of OSD API into semantic validation

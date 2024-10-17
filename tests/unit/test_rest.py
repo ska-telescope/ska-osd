@@ -5,7 +5,6 @@ import pytest
 
 from ska_ost_osd.rest import get_openapi_spec, init_app
 from ska_ost_osd.rest.api.resources import validation_response
-from ska_ost_osd.telvalidation.semantic_validator import SEMANTIC_VALIDATION
 from tests.conftest import BASE_API_URL
 
 
@@ -327,9 +326,8 @@ def test_semantic_validate_api(
     json_body = request.getfixturevalue(json_body_to_validate)
     expected_response = request.getfixturevalue(response)
 
-    if SEMANTIC_VALIDATION == "true":
-        res = client.post(f"{BASE_API_URL}/semantic_validation", json=json_body)
-        assert res.get_json() == expected_response
+    res = client.post(f"{BASE_API_URL}/semantic_validation", json=json_body)
+    assert res.get_json() == expected_response
 
 
 def test_semantic_validate_api_not_passing_required_keys(
@@ -338,12 +336,11 @@ def test_semantic_validate_api_not_passing_required_keys(
     """
     Test semantic validation API response with missing input observing_command_input key
     """
-    if SEMANTIC_VALIDATION == "true":
-        json_body = valid_semantic_validation_body.copy()
-        del json_body["observing_command_input"]
-        expected_response = observing_command_input_missing_response
-        res = client.post(f"{BASE_API_URL}/semantic_validation", json=json_body)
-        assert res.get_json() == expected_response
+    json_body = valid_semantic_validation_body.copy()
+    del json_body["observing_command_input"]
+    expected_response = observing_command_input_missing_response
+    res = client.post(f"{BASE_API_URL}/semantic_validation", json=json_body)
+    assert res.get_json() == expected_response
 
 
 @patch("ska_ost_osd.rest.api.resources.get_tmdata_sources")

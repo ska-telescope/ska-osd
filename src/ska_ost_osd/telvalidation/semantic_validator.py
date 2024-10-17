@@ -35,7 +35,7 @@ from .schematic_validation_exceptions import SchematicValidationError
 
 logging.getLogger("telvalidation")
 
-SEMANTIC_VALIDATION = environ.get("SEMANTIC_VALIDATION", "true")
+VALIDATION_STRICTNESS = environ.get("VALIDATION_STRICTNESS", "2")
 
 
 def get_validation_data(interface: str, telescope: str) -> Optional[str]:
@@ -311,7 +311,7 @@ def semantic_validate(
     Set False to only log the error messages.
     :returns: True if semantic validation passes, False otherwise.
     """
-    if SEMANTIC_VALIDATION == "true":
+    if VALIDATION_STRICTNESS == "2":
         try:
             SemanticModel(
                 observing_command_input=observing_command_input,
