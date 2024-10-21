@@ -30,6 +30,13 @@ docs-pre-build:
 .PHONY: docs-pre-build
 
 IMAGE_TO_TEST = $(CAR_OCI_REGISTRY_HOST)/$(strip $(OCI_IMAGE)):$(VERSION)
+K8S_CHART = ska-ost-osd-umbrella
+
+ # Set cluster_domain to minikube default (cluster.local) in local development
+# (CI_ENVIRONMENT_SLUG should only be defined when running on the CI/CD pipeline)
+ifeq ($(CI_ENVIRONMENT_SLUG),)
+K8S_CHART_PARAMS += --set global.cluster_domain="cluster.local"
+endif
 
 # For the test, dev and integration environment, use the freshly built image in the GitLab registry
 ENV_CHECK := $(shell echo $(CI_ENVIRONMENT_SLUG) | egrep 'test|dev|integration')
