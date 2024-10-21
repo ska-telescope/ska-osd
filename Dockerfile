@@ -1,8 +1,6 @@
-ARG BUILD_IMAGE="artefact.skao.int/ska-tango-images-pytango-builder:9.5.0"
-ARG BASE_IMAGE="artefact.skao.int/ska-tango-images-pytango-runtime:9.5.0"
+FROM artefact.skao.int/ska-tango-images-pytango-builder:9.5.0 AS buildenv
+FROM artefact.skao.int/ska-tango-images-pytango-runtime:9.5.0 AS runtime
 
-FROM $BUILD_IMAGE AS buildenv
-FROM $BASE_IMAGE AS runtime
 
 ARG CAR_PYPI_REPOSITORY_URL=https://artefact.skao.int/repository/pypi-internal
 ENV PIP_INDEX_URL=${CAR_PYPI_REPOSITORY_URL}
@@ -18,6 +16,8 @@ COPY tmdata /app/src/tmdata
 
 # Install runtime dependencies and the app
 RUN poetry config virtualenvs.create false
+
+RUN pip install poetry==1.8.3
 # Developers may want to add --dev to the poetry export for testing inside a container
 RUN poetry export --format requirements.txt --output poetry-requirements.txt --without-hashes && \
     pip install -r poetry-requirements.txt && \
