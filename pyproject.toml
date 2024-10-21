@@ -14,14 +14,23 @@ include = [
     { path = 'tests' }
 ]
 
+classifiers = [
+    'Development Status :: 2 - Pre-Alpha',
+    'Intended Audience :: Developers',
+    'License :: OSI Approved :: BSD License',
+    'Natural Language :: English',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.10',
+]
+
 
 [[tool.poetry.source]]
-name = 'skao'
+name = 'ska-nexus'
 url = 'https://artefact.skao.int/repository/pypi-internal/simple'
 
 [[tool.poetry.source]]
-name = "PyPI-public"
-url = 'https://pypi.org/simple'
+name = 'PyPI'
+priority = 'primary'
 
 [tool.poetry.dependencies]
 python = "^3.10"

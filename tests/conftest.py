@@ -1,3 +1,5 @@
+from importlib.metadata import version
+
 import pytest
 
 from ska_ost_osd.rest import init_app
@@ -10,6 +12,8 @@ from tests.unit.telvalidation.test_semantic_validator import (
 
 # flake8: noqa E501
 # pylint: disable=W0621
+OSD_MAJOR_VERSION = version("ska-ost-osd").split(".")[0]
+BASE_API_URL = f"/ska-ost-osd/osd/api/v{OSD_MAJOR_VERSION}"
 
 
 @pytest.fixture

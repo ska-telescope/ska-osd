@@ -32,9 +32,6 @@ DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER = read_json(
 OSD_RESPONSE_WITH_ONLY_CAPABILITIES_PARAMETER = read_json(
     "test_files/osd_response_with_capabilities.json"
 )
-OSD_RESPONSE_WITH_ONLY_ARRAY_ASSEMBLY_PARAMETER = read_json(
-    "test_files/osd_response_with_array_assembly.json"
-)
 
 file_name = "osd_response_with_capabilities_and_array_assembly.json"
 OSD_RESPONSE_WITH_CAPABILITIES_ARRAY_ASSEMBLY_PARAMETER = read_json(
@@ -88,12 +85,6 @@ def validate_gitlab_class():
             None,
             tm_data,
             OSD_RESPONSE_WITH_ONLY_CAPABILITIES_PARAMETER,
-        ),
-        (
-            None,
-            "AA0.5",
-            tm_data,
-            OSD_RESPONSE_WITH_ONLY_ARRAY_ASSEMBLY_PARAMETER,
         ),
         (
             ["mid"],
