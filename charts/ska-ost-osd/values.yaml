@@ -3,7 +3,7 @@
 # Declare variables to be passed into your templates.
 minikube: true
 
-system: OST
+system: ost
 subsystem: osd
 
 labels:
@@ -15,7 +15,7 @@ global:
 
 rest:
   component: rest
-  function: osd
+  function: ost
   domain: operations
   production: false
   logLevel: info
