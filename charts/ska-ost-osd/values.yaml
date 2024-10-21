@@ -11,12 +11,13 @@ labels:
 
 global:
   minikube: true
-  cluster_domain: cluster.local
+  cluster_domain: techops.internal.skao.int
 
 rest:
   component: rest
   function: osd
   domain: operations
+  production: false
   logLevel: info
   enabled: true
   image:
