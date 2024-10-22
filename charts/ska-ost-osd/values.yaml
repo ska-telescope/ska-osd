@@ -15,10 +15,10 @@ global:
 
 rest:
   component: rest
-  function: ost
+  function: backend
   domain: operations
   production: false
-  logLevel: info
+  logLevel: INFO
   enabled: true
   image:
     registry: artefact.skao.int
