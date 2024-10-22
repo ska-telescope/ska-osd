@@ -103,6 +103,29 @@ Alternatively use the following command
 make rest
 ```
 
+# Ability to turn Semantic Validation off/on in real-time
+
+To turn semantic validation off/on in real-time user need to create environment variable into helm charts. 
+This will allow user to control semantic validation in real-time.
+
+The purpose of this environment variable, is likely to control whether semantic validation 
+should be performed in the program. By using an environment variable, the behavior can be easily 
+changed without modifying the code itself, which is useful for different deployment environments or testing scenarios.
+
+Setting the environment variable:
+
+```
+from os import environ
+VALIDATION_STRICTNESS = environ.get("VALIDATION_STRICTNESS", "2")
+```
+
+User can turn off the semantic validation by running below command.
+
+```      
+export VALIDATION_STRICTNESS="1"
+```
+
+
 # Documentation
 
 [![Documentation Status](https://readthedocs.org/projects/ska-telescope-ska-ost-osd/badge/?version=latest)](https://developer.skao.int/projects/ska-ost-osd/en/latest/?badge=latest)
