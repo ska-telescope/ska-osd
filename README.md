@@ -114,6 +114,8 @@ changed without modifying the code itself, which is useful for different deploym
 
 Setting the environment variable:
 
+## On Local Environment
+
 ```
 from os import environ
 VALIDATION_STRICTNESS = environ.get("VALIDATION_STRICTNESS", "2")
@@ -123,6 +125,28 @@ User can turn off the semantic validation by running below command.
 
 ```      
 export VALIDATION_STRICTNESS="1"
+```
+
+## On Minikube Environment
+
+  
+Add the `validation_strictness` environment variable into values.yaml file in your chart directory
+This allows users to configure the value when installing or upgrading the chart.
+
+```
+validation_strictness: 2
+```
+
+Add path of environment variable into environment.yaml file.
+
+```
+VALIDATION_STRICTNESS: {{.Values.validation_strictness  | quote }}
+```
+
+Insatll charts
+
+```
+make k8s-install-chart
 ```
 
 

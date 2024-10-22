@@ -14,10 +14,7 @@ from ska_ost_osd.osd.osd_schema_validator import OSDModelError
 from ska_ost_osd.telvalidation import SchematicValidationError, semantic_validate
 from ska_ost_osd.telvalidation.constant import (
     CAR_TELMODEL_SOURCE,
-    RESPONSE_MSG,
     SEMANTIC_VALIDATION_VALUE,
-    TITLE,
-    VALID_RESPONSE_MSG,
 )
 from ska_ost_osd.telvalidation.semantic_validator import VALIDATION_STRICTNESS
 
@@ -179,15 +176,15 @@ def semantically_validate_json(body: dict):
     if int(VALIDATION_STRICTNESS) < int(SEMANTIC_VALIDATION_VALUE):
         return validation_response(
             status=0,
-            detail=RESPONSE_MSG,
-            title=TITLE,
+            detail="Semantic Validation is currently disable",
+            title="Semantic validation",
             http_status=HTTPStatus.OK,
         )
     else:
         return validation_response(
             status=0,
-            detail=VALID_RESPONSE_MSG,
-            title=TITLE,
+            detail="JSON is semantically valid",
+            title="Semantic validation",
             http_status=HTTPStatus.OK,
         )
 
