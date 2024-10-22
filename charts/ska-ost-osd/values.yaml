@@ -3,7 +3,7 @@
 # Declare variables to be passed into your templates.
 minikube: true
 
-system: OST
+system: ost
 subsystem: osd
 
 labels:
@@ -11,13 +11,14 @@ labels:
 
 global:
   minikube: true
-  cluster_domain: cluster.local
+  cluster_domain: techops.internal.skao.int
 
 rest:
   component: rest
-  function: osd
+  function: backend
   domain: operations
-  logLevel: info
+  production: false
+  logLevel: INFO
   enabled: true
   image:
     registry: artefact.skao.int

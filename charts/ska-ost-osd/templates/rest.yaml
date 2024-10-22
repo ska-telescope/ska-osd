@@ -13,7 +13,6 @@ metadata:
     domain: {{ .Values.rest.domain }}
     intent: production
   annotations:
-    kubernetes.io/ingress.class: nginx
 spec:
   rules:
     - http:
