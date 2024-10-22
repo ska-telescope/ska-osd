@@ -332,6 +332,31 @@ def test_semantic_validate_api(
     assert res.get_json() == expected_response
 
 
+@patch("ska_ost_osd.telvalidation.semantic_validator.VALIDATION_STRICTNESS", "1")
+@patch("ska_ost_osd.rest.api.resources.VALIDATION_STRICTNESS", "1")
+@patch("ska_ost_osd.rest.api.resources.get_tmdata_sources")
+@pytest.mark.parametrize(
+    "json_body_to_validate, response",
+    [
+        ("valid_semantic_validation_body", "semantic_validation_disable_response"),
+        ("invalid_semantic_validation_body", "semantic_validation_disable_response"),
+    ],
+)
+def test_disable_semantic_validate_api(
+    mock_tmdata, client, request, json_body_to_validate, response
+):
+    """
+    Test semantic validation API when VALIDATION_STRICTNESS is set to 1
+    """
+    mock_tmdata.return_value = ["file://tmdata"]
+    json_body = request.getfixturevalue(json_body_to_validate)
+    expected_response = request.getfixturevalue(response)
+
+    res = client.post(f"{BASE_API_URL}/semantic_validation", json=json_body)
+
+    assert res.get_json() == expected_response
+
+
 def test_semantic_validate_api_not_passing_required_keys(
     client, observing_command_input_missing_response, valid_semantic_validation_body
 ):
