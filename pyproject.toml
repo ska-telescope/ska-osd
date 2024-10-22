@@ -47,9 +47,6 @@ jsonschema = "4.17.3"
 ska-telmodel = "^1.19.4"
 astropy = "^5.1"
 simpleeval = "^0.9.13"
-pydantic = "^2.7.0"
-pydantic-core = "^2.18.1"
-deepdiff = "^5.8.1"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -70,6 +67,9 @@ pytest-repeat = "^0.9.1"
 pytest-timeout = "^2.0.1"
 platformdirs = "^2.5.1"
 requests-mock = "^1.9.3"
+pydantic = "^2.7.0"
+pydantic-core = "^2.18.1"
+deepdiff = "^5.8.1"
 
 
 [tool.poetry.group.docs.dependencies]
