@@ -11,4 +11,5 @@ metadata:
     intent: production
 data:
   KUBE_NAMESPACE: {{ .Release.Namespace }}
+  VALIDATION_STRICTNESS: {{.Values.validation_strictness  | quote }}
 

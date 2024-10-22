@@ -195,6 +195,32 @@ There are some steps of this framework these are as follows:
     .. autofunction:: ska_ost_osd.telvalidation.semantic_validator.semantic_validate
 
 
+
+Ability to turn Semantic Validation off/on in real-time
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+To turn semantic validation off/on in real-time user need to create environment variable into helm charts. 
+This will allow user to control semantic validation in real-time.
+
+The purpose of this environment variable, is likely to control whether semantic validation 
+should be performed in the program. By using an environment variable, the behavior can be easily 
+changed without modifying the code itself, which is useful for different deployment environments or testing scenarios.
+
+Steps to add and change the VALIDATION_STRICTNESS environment variable:
+
+   * Setting the environment variable:
+
+      .. code::
+
+            from os import environ
+            VALIDATION_STRICTNESS = environ.get("VALIDATION_STRICTNESS", "2")
+
+   * Changing the value: User can change the value by running below command with a different value.
+
+      .. code::
+      
+            export VALIDATION_STRICTNESS="1"
+
+
 Integration of OSD API into semantic validation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Integrated OSD capabilities into semantic validation rule file currently added support for ``mid-validation-contant.json``
