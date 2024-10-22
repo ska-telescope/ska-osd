@@ -8,6 +8,10 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 unreleased
 **************
 
+2.2.0
+*******
+* Added VALIDATION_STRICTNESS environment variable to enable the functionality of semantic validation to turn on/off.
+
 2.1.0
 **************
 * Verify OSD version mapping behaviour along with remove hard coded error messages checks from OSD code.
