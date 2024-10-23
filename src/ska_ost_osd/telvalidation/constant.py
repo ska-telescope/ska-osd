@@ -31,3 +31,5 @@ CONFIGURE = "configure"
 CAR_TELMODEL_SOURCE = ("car:ost/ska-ost-osd?main#tmdata",)
 
 INTERFACE_PATTERN = r"^https://schema\.skao\.int/[a-zA-Z-]+/\d+\.\d+$"
+
+SEMANTIC_VALIDATION_VALUE = 2
