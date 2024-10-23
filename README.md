@@ -143,7 +143,7 @@ Add path of environment variable into environment.yaml file.
 VALIDATION_STRICTNESS: {{.Values.validation_strictness  | quote }}
 ```
 
-Insatll charts
+Install charts
 
 ```
 make k8s-install-chart
