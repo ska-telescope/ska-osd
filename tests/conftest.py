@@ -785,6 +785,15 @@ def valid_semantic_validation_response():
 
 
 @pytest.fixture
+def semantic_validation_disable_response():
+    return {
+        "status": 0,
+        "detail": "Semantic Validation is currently disable",
+        "title": "Semantic validation",
+    }
+
+
+@pytest.fixture
 def invalid_semantic_validation_body(
     tmdata_source, mid_osd_data, invalid_observing_command_input
 ):

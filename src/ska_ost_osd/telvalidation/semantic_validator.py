@@ -25,6 +25,7 @@ from .constant import (
     LOW_VALIDATION_CONSTANT_JSON_FILE_PATH,
     MID_SBD_VALIDATION_CONSTANT_JSON_FILE_PATH,
     MID_VALIDATION_CONSTANT_JSON_FILE_PATH,
+    SEMANTIC_VALIDATION_VALUE,
     SKA_LOW_SBD,
     SKA_LOW_TELESCOPE,
     SKA_MID_SBD,
@@ -311,7 +312,7 @@ def semantic_validate(
     Set False to only log the error messages.
     :returns: True if semantic validation passes, False otherwise.
     """
-    if VALIDATION_STRICTNESS == "2":
+    if int(VALIDATION_STRICTNESS) == SEMANTIC_VALIDATION_VALUE:
         try:
             SemanticModel(
                 observing_command_input=observing_command_input,
