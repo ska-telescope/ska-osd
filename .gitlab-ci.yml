@@ -81,6 +81,11 @@ test-dev-environment:
 stop-dev-environment:
   <<: *dev_env
 
+osd-tmdata-publish:
+  stage: publish
+  script:
+    - make osddata-do-publish
+
 include:
   # Python
   - project: "ska-telescope/templates-repository"
@@ -106,6 +111,3 @@ include:
   # deploy steps
   - project: "ska-telescope/templates-repository"
     file: "gitlab-ci/includes/deploy.gitlab-ci.yml"
-  # Telescope model data job
-  - project: "ska-telescope/templates-repository"
-    file: "gitlab-ci/includes/tmdata.gitlab-ci.yml"
