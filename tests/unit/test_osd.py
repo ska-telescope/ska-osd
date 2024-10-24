@@ -7,6 +7,9 @@ import pytest
 from ska_telmodel.data import TMData
 
 from ska_ost_osd.osd.osd import get_osd_data, osd_tmdata_source
+from tests.conftest import load_osd_versions
+
+OSD_VERSIONS = load_osd_versions()
 
 
 def read_json(json_file_location: str) -> dict[dict[str, Any]]:
@@ -227,28 +230,23 @@ def test_invalid_osd_tmdata_source():
     ]
 
 
-# TODO: Commenting this test cause it contains hardcoded tmdata version.
-# Will remove these hardcoded tmdata versions
+def test_invalid_source():
+    """This test case checks when gitlab_branch is given source
+    should be gitlab else will raise / return error..
+    """
+    _, error_msgs = osd_tmdata_source(
+        cycle_id=1,
+        gitlab_branch="main",
+        source="file",
+    )
 
-# def test_invalid_source():
-#     """This test case checks when gitlab_branch is given source
-#     should be gitlab else will raise / return error..
-#     """
-#     _, error_msgs = osd_tmdata_source(
-#         cycle_id=1,
-#         gitlab_branch="main",
-#         source="file",
-#     )
+    expected_error_msg = ", ".join([str(err) for err in error_msgs])
 
-#     expected_error_msg = ", ".join([str(err) for err in error_msgs])
-
-#     assert (
-#         expected_error_msg
-#         == "Source file is not valid, OSD Version main is not valid,Available OSD"
-#         " Versions are ['1.0.0', '1.0.1', '1.0.2', '1.0.3', '2.0.0', '2.0.1',"
-#         " '2.1.0']"
-
-#     )
+    assert (
+        expected_error_msg
+        == "Source file is not valid, OSD Version main is not valid,Available OSD"
+        f" Versions are {OSD_VERSIONS}"
+    )
 
 
 def test_invalid_get_osd_data_capability(tm_data):  # pylint: disable=W0621

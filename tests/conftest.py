@@ -1,3 +1,5 @@
+import json
+import os
 from importlib.metadata import version
 
 import pytest
@@ -36,6 +38,28 @@ def client():
     app = init_app()
     with app.test_client() as client:  # pylint: disable=W0621
         yield client
+
+
+def load_osd_versions():
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(current_dir)
+    json_path = os.path.join(
+        parent_dir,
+        "src",
+        "ska_ost_osd",
+        "osd",
+        "version_mapping",
+        "cycle_gitlab_release_version_mapping.json",
+    )
+
+    with open(json_path, "r", encoding="utf-8") as file:
+        data = json.load(file)
+
+    all_versions = set()
+    for cycle_versions in data.values():
+        all_versions.update(cycle_versions)
+
+    return sorted(list(all_versions))
 
 
 @pytest.fixture

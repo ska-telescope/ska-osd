@@ -5,7 +5,9 @@ import pytest
 
 from ska_ost_osd.rest import get_openapi_spec, init_app
 from ska_ost_osd.rest.api.resources import validation_response
-from tests.conftest import BASE_API_URL
+from tests.conftest import BASE_API_URL, load_osd_versions
+
+OSD_VERSIONS = load_osd_versions()
 
 
 def test_init_app(open_api_spec):
@@ -147,23 +149,21 @@ def test_init_app_client(client, open_api_spec):
                 "title": "Value Error",
             },
         ),
-        # TODO: Commenting this test cause it contains hardcoded tmdata version.
-        # Will remove these hardcoded tmdata versions
-        # (
-        #     1,
-        #     "3.0.7",
-        #     None,
-        #     ["mid"],
-        #     None,
-        #     {
-        #         "detail": [
-        #             "OSD Version 3.0.7 is not valid,Available OSD Versions are"
-        #             " ['1.0.0', '1.0.1', '1.0.2', '1.0.3', '2.0.0', '2.0.1', '2.1.0']"
-        #         ],
-        #         "status": -1,
-        #         "title": "Value Error",
-        #     },
-        # ),
+        (
+            1,
+            "3.0.7",
+            None,
+            ["mid"],
+            None,
+            {
+                "detail": [
+                    "OSD Version 3.0.7 is not valid,Available OSD Versions are"
+                    f" {OSD_VERSIONS}"
+                ],
+                "status": -1,
+                "title": "Value Error",
+            },
+        ),
     ],
 )
 def test_invalid_osd_tmdata_source(
