@@ -20,10 +20,6 @@ stages:
   - deploy
   - lint
   - publish
-  - pages
-  - scan
-  - integration
-  - staging
 
 test-chart-templates:
   stage: test
@@ -86,28 +82,11 @@ osd-tmdata-publish:
   script:
     - make osddata-do-publish
 
+# Include CI templates
 include:
-  # OCI
-  - project: "ska-telescope/templates-repository"
-    file: "gitlab-ci/includes/oci-image.gitlab-ci.yml"
-  # Helm Chart linting and Publish
-  - project: "ska-telescope/templates-repository"
-    file: "gitlab-ci/includes/helm-chart.gitlab-ci.yml"
-  # Docs pages
-  - project: "ska-telescope/templates-repository"
-    file: "gitlab-ci/includes/docs.gitlab-ci.yml"
-  # .post step finalisers eg: badges
-  - project: "ska-telescope/templates-repository"
-    file: "gitlab-ci/includes/finaliser.gitlab-ci.yml"
-  # change log
-  - project: "ska-telescope/templates-repository"
-    file: "gitlab-ci/includes/changelog.gitlab-ci.yml"
-  # release notes
-  - project: "ska-telescope/templates-repository"
-    file: "gitlab-ci/includes/release.gitlab-ci.yml"
-  # deploy steps
-  - project: "ska-telescope/templates-repository"
-    file: "gitlab-ci/includes/deploy.gitlab-ci.yml"
-  # Telescope model data job
-  - project: "ska-telescope/templates-repository"
-    file: "gitlab-ci/includes/tmdata.gitlab-ci.yml"
+  - project: 'ska-telescope/templates-repository'
+    file: 'gitlab-ci/includes/tmdata.gitlab-ci.yml'
+  - project: 'ska-telescope/templates-repository'
+    file: 'gitlab-ci/includes/python-lint.gitlab-ci.yml'
+  - project: 'ska-telescope/templates-repository'
+    file: 'gitlab-ci/includes/python-test.gitlab-ci.yml'
