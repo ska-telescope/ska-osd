@@ -324,7 +324,7 @@ def validate_json(
      along with its business semantic validation rules and error messages.
     :param command_input_json_config: Dictionary containing details of the command input
      which needs validation.
-    This is the same as for ska_telmodel.schema.validate.
+     This is the same as for ska_telmodel.schema.validate.
     :param parent_path_list: List representing the current parent path.
     :param capabilities: Defined key-value structure pair from the OSD API.
     :return: error_msg_list: List containing all combined errors arising due

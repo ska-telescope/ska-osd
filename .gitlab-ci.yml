@@ -9,6 +9,7 @@ default:
 
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
+  DOCS_RTD_PROJECT_SLUG: ska-telescope-ska-ost-osd
 
 # The YAML file defines a set of jobs with constraints stating when they should be run.
 # You can specify an unlimited number of jobs which are defined as top-level elements with an arbitrary name and always have to contain at least the script clause.

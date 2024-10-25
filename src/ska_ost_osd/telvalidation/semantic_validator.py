@@ -297,19 +297,19 @@ def semantic_validate(
     which can be consumed by other libraries like CDM.
 
     :param observing_command_input: dictionary containing details
-    of the command which needs validation.This is the same as
-    for ska_telmodel.schema.validate.
-    If the command is available as a JSON string,
-    first convert it to a dictionary using json.loads.
+     of the command which needs validation.This is the same as
+     for ska_telmodel.schema.validate.
+     If the command is available as a JSON string,
+     first convert it to a dictionary using json.loads.
     :param tm_data: telemodel tm data object using
-    which we can load the semantic validation JSON.
+     which we can load the semantic validation JSON.
     :param osd_data: osd_data dict which is passed externally.
     :param interface: interface URI in full,
-    only provide if missing in observing_command_input.
+     only provide if missing in observing_command_input.
     :param array_assembly: Array assembly like AA0.5, AA0.1.
     :param raise_semantic: True (default) would require
-    the user to catch the SchematicValidationError somewhere.
-    Set False to only log the error messages.
+     the user to catch the SchematicValidationError somewhere.
+     Set False to only log the error messages.
     :returns: True if semantic validation passes, False otherwise.
     """
     if int(VALIDATION_STRICTNESS) == SEMANTIC_VALIDATION_VALUE:
@@ -352,7 +352,7 @@ def semantic_validate(
             msg = "\n".join(msg_list)
             logging.error(
                 "Also following errors were encountered during semantic %s",
-                "validations:\n{msg}",
+                f"validations:\n{msg}",
             )
             if raise_semantic:
                 raise SchematicValidationError(msg)
