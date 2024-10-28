@@ -147,23 +147,21 @@ def test_init_app_client(client, open_api_spec):
                 "title": "Value Error",
             },
         ),
-        # TODO: Commenting this test cause it contains hardcoded tmdata version.
-        # Will remove these hardcoded tmdata versions
-        # (
-        #     1,
-        #     "3.0.7",
-        #     None,
-        #     ["mid"],
-        #     None,
-        #     {
-        #         "detail": [
-        #             "OSD Version 3.0.7 is not valid,Available OSD Versions are"
-        #             " ['1.0.0', '1.0.1', '1.0.2', '1.0.3', '2.0.0', '2.0.1', '2.1.0']"
-        #         ],
-        #         "status": -1,
-        #         "title": "Value Error",
-        #     },
-        # ),
+        (
+            1,
+            "3.0.7",
+            None,
+            ["mid"],
+            None,
+            {
+                "detail": [
+                    "OSD Version 3.0.7 is not valid,Available OSD Versions are"
+                    " {osd_versions}"
+                ],
+                "status": -1,
+                "title": "Value Error",
+            },
+        ),
     ],
 )
 def test_invalid_osd_tmdata_source(
@@ -174,6 +172,7 @@ def test_invalid_osd_tmdata_source(
     array_assembly,
     expected,
     client,
+    osd_versions,
 ):
     """This test case checks the functionality of OSD API
         It will validate all params and retunr expected output.
@@ -188,6 +187,9 @@ def test_invalid_osd_tmdata_source(
 
     :returns: assert equals values
     """
+
+    if expected.get("detail") and isinstance(expected["detail"], list):
+        expected["detail"][0] = expected["detail"][0].format(osd_versions=osd_versions)
 
     response = client.get(
         f"{BASE_API_URL}/osd",
