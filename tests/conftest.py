@@ -40,7 +40,16 @@ def client():
         yield client
 
 
-def load_osd_versions():
+@pytest.fixture
+def osd_versions():
+    """
+    This fixture reads a JSON file containing cycle-to-version mappings,
+    extracts all unique versions across all cycles, and returns them as a
+    sorted list.
+
+    :returns list: A sorted list of unique OSD versions extracted from the JSON file.
+    """
+
     current_dir = os.path.dirname(os.path.abspath(__file__))
     parent_dir = os.path.dirname(current_dir)
     json_path = os.path.join(

@@ -7,9 +7,6 @@ import pytest
 from ska_telmodel.data import TMData
 
 from ska_ost_osd.osd.osd import get_osd_data, osd_tmdata_source
-from tests.conftest import load_osd_versions
-
-OSD_VERSIONS = load_osd_versions()
 
 
 def read_json(json_file_location: str) -> dict[dict[str, Any]]:
@@ -230,7 +227,7 @@ def test_invalid_osd_tmdata_source():
     ]
 
 
-def test_invalid_source():
+def test_invalid_source(osd_versions):
     """This test case checks when gitlab_branch is given source
     should be gitlab else will raise / return error..
     """
@@ -245,7 +242,7 @@ def test_invalid_source():
     assert (
         expected_error_msg
         == "Source file is not valid, OSD Version main is not valid,Available OSD"
-        f" Versions are {OSD_VERSIONS}"
+        f" Versions are {osd_versions}"
     )
 
 

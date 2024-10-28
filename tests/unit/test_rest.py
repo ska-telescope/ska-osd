@@ -5,9 +5,7 @@ import pytest
 
 from ska_ost_osd.rest import get_openapi_spec, init_app
 from ska_ost_osd.rest.api.resources import validation_response
-from tests.conftest import BASE_API_URL, load_osd_versions
-
-OSD_VERSIONS = load_osd_versions()
+from tests.conftest import BASE_API_URL
 
 
 def test_init_app(open_api_spec):
@@ -158,7 +156,7 @@ def test_init_app_client(client, open_api_spec):
             {
                 "detail": [
                     "OSD Version 3.0.7 is not valid,Available OSD Versions are"
-                    f" {OSD_VERSIONS}"
+                    " {osd_versions}"
                 ],
                 "status": -1,
                 "title": "Value Error",
@@ -174,6 +172,7 @@ def test_invalid_osd_tmdata_source(
     array_assembly,
     expected,
     client,
+    osd_versions,
 ):
     """This test case checks the functionality of OSD API
         It will validate all params and retunr expected output.
@@ -188,6 +187,9 @@ def test_invalid_osd_tmdata_source(
 
     :returns: assert equals values
     """
+
+    if expected.get("detail") and isinstance(expected["detail"], list):
+        expected["detail"][0] = expected["detail"][0].format(osd_versions=osd_versions)
 
     response = client.get(
         f"{BASE_API_URL}/osd",
