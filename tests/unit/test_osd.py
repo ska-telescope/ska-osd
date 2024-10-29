@@ -229,7 +229,10 @@ def test_invalid_osd_tmdata_source():
 
 def test_invalid_source(osd_versions):
     """This test case checks when gitlab_branch is given source
-    should be gitlab else will raise / return error..
+    should be gitlab else will raise / return error.
+    NOTE: This testcase has dependency on 'cycle_gitlab_release_version_mapping.json'
+          file so make sure to run the 'make osd-pre-release' command which is
+          mentioned in readme and document files.
     """
     _, error_msgs = osd_tmdata_source(
         cycle_id=1,

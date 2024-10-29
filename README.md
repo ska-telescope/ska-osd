@@ -69,6 +69,9 @@ make k8s-uninstall-chart
 ### Release a new version
 
 This is a very crucial part for OSD, without this some functionality may break and exceptions and errors will be raised.
+
+Failing to run this command before releasing a new version may cause test cases to fail. This command ensures all necessary pre-release checks and configurations are properly set up.
+
 Run Below command from Command line.
 
 ```
