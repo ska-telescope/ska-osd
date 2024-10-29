@@ -177,6 +177,10 @@ def test_invalid_osd_tmdata_source(
     """This test case checks the functionality of OSD API
         It will validate all params and retunr expected output.
 
+    NOTE: This testcase has dependency on 'cycle_gitlab_release_version_mapping.json'
+          file so make sure to run the 'make osd-pre-release' command which is
+          mentioned in readme and document files.
+
     :param cycle_id,: 1, 2
     :param osd_version,: 1.0.0
     :param source,: File, Car and Gitlab
