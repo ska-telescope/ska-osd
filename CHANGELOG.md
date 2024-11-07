@@ -5,8 +5,13 @@ Change Log
 All notable changes to this project will be documented in this file.
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
-unreleased
-**************
+
+2.2.1
+********
+* Fixed Semantic Validation error message bug.
+* Fixed OSD document issue.
+  - Changelog was not reflecting earlier so fixed that.
+  - RTD build was failing on pipeline.
 
 2.2.0
 *******
