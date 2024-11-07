@@ -10,6 +10,8 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 ********
 * Fixed Semantic Validation error message bug.
 * Fixed OSD document issue.
+  - Changelog was not reflecting earlier so fixed that.
+  - RTD build was failing on pipeline.
 
 2.2.0
 *******
