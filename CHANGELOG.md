@@ -5,8 +5,11 @@ Change Log
 All notable changes to this project will be documented in this file.
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
-unreleased
-**************
+
+2.2.1
+********
+* Fixed Semantic Validation error message bug.
+* Fixed OSD document issue.
 
 2.2.0
 *******
