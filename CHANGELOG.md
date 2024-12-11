@@ -7,7 +7,7 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 2.3.0
 ********
-* Upgraded astropy version 6.1 from 5.1.
+* Upgraded astropy version to 6.1 from 5.1.
 
 2.2.1
 ********
