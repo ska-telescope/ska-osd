@@ -5,7 +5,7 @@ Change Log
 All notable changes to this project will be documented in this file.
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
-Unreleased
+2.3.1
 **********
 * Updated to deepdiff version 7.0.0.
 * Updated to pydantic version 2.10.3
