@@ -1942,8 +1942,7 @@ Missing observing_command_input and interface.
    }
 
 * Example 6: Invalid JSON input.
-
-Wrong interface and missing observing_command_input.
+  If user provide wrong interface or missed to add observing_command_input, then it will raise error.
 
 Semantic Validation Error Response
 
@@ -1963,9 +1962,9 @@ Semantic Validation Error Response
             }
         }
 
-* Example 6:  raise_semantic and osd_data both are optional parameters, 
-  If do not pass API will take as default raise_semantic default value is true and osd_data fetch from latest
-  release of osd_data.
+* Example 7:   'raise_semantic' and 'osd_data' both are optional parameters.
+  So, if user do not pass these parameters, then API will take as default value of 'raise_semantic' 
+  i.e. true and osd_data fetch from latest release of osd_data.
 
 .. code-block:: json
   
