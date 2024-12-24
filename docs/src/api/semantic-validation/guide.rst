@@ -1656,7 +1656,7 @@ Semantic Validation Success Response for SBD-Mid input.
             "spectral_windows": [
               {
                 "spectral_window_id": "pulsar_fsp_channels",
-                "count": 14880,
+                "count": 15000,
                 "start": 0,
                 "freq_min": 350000000000,
                 "freq_max": 36800000000
@@ -1844,7 +1844,7 @@ Semantic Validation Success Response for SBD-Mid input.
             "pst"
           ],
           "max_baseline_km": 1.5,
-          "number_channels": 15000,
+          "number_channels": 14880,
           "number_fsps": 4,
           "number_meerkat_dishes": 0,
           "number_meerkatplus_dishes": 0,
@@ -1917,7 +1917,7 @@ Semantic Validation Success Response With Error for SBD-Mid input.
 
      {
       "detail": [
-        "Invalid input for channel_count! Currently allowed 15000",
+        "Invalid input for channel_count! Currently allowed 14880",
         "Invalid input for freq_min",
         "Invalid input for freq_max",
         "freq_min should be less than freq_max",
@@ -1927,21 +1927,9 @@ Semantic Validation Success Response With Error for SBD-Mid input.
       "title": "Semantic Validation Error"
     }
 
+
 * Example 5: Invalid JSON input.
-
-Missing observing_command_input and interface.
-
-.. code-block:: json
-
-    {
-    "detail": [
-      "Input should be a valid dictionary"
-    ],
-    "status": -1,
-    "title": "Value Error"
-   }
-
-* Example 6: Invalid JSON input.
+  
   If user provide wrong interface or missed to add observing_command_input, then it will raise error.
 
 Semantic Validation Error Response
@@ -1954,7 +1942,6 @@ Semantic Validation Error Response
             "detail": {
                 "interface": "interface is not valid",
                 "observing_command_output": "observing_command_input is missing",
-                "raise_semantic": "raise_semantic is not a boolean value ",
                 "sources":
                     "gitlab://gitlab.com/ska-telescope14.1?~default~#tmdata not found"
                     " in SKA CAR - make sure to add tmdata CI!"
@@ -1962,7 +1949,7 @@ Semantic Validation Error Response
             }
         }
 
-* Example 7:   'raise_semantic' and 'osd_data' both are optional parameters.
+* Example 6:   'raise_semantic' and 'osd_data' both are optional parameters.
   So, if user do not pass these parameters, then API will take as default value of 'raise_semantic' 
   i.e. true and osd_data fetch from latest release of osd_data.
 
