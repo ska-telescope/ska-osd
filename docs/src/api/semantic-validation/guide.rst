@@ -2389,4 +2389,26 @@ Semantic Validation Success Response for SBD-Mid input.
         "details": "JSON is semantically valid",
     }
 
+* Example 7: Missing key observing_command_input.
+
+.. code-block:: json
+
+  {
+    "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
+    "raise_semantic": true,
+    "sources": "car:ost/ska-ost-osd?2.0.0#tmdata"
+  }
+
+Getting error as observing_command_input is required field
+
+.. code-block:: json
+
+  {
+    "detail": [
+      "Value error, [{'field': 'observing_command_input', 'msg': 'This field is required'}]"
+    ],
+    "status": -1,
+    "title": "Value Error"
+  }
+
 

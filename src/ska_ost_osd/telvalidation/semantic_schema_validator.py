@@ -1,17 +1,9 @@
 import re
-from typing import List, Optional
+from typing import Optional
 
 from pydantic import BaseModel, model_validator
 
 from ska_ost_osd.telvalidation.constant import INTERFACE_PATTERN
-
-
-class SemanticModelError(ValueError):
-    """Custom exception class for validation errors."""
-
-    def __init__(self, errors: List[dict]):
-        self.errors = errors
-        super().__init__(errors)
 
 
 class SemanticModel(BaseModel):
