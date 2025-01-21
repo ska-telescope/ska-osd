@@ -19,11 +19,9 @@ class SemanticModel(BaseModel):
     def validate_semantic_combinations(cls, values: dict) -> dict:
         errors = []
         # Validate that observing_command_input is present and is a dictionary
-        if "observing_command_input" not in values:
-            errors.append(
-                {"field": "observing_command_input", "msg": "This field is required"}
-            )
-        elif not isinstance(values.get("observing_command_input"), dict):
+        if "observing_command_input" not in values or not isinstance(
+            values.get("observing_command_input"), dict
+        ):
             errors.append(
                 {"field": "observing_command_input", "msg": "This field is required"}
             )

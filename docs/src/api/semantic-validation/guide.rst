@@ -2396,7 +2396,7 @@ Semantic Validation Success Response for SBD-Mid input.
   {
     "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
     "raise_semantic": true,
-    "sources": "car:ost/ska-ost-osd?2.0.0#tmdata"
+    "sources": "car:ost/ska-ost-osd?{OSD_MAJOR_VERSION}#tmdata"
   }
 
 Getting error as observing_command_input is required field
