@@ -3,12 +3,17 @@ Functions which the HTTP requests to individual resources are mapped to.
 
 See the operationId fields of the Open API spec for the specific mappings.
 """
+import json
 from functools import wraps
 from http import HTTPStatus
 
 from pydantic import ValidationError
 from ska_telmodel.data import TMData
 
+from ska_ost_osd.osd.constant import (
+    LOW_CAPABILITIES_JSON_PATH,
+    MID_CAPABILITIES_JSON_PATH,
+)
 from ska_ost_osd.osd.osd import get_osd_using_tmdata
 from ska_ost_osd.osd.osd_schema_validator import OSDModelError
 from ska_ost_osd.telvalidation import SchematicValidationError, semantic_validate
@@ -121,6 +126,40 @@ def validation_response(
 
 def get_tmdata_sources(source):
     return [source] if source else CAR_TELMODEL_SOURCE  # check source
+
+
+@error_handler
+def update_osd_data(body: dict):
+    """
+    This function updates the input JSON against the schema
+
+    :param body:
+    A dictionary containing key-value pairs of parameters required for validation.
+
+    :returns: :returns dict: A dictionary with OSD data satisfying the query.
+    """
+
+    try:
+        telescope = body["telescope"]
+        capabilities_path = (
+            MID_CAPABILITIES_JSON_PATH
+            if telescope == "Mid"
+            else LOW_CAPABILITIES_JSON_PATH
+        )
+
+        with open(capabilities_path, "r", encoding="utf-8") as file:
+            existing_data = json.load(file)
+
+        existing_data.update(body)
+        with open(capabilities_path, "w", encoding="utf-8") as file:
+            json.dump(existing_data, file, indent=4)
+
+        return existing_data
+
+    except KeyError as exc:
+        raise ValueError(
+            "Telescope type must be specified in the request body"
+        ) from exc
 
 
 @error_handler
