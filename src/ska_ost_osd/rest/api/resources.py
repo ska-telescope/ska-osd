@@ -4,13 +4,17 @@ Functions which the HTTP requests to individual resources are mapped to.
 See the operationId fields of the Open API spec for the specific mappings.
 """
 import json
+import re
 from functools import wraps
 from http import HTTPStatus
+from pathlib import Path
+from typing import Dict
 
 from pydantic import ValidationError
 from ska_telmodel.data import TMData
 
 from ska_ost_osd.osd.constant import (
+    ARRAY_ASSEMBLY_PATTERN,
     LOW_CAPABILITIES_JSON_PATH,
     MID_CAPABILITIES_JSON_PATH,
 )
@@ -129,7 +133,7 @@ def get_tmdata_sources(source):
 
 
 @error_handler
-def update_osd_data(body: dict):
+def update_osd_data(body: Dict, **kwargs) -> Dict:
     """
     This function updates the input JSON against the schema
 
@@ -140,19 +144,27 @@ def update_osd_data(body: dict):
     """
 
     try:
-        telescope = body["telescope"]
+        cycle_id = kwargs.get("cycle_id")
+        capabilities = kwargs.get("capabilities")
+        array_assembly = kwargs.get("array_assembly")
+
+        if not isinstance(cycle_id, int):
+            raise ValueError("Cycle ID must be an integer")
+
+        if array_assembly and not re.match(ARRAY_ASSEMBLY_PATTERN, array_assembly):
+            raise ValueError("Array assembly must be in the format of AA[0-9].[0-9]")
+
         capabilities_path = (
             MID_CAPABILITIES_JSON_PATH
-            if telescope == "Mid"
+            if capabilities.lower() == "mid"
             else LOW_CAPABILITIES_JSON_PATH
         )
 
-        with open(capabilities_path, "r", encoding="utf-8") as file:
-            existing_data = json.load(file)
+        existing_data = read_file(capabilities_path)
 
-        existing_data.update(body)
-        with open(capabilities_path, "w", encoding="utf-8") as file:
-            json.dump(existing_data, file, indent=4)
+        existing_data[array_assembly].update(body)
+
+        update_file(capabilities_path, existing_data)
 
         return existing_data
 
@@ -160,6 +172,29 @@ def update_osd_data(body: dict):
         raise ValueError(
             "Telescope type must be specified in the request body"
         ) from exc
+
+
+def read_file(filename: Path) -> Dict:
+    """
+    This function reads the input JSON file
+
+    :param filename: The name of the file to be read
+    :returns: A dictionary containing the contents of the file
+    """
+    with open(filename, "r", encoding="utf-8") as file:
+        return json.load(file)
+
+
+def update_file(filename: Path, json_data: Dict) -> None:
+    """
+    This function updates the input JSON file
+
+    :param filename: The name of the file to be updated
+    :param json_data: The data to be written to the file
+    :returns: None
+    """
+    with open(filename, "w", encoding="utf-8") as file:
+        json.dump(json_data, file, indent=4)
 
 
 @error_handler
