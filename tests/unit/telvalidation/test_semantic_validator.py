@@ -54,6 +54,9 @@ def load_string_from_file(filename):
 
 
 MID_OSD_DATA_JSON = load_string_from_file("test_files/testfile_mid_osd_data.json")
+OSD_OBSERVATORY_JSON_DATA = load_string_from_file(
+    "test_files/testfile_osd_observatory.json"
+)
 
 VALID_MID_ASSIGN_JSON = load_string_from_file(
     "test_files/testfile_valid_mid_assign.json"

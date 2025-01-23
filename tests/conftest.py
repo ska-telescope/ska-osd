@@ -9,6 +9,7 @@ from ska_ost_osd.telvalidation.constant import CAR_TELMODEL_SOURCE
 from tests.unit.telvalidation.test_semantic_validator import (
     INVALID_MID_ASSIGN_JSON,
     MID_OSD_DATA_JSON,
+    OSD_OBSERVATORY_JSON_DATA,
     VALID_MID_ASSIGN_JSON,
 )
 
@@ -783,6 +784,17 @@ def mid_osd_data():
     :returns dict: The OpenAPI specification
     """
     return MID_OSD_DATA_JSON
+
+
+@pytest.fixture
+def osd_observatory_policies():
+    """This fixture returns the expected OpenAPI specification
+        that is returned from the API. It is used to validate
+        the response in tests.
+
+    :returns dict: The OpenAPI specification
+    """
+    return OSD_OBSERVATORY_JSON_DATA
 
 
 @pytest.fixture

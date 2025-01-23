@@ -17,9 +17,16 @@ from ska_ost_osd.osd.constant import (
     ARRAY_ASSEMBLY_PATTERN,
     LOW_CAPABILITIES_JSON_PATH,
     MID_CAPABILITIES_JSON_PATH,
+    OBSERVATORY_POLICIES_JSON_PATH,
+    osd_file_mapping,
 )
+from ska_ost_osd.osd.helper import read_json
 from ska_ost_osd.osd.osd import get_osd_using_tmdata
 from ska_ost_osd.osd.osd_schema_validator import OSDModelError
+from ska_ost_osd.osd.osd_validation_messages import (
+    ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE,
+    CYCLE_ID_ERROR_MESSAGE,
+)
 from ska_ost_osd.telvalidation import SchematicValidationError, semantic_validate
 from ska_ost_osd.telvalidation.constant import (
     CAR_TELMODEL_SOURCE,
@@ -151,8 +158,15 @@ def update_osd_data(body: Dict, **kwargs) -> Dict:
         if not isinstance(cycle_id, int):
             raise ValueError("Cycle ID must be an integer")
 
-        if array_assembly and not re.match(ARRAY_ASSEMBLY_PATTERN, array_assembly):
-            raise ValueError("Array assembly must be in the format of AA[0-9].[0-9]")
+        versions_dict = read_json(osd_file_mapping["cycle_to_version_mapping"])
+        cycle_ids = [int(key.split("_")[-1]) for key in versions_dict]
+        cycle_id_exists = [cycle_id if cycle_id in cycle_ids else None][0]
+        string_ids = ",".join([str(i) for i in cycle_ids])
+
+        if cycle_id is not None and cycle_id_exists is None:
+            raise ValueError(
+                CYCLE_ID_ERROR_MESSAGE.format(cycle_id, string_ids),
+            )
 
         capabilities_path = (
             MID_CAPABILITIES_JSON_PATH
@@ -160,18 +174,42 @@ def update_osd_data(body: Dict, **kwargs) -> Dict:
             else LOW_CAPABILITIES_JSON_PATH
         )
 
-        existing_data = read_file(capabilities_path)
+        if array_assembly:
+            if not re.match(ARRAY_ASSEMBLY_PATTERN, array_assembly):
+                raise ValueError(
+                    "Array assembly must be in the format of AA[0-9].[0-9]"
+                )
 
-        existing_data[array_assembly].update(body)
+            existing_data = read_file(capabilities_path)
+            array_assembly_list = list(
+                filter(lambda x: x.startswith("A"), existing_data.keys())
+            )
 
-        update_file(capabilities_path, existing_data)
+            if array_assembly not in array_assembly_list:
+                raise ValueError(
+                    ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE.format(
+                        array_assembly, ", ".join(array_assembly_list)
+                    ),
+                )
 
-        return existing_data
+            existing_data[array_assembly].update(body)
+            update_file(capabilities_path, existing_data)
+            return existing_data
 
-    except KeyError as exc:
-        raise ValueError(
-            "Telescope type must be specified in the request body"
-        ) from exc
+        elif "basic_capabilities" in body.keys():
+            existing_data = read_file(capabilities_path)
+            existing_data["basic_capabilities"].update(body["basic_capabilities"])
+            update_file(capabilities_path, existing_data)
+            return existing_data
+
+        elif cycle_id and capabilities:
+            existing_data = read_file(OBSERVATORY_POLICIES_JSON_PATH)
+            existing_data.update(body)
+            update_file(OBSERVATORY_POLICIES_JSON_PATH, existing_data)
+            return existing_data
+
+    except (OSDModelError, ValueError) as error:
+        raise error
 
 
 def read_file(filename: Path) -> Dict:
