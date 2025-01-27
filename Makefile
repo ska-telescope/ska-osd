@@ -90,7 +90,7 @@ osd-pre-release:
 
 	@./src/ska_ost_osd/osd/resource/release.sh $(VERSION)
 
-
+VERSION = 2.3.2
 # CI_MERGE_REQUEST_SOURCE_BRANCH_NAME=$(VERSION)
 
 osddata-do-publish:
