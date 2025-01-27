@@ -87,6 +87,7 @@ stop-dev-environment:
 osd-tmdata-publish:
   <<: *dev_env
   stage: deploy
+  when: manual
   script:
     - make osddata-do-publish
 
