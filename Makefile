@@ -89,10 +89,10 @@ dev-down: k8s-uninstall-chart k8s-delete-namespace  ## tear down developer deplo
 osd-pre-release:
 
 	@./src/ska_ost_osd/osd/resource/release.sh $(VERSION)
-	
 
-CI_MERGE_REQUEST_SOURCE_BRANCH_NAME=cycle.$(VERSION)
+
+# CI_MERGE_REQUEST_SOURCE_BRANCH_NAME=$(VERSION)
 
 osddata-do-publish:
 	@echo "tmdata-publish: package to publish: $(TMDATA_PKG) version: $(VERSION) in: $(TMDATA_OUT_DIR)"
-	@. $(TMDATA_SUPPORT); publishTMData "$(TMDATA_SRC_DIR)" "$(TMDATA_OUT_DIR)" `git rev-parse HEAD` "${CI_COMMIT_TAG}" "${CI_COMMIT_BRANCH}" "${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}"
+	@. $(TMDATA_SUPPORT); publishTMData "$(TMDATA_SRC_DIR)" "$(TMDATA_OUT_DIR)" `git rev-parse HEAD` "${CI_COMMIT_TAG}" "${CI_COMMIT_BRANCH}" "${VERSION}"
