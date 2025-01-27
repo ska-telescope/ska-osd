@@ -5,8 +5,8 @@
         "receiver_information": [
             {
                 "rx_id": "Band_1",
-                "min_frequency_hz": 350000000.0,
-                "max_frequency_hz": 1050000000.0
+                "min_frequency_hz": 35,
+                "max_frequency_hz": 105
             },
             {
                 "rx_id": "Band_2",
