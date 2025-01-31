@@ -309,6 +309,222 @@ GET /osd
     5. If ``cycle_id`` and ``array_assembly`` are provided together then API will return appropriate error message.
 
 
+PUT /osd
+==========================
+
+.. list-table:: OSD REST resources
+   :widths: 5 15 80
+   :header-rows: 1
+
+   * - HTTP Method
+     - Resource URL
+     - Description
+   * - PUT
+     - ``/ska-ost-osd/osd/api/v2/osd/``
+     - **Updating Data**
+
+       Update the OSD capabilities data.
+
+
+1. Query Parameters
+
+  * The API supports the following query parameters to filter the OSD data:
+
+    ===================    ============================================================
+    Parameters             Description
+    ===================    ============================================================
+    cycle_id               Cycle Id a integer value 1, 2, 3
+    capabilities           Mid or Low
+    array_assembly         AA0.5, AA1 or any Array Assembly
+    ===================    ============================================================
+
+
+
+2. For example:
+
+.. code:: python
+
+    "/ska-ost-osd/osd/api/v2/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
+
+
+3. CURL Example Request
+
+.. code:: python
+
+    curl -X PUT "/ska-ost-osd/osd/api/v2/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
+
+
+4. Example Response
+
+    * The API returns a JSON object containing the matched OSD data based on query params.
+
+        Calling API with parameters ``cycle_id``,  ``capabilities``, ``array_assembly``
+        their valid inputs will return the JSON containing the matched OSD data.
+
+    .. code:: python
+
+        client.put(
+            "/ska-ost-osd/osd/api/v2/osd",
+            query_string={
+                "cycle_id": 1,
+                "capabilities": "mid",
+                "array_assembly": "AA1",
+            },
+        )
+
+    * Response
+
+    .. code:: python
+
+        {
+            "AA0.5": {
+                "allowed_channel_count_range_max": 58982,
+                "allowed_channel_count_range_min": 1,
+                "allowed_channel_width_values": [
+                13440
+                ],
+                "available_bandwidth_hz": 800000000,
+                "available_receivers": [
+                "Band_1",
+                "Band_2"
+                ],
+                "cbf_modes": [
+                "correlation",
+                "pst"
+                ],
+                "max_baseline_km": 1.5,
+                "number_channels": 14880,
+                "number_fsps": 4,
+                "number_meerkat_dishes": 0,
+                "number_meerkatplus_dishes": 0,
+                "number_pss_beams": 0,
+                "number_pst_beams": 1,
+                "number_ska_dishes": 6,
+                "number_zoom_channels": 0,
+                "number_zoom_windows": 0,
+                "ps_beam_bandwidth_hz": 400000000
+            },
+            "AA1": {
+                "allowed_channel_count_range_max": 58982,
+                "allowed_channel_count_range_min": 1,
+                "available_bandwidth_hz": 800000000,
+                "available_receivers": [
+                "Band_1",
+                "Band_2",
+                "Band_5a",
+                "Band_5b"
+                ],
+                "cbf_modes": [
+                "correlation",
+                "pst"
+                ],
+                "max_baseline_km": 1.5,
+                "number_channels": 14880,
+                "number_fsps": 8,
+                "number_meerkat_dishes": 0,
+                "number_meerkatplus_dishes": 0,
+                "number_pss_beams": 0,
+                "number_pst_beams": 1,
+                "number_ska_dishes": 8,
+                "number_zoom_channels": 0,
+                "number_zoom_windows": 0,
+                "ps_beam_bandwidth_hz": 400000000
+            },
+            "AA2": {
+                "allowed_channel_count_range_max": 214748647,
+                "allowed_channel_count_range_min": 1,
+                "allowed_channel_width_values": [
+                210,
+                420,
+                840,
+                1680,
+                3360,
+                6720,
+                13440,
+                26880,
+                40320,
+                53760,
+                80640,
+                107520,
+                161280,
+                215040,
+                322560,
+                416640,
+                430080,
+                645120
+                ],
+                "available_bandwidth_hz": 800000000,
+                "available_receivers": [
+                "Band_1",
+                "Band_2",
+                "Band_5a",
+                "Band_5b"
+                ],
+                "cbf_modes": [
+                "correlation",
+                "pst",
+                "pss"
+                ],
+                "max_baseline_km": 110,
+                "number_channels": 14880,
+                "number_fsps": 27,
+                "number_meerkat_dishes": 4,
+                "number_meerkatplus_dishes": 0,
+                "number_pss_beams": 384,
+                "number_pst_beams": 6,
+                "number_ska_dishes": 64,
+                "number_zoom_channels": 14880,
+                "number_zoom_windows": 16,
+                "ps_beam_bandwidth_hz": 800000000
+            },
+            "basic_capabilities": {
+                "dish_elevation_limit_deg": 16,
+                "receiver_information": [
+                {
+                    "max_frequency_hz": 1050000000,
+                    "min_frequency_hz": 350000000,
+                    "rx_id": "Band_1"
+                },
+                {
+                    "max_frequency_hz": 1760000000,
+                    "min_frequency_hz": 950000000,
+                    "rx_id": "Band_2"
+                },
+                {
+                    "max_frequency_hz": 3050000000,
+                    "min_frequency_hz": 1650000000,
+                    "rx_id": "Band_3"
+                },
+                {
+                    "max_frequency_hz": 5180000000,
+                    "min_frequency_hz": 2800000000,
+                    "rx_id": "Band_4"
+                },
+                {
+                    "max_frequency_hz": 8500000000,
+                    "min_frequency_hz": 4600000000,
+                    "rx_id": "Band_5a"
+                },
+                {
+                    "max_frequency_hz": 15400000000,
+                    "min_frequency_hz": 8300000000,
+                    "rx_id": "Band_5b"
+                }
+                ]
+            },
+            "telescope": "Mid"
+        }
+
+5. Scenarios
+
+    1. Calling API with only one parameter cycle_id and no other parameter. First it will check if the 
+       cycle id is valid or not, and will take capabilities as ``mid`` by default.
+
+    2. If ``osd_verison``, ``capabilities`` and ``array_assembly`` are given together then API will return capabilities json based on mid/low capabilities.
+    
+    3. If ``osd_verison``, ``capabilities`` are given together and request body contains basic_capabilities then API will return updated ``basic_capabilities``.
+
+
 Error Handling
 ```````````````
 
