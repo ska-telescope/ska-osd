@@ -328,7 +328,7 @@ PUT /osd
 
 1. Query Parameters
 
-  * The API supports the following query parameters to filter the OSD data:
+  * The API supports the following query parameters to update the OSD data:
 
     ===================    ============================================================
     Parameters             Description
@@ -517,12 +517,11 @@ PUT /osd
 
 5. Scenarios
 
-    1. Calling API with only one parameter cycle_id and no other parameter. First it will check if the 
-       cycle id is valid or not, and will take capabilities as ``mid`` by default.
-
-    2. If ``osd_verison``, ``capabilities`` and ``array_assembly`` are given together then API will return capabilities json based on mid/low capabilities.
+    1. If ``osd_verison``, ``capabilities`` and ``array_assembly`` are given together then API will return capabilities json based on mid/low capabilities.
     
-    3. If ``osd_verison``, ``capabilities`` are given together and request body contains basic_capabilities then API will return updated ``basic_capabilities``.
+    2. If ``osd_verison``, ``capabilities`` are given together and request body contains basic_capabilities then API will return updated ``basic_capabilities``.
+
+    3. If invalid ``cycle_id`` is given then API will return appropriate error message. 
 
 
 Error Handling
