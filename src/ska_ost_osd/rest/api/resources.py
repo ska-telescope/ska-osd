@@ -3,11 +3,9 @@ Functions which the HTTP requests to individual resources are mapped to.
 
 See the operationId fields of the Open API spec for the specific mappings.
 """
-import json
 import re
 from functools import wraps
 from http import HTTPStatus
-from pathlib import Path
 from typing import Dict
 
 from pydantic import ValidationError
@@ -27,6 +25,7 @@ from ska_ost_osd.osd.osd_validation_messages import (
     ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE,
     CYCLE_ID_ERROR_MESSAGE,
 )
+from ska_ost_osd.rest.api.utils import read_file, update_file
 from ska_ost_osd.telvalidation import SchematicValidationError, semantic_validate
 from ska_ost_osd.telvalidation.constant import (
     CAR_TELMODEL_SOURCE,
@@ -212,27 +211,27 @@ def update_osd_data(body: Dict, **kwargs) -> Dict:
         raise error
 
 
-def read_file(filename: Path) -> Dict:
-    """
-    This function reads the input JSON file
+# def read_file(filename: Path) -> Dict:
+#     """
+#     This function reads the input JSON file
 
-    :param filename: The name of the file to be read
-    :returns: A dictionary containing the contents of the file
-    """
-    with open(filename, "r", encoding="utf-8") as file:
-        return json.load(file)
+#     :param filename: The name of the file to be read
+#     :returns: A dictionary containing the contents of the file
+#     """
+#     with open(filename, "r", encoding="utf-8") as file:
+#         return json.load(file)
 
 
-def update_file(filename: Path, json_data: Dict) -> None:
-    """
-    This function updates the input JSON file
+# def update_file(filename: Path, json_data: Dict) -> None:
+#     """
+#     This function updates the input JSON file
 
-    :param filename: The name of the file to be updated
-    :param json_data: The data to be written to the file
-    :returns: None
-    """
-    with open(filename, "w", encoding="utf-8") as file:
-        json.dump(json_data, file, indent=4)
+#     :param filename: The name of the file to be updated
+#     :param json_data: The data to be written to the file
+#     :returns: None
+#     """
+#     with open(filename, "w", encoding="utf-8") as file:
+#         json.dump(json_data, file, indent=4)
 
 
 @error_handler
