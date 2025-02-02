@@ -95,13 +95,13 @@ def error_handler(api_fn: callable) -> str:
 def insert_osd_data(body: Dict) -> Dict:
     """
     This function handles REST API requests to insert new OSD data
-    
+
     Args:
         body (Dict): A dictionary containing the OSD data to insert
-        
+
     Returns:
         Dict: The processed OSD data
-        
+
     Raises:
         OSDModelError: If validation fails
         ValueError: If required data is missing or invalid
@@ -110,6 +110,7 @@ def insert_osd_data(body: Dict) -> Dict:
         return update_storage(body)
     except (OSDModelError, ValueError) as error:
         raise error
+
 
 @error_handler
 def get_osd(**kwargs) -> dict:
@@ -229,7 +230,6 @@ def update_osd_data(body: Dict, **kwargs) -> Dict:
 
     except (OSDModelError, ValueError) as error:
         raise error
-
 
 
 # def read_file(filename: Path) -> Dict:

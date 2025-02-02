@@ -4,7 +4,6 @@ from importlib.metadata import version
 from typing import Any, Dict, Optional
 
 from ska_telmodel.data import TMData
-from ska_ost_osd.rest.api.utils import read_file, update_file
 
 from ska_ost_osd.osd.constant import ARRAY_ASSEMBLY_PATTERN
 from ska_ost_osd.osd.osd_schema_validator import OSDModel, OSDModelError
@@ -17,15 +16,16 @@ from ska_ost_osd.osd.osd_validation_messages import (
     OSD_VERSION_ERROR_MESSAGE,
     SOURCE_ERROR_MESSAGE,
 )
+from ska_ost_osd.rest.api.utils import read_file, update_file
 
 from .constant import (
-    LOW_CAPABILITIES_JSON_PATH,
-    MID_CAPABILITIES_JSON_PATH,
-    OBSERVATORY_POLICIES_JSON_PATH,
     ARRAY_ASSEMBLY_PATTERN,
     BASE_FOLDER_NAME,
     BASE_URL,
     CAR_URL,
+    LOW_CAPABILITIES_JSON_PATH,
+    MID_CAPABILITIES_JSON_PATH,
+    OBSERVATORY_POLICIES_JSON_PATH,
     SOURCES,
     osd_file_mapping,
     osd_response_template,
@@ -382,32 +382,32 @@ def update_storage(body: Dict) -> Dict:
     result = {}
     if not body.get("capabilities", {}).get("mid"):
         return mid_capabilities
-    
+
     capabilities = body["capabilities"]
     telescope = next(iter(capabilities.keys()))
     telescope_data = capabilities[telescope]
-    
-    mid_capabilities.update({
-        "telescope": telescope,
-        "basic_capabilities": telescope_data["basic_capabilities"],
-        **{
-            key: telescope_data[key]
-            for key in telescope_data
-            if re.match(ARRAY_ASSEMBLY_PATTERN, key)
+
+    mid_capabilities.update(
+        {
+            "telescope": telescope,
+            "basic_capabilities": telescope_data["basic_capabilities"],
+            **{
+                key: telescope_data[key]
+                for key in telescope_data
+                if re.match(ARRAY_ASSEMBLY_PATTERN, key)
+            },
         }
-    })
+    )
     capabilities_path = (
-            MID_CAPABILITIES_JSON_PATH
-            if telescope == "mid"
-            else LOW_CAPABILITIES_JSON_PATH
-        )
+        MID_CAPABILITIES_JSON_PATH if telescope == "mid" else LOW_CAPABILITIES_JSON_PATH
+    )
     mid_capabilities["telescope"] = mid_capabilities["telescope"].title()
     update_file(capabilities_path, mid_capabilities)
     update_file(OBSERVATORY_POLICIES_JSON_PATH, body["observatory_policy"])
     result.update(mid_capabilities)
     result.update(body["observatory_policy"])
     return mid_capabilities
-    
+
 
 def get_osd_using_tmdata(
     cycle_id: Optional[int] = None,
