@@ -19,7 +19,7 @@ from ska_ost_osd.osd.constant import (
     osd_file_mapping,
 )
 from ska_ost_osd.osd.helper import read_json
-from ska_ost_osd.osd.osd import get_osd_using_tmdata
+from ska_ost_osd.osd.osd import get_osd_using_tmdata, update_storage
 from ska_ost_osd.osd.osd_schema_validator import OSDModelError
 from ska_ost_osd.osd.osd_validation_messages import (
     ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE,
@@ -90,6 +90,26 @@ def error_handler(api_fn: callable) -> str:
 
     return wrapper
 
+
+@error_handler
+def insert_osd_data(body: Dict) -> Dict:
+    """
+    This function handles REST API requests to insert new OSD data
+    
+    Args:
+        body (Dict): A dictionary containing the OSD data to insert
+        
+    Returns:
+        Dict: The processed OSD data
+        
+    Raises:
+        OSDModelError: If validation fails
+        ValueError: If required data is missing or invalid
+    """
+    try:
+        return update_storage(body)
+    except (OSDModelError, ValueError) as error:
+        raise error
 
 @error_handler
 def get_osd(**kwargs) -> dict:
@@ -209,6 +229,7 @@ def update_osd_data(body: Dict, **kwargs) -> Dict:
 
     except (OSDModelError, ValueError) as error:
         raise error
+
 
 
 # def read_file(filename: Path) -> Dict:

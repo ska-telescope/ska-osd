@@ -7,8 +7,9 @@ from gunicorn import glogging
 from ska_ser_logging import configure_logging, get_default_formatter
 
 from ska_ost_osd.rest import init_app
-
+from flask_cors import CORS
 app = init_app()
+CORS(app) #
 
 
 class UniformLogger(glogging.Logger):
