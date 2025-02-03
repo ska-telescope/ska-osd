@@ -157,6 +157,9 @@ def update_osd_data(body: Dict, **kwargs) -> Dict:
         if not isinstance(cycle_id, int):
             raise ValueError("Cycle ID must be an integer")
 
+        if capabilities is None:
+            raise ValueError("Capabilities must be provided")
+
         versions_dict = read_json(osd_file_mapping["cycle_to_version_mapping"])
         cycle_ids = [int(key.split("_")[-1]) for key in versions_dict]
         cycle_id_exists = [cycle_id if cycle_id in cycle_ids else None][0]
@@ -209,29 +212,6 @@ def update_osd_data(body: Dict, **kwargs) -> Dict:
 
     except (OSDModelError, ValueError) as error:
         raise error
-
-
-# def read_file(filename: Path) -> Dict:
-#     """
-#     This function reads the input JSON file
-
-#     :param filename: The name of the file to be read
-#     :returns: A dictionary containing the contents of the file
-#     """
-#     with open(filename, "r", encoding="utf-8") as file:
-#         return json.load(file)
-
-
-# def update_file(filename: Path, json_data: Dict) -> None:
-#     """
-#     This function updates the input JSON file
-
-#     :param filename: The name of the file to be updated
-#     :param json_data: The data to be written to the file
-#     :returns: None
-#     """
-#     with open(filename, "w", encoding="utf-8") as file:
-#         json.dump(json_data, file, indent=4)
 
 
 @error_handler
