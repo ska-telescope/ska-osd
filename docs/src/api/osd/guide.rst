@@ -531,7 +531,8 @@ PUT /osd
 
     6. If the request body is missing required fields or contains invalid data formats, the API will return a 400 Bad Request status with validation error details.
     
-
+    7. If the API encounters an unexpected server-side error (such as database connection failures, internal processing errors, or system-level issues), the API will return a 500 Internal Server Error status with 
+       a generic error message.
 
 Error Handling
 ```````````````
