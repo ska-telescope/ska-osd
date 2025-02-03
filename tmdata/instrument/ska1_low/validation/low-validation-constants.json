@@ -52,14 +52,6 @@
                                 "error": "Invalid function for beams! Currently allowed visibilities"
                             }
                         ]
-                    },
-                    "channels": {
-                        "spectral_windows": [
-                            {
-                                "rule": "len(spectral_windows) == 1",
-                                "error": "spectral windows are too many! Current limit = 1"
-                            }
-                        ]
                     }
                 }
             }

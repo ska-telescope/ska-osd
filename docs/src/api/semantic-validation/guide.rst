@@ -1917,7 +1917,6 @@ Semantic Validation Success Response With Error for SBD-Mid input.
 
      {
       "detail": [
-        "Invalid input for channel_count! Currently allowed 14880",
         "Invalid input for freq_min",
         "Invalid input for freq_max",
         "freq_min should be less than freq_max",

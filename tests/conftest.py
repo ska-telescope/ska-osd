@@ -584,10 +584,6 @@ def open_api_spec():
                                                     "spectral windows are too many!"
                                                     " Current limit = 1"
                                                 ),
-                                                (
-                                                    "Invalid input for channel_count!"
-                                                    " Currently allowed 14880"
-                                                ),
                                                 "Invalid input for freq_min",
                                                 "Invalid input for freq_max",
                                                 "freq_min should be less than freq_max",
@@ -846,8 +842,6 @@ def invalid_semantic_validation_response():
             "receptor_ids are too many!Current Limit is 4",
             "beams are too many! Current limit is 1",
             "Invalid function for beams! Currently allowed visibilities",
-            "spectral windows are too many! Current limit = 1",
-            "Invalid input for channel_count! Currently allowed 14880",
             "Invalid input for freq_min",
             "Invalid input for freq_max",
             "freq_min should be less than freq_max",
