@@ -356,10 +356,12 @@ PUT /osd
 
 4. Example Response
 
-    * The API returns a JSON object containing the matched OSD data based on query params.
+    * The PUT API allows updating the OSD data by providing a JSON object in the request body.
 
-        Calling API with parameters ``cycle_id``,  ``capabilities``, ``array_assembly``
-        their valid inputs will return the JSON containing the matched OSD data.
+      When calling the PUT API, provide a complete JSON object containing all required fields including 
+      ``cycle_id``, ``capabilities``, and ``array_assembly``. The API will replace the existing OSD data 
+      that matches these parameters with the new data provided in the request body.
+
 
     .. code:: python
 
@@ -517,11 +519,18 @@ PUT /osd
 
 5. Scenarios
 
-    1. If ``osd_verison``, ``capabilities`` and ``array_assembly`` are given together then API will return capabilities json based on mid/low capabilities.
-    
-    2. If ``osd_verison``, ``capabilities`` are given together and request body contains basic_capabilities then API will return updated ``basic_capabilities``.
+    1. If ``cycle_id``, ``capabilities`` and ``array_assembly`` are provided together with valid data in the request body, the API will update the capabilities JSON for the specified mid/low capabilities and return a 200 OK status code with the updated resource.
 
-    3. If invalid ``cycle_id`` is given then API will return appropriate error message. 
+    2. If ``cycle_id``, ``capabilities`` are provided together and the request body contains ``basic_capabilities``, the API will update the basic_capabilities and return a 200 OK status code.
+
+    3. If invalid ``cycle_id`` is provided in the request, the API will return a 404 Not Found status with an appropriate error message.
+
+    4. If an invalid ``array_assembly`` value is provided (values other than 'AA0.5', 'AA1', or 'AA2'), the API will return a 400 Bad Request status with an error message indicating the allowed array_assembly values.
+
+    5. If the ``array_assembly`` value doesn't match the required pattern (must be 'AA' followed by a number), the API will return a 400 Bad Request status with a message indicating the correct format pattern.
+
+    6. If the request body is missing required fields or contains invalid data formats, the API will return a 400 Bad Request status with validation error details.
+    
 
 
 Error Handling

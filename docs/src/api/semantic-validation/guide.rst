@@ -209,12 +209,8 @@ Steps to add and change the validation_strictness environment variable in 'value
 
    * Setting the environment variable:
 
-      * :code:`strictness=0` will not run any external validation, only the Pydantic model validation in the CDM. This is the same as setting :code:`validation=False`
-
-      * :code:`strictness=1` will apply telmodel schema validation, but raise warnings rather than exceptions, it will not apply OSD semantic validation.
-
-      * :code:`strictness=2` will run telmodel schema validation that raises exceptions, and also apply the OSD semantic validations.
-
+      The VALIDATION_STRICTNESS parameter determines the level of validation applied. When set to 2, it enables the semantic 
+      validation flag for OSD validation, while setting it to 1 only applies telmodel schema validation without OSD semantic checks.
 
       .. code::
 
