@@ -138,6 +138,7 @@ mid_configure_expected_result_for_invalid_data = (
     "Invalid input for receiver_band! Currently allowed [1,2]\n"
     "The fsp_ids should all be distinct\n"
     "fsp_ids are too many!Current Limit is 4\n"
+    "Invalid fsp_ids! The range should not greater than 4\n"
     "Invalid input for channel_width! Currently allowed [13440]\n"
     "channel_count must be between 1 to 58982\n"
     "channel_count must be a multiple of 20\n"
@@ -162,6 +163,7 @@ low_configure_expected_result_for_invalid_data = (
     "Invalid input for firmware! Currently allowed vis\n"
     "The fsp_ids should all be distinct\n"
     "fsp_ids are too many!Current Limit is 6\n"
+    "Invalid fsp_ids! The range should not greater than 6\n"
     "beams are too many!Current Limit is 1\n"
     "Invalid input for firmware! Currently allowed pst\n"
     "beams are too many! Current limit is 1"
@@ -199,28 +201,28 @@ low_sbd_expected_result_for_invalid_data = (
 @pytest.mark.parametrize(
     "config, telescope, expected_result, is_exception",
     [
-        # (VALID_MID_ASSIGN_JSON, "MID", True, False),
-        # (INVALID_MID_ASSIGN_JSON, "MID", mid_expected_result_for_invalid_data, True),
-        # (VALID_LOW_ASSIGN_JSON, "LOW", True, False),
+        (VALID_MID_ASSIGN_JSON, "MID", True, False),
+        (INVALID_MID_ASSIGN_JSON, "MID", mid_expected_result_for_invalid_data, True),
+        (VALID_LOW_ASSIGN_JSON, "LOW", True, False),
         (INVALID_LOW_ASSIGN_JSON, "LOW", low_expected_result_for_invalid_data, True),
-        # (VALID_MID_CONFIGURE_JSON, "MID", True, False),
-        # (
-        #     INVALID_MID_CONFIGURE_JSON,
-        #     "MID",
-        #     mid_configure_expected_result_for_invalid_data,
-        #     True,
-        # ),
-        # (VALID_LOW_CONFIGURE_JSON, "LOW", True, False),
-        # (
-        #     INVALID_LOW_CONFIGURE_JSON,
-        #     "LOW",
-        #     low_configure_expected_result_for_invalid_data,
-        #     True,
-        # ),
-        # (VALID_MID_SBD_JSON, "MID", True, False),
-        # (INVALID_MID_SBD_JSON, "MID", mid_sbd_expected_result_for_invalid_data, True),
-        # (VALID_LOW_SBD_JSON, "LOW", True, False),
-        # (INVALID_LOW_SBD_JSON, "LOW", low_sbd_expected_result_for_invalid_data, True),
+        (VALID_MID_CONFIGURE_JSON, "MID", True, False),
+        (
+            INVALID_MID_CONFIGURE_JSON,
+            "MID",
+            mid_configure_expected_result_for_invalid_data,
+            True,
+        ),
+        (VALID_LOW_CONFIGURE_JSON, "LOW", True, False),
+        (
+            INVALID_LOW_CONFIGURE_JSON,
+            "LOW",
+            low_configure_expected_result_for_invalid_data,
+            True,
+        ),
+        (VALID_MID_SBD_JSON, "MID", True, False),
+        (INVALID_MID_SBD_JSON, "MID", mid_sbd_expected_result_for_invalid_data, True),
+        (VALID_LOW_SBD_JSON, "LOW", True, False),
+        (INVALID_LOW_SBD_JSON, "LOW", low_sbd_expected_result_for_invalid_data, True),
         # # Add more test cases here
     ],
 )
