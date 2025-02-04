@@ -38,6 +38,36 @@ paths:
           $ref: '#/components/responses/BadRequest'
         "500":
           $ref: '#/components/responses/InternalServerError'
+    put:
+      summary: Update OSD data filter by the query parameter
+      description: |
+        Update the OSD data which match the query parameters. Also requests without parameters will take
+        example and default values and return data based on that. All query parameters has its own validation
+        if user provide any invalid value it will return the error message.
+      operationId: ska_ost_osd.rest.api.resources.update_osd_data
+      parameters:
+        - $ref: '#/components/parameters/cycle_id'
+        - $ref: '#/components/parameters/capabilities'
+        - $ref: '#/components/parameters/array_assembly'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './mid-osd-data-openapi-v1.yaml#/components/schemas/OSDRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
   /semantic_validation:
     post:
       summary: Checks if the Command Input JSON is semantically valid
@@ -111,6 +141,14 @@ components:
         type: string
       required: false
       example: AA0.5
+    telescope:
+      in: query
+      name: telescope
+      schema:
+        type: string
+        enum: [Mid, Low]
+      required: false
+      example: Mid
 
 
   responses:

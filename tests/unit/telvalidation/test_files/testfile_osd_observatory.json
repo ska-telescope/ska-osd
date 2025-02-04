@@ -1,0 +1,16 @@
+{
+    "cycle_number": 1,
+    "cycle_description": "Science Verification",
+    "cycle_information": {
+        "cycle_id": "SKAO_2027_1",
+        "proposal_open": "20260327T12:00:00.000Z",
+        "proposal_close": "20260512T15:00:00.000z"
+    },
+    "cycle_policies": {
+        "normal_max_hours": 100.0
+    },
+    "telescope_capabilities": {
+        "Mid": "AA2",
+        "Low": "AA2"
+    }
+}
