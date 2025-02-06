@@ -18,7 +18,8 @@
                 "number_ska_dishes": 4,
                 "number_zoom_channels": 0,
                 "number_zoom_windows": 0,
-                "ps_beam_bandwidth_hz": 400000000.0
+                "ps_beam_bandwidth_hz": 400000000.0,
+                "number_dish_ids": ["SKA001", "SKA036", "SKA063", "SKA100"]
             },
             "basic_capabilities": {
                 "dish_elevation_limit_deg": 15.0,

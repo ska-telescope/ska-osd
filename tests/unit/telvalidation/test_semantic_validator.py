@@ -108,13 +108,14 @@ INPUT_COMMAND_CONFIG = {
     "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
     "transaction_id": "txn-....-00001",
     "subarray_id": 1,
-    "dish": {"receptor_ids": ["0001"]},
+    "dish": {"receptor_ids": ["SKA001"]},
 }
 
 ARRAY_ASSEMBLY = "AA0.5"
 
 mid_expected_result_for_invalid_data = (
     "receptor_ids are too many!Current Limit is 4\n"
+    "Invalid input for receptor_ids! Currently allowed ['SKA001', 'SKA036', 'SKA063', 'SKA100']\n"
     "beams are too many! Current limit is 1\n"
     "Invalid function for beams! Currently allowed visibilities\n"
     "Invalid input for freq_min\n"
@@ -173,6 +174,7 @@ low_configure_expected_result_for_invalid_data = (
 mid_sbd_expected_result_for_invalid_data = (
     "receptor_ids are too many!Current Limit is 4\n"
     "beams are too many! Current limit is 1\n"
+    # "Invalid input for receptor_ids! Currently allowed ['SKA001', 'SKA036', 'SKA063', 'SKA100']\n"
     "Invalid function for beams! Currently allowed visibilities\n"
     "Invalid input for freq_min\n"
     "Invalid input for freq_max\n"
