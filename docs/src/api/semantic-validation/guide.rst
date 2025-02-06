@@ -592,7 +592,8 @@ Note: Below examples are given for MID telescope. For Low telescope need to chan
                 "number_pss_beams": 0,
                 "number_pst_beams": 0,
                 "ps_beam_bandwidth_hz": 0.0,
-                "number_fsps": 4
+                "number_fsps": 4,
+                "number_dish_ids": ["SKA001", "SKA036", "SKA063", "SKA100"]
             },
             "basic_capabilities": {
                 "dish_elevation_limit_deg": 15.0,
@@ -818,7 +819,8 @@ In below example added extra dish into 'receptor_ids' currently allowed 4, due t
                 "number_pss_beams": 0,
                 "number_pst_beams": 0,
                 "ps_beam_bandwidth_hz": 0.0,
-                "number_fsps": 4
+                "number_fsps": 4,
+                "number_dish_ids": ["SKA001", "SKA036", "SKA063", "SKA100"]
             },
             "basic_capabilities": {
                 "dish_elevation_limit_deg": 15.0,
@@ -1326,7 +1328,8 @@ Semantic Validation Success Response With Error
           "number_ska_dishes": 4,
           "number_zoom_channels": 0,
           "number_zoom_windows": 0,
-          "ps_beam_bandwidth_hz": 400000000
+          "ps_beam_bandwidth_hz": 400000000,
+          "number_dish_ids": ["SKA001", "SKA036", "SKA063", "SKA100"]
         },
         "basic_capabilities": {
           "dish_elevation_limit_deg": 15,
@@ -1849,7 +1852,8 @@ Semantic Validation Success Response for SBD-Mid input.
           "number_ska_dishes": 4,
           "number_zoom_channels": 0,
           "number_zoom_windows": 0,
-          "ps_beam_bandwidth_hz": 400000000
+          "ps_beam_bandwidth_hz": 400000000,
+          "number_dish_ids": ["SKA001", "SKA036", "SKA063", "SKA100"]
         },
         "basic_capabilities": {
           "dish_elevation_limit_deg": 15,

@@ -482,6 +482,12 @@ def open_api_spec():
                                                             ],
                                                             "allowed_channel_count_range_min": 1,
                                                             "allowed_channel_count_range_max": 58982,
+                                                            "number_dish_ids": [
+                                                                "SKA001",
+                                                                "SKA036",
+                                                                "SKA063",
+                                                                "SKA100",
+                                                            ],
                                                         },
                                                         "basic_capabilities": {
                                                             "dish_elevation_limit_deg": 15.0,
