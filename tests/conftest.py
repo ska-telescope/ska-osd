@@ -840,7 +840,10 @@ def invalid_semantic_validation_response():
     return {
         "detail": [
             "receptor_ids are too many!Current Limit is 4",
-            "Invalid input for receptor_ids! Currently allowed ['SKA001', 'SKA036', 'SKA063', 'SKA100']"
+            (
+                "Invalid input for receptor_ids! Currently allowed ['SKA001', 'SKA036',"
+                " 'SKA063', 'SKA100']"
+            ),
             "beams are too many! Current limit is 1",
             "Invalid function for beams! Currently allowed visibilities",
             "Invalid input for freq_min",
