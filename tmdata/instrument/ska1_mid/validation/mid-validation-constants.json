@@ -106,8 +106,8 @@
                             ],
                             "channel_count": [
                                 {
-                                    "rule": "allowed_channel_count_range_min <= channel_count <= allowed_channel_count_range_max",
-                                    "error": "channel_count must be between {allowed_channel_count_range_min} to {allowed_channel_count_range_max}"
+                                    "rule": "allowed_channel_count_range_min[0] <= channel_count <= allowed_channel_count_range_max[0]",
+                                    "error": "channel_count must be between {allowed_channel_count_range_min[0]} to {allowed_channel_count_range_max[0]}"
                                 },
                                 {
                                     "rule": "(channel_count % 20) == 0",

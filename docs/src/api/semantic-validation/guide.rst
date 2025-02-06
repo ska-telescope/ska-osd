@@ -1305,8 +1305,8 @@ Semantic Validation Success Response With Error
     "capabilities": {
       "mid": {
         "AA0.5": {
-          "allowed_channel_count_range_max": 58982,
-          "allowed_channel_count_range_min": 1,
+          "allowed_channel_count_range_max": [58982],
+          "allowed_channel_count_range_min": [1],
           "allowed_channel_width_values": [
             13440
           ],
@@ -1829,8 +1829,8 @@ Semantic Validation Success Response for SBD-Mid input.
     "capabilities": {
       "mid": {
         "AA0.5": {
-          "allowed_channel_count_range_max": 58982,
-          "allowed_channel_count_range_min": 1,
+          "allowed_channel_count_range_max": [58982],
+          "allowed_channel_count_range_min": [1],
           "allowed_channel_width_values": [
             13440
           ],

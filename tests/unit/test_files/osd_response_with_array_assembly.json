@@ -30,8 +30,8 @@
                 "ps_beam_bandwidth_hz": 400000000.0,
                 "number_fsps": 4,
                 "allowed_channel_width_values": [13440],
-                "allowed_channel_count_range_min": 1,
-                "allowed_channel_count_range_max": 58982,
+                "allowed_channel_count_range_min": [1],
+                "allowed_channel_count_range_max": [58982],
                 "number_dish_ids": ["SKA001", "SKA036", "SKA063", "SKA100"]
             },
             "basic_capabilities": {

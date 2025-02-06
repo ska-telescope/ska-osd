@@ -480,8 +480,12 @@ def open_api_spec():
                                                             "allowed_channel_width_values": [
                                                                 13440
                                                             ],
-                                                            "allowed_channel_count_range_min": 1,
-                                                            "allowed_channel_count_range_max": 58982,
+                                                            "allowed_channel_count_range_min": [
+                                                                1
+                                                            ],
+                                                            "allowed_channel_count_range_max": [
+                                                                58982
+                                                            ],
                                                             "number_dish_ids": [
                                                                 "SKA001",
                                                                 "SKA036",
