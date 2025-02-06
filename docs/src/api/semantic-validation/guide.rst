@@ -586,7 +586,6 @@ Note: Below examples are given for MID telescope. For Low telescope need to chan
                 "number_meerkatplus_dishes": 0,
                 "max_baseline_km": 1.5,
                 "available_bandwidth_hz": 800000000.0,
-                "number_channels": 14880,
                 "cbf_modes": ["CORR"],
                 "number_zoom_windows": 0,
                 "number_zoom_channels": 0,
@@ -813,7 +812,6 @@ In below example added extra dish into 'receptor_ids' currently allowed 4, due t
                 "number_meerkatplus_dishes": 0,
                 "max_baseline_km": 1.5,
                 "available_bandwidth_hz": 800000000.0,
-                "number_channels": 14880,
                 "cbf_modes": ["CORR"],
                 "number_zoom_windows": 0,
                 "number_zoom_channels": 0,
@@ -1320,7 +1318,6 @@ Semantic Validation Success Response With Error
             "pst"
           ],
           "max_baseline_km": 1.5,
-          "number_channels": 14880,
           "number_fsps": 4,
           "number_meerkat_dishes": 0,
           "number_meerkatplus_dishes": 0,
@@ -1844,7 +1841,6 @@ Semantic Validation Success Response for SBD-Mid input.
             "pst"
           ],
           "max_baseline_km": 1.5,
-          "number_channels": 14880,
           "number_fsps": 4,
           "number_meerkat_dishes": 0,
           "number_meerkatplus_dishes": 0,

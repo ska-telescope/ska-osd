@@ -218,7 +218,6 @@ GET /osd
                 "number_meerkatplus_dishes": 0,
                 "max_baseline_km": 110.0,
                 "available_bandwidth_hz": 800000.0,
-                "number_channels": 14880,
                 "cbf_modes": [
                     "correlation",
                     "pst",
