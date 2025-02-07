@@ -41,7 +41,7 @@ These are as follows:
 JSON validator file
 ~~~~~~~~~~~~~~~~~~~
 
-Four seperate JSON files have been created for Mid, Low and Scheduling Block Definition (MID & LOW) schemas to store all the parameters present in assign & configure resources
+Four separate JSON files have been created for Mid, Low and Scheduling Block Definition (MID & LOW) schemas to store all the parameters present in assign & configure resources
 along with its business rules and errors.
 
 * `Reference of JSON validator file (Mid) <https://gitlab.com/ska-telescope/ost/ska-ost-osd/-/blob/main/tmdata/instrument/ska1_mid/validation/mid-validation-constants.json?ref_type=heads>`_
@@ -52,7 +52,7 @@ along with its business rules and errors.
 
 * `Reference of JSON validator file (SBD-Low) <https://gitlab.com/ska-telescope/ost/ska-ost-osd/-/blob/main/tmdata/instrument/scheduling-block/validation/low_sbd-validation-constants?ref_type=heads>`_
 
-Created a seperate ``constant`` file to maintain all telvalidation constant. From there we are importing JSON validator file
+Created a separate ``constant`` file to maintain all telvalidation constant. From there we are importing JSON validator file
 in ``semantic_validator`` for Mid, Low as well as Scheduling Block Definition (MID) schemas.
 
 Below are the commands to import JSON validator files.
