@@ -29,7 +29,7 @@ from .coordinates_conversion import (
     ra_degs_from_str_formats,
 )
 from .schematic_validation_exceptions import (
-    SchemanticValdidationKeyError,
+    SchemanticValidationKeyError,
     SchematicValidationError,
 )
 
@@ -206,7 +206,7 @@ def apply_validation_rule(
                     error_msgs.append(error_msg)
             except KeyError as key_error:
                 logging.error(key_error)
-                raise SchemanticValdidationKeyError(  # pylint: disable=W0707
+                raise SchemanticValidationKeyError(  # pylint: disable=W0707
                     message="Invalid rule and error key passed"
                 )
 

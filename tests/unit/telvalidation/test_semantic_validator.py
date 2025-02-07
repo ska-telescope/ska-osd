@@ -15,7 +15,7 @@ from ska_ost_osd.telvalidation.oet_tmc_validators import (
     validate_target_is_visible,
 )
 from ska_ost_osd.telvalidation.schematic_validation_exceptions import (
-    SchemanticValdidationKeyError,
+    SchemanticValidationKeyError,
     SchematicValidationError,
 )
 from ska_ost_osd.telvalidation.semantic_validator import (
@@ -268,7 +268,7 @@ def test_semantic_validate_para(
 
 
 @patch("ska_ost_osd.telvalidation.semantic_validator.fetch_capabilities_from_osd")
-def test_validate_scemantic_json_input_keys(mock6):
+def test_validate_schemantic_json_input_keys(mock6):
     """
     Test if error is raised when invalid key is passed.
     """
@@ -278,7 +278,7 @@ def test_validate_scemantic_json_input_keys(mock6):
         osd_capabilities["basic_capabilities"],
     )
     with pytest.raises(
-        SchemanticValdidationKeyError,
+        SchemanticValidationKeyError,
         match="Invalid rule and error key passed",
     ):
         validate_json(

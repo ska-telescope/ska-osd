@@ -310,7 +310,7 @@ Limitation
     OSD version and semantic validation rule file version should be same.
 
 if OSD keys got removed/changed and those are not in validation rule file
-it will raise SchemanticValdidationKeyError saying ``Invalid rule and error key passed``
+it will raise SchemanticValidationKeyError saying ``Invalid rule and error key passed``
 
 
 
