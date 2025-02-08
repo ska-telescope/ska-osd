@@ -93,7 +93,7 @@ osd-pre-release:
 
 
 osddata-do-publish:
-	VERSION := $(shell \
+	VERSION = $(shell \
 	cat tmdata/version_mapping/latest_release.txt)
 
 	@echo "tmdata-publish: package to publish: $(TMDATA_PKG) version: $(VERSION) in: $(TMDATA_OUT_DIR)"
