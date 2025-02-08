@@ -91,7 +91,8 @@ osd-pre-release:
 	@./src/ska_ost_osd/osd/resource/release.sh $(VERSION)
 
 
+CI_MERGE_REQUEST_SOURCE_BRANCH_NAME=$(cat tmdata/version_mapping/latest_release.txt)
+
 osddata-do-publish:
-	VERSION=$(cat tmdata/version_mapping/latest_release.txt)
 	@echo "tmdata-publish: package to publish: $(TMDATA_PKG) version: $(VERSION) in: $(TMDATA_OUT_DIR)"
-	@. $(TMDATA_SUPPORT); publishTMData "$(TMDATA_SRC_DIR)" "$(TMDATA_OUT_DIR)" `git rev-parse HEAD` "${CI_COMMIT_TAG}" "${CI_COMMIT_BRANCH}" "$(VERSION)"
+	@. $(TMDATA_SUPPORT); publishTMData "$(TMDATA_SRC_DIR)" "$(TMDATA_OUT_DIR)" `git rev-parse HEAD` "${CI_COMMIT_TAG}" "${CI_COMMIT_BRANCH}" "${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}"
