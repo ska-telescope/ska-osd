@@ -466,7 +466,7 @@ def open_api_spec():
                                                             "number_meerkat_dishes": 0,
                                                             "number_meerkatplus_dishes": 0,
                                                             "max_baseline_km": 1.5,
-                                                            "available_bandwidth_hz": 800000.0,
+                                                            "available_bandwidth_hz": 800000000.0,
                                                             "cbf_modes": [
                                                                 "correlation",
                                                                 "pst",
@@ -588,10 +588,6 @@ def open_api_spec():
                                                 (
                                                     "Invalid function for beams!"
                                                     " Currently allowed visibilities"
-                                                ),
-                                                (
-                                                    "spectral windows are too many!"
-                                                    " Current limit = 1"
                                                 ),
                                                 "Invalid input for freq_min",
                                                 "Invalid input for freq_max",

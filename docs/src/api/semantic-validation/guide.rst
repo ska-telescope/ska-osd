@@ -586,12 +586,12 @@ Note: Below examples are given for MID telescope. For Low telescope need to chan
                 "number_meerkatplus_dishes": 0,
                 "max_baseline_km": 1.5,
                 "available_bandwidth_hz": 800000000.0,
-                "cbf_modes": ["CORR"],
+                "cbf_modes": ["correlation", "pst"],
                 "number_zoom_windows": 0,
                 "number_zoom_channels": 0,
                 "number_pss_beams": 0,
-                "number_pst_beams": 0,
-                "ps_beam_bandwidth_hz": 0.0,
+                "number_pst_beams": 1,
+                "ps_beam_bandwidth_hz": 400000000.0,
                 "number_fsps": 4,
                 "number_dish_ids": ["SKA001", "SKA036", "SKA063", "SKA100"]
             },
@@ -813,12 +813,12 @@ In below example added extra dish into 'receptor_ids' currently allowed 4, due t
                 "number_meerkatplus_dishes": 0,
                 "max_baseline_km": 1.5,
                 "available_bandwidth_hz": 800000000.0,
-                "cbf_modes": ["CORR"],
+                "cbf_modes": ["correlation", "pst"],
                 "number_zoom_windows": 0,
                 "number_zoom_channels": 0,
                 "number_pss_beams": 0,
-                "number_pst_beams": 0,
-                "ps_beam_bandwidth_hz": 0.0,
+                "number_pst_beams": 1,
+                "ps_beam_bandwidth_hz": 400000000.0,
                 "number_fsps": 4,
                 "number_dish_ids": ["SKA001", "SKA036", "SKA063", "SKA100"]
             },
@@ -1310,7 +1310,7 @@ Semantic Validation Success Response With Error
           "allowed_channel_width_values": [
             13440
           ],
-          "available_bandwidth_hz": 800000000,
+          "available_bandwidth_hz": 800000000.0,
           "available_receivers": [
             "Band_1",
             "Band_2"
@@ -1328,7 +1328,7 @@ Semantic Validation Success Response With Error
           "number_ska_dishes": 4,
           "number_zoom_channels": 0,
           "number_zoom_windows": 0,
-          "ps_beam_bandwidth_hz": 400000000,
+          "ps_beam_bandwidth_hz": 400000000.0,
           "number_dish_ids": ["SKA001", "SKA036", "SKA063", "SKA100"]
         },
         "basic_capabilities": {
@@ -1834,7 +1834,7 @@ Semantic Validation Success Response for SBD-Mid input.
           "allowed_channel_width_values": [
             13440
           ],
-          "available_bandwidth_hz": 800000000,
+          "available_bandwidth_hz": 800000000.0,
           "available_receivers": [
             "Band_1",
             "Band_2"
@@ -1852,7 +1852,7 @@ Semantic Validation Success Response for SBD-Mid input.
           "number_ska_dishes": 4,
           "number_zoom_channels": 0,
           "number_zoom_windows": 0,
-          "ps_beam_bandwidth_hz": 400000000,
+          "ps_beam_bandwidth_hz": 400000000.0,
           "number_dish_ids": ["SKA001", "SKA036", "SKA063", "SKA100"]
         },
         "basic_capabilities": {
