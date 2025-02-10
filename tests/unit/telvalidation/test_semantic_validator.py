@@ -1,8 +1,13 @@
 import json
 import os
+from typing import Dict
 import unittest
 from datetime import datetime
 from unittest.mock import patch
+
+from pathlib import Path
+from genson import SchemaBuilder
+from jsonschema import validate, ValidationError
 
 import pytest
 from ska_telmodel.data import TMData
@@ -42,16 +47,49 @@ def tm_data():
     return TMData(local_source)
 
 
-def load_string_from_file(filename):
+def load_string_from_file(filename: Path, source_file: bool = False):
     """
     Return a file from the current directory as a string
     """
     cwd, _ = os.path.split(__file__)
-    path = os.path.join(cwd, filename)
+
+    if not source_file:
+        path = os.path.join(cwd, filename)
+    else:
+        path = Path('/'.join(cwd.split('/')[0:-3]), filename) 
+
     with open(path, "r", encoding="utf-8") as json_file:
         json_data = json.load(json_file)
         return json_data
 
+def generate_schema(filename: Path, print_schema: bool = False, source_file: bool = True) -> Dict:
+    """
+    This Function creates a json schema for a given file
+
+    Args:
+        filename (Path): json file path
+        print_schema (bool, optional): if user wants to print schema or not. Defaults to False.
+        source_file (bool, optional): input to load_string_from_file function. Defaults to True.
+
+    Returns:
+        Dict: newly created json schema
+    """
+
+    SOURCE_FILE = load_string_from_file(filename, source_file=source_file)
+
+    builder = SchemaBuilder()
+    builder.add_object(SOURCE_FILE)
+
+    json_schema = builder.to_schema()
+
+    if print_schema:
+
+        print("Generated Schema:")
+        print(json.dumps(json_schema, indent=2))
+
+    return json_schema
+
+MID_SCHEMA = generate_schema("tmdata/ska1_mid/mid_capabilities.json", True)
 
 MID_OSD_DATA_JSON = load_string_from_file("test_files/testfile_mid_osd_data.json")
 
