@@ -1,13 +1,15 @@
 import json
 
-# import logging
+import logging
 import os
+import sys
 
-# import sys
-# from pathlib import Path
+from pathlib import Path
 from typing import Any
 
-# from ska_telmodel.data.new_data_backend import GitBackend
+from ska_telmodel.data.new_data_backend import GitBackend
+
+logging.basicConfig(level=logging.INFO)
 
 
 def read_json(json_file_location: str) -> dict[dict[str, Any]]:
@@ -18,7 +20,7 @@ def read_json(json_file_location: str) -> dict[dict[str, Any]]:
     :returns: file content as json object
     """
 
-    cwd, _ = os.path.split(__file__)
+    cwd = Path(__file__).resolve().parent.parent.parent.parent
     path = os.path.join(cwd, json_file_location)
     with open(path) as user_file:  # pylint: disable=W1514
         file_contents = json.load(user_file)
@@ -26,7 +28,6 @@ def read_json(json_file_location: str) -> dict[dict[str, Any]]:
     return file_contents
 
 
-# logging.basicConfig(level=logging.INFO)
 
 # ################################################################################
 # # Config

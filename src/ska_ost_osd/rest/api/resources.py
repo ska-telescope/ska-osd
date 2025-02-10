@@ -11,11 +11,16 @@ from typing import Dict
 from pydantic import ValidationError
 from ska_telmodel.data import TMData
 
+from pathlib import Path
+from ska_ost_osd.osd.gitlab_helper import push_to_gitlab
+
 from ska_ost_osd.osd.constant import (
     ARRAY_ASSEMBLY_PATTERN,
     LOW_CAPABILITIES_JSON_PATH,
     MID_CAPABILITIES_JSON_PATH,
     OBSERVATORY_POLICIES_JSON_PATH,
+    CYCLE_TO_VERSION_MAPPING,
+    RELEASE_VERSION_MAPPING,
     osd_file_mapping,
 )
 from ska_ost_osd.osd.helper import read_json
@@ -212,6 +217,50 @@ def update_osd_data(body: Dict, **kwargs) -> Dict:
 
     except (OSDModelError, ValueError) as error:
         raise error
+    
+@error_handler
+def release_osd_data(**kwargs):
+    """Release OSD data with automatic version increment based on cycle ID.
+    
+    Args:
+        **kwargs: Keyword arguments including:
+            - cycle_id: Required. The cycle ID for version mapping
+            - release_type: Optional. Type of release ('major' or 'minor', defaults to patch)
+        
+    Returns:
+        dict: Response containing the new version information
+    """
+    from ska_ost_osd.osd.version_manager import manage_version_release
+    
+    cycle_id = kwargs.get('cycle_id')
+    if not cycle_id:
+        raise ValueError("cycle_id is required")
+    cycle_id = "cycle_"+str(cycle_id)
+    release_type = kwargs.get('release_type')
+    if release_type and release_type not in ['major', 'minor']:
+        raise ValueError("release_type must be either 'major' or 'minor' if provided")
+    
+    # Use version manager to handle version release
+    new_version, cycle_id = manage_version_release(cycle_id, release_type)
+
+    files_to_add_small = [
+        (Path(LOW_CAPABILITIES_JSON_PATH), osd_file_mapping["low"]),
+        (Path(MID_CAPABILITIES_JSON_PATH), osd_file_mapping["mid"]),
+        (Path(OBSERVATORY_POLICIES_JSON_PATH), osd_file_mapping["observatory_policies"]),
+        (Path(CYCLE_TO_VERSION_MAPPING), "version_mapping/latest_release.txt"),
+        (Path(RELEASE_VERSION_MAPPING),osd_file_mapping["cycle_to_version_mapping"]),
+    ]
+    push_to_gitlab(files_to_add=files_to_add_small,
+                   commit_msg="updated tmdata",
+                   branch_name="nak-1093-tmdata-release")
+        
+    return {
+        "status": "success",
+        "message": f"Released new version {new_version}",
+        "version": str(new_version),
+        "cycle_id": cycle_id
+    }
+    
 
 
 @error_handler
