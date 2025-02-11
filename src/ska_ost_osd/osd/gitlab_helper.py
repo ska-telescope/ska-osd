@@ -44,6 +44,7 @@ def push_to_gitlab(files_to_add: List[Tuple[Path, str]], commit_msg: str, branch
     repo = "ska-telescope/ost/ska-ost-osd"
     git_repo = GitBackend(repo=repo)
     git_repo.checkout_branch(branch_name)
+    
     # # Create branch
     # logger.info("Creating branch...")
     # git_repo.create_branch(branch)
@@ -76,6 +77,5 @@ def push_to_gitlab(files_to_add: List[Tuple[Path, str]], commit_msg: str, branch
         
     # Commit and push
     git_repo.commit(commit_msg)
-
     print("Push Branch...")
     git_repo.commit_transaction()
