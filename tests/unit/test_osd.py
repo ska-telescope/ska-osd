@@ -1,94 +1,30 @@
-import json
-import os
 from importlib.metadata import version
-from typing import Any
 
 import pytest
-from ska_telmodel.data import TMData
 
 from ska_ost_osd.osd.osd import get_osd_data, osd_tmdata_source
-
-
-def read_json(json_file_location: str) -> dict[dict[str, Any]]:
-    """This function returns json file object from local file system
-
-    :param json_file_location: json file.
-
-    :returns: file content as json object
-    """
-    cwd, _ = os.path.split(__file__)
-    path = os.path.join(cwd, json_file_location)
-
-    with open(path) as user_file:  # pylint: disable=W1514
-        file_contents = json.load(user_file)
-
-    return file_contents
-
-
-DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER = read_json(
-    "test_files/default_osd_response.json"
+from tests.conftest import (
+    DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER,
+    OSD_RESPONSE_WITH_CAPABILITIES_ARRAY_ASSEMBLY_PARAMETER,
+    OSD_RESPONSE_WITH_ONLY_CAPABILITIES_PARAMETER,
+    tm_data_osd,
 )
-OSD_RESPONSE_WITH_ONLY_CAPABILITIES_PARAMETER = read_json(
-    "test_files/osd_response_with_capabilities.json"
-)
-
-file_name = "osd_response_with_capabilities_and_array_assembly.json"
-OSD_RESPONSE_WITH_CAPABILITIES_ARRAY_ASSEMBLY_PARAMETER = read_json(
-    f"test_files/{file_name}"
-)
-
-
-@pytest.fixture(scope="module")
-def tm_data():
-    """This function is used as a fixture for tm_data object
-
-    :returns: tmdata object
-    """
-
-    source_uris, _ = osd_tmdata_source(cycle_id=1, source="file")
-    return TMData(source_uris=source_uris)
-
-
-@pytest.fixture(scope="module")
-def validate_car_class():
-    """This function is used as a fixture for osd_tmdata_source object
-        with osd_version as '1.11.0'
-
-    :returns: osd_tmdata_source object
-    """
-    tmdata_source, _ = osd_tmdata_source(osd_version="1.11.0")
-    return tmdata_source
-
-
-@pytest.fixture(scope="module")
-def validate_gitlab_class():
-    """This function is used as a fixture for osd_tmdata_source object
-        with parameters.
-
-    :returns: osd_tmdata_source object
-    """
-    tmdata_source, _ = osd_tmdata_source(
-        cycle_id=1,
-        gitlab_branch="nak-776-osd-implementation-file-versioning",
-        source="gitlab",
-    )
-    return tmdata_source
 
 
 @pytest.mark.parametrize(
     "capabilities, array_assembly, tmdata, expected",
     [
-        (None, None, tm_data, DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER),
+        (None, None, tm_data_osd, DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER),
         (
             ["mid"],
             None,
-            tm_data,
+            tm_data_osd,
             OSD_RESPONSE_WITH_ONLY_CAPABILITIES_PARAMETER,
         ),
         (
             ["mid"],
             "AA0.5",
-            tm_data,
+            tm_data_osd,
             OSD_RESPONSE_WITH_CAPABILITIES_ARRAY_ASSEMBLY_PARAMETER,
         ),
     ],
@@ -98,7 +34,7 @@ def test_get_osd_data(
     array_assembly,
     tmdata,  # pylint: disable=W0613
     expected,
-    tm_data,  # pylint: disable=W0621
+    tm_data_osd,  # pylint: disable=W0621
 ):
     """This test case checks the functionality of get_osd_data
         it converts the python dict into list keys and checks
@@ -108,19 +44,19 @@ def test_get_osd_data(
     :param array_assembly: Array Assembly AA0.5, AA1
     :param tmdata: tmdata object
     :param expected: output of get_osd_data function
-    :param tm_data: tmdata fixture
+    :param tm_data_osd: tmdata fixture
 
     :returns: assert equals values
     """
 
-    result, _ = get_osd_data(capabilities, array_assembly, tmdata=tm_data)
+    result, _ = get_osd_data(capabilities, array_assembly, tmdata=tm_data_osd)
     result_keys = list(result["capabilities"].keys())
     expected_keys = list(expected["capabilities"].keys())
 
     assert result_keys == expected_keys
 
 
-def test_set_source_car_method(validate_car_class):  # pylint: disable=W0621
+def test_set_source_car_method(validate_car_class):
     """This test case checks if the output of the osd_tmdata_source
         function is as expected or not.
 
@@ -130,7 +66,7 @@ def test_set_source_car_method(validate_car_class):  # pylint: disable=W0621
     assert validate_car_class == ("car:ost/ska-ost-osd?1.11.0#tmdata",)
 
 
-def test_set_source_gitlab_method(validate_gitlab_class):  # pylint: disable=W0621
+def test_set_source_gitlab_method(validate_gitlab_class):
     """This test case checks if the output of the osd_tmdata_source
         function is as expected or not.
 
@@ -247,16 +183,16 @@ def test_invalid_source(osd_versions):
     )
 
 
-def test_invalid_get_osd_data_capability(tm_data):  # pylint: disable=W0621
+def test_invalid_get_osd_data_capability(tm_data_osd):  # pylint: disable=W0621
     """This test case checks if the output of the get_osd_data
-    when capabilities is given incorrect with corret array_assembly
+    when capabilities is given incorrect with correct array_assembly
     it should return the appropriate error messages.
 
-    :param tm_data: tm_data
+    :param tm_data_osd: tm_data_osd
     """
 
     _, error_msgs = get_osd_data(
-        capabilities=["midd"], array_assembly="AA1", tmdata=tm_data
+        capabilities=["midd"], array_assembly="AA1", tmdata=tm_data_osd
     )
     assert error_msgs == [
         "Capability midd is not valid,Available Capabilities are low, mid,"
@@ -264,16 +200,16 @@ def test_invalid_get_osd_data_capability(tm_data):  # pylint: disable=W0621
     ]
 
 
-def test_invalid_get_osd_data_array_assembly(tm_data):  # pylint: disable=W0621
+def test_invalid_get_osd_data_array_assembly(tm_data_osd):  # pylint: disable=W0621
     """This test case checks if the output of the get_osd_data
-    when array_assembly is given incorrect with corret capabilities
+    when array_assembly is given incorrect with correct capabilities
     it should return the appropriate error messages.
 
-    :param tm_data: tm_data
+    :param tm_data_osd: tm_data_osd
     """
 
     _, error_msgs = get_osd_data(
-        capabilities=["mid"], array_assembly="AA3", tmdata=tm_data
+        capabilities=["mid"], array_assembly="AA3", tmdata=tm_data_osd
     )
     assert error_msgs == [
         "Array Assembly AA3 is not valid,Available Array Assemblies are AA0.5, AA1, AA2"
