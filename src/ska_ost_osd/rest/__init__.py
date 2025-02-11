@@ -40,6 +40,7 @@ def init_app(open_api_spec=None):
     Resolving the spec is relatively time-consuming, so allow a single
     spec to be injected to all the test app instances to speed up the unit tests
     """
+    os.environ["GIT_PYTHON_REFRESH"] = "quiet"
     if open_api_spec is None:
         open_api_spec = get_openapi_spec()
 
