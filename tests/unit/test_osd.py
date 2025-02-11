@@ -16,7 +16,6 @@ def read_json(json_file_location: str) -> dict[dict[str, Any]]:
 
     :returns: file content as json object
     """
-
     cwd, _ = os.path.split(__file__)
     path = os.path.join(cwd, json_file_location)
 
@@ -115,7 +114,6 @@ def test_get_osd_data(
     """
 
     result, _ = get_osd_data(capabilities, array_assembly, tmdata=tm_data)
-
     result_keys = list(result["capabilities"].keys())
     expected_keys = list(expected["capabilities"].keys())
 

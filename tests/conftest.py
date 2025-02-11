@@ -8,6 +8,8 @@ from ska_ost_osd.rest import init_app
 from ska_ost_osd.telvalidation.constant import CAR_TELMODEL_SOURCE
 from tests.unit.telvalidation.test_semantic_validator import (
     INVALID_MID_ASSIGN_JSON,
+    LOW_MOCK_DATA,
+    MID_MOCK_DATA,
     MID_OSD_DATA_JSON,
     VALID_MID_ASSIGN_JSON,
 )
@@ -788,6 +790,26 @@ def mid_osd_data():
     :returns dict: The OpenAPI specification
     """
     return MID_OSD_DATA_JSON
+
+
+@pytest.fixture(scope="module")
+def mock_mid_data():
+    """This function is used as a fixture for mid json data
+
+    :returns: mid json data
+    """
+
+    return MID_MOCK_DATA
+
+
+@pytest.fixture(scope="module")
+def mock_low_data():
+    """This function is used as a fixture for low json data
+
+    :returns: low json data
+    """
+
+    return LOW_MOCK_DATA
 
 
 @pytest.fixture
