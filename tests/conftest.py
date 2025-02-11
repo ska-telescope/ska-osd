@@ -1,21 +1,195 @@
 import json
 import os
 from importlib.metadata import version
+from pathlib import Path
+from typing import Dict
 
 import pytest
+from ska_telmodel.data import TMData
 
+from ska_ost_osd.osd.osd import osd_tmdata_source
 from ska_ost_osd.rest import init_app
 from ska_ost_osd.telvalidation.constant import CAR_TELMODEL_SOURCE
-from tests.unit.telvalidation.test_semantic_validator import (
-    INVALID_MID_ASSIGN_JSON,
-    MID_OSD_DATA_JSON,
-    VALID_MID_ASSIGN_JSON,
-)
 
 # flake8: noqa E501
 # pylint: disable=W0621
 OSD_MAJOR_VERSION = version("ska-ost-osd").split(".")[0]
 BASE_API_URL = f"/ska-ost-osd/osd/api/v{OSD_MAJOR_VERSION}"
+
+
+def read_json(json_file_location: Path) -> Dict:
+    """This function returns json file object from local file system
+
+    :param json_file_location: json file.
+
+    :returns: file content as json object
+    """
+    cwd, _ = os.path.split(__file__)
+    path = os.path.join(cwd, "unit/", json_file_location)
+
+    with open(path) as user_file:  # pylint: disable=W1514
+        file_contents = json.load(user_file)
+
+    return file_contents
+
+
+MID_MOCK_DATA = read_json("test_files/mock_mid_capabilities.json")
+
+LOW_MOCK_DATA = read_json("test_files/mock_low_capabilities.json")
+
+MID_OSD_DATA_JSON = read_json("test_files/testfile_mid_osd_data.json")
+
+VALID_MID_ASSIGN_JSON = read_json("test_files/testfile_valid_mid_assign.json")
+INVALID_MID_ASSIGN_JSON = read_json("test_files/testfile_invalid_mid_assign.json")
+VALID_MID_CONFIGURE_JSON = read_json("test_files/testfile_valid_mid_configure.json")
+VALID_MID_SBD_JSON = read_json("test_files/testfile_valid_mid_sbd.json")
+INVALID_MID_SBD_JSON = read_json("test_files/testfile_invalid_mid_sbd.json")
+VALID_LOW_SBD_JSON = read_json("test_files/testfile_valid_low_sbd.json")
+INVALID_LOW_SBD_JSON = read_json("test_files/testfile_invalid_low_sbd.json")
+INVALID_MID_CONFIGURE_JSON = read_json("test_files/testfile_invalid_mid_configure.json")
+VALID_LOW_ASSIGN_JSON = read_json("test_files/testfile_valid_low_assign.json")
+INVALID_LOW_ASSIGN_JSON = read_json("test_files/testfile_invalid_low_assign.json")
+VALID_LOW_CONFIGURE_JSON = read_json("test_files/testfile_valid_low_configure.json")
+INVALID_LOW_CONFIGURE_JSON = read_json("test_files/testfile_invalid_low_configure.json")
+capabilities = read_json("test_files/testfile_capabilities.json")
+
+DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER = read_json(
+    "test_files/default_osd_response.json"
+)
+OSD_RESPONSE_WITH_ONLY_CAPABILITIES_PARAMETER = read_json(
+    "test_files/osd_response_with_capabilities.json"
+)
+
+file_name = "osd_response_with_capabilities_and_array_assembly.json"
+OSD_RESPONSE_WITH_CAPABILITIES_ARRAY_ASSEMBLY_PARAMETER = read_json(
+    f"test_files/{file_name}"
+)
+
+# This is dummy constant json for testing "Invalid rule and error key passed" scenario.
+INVALID_MID_VALIDATE_CONSTANT = {
+    "AA0.5": {
+        "assign_resource": {
+            "dish": {
+                "receptor_ids": [
+                    {
+                        "rules": "(0 < len(receptor_ids) <= 0)",
+                        "error": (
+                            "receptor_ids are                             too"
+                            " many!Current Limit is 4"
+                        ),
+                    }
+                ]
+            }
+        }
+    }
+}
+
+INPUT_COMMAND_CONFIG = {
+    "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
+    "transaction_id": "txn-....-00001",
+    "subarray_id": 1,
+    "dish": {"receptor_ids": ["SKA001"]},
+}
+
+ARRAY_ASSEMBLY = "AA0.5"
+
+mid_expected_result_for_invalid_data = (
+    "receptor_ids are too many!Current Limit is 4\nInvalid input for receptor_ids!"
+    " Currently allowed ['SKA001', 'SKA036', 'SKA063', 'SKA100']\nbeams are too many!"
+    " Current limit is 1\nInvalid function for beams! Currently allowed"
+    " visibilities\nInvalid input for freq_min\nInvalid input for freq_max\nfreq_min"
+    " should be less than freq_max\nlength of receptor_ids should be same as length of"
+    " receptors\nreceptor_ids did not match receptors"
+)
+
+low_expected_result_for_invalid_data = (
+    "subarray_beam_id must be between 1 and 48\n"
+    "number_of_channels must be between 8 and 384\n"
+    "Invalid input for station_id! Currently allowed [345, 350, 352, 431]\n"
+    "Initials of aperture_id should be AP\n"
+    "station_id in aperture_id should be same as station_id\n"
+    "beams are too many! Current limit is 1\n"
+    "Invalid function for beams! Currently allowed visibilities"
+)
+
+mid_configure_expected_result_for_invalid_data = (
+    "Invalid input for receiver_band! Currently allowed [1,2]\n"
+    "The fsp_ids should all be distinct\n"
+    "fsp_ids are too many!Current Limit is 4\n"
+    "Invalid fsp_ids! The range should not greater than 4\n"
+    "Invalid input for channel_width! Currently allowed [13440]\n"
+    "channel_count must be between 1 to 58982\n"
+    "channel_count must be a multiple of 20\n"
+    "Invalid input for start_freq\n"
+    "Invalid input for start_freq\n"
+    "sdp_start_channel_id must be between 0 to 2147483647\n"
+    "integration_factor must be between 1 to 10\n"
+    "frequency_band did not match receiver_band"
+)
+
+low_configure_expected_result_for_invalid_data = (
+    "subarray_beam_id must be between 1 and 48\n"
+    "update_rate must be greater than or equal to 0.0\n"
+    "start_channel must be greater than 2 and less than 504\n"
+    "number_of_channels must be greater than or equal to 8 and less"
+    " than or equal to 384\n"
+    "Initials of aperture_id should be AP\n"
+    "Invalid reference frame! Currently allowed  [“topocentric”, “ICRS”, “galactic”]\n"
+    "c1 must be between 0.0 and 360.0\n"
+    "c2 must be between -90.0 and 90.0\n"
+    "stations are too many! Current limit is 4\n"
+    "Invalid input for firmware! Currently allowed vis\n"
+    "The fsp_ids should all be distinct\n"
+    "fsp_ids are too many!Current Limit is 6\n"
+    "Invalid fsp_ids! The range should not greater than 6\n"
+    "beams are too many!Current Limit is 1\n"
+    "Invalid input for firmware! Currently allowed pst\n"
+    "beams are too many! Current limit is 1"
+)
+
+mid_sbd_expected_result_for_invalid_data = (
+    "receptor_ids are too many!Current Limit is 4\n"
+    "beams are too many! Current limit is 1\n"
+    "Invalid function for beams! Currently allowed visibilities\n"
+    "Invalid input for freq_min\n"
+    "Invalid input for freq_max\n"
+    "freq_min should be less than freq_max\n"
+    "length of receptor_ids should be same as length of receptors\n"
+    "receptor_ids did not match receptors\n"
+    "FSPs are too many!Current Limit = 4\n"
+    "Invalid input for fsp_id!\n"
+    "Invalid input for function_mode\n"
+    "Invalid input for zoom_factor\n"
+    "frequency_slice_id did not match fsp_id\n"
+    "Invalid input for receiver_band! Currently allowed [1,2]"
+)
+
+low_sbd_expected_result_for_invalid_data = (
+    "subarray_beam_id must be between 1 and 48\n"
+    "number_of_channels must be between 8 and 384\n"
+    "Invalid input for station_id! Currently allowed [345, 350, 352, 431]\n"
+    "The logical_fsp_ids should all be distinct\n"
+    "logical_fsp_ids are too many!Current Limit is 6\n"
+    "Invalid input for zoom_factor"
+)
+
+sources = [
+    CAR_TELMODEL_SOURCE[0],
+    "car:ska-telmodel-data?main",
+]
+
+local_source = ["file://tmdata"]
+
+
+@pytest.fixture(scope="module")
+def git_tm_data():
+    return TMData(sources)
+
+
+# re-defined TMData for local file source
+@pytest.fixture(scope="module")
+def tm_data():
+    return TMData(local_source)
 
 
 @pytest.fixture
@@ -24,6 +198,43 @@ def tmdata_source():
     TMData source URL fixture
     """
     return CAR_TELMODEL_SOURCE[0]
+
+
+@pytest.fixture(scope="module")
+def tm_data_osd():
+    """This function is used as a fixture for tm_data object
+
+    :returns: tmdata object
+    """
+
+    source_uris, _ = osd_tmdata_source(cycle_id=1, source="file")
+    return TMData(source_uris=source_uris)
+
+
+@pytest.fixture(scope="module")
+def validate_car_class():
+    """This function is used as a fixture for osd_tmdata_source object
+        with osd_version as '1.11.0'
+
+    :returns: osd_tmdata_source object
+    """
+    tmdata_source, _ = osd_tmdata_source(osd_version="1.11.0")
+    return tmdata_source
+
+
+@pytest.fixture(scope="module")
+def validate_gitlab_class():
+    """This function is used as a fixture for osd_tmdata_source object
+        with parameters.
+
+    :returns: osd_tmdata_source object
+    """
+    tmdata_source, _ = osd_tmdata_source(
+        cycle_id=1,
+        gitlab_branch="nak-776-osd-implementation-file-versioning",
+        source="gitlab",
+    )
+    return tmdata_source
 
 
 @pytest.fixture
@@ -784,6 +995,26 @@ def mid_osd_data():
     :returns dict: The OpenAPI specification
     """
     return MID_OSD_DATA_JSON
+
+
+@pytest.fixture(scope="module")
+def mock_mid_data():
+    """This function is used as a fixture for mid json data
+
+    :returns: mid json data
+    """
+
+    return MID_MOCK_DATA
+
+
+@pytest.fixture(scope="module")
+def mock_low_data():
+    """This function is used as a fixture for low json data
+
+    :returns: low json data
+    """
+
+    return LOW_MOCK_DATA
 
 
 @pytest.fixture

@@ -9,7 +9,7 @@ class SchematicValidationError(ValueError):
         super().__init__(self.message)
 
 
-class SchemanticValdidationKeyError(KeyError):
+class SchemanticValidationKeyError(KeyError):
     """class to raise invalid input key for schemantic validation"""
 
     # flake8: noqa E501

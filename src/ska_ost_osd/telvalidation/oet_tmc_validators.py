@@ -29,7 +29,7 @@ from .coordinates_conversion import (
     ra_degs_from_str_formats,
 )
 from .schematic_validation_exceptions import (
-    SchemanticValdidationKeyError,
+    SchemanticValidationKeyError,
     SchematicValidationError,
 )
 
@@ -206,7 +206,7 @@ def apply_validation_rule(
                     error_msgs.append(error_msg)
             except KeyError as key_error:
                 logging.error(key_error)
-                raise SchemanticValdidationKeyError(  # pylint: disable=W0707
+                raise SchemanticValidationKeyError(  # pylint: disable=W0707
                     message="Invalid rule and error key passed"
                 )
 
@@ -390,7 +390,7 @@ def validate_target_is_visible(
     :param observing_time: string containing value of observing_time
     :param target_env: string containing the environment value(mid/low)
             for the target
-    :param tm_data: telemodel tm dataobject using which
+    :param tm_data: telemodel tm data object using which
             we can load semantic validate json.
     """
     observing_time = observing_time.strftime("%Y-%m-%dT%H:%M:%S")
