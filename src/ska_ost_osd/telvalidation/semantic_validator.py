@@ -13,10 +13,7 @@ from typing import Any, Optional
 from pydantic import ValidationError
 from ska_telmodel.data import TMData
 
-from ska_ost_osd.telvalidation.semantic_schema_validator import (
-    SemanticModel,
-    SemanticModelError,
-)
+from ska_ost_osd.telvalidation.semantic_schema_validator import SemanticModel
 
 from .constant import (
     ASSIGN_RESOURCE,
@@ -324,7 +321,7 @@ def semantic_validate(
             )
         except ValidationError as err:
             raise err
-        except SemanticModelError as semantic_error:
+        except ValueError as semantic_error:
             raise semantic_error
         clear_semantic_variable_data()
         version = observing_command_input.get("interface") or interface

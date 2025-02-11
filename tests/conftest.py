@@ -874,7 +874,10 @@ def invalid_semantic_validation_response():
 @pytest.fixture
 def observing_command_input_missing_response():
     return {
-        "detail": ["Input should be a valid dictionary"],
+        "detail": [
+            "Value error, [{'field': 'observing_command_input', 'msg': 'This field is"
+            " required'}]"
+        ],
         "status": -1,
         "title": "Value Error",
     }

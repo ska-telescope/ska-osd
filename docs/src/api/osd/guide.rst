@@ -309,6 +309,231 @@ GET /osd
     5. If ``cycle_id`` and ``array_assembly`` are provided together then API will return appropriate error message.
 
 
+PUT /osd
+==========================
+
+.. list-table:: OSD REST resources
+   :widths: 5 15 80
+   :header-rows: 1
+
+   * - HTTP Method
+     - Resource URL
+     - Description
+   * - PUT
+     - ``/ska-ost-osd/osd/api/v2/osd/``
+     - **Updating Data**
+
+       Update the OSD capabilities data.
+
+
+1. Query Parameters
+
+  * The API supports the following query parameters to update the OSD data:
+
+    ===================    ============================================================
+    Parameters             Description
+    ===================    ============================================================
+    cycle_id               Cycle Id a integer value 1, 2, 3
+    capabilities           Mid or Low
+    array_assembly         AA0.5, AA1 or any Array Assembly
+    ===================    ============================================================
+
+
+
+2. For example:
+
+.. code:: python
+
+    "/ska-ost-osd/osd/api/v2/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
+
+
+3. CURL Example Request
+
+.. code:: python
+
+    curl -X PUT "/ska-ost-osd/osd/api/v2/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
+
+
+4. Example Response
+
+    * The PUT API allows updating the OSD data by providing a JSON object in the request body.
+
+      When calling the PUT API, provide a complete JSON object containing all required fields including 
+      ``cycle_id``, ``capabilities``, and ``array_assembly``. The API will replace the existing OSD data 
+      that matches these parameters with the new data provided in the request body.
+
+
+    .. code:: python
+
+        client.put(
+            "/ska-ost-osd/osd/api/v2/osd",
+            query_string={
+                "cycle_id": 1,
+                "capabilities": "mid",
+                "array_assembly": "AA1",
+            },
+        )
+
+    * Response
+
+    .. code:: python
+
+        {
+            "AA0.5": {
+                "allowed_channel_count_range_max": 58982,
+                "allowed_channel_count_range_min": 1,
+                "allowed_channel_width_values": [
+                13440
+                ],
+                "available_bandwidth_hz": 800000000,
+                "available_receivers": [
+                "Band_1",
+                "Band_2"
+                ],
+                "cbf_modes": [
+                "correlation",
+                "pst"
+                ],
+                "max_baseline_km": 1.5,
+                "number_channels": 14880,
+                "number_fsps": 4,
+                "number_meerkat_dishes": 0,
+                "number_meerkatplus_dishes": 0,
+                "number_pss_beams": 0,
+                "number_pst_beams": 1,
+                "number_ska_dishes": 6,
+                "number_zoom_channels": 0,
+                "number_zoom_windows": 0,
+                "ps_beam_bandwidth_hz": 400000000
+            },
+            "AA1": {
+                "allowed_channel_count_range_max": 58982,
+                "allowed_channel_count_range_min": 1,
+                "available_bandwidth_hz": 800000000,
+                "available_receivers": [
+                "Band_1",
+                "Band_2",
+                "Band_5a",
+                "Band_5b"
+                ],
+                "cbf_modes": [
+                "correlation",
+                "pst"
+                ],
+                "max_baseline_km": 1.5,
+                "number_channels": 14880,
+                "number_fsps": 8,
+                "number_meerkat_dishes": 0,
+                "number_meerkatplus_dishes": 0,
+                "number_pss_beams": 0,
+                "number_pst_beams": 1,
+                "number_ska_dishes": 8,
+                "number_zoom_channels": 0,
+                "number_zoom_windows": 0,
+                "ps_beam_bandwidth_hz": 400000000
+            },
+            "AA2": {
+                "allowed_channel_count_range_max": 214748647,
+                "allowed_channel_count_range_min": 1,
+                "allowed_channel_width_values": [
+                210,
+                420,
+                840,
+                1680,
+                3360,
+                6720,
+                13440,
+                26880,
+                40320,
+                53760,
+                80640,
+                107520,
+                161280,
+                215040,
+                322560,
+                416640,
+                430080,
+                645120
+                ],
+                "available_bandwidth_hz": 800000000,
+                "available_receivers": [
+                "Band_1",
+                "Band_2",
+                "Band_5a",
+                "Band_5b"
+                ],
+                "cbf_modes": [
+                "correlation",
+                "pst",
+                "pss"
+                ],
+                "max_baseline_km": 110,
+                "number_channels": 14880,
+                "number_fsps": 27,
+                "number_meerkat_dishes": 4,
+                "number_meerkatplus_dishes": 0,
+                "number_pss_beams": 384,
+                "number_pst_beams": 6,
+                "number_ska_dishes": 64,
+                "number_zoom_channels": 14880,
+                "number_zoom_windows": 16,
+                "ps_beam_bandwidth_hz": 800000000
+            },
+            "basic_capabilities": {
+                "dish_elevation_limit_deg": 16,
+                "receiver_information": [
+                {
+                    "max_frequency_hz": 1050000000,
+                    "min_frequency_hz": 350000000,
+                    "rx_id": "Band_1"
+                },
+                {
+                    "max_frequency_hz": 1760000000,
+                    "min_frequency_hz": 950000000,
+                    "rx_id": "Band_2"
+                },
+                {
+                    "max_frequency_hz": 3050000000,
+                    "min_frequency_hz": 1650000000,
+                    "rx_id": "Band_3"
+                },
+                {
+                    "max_frequency_hz": 5180000000,
+                    "min_frequency_hz": 2800000000,
+                    "rx_id": "Band_4"
+                },
+                {
+                    "max_frequency_hz": 8500000000,
+                    "min_frequency_hz": 4600000000,
+                    "rx_id": "Band_5a"
+                },
+                {
+                    "max_frequency_hz": 15400000000,
+                    "min_frequency_hz": 8300000000,
+                    "rx_id": "Band_5b"
+                }
+                ]
+            },
+            "telescope": "Mid"
+        }
+
+5. Scenarios
+
+    1. If ``cycle_id``, ``capabilities`` and ``array_assembly`` are provided together with valid data in the request body, the API will update the capabilities JSON for the specified mid/low capabilities and return a 200 OK status code with the updated resource.
+
+    2. If ``cycle_id``, ``capabilities`` are provided together and the request body contains ``basic_capabilities``, the API will update the basic_capabilities and return a 200 OK status code.
+
+    3. If invalid ``cycle_id`` is provided in the request, the API will return a 404 Not Found status with an appropriate error message.
+
+    4. If an invalid ``array_assembly`` value is provided (values other than 'AA0.5', 'AA1', or 'AA2'), the API will return a 400 Bad Request status with an error message indicating the allowed array_assembly values.
+
+    5. If the ``array_assembly`` value doesn't match the required pattern (must be 'AA' followed by a number), the API will return a 400 Bad Request status with a message indicating the correct format pattern.
+
+    6. If the request body is missing required fields or contains invalid data formats, the API will return a 400 Bad Request status with validation error details.
+    
+    7. If the API encounters an unexpected server-side error (such as database connection failures, internal processing errors, or system-level issues), the API will return a 500 Internal Server Error status with 
+       a generic error message.
+
 Error Handling
 ```````````````
 

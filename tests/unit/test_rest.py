@@ -543,9 +543,8 @@ def test_semantic_validate_api_not_passing_required_keys(
     """
     json_body = valid_semantic_validation_body.copy()
     del json_body["observing_command_input"]
-    expected_response = observing_command_input_missing_response
     res = client.post(f"{BASE_API_URL}/semantic_validation", json=json_body)
-    assert res.get_json() == expected_response
+    assert res.get_json() == observing_command_input_missing_response
 
 
 @patch("ska_ost_osd.rest.api.resources.get_tmdata_sources")

@@ -84,6 +84,11 @@ test-dev-environment:
 stop-dev-environment:
   <<: *dev_env
 
+osd-tmdata-publish:
+  stage: publish
+  script:
+    - make osddata-do-publish
+
 include:
   # Python
   - project: "ska-telescope/templates-repository"
