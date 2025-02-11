@@ -68,31 +68,34 @@ paths:
           $ref: '#/components/responses/BadRequest'
         "500":
           $ref: '#/components/responses/InternalServerError'
-  /release:
+  
     post:
-      summary: Checks if the Command Input JSON is semantically valid
+      summary: Update OSD data filter by the query parameter
       description: |
-        Validate input json Semantically
-        Semantic validation checks the meaning of the input data and ensures that it is valid in the context of the system. It checks whether the input data conforms to the business rules and logic of the system.
-      operationId: ska_ost_osd.rest.api.resources.release_osd_data
-      parameters:
-        - $ref: '#/components/parameters/cycle_id'
-        - $ref: '#/components/parameters/release_type'
+        Update the OSD data which match the query parameters. Also requests without parameters will take
+        example and default values and return data based on that. All query parameters has its own validation
+        if user provide any invalid value it will return the error message.
+      operationId: ska_ost_osd.rest.api.resources.insert_osd_data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './mid-osd-data-openapi-v1.yaml#/components/schemas/OSDRequest'
       responses:
-        '200':
-          description: Semantic Validation Successfully
+        "200":
+          description: OK
           content:
             application/json:
               schema:
-                $ref: './semantic-validation-openapi-v1.yaml#/components/schemas/SemanticValidationSuccessResponse'
-        '400':
-          description: Bad Request due to semantic validation errors.
-          content:
-            application/json:
-              schema:
-                $ref: './semantic-validation-openapi-v1.yaml#/components/schemas/SemanticValidationErrorResponse'
-        '500':
+                type: array
+                items:
+                  type: object
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "500":
           $ref: '#/components/responses/InternalServerError'
+
   /semantic_validation:
     post:
       summary: Checks if the Command Input JSON is semantically valid
@@ -122,6 +125,31 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /release:
+    post:
+      summary: Checks if the Command Input JSON is semantically valid
+      description: |
+        Validate input json Semantically
+        Semantic validation checks the meaning of the input data and ensures that it is valid in the context of the system. It checks whether the input data conforms to the business rules and logic of the system.
+      operationId: ska_ost_osd.rest.api.resources.release_osd_data
+      parameters:
+        - $ref: '#/components/parameters/cycle_id'
+        - $ref: '#/components/parameters/release_type'
+      responses:
+        '200':
+          description: Semantic Validation Successfully
+          content:
+            application/json:
+              schema:
+                $ref: './semantic-validation-openapi-v1.yaml#/components/schemas/SemanticValidationSuccessResponse'
+        '400':
+          description: Bad Request due to semantic validation errors.
+          content:
+            application/json:
+              schema:
+                $ref: './semantic-validation-openapi-v1.yaml#/components/schemas/SemanticValidationErrorResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
 components:
   parameters:
