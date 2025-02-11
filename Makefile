@@ -90,7 +90,6 @@ osd-pre-release:
 
 	@./src/ska_ost_osd/osd/resource/release.sh $(VERSION)
 
-
 CI_MERGE_REQUEST_SOURCE_BRANCH_NAME := $(shell cat tmdata/version_mapping/latest_release.txt)
 osddata-do-publish:
 	@echo "tmdata-publish: package to publish: $(TMDATA_PKG) version: $(VERSION) in: $(TMDATA_OUT_DIR)"
