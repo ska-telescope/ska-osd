@@ -380,8 +380,8 @@ PUT /osd
 
         {
             "AA0.5": {
-                "allowed_channel_count_range_max": 58982,
-                "allowed_channel_count_range_min": 1,
+                "allowed_channel_count_range_max": [58982],
+                "allowed_channel_count_range_min": [1],
                 "allowed_channel_width_values": [
                 13440
                 ],
@@ -407,8 +407,9 @@ PUT /osd
                 "ps_beam_bandwidth_hz": 400000000
             },
             "AA1": {
-                "allowed_channel_count_range_max": 58982,
-                "allowed_channel_count_range_min": 1,
+                "allowed_channel_count_range_max": [58982],
+                "allowed_channel_count_range_min": [1],
+                "allowed_channel_width_values": [13440],
                 "available_bandwidth_hz": 800000000,
                 "available_receivers": [
                 "Band_1",
@@ -433,8 +434,8 @@ PUT /osd
                 "ps_beam_bandwidth_hz": 400000000
             },
             "AA2": {
-                "allowed_channel_count_range_max": 214748647,
-                "allowed_channel_count_range_min": 1,
+                "allowed_channel_count_range_max": [214748647],
+                "allowed_channel_count_range_min": [1],
                 "allowed_channel_width_values": [
                 210,
                 420,
