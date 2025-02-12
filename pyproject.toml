@@ -69,6 +69,7 @@ pytest-repeat = "^0.9.1"
 pytest-timeout = "^2.0.1"
 platformdirs = "^2.5.1"
 requests-mock = "^1.9.3"
+Flask-Cors="^5.0.0"
 
 
 [tool.poetry.group.docs.dependencies]
