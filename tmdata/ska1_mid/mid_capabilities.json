@@ -134,5 +134,8 @@
         "number_zoom_channels": 14880,
         "number_zoom_windows": 16,
         "ps_beam_bandwidth_hz": 800000000
+    },
+    "AA0.6": {
+        "max_content": 1000
     }
 }
