@@ -73,6 +73,10 @@ def manage_version_release(cycle_id: str, release_type: Optional[str] = None) ->
     # Increment version
     new_version = increment_version(latest_version, release_type)
     
+    # Keep incrementing version until we find one that doesn't exist in any cycle
+    while any(new_version in cycle_versions for cycle_versions in version_mapping.values()):
+        new_version = increment_version(new_version, release_type)
+    
     # Update version mapping with new version
     version_mapping[cycle_id].append(new_version)
     
