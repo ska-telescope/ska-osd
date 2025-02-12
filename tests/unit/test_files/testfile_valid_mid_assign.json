@@ -4,7 +4,7 @@
   "dish": {
     "receptor_ids": [
       "SKA001",
-      "SKA002"
+      "SKA036"
     ]
   },
   "sdp": {
@@ -129,7 +129,7 @@
       "csp_links": [1, 2, 3, 4],
       "receptors": [
               "SKA001",
-              "SKA002"
+              "SKA036"
       ]
     }
   }

@@ -44,10 +44,9 @@ components:
           number_pst_beams: 1
           ps_beam_bandwidth_hz: 400000000.0
           number_fsps: 4
-          allowed_channel_width_values: 
-            - 13440
-          allowed_channel_count_range_min: 1
-          allowed_channel_count_range_max: 58982
+          allowed_channel_width_values: [13440]
+          allowed_channel_count_range_min: [1]
+          allowed_channel_count_range_max: [58982]
         AA1:
           available_receivers:
             - Band_1
@@ -69,8 +68,9 @@ components:
           number_pst_beams: 1
           ps_beam_bandwidth_hz: 400000000.0
           number_fsps: 8
-          allowed_channel_count_range_min: 1
-          allowed_channel_count_range_max: 58982
+          allowed_channel_width_values: [13440]
+          allowed_channel_count_range_min: [1]
+          allowed_channel_count_range_max: [58982]
         AA2:
           available_receivers:
             - Band_1
@@ -112,8 +112,8 @@ components:
             - 416640
             - 430080
             - 645120
-          allowed_channel_count_range_min: 1
-          allowed_channel_count_range_max: 214748647
+          allowed_channel_count_range_min: [1]
+          allowed_channel_count_range_max: [214748647]
   
     OSDResponse:
       type: object

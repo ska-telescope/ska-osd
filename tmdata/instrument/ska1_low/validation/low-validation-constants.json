@@ -52,14 +52,6 @@
                                 "error": "Invalid function for beams! Currently allowed visibilities"
                             }
                         ]
-                    },
-                    "channels": {
-                        "spectral_windows": [
-                            {
-                                "rule": "len(spectral_windows) == 1",
-                                "error": "spectral windows are too many! Current limit = 1"
-                            }
-                        ]
                     }
                 }
             }
@@ -149,6 +141,10 @@
                                 {
                                     "rule": "(0 < len(fsp_ids) <= number_fsps)",
                                     "error": "fsp_ids are too many!Current Limit is {number_fsps}"
+                                },
+                                {
+                                    "rule": "False if len([num for num in fsp_ids if num > number_fsps])> 0 else True",
+                                    "error": "Invalid fsp_ids! The range should not greater than {number_fsps}"
                                 }
                             ]
                         }
