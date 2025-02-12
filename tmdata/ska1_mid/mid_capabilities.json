@@ -123,8 +123,8 @@
             "pst",
             "pss"
         ],
-        "max_baseline_km": "170",
-        "number_channels": 14880,
+        "max_baseline_km": 140,
+        "number_channels": "15000",
         "number_fsps": 27,
         "number_meerkat_dishes": 4,
         "number_meerkatplus_dishes": 0,
