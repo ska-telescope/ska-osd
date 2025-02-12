@@ -7,6 +7,10 @@
                     {
                         "rule": "(0 < len(receptor_ids) <= number_ska_dishes)",
                         "error": "receptor_ids are too many!Current Limit is {number_ska_dishes}"
+                    },
+                    {
+                        "rule": "set(receptor_ids).difference(set(number_dish_ids))",
+                        "error": "Invalid input for receptor_ids! Currently allowed {number_dish_ids}"
                     }
                 ]
             },

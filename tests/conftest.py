@@ -150,20 +150,15 @@ low_configure_expected_result_for_invalid_data = (
 )
 
 mid_sbd_expected_result_for_invalid_data = (
-    "receptor_ids are too many!Current Limit is 4\n"
-    "beams are too many! Current limit is 1\n"
-    "Invalid function for beams! Currently allowed visibilities\n"
-    "Invalid input for freq_min\n"
-    "Invalid input for freq_max\n"
-    "freq_min should be less than freq_max\n"
-    "length of receptor_ids should be same as length of receptors\n"
-    "receptor_ids did not match receptors\n"
-    "FSPs are too many!Current Limit = 4\n"
-    "Invalid input for fsp_id!\n"
-    "Invalid input for function_mode\n"
-    "Invalid input for zoom_factor\n"
-    "frequency_slice_id did not match fsp_id\n"
-    "Invalid input for receiver_band! Currently allowed [1,2]"
+    "receptor_ids are too many!Current Limit is 4\nInvalid input for receptor_ids!"
+    " Currently allowed ['SKA001', 'SKA036', 'SKA063', 'SKA100']\nbeams are too many!"
+    " Current limit is 1\nInvalid function for beams! Currently allowed"
+    " visibilities\nInvalid input for freq_min\nInvalid input for freq_max\nfreq_min"
+    " should be less than freq_max\nlength of receptor_ids should be same as length of"
+    " receptors\nreceptor_ids did not match receptors\nFSPs are too many!Current Limit"
+    " = 4\nInvalid input for fsp_id!\nInvalid input for function_mode\nInvalid input"
+    " for zoom_factor\nfrequency_slice_id did not match fsp_id\nInvalid input for"
+    " receiver_band! Currently allowed [1,2]"
 )
 
 low_sbd_expected_result_for_invalid_data = (
