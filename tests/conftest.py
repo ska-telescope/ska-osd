@@ -39,6 +39,8 @@ LOW_MOCK_DATA = read_json("test_files/mock_low_capabilities.json")
 
 MID_OSD_DATA_JSON = read_json("test_files/testfile_mid_osd_data.json")
 
+OSD_OBSERVATORY_JSON_DATA = read_json("test_files/testfile_osd_observatory.json")
+
 VALID_MID_ASSIGN_JSON = read_json("test_files/testfile_valid_mid_assign.json")
 INVALID_MID_ASSIGN_JSON = read_json("test_files/testfile_invalid_mid_assign.json")
 VALID_MID_CONFIGURE_JSON = read_json("test_files/testfile_valid_mid_configure.json")
@@ -995,6 +997,17 @@ def mid_osd_data():
     :returns dict: The OpenAPI specification
     """
     return MID_OSD_DATA_JSON
+
+
+@pytest.fixture
+def osd_observatory_policies():
+    """This fixture returns the expected OpenAPI specification
+        that is returned from the API. It is used to validate
+        the response in tests.
+
+    :returns dict: The OpenAPI specification
+    """
+    return OSD_OBSERVATORY_JSON_DATA
 
 
 @pytest.fixture(scope="module")

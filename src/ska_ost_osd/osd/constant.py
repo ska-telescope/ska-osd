@@ -37,3 +37,7 @@ QUERY_FIELDS = [
     "capabilities",
     "array_assembly",
 ]
+
+MID_CAPABILITIES_JSON_PATH = "tmdata/ska1_mid/mid_capabilities.json"
+LOW_CAPABILITIES_JSON_PATH = "tmdata/ska1_low/low_capabilities.json"
+OBSERVATORY_POLICIES_JSON_PATH = "tmdata/observatory_policies.json"

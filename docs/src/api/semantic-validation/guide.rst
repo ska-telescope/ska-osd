@@ -205,16 +205,19 @@ The purpose of this environment variable, is likely to control whether semantic 
 should be performed in the program. By using an environment variable, the behavior can be easily 
 changed without modifying the code itself, which is useful for different deployment environments or testing scenarios.
 
-Steps to add and change the VALIDATION_STRICTNESS environment variable:
+Steps to add and change the validation_strictness environment variable in 'values.yaml' file:
 
    * Setting the environment variable:
+
+      The VALIDATION_STRICTNESS parameter determines the level of validation applied. When set to 2, it enables the semantic 
+      validation flag for OSD validation, while setting it to 1 only applies telmodel schema validation without OSD semantic checks.
 
       .. code::
 
             from os import environ
             VALIDATION_STRICTNESS = environ.get("VALIDATION_STRICTNESS", "2")
 
-   * Changing the value: User can change the value by running below command with a different value.
+   * Changing the value: User can change the value by running below command with a different value from CLI.
 
       .. code::
       

@@ -3,14 +3,29 @@ Functions which the HTTP requests to individual resources are mapped to.
 
 See the operationId fields of the Open API spec for the specific mappings.
 """
+import re
 from functools import wraps
 from http import HTTPStatus
+from typing import Dict
 
 from pydantic import ValidationError
 from ska_telmodel.data import TMData
 
+from ska_ost_osd.osd.constant import (
+    ARRAY_ASSEMBLY_PATTERN,
+    LOW_CAPABILITIES_JSON_PATH,
+    MID_CAPABILITIES_JSON_PATH,
+    OBSERVATORY_POLICIES_JSON_PATH,
+    osd_file_mapping,
+)
+from ska_ost_osd.osd.helper import read_json
 from ska_ost_osd.osd.osd import get_osd_using_tmdata
 from ska_ost_osd.osd.osd_schema_validator import OSDModelError
+from ska_ost_osd.osd.osd_validation_messages import (
+    ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE,
+    CYCLE_ID_ERROR_MESSAGE,
+)
+from ska_ost_osd.rest.api.utils import read_file, update_file
 from ska_ost_osd.telvalidation import SchematicValidationError, semantic_validate
 from ska_ost_osd.telvalidation.constant import (
     CAR_TELMODEL_SOURCE,
@@ -121,6 +136,82 @@ def validation_response(
 
 def get_tmdata_sources(source):
     return [source] if source else CAR_TELMODEL_SOURCE  # check source
+
+
+@error_handler
+def update_osd_data(body: Dict, **kwargs) -> Dict:
+    """
+    This function updates the input JSON against the schema
+
+    :param body:
+    A dictionary containing key-value pairs of parameters required for validation.
+
+    :returns: :returns dict: A dictionary with OSD data satisfying the query.
+    """
+
+    try:
+        cycle_id = kwargs.get("cycle_id")
+        capabilities = kwargs.get("capabilities")
+        array_assembly = kwargs.get("array_assembly")
+
+        if not isinstance(cycle_id, int):
+            raise ValueError("Cycle ID must be an integer")
+
+        if capabilities is None:
+            raise ValueError("Capabilities must be provided")
+
+        versions_dict = read_json(osd_file_mapping["cycle_to_version_mapping"])
+        cycle_ids = [int(key.split("_")[-1]) for key in versions_dict]
+        cycle_id_exists = [cycle_id if cycle_id in cycle_ids else None][0]
+        string_ids = ",".join([str(i) for i in cycle_ids])
+
+        if cycle_id is not None and cycle_id_exists is None:
+            raise ValueError(
+                CYCLE_ID_ERROR_MESSAGE.format(cycle_id, string_ids),
+            )
+
+        capabilities_path = (
+            MID_CAPABILITIES_JSON_PATH
+            if capabilities.lower() == "mid"
+            else LOW_CAPABILITIES_JSON_PATH
+        )
+
+        if array_assembly:
+            if not re.match(ARRAY_ASSEMBLY_PATTERN, array_assembly):
+                raise ValueError(
+                    "Array assembly must be in the format of AA[0-9].[0-9]"
+                )
+
+            existing_data = read_file(capabilities_path)
+            array_assembly_list = list(
+                filter(lambda x: x.startswith("A"), existing_data.keys())
+            )
+
+            if array_assembly not in array_assembly_list:
+                raise ValueError(
+                    ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE.format(
+                        array_assembly, ", ".join(array_assembly_list)
+                    ),
+                )
+
+            existing_data[array_assembly].update(body)
+            update_file(capabilities_path, existing_data)
+            return existing_data
+
+        elif "basic_capabilities" in body.keys():
+            existing_data = read_file(capabilities_path)
+            existing_data["basic_capabilities"].update(body["basic_capabilities"])
+            update_file(capabilities_path, existing_data)
+            return existing_data
+
+        elif cycle_id and capabilities:
+            existing_data = read_file(OBSERVATORY_POLICIES_JSON_PATH)
+            existing_data.update(body)
+            update_file(OBSERVATORY_POLICIES_JSON_PATH, existing_data)
+            return existing_data
+
+    except (OSDModelError, ValueError) as error:
+        raise error
 
 
 @error_handler
