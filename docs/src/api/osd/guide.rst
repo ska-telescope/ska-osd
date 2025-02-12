@@ -217,8 +217,7 @@ GET /osd
                 "number_meerkat_dishes": 4,
                 "number_meerkatplus_dishes": 0,
                 "max_baseline_km": 110.0,
-                "available_bandwidth_hz": 800000.0,
-                "number_channels": 14880,
+                "available_bandwidth_hz": 800000000.0,
                 "cbf_modes": [
                     "correlation",
                     "pst",
@@ -228,11 +227,12 @@ GET /osd
                 "number_zoom_channels": 14880,
                 "number_pss_beams": 384,
                 "number_pst_beams": 6,
-                "ps_beam_bandwidth_hz": 800000.0,
-                "number_fsps": 27,
+                "ps_beam_bandwidth_hz": 800000000.0,
+                "number_fsps": 26,
                 "allowed_channel_width_values": [210, 420, 840, 1680, 3360, 6720, 13440, 26880, 40320, 53760, 80640, 107520, 161280, 215040, 322560, 416640, 430080, 645120],
-                "allowed_channel_count_range_min": 1,
-                "allowed_channel_count_range_max": 214748647
+                "allowed_channel_count_range_min": [1],
+                "allowed_channel_count_range_max": [214748647],
+                "number_dish_ids": ["SKA001", "SKA008", "SKA013", "SKA014", "SKA015", "SKA016", "SKA019", "SKA024", "SKA025", "SKA027", "SKA028", "SKA030", "SKA031", "SKA032", "SKA033", "SKA034", "SKA035", "SKA036", "SKA037", "SKA038", "SKA039", "SKA040", "SKA041", "SKA042", "SKA043", "SKA045", "SKA046", "SKA048", "SKA049", "SKA050", "SKA051", "SKA055", "SKA061", "SKA063", "SKA067", "SKA068", "SKA070", "SKA075", "SKA077", "SKA079", "SKA081", "SKA082", "SKA083", "SKA089", "SKA091", "SKA092", "SKA095", "SKA096", "SKA097", "SKA098", "SKA099", "SKA100", "SKA101", "SKA102", "SKA103", "SKA104", "SKA106", "SKA108", "SKA109", "SKA113", "SKA114", "SKA123", "SKA125", "SKA126"]
                 },
                 "basic_capabilities": {
                     "dish_elevation_limit_deg": 15,
@@ -380,8 +380,8 @@ PUT /osd
 
         {
             "AA0.5": {
-                "allowed_channel_count_range_max": 58982,
-                "allowed_channel_count_range_min": 1,
+                "allowed_channel_count_range_max": [58982],
+                "allowed_channel_count_range_min": [1],
                 "allowed_channel_width_values": [
                 13440
                 ],
@@ -407,8 +407,9 @@ PUT /osd
                 "ps_beam_bandwidth_hz": 400000000
             },
             "AA1": {
-                "allowed_channel_count_range_max": 58982,
-                "allowed_channel_count_range_min": 1,
+                "allowed_channel_count_range_max": [58982],
+                "allowed_channel_count_range_min": [1],
+                "allowed_channel_width_values": [13440],
                 "available_bandwidth_hz": 800000000,
                 "available_receivers": [
                 "Band_1",
@@ -433,8 +434,8 @@ PUT /osd
                 "ps_beam_bandwidth_hz": 400000000
             },
             "AA2": {
-                "allowed_channel_count_range_max": 214748647,
-                "allowed_channel_count_range_min": 1,
+                "allowed_channel_count_range_max": [214748647],
+                "allowed_channel_count_range_min": [1],
                 "allowed_channel_width_values": [
                 210,
                 420,

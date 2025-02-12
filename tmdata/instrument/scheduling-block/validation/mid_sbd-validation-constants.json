@@ -7,6 +7,10 @@
                     {
                         "rule": "(0 < len(receptor_ids) <= number_ska_dishes)",
                         "error": "receptor_ids are too many!Current Limit is {number_ska_dishes}"
+                    },
+                    {
+                        "rule": "set(receptor_ids).difference(set(number_dish_ids))",
+                        "error": "Invalid input for receptor_ids! Currently allowed {number_dish_ids}"
                     }
                 ]
             },
@@ -27,19 +31,7 @@
                         ]
                     },
                     "channels": {
-                        "parent_key_rule": [
-                            {
-                                "rule": "len(spectral_windows) == 1",
-                                "error": "spectral windows are too many! Current limit = 1"
-                            }
-                        ],
                         "spectral_windows": {
-                            "count": [
-                                {
-                                    "rule": "count == number_channels",
-                                    "error": "Invalid input for channel_count! Currently allowed {number_channels}"
-                                }
-                            ],
                             "freq_min": [
                                 {
                                     "rule": "min_frequency_hz <= freq_min <= max_frequency_hz",

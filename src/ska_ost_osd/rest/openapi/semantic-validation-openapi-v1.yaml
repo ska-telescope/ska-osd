@@ -135,7 +135,6 @@ components:
                   number_meerkatplus_dishes: 0
                   max_baseline_km: 1.5
                   available_bandwidth_hz: 800000000.0
-                  number_channels: 14880
                   cbf_modes: ["correlation", "pst"]
                   number_zoom_windows: 0
                   number_zoom_channels: 0
@@ -144,8 +143,9 @@ components:
                   ps_beam_bandwidth_hz: 400000000.0
                   number_fsps: 4
                   allowed_channel_width_values: [13440]
-                  allowed_channel_count_range_min: 1
-                  allowed_channel_count_range_max: 58982
+                  allowed_channel_count_range_min: [1]
+                  allowed_channel_count_range_max: [58982]
+                  number_dish_ids: ["SKA001", "SKA036", "SKA063", "SKA100"]
                 basic_capabilities:
                   dish_elevation_limit_deg: 15.0
                   receiver_information:
@@ -195,10 +195,9 @@ components:
       example:
         detail:
           - "receptor_ids are too many!Current Limit is 4"
+          - "Invalid input for receptor_ids! Currently allowed ['SKA001', 'SKA036', 'SKA063', 'SKA100']"
           - "beams are too many! Current limit is 1"
           - "Invalid function for beams! Currently allowed visibilities"
-          - "spectral windows are too many! Current limit = 1"
-          - "Invalid input for channel_count! Currently allowed 14880"
           - "Invalid input for freq_min"
           - "Invalid input for freq_max"
           - "freq_min should be less than freq_max"

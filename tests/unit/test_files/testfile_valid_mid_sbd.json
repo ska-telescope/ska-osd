@@ -345,8 +345,7 @@
           4
         ],
         "receptors": [
-          "0001",
-          "0002"    
+          "SKA001", "SKA036"    
         ],
         "receive_nodes": 10
       }
@@ -408,8 +407,7 @@
     ],
     "dish_allocations": {
       "receptor_ids": [
-        "0001",
-        "0002"  
+        "SKA001", "SKA036"  
       ]
     },
     "dish_configurations": [

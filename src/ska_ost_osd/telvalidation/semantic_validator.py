@@ -201,7 +201,7 @@ def fetch_matched_capabilities_from_basic_capabilities(
     """
     clone_capabilities = capabilities.copy()
     stack = [(capabilities, [])]
-    replacible_values = []
+    replaceable_values = []
     while stack:
         current, path = stack.pop()
         if isinstance(current, dict):
@@ -211,7 +211,7 @@ def fetch_matched_capabilities_from_basic_capabilities(
                         basic_capabilities, key
                     )
                     if matched_values:
-                        replacible_values.append(matched_values)
+                        replaceable_values.append(matched_values)
                 if isinstance(value, (dict, list)):
                     stack.append((value, path + [key]))
 
@@ -225,9 +225,11 @@ def fetch_matched_capabilities_from_basic_capabilities(
                         basic_capabilities, item
                     )
                     if matched_values:
-                        replacible_values.append(matched_values)
-    if replacible_values and path:
-        replace_matched_capabilities_values(clone_capabilities, path, replacible_values)
+                        replaceable_values.append(matched_values)
+    if replaceable_values and path:
+        replace_matched_capabilities_values(
+            clone_capabilities, path, replaceable_values
+        )
     return clone_capabilities
 
 

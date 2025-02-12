@@ -18,8 +18,7 @@
                 "number_meerkat_dishes": 0,
                 "number_meerkatplus_dishes": 0,
                 "max_baseline_km": 1.5,
-                "available_bandwidth_hz": 800000.0,
-                "number_channels": 14880,
+                "available_bandwidth_hz": 800000000.0,
                 "cbf_modes": [
                     "correlation",
                     "pst"
@@ -31,8 +30,9 @@
                 "ps_beam_bandwidth_hz": 400000000.0,
                 "number_fsps": 4,
                 "allowed_channel_width_values": [13440],
-                "allowed_channel_count_range_min": 1,
-                "allowed_channel_count_range_max": 58982
+                "allowed_channel_count_range_min": [1],
+                "allowed_channel_count_range_max": [58982],
+                "number_dish_ids": ["SKA001", "SKA036", "SKA063", "SKA100"]
             },
             "basic_capabilities": {
                 "dish_elevation_limit_deg": 15.0,
@@ -78,7 +78,7 @@
                 "number_beams": 1,
                 "max_baseline_km": 3.0,
                 "available_bandwidth_hz": 75000000.0,
-                "channel_width_hz": 5400,
+                "channel_width_hz": 5425.34722,
                 "cbf_modes": ["vis", "pst"],
                 "number_zoom_windows": 0,
                 "number_zoom_channels": 0,
