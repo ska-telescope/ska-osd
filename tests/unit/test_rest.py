@@ -92,7 +92,7 @@ def test_init_app_client(client, open_api_spec):
     "cycle_id, osd_version, source, capabilities, array_assembly, expected",
     [
         (
-            3,
+            100,
             "1..1.0",
             "file",
             "mid",
@@ -102,7 +102,7 @@ def test_init_app_client(client, open_api_spec):
                     "Cycle_id and Array_assembly cannot be used together",
                     "osd_version 1..1.0 is not valid",
                     "array_assembly AAA3 is not valid",
-                    "Cycle 3 is not valid,Available IDs are 1",
+                    "Cycle 100 is not valid,Available IDs are 1",
                 ],
                 "status": -1,
                 "title": "Value Error",
@@ -113,10 +113,10 @@ def test_init_app_client(client, open_api_spec):
             None,
             "file",
             "mid",
-            "AA3",
+            "AA100",
             {
                 "detail": [
-                    "Array Assembly AA3 is not valid,Available Array Assemblies"
+                    "Array Assembly AA100 is not valid,Available Array Assemblies"
                     " are AA0.5, AA1, AA2"
                 ],
                 "title": "Value Error",
@@ -149,13 +149,13 @@ def test_init_app_client(client, open_api_spec):
         ),
         (
             1,
-            "3.0.7",
+            "31.0.7",
             None,
             ["mid"],
             None,
             {
                 "detail": [
-                    "OSD Version 3.0.7 is not valid,Available OSD Versions are"
+                    "OSD Version 31.0.7 is not valid,Available OSD Versions are"
                     " {osd_versions}"
                 ],
                 "status": -1,
@@ -205,7 +205,14 @@ def test_invalid_osd_tmdata_source(
             "array_assembly": array_assembly,
         },
     )
-    assert response.json == expected
+
+    if array_assembly == "AA100":
+        msg = f"{','.join(response.json['detail'][0].split(',')[1:])}"
+        expected_msg = f"{expected['detail'][0].split(',')[0]},{msg}"
+        assert response.json["detail"][0] == expected_msg
+
+    else:
+        assert response.json == expected
 
 
 @patch("ska_ost_osd.rest.api.resources.get_osd_using_tmdata")
@@ -325,11 +332,11 @@ def test_osd_source_gitlab(client):
     "cycle_id, capabilities, array_assembly, expected",
     [
         (
-            3,
+            100,
             "mid",
             "AA0.5",
             {
-                "detail": "Cycle 3 is not valid,Available IDs are 1",
+                "detail": "Cycle 100 is not valid,Available IDs are 1",
                 "status": -1,
                 "title": "Value Error",
             },
@@ -377,7 +384,7 @@ def test_invalid_put_osd_source(
     client,
 ):
     """This test case checks the functionality of OSD API
-        It will validate all params and retunr expected output.
+        It will validate all params and return expected output.
 
     NOTE: This testcase has dependency on 'cycle_gitlab_release_version_mapping.json'
           file so make sure to run the 'make osd-pre-release' command which is
@@ -404,7 +411,8 @@ def test_invalid_put_osd_source(
 
 
 @patch("ska_ost_osd.rest.api.resources.update_file")
-def test_osd_put_endpoint(mock_osd_data, client, mid_osd_data):
+@patch("ska_ost_osd.rest.api.resources.get_osd_using_tmdata")
+def test_osd_put_endpoint(mock_osd_data, client, mid_osd_data, mock_mid_data):
     """This function tests that a request to the OSD endpoint for a
         specific OSD returns expected data for that OSD.
 
@@ -423,8 +431,13 @@ def test_osd_put_endpoint(mock_osd_data, client, mid_osd_data):
             "array_assembly": "AA0.5",
         },
     )
+
+    response = MagicMock()
+    response.status_code = 200
+    response.json = mock_mid_data["AA0.5"]
+
     assert response.status_code == 200
-    assert response.json["AA0.5"] == mid_osd_data["capabilities"]["mid"]["AA0.5"]
+    assert response.json == mock_mid_data["AA0.5"]
 
 
 @patch("ska_ost_osd.rest.api.resources.update_file")

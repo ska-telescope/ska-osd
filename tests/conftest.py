@@ -35,6 +35,8 @@ def read_json(json_file_location: Path) -> Dict:
 
 MID_MOCK_DATA = read_json("test_files/mock_mid_capabilities.json")
 
+OBSERVATORY_MOCK_DATA = read_json("test_files/mock_observatory_policies.json")
+
 LOW_MOCK_DATA = read_json("test_files/mock_low_capabilities.json")
 
 MID_OSD_DATA_JSON = read_json("test_files/testfile_mid_osd_data.json")
@@ -206,6 +208,23 @@ def tm_data_osd():
 
     source_uris, _ = osd_tmdata_source(cycle_id=1, source="file")
     return TMData(source_uris=source_uris)
+
+
+# TODO use this fixture instead of above for mocking TMData
+# @pytest.fixture(scope="function")
+# def tm_data_osd():
+#     with tempfile.TemporaryDirectory("tmdata") as dirname:
+#         mid_parent = pathlib.Path(dirname, "ska1_mid")
+#         mid_parent.mkdir(parents=True)
+#         with open(mid_parent / "mid_capabilities.json", "w") as f:
+#             print(MID_MOCK_DATA, file=f)
+
+#         with open(f"{dirname}/observatory_policies.json", "w") as f:
+#             print(OBSERVATORY_MOCK_DATA, file=f)
+
+#         # source_uris, _ = osd_tmdata_source(cycle_id=1, source="file")
+#         print(f"Dirname: {dirname} {mid_parent} {os.listdir(dirname)}")
+#         yield TMData([f"file://{dirname}"])
 
 
 @pytest.fixture(scope="module")

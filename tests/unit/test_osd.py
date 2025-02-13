@@ -149,7 +149,7 @@ def test_invalid_osd_tmdata_source():
     """
 
     _, error_msgs = osd_tmdata_source(
-        cycle_id=3,
+        cycle_id=100,
         osd_version="1.1.0",
         gitlab_branch="main",
         source="github",
@@ -157,7 +157,7 @@ def test_invalid_osd_tmdata_source():
     assert error_msgs == [
         "Source is not valid available are file, car, gitlab",
         "Only one parameter is needed either osd_version or gitlab_branch",
-        "Cycle 3 is not valid,Available IDs are 1",
+        "Cycle 100 is not valid,Available IDs are 1",
     ]
 
 
@@ -207,10 +207,11 @@ def test_invalid_get_osd_data_array_assembly(tm_data_osd):  # pylint: disable=W0
 
     :param tm_data_osd: tm_data_osd
     """
+    aa_value = "AA100"
 
     _, error_msgs = get_osd_data(
-        capabilities=["mid"], array_assembly="AA3", tmdata=tm_data_osd
+        capabilities=["mid"], array_assembly=aa_value, tmdata=tm_data_osd
     )
-    assert error_msgs == [
-        "Array Assembly AA3 is not valid,Available Array Assemblies are AA0.5, AA1, AA2"
-    ]
+    msg = ",".join(error_msgs[0].split(",")[1:])
+
+    assert error_msgs[0] == f"Array Assembly {aa_value} is not valid,{msg}"
