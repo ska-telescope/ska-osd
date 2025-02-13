@@ -124,7 +124,7 @@
             "pss"
         ],
         "max_baseline_km": "180",
-        "number_channels": 16000,
+        "number_channels": 17000,
         "number_fsps": 27,
         "number_meerkat_dishes": 4,
         "number_meerkatplus_dishes": 0,
