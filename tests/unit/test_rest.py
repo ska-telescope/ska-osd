@@ -92,7 +92,7 @@ def test_init_app_client(client, open_api_spec):
     "cycle_id, osd_version, source, capabilities, array_assembly, expected",
     [
         (
-            100,
+            100000,
             "1..1.0",
             "file",
             "mid",
@@ -102,7 +102,7 @@ def test_init_app_client(client, open_api_spec):
                     "Cycle_id and Array_assembly cannot be used together",
                     "osd_version 1..1.0 is not valid",
                     "array_assembly AAA3 is not valid",
-                    "Cycle 100 is not valid,Available IDs are 1",
+                    "Cycle 100000 is not valid,Available IDs are 1",
                 ],
                 "status": -1,
                 "title": "Value Error",
@@ -113,10 +113,10 @@ def test_init_app_client(client, open_api_spec):
             None,
             "file",
             "mid",
-            "AA100",
+            "AA100000",
             {
                 "detail": [
-                    "Array Assembly AA100 is not valid,Available Array Assemblies"
+                    "Array Assembly AA100000 is not valid,Available Array Assemblies"
                     " are AA0.5, AA1, AA2"
                 ],
                 "title": "Value Error",
@@ -206,7 +206,7 @@ def test_invalid_osd_tmdata_source(
         },
     )
 
-    if array_assembly == "AA100":
+    if array_assembly == "AA100000":
         msg = f"{','.join(response.json['detail'][0].split(',')[1:])}"
         expected_msg = f"{expected['detail'][0].split(',')[0]},{msg}"
         assert response.json["detail"][0] == expected_msg
@@ -332,11 +332,11 @@ def test_osd_source_gitlab(client):
     "cycle_id, capabilities, array_assembly, expected",
     [
         (
-            100,
+            100000,
             "mid",
             "AA0.5",
             {
-                "detail": "Cycle 100 is not valid,Available IDs are 1",
+                "detail": "Cycle 100000 is not valid,Available IDs are 1",
                 "status": -1,
                 "title": "Value Error",
             },
