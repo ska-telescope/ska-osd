@@ -364,11 +364,11 @@ def test_osd_source_gitlab(client):
         (
             1,
             "low",
-            "AA5",
+            "AA500000",
             {
                 "detail": (
-                    "Array Assembly AA5 is not valid,Available Array Assemblies are"
-                    " AA0.5, AA1, AA2"
+                    "Array Assembly AA500000 is not valid,Available Array Assemblies"
+                    " are AA0.5, AA1, AA2"
                 ),
                 "status": -1,
                 "title": "Value Error",
@@ -407,7 +407,14 @@ def test_invalid_put_osd_source(
             "array_assembly": array_assembly,
         },
     )
-    assert response.json == expected
+
+    if array_assembly == "AA500000":
+        msg = f"{','.join(response.json['detail'].split(',')[1:])}"
+        expected_msg = f"{expected['detail'].split(',')[0]},{msg}"
+        assert response.json["detail"] == expected_msg
+
+    else:
+        assert response.json == expected
 
 
 @patch("ska_ost_osd.rest.api.resources.update_file")

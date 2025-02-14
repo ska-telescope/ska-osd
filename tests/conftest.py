@@ -1,5 +1,7 @@
 import json
 import os
+import pathlib
+import tempfile
 from importlib.metadata import version
 from pathlib import Path
 from typing import Dict
@@ -33,11 +35,35 @@ def read_json(json_file_location: Path) -> Dict:
     return file_contents
 
 
+def create_mock_json_files(json_file_location: Path, json_data: Dict) -> None:
+    """This function create json file for mocking TMData object
+
+    :param json_file_location: json file.
+    :param json_data: json data to be saved.
+
+    :returns: None
+    """
+    with open(json_file_location, "w") as f:  # pylint: disable=W1514
+        json.dump(json_data, f)
+
+
 MID_MOCK_DATA = read_json("test_files/mock_mid_capabilities.json")
+
+LOW_MOCK_DATA = read_json("test_files/mock_low_capabilities.json")
 
 OBSERVATORY_MOCK_DATA = read_json("test_files/mock_observatory_policies.json")
 
-LOW_MOCK_DATA = read_json("test_files/mock_low_capabilities.json")
+MID_VALIDATION_MOCK_DATA = read_json("test_files/mock-mid-validation-constants.json")
+
+LOW_VALIDATION_MOCK_DATA = read_json("test_files/mock-low-validation-constants.json")
+
+MID_SBD_VALIDATION_MOCK_DATA = read_json(
+    "test_files/mock_mid_sbd-validation-constants.json"
+)
+
+LOW_SBD_VALIDATION_MOCK_DATA = read_json(
+    "test_files/mock_low_sbd-validation-constants.json"
+)
 
 MID_OSD_DATA_JSON = read_json("test_files/testfile_mid_osd_data.json")
 
@@ -201,30 +227,53 @@ def tmdata_source():
 
 @pytest.fixture(scope="module")
 def tm_data_osd():
-    """This function is used as a fixture for tm_data object
+    with tempfile.TemporaryDirectory("tmdata") as dirname:
+        mid_parent = pathlib.Path(dirname, "ska1_mid")
+        mid_parent.mkdir(parents=True)
+        create_mock_json_files(mid_parent / "mid_capabilities.json", MID_MOCK_DATA)
 
-    :returns: tmdata object
-    """
+        low_parent = pathlib.Path(dirname, "ska1_low")
+        low_parent.mkdir(parents=True)
+        create_mock_json_files(low_parent / "low_capabilities.json", LOW_MOCK_DATA)
 
-    source_uris, _ = osd_tmdata_source(cycle_id=1, source="file")
-    return TMData(source_uris=source_uris)
+        create_mock_json_files(
+            f"{dirname}/observatory_policies.json", OBSERVATORY_MOCK_DATA
+        )
 
+        mid_validation_parent = pathlib.Path(
+            dirname, "instrument", "ska1_mid", "validation"
+        )
+        mid_validation_parent.mkdir(parents=True)
+        create_mock_json_files(
+            mid_validation_parent / "mid-validation-constants.json",
+            MID_VALIDATION_MOCK_DATA,
+        )
 
-# TODO use this fixture instead of above for mocking TMData
-# @pytest.fixture(scope="function")
-# def tm_data_osd():
-#     with tempfile.TemporaryDirectory("tmdata") as dirname:
-#         mid_parent = pathlib.Path(dirname, "ska1_mid")
-#         mid_parent.mkdir(parents=True)
-#         with open(mid_parent / "mid_capabilities.json", "w") as f:
-#             print(MID_MOCK_DATA, file=f)
+        low_validation_parent = pathlib.Path(
+            dirname, "instrument", "ska1_low", "validation"
+        )
+        low_validation_parent.mkdir(parents=True)
+        create_mock_json_files(
+            low_validation_parent / "low-validation-constants.json",
+            LOW_VALIDATION_MOCK_DATA,
+        )
 
-#         with open(f"{dirname}/observatory_policies.json", "w") as f:
-#             print(OBSERVATORY_MOCK_DATA, file=f)
+        mid_sbd_validation_parent = pathlib.Path(
+            dirname, "instrument", "scheduling-block", "validation"
+        )
+        mid_sbd_validation_parent.mkdir(parents=True)
+        create_mock_json_files(
+            mid_sbd_validation_parent / "mid_sbd-validation-constants.json",
+            MID_SBD_VALIDATION_MOCK_DATA,
+        )
 
-#         # source_uris, _ = osd_tmdata_source(cycle_id=1, source="file")
-#         print(f"Dirname: {dirname} {mid_parent} {os.listdir(dirname)}")
-#         yield TMData([f"file://{dirname}"])
+        create_mock_json_files(
+            mid_sbd_validation_parent / "low_sbd-validation-constants.json",
+            LOW_SBD_VALIDATION_MOCK_DATA,
+        )
+
+        print(f"Dirname: {dirname} {mid_parent} {os.listdir(dirname)}")
+        yield TMData([f"file://{dirname}"])
 
 
 @pytest.fixture(scope="module")
