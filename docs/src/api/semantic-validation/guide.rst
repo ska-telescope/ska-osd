@@ -41,7 +41,7 @@ These are as follows:
 JSON validator file
 ~~~~~~~~~~~~~~~~~~~
 
-Four seperate JSON files have been created for Mid, Low and Scheduling Block Definition (MID & LOW) schemas to store all the parameters present in assign & configure resources
+Four separate JSON files have been created for Mid, Low and Scheduling Block Definition (MID & LOW) schemas to store all the parameters present in assign & configure resources
 along with its business rules and errors.
 
 * `Reference of JSON validator file (Mid) <https://gitlab.com/ska-telescope/ost/ska-ost-osd/-/blob/main/tmdata/instrument/ska1_mid/validation/mid-validation-constants.json?ref_type=heads>`_
@@ -52,7 +52,7 @@ along with its business rules and errors.
 
 * `Reference of JSON validator file (SBD-Low) <https://gitlab.com/ska-telescope/ost/ska-ost-osd/-/blob/main/tmdata/instrument/scheduling-block/validation/low_sbd-validation-constants?ref_type=heads>`_
 
-Created a seperate ``constant`` file to maintain all telvalidation constant. From there we are importing JSON validator file
+Created a separate ``constant`` file to maintain all telvalidation constant. From there we are importing JSON validator file
 in ``semantic_validator`` for Mid, Low as well as Scheduling Block Definition (MID) schemas.
 
 Below are the commands to import JSON validator files.
@@ -313,7 +313,7 @@ Limitation
     OSD version and semantic validation rule file version should be same.
 
 if OSD keys got removed/changed and those are not in validation rule file
-it will raise SchemanticValdidationKeyError saying ``Invalid rule and error key passed``
+it will raise SchemanticValidationKeyError saying ``Invalid rule and error key passed``
 
 
 
@@ -589,14 +589,14 @@ Note: Below examples are given for MID telescope. For Low telescope need to chan
                 "number_meerkatplus_dishes": 0,
                 "max_baseline_km": 1.5,
                 "available_bandwidth_hz": 800000000.0,
-                "number_channels": 14880,
-                "cbf_modes": ["CORR"],
+                "cbf_modes": ["correlation", "pst"],
                 "number_zoom_windows": 0,
                 "number_zoom_channels": 0,
                 "number_pss_beams": 0,
-                "number_pst_beams": 0,
-                "ps_beam_bandwidth_hz": 0.0,
-                "number_fsps": 4
+                "number_pst_beams": 1,
+                "ps_beam_bandwidth_hz": 400000000.0,
+                "number_fsps": 4,
+                "number_dish_ids": ["SKA001", "SKA036", "SKA063", "SKA100"]
             },
             "basic_capabilities": {
                 "dish_elevation_limit_deg": 15.0,
@@ -816,14 +816,14 @@ In below example added extra dish into 'receptor_ids' currently allowed 4, due t
                 "number_meerkatplus_dishes": 0,
                 "max_baseline_km": 1.5,
                 "available_bandwidth_hz": 800000000.0,
-                "number_channels": 14880,
-                "cbf_modes": ["CORR"],
+                "cbf_modes": ["correlation", "pst"],
                 "number_zoom_windows": 0,
                 "number_zoom_channels": 0,
                 "number_pss_beams": 0,
-                "number_pst_beams": 0,
-                "ps_beam_bandwidth_hz": 0.0,
-                "number_fsps": 4
+                "number_pst_beams": 1,
+                "ps_beam_bandwidth_hz": 400000000.0,
+                "number_fsps": 4,
+                "number_dish_ids": ["SKA001", "SKA036", "SKA063", "SKA100"]
             },
             "basic_capabilities": {
                 "dish_elevation_limit_deg": 15.0,
@@ -1308,12 +1308,12 @@ Semantic Validation Success Response With Error
     "capabilities": {
       "mid": {
         "AA0.5": {
-          "allowed_channel_count_range_max": 58982,
-          "allowed_channel_count_range_min": 1,
+          "allowed_channel_count_range_max": [58982],
+          "allowed_channel_count_range_min": [1],
           "allowed_channel_width_values": [
             13440
           ],
-          "available_bandwidth_hz": 800000000,
+          "available_bandwidth_hz": 800000000.0,
           "available_receivers": [
             "Band_1",
             "Band_2"
@@ -1323,7 +1323,6 @@ Semantic Validation Success Response With Error
             "pst"
           ],
           "max_baseline_km": 1.5,
-          "number_channels": 14880,
           "number_fsps": 4,
           "number_meerkat_dishes": 0,
           "number_meerkatplus_dishes": 0,
@@ -1332,7 +1331,8 @@ Semantic Validation Success Response With Error
           "number_ska_dishes": 4,
           "number_zoom_channels": 0,
           "number_zoom_windows": 0,
-          "ps_beam_bandwidth_hz": 400000000
+          "ps_beam_bandwidth_hz": 400000000.0,
+          "number_dish_ids": ["SKA001", "SKA036", "SKA063", "SKA100"]
         },
         "basic_capabilities": {
           "dish_elevation_limit_deg": 15,
@@ -1832,12 +1832,12 @@ Semantic Validation Success Response for SBD-Mid input.
     "capabilities": {
       "mid": {
         "AA0.5": {
-          "allowed_channel_count_range_max": 58982,
-          "allowed_channel_count_range_min": 1,
+          "allowed_channel_count_range_max": [58982],
+          "allowed_channel_count_range_min": [1],
           "allowed_channel_width_values": [
             13440
           ],
-          "available_bandwidth_hz": 800000000,
+          "available_bandwidth_hz": 800000000.0,
           "available_receivers": [
             "Band_1",
             "Band_2"
@@ -1847,7 +1847,6 @@ Semantic Validation Success Response for SBD-Mid input.
             "pst"
           ],
           "max_baseline_km": 1.5,
-          "number_channels": 14880,
           "number_fsps": 4,
           "number_meerkat_dishes": 0,
           "number_meerkatplus_dishes": 0,
@@ -1856,7 +1855,8 @@ Semantic Validation Success Response for SBD-Mid input.
           "number_ska_dishes": 4,
           "number_zoom_channels": 0,
           "number_zoom_windows": 0,
-          "ps_beam_bandwidth_hz": 400000000
+          "ps_beam_bandwidth_hz": 400000000.0,
+          "number_dish_ids": ["SKA001", "SKA036", "SKA063", "SKA100"]
         },
         "basic_capabilities": {
           "dish_elevation_limit_deg": 15,
@@ -1920,7 +1920,6 @@ Semantic Validation Success Response With Error for SBD-Mid input.
 
      {
       "detail": [
-        "Invalid input for channel_count! Currently allowed 14880",
         "Invalid input for freq_min",
         "Invalid input for freq_max",
         "freq_min should be less than freq_max",
