@@ -7,10 +7,10 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 2.4.0
 **********
-* Added `number_dish_ids` in Mid Capabilities.
-* Removed `number_channel` key.
-* Converted `allowed_channel_count_range_min` and `allowed_channel_count_range_max` string type to list.
-* Added `allowed_channel_width_values` key.
+* [BREAKING] Added `number_dish_ids` in Mid Capabilities.
+* [BREAKING] Removed `number_channel` key.
+* [BREAKING] Converted `allowed_channel_count_range_min` and `allowed_channel_count_range_max` string type to list.
+* [BREAKING] Added `allowed_channel_width_values` key.
 * Updated Docs for Mid and Low Capabilities.
 * Refactored Test cases and restructured Test folder.
 
