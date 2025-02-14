@@ -6,6 +6,7 @@ minikube: true
 system: ost
 subsystem: osd
 validation_strictness: 2
+push_to_gitlab: 1
 
 labels:
   app: ska-ost-osd

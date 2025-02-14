@@ -6,14 +6,14 @@ MID_CONSTANT_JSON_FILE_PATH = "ska1_mid/mid_capabilities.json"
 LOW_CONSTANT_JSON_FILE_PATH = "ska1_low/low_capabilities.json"
 POLICIES_CONSTANT_JSON_FILE_PATH = "observatory_policies.json"
 RELEASE_FILE = "tmdata/version_mapping/latest_release.txt"
-VERSIONS_JSON_FILE_PATH = f"version_mapping/cycle_gitlab_release_version_mapping.json"
+VER_FL_PATH = "version_mapping/cycle_gitlab_release_version_mapping.json"
 
 osd_file_mapping = {
     "low": LOW_CONSTANT_JSON_FILE_PATH,
     "mid": MID_CONSTANT_JSON_FILE_PATH,
     "observatory_policies": POLICIES_CONSTANT_JSON_FILE_PATH,
-    "cycle_to_version_mapping": VERSIONS_JSON_FILE_PATH,
-    "latest_cycle_version_to_release":RELEASE_FILE
+    "cycle_to_version_mapping": VER_FL_PATH,
+    "latest_cycle_version_to_release": RELEASE_FILE,
 }
 
 osd_response_template = {
@@ -43,4 +43,7 @@ MID_CAPABILITIES_JSON_PATH = "tmdata/ska1_mid/mid_capabilities.json"
 LOW_CAPABILITIES_JSON_PATH = "tmdata/ska1_low/low_capabilities.json"
 OBSERVATORY_POLICIES_JSON_PATH = "tmdata/observatory_policies.json"
 CYCLE_TO_VERSION_MAPPING = "tmdata/version_mapping/latest_release.txt"
-RELEASE_VERSION_MAPPING = "tmdata/version_mapping/cycle_gitlab_release_version_mapping.json"
+RELEASE_VERSION_MAPPING = (
+    "tmdata/version_mapping/cycle_gitlab_release_version_mapping.json"
+)
+PUSH_TO_GITLAB_FLAG = "1"

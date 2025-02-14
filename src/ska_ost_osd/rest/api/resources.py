@@ -6,23 +6,24 @@ See the operationId fields of the Open API spec for the specific mappings.
 import re
 from functools import wraps
 from http import HTTPStatus
+from os import environ
+from pathlib import Path
 from typing import Dict
 
 from pydantic import ValidationError
 from ska_telmodel.data import TMData
 
-from pathlib import Path
-from ska_ost_osd.osd.gitlab_helper import push_to_gitlab
-
 from ska_ost_osd.osd.constant import (
     ARRAY_ASSEMBLY_PATTERN,
+    CYCLE_TO_VERSION_MAPPING,
     LOW_CAPABILITIES_JSON_PATH,
     MID_CAPABILITIES_JSON_PATH,
     OBSERVATORY_POLICIES_JSON_PATH,
-    CYCLE_TO_VERSION_MAPPING,
+    PUSH_TO_GITLAB_FLAG,
     RELEASE_VERSION_MAPPING,
     osd_file_mapping,
 )
+from ska_ost_osd.osd.gitlab_helper import push_to_gitlab
 from ska_ost_osd.osd.helper import read_json
 from ska_ost_osd.osd.osd import get_osd_using_tmdata
 from ska_ost_osd.osd.osd_schema_validator import OSDModelError
@@ -30,6 +31,7 @@ from ska_ost_osd.osd.osd_validation_messages import (
     ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE,
     CYCLE_ID_ERROR_MESSAGE,
 )
+from ska_ost_osd.osd.version_manager import manage_version_release
 from ska_ost_osd.rest.api.utils import read_file, update_file
 from ska_ost_osd.telvalidation import SchematicValidationError, semantic_validate
 from ska_ost_osd.telvalidation.constant import (
@@ -37,6 +39,8 @@ from ska_ost_osd.telvalidation.constant import (
     SEMANTIC_VALIDATION_VALUE,
 )
 from ska_ost_osd.telvalidation.semantic_validator import VALIDATION_STRICTNESS
+
+PUSH_TO_GITLAB = environ.get("PUSH_TO_GITLAB", "0")
 
 
 def error_handler(api_fn: callable) -> str:
@@ -164,8 +168,9 @@ def update_osd_data(body: Dict, **kwargs) -> Dict:
 
         if capabilities is None:
             raise ValueError("Capabilities must be provided")
-
-        versions_dict = read_json(osd_file_mapping["cycle_to_version_mapping"])
+        versions_dict = read_json(
+            "tmdata/" + osd_file_mapping["cycle_to_version_mapping"]
+        )
         cycle_ids = [int(key.split("_")[-1]) for key in versions_dict]
         cycle_id_exists = [cycle_id if cycle_id in cycle_ids else None][0]
         string_ids = ",".join([str(i) for i in cycle_ids])
@@ -217,48 +222,60 @@ def update_osd_data(body: Dict, **kwargs) -> Dict:
 
     except (OSDModelError, ValueError) as error:
         raise error
-    
+
+
 @error_handler
 def release_osd_data(**kwargs):
     """Release OSD data with automatic version increment based on cycle ID.
-    
+
     Args:
         **kwargs: Keyword arguments including:
             - cycle_id: Required. The cycle ID for version mapping
-            - release_type: Optional. Type of release ('major' or 'minor', defaults to patch)
-        
+            - release_type: Optional.
+            Type of release ('major' or 'minor', defaults to patch)
+
     Returns:
         dict: Response containing the new version information
     """
-    from ska_ost_osd.osd.version_manager import manage_version_release
-    
-    cycle_id = kwargs.get('cycle_id')
+    cycle_id = kwargs.get("cycle_id")
     if not cycle_id:
         raise ValueError("cycle_id is required")
-    cycle_id = "cycle_"+str(cycle_id)
-    release_type = kwargs.get('release_type')
-    if release_type and release_type not in ['major', 'minor']:
+    cycle_id = "cycle_" + str(cycle_id)
+    release_type = kwargs.get("release_type")
+    # TODO we will decide in future if major or minor release support going
+    # to provide or not based on decision will remove belode code.
+    # right now provided support for default as patch
+    if release_type and release_type not in ["major", "minor"]:
         raise ValueError("release_type must be either 'major' or 'minor' if provided")
-    
-    # Use version manager to handle version release
-    new_version, cycle_id = manage_version_release(cycle_id, release_type)
+    if PUSH_TO_GITLAB == PUSH_TO_GITLAB_FLAG:
+        # Use version manager to handle version release
+        new_version, cycle_id = manage_version_release(cycle_id, release_type)
 
-    files_to_add_small = [
-        (Path(MID_CAPABILITIES_JSON_PATH), osd_file_mapping["mid"]),
-        (Path(CYCLE_TO_VERSION_MAPPING), "version_mapping/latest_release.txt"),
-        (Path(RELEASE_VERSION_MAPPING),osd_file_mapping["cycle_to_version_mapping"]),
-    ]
-    push_to_gitlab(files_to_add=files_to_add_small,
-                   commit_msg="updated tmdata",
-                   branch_name="nak-1093-tmdata-push-artifact")
-        
-    return {
-        "status": "success",
-        "message": f"Released new version {new_version}",
-        "version": str(new_version),
-        "cycle_id": cycle_id
-    }
-    
+        files_to_add_small = [
+            (Path(MID_CAPABILITIES_JSON_PATH), osd_file_mapping["mid"]),
+            (Path(CYCLE_TO_VERSION_MAPPING), "version_mapping/latest_release.txt"),
+            (
+                Path(RELEASE_VERSION_MAPPING),
+                osd_file_mapping["cycle_to_version_mapping"],
+            ),
+        ]
+
+        push_to_gitlab(files_to_add=files_to_add_small, commit_msg="updated tmdata")
+
+        return {
+            "status": "success",
+            "message": f"Released new version {new_version}",
+            "version": str(new_version),
+            "cycle_id": cycle_id,
+        }
+
+    else:
+        return {
+            "status": "success",
+            "message": "Push to gitlab is disabled",
+            "version": "0.0.0",
+            "cycle_id": cycle_id,
+        }
 
 
 @error_handler

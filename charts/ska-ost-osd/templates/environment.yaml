@@ -12,4 +12,5 @@ metadata:
 data:
   KUBE_NAMESPACE: {{ .Release.Namespace }}
   VALIDATION_STRICTNESS: {{.Values.validation_strictness  | quote }}
+  PUSH_TO_GITLAB: {{.Values.push_to_gitlab  | quote }}
 

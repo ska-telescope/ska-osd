@@ -68,29 +68,20 @@ paths:
           $ref: '#/components/responses/BadRequest'
         "500":
           $ref: '#/components/responses/InternalServerError'
-  /release:
+  /osd_release:
     post:
-      summary: Checks if the Command Input JSON is semantically valid
+      summary: Release new osd version to Gitlab.
       description: |
-        Validate input json Semantically
-        Semantic validation checks the meaning of the input data and ensures that it is valid in the context of the system. It checks whether the input data conforms to the business rules and logic of the system.
+        Release new osd version to Gitlab based on cycle.
       operationId: ska_ost_osd.rest.api.resources.release_osd_data
       parameters:
         - $ref: '#/components/parameters/cycle_id'
         - $ref: '#/components/parameters/release_type'
       responses:
         '200':
-          description: Semantic Validation Successfully
-          content:
-            application/json:
-              schema:
-                $ref: './semantic-validation-openapi-v1.yaml#/components/schemas/SemanticValidationSuccessResponse'
+          description: Release process invoked. 
         '400':
-          description: Bad Request due to semantic validation errors.
-          content:
-            application/json:
-              schema:
-                $ref: './semantic-validation-openapi-v1.yaml#/components/schemas/SemanticValidationErrorResponse'
+          description: Release process get failed.
         '500':
           $ref: '#/components/responses/InternalServerError'
   /semantic_validation:

@@ -262,7 +262,7 @@ def check_cycle_id(
     if cycle_id is None and osd_version is None and gitlab_branch is None:
         osd_version = version("ska_ost_osd")
 
-    versions_dict = read_json("tmdata/"+osd_file_mapping["cycle_to_version_mapping"])
+    versions_dict = read_json("tmdata/" + osd_file_mapping["cycle_to_version_mapping"])
     cycle_ids = [int(key.split("_")[-1]) for key in versions_dict]
     cycle_id_exists = [cycle_id if cycle_id in cycle_ids else None][0]
     string_ids = ",".join([str(i) for i in cycle_ids])
@@ -304,7 +304,6 @@ def osd_tmdata_source(
     :returns: source_uris as a string or raises exception
     """
     source_error_msg_list = []
-
     if source not in SOURCES:
         source_msg = ", ".join(SOURCES)
         source_error_msg_list.append(AVAILABLE_SOURCE_ERROR_MESSAGE.format(source_msg))
