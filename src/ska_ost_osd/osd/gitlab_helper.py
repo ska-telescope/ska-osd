@@ -43,22 +43,6 @@ def push_to_gitlab(files_to_add: List[Tuple[Path, str]], commit_msg: str, branch
     """
     repo = "ska-telescope/ost/ska-ost-osd"
     git_repo = GitBackend(repo=repo)
-    git_repo.checkout_branch(branch_name)
-    
-    # # Create branch
-    # logger.info("Creating branch...")
-    # git_repo.create_branch(branch)
-    
-    # Filter and add only modified files
-
-    # try:
-    #     git_repo.start_transaction(branch_name, create_new_branch=True)
-    # except ValueError as err:
-    #     if str(err) == "Branch Already Exists":
-    #         print("Branch already exists, try a different branch name")
-    #         sys.exit(1)
-    #     else:
-    #         raise
     modified_files = []
     
     for src_path, target_path in files_to_add:

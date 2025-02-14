@@ -244,9 +244,7 @@ def release_osd_data(**kwargs):
     new_version, cycle_id = manage_version_release(cycle_id, release_type)
 
     files_to_add_small = [
-        (Path(LOW_CAPABILITIES_JSON_PATH), osd_file_mapping["low"]),
         (Path(MID_CAPABILITIES_JSON_PATH), osd_file_mapping["mid"]),
-        (Path(OBSERVATORY_POLICIES_JSON_PATH), osd_file_mapping["observatory_policies"]),
         (Path(CYCLE_TO_VERSION_MAPPING), "version_mapping/latest_release.txt"),
         (Path(RELEASE_VERSION_MAPPING),osd_file_mapping["cycle_to_version_mapping"]),
     ]
