@@ -67,8 +67,6 @@ LOW_SBD_VALIDATION_MOCK_DATA = read_json(
 
 MID_OSD_DATA_JSON = read_json("test_files/testfile_mid_osd_data.json")
 
-OSD_OBSERVATORY_JSON_DATA = read_json("test_files/testfile_osd_observatory.json")
-
 VALID_MID_ASSIGN_JSON = read_json("test_files/testfile_valid_mid_assign.json")
 INVALID_MID_ASSIGN_JSON = read_json("test_files/testfile_invalid_mid_assign.json")
 VALID_MID_CONFIGURE_JSON = read_json("test_files/testfile_valid_mid_configure.json")
@@ -378,7 +376,7 @@ def osd_observatory_policies():
 
     :returns dict: The OpenAPI specification
     """
-    return OSD_OBSERVATORY_JSON_DATA
+    return OBSERVATORY_MOCK_DATA
 
 
 @pytest.fixture(scope="module")
