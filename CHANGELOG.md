@@ -5,6 +5,15 @@ Change Log
 All notable changes to this project will be documented in this file.
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
+3.0.0
+**********
+* [BREAKING] Added `number_dish_ids` in Mid Capabilities.
+* [BREAKING] Removed `number_channel` key.
+* [BREAKING] Converted `allowed_channel_count_range_min` and `allowed_channel_count_range_max` string type to list.
+* [BREAKING] Added `allowed_channel_width_values` key.
+* Updated Docs for Mid and Low Capabilities.
+* Refactored Test cases and restructured Test folder.
+
 2.3.1
 **********
 * Updated to deepdiff version 7.0.0.
