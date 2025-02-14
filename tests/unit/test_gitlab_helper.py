@@ -216,55 +216,6 @@ class TestGitlabHelper:
         mock_git_backend_instance.commit.assert_not_called()
         mock_git_backend_instance.commit_transaction.assert_not_called()
 
-    def test_push_to_gitlab_no_modified_files_2(self):
-        """
-        Test push_to_gitlab when no files are modified.
-        """
-        # Mock the check_file_modified function to always return False
-        with patch(
-            "ska_ost_osd.osd.gitlab_helper.check_file_modified", return_value=False
-        ):
-            # Mock the GitBackend class
-            with patch("ska_ost_osd.osd.gitlab_helper.GitBackend") as mock_git_backend:
-                # Create mock files
-                mock_files = [
-                    (Path("/path/to/file1.txt"), "target/file1.txt"),
-                    (Path("/path/to/file2.txt"), "target/file2.txt"),
-                ]
-
-                # Call the function
-                push_to_gitlab(mock_files, "Test commit")
-
-                # Assert that GitBackend was initialized but not used
-                mock_git_backend.assert_called_once_with(
-                    repo="ska-telescope/ost/ska-ost-osd"
-                )
-                mock_git_backend.return_value.add_data.assert_not_called()
-                mock_git_backend.return_value.commit.assert_not_called()
-                mock_git_backend.return_value.commit_transaction.assert_not_called()
-
-        # Assert that the logger.info was called with the expected message
-        with patch("ska_ost_osd.osd.gitlab_helper.logger.info") as mock_logger:
-            push_to_gitlab(mock_files, "Test commit")
-            mock_logger.assert_called_with("No modified files to push")
-
-    def test_push_to_gitlab_no_modified_files_3(
-        self, mock_git_backend, mock_check_file_modified
-    ):
-        """
-        Test push_to_gitlab when no files are modified.
-        """
-        mock_check_file_modified.return_value = False
-        files_to_add = [
-            (Path("/file1"), "target/file1"),
-            (Path("/file2"), "target/file2"),
-        ]
-
-        push_to_gitlab(files_to_add, "No changes")
-        mock_git_backend.return_value.add_data.assert_not_called()
-        mock_git_backend.return_value.commit.assert_not_called()
-        mock_git_backend.return_value.commit_transaction.assert_not_called()
-
     def test_push_to_gitlab_with_modified_files(self):
         """
         Test push_to_gitlab when there are modified files to push.
