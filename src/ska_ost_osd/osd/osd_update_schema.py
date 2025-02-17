@@ -1,9 +1,9 @@
-import re
 from typing import Any, Dict
 
 from pydantic import BaseModel, Field, model_validator
 
 ARRAY_ASSEMBLY_PATTERN = r"^AA(\d+|\d+)"
+from ska_ost_osd.osd.osd_schema_validator import CapabilityError
 
 
 class UpdateRequestModel(BaseModel):
@@ -19,11 +19,11 @@ class UpdateRequestModel(BaseModel):
     @classmethod
     def validate_capabilities(cls, values):
         if not values.get("cycle_id"):
-            raise ValueError("cycle_id field is required")
+            raise CapabilityError("cycle_id field is required")
         if not values.get("array_assembly"):
-            raise ValueError("array_assembly field is required")
+            raise CapabilityError("array_assembly field is required")
         if not values.get("capabilities"):
-            raise ValueError("capabilities field is required")
+            raise CapabilityError("capabilities field is required")
         return values
 
 
@@ -34,14 +34,14 @@ class ValidationOnCapabilities(BaseModel):
     @classmethod
     def validate_capabilities(cls, values):
         if not values.get("capabilities"):
-            raise ValueError("capabilities field is required")
+            raise CapabilityError("capabilities field is required")
 
         capabilities = values["capabilities"]
         if not isinstance(capabilities, dict) or len(capabilities) != 1:
-            raise ValueError("capabilities must contain exactly one telescope key")
+            raise CapabilityError("capabilities must contain exactly one telescope key")
 
         telescope_data = next(iter(capabilities.values()))
         if not isinstance(telescope_data, dict):
-            raise ValueError("telescope data must be a dictionary")
+            raise CapabilityError("telescope data must be a dictionary")
 
         return values

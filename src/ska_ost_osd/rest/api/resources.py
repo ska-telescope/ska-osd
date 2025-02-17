@@ -4,33 +4,27 @@ Functions which the HTTP requests to individual resources are mapped to.
 See the operationId fields of the Open API spec for the specific mappings.
 """
 import json
-import re
 from functools import wraps
 from http import HTTPStatus
-from typing import Dict
+from typing import Any, Dict
 
 from pydantic import ValidationError
 from ska_telmodel.data import TMData
 
 from ska_ost_osd.osd.constant import (
-    ARRAY_ASSEMBLY_PATTERN,
-    LOW_CAPABILITIES_JSON_PATH,
     MID_CAPABILITIES_JSON_PATH,
     OBSERVATORY_POLICIES_JSON_PATH,
-    osd_file_mapping,
 )
-from ska_ost_osd.osd.helper import read_json
 from ska_ost_osd.osd.osd import get_osd_using_tmdata, update_storage
-from ska_ost_osd.osd.osd_schema_validator import OSDModelError
+from ska_ost_osd.osd.osd_schema_validator import CapabilityError, OSDModelError
 from ska_ost_osd.osd.osd_update_schema import (
     UpdateRequestModel,
     ValidationOnCapabilities,
 )
 from ska_ost_osd.osd.osd_validation_messages import (
-    ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE,
-    CYCLE_ID_ERROR_MESSAGE,
+    ARRAY_ASSEMBLY_DOESNOT_BELONGS_TO_CYCLE_ERROR_MESSAGE,
 )
-from ska_ost_osd.rest.api.utils import read_file, update_file
+from ska_ost_osd.rest.api.utils import read_file
 from ska_ost_osd.telvalidation import SchematicValidationError, semantic_validate
 from ska_ost_osd.telvalidation.constant import (
     CAR_TELMODEL_SOURCE,
@@ -76,7 +70,13 @@ def error_handler(api_fn: callable) -> str:
                 title="Value Error",
                 http_status=HTTPStatus.BAD_REQUEST,
             )
-
+        except CapabilityError as err:
+            return validation_response(
+                status=-1,
+                detail=err.args[0],
+                title="Value Error",
+                http_status=HTTPStatus.BAD_REQUEST,
+            )
         except RuntimeError as err:
             return validation_response(
                 status=-1,
@@ -96,22 +96,18 @@ def error_handler(api_fn: callable) -> str:
     return wrapper
 
 
-import json
-from typing import Any
-
-
 class FloatPreservingJSONEncoder(json.JSONEncoder):
     """JSON encoder that preserves floating point numbers."""
 
-    def default(self, obj: Any) -> Any:
+    def default(self, o: Any) -> Any:
         """Encode the object."""
-        if isinstance(obj, float):
-            return format(obj, ".1f")  # Ensure at least one decimal place is preserved
-        return super().default(obj)
+        if isinstance(o, float):
+            return format(o, ".1f")  # Ensure at least one decimal place is preserved
+        return super().default(o)
 
-    def encode(self, obj: Any) -> str:
+    def encode(self, o: Any) -> str:
         """Custom encode method to preserve float format."""
-        if isinstance(obj, (dict, list)):
+        if isinstance(o, (dict, list)):
 
             def convert(item):
                 if isinstance(item, float):
@@ -122,7 +118,7 @@ class FloatPreservingJSONEncoder(json.JSONEncoder):
                     return [convert(i) for i in item]
                 return item
 
-            obj = convert(obj)
+            obj = convert(o)
         return super().encode(obj)
 
 
@@ -181,8 +177,10 @@ def update_osd_data(body: Dict, **kwargs) -> Dict:
     This function updates the input JSON against the schema
 
     Args:
-        body (Dict): A dictionary containing key-value pairs of parameters required for validation.
-        **kwargs: Additional keyword arguments including cycle_id and array_assembly
+        body (Dict): A dictionary containing key-value pairs of
+        parameters required for validation.
+        **kwargs: Additional keyword arguments
+        including cycle_id and array_assembly
 
     Returns:
         Dict: A dictionary with OSD data satisfying the query.
@@ -211,8 +209,8 @@ def update_osd_data(body: Dict, **kwargs) -> Dict:
             and validated_data.array_assembly
             != osd_data["telescope_capabilities"]["Mid"]
         ):
-            raise ValueError(
-                ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE.format(
+            raise CapabilityError(
+                ARRAY_ASSEMBLY_DOESNOT_BELONGS_TO_CYCLE_ERROR_MESSAGE.format(
                     validated_data.array_assembly, validated_data.cycle_id
                 )
             )
@@ -225,9 +223,13 @@ def update_osd_data(body: Dict, **kwargs) -> Dict:
         )
 
     except KeyError as ke:
-        raise ValueError(f"Missing required parameter: {ke}")
+        raise ValueError(f"Missing required parameter: {ke}") from ke
     except (OSDModelError, ValueError) as error:
         raise error
+    except CapabilityError as ce:
+        raise ValueError(f"Capability error: {ce}") from ce
+    except ValidationError as ve:
+        raise ValueError(f"Validation error: {ve}") from ve
 
 
 @error_handler
@@ -304,7 +306,7 @@ def get_cycle_list() -> Dict:
     """
     try:
         json_file = "tmdata/version_mapping/cycle_gitlab_release_version_mapping.json"
-        with open(json_file) as f:
+        with open(json_file, encoding="utf-8") as f:
             data = json.load(f)
         cycle_numbers = []
         for key in data.keys():
@@ -317,7 +319,7 @@ def get_cycle_list() -> Dict:
                     continue
 
         return {"cycles": sorted(cycle_numbers)}
-    except Exception as e:
+    except Exception as e:  # pylint: disable=W0718
         return {"error": str(e)}
 
 

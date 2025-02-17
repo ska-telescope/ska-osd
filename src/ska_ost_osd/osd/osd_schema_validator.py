@@ -21,6 +21,14 @@ class OSDModelError(Exception):
         super().__init__(errors)
 
 
+class CapabilityError(Exception):
+    """Custom exception class for validation errors."""
+
+    def __init__(self, errors: List[dict]):
+        self.errors = errors
+        super().__init__(errors)
+
+
 class OSDModel(BaseModel):
     cycle_id: Optional[int] = None
     osd_version: Optional[str] = None

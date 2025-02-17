@@ -22,7 +22,6 @@ from .constant import (
     BASE_FOLDER_NAME,
     BASE_URL,
     CAR_URL,
-    LOW_CAPABILITIES_JSON_PATH,
     MID_CAPABILITIES_JSON_PATH,
     OBSERVATORY_POLICIES_JSON_PATH,
     SOURCES,
@@ -457,7 +456,6 @@ def update_storage(
 
     capabilities = validated_capabilities.capabilities
 
-    # Get telescope data - we know there's exactly one key due to UpdateRequestModel validation
     telescope = next(iter(capabilities.keys()))
     telescope_data = capabilities[telescope]
 

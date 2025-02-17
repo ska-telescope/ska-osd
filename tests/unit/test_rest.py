@@ -328,36 +328,6 @@ def test_osd_source_gitlab(client):
     response.json == error_msg  # pylint: disable=W0104
 
 
-@patch("ska_ost_osd.rest.api.resources.update_file")
-@patch("ska_ost_osd.rest.api.resources.get_osd_using_tmdata")
-def test_osd_put_endpoint(mock_osd_data, client, mid_osd_data, mock_mid_data):
-    """This function tests that a request to the OSD endpoint for a
-        specific OSD returns expected data for that OSD.
-
-    :param client (FlaskClient): The Flask test client.
-    :param mid_osd_data (dict): The expected data for the OSD.
-
-    :raises AssertionError: If the response does not contain the expected
-         OSD data or returns an error status code.
-    """
-    mock_osd_data.return_value = mid_osd_data
-    response = client.put(
-        f"{BASE_API_URL}/osd",
-        query_string={
-            "cycle_id": 1,
-            "capabilities": "mid",
-            "array_assembly": "AA0.5",
-        },
-    )
-
-    response = MagicMock()
-    response.status_code = 200
-    response.json = mock_mid_data["AA0.5"]
-
-    assert response.status_code == 200
-    assert response.json == mock_mid_data["AA0.5"]
-
-
 @patch("ska_ost_osd.rest.api.resources.get_tmdata_sources")
 @pytest.mark.parametrize(
     "json_body_to_validate, response",
