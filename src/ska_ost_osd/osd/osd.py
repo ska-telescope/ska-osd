@@ -1,7 +1,7 @@
 import copy
 import re
 from importlib.metadata import version
-from typing import Any, Optional
+from typing import Any, Dict, Optional
 
 from ska_telmodel.data import TMData
 
@@ -15,12 +15,16 @@ from ska_ost_osd.osd.osd_validation_messages import (
     OSD_VERSION_ERROR_MESSAGE,
     SOURCE_ERROR_MESSAGE,
 )
+from ska_ost_osd.rest.api.utils import update_file
 
 from .constant import (
     ARRAY_ASSEMBLY_PATTERN,
     BASE_FOLDER_NAME,
     BASE_URL,
     CAR_URL,
+    LOW_CAPABILITIES_JSON_PATH,
+    MID_CAPABILITIES_JSON_PATH,
+    OBSERVATORY_POLICIES_JSON_PATH,
     SOURCES,
     osd_file_mapping,
     osd_response_template,
@@ -430,3 +434,52 @@ def get_osd_using_tmdata(
     if errors:
         raise ValueError(errors)
     return osd_data
+
+
+def update_storage(
+    validated_capabilities: Dict, observatory_policy: Dict, existing_stored_data: Dict
+) -> Dict:
+    """This function processes and validates OSD data for insertion
+    into the capabilities file
+
+    Args:
+        validated_input_body (Dict): A dictionary containing the OSD data to insert
+        existing_stored_data (Dict): The existing stored capabilities data
+
+    Returns:
+        Dict: A dictionary with the processed capabilities data
+
+    Raises:
+        OSDModelError: If validation fails
+        ValueError: If required data is missing or invalid
+    """
+    # Validate request body against schema
+
+    capabilities = validated_capabilities.capabilities
+
+    # Get telescope data - we know there's exactly one key due to UpdateRequestModel validation
+    telescope = next(iter(capabilities.keys()))
+    telescope_data = capabilities[telescope]
+
+    # Create a copy of existing data to avoid modifying it directly
+    updated_data = copy.deepcopy(existing_stored_data)
+
+    # Allow new fields while preserving existing data structure
+    for key, value in telescope_data.items():
+        if key in updated_data:
+            # Update existing fields
+            if isinstance(value, dict) and isinstance(existing_stored_data[key], dict):
+                updated_data[key].update(value)
+            else:
+                updated_data[key] = value
+        else:
+            # Add new fields
+            updated_data[key] = value
+
+    # Write updated data to file
+    update_file(MID_CAPABILITIES_JSON_PATH, updated_data)
+
+    if observatory_policy:
+        update_file(OBSERVATORY_POLICIES_JSON_PATH, observatory_policy)
+
+    return updated_data
