@@ -1,6 +1,6 @@
 """GitLab helper functions for OSD."""
 import logging
-import os
+from os import getenv
 import sys
 from pathlib import Path
 from typing import List, Tuple
@@ -10,6 +10,25 @@ from ska_telmodel.data.new_data_backend import GitBackend
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+def setup_ssh_key(self) -> Path:
+    """
+    Set up SSH key from vault in the user's SSH directory
+    Returns the path to the SSH key file
+    """
+    ssh_key = getenv('ID_RSA')
+    if not ssh_key:
+        raise ValueError("Failed to retrieve SSH key from vault")
+
+    # Create .ssh directory if it doesn't exist
+    ssh_dir = Path.home() / ".ssh"
+    ssh_dir.mkdir(mode=0o700, exist_ok=True)
+    
+    # Write the key to a file
+    key_path = ssh_dir / "gitlab_vault_key"
+    key_path.write_text(ssh_key)
+    key_path.chmod(0o600)
+    
+    return key_path
 
 def get_project_root() -> Path:
     """Get the project root directory."""
@@ -47,10 +66,14 @@ def push_to_gitlab(
         commit_msg: Commit message
         branch: Branch name
     """
+
+    
+    ssh_key_path = setup_ssh_key()
+
     repo = "ska-telescope/ost/ska-ost-osd"
     git_repo = GitBackend(repo=repo)
-    git_repo.checkout_branch(branch_name)
-
+    #git_repo.checkout_branch(branch_name)
+    os.environ['GIT_SSH_COMMAND'] = f'ssh -i {ssh_key_path} -o StrictHostKeyChecking=yes'
     # Filter and add only modified files
     if branch_name:
         try:

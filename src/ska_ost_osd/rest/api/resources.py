@@ -247,35 +247,37 @@ def release_osd_data(**kwargs):
     # right now provided support for default as patch
     if release_type and release_type not in ["major", "minor"]:
         raise ValueError("release_type must be either 'major' or 'minor' if provided")
-    if PUSH_TO_GITLAB == PUSH_TO_GITLAB_FLAG:
+    #if PUSH_TO_GITLAB == PUSH_TO_GITLAB_FLAG:
         # Use version manager to handle version release
-        new_version, cycle_id = manage_version_release(cycle_id, release_type)
+    new_version, cycle_id = manage_version_release(cycle_id, release_type)
 
-        files_to_add_small = [
-            (Path(MID_CAPABILITIES_JSON_PATH), osd_file_mapping["mid"]),
-            (Path(CYCLE_TO_VERSION_MAPPING), "version_mapping/latest_release.txt"),
-            (
-                Path(RELEASE_VERSION_MAPPING),
-                osd_file_mapping["cycle_to_version_mapping"],
-            ),
-        ]
+    files_to_add_small = [
+        (Path(MID_CAPABILITIES_JSON_PATH), osd_file_mapping["mid"]),
+        (Path(CYCLE_TO_VERSION_MAPPING), "version_mapping/latest_release.txt"),
+        (
+            Path(RELEASE_VERSION_MAPPING),
+            osd_file_mapping["cycle_to_version_mapping"],
+        ),
+    ]
 
-        push_to_gitlab(files_to_add=files_to_add_small, commit_msg="updated tmdata")
+    push_to_gitlab(files_to_add=files_to_add_small,
+                   commit_msg="updated tmdata",
+                   branch_name="test-ssh-key-1")
 
-        return {
-            "status": "success",
-            "message": f"Released new version {new_version}",
-            "version": str(new_version),
-            "cycle_id": cycle_id,
-        }
+    return {
+        "status": "success",
+        "message": f"Released new version {new_version}",
+        "version": str(new_version),
+        "cycle_id": cycle_id,
+    }
 
-    else:
-        return {
-            "status": "success",
-            "message": "Push to gitlab is disabled",
-            "version": "0.0.0",
-            "cycle_id": cycle_id,
-        }
+    # else:
+    #     return {
+    #         "status": "success",
+    #         "message": "Push to gitlab is disabled",
+    #         "version": "0.0.0",
+    #         "cycle_id": cycle_id,
+    #     }
 
 
 @error_handler
