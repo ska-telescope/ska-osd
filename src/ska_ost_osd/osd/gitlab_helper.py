@@ -1,5 +1,6 @@
 """GitLab helper functions for OSD."""
 import logging
+import os
 from os import getenv
 import sys
 from pathlib import Path
@@ -10,7 +11,7 @@ from ska_telmodel.data.new_data_backend import GitBackend
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def setup_ssh_key(self) -> Path:
+def setup_ssh_key() -> Path:
     """
     Set up SSH key from vault in the user's SSH directory
     Returns the path to the SSH key file
