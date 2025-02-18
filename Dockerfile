@@ -25,15 +25,16 @@ RUN apt-get update && \
     openssh-client \
     && rm -rf /var/lib/apt/lists/*
 
-# Set up SSH directory
-RUN mkdir -p /root/.ssh && \
-    chmod 700 /root/.ssh
-
 # Developers may want to add --dev to the poetry export for testing inside a container
 RUN poetry export --format requirements.txt --output poetry-requirements.txt --without-hashes && \
     pip install -r poetry-requirements.txt && \
     pip install . && \
     rm poetry-requirements.txt
+
+RUN useradd -m -d /home/tango tango && \
+    mkdir -p /home/tango/.ssh && \
+    chown -R tango:tango /home/tango && \
+    chmod 700 /home/tango/.ssh
 
 USER tango
 
