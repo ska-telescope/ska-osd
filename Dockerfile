@@ -31,8 +31,7 @@ RUN poetry export --format requirements.txt --output poetry-requirements.txt --w
     pip install . && \
     rm poetry-requirements.txt
 
-RUN useradd -m -d /home/tango tango && \
-    mkdir -p /home/tango/.ssh && \
+RUN mkdir -p /home/tango/.ssh && \
     chown -R tango:tango /home/tango && \
     chmod 700 /home/tango/.ssh
 
