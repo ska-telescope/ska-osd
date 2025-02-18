@@ -112,7 +112,7 @@ def push_to_gitlab(
     repo = "ska-telescope/ost/ska-ost-osd"
     git_repo = GitBackend(repo=repo)
     #git_repo.checkout_branch(branch_name)
-    os.environ['GIT_SSH_COMMAND'] = f'ssh -i {ssh_key_path} -o StrictHostKeyChecking=yes'
+    #os.environ['GIT_SSH_COMMAND'] = f'ssh -i {ssh_key_path} -o StrictHostKeyChecking=yes'
     # Filter and add only modified files
     if branch_name:
         try:
