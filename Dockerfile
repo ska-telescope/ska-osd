@@ -20,8 +20,14 @@ RUN poetry config virtualenvs.create false
 RUN pip install poetry==1.8.3
 
 RUN apt-get update && \
-    apt-get install -y git && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y \
+    git \
+    openssh-client \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set up SSH directory
+RUN mkdir -p /root/.ssh && \
+    chmod 700 /root/.ssh
 
 # Developers may want to add --dev to the poetry export for testing inside a container
 RUN poetry export --format requirements.txt --output poetry-requirements.txt --without-hashes && \
