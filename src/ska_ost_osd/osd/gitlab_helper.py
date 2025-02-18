@@ -11,12 +11,34 @@ from ska_telmodel.data.new_data_backend import GitBackend
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def setup_ssh_key() -> Path:
+import subprocess
+import logging
+
+logger = logging.getLogger(__name__)
+
+def setup_gitlab_access():
     """
-    Set up SSH key from vault in the user's SSH directory
-    Returns the path to the SSH key file
+    Set up GitLab SSH access with proper host key verification
     """
-    ssh_key = '''-----BEGIN OPENSSH PRIVATE KEY-----
+    ssh_dir = Path('/home/tango/.ssh')
+    known_hosts_file = ssh_dir / 'known_hosts'
+    
+    try:
+        # Create .ssh directory with correct permissions
+        ssh_dir.mkdir(mode=0o700, exist_ok=True)
+        
+        # Add GitLab's host key using ssh-keyscan
+        subprocess.run(
+            ['ssh-keyscan', 'gitlab.com'],
+            stdout=known_hosts_file.open('a'),
+            stderr=subprocess.PIPE,
+            check=True
+        )
+        known_hosts_file.chmod(0o600)
+        
+        # If using SSH key from vault or environment
+        
+        ssh_key = '''-----BEGIN OPENSSH PRIVATE KEY-----
 b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABlwAAAAdzc2gtcn
 NhAAAAAwEAAQAAAYEAtXoUh4ROTtqzKUOZBRrnx3wyGRBROuvlLo7QINWvGahJcI8Dbz+J
 xcNWJ4V1G8caUjS0268mB9DoJdBkJlkKzaEtq4rEXLlRs1XfMEIAGj64/kbAQ1pcVwHHTF
@@ -54,20 +76,35 @@ nzfLX0KJN/Vw7AFDU8HfxIMrE1AKc1T53WbB7mFJe8IgORK9DWZvnI2/Gldu4vdERvT7tE
 wdInJll4sRpFXleVCeo8qaj25QW1XrEsDaOAiGpxEVh/sUwJZ9WjWrmVjBfWQjst6eRP0Z
 J0hOkF2ZODY1BHAAAAH2RheWFuYW5kQGRheWFuYW5kLUxhdGl0dWRlLTU0MjABAgM=
 -----END OPENSSH PRIVATE KEY-----'''
+        key_file = ssh_dir / 'id_rsa'
+        key_file.write_text(ssh_key)
+        key_file.chmod(0o600)
+        
+        
+    except Exception as e:
+        logger.error(f"Failed to setup GitLab SSH access: {str(e)}")
+        raise
 
-    if not ssh_key:
-        raise ValueError("Failed to retrieve SSH key from vault")
+# def setup_ssh_key() -> Path:
+#     """
+#     Set up SSH key from vault in the user's SSH directory
+#     Returns the path to the SSH key file
+#     """
+    
 
-    # Create .ssh directory if it doesn't exist
-    ssh_dir = Path.home() / ".ssh"
-    ssh_dir.mkdir(mode=0o700, exist_ok=True)
+#     if not ssh_key:
+#         raise ValueError("Failed to retrieve SSH key from vault")
+
+#     # Create .ssh directory if it doesn't exist
+#     ssh_dir = Path.home() / ".ssh"
+#     ssh_dir.mkdir(mode=0o700, exist_ok=True)
     
-    # Write the key to a file
-    key_path = ssh_dir / "gitlab_vault_key"
-    key_path.write_text(ssh_key)
-    key_path.chmod(0o600)
+#     # Write the key to a file
+#     key_path = ssh_dir / "gitlab_vault_key"
+#     key_path.write_text(ssh_key)
+#     key_path.chmod(0o600)
     
-    return key_path
+#     return key_path
 
 def get_project_root() -> Path:
     """Get the project root directory."""
@@ -107,7 +144,7 @@ def push_to_gitlab(
     """
 
     
-    ssh_key_path = setup_ssh_key()
+    setup_gitlab_access()
 
     repo = "ska-telescope/ost/ska-ost-osd"
     git_repo = GitBackend(repo=repo)
