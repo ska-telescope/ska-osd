@@ -18,6 +18,11 @@ COPY tmdata /app/src/tmdata
 RUN poetry config virtualenvs.create false
 
 RUN pip install poetry==1.8.3
+
+RUN apt-get update && \
+    apt-get install -y git && \
+    rm -rf /var/lib/apt/lists/*
+
 # Developers may want to add --dev to the poetry export for testing inside a container
 RUN poetry export --format requirements.txt --output poetry-requirements.txt --without-hashes && \
     pip install -r poetry-requirements.txt && \
