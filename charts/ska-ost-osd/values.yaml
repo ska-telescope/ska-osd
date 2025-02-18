@@ -6,7 +6,6 @@ minikube: true
 system: ost
 subsystem: osd
 validation_strictness: 2
-push_to_gitlab: 1
 
 labels:
   app: ska-ost-osd
@@ -14,7 +13,6 @@ labels:
 global:
   minikube: true
   cluster_domain: techops.internal.skao.int
-  id_rsa:
 
 rest:
   component: rest
@@ -24,9 +22,9 @@ rest:
   logLevel: INFO
   enabled: true
   image:
-    registry: artefact.skao.int
-    image: ska-ost-osd
-    tag: ~ # Defaults to the chart appVersion if not set
+    registry: registry.gitlab.com
+    image: ska-telescope/ost/ska-ost-osd/ska-ost-osd
+    tag: 1.0.0-dev.c99ed0773
     pullPolicy: IfNotPresent
   resources:
     requests:
@@ -43,15 +41,3 @@ nodeSelector: {}
 affinity: {}
 
 tolerations: []
-
-
-secretProvider:
-  enabled: true
-  provider:
-    name: "vault"
-    vaultAddress: "https://vault.skao.int"
-    roleName: "kube-role"
-    secretsPath: "kv/data/users/dayanand_arade/gitlab_ssh_key"
-    secrets:
-    - secretKey: "id_rsa"
-      targetEnv: ID_RSA
