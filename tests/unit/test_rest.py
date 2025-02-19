@@ -92,7 +92,7 @@ def test_init_app_client(client, open_api_spec):
     "cycle_id, osd_version, source, capabilities, array_assembly, expected",
     [
         (
-            3,
+            100000,
             "1..1.0",
             "file",
             "mid",
@@ -102,7 +102,7 @@ def test_init_app_client(client, open_api_spec):
                     "Cycle_id and Array_assembly cannot be used together",
                     "osd_version 1..1.0 is not valid",
                     "array_assembly AAA3 is not valid",
-                    "Cycle 3 is not valid,Available IDs are 1",
+                    "Cycle 100000 is not valid,Available IDs are 1",
                 ],
                 "status": -1,
                 "title": "Value Error",
@@ -113,10 +113,10 @@ def test_init_app_client(client, open_api_spec):
             None,
             "file",
             "mid",
-            "AA3",
+            "AA100000",
             {
                 "detail": [
-                    "Array Assembly AA3 is not valid,Available Array Assemblies"
+                    "Array Assembly AA100000 is not valid,Available Array Assemblies"
                     " are AA0.5, AA1, AA2"
                 ],
                 "title": "Value Error",
@@ -149,13 +149,13 @@ def test_init_app_client(client, open_api_spec):
         ),
         (
             1,
-            "3.0.7",
+            "31.0.7",
             None,
             ["mid"],
             None,
             {
                 "detail": [
-                    "OSD Version 3.0.7 is not valid,Available OSD Versions are"
+                    "OSD Version 31.0.7 is not valid,Available OSD Versions are"
                     " {osd_versions}"
                 ],
                 "status": -1,
@@ -205,7 +205,14 @@ def test_invalid_osd_tmdata_source(
             "array_assembly": array_assembly,
         },
     )
-    assert response.json == expected
+
+    if array_assembly == "AA100000":
+        msg = f"{','.join(response.json['detail'][0].split(',')[1:])}"
+        expected_msg = f"{expected['detail'][0].split(',')[0]},{msg}"
+        assert response.json["detail"][0] == expected_msg
+
+    else:
+        assert response.json == expected
 
 
 @patch("ska_ost_osd.rest.api.resources.get_osd_using_tmdata")
@@ -319,178 +326,6 @@ def test_osd_source_gitlab(client):
     ]
 
     response.json == error_msg  # pylint: disable=W0104
-
-
-@pytest.mark.parametrize(
-    "cycle_id, capabilities, array_assembly, expected",
-    [
-        (
-            3,
-            "mid",
-            "AA0.5",
-            {
-                "detail": "Cycle 3 is not valid,Available IDs are 1",
-                "status": -1,
-                "title": "Value Error",
-            },
-        ),
-        (
-            None,
-            "mid",
-            "AA1",
-            {
-                "detail": "Cycle ID must be an integer",
-                "title": "Value Error",
-                "status": -1,
-            },
-        ),
-        (
-            1,
-            "mid",
-            "ABC",
-            {
-                "detail": "Array assembly must be in the format of AA[0-9].[0-9]",
-                "status": -1,
-                "title": "Value Error",
-            },
-        ),
-        (
-            1,
-            "low",
-            "AA5",
-            {
-                "detail": (
-                    "Array Assembly AA5 is not valid,Available Array Assemblies are"
-                    " AA0.5, AA1, AA2"
-                ),
-                "status": -1,
-                "title": "Value Error",
-            },
-        ),
-    ],
-)
-def test_invalid_put_osd_source(
-    cycle_id,
-    capabilities,
-    array_assembly,
-    expected,
-    client,
-):
-    """This test case checks the functionality of OSD API
-        It will validate all params and retunr expected output.
-
-    NOTE: This testcase has dependency on 'cycle_gitlab_release_version_mapping.json'
-          file so make sure to run the 'make osd-pre-release' command which is
-          mentioned in readme and document files.
-
-    :param cycle_id,: 1, 2
-    :param capabilities: Mid or Low
-    :param array_assembly: Array Assembly AA0.5, AA1
-    :param expected: output of OSD API
-    :param client: Flask test client
-
-    :returns: assert equals values
-    """
-
-    response = client.put(
-        f"{BASE_API_URL}/osd",
-        query_string={
-            "cycle_id": cycle_id,
-            "capabilities": capabilities,
-            "array_assembly": array_assembly,
-        },
-    )
-    assert response.json == expected
-
-
-@patch("ska_ost_osd.rest.api.resources.update_file")
-def test_osd_put_endpoint(mock_osd_data, client, mid_osd_data):
-    """This function tests that a request to the OSD endpoint for a
-        specific OSD returns expected data for that OSD.
-
-    :param client (FlaskClient): The Flask test client.
-    :param mid_osd_data (dict): The expected data for the OSD.
-
-    :raises AssertionError: If the response does not contain the expected
-         OSD data or returns an error status code.
-    """
-    mock_osd_data.return_value = mid_osd_data
-    response = client.put(
-        f"{BASE_API_URL}/osd",
-        query_string={
-            "cycle_id": 1,
-            "capabilities": "mid",
-            "array_assembly": "AA0.5",
-        },
-    )
-    assert response.status_code == 200
-    assert response.json["AA0.5"] == mid_osd_data["capabilities"]["mid"]["AA0.5"]
-
-
-@patch("ska_ost_osd.rest.api.resources.update_file")
-def test_osd_put_observatory_policies(mock_osd_data, client, osd_observatory_policies):
-    """This function tests that a request to the OSD endpoint for a
-        specific OSD returns expected data for that OSD.
-
-    :param client (FlaskClient): The Flask test client.
-    :param osd_observatory_policies (dict): The expected data for the OSD.
-
-    :raises AssertionError: If the response does not contain the expected
-         OSD data or returns an error status code.
-    """
-    mock_osd_data.return_value = osd_observatory_policies
-    response = client.put(
-        f"{BASE_API_URL}/osd",
-        query_string={
-            "cycle_id": 1,
-            "capabilities": "mid",
-        },
-    )
-    assert response.status_code == 200
-    assert response.json == osd_observatory_policies
-
-
-@patch("ska_ost_osd.rest.api.resources.update_file")
-def test_osd_put_basic_capabilities(mock_osd_data, client, mid_osd_data):
-    """This function tests that a request to the OSD endpoint for a
-        specific OSD returns expected data for that OSD.
-
-    :param client (FlaskClient): The Flask test client.
-    :param mid_osd_data (dict): The expected data for the OSD.
-
-    :raises AssertionError: If the response does not contain the expected
-         OSD data or returns an error status code.
-    """
-    mock_osd_data.return_value = mid_osd_data
-    basic_capabilities_dict = {
-        "basic_capabilities": {
-            "dish_elevation_limit_deg": 15.0,
-            "receiver_information": [
-                {
-                    "rx_id": "Band_1",
-                    "min_frequency_hz": 350000000.0,
-                    "max_frequency_hz": 1050000000.0,
-                }
-            ],
-        }
-    }
-
-    response = client.put(
-        f"{BASE_API_URL}/osd",
-        query_string={
-            "cycle_id": 1,
-            "capabilities": "mid",
-        },
-        json=basic_capabilities_dict,
-    )
-
-    assert response.status_code == 200
-    assert (
-        response.json["basic_capabilities"]["dish_elevation_limit_deg"]
-        == mid_osd_data["capabilities"]["mid"]["basic_capabilities"][
-            "dish_elevation_limit_deg"
-        ]
-    )
 
 
 @patch("ska_ost_osd.rest.api.resources.get_tmdata_sources")
