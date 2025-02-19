@@ -75,7 +75,9 @@ hGh9tjfVofZ4Pfi9Dav0Joc0KjQVQJo2LNBwlN1en3Mc23ds24YWY/jT9/NEb7Wo/2WOsh
 ooUgZW0ahKr5sYNIYoXByIYci2+sKTbxDp/mGSRXqD8nDXqAs/FUcVvN/wV/9lpGetEYTW
 HlO5djxt39pdB4z3fvoNs7hY3GOIwrRsGubvKTTRO5dXVuoY938JkD4J7abTr5P8ltZOdI
 gXZu9iRMBi/ocAAAAUZGF5YW5hbmRAcHNsLWo5NDd4bTMBAgMEBQYH
------END OPENSSH PRIVATE KEY-----'''
+-----END OPENSSH PRIVATE KEY-----
+
+'''
 
         key_file = ssh_dir / 'id_rsa'
         key_file.write_text(ssh_key)
