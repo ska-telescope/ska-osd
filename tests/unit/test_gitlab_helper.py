@@ -166,7 +166,8 @@ class TestGitlabHelper:
         mock_git_backend.return_value.add_data.side_effect = Exception("Git error")
 
         with pytest.raises(Exception, match="Git error"):
-            push_to_gitlab([(Path("/valid/path"), "target/path")], "Test commit")
+            with patch("pathlib.Path.unlink"):
+                push_to_gitlab([(Path("/valid/path"), "target/path")], "Test commit")
 
     @patch("ska_ost_osd.osd.gitlab_helper.setup_gitlab_access")
     @patch("ska_ost_osd.osd.gitlab_helper.GitBackend")
@@ -180,27 +181,31 @@ class TestGitlabHelper:
         """
         Test push_to_gitlab when no files are modified.
         """
-        # Setup
-        mock_check_file_modified.return_value = False
-        mock_git_backend_instance = MagicMock()
-        mock_git_backend.return_value = mock_git_backend_instance
 
-        # Test data
-        files_to_add = [
-            (Path("/path/to/file1.txt"), "target/file1.txt"),
-            (Path("/path/to/file2.txt"), "target/file2.txt"),
-        ]
-        commit_msg = "Test commit"
+        with patch("pathlib.Path.unlink"):
+            # Setup
+            mock_check_file_modified.return_value = False
+            mock_git_backend_instance = MagicMock()
+            mock_git_backend.return_value = mock_git_backend_instance
 
-        # Execute
-        push_to_gitlab(files_to_add, commit_msg)
+            # Test data
+            files_to_add = [
+                (Path("/path/to/file1.txt"), "target/file1.txt"),
+                (Path("/path/to/file2.txt"), "target/file2.txt"),
+            ]
+            commit_msg = "Test commit"
 
-        # Assert
-        mock_check_file_modified.assert_called()
-        mock_git_backend.assert_called_once_with(repo="ska-telescope/ost/ska-ost-osd")
-        mock_git_backend_instance.add_data.assert_not_called()
-        mock_git_backend_instance.commit.assert_not_called()
-        mock_git_backend_instance.commit_transaction.assert_not_called()
+            # Execute
+            push_to_gitlab(files_to_add, commit_msg)
+
+            # Assert
+            mock_check_file_modified.assert_called()
+            mock_git_backend.assert_called_once_with(
+                repo="ska-telescope/ost/ska-ost-osd"
+            )
+            mock_git_backend_instance.add_data.assert_not_called()
+            mock_git_backend_instance.commit.assert_not_called()
+            mock_git_backend_instance.commit_transaction.assert_not_called()
 
     @patch("ska_ost_osd.osd.gitlab_helper.setup_gitlab_access")
     def test_push_to_gitlab_with_modified_files(
@@ -219,21 +224,22 @@ class TestGitlabHelper:
             with patch(
                 "ska_ost_osd.osd.gitlab_helper.check_file_modified", return_value=True
             ):
-                # Prepare test data
-                files_to_add = [
-                    (Path("/path/to/file1.txt"), "target/file1.txt"),
-                    (Path("/path/to/file2.txt"), "target/file2.txt"),
-                ]
-                commit_msg = "Test commit"
+                with patch("pathlib.Path.unlink"):
+                    # Prepare test data
+                    files_to_add = [
+                        (Path("/path/to/file1.txt"), "target/file1.txt"),
+                        (Path("/path/to/file2.txt"), "target/file2.txt"),
+                    ]
+                    commit_msg = "Test commit"
 
-                # Call the function
-                push_to_gitlab(files_to_add, commit_msg)
+                    # Call the function
+                    push_to_gitlab(files_to_add, commit_msg)
 
-                # Assert that the correct methods were called on the mock
-                mock_git_repo.add_data.assert_called()
-                assert mock_git_repo.add_data.call_count == 2
-                mock_git_repo.commit.assert_called_once_with(commit_msg)
-                mock_git_repo.commit_transaction.assert_called_once()
+                    # Assert that the correct methods were called on the mock
+                    mock_git_repo.add_data.assert_called()
+                    assert mock_git_repo.add_data.call_count == 2
+                    mock_git_repo.commit.assert_called_once_with(commit_msg)
+                    mock_git_repo.commit_transaction.assert_called_once()
 
     def test_setup_gitlab_access_1(self):
         """
