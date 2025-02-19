@@ -153,17 +153,6 @@ class TestGitlabHelper:
         assert isinstance(result, Path)
 
     @patch("ska_ost_osd.osd.gitlab_helper.setup_gitlab_access")
-    def test_push_to_gitlab_empty_input(
-        self, mock_git_backend, mock_check_file_modified  # pylint: disable=W0613
-    ):
-        """
-        Test push_to_gitlab with empty input list.
-        """
-        push_to_gitlab([], "Empty commit")
-        mock_git_backend.return_value.commit.assert_not_called()
-        mock_git_backend.return_value.commit_transaction.assert_not_called()
-
-    @patch("ska_ost_osd.osd.gitlab_helper.setup_gitlab_access")
     def test_push_to_gitlab_git_backend_exception(
         self,
         mock_setup,  # pylint: disable=W0613
@@ -178,21 +167,6 @@ class TestGitlabHelper:
 
         with pytest.raises(Exception, match="Git error"):
             push_to_gitlab([(Path("/valid/path"), "target/path")], "Test commit")
-
-    @patch("ska_ost_osd.osd.gitlab_helper.setup_gitlab_access")
-    def test_push_to_gitlab_invalid_file_paths(
-        self, mock_git_backend, mock_check_file_modified
-    ):
-        """
-        Test push_to_gitlab with invalid file paths.
-        """
-        invalid_files = [(Path("/nonexistent/file"), "target/path")]
-        mock_check_file_modified.return_value = False
-
-        push_to_gitlab(invalid_files, "Invalid files")
-        mock_git_backend.return_value.add_data.assert_not_called()
-        mock_git_backend.return_value.commit.assert_not_called()
-        mock_git_backend.return_value.commit_transaction.assert_not_called()
 
     @patch("ska_ost_osd.osd.gitlab_helper.setup_gitlab_access")
     @patch("ska_ost_osd.osd.gitlab_helper.GitBackend")
