@@ -79,6 +79,7 @@ def push_to_gitlab(
         branch: Branch name
     """
     repo = "ska-telescope/ost/ska-ost-osd"
+    setup_gitlab_access()
     git_repo = GitBackend(repo=repo)
     git_repo.checkout_branch(branch_name)
 
