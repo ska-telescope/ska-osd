@@ -2,6 +2,8 @@
 import logging
 import os
 import sys
+import subprocess
+
 from pathlib import Path
 from typing import List, Tuple
 
@@ -36,6 +38,35 @@ def check_file_modified(file_path: Path) -> bool:
     # For now, we'll assume any file with content is modified
     return stats.st_size > 0
 
+
+def setup_gitlab_access():
+    """
+    Set up GitLab SSH access with proper host key verification
+    """
+    ssh_dir = Path('/home/tango/.ssh')
+    known_hosts_file = ssh_dir / 'known_hosts'
+
+    try:
+        # Create .ssh directory with correct permissions
+        ssh_dir.mkdir(mode=0o700, exist_ok=True)
+
+        # Add GitLab's host key using ssh-keyscan
+        subprocess.run(
+            ['ssh-keyscan', 'gitlab.com'],
+            stdout=known_hosts_file.open('a'),
+            stderr=subprocess.PIPE,
+            check=True
+        )
+        known_hosts_file.chmod(0o600)
+
+        # If using SSH key from vault or environment
+        ssh_key = os.getenv('ID_RSA')
+        key_file = ssh_dir / 'id_rsa'
+        key_file.write_text(ssh_key)
+        key_file.chmod(0o600)
+    except Exception as e:
+        logger.error(f"Failed to setup GitLab SSH access: {str(e)}")
+        raise
 
 def push_to_gitlab(
     files_to_add: List[Tuple[Path, str]], commit_msg: str, branch_name: str = None
