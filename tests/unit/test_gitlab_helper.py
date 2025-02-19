@@ -1,5 +1,6 @@
+import subprocess
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, mock_open, patch
 
 import pytest
 
@@ -7,6 +8,7 @@ from ska_ost_osd.osd.gitlab_helper import (
     check_file_modified,
     get_project_root,
     push_to_gitlab,
+    setup_gitlab_access,
 )
 
 
@@ -150,6 +152,7 @@ class TestGitlabHelper:
         result = get_project_root()
         assert isinstance(result, Path)
 
+    @patch("ska_ost_osd.osd.gitlab_helper.setup_gitlab_access")
     def test_push_to_gitlab_empty_input(
         self, mock_git_backend, mock_check_file_modified  # pylint: disable=W0613
     ):
@@ -160,8 +163,12 @@ class TestGitlabHelper:
         mock_git_backend.return_value.commit.assert_not_called()
         mock_git_backend.return_value.commit_transaction.assert_not_called()
 
+    @patch("ska_ost_osd.osd.gitlab_helper.setup_gitlab_access")
     def test_push_to_gitlab_git_backend_exception(
-        self, mock_git_backend, mock_check_file_modified
+        self,
+        mock_setup,  # pylint: disable=W0613
+        mock_git_backend,
+        mock_check_file_modified,
     ):
         """
         Test push_to_gitlab when GitBackend raises an exception.
@@ -172,6 +179,7 @@ class TestGitlabHelper:
         with pytest.raises(Exception, match="Git error"):
             push_to_gitlab([(Path("/valid/path"), "target/path")], "Test commit")
 
+    @patch("ska_ost_osd.osd.gitlab_helper.setup_gitlab_access")
     def test_push_to_gitlab_invalid_file_paths(
         self, mock_git_backend, mock_check_file_modified
     ):
@@ -186,10 +194,14 @@ class TestGitlabHelper:
         mock_git_backend.return_value.commit.assert_not_called()
         mock_git_backend.return_value.commit_transaction.assert_not_called()
 
+    @patch("ska_ost_osd.osd.gitlab_helper.setup_gitlab_access")
     @patch("ska_ost_osd.osd.gitlab_helper.GitBackend")
     @patch("ska_ost_osd.osd.gitlab_helper.check_file_modified")
     def test_push_to_gitlab_no_modified_files(
-        self, mock_check_file_modified, mock_git_backend
+        self,
+        mock_check_file_modified,
+        mock_git_backend,
+        mock_setup,  # pylint: disable=W0613
     ):
         """
         Test push_to_gitlab when no files are modified.
@@ -216,7 +228,10 @@ class TestGitlabHelper:
         mock_git_backend_instance.commit.assert_not_called()
         mock_git_backend_instance.commit_transaction.assert_not_called()
 
-    def test_push_to_gitlab_with_modified_files(self):
+    @patch("ska_ost_osd.osd.gitlab_helper.setup_gitlab_access")
+    def test_push_to_gitlab_with_modified_files(
+        self, mock_gitlab
+    ):  # pylint: disable=W0613
         """
         Test push_to_gitlab when there are modified files to push.
         """
@@ -245,3 +260,40 @@ class TestGitlabHelper:
                 assert mock_git_repo.add_data.call_count == 2
                 mock_git_repo.commit.assert_called_once_with(commit_msg)
                 mock_git_repo.commit_transaction.assert_called_once()
+
+    def test_setup_gitlab_access_1(self):
+        """
+        Test the setup_gitlab_access function to ensure it creates the .ssh directory,
+        adds the GitLab host key, and sets up the SSH key file correctly.
+        """
+
+        with patch(
+            "ska_ost_osd.osd.gitlab_helper.Path.home", return_value=Path("/mock/home")
+        ), patch("ska_ost_osd.osd.gitlab_helper.subprocess.run") as mock_run, patch(
+            "ska_ost_osd.osd.gitlab_helper.os.getenv", return_value="mock_ssh_key"
+        ), patch(
+            "pathlib.Path.mkdir"
+        ) as mock_mkdir, patch(
+            "pathlib.Path.chmod"
+        ) as mock_chmod, patch(
+            "pathlib.Path.open", mock_open()
+        ) as mock_file:
+            setup_gitlab_access()
+
+            # Assert .ssh directory creation
+            mock_mkdir.assert_called_once_with(mode=0o700, exist_ok=True)
+
+            # Assert ssh-keyscan execution
+            mock_run.assert_called_once_with(
+                ["ssh-keyscan", "gitlab.com"],
+                stdout=mock_file.return_value,
+                stderr=subprocess.PIPE,
+                check=True,
+            )
+
+            # Assert file permissions
+            mock_chmod.assert_any_call(0o600)
+
+            # Assert SSH key file creation and permissions
+            mock_file.return_value.write.assert_called_once_with("mock_ssh_key")
+            mock_chmod.assert_any_call(0o600)
