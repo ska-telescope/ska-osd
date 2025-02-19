@@ -81,7 +81,7 @@ def push_to_gitlab(
     repo = "ska-telescope/ost/ska-ost-osd"
     setup_gitlab_access()
     git_repo = GitBackend(repo=repo)
-    git_repo.checkout_branch(branch_name)
+    #git_repo.checkout_branch(branch_name)
 
     # Filter and add only modified files
     if branch_name:
