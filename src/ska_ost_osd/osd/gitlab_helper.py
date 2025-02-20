@@ -46,7 +46,8 @@ def setup_gitlab_access():
 
     try:
         # Create .ssh directory with correct permissions
-        ssh_dir.mkdir(mode=0o700, exist_ok=True)
+        if ssh_dir.exists():
+            ssh_dir.mkdir(mode=0o700, exist_ok=True)
 
         # Add GitLab's host key using ssh-keyscan
         subprocess.run(
@@ -59,6 +60,8 @@ def setup_gitlab_access():
 
         # If using SSH key from vault or environment
         ssh_key = os.getenv("ID_RSA")
+        if ssh_key is None:
+            raise ValueError("ID_RSA environment variable not set")
         key_file = ssh_dir / "id_rsa"
         key_file.write_text(ssh_key)
         key_file.chmod(0o600)

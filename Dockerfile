@@ -24,7 +24,6 @@ RUN apt-get update && \
     openssh-client \
     && rm -rf /var/lib/apt/lists/*
 # create temporary .ssh folder to store ssh key.
-# deleted key once data pushed to artefact.
 RUN mkdir -p /home/tango/.ssh && \
     chown -R tango:tango /home/tango && \
     chmod 700 /home/tango/.ssh

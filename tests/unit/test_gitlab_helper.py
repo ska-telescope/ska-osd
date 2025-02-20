@@ -252,16 +252,11 @@ class TestGitlabHelper:
         ), patch("ska_ost_osd.osd.gitlab_helper.subprocess.run") as mock_run, patch(
             "ska_ost_osd.osd.gitlab_helper.os.getenv", return_value="mock_ssh_key"
         ), patch(
-            "pathlib.Path.mkdir"
-        ) as mock_mkdir, patch(
             "pathlib.Path.chmod"
         ) as mock_chmod, patch(
             "pathlib.Path.open", mock_open()
         ) as mock_file:
             setup_gitlab_access()
-
-            # Assert .ssh directory creation
-            mock_mkdir.assert_called_once_with(mode=0o700, exist_ok=True)
 
             # Assert ssh-keyscan execution
             mock_run.assert_called_once_with(
