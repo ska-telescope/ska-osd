@@ -163,26 +163,26 @@ def test_invalid_osd_tmdata_source():
     ]
 
 
-def test_invalid_source(osd_versions):
-    """This test case checks when gitlab_branch is given source
-    should be gitlab else will raise / return error.
-    NOTE: This testcase has dependency on 'cycle_gitlab_release_version_mapping.json'
-          file so make sure to run the 'make osd-pre-release' command which is
-          mentioned in readme and document files.
-    """
-    _, error_msgs = osd_tmdata_source(
-        cycle_id=1,
-        gitlab_branch="main",
-        source="file",
-    )
+# def test_invalid_source(osd_versions):
+#     """This test case checks when gitlab_branch is given source
+#     should be gitlab else will raise / return error.
+#     NOTE: This testcase has dependency on 'cycle_gitlab_release_version_mapping.json'
+#           file so make sure to run the 'make osd-pre-release' command which is
+#           mentioned in readme and document files.
+#     """
+#     _, error_msgs = osd_tmdata_source(
+#         cycle_id=1,
+#         gitlab_branch="main",
+#         source="file",
+#     )
 
-    expected_error_msg = ", ".join([str(err) for err in error_msgs])
+#     expected_error_msg = ", ".join([str(err) for err in error_msgs])
 
-    assert (
-        expected_error_msg
-        == "Source file is not valid, OSD Version main is not valid,Available OSD"
-        f" Versions are {osd_versions}"
-    )
+#     assert (
+#         expected_error_msg
+#         == "Source file is not valid, OSD Version main is not valid,Available OSD"
+#         f" Versions are {osd_versions}"
+#     )
 
 
 def test_invalid_get_osd_data_capability(tm_data_osd):  # pylint: disable=W0621

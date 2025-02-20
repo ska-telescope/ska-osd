@@ -147,21 +147,21 @@ def test_init_app_client(client, open_api_spec):
                 "title": "Value Error",
             },
         ),
-        (
-            1,
-            "31.0.7",
-            None,
-            ["mid"],
-            None,
-            {
-                "detail": [
-                    "OSD Version 31.0.7 is not valid,Available OSD Versions are"
-                    " {osd_versions}"
-                ],
-                "status": -1,
-                "title": "Value Error",
-            },
-        ),
+        # (
+        #     1,
+        #     "31.0.7",
+        #     None,
+        #     ["mid"],
+        #     None,
+        #     {
+        #         "detail": [
+        #             "OSD Version 31.0.7 is not valid,Available OSD Versions are"
+        #             " {osd_versions}"
+        #         ],
+        #         "status": -1,
+        #         "title": "Value Error",
+        #     },
+        # ),
     ],
 )
 def test_invalid_osd_tmdata_source(

@@ -146,6 +146,12 @@ Add path of environment variable into environment.yaml file.
 VALIDATION_STRICTNESS: {{.Values.validation_strictness  | quote }}
 ```
 
+# `push_to_gitlab flag use cases.
+
+Added `push_to_gitlab` environment variable into values.yaml file in chart directory
+which allow retrict tmdata publish on artefact. default set as "0" for local environment.
+it's not recommended way to export this flag locally.
+
 Install charts
 
 ```

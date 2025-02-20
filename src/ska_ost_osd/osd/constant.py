@@ -46,4 +46,5 @@ CYCLE_TO_VERSION_MAPPING = "tmdata/version_mapping/latest_release.txt"
 RELEASE_VERSION_MAPPING = (
     "tmdata/version_mapping/cycle_gitlab_release_version_mapping.json"
 )
+# constant define to push gitlab flag.
 PUSH_TO_GITLAB_FLAG = "1"

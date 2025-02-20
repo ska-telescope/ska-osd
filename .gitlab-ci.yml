@@ -19,8 +19,8 @@ variables:
 # non build and test stages hidden https://docs.gitlab.com/ee/ci/yaml/README.html#hide-jobs
 stages:
   - build
-  - deploy
   - test
+  - deploy
   - lint
   - publish
   - pages

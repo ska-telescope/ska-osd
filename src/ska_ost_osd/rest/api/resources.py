@@ -14,12 +14,12 @@ from pydantic import ValidationError
 from ska_telmodel.data import TMData
 
 from ska_ost_osd.osd.constant import (
+    CYCLE_TO_VERSION_MAPPING,
     MID_CAPABILITIES_JSON_PATH,
     OBSERVATORY_POLICIES_JSON_PATH,
     PUSH_TO_GITLAB_FLAG,
-    CYCLE_TO_VERSION_MAPPING,
     RELEASE_VERSION_MAPPING,
-    osd_file_mapping
+    osd_file_mapping,
 )
 from ska_ost_osd.osd.gitlab_helper import push_to_gitlab
 from ska_ost_osd.osd.osd import get_osd_using_tmdata, update_file_storage
@@ -28,18 +28,21 @@ from ska_ost_osd.osd.osd_update_schema import (
     UpdateRequestModel,
     ValidationOnCapabilities,
 )
-from ska_ost_osd.osd.version_manager import manage_version_release
 from ska_ost_osd.osd.osd_validation_messages import (
     ARRAY_ASSEMBLY_DOESNOT_BELONGS_TO_CYCLE_ERROR_MESSAGE,
 )
+from ska_ost_osd.osd.version_manager import manage_version_release
 from ska_ost_osd.rest.api.utils import read_file
 from ska_ost_osd.telvalidation import SchematicValidationError, semantic_validate
 from ska_ost_osd.telvalidation.constant import (
     CAR_TELMODEL_SOURCE,
-    SEMANTIC_VALIDATION_VALUE
+    SEMANTIC_VALIDATION_VALUE,
 )
 from ska_ost_osd.telvalidation.semantic_validator import VALIDATION_STRICTNESS
 
+# this variable is added for restricting tmdata publish from local/dev environment.
+# usage: "0" means disable tmdata publish to artefact.
+# "1" means allow to publish
 PUSH_TO_GITLAB = environ.get("PUSH_TO_GITLAB", "0")
 
 
@@ -232,9 +235,7 @@ def release_osd_data(**kwargs):
         raise ValueError("cycle_id is required")
     cycle_id = "cycle_" + str(cycle_id)
     release_type = kwargs.get("release_type")
-    # TODO we will decide in future if major or minor release support going
-    # to provide or not based on decision will remove belode code.
-    # right now provided support for default as patch
+    # provided support for patch as part of current implementation
     if release_type and release_type not in ["major", "minor"]:
         raise ValueError("release_type must be either 'major' or 'minor' if provided")
     if PUSH_TO_GITLAB == PUSH_TO_GITLAB_FLAG:
