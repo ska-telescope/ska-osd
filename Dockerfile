@@ -17,9 +17,16 @@ COPY tmdata /app/src/tmdata
 # Install runtime dependencies and the app
 RUN poetry config virtualenvs.create false
 
-# Create .ssh directory
-RUN mkdir -p /root/.ssh && \
-    chmod 700 /root/.ssh
+# Install ssh client and git in order to push tmdata to artefact
+RUN apt-get update && \
+    apt-get install -y \
+    git \
+    openssh-client \
+    && rm -rf /var/lib/apt/lists/*
+# create temporary .ssh folder to store ssh key.
+RUN mkdir -p /home/tango/.ssh && \
+    chown -R tango:tango /home/tango && \
+    chmod 700 /home/tango/.ssh
 
 RUN pip install poetry==1.8.3
 # Developers may want to add --dev to the poetry export for testing inside a container
