@@ -6,7 +6,7 @@ See the operationId fields of the Open API spec for the specific mappings.
 import json
 from functools import wraps
 from http import HTTPStatus
-from typing import Any, Dict
+from typing import Dict
 
 from pydantic import ValidationError
 from ska_telmodel.data import TMData
@@ -15,7 +15,7 @@ from ska_ost_osd.osd.constant import (
     MID_CAPABILITIES_JSON_PATH,
     OBSERVATORY_POLICIES_JSON_PATH,
 )
-from ska_ost_osd.osd.osd import get_osd_using_tmdata, update_storage
+from ska_ost_osd.osd.osd import get_osd_using_tmdata, update_file_storage
 from ska_ost_osd.osd.osd_schema_validator import CapabilityError, OSDModelError
 from ska_ost_osd.osd.osd_update_schema import (
     UpdateRequestModel,
@@ -96,32 +96,6 @@ def error_handler(api_fn: callable) -> str:
     return wrapper
 
 
-class FloatPreservingJSONEncoder(json.JSONEncoder):
-    """JSON encoder that preserves floating point numbers."""
-
-    def default(self, o: Any) -> Any:
-        """Encode the object."""
-        if isinstance(o, float):
-            return format(o, ".1f")  # Ensure at least one decimal place is preserved
-        return super().default(o)
-
-    def encode(self, o: Any) -> str:
-        """Custom encode method to preserve float format."""
-        if isinstance(o, (dict, list)):
-
-            def convert(item):
-                if isinstance(item, float):
-                    return format(item, ".1f")
-                elif isinstance(item, dict):
-                    return {k: convert(v) for k, v in item.items()}
-                elif isinstance(item, list):
-                    return [convert(i) for i in item]
-                return item
-
-            obj = convert(o)
-        return super().encode(obj)
-
-
 @error_handler
 def get_osd(**kwargs) -> dict:
     """This function takes query parameters and OSD data source objects
@@ -144,9 +118,7 @@ def get_osd(**kwargs) -> dict:
         )
     except (OSDModelError, ValueError) as error:
         raise error
-    # Convert to JSON and back using our custom encoder to preserve float format
-    json_str = json.dumps(osd_data, cls=FloatPreservingJSONEncoder)
-    return json.loads(json_str)
+    return osd_data
 
 
 def validation_response(
@@ -218,7 +190,7 @@ def update_osd_data(body: Dict, **kwargs) -> Dict:
         # Combine capability validation with existing data update
         validated_capabilities = ValidationOnCapabilities(**body)
         existing_data = read_file(MID_CAPABILITIES_JSON_PATH)
-        return update_storage(
+        return update_file_storage(
             validated_capabilities, body["observatory_policy"], existing_data
         )
 

@@ -435,7 +435,7 @@ def get_osd_using_tmdata(
     return osd_data
 
 
-def update_storage(
+def update_file_storage(
     validated_capabilities: Dict, observatory_policy: Dict, existing_stored_data: Dict
 ) -> Dict:
     """This function processes and validates OSD data for insertion

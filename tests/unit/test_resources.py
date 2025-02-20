@@ -16,14 +16,14 @@ class TestResources:
             yield mock
 
     @pytest.fixture
-    def mock_update_storage(self):
-        with patch("ska_ost_osd.rest.api.resources.update_storage") as mock:
+    def mock_update_file_storage(self):
+        with patch("ska_ost_osd.rest.api.resources.update_file_storage") as mock:
             mock.return_value = {"updated": "data"}
             yield mock
 
     @patch("ska_ost_osd.rest.api.resources.read_file")
-    @patch("ska_ost_osd.rest.api.resources.update_storage")
-    def test_update_osd_data_2(self, mock_update_storage, mock_read_file):
+    @patch("ska_ost_osd.rest.api.resources.update_file_storage")
+    def test_update_osd_data_2(self, mock_update_file_storage, mock_read_file):
         """
         Test update_osd_data when cycle_id and array_assembly are valid
         """
@@ -36,8 +36,8 @@ class TestResources:
             {"existing": "data"},  # MID_CAPABILITIES_JSON_PATH
         ]
 
-        # Mock the update_storage function
-        mock_update_storage.return_value = {"updated": "data"}
+        # Mock the update_file_storage function
+        mock_update_file_storage.return_value = {"updated": "data"}
 
         # Prepare test data
         body = {
@@ -54,7 +54,7 @@ class TestResources:
     def test_update_osd_data_empty_input(
         self,
         mock_read_file,  # pylint: disable=W0613
-        mock_update_storage,  # pylint: disable=W0613
+        mock_update_file_storage,  # pylint: disable=W0613
     ):
         """Test update_osd_data with empty input"""
 
@@ -75,6 +75,6 @@ class TestResources:
         kwargs = {"cycle_id": 1, "array_assembly": "AA0", "capabilities": "mid"}
         result = update_osd_data(body, **kwargs)
         assert (
-            "Capability error: Array Assembly AA0 is not belongs to cycle 1"
+            "Capability error: Array Assembly AA0 does not belongs to cycle 1"
             == result[0]["detail"]
         )

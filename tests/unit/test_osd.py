@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 import pytest
 
-from ska_ost_osd.osd.osd import get_osd_data, osd_tmdata_source, update_storage
+from ska_ost_osd.osd.osd import get_osd_data, osd_tmdata_source, update_file_storage
 from ska_ost_osd.osd.osd_update_schema import ValidationOnCapabilities
 from tests.conftest import (
     DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER,
@@ -234,9 +234,9 @@ def sample_existing_data():
     }
 
 
-def test_update_storage_1():
+def test_update_file_storage_1():
     """
-    Test update_storage function when updating nested dictionary
+    Test update_file_storage function when updating nested dictionary
     fields and observatory policy.
     """
     validated_capabilities = {
@@ -270,24 +270,26 @@ def test_update_storage_1():
     }
 
     with patch("ska_ost_osd.osd.osd.update_file"):
-        updated_data = update_storage(
+        updated_data = update_file_storage(
             validated_capabilities, observatory_policy, existing_stored_data
         )
     assert updated_data == expected_updated_data
 
 
-def test_update_storage_invalid_input(sample_existing_data):  # pylint: disable=W0621
-    """Test update_storage with invalid input structure"""
+def test_update_file_storage_invalid_input(
+    sample_existing_data,
+):  # pylint: disable=W0621
+    """Test update_file_storage with invalid input structure"""
     invalid_input = {"invalid_key": {"telescope": "SKA-Mid"}}
     with patch("ska_ost_osd.osd.osd.update_file"):
         with pytest.raises(AttributeError):
-            update_storage(invalid_input, {}, sample_existing_data)
+            update_file_storage(invalid_input, {}, sample_existing_data)
 
 
-def test_update_storage_nested_dict_update(
+def test_update_file_storage_nested_dict_update(
     sample_existing_data, mocker
 ):  # pylint: disable=W0621
-    """Test update_storage with nested dictionary updates"""
+    """Test update_file_storage with nested dictionary updates"""
     mock_update_file = mocker.patch("ska_ost_osd.osd.osd.update_file")
 
     update_data = {
@@ -304,7 +306,7 @@ def test_update_storage_nested_dict_update(
         }
     }
     validated_capabilities = ValidationOnCapabilities(**update_data)
-    result = update_storage(validated_capabilities, {}, sample_existing_data)
+    result = update_file_storage(validated_capabilities, {}, sample_existing_data)
 
     assert result["basic_capabilities"]["new_capability"] == "value"
     assert result["basic_capabilities"]["max_frequency"] == 16e9
@@ -314,7 +316,7 @@ def test_update_storage_nested_dict_update(
     mock_update_file.assert_called_once()
 
 
-def test_update_storage_non_existent_telescope(
+def test_update_file_storage_non_existent_telescope(
     sample_existing_data, mocker
 ):  # pylint: disable=W0621
     mock_update_file = mocker.patch("ska_ost_osd.osd.osd.update_file")
@@ -328,15 +330,15 @@ def test_update_storage_non_existent_telescope(
         }
     }
     validated_capabilities = ValidationOnCapabilities(**non_existent_telescope)
-    result = update_storage(validated_capabilities, {}, sample_existing_data)
+    result = update_file_storage(validated_capabilities, {}, sample_existing_data)
     assert "SKA-Low" not in result
     mock_update_file.assert_called_once()
 
 
-def test_update_storage_observatory_policy_update(
+def test_update_file_storage_observatory_policy_update(
     sample_existing_data, mocker
 ):  # pylint: disable=W0621
-    """Test update_storage with observatory policy updates"""
+    """Test update_file_storage with observatory policy updates"""
     mock_update_file = mocker.patch("ska_ost_osd.osd.osd.update_file")
 
     update_data = {
@@ -351,6 +353,8 @@ def test_update_storage_observatory_policy_update(
 
     observatory_policy = {"new_policy": "value"}
     validated_capabilities = ValidationOnCapabilities(**update_data)
-    update_storage(validated_capabilities, observatory_policy, sample_existing_data)
+    update_file_storage(
+        validated_capabilities, observatory_policy, sample_existing_data
+    )
 
     assert mock_update_file.call_count == 2

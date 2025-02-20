@@ -2,8 +2,9 @@ from typing import Any, Dict
 
 from pydantic import BaseModel, Field, model_validator
 
-ARRAY_ASSEMBLY_PATTERN = r"^AA(\d+|\d+)"
 from ska_ost_osd.osd.osd_schema_validator import CapabilityError
+
+from .constant import ARRAY_ASSEMBLY_PATTERN
 
 
 class UpdateRequestModel(BaseModel):

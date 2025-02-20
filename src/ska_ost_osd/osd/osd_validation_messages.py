@@ -17,5 +17,5 @@ CYCLE_ID_CAPABILITIES_ERROR_MESSAGE = "Either cycle_id or capabilities must be p
 OSD_VERSION_INVALID_ERROR_MESSAGE = "osd_version {} is not valid"
 ARRAY_ASSEMBLY_INVALID_ERROR_MESSAGE = "array_assembly {} is not valid"
 ARRAY_ASSEMBLY_DOESNOT_BELONGS_TO_CYCLE_ERROR_MESSAGE = (
-    "Array Assembly {} is not belongs to cycle {}"
+    "Array Assembly {} does not belongs to cycle {}"
 )
