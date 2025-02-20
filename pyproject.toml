@@ -49,6 +49,9 @@ astropy = "^6.1"
 simpleeval = "^0.9.13"
 pydantic = "^2.10.3"
 deepdiff = "^7.0.0"
+flask = "2.2.5"
+Flask-Cors="^5.0.0"
+
 
 
 [tool.poetry.group.dev.dependencies]

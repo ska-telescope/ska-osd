@@ -2,125 +2,134 @@ components:
   schemas:
     OSDRequest:
       type: object
-      example:
-        telescope: "Mid"
-        basic_capabilities:
-          dish_elevation_limit_deg: 15.0
-          receiver_information:
-            - rx_id: "Band_1"
-              min_frequency_hz: 350000000.0
-              max_frequency_hz: 1050000000.0
-            - rx_id: "Band_2"
-              min_frequency_hz: 950000000.0
-              max_frequency_hz: 1760000000.0
-            - rx_id: "Band_3"
-              min_frequency_hz: 1650000000.0
-              max_frequency_hz: 3050000000.0
-            - rx_id: "Band_4"
-              min_frequency_hz: 2800000000.0
-              max_frequency_hz: 5180000000.0
-            - rx_id: "Band_5a"
-              min_frequency_hz: 4600000000.0
-              max_frequency_hz: 8500000000.0
-            - rx_id: "Band_5b"
-              min_frequency_hz: 8300000000.0
-              max_frequency_hz: 15400000000.0
-        AA0.5:
-          available_receivers:
-            - Band_1
-            - Band_2
-          number_ska_dishes: 4
-          number_meerkat_dishes: 0
-          number_meerkatplus_dishes: 0
-          max_baseline_km: 1.5
-          available_bandwidth_hz: 800000000.0
-          number_channels: 14880
-          cbf_modes:
-            - "correlation"
-            - "pst"
-          number_zoom_windows: 0
-          number_zoom_channels: 0
-          number_pss_beams: 0
-          number_pst_beams: 1
-          ps_beam_bandwidth_hz: 400000000.0
-          number_fsps: 4
-          allowed_channel_width_values: [13440]
-          allowed_channel_count_range_min: [1]
-          allowed_channel_count_range_max: [58982]
-        AA1:
-          available_receivers:
-            - Band_1
-            - Band_2
-            - Band_5a
-            - Band_5b
-          number_ska_dishes: 8
-          number_meerkat_dishes: 0
-          number_meerkatplus_dishes: 0
-          max_baseline_km: 1.5
-          available_bandwidth_hz: 800000000.0
-          number_channels: 14880
-          cbf_modes:
-            - "correlation"
-            - "pst"
-          number_zoom_windows: 0
-          number_zoom_channels: 0
-          number_pss_beams: 0
-          number_pst_beams: 1
-          ps_beam_bandwidth_hz: 400000000.0
-          number_fsps: 8
-          allowed_channel_width_values: [13440]
-          allowed_channel_count_range_min: [1]
-          allowed_channel_count_range_max: [58982]
-        AA2:
-          available_receivers:
-            - Band_1
-            - Band_2
-            - Band_5a
-            - Band_5b
-          number_ska_dishes: 64
-          number_meerkat_dishes: 4
-          number_meerkatplus_dishes: 0
-          max_baseline_km: 110.0
-          available_bandwidth_hz: 800000000.0
-          number_channels: 14880
-          cbf_modes:
-            - "correlation"
-            - "pst"
-            - "pss"
-          number_zoom_windows: 16
-          number_zoom_channels: 14880
-          number_pss_beams: 384
-          number_pst_beams: 6
-          ps_beam_bandwidth_hz: 800000000.0
-          number_fsps: 27
-          allowed_channel_width_values: 
-            - 210
-            - 420
-            - 840
-            - 1680
-            - 3360
-            - 6720
-            - 13440
-            - 26880
-            - 40320
-            - 53760
-            - 80640
-            - 107520
-            - 161280
-            - 215040
-            - 322560
-            - 416640
-            - 430080
-            - 645120
-          allowed_channel_count_range_min: [1]
-          allowed_channel_count_range_max: [214748647]
-  
-    OSDResponse:
-      type: object
       properties:
-        status:
-          type: string
-        message:
-          type: string
-      xml:
-        name: OSDResponse
+        capabilities:
+          type: object
+          properties:
+            mid:
+              type: object
+              properties:
+                AA2:
+                  type: object
+                  properties:
+                    allowed_channel_count_range_max:
+                      type: array
+                      items:
+                        type: integer
+                      example: [214748647]
+                    allowed_channel_count_range_min:
+                      type: array
+                      items:
+                        type: integer
+                      example: [1]
+                    allowed_channel_width_values:
+                      type: array
+                      items:
+                        type: integer
+                      example: [210, 420, 840, 1680, 3360, 6720, 13440, 26880, 40320, 53760]
+                    available_bandwidth_hz:
+                      type: string
+                      example: "800000000.0"
+                    available_receivers:
+                      type: array
+                      items:
+                        type: string
+                      example: ["Band_1", "Band_2", "Band_5a", "Band_5b"]
+                    cbf_modes:
+                      type: array
+                      items:
+                        type: string
+                      example: ["correlation", "pst", "pss"]
+                    max_baseline_km:
+                      type: string
+                      example: "110.0"
+                    number_dish_ids:
+                      type: array
+                      items:
+                        type: string
+                      description: List of dish IDs
+                    number_fsps:
+                      type: integer
+                      example: 26
+                    number_meerkat_dishes:
+                      type: integer
+                      example: 4
+                    number_meerkatplus_dishes:
+                      type: integer
+                      example: 0
+                    number_pss_beams:
+                      type: integer
+                      example: 384
+                    number_pst_beams:
+                      type: integer
+                      example: 6
+                    number_ska_dishes:
+                      type: integer
+                      example: 64
+                    number_zoom_channels:
+                      type: integer
+                      example: 14880
+                    number_zoom_windows:
+                      type: integer
+                      example: 16
+                    ps_beam_bandwidth_hz:
+                      type: string
+                      example: "800000000.0"
+                basic_capabilities:
+                  type: object
+                  properties:
+                    dish_elevation_limit_deg:
+                      type: string
+                      example: "15.0"
+                    receiver_information:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          max_frequency_hz:
+                            type: string
+                            example: "350000000.0"
+                          min_frequency_hz:
+                            type: string
+                            example: "1050000000.0"
+                          rx_id:
+                            type: string
+                            example: "Band_1"
+        observatory_policy:
+          type: object
+          properties:
+            cycle_description:
+              type: string
+              example: "Science Verification"
+            cycle_information:
+              type: object
+              properties:
+                cycle_id:
+                  type: string
+                  example: "SKAO_2027_1"
+                proposal_close:
+                  type: string
+                  format: date-time
+                  example: "20260512T15:00:00.000z"
+                proposal_open:
+                  type: string
+                  format: date-time
+                  example: "20260327T12:00:00.000Z"
+            cycle_number:
+              type: integer
+              example: 1
+            cycle_policies:
+              type: object
+              properties:
+                normal_max_hours:
+                  type: string
+                  example: "100.0"
+            telescope_capabilities:
+              type: object
+              properties:
+                Low:
+                  type: string
+                  example: "AA2"
+                Mid:
+                  type: string
+                  example: "AA2"
