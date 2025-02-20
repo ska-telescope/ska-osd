@@ -113,6 +113,31 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerError'
 
+  /cycle:
+    get:
+      summary: Get list of available cycles
+      description: Returns a list of cycle numbers extracted from cycle_gitlab_release_version_mapping.json
+      operationId: ska_ost_osd.rest.api.resources.get_cycle_list
+      responses:
+        "200":
+          description: Successfully retrieved cycle list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cycles:
+                    type: array
+                    items:
+                      type: integer
+                    description: List of cycle numbers
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 
 components:
   parameters:

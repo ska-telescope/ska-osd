@@ -18,6 +18,6 @@ def read_json(json_file_location: str) -> dict[dict[str, Any]]:
     cwd = Path(__file__).resolve().parent.parent.parent.parent
     path = os.path.join(cwd, json_file_location)
     with open(path) as user_file:  # pylint: disable=W1514
-        file_contents = json.load(user_file)
+        file_contents = json.load(user_file, parse_float=float)
 
     return file_contents

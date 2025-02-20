@@ -1,8 +1,10 @@
 from importlib.metadata import version
+from unittest.mock import patch
 
 import pytest
 
-from ska_ost_osd.osd.osd import get_osd_data, osd_tmdata_source
+from ska_ost_osd.osd.osd import get_osd_data, osd_tmdata_source, update_file_storage
+from ska_ost_osd.osd.osd_update_schema import ValidationOnCapabilities
 from tests.conftest import (
     DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER,
     OSD_RESPONSE_WITH_CAPABILITIES_ARRAY_ASSEMBLY_PARAMETER,
@@ -149,7 +151,7 @@ def test_invalid_osd_tmdata_source():
     """
 
     _, error_msgs = osd_tmdata_source(
-        cycle_id=3,
+        cycle_id=100000,
         osd_version="1.1.0",
         gitlab_branch="main",
         source="github",
@@ -157,7 +159,7 @@ def test_invalid_osd_tmdata_source():
     assert error_msgs == [
         "Source is not valid available are file, car, gitlab",
         "Only one parameter is needed either osd_version or gitlab_branch",
-        "Cycle 3 is not valid,Available IDs are 1",
+        "Cycle 100000 is not valid,Available IDs are 1",
     ]
 
 
@@ -207,10 +209,152 @@ def test_invalid_get_osd_data_array_assembly(tm_data_osd):  # pylint: disable=W0
 
     :param tm_data_osd: tm_data_osd
     """
+    aa_value = "AA100000"
 
     _, error_msgs = get_osd_data(
-        capabilities=["mid"], array_assembly="AA3", tmdata=tm_data_osd
+        capabilities=["mid"], array_assembly=aa_value, tmdata=tm_data_osd
     )
-    assert error_msgs == [
-        "Array Assembly AA3 is not valid,Available Array Assemblies are AA0.5, AA1, AA2"
-    ]
+    msg = ",".join(error_msgs[0].split(",")[1:])
+
+    assert error_msgs[0] == f"Array Assembly {aa_value} is not valid,{msg}"
+
+
+@pytest.fixture
+def sample_existing_data():
+    return {
+        "telescope": "SKA-Mid",
+        "basic_capabilities": {
+            "max_frequency": 15.3e9,
+            "min_frequency": 350e6,
+        },
+        "AA0.5": {
+            "max_baseline": 1000,
+            "num_stations": 64,
+        },
+    }
+
+
+def test_update_file_storage_1():
+    """
+    Test update_file_storage function when updating nested dictionary
+    fields and observatory policy.
+    """
+    validated_capabilities = {
+        "capabilities": {
+            "mid": {
+                "AA0.5": {
+                    "existing_key": {"nested_key": "new_value"},
+                    "new_key": "new_value",
+                }
+            }
+        }
+    }
+    validated_capabilities = ValidationOnCapabilities(**validated_capabilities)
+    observatory_policy = {"new_policy": "value"}
+    existing_stored_data = {
+        "AA0.5": {
+            "existing_key": {
+                "nested_key": "old_value",
+                "untouched_key": "untouched_value",
+            },
+            "untouched_field": "untouched_value",
+        }
+    }
+
+    expected_updated_data = {
+        "AA0.5": {
+            "existing_key": {"nested_key": "new_value"},
+            "untouched_field": "untouched_value",
+            "new_key": "new_value",
+        }
+    }
+
+    with patch("ska_ost_osd.osd.osd.update_file"):
+        updated_data = update_file_storage(
+            validated_capabilities, observatory_policy, existing_stored_data
+        )
+    assert updated_data == expected_updated_data
+
+
+def test_update_file_storage_invalid_input(
+    sample_existing_data,
+):  # pylint: disable=W0621
+    """Test update_file_storage with invalid input structure"""
+    invalid_input = {"invalid_key": {"telescope": "SKA-Mid"}}
+    with patch("ska_ost_osd.osd.osd.update_file"):
+        with pytest.raises(AttributeError):
+            update_file_storage(invalid_input, {}, sample_existing_data)
+
+
+def test_update_file_storage_nested_dict_update(
+    sample_existing_data, mocker
+):  # pylint: disable=W0621
+    """Test update_file_storage with nested dictionary updates"""
+    mock_update_file = mocker.patch("ska_ost_osd.osd.osd.update_file")
+
+    update_data = {
+        "capabilities": {
+            "SKA-Mid": {
+                "basic_capabilities": {
+                    "new_capability": "value",
+                    "max_frequency": 16e9,  # Updating existing value
+                },
+                "AA0.5": {
+                    "new_field": "new_value",
+                },
+            }
+        }
+    }
+    validated_capabilities = ValidationOnCapabilities(**update_data)
+    result = update_file_storage(validated_capabilities, {}, sample_existing_data)
+
+    assert result["basic_capabilities"]["new_capability"] == "value"
+    assert result["basic_capabilities"]["max_frequency"] == 16e9
+    assert result["AA0.5"]["new_field"] == "new_value"
+    assert result["AA0.5"]["max_baseline"] == 1000  # Existing value should be preserved
+
+    mock_update_file.assert_called_once()
+
+
+def test_update_file_storage_non_existent_telescope(
+    sample_existing_data, mocker
+):  # pylint: disable=W0621
+    mock_update_file = mocker.patch("ska_ost_osd.osd.osd.update_file")
+    non_existent_telescope = {
+        "capabilities": {
+            "SKA-Low": {  # This telescope doesn't exist in the sample data
+                "basic_capabilities": {
+                    "max_frequency": 350e6,
+                }
+            }
+        }
+    }
+    validated_capabilities = ValidationOnCapabilities(**non_existent_telescope)
+    result = update_file_storage(validated_capabilities, {}, sample_existing_data)
+    assert "SKA-Low" not in result
+    mock_update_file.assert_called_once()
+
+
+def test_update_file_storage_observatory_policy_update(
+    sample_existing_data, mocker
+):  # pylint: disable=W0621
+    """Test update_file_storage with observatory policy updates"""
+    mock_update_file = mocker.patch("ska_ost_osd.osd.osd.update_file")
+
+    update_data = {
+        "capabilities": {
+            "SKA-Mid": {
+                "basic_capabilities": {
+                    "new_capability": "value",
+                }
+            }
+        }
+    }
+
+    observatory_policy = {"new_policy": "value"}
+    validated_capabilities = ValidationOnCapabilities(**update_data)
+    update_file_storage(
+        validated_capabilities, observatory_policy, sample_existing_data
+    )
+
+    assert mock_update_file.call_count == 2

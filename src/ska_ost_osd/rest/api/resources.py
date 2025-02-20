@@ -3,7 +3,7 @@ Functions which the HTTP requests to individual resources are mapped to.
 
 See the operationId fields of the Open API spec for the specific mappings.
 """
-import re
+import json
 from functools import wraps
 from http import HTTPStatus
 from os import environ
@@ -14,29 +14,29 @@ from pydantic import ValidationError
 from ska_telmodel.data import TMData
 
 from ska_ost_osd.osd.constant import (
-    ARRAY_ASSEMBLY_PATTERN,
-    CYCLE_TO_VERSION_MAPPING,
-    LOW_CAPABILITIES_JSON_PATH,
     MID_CAPABILITIES_JSON_PATH,
     OBSERVATORY_POLICIES_JSON_PATH,
     PUSH_TO_GITLAB_FLAG,
+    CYCLE_TO_VERSION_MAPPING,
     RELEASE_VERSION_MAPPING,
-    osd_file_mapping,
+    osd_file_mapping
 )
 from ska_ost_osd.osd.gitlab_helper import push_to_gitlab
-from ska_ost_osd.osd.helper import read_json
-from ska_ost_osd.osd.osd import get_osd_using_tmdata
-from ska_ost_osd.osd.osd_schema_validator import OSDModelError
-from ska_ost_osd.osd.osd_validation_messages import (
-    ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE,
-    CYCLE_ID_ERROR_MESSAGE,
+from ska_ost_osd.osd.osd import get_osd_using_tmdata, update_file_storage
+from ska_ost_osd.osd.osd_schema_validator import CapabilityError, OSDModelError
+from ska_ost_osd.osd.osd_update_schema import (
+    UpdateRequestModel,
+    ValidationOnCapabilities,
 )
 from ska_ost_osd.osd.version_manager import manage_version_release
-from ska_ost_osd.rest.api.utils import read_file, update_file
+from ska_ost_osd.osd.osd_validation_messages import (
+    ARRAY_ASSEMBLY_DOESNOT_BELONGS_TO_CYCLE_ERROR_MESSAGE,
+)
+from ska_ost_osd.rest.api.utils import read_file
 from ska_ost_osd.telvalidation import SchematicValidationError, semantic_validate
 from ska_ost_osd.telvalidation.constant import (
     CAR_TELMODEL_SOURCE,
-    SEMANTIC_VALIDATION_VALUE,
+    SEMANTIC_VALIDATION_VALUE
 )
 from ska_ost_osd.telvalidation.semantic_validator import VALIDATION_STRICTNESS
 
@@ -80,7 +80,13 @@ def error_handler(api_fn: callable) -> str:
                 title="Value Error",
                 http_status=HTTPStatus.BAD_REQUEST,
             )
-
+        except CapabilityError as err:
+            return validation_response(
+                status=-1,
+                detail=err.args[0],
+                title="Value Error",
+                http_status=HTTPStatus.BAD_REQUEST,
+            )
         except RuntimeError as err:
             return validation_response(
                 status=-1,
@@ -152,76 +158,60 @@ def update_osd_data(body: Dict, **kwargs) -> Dict:
     """
     This function updates the input JSON against the schema
 
-    :param body:
-    A dictionary containing key-value pairs of parameters required for validation.
+    Args:
+        body (Dict): A dictionary containing key-value pairs of
+        parameters required for validation.
+        **kwargs: Additional keyword arguments
+        including cycle_id and array_assembly
 
-    :returns: :returns dict: A dictionary with OSD data satisfying the query.
+    Returns:
+        Dict: A dictionary with OSD data satisfying the query.
+
+    Raises:
+        OSDModelError: If validation fails
+        ValueError: If data validation or business logic checks fail
     """
-
     try:
-        cycle_id = kwargs.get("cycle_id")
-        capabilities = kwargs.get("capabilities")
-        array_assembly = kwargs.get("array_assembly")
+        # Read observatory policies once at the beginning
+        osd_data = read_file(OBSERVATORY_POLICIES_JSON_PATH)
 
-        if not isinstance(cycle_id, int):
-            raise ValueError("Cycle ID must be an integer")
+        # Prepare input parameters with direct dictionary access
+        input_parameters = {
+            "cycle_id": kwargs["cycle_id"],
+            "array_assembly": kwargs["array_assembly"],
+            "capabilities": kwargs["capabilities"],
+        }
 
-        if capabilities is None:
-            raise ValueError("Capabilities must be provided")
-        versions_dict = read_json(
-            "tmdata/" + osd_file_mapping["cycle_to_version_mapping"]
-        )
-        cycle_ids = [int(key.split("_")[-1]) for key in versions_dict]
-        cycle_id_exists = [cycle_id if cycle_id in cycle_ids else None][0]
-        string_ids = ",".join([str(i) for i in cycle_ids])
+        # Validate data using Pydantic model
+        validated_data = UpdateRequestModel(**input_parameters)
 
-        if cycle_id is not None and cycle_id_exists is None:
-            raise ValueError(
-                CYCLE_ID_ERROR_MESSAGE.format(cycle_id, string_ids),
+        # Early validation checks
+        if (
+            validated_data.cycle_id == osd_data["cycle_number"]
+            and validated_data.array_assembly
+            != osd_data["telescope_capabilities"]["Mid"]
+        ):
+            raise CapabilityError(
+                ARRAY_ASSEMBLY_DOESNOT_BELONGS_TO_CYCLE_ERROR_MESSAGE.format(
+                    validated_data.array_assembly, validated_data.cycle_id
+                )
             )
 
-        capabilities_path = (
-            MID_CAPABILITIES_JSON_PATH
-            if capabilities.lower() == "mid"
-            else LOW_CAPABILITIES_JSON_PATH
+        # Combine capability validation with existing data update
+        validated_capabilities = ValidationOnCapabilities(**body)
+        existing_data = read_file(MID_CAPABILITIES_JSON_PATH)
+        return update_file_storage(
+            validated_capabilities, body["observatory_policy"], existing_data
         )
 
-        if array_assembly:
-            if not re.match(ARRAY_ASSEMBLY_PATTERN, array_assembly):
-                raise ValueError(
-                    "Array assembly must be in the format of AA[0-9].[0-9]"
-                )
-
-            existing_data = read_file(capabilities_path)
-            array_assembly_list = list(
-                filter(lambda x: x.startswith("A"), existing_data.keys())
-            )
-
-            if array_assembly not in array_assembly_list:
-                raise ValueError(
-                    ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE.format(
-                        array_assembly, ", ".join(array_assembly_list)
-                    ),
-                )
-
-            existing_data[array_assembly].update(body)
-            update_file(capabilities_path, existing_data)
-            return existing_data
-
-        elif "basic_capabilities" in body.keys():
-            existing_data = read_file(capabilities_path)
-            existing_data["basic_capabilities"].update(body["basic_capabilities"])
-            update_file(capabilities_path, existing_data)
-            return existing_data
-
-        elif cycle_id and capabilities:
-            existing_data = read_file(OBSERVATORY_POLICIES_JSON_PATH)
-            existing_data.update(body)
-            update_file(OBSERVATORY_POLICIES_JSON_PATH, existing_data)
-            return existing_data
-
+    except KeyError as ke:
+        raise ValueError(f"Missing required parameter: {ke}") from ke
     except (OSDModelError, ValueError) as error:
         raise error
+    except CapabilityError as ce:
+        raise ValueError(f"Capability error: {ce}") from ce
+    except ValidationError as ve:
+        raise ValueError(f"Validation error: {ve}") from ve
 
 
 @error_handler
@@ -342,6 +332,31 @@ def semantically_validate_json(body: dict):
             title="Semantic validation",
             http_status=HTTPStatus.OK,
         )
+
+
+def get_cycle_list() -> Dict:
+    """Get list of cycles from cycle_gitlab_release_version_mapping.json.
+
+    Returns:
+        Dict: Dictionary containing list of cycle numbers
+    """
+    try:
+        json_file = "tmdata/version_mapping/cycle_gitlab_release_version_mapping.json"
+        with open(json_file, encoding="utf-8") as f:
+            data = json.load(f)
+        cycle_numbers = []
+        for key in data.keys():
+            # Extract number from cycle_X format
+            if key.startswith("cycle_"):
+                try:
+                    cycle_num = int(key.split("_")[1])
+                    cycle_numbers.append(cycle_num)
+                except (IndexError, ValueError):
+                    continue
+
+        return {"cycles": sorted(cycle_numbers)}
+    except Exception as e:  # pylint: disable=W0718
+        return {"error": str(e)}
 
 
 def handle_validation_error(err: object) -> list:

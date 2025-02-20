@@ -81,7 +81,7 @@ def test_semantic_validate_para(
     telescope,
     expected_result,
     is_exception,
-    tm_data,
+    tm_data_osd,
 ):
     """
     Parameterized test case to verify semantic validation for different inputs.
@@ -106,15 +106,15 @@ def test_semantic_validate_para(
             " interface='...' explicitly."
         ),
     ):
-        semantic_validate(config, tm_data)
+        semantic_validate(config, tm_data_osd)
 
     config["interface"] = interface
 
     if not is_exception:
-        assert semantic_validate(config, tm_data=tm_data), expected_result
+        assert semantic_validate(config, tm_data=tm_data_osd), expected_result
     else:
         try:
-            semantic_validate(config, tm_data=tm_data)
+            semantic_validate(config, tm_data=tm_data_osd)
         except SchematicValidationError as error:
             assert error.message == expected_result
 
