@@ -114,6 +114,7 @@ def push_to_gitlab(
 
         try:
             # Add files
+            logger.info("Adding file: %s", modified_files)
             for src_path, target_path in modified_files:
                 git_repo.add_data(src_path, target_path)
 
