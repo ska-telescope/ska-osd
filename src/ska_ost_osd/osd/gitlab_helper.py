@@ -89,7 +89,8 @@ def push_to_gitlab(
     git_repo_cache_path = Path.home() / ".cache/ska-telmodel/git_repos"
 
     if git_repo_cache_path.exists():
-        git_repo_cache_path.rmdir()
+        os.rmdir(git_repo_cache_path)
+        logger.info("Successfully removed git repo cache")
 
     try:
         setup_gitlab_access()
@@ -121,6 +122,8 @@ def push_to_gitlab(
             # Add files
             logger.info("Adding file: %s", modified_files)
             for src_path, target_path in modified_files:
+                logger.info("Src path: %s", src_path)
+                logger.info("Target path: %s", target_path)
                 git_repo.add_data(src_path, target_path)
 
             # Commit and push
