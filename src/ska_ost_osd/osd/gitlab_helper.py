@@ -38,46 +38,7 @@ def setup_gitlab_access():
         
         # If using SSH key from vault or environment
         
-        ssh_key = '''-----BEGIN OPENSSH PRIVATE KEY-----
-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
------END OPENSSH PRIVATE KEY-----
-
-'''
+        ssh_key = "test"
 
         key_file = ssh_dir / 'id_rsa'
         key_file.write_text(ssh_key)
@@ -147,7 +108,7 @@ def push_to_gitlab(
     """
 
     
-    setup_gitlab_access()
+    #setup_gitlab_access()
 
     repo = "ska-telescope/ost/ska-ost-osd"
     git_repo = GitBackend(repo=repo)

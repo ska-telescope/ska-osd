@@ -260,9 +260,9 @@ def release_osd_data(**kwargs):
         ),
     ]
 
-    push_to_gitlab(files_to_add=files_to_add_small,
-                   commit_msg="updated tmdata",
-                   branch_name="test-ssh-key-3")
+    # push_to_gitlab(files_to_add=files_to_add_small,
+    #                commit_msg="updated tmdata",
+    #                branch_name="test-ssh-key-3")
 
     return {
         "status": "success",
