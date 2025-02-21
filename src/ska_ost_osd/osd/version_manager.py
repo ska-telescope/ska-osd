@@ -4,7 +4,10 @@ This module handles version increments according to semantic versioning rules.
 """
 import json
 from pathlib import Path
+import logging
 from typing import Optional, Tuple
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 def increment_version(current_version: str, release_type: Optional[str] = None) -> str:
@@ -97,4 +100,6 @@ def manage_version_release(
     latest_release_path = project_root / "tmdata/version_mapping/latest_release.txt"
     with open(latest_release_path, "w", encoding="utf-8") as f:
         f.write(f'"{new_version}"')
+    with open(latest_release_path, "r", encoding="utf-8") as f:
+        logger.info("Skipping unmodified file: %s", f.read())
     return new_version, cycle_id
