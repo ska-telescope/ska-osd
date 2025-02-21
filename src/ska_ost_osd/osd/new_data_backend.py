@@ -191,7 +191,18 @@ class GitBackend(NewDataBackend):
         
         new_path = self._checkout_location / "tmdata" / key
         os.makedirs(new_path.parent, exist_ok=True)
-        shutil.copy(path, new_path)
+        try:
+            shutil.copy(path, new_path)
+            logger.info("File copied successfully.")
+        # If source and destination are same
+        except shutil.SameFileError:
+            logger.info("Source and destination represents the same file.")
+        # If there is any permission issue
+        except PermissionError:
+            logger.info("Permission denied.")
+        # For other errors
+        except:
+            logger.info("Error occurred while copying file.")	
         logger.info("path-------->> %s", path)
         logger.info("new path-------->> %s", new_path)
         logger.info("changed path-------->> %s", new_path.relative_to(self._checkout_location))
