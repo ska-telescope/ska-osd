@@ -67,6 +67,7 @@ def manage_version_release(
     )
     with open(version_mapping_path, "r", encoding="utf-8") as f:
         version_mapping = json.load(f)
+        logger.info("modified files----->>>: %s", f.read())
 
     # Validate cycle_id exists in mapping
     if cycle_id not in version_mapping:

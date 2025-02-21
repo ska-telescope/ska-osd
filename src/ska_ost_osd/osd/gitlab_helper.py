@@ -88,16 +88,16 @@ def push_to_gitlab(
     id_rsa_path = Path.home() / ".ssh/id_rsa"
     git_repo_cache_path = Path.home() / ".cache/ska-telmodel/git_repos"
 
-    if git_repo_cache_path.exists():
-        os.rmdir(git_repo_cache_path)
-        logger.info("Successfully removed git repo cache")
+    # if git_repo_cache_path.exists():
+    #     os.rmdir(git_repo_cache_path)
+    #     logger.info("Successfully removed git repo cache")
 
     try:
         setup_gitlab_access()
         git_repo = GitBackend(repo=repo)
         #git_repo.checkout_branch(branch_name)
 
-        # Filter and add only modified files
+        # # Filter and add only modified files
         if branch_name:
             try:
                 git_repo.start_transaction(branch_name, create_new_branch=True)
