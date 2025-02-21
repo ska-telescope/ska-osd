@@ -90,16 +90,17 @@ def push_to_gitlab(
     try:
         setup_gitlab_access()
         git_repo = GitBackend(repo=repo)
+        git_repo.checkout_branch(branch_name)
 
-        # Filter and add only modified files
-        if branch_name:
-            try:
-                git_repo.start_transaction(branch_name, create_new_branch=True)
-            except ValueError as err:
-                if str(err) == "Branch Already Exists":
-                    logger.error("Branch already exists, try a different branch name")
-                    raise ValueError("Branch already exists") from err
-                raise
+        # # Filter and add only modified files
+        # if branch_name:
+        #     try:
+        #         git_repo.start_transaction(branch_name, create_new_branch=True)
+        #     except ValueError as err:
+        #         if str(err) == "Branch Already Exists":
+        #             logger.error("Branch already exists, try a different branch name")
+        #             raise ValueError("Branch already exists") from err
+        #         raise
 
         modified_files = []
         for src_path, target_path in files_to_add:
