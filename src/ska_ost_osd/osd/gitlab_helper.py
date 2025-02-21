@@ -104,7 +104,7 @@ def push_to_gitlab(
             except ValueError as err:
                 if str(err) == "Branch Already Exists":
                     logger.error("Branch already exists, try a different branch name")
-                    #git_repo.checkout_branch(branch_name)
+                    git_repo.checkout_branch(branch_name)
                     logger.error("Cheking out same branch")
 
         modified_files = []
