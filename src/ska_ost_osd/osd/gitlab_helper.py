@@ -124,6 +124,9 @@ def push_to_gitlab(
             for src_path, target_path in modified_files:
                 logger.info("Src path: %s", src_path)
                 logger.info("Target path: %s", target_path)
+                current_dir = Path(__file__).resolve().parent
+                project_root = current_dir.parent.parent.parent
+                src_path = project_root / src_path
                 git_repo.add_data(src_path, target_path)
 
             # Commit and push
