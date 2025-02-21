@@ -5,7 +5,7 @@ import subprocess
 from pathlib import Path
 from typing import List, Tuple
 
-from ska_telmodel.data.new_data_backend import GitBackend
+from ska_ost_osd.osd.new_data_backend import GitBackend
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -89,7 +89,8 @@ def push_to_gitlab(
     git_repo_cache_path = Path.home() / ".cache/ska-telmodel/git_repos"
 
     # if git_repo_cache_path.exists():
-    #     os.rmdir(git_repo_cache_path)
+    #     import shutil
+    #     shutil.rmtree('/home/dayanand/.cache/ska-telmodel/git_repos')
     #     logger.info("Successfully removed git repo cache")
 
     try:
