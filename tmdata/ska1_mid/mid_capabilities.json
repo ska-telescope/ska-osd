@@ -135,7 +135,7 @@
         "number_pss_beams": 385,
         "number_pst_beams": 6,
         "ps_beam_bandwidth_hz": 800000000,
-        "number_fsps": 28,
+        "number_fsps": 30,
         "allowed_channel_width_values": [
             210,
             420,
