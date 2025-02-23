@@ -337,9 +337,7 @@ class GitBackend(NewDataBackend):
 
         with open(path, encoding="utf-8") as f:
             logger.info("file content in _add method %s", f.read())
-        if "mid_capabilities.json" == path.name:
-            from pathlib import Path
-            path = Path('tmdata/ska1_mid/mid_capabilities.json')
+
         self._repo.index.add([path])
 
     def _commit(self, message: str):
