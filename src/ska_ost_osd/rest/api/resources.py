@@ -22,7 +22,11 @@ from ska_ost_osd.osd.constant import (
     osd_file_mapping,
 )
 from ska_ost_osd.osd.gitlab_helper import push_to_gitlab
-from ska_ost_osd.osd.osd import get_osd_using_tmdata, update_file_storage
+from ska_ost_osd.osd.osd import (
+    add_new_data_storage,
+    get_osd_using_tmdata,
+    update_file_storage,
+)
 from ska_ost_osd.osd.osd_schema_validator import CapabilityError, OSDModelError
 from ska_ost_osd.osd.osd_update_schema import (
     UpdateRequestModel,
@@ -171,50 +175,48 @@ def update_osd_data(body: Dict, **kwargs) -> Dict:
         Dict: A dictionary with OSD data satisfying the query.
 
     Raises:
-        OSDModelError: If validation fails
         ValueError: If data validation or business logic checks fail
     """
+    # Handle the simpler case first - when no cycle_id is present
+    if "cycle_id" not in kwargs:
+        return add_new_data_storage(body)
+
     try:
-        # Read observatory policies once at the beginning
-        osd_data = read_file(OBSERVATORY_POLICIES_JSON_PATH)
-
-        # Prepare input parameters with direct dictionary access
+        # Validate input data
         input_parameters = {
-            "cycle_id": kwargs["cycle_id"],
-            "array_assembly": kwargs["array_assembly"],
-            "capabilities": kwargs["capabilities"],
+            "cycle_id": kwargs.get("cycle_id"),
+            "array_assembly": kwargs.get("array_assembly"),
+            "capabilities": kwargs.get("capabilities"),
         }
-
-        # Validate data using Pydantic model
         validated_data = UpdateRequestModel(**input_parameters)
-
-        # Early validation checks
-        if (
-            validated_data.cycle_id == osd_data["cycle_number"]
-            and validated_data.array_assembly
-            != osd_data["telescope_capabilities"]["Mid"]
-        ):
-            raise CapabilityError(
-                ARRAY_ASSEMBLY_DOESNOT_BELONGS_TO_CYCLE_ERROR_MESSAGE.format(
-                    validated_data.array_assembly, validated_data.cycle_id
-                )
-            )
-
-        # Combine capability validation with existing data update
         validated_capabilities = ValidationOnCapabilities(**body)
+
+        # Check cycle and assembly compatibility if both attributes are present
+        if hasattr(validated_data, "cycle_id") and hasattr(
+            validated_data, "array_assembly"
+        ):
+            osd_data = read_file(OBSERVATORY_POLICIES_JSON_PATH)
+            if (
+                validated_data.cycle_id == osd_data["cycle_number"]
+                and validated_data.array_assembly
+                != osd_data["telescope_capabilities"]["Mid"]
+            ):
+                raise CapabilityError(
+                    ARRAY_ASSEMBLY_DOESNOT_BELONGS_TO_CYCLE_ERROR_MESSAGE.format(
+                        validated_data.array_assembly, validated_data.cycle_id
+                    )
+                )
+
+        # Update storage with validated data
         existing_data = read_file(MID_CAPABILITIES_JSON_PATH)
+        observatory_policy = body.get("observatory_policy", None)
+
         return update_file_storage(
-            validated_capabilities, body["observatory_policy"], existing_data
+            validated_capabilities, observatory_policy, existing_data
         )
 
-    except KeyError as ke:
-        raise ValueError(f"Missing required parameter: {ke}") from ke
-    except (OSDModelError, ValueError) as error:
-        raise error
-    except CapabilityError as ce:
-        raise ValueError(f"Capability error: {ce}") from ce
-    except ValidationError as ve:
-        raise ValueError(f"Validation error: {ve}") from ve
+    except (ValidationError, KeyError, OSDModelError, CapabilityError) as error:
+        raise ValueError(str(error)) from error
 
 
 @error_handler
@@ -254,7 +256,6 @@ def release_osd_data(**kwargs):
         push_to_gitlab(
             files_to_add=files_to_add_small,
             commit_msg="updated tmdata",
-            branch_name="nak-1089-tmdata-test11" # first time initialisation
         )
 
         return {

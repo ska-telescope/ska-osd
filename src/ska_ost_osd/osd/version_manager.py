@@ -3,9 +3,10 @@
 This module handles version increments according to semantic versioning rules.
 """
 import json
-from pathlib import Path
 import logging
+from pathlib import Path
 from typing import Optional, Tuple
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 

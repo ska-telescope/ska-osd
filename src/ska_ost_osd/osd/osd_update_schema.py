@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -8,24 +8,13 @@ from .constant import ARRAY_ASSEMBLY_PATTERN
 
 
 class UpdateRequestModel(BaseModel):
-    cycle_id: int = Field(..., description="Cycle ID must be an integer")
-    array_assembly: str = Field(
+    cycle_id: Optional[int] = Field(..., description="Cycle ID must be an integer")
+    array_assembly: Optional[str] = Field(
         ...,
         pattern=ARRAY_ASSEMBLY_PATTERN,
         description="Array assembly in format AA[0-9].[0-9]",
     )
-    capabilities: str = Field(..., description="Capabilites must be string")
-
-    @model_validator(mode="before")
-    @classmethod
-    def validate_capabilities(cls, values):
-        if not values.get("cycle_id"):
-            raise CapabilityError("cycle_id field is required")
-        if not values.get("array_assembly"):
-            raise CapabilityError("array_assembly field is required")
-        if not values.get("capabilities"):
-            raise CapabilityError("capabilities field is required")
-        return values
+    capabilities: Optional[str] = Field(..., description="Capabilites must be str")
 
 
 class ValidationOnCapabilities(BaseModel):

@@ -51,16 +51,6 @@ class TestResources:
         # Assert the result
         assert result == {"updated": "data"}
 
-    def test_update_osd_data_empty_input(
-        self,
-        mock_read_file,  # pylint: disable=W0613
-        mock_update_file_storage,  # pylint: disable=W0613
-    ):
-        """Test update_osd_data with empty input"""
-
-        result = update_osd_data({}, cycle_id=1, array_assembly="4", capabilities={})
-        assert "Capability error: capabilities field is required" == result[0]["detail"]
-
     @patch("ska_ost_osd.rest.api.resources.read_file")
     def test_update_osd_data_invalid_array_assembly(self, mock_read_file):
         """
@@ -71,10 +61,7 @@ class TestResources:
             "telescope_capabilities": {"Mid": "AA5"},
         }
 
-        body = {}
+        body = {"capabilities": {"telescope": {"mid": "test"}}}
         kwargs = {"cycle_id": 1, "array_assembly": "AA0", "capabilities": "mid"}
         result = update_osd_data(body, **kwargs)
-        assert (
-            "Capability error: Array Assembly AA0 does not belongs to cycle 1"
-            == result[0]["detail"]
-        )
+        assert "Array Assembly AA0 does not belongs to cycle 1" == result[0]["detail"]

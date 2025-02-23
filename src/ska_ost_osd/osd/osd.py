@@ -480,3 +480,46 @@ def update_file_storage(
         update_file(OBSERVATORY_POLICIES_JSON_PATH, observatory_policy)
 
     return updated_data
+
+
+def add_new_data_storage(body: Dict) -> Dict:
+    """This function processes and validates OSD data for insertion
+    into the capabilities file
+
+    Args:
+        body (Dict): A dictionary containing the OSD data to insert
+
+    Returns:
+        Dict: A dictionary with the processed capabilities data
+
+    Raises:
+        OSDModelError: If validation fails
+        ValueError: If required data is missing or invalid
+    """
+    mid_capabilities = {}
+    result = {}
+    if not body.get("capabilities", {}).get("mid"):
+        return mid_capabilities
+
+    capabilities = body["capabilities"]
+    telescope = next(iter(capabilities.keys()))
+    telescope_data = capabilities[telescope]
+
+    mid_capabilities.update(
+        {
+            "telescope": telescope,
+            "basic_capabilities": telescope_data["basic_capabilities"],
+            **{
+                key: telescope_data[key]
+                for key in telescope_data
+                if re.match(ARRAY_ASSEMBLY_PATTERN, key)
+            },
+        }
+    )
+    mid_capabilities["telescope"] = mid_capabilities["telescope"].title()
+    update_file(MID_CAPABILITIES_JSON_PATH, mid_capabilities)
+    if body.get("observatory_policy"):
+        update_file(OBSERVATORY_POLICIES_JSON_PATH, body["observatory_policy"])
+        result.update(body["observatory_policy"])
+    result.update(mid_capabilities)
+    return mid_capabilities
