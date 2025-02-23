@@ -253,7 +253,8 @@ def release_osd_data(**kwargs):
 
         push_to_gitlab(
             files_to_add=files_to_add_small,
-            commit_msg="updated tmdata"
+            commit_msg="updated tmdata",
+            branch_name="nak-1089-remove-existing-tmdata-test-1"
         )
 
         return {
