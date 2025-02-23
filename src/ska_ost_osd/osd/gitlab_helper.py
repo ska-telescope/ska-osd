@@ -127,6 +127,8 @@ def push_to_gitlab(
                 src_path = project_root / src_path
                 logger.info("new Src path: %s", src_path)
                 logger.info("new Target path: %s", target_path)
+                if src_path.path == "mid_capabilities.json":
+                    src_path = Path('tmdata/ska1_mid/mid_capabilities.json')
                 with open(src_path, "rb") as file:
                     content = file.read()
                     logger.info("File content before adding path: %s", content)
