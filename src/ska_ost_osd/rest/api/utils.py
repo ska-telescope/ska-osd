@@ -1,7 +1,9 @@
 import json
 from pathlib import Path
 from typing import Dict
-
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def read_file(filename: Path) -> Dict:
     """
@@ -25,5 +27,6 @@ def update_file(filename: Path, json_data: Dict) -> None:
     :returns: None
     :raises: TypeError if json_data is not serializable
     """
+    logger.info("Updating file path for capabilities: %s", filename)
     with open(filename, "w", encoding="utf-8") as file:
         json.dump(json_data, file, indent=4)
