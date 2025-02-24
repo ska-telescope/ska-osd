@@ -6,16 +6,27 @@ See the operationId fields of the Open API spec for the specific mappings.
 import json
 from functools import wraps
 from http import HTTPStatus
+from os import environ
+from pathlib import Path
 from typing import Dict
 
 from pydantic import ValidationError
 from ska_telmodel.data import TMData
 
 from ska_ost_osd.osd.constant import (
+    CYCLE_TO_VERSION_MAPPING,
     MID_CAPABILITIES_JSON_PATH,
     OBSERVATORY_POLICIES_JSON_PATH,
+    PUSH_TO_GITLAB_FLAG,
+    RELEASE_VERSION_MAPPING,
+    osd_file_mapping,
 )
-from ska_ost_osd.osd.osd import get_osd_using_tmdata, update_file_storage
+from ska_ost_osd.osd.gitlab_helper import push_to_gitlab
+from ska_ost_osd.osd.osd import (
+    add_new_data_storage,
+    get_osd_using_tmdata,
+    update_file_storage,
+)
 from ska_ost_osd.osd.osd_schema_validator import CapabilityError, OSDModelError
 from ska_ost_osd.osd.osd_update_schema import (
     UpdateRequestModel,
@@ -24,6 +35,7 @@ from ska_ost_osd.osd.osd_update_schema import (
 from ska_ost_osd.osd.osd_validation_messages import (
     ARRAY_ASSEMBLY_DOESNOT_BELONGS_TO_CYCLE_ERROR_MESSAGE,
 )
+from ska_ost_osd.osd.version_manager import manage_version_release
 from ska_ost_osd.rest.api.utils import read_file
 from ska_ost_osd.telvalidation import SchematicValidationError, semantic_validate
 from ska_ost_osd.telvalidation.constant import (
@@ -31,6 +43,11 @@ from ska_ost_osd.telvalidation.constant import (
     SEMANTIC_VALIDATION_VALUE,
 )
 from ska_ost_osd.telvalidation.semantic_validator import VALIDATION_STRICTNESS
+
+# this variable is added for restricting tmdata publish from local/dev environment.
+# usage: "0" means disable tmdata publish to artefact.
+# "1" means allow to publish
+PUSH_TO_GITLAB = environ.get("PUSH_TO_GITLAB", "0")
 
 
 def error_handler(api_fn: callable) -> str:
@@ -158,50 +175,103 @@ def update_osd_data(body: Dict, **kwargs) -> Dict:
         Dict: A dictionary with OSD data satisfying the query.
 
     Raises:
-        OSDModelError: If validation fails
         ValueError: If data validation or business logic checks fail
     """
+    # Handle the simpler case first - when no cycle_id is present
+    if "cycle_id" not in kwargs:
+        return add_new_data_storage(body)
+
     try:
-        # Read observatory policies once at the beginning
-        osd_data = read_file(OBSERVATORY_POLICIES_JSON_PATH)
-
-        # Prepare input parameters with direct dictionary access
+        # Validate input data
         input_parameters = {
-            "cycle_id": kwargs["cycle_id"],
-            "array_assembly": kwargs["array_assembly"],
-            "capabilities": kwargs["capabilities"],
+            "cycle_id": kwargs.get("cycle_id"),
+            "array_assembly": kwargs.get("array_assembly"),
+            "capabilities": kwargs.get("capabilities"),
         }
-
-        # Validate data using Pydantic model
         validated_data = UpdateRequestModel(**input_parameters)
-
-        # Early validation checks
-        if (
-            validated_data.cycle_id == osd_data["cycle_number"]
-            and validated_data.array_assembly
-            != osd_data["telescope_capabilities"]["Mid"]
-        ):
-            raise CapabilityError(
-                ARRAY_ASSEMBLY_DOESNOT_BELONGS_TO_CYCLE_ERROR_MESSAGE.format(
-                    validated_data.array_assembly, validated_data.cycle_id
-                )
-            )
-
-        # Combine capability validation with existing data update
         validated_capabilities = ValidationOnCapabilities(**body)
+
+        # Check cycle and assembly compatibility if both attributes are present
+        if hasattr(validated_data, "cycle_id") and hasattr(
+            validated_data, "array_assembly"
+        ):
+            osd_data = read_file(OBSERVATORY_POLICIES_JSON_PATH)
+            if (
+                validated_data.cycle_id == osd_data["cycle_number"]
+                and validated_data.array_assembly
+                != osd_data["telescope_capabilities"]["Mid"]
+            ):
+                raise CapabilityError(
+                    ARRAY_ASSEMBLY_DOESNOT_BELONGS_TO_CYCLE_ERROR_MESSAGE.format(
+                        validated_data.array_assembly, validated_data.cycle_id
+                    )
+                )
+
+        # Update storage with validated data
         existing_data = read_file(MID_CAPABILITIES_JSON_PATH)
+        observatory_policy = body.get("observatory_policy", None)
+
         return update_file_storage(
-            validated_capabilities, body["observatory_policy"], existing_data
+            validated_capabilities, observatory_policy, existing_data
         )
 
-    except KeyError as ke:
-        raise ValueError(f"Missing required parameter: {ke}") from ke
-    except (OSDModelError, ValueError) as error:
-        raise error
-    except CapabilityError as ce:
-        raise ValueError(f"Capability error: {ce}") from ce
-    except ValidationError as ve:
-        raise ValueError(f"Validation error: {ve}") from ve
+    except (ValidationError, KeyError, OSDModelError, CapabilityError) as error:
+        raise ValueError(str(error)) from error
+
+
+@error_handler
+def release_osd_data(**kwargs):
+    """Release OSD data with automatic version increment based on cycle ID.
+
+    Args:
+        **kwargs: Keyword arguments including:
+            - cycle_id: Required. The cycle ID for version mapping
+            - release_type: Optional.
+            Type of release ('major' or 'minor', defaults to patch)
+
+    Returns:
+        dict: Response containing the new version information
+    """
+    cycle_id = kwargs.get("cycle_id")
+    if not cycle_id:
+        raise ValueError("cycle_id is required")
+    cycle_id = "cycle_" + str(cycle_id)
+    release_type = kwargs.get("release_type")
+    # provided support for patch as part of current implementation
+    if release_type and release_type not in ["major", "minor"]:
+        raise ValueError("release_type must be either 'major' or 'minor' if provided")
+    if PUSH_TO_GITLAB == PUSH_TO_GITLAB_FLAG:
+        # Use version manager to handle version release
+        new_version, cycle_id = manage_version_release(cycle_id, release_type)
+
+        files_to_add_small = [
+            (Path(MID_CAPABILITIES_JSON_PATH), osd_file_mapping["mid"]),
+            (Path(CYCLE_TO_VERSION_MAPPING), "version_mapping/latest_release.txt"),
+            (
+                Path(RELEASE_VERSION_MAPPING),
+                osd_file_mapping["cycle_to_version_mapping"],
+            ),
+        ]
+
+        push_to_gitlab(
+            files_to_add=files_to_add_small,
+            commit_msg="updated tmdata",
+        )
+
+        return {
+            "status": "success",
+            "message": f"Released new version {new_version}",
+            "version": str(new_version),
+            "cycle_id": cycle_id,
+        }
+
+    else:
+        return {
+            "status": "success",
+            "message": "Push to gitlab is disabled",
+            "version": "0.0.0",
+            "cycle_id": cycle_id,
+        }
 
 
 @error_handler

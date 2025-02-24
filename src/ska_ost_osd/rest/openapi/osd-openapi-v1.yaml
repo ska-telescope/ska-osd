@@ -68,6 +68,22 @@ paths:
           $ref: '#/components/responses/BadRequest'
         "500":
           $ref: '#/components/responses/InternalServerError'
+  /osd_release:
+    post:
+      summary: Release new osd version to Gitlab.
+      description: |
+        Release new osd version to Gitlab based on cycle.
+      operationId: ska_ost_osd.rest.api.resources.release_osd_data
+      parameters:
+        - $ref: '#/components/parameters/cycle_id'
+        - $ref: '#/components/parameters/release_type'
+      responses:
+        '200':
+          description: Release process invoked. 
+        '400':
+          description: Release process get failed.
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /semantic_validation:
     post:
       summary: Checks if the Command Input JSON is semantically valid
@@ -159,6 +175,13 @@ components:
       schema:
         type: string
         enum: [ mid, low]
+      required: false
+    release_type:
+      in: query
+      name: release_type
+      schema:
+        type: string
+        enum: [ major, minor]
       required: false
     array_assembly:
       in: query

@@ -6,6 +6,7 @@ minikube: true
 system: ost
 subsystem: osd
 validation_strictness: 2
+push_to_gitlab: 1
 
 labels:
   app: ska-ost-osd
@@ -13,6 +14,7 @@ labels:
 global:
   minikube: true
   cluster_domain: techops.internal.skao.int
+  id_rsa:
 
 rest:
   component: rest
@@ -41,3 +43,15 @@ nodeSelector: {}
 affinity: {}
 
 tolerations: []
+
+
+secretProvider:
+  enabled: true
+  provider:
+    name: "vault"
+    vaultAddress: "https://vault.skao.int"
+    roleName: "kube-role"
+    secretsPath: "kv/data/users/dayanand_arade/gitlab_ssh_key"
+    secrets:
+    - secretKey: "id_rsa"
+      targetEnv: ID_RSA
