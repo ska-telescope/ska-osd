@@ -27,8 +27,7 @@ Folder Structure
 .. code-block:: bash
 
     tmdata
-    ├── osd_data
-    │   ├── observatory_policies.json
+    │──── observatory_policies.json
     │   ├── ska1_low
     │   │   └── low_capabilities.json
     │   └── ska1_mid
@@ -64,8 +63,8 @@ General Structure
 
     * Created a separate JSON file for mapping ``cycle_id`` to version number ``cycle_gitlab_release_version_mapping.json`` inside ``version_mapping`` folder.
     
-    * OSD supports backward compatibility for all existing released verisons. If someone wants to retrieve older version then 
-      they just need to point out that specific version in ``osd_verison``.
+    * OSD supports backward compatibility for all existing released versions. If someone wants to retrieve older version then 
+      they just need to point out that specific version in ``osd_version``.
       
 .. note::
 
@@ -305,7 +304,7 @@ GET /osd
        If ``source`` is 'gitlab' and ``gitlab_branch`` is 'main' then it will fetch data from main branch.
        If ``source`` is 'car' then API will fetch data from Car Gitlab repo.
     
-    4. If ``osd_verison`` and ``gitlab_branch`` are given together then API will return appropriate error message.
+    4. If ``osd_version`` and ``gitlab_branch`` are given together then API will return appropriate error message.
 
     5. If ``cycle_id`` and ``array_assembly`` are provided together then API will return appropriate error message.
 
@@ -317,7 +316,7 @@ GET /cycle
    :widths: 5 15 80
    :header-rows: 1
 
-   * - HTTP Methodcycle
+   * - HTTP Method
      - Resource URL
      - Description
    * - GET
@@ -403,7 +402,7 @@ POST /osd_release
     Parameters             Description
     ===================    ============================================================
     cycle_id               Cycle Id a integer value 1, 2, 3
-    release_type           Major or Minor
+    release_type           Patch, Major and Minor 
     ===================    ============================================================
 
 
@@ -412,14 +411,14 @@ POST /osd_release
 
     .. code:: python
 
-      "/ska-ost-osd/osd/api/v3/osd_release?cycle_id=1&release_type=minor"
+      "/ska-ost-osd/osd/api/v3/osd_release?cycle_id=1&release_type=patch"
 
 
 3. CURL Example Request
 
     .. code:: python
 
-       curl -X POST "/ska-ost-osd/osd/api/v3/osd_release?cycle_id=1&release_type=minor"
+       curl -X POST "/ska-ost-osd/osd/api/v3/osd_release?cycle_id=1&release_type=patch"
 
 
 4. Example Response
@@ -429,10 +428,10 @@ POST /osd_release
     .. code:: python
 
         client.put(
-            "/ska-ost-osd/osd/api/v3/osd_release?cycle_id=1&release_type=minor",
+            "/ska-ost-osd/osd/api/v3/osd_release?cycle_id=1&release_type=patch",
             query_string={
                 "cycle_id": 1,
-                "release_type": "minor"
+                "release_type": "patch"
             },
         )
 
@@ -441,18 +440,17 @@ POST /osd_release
 
     1. If ``cycle_id``, ``capabilities`` and ``array_assembly`` are provided together with valid data in the request body, the API will update the capabilities JSON for the specified mid/low capabilities and return a 200 OK status code with the updated resource.
 
-    2. If ``cycle_id``, ``capabilities`` are provided together and the request body contains ``basic_capabilities``, the API will update the basic_capabilities and return a 200 OK status code.
+    2. If ``cycle_id``, ``capabilities`` are provided together and the request body contains ``basic_capabilities``, the API will update the ``basic_capabilities`` and return a 200 OK status code.
 
     3. If invalid ``cycle_id`` is provided in the request, the API will return a 404 Not Found status with an appropriate error message.
 
-    4. If an invalid ``array_assembly`` value is provided (values other than 'AA0.5', 'AA1', or 'AA2'), the API will return a 400 Bad Request status with an error message indicating the allowed array_assembly values.
+    4. If an invalid ``array_assembly`` value is provided (values other than 'AA0.5', 'AA1', or 'AA2'), the API will return a 400 Bad Request status with an error message indicating the allowed ``array_assembly`` values.
 
     5. If the ``array_assembly`` value doesn't match the required pattern (must be 'AA' followed by a number), the API will return a 400 Bad Request status with a message indicating the correct format pattern.
 
     6. If the request body is missing required fields or contains invalid data formats, the API will return a 400 Bad Request status with validation error details.
     
-    7. If the API encounters an unexpected server-side error (such as database connection failures, internal processing errors, or system-level issues), the API will return a 500 Internal Server Error status with 
-       a generic error message.
+    7. If the API encounters an unexpected server-side error (such as database connection failures, internal processing errors, or system-level issues), the API will return a 500 Internal Server Error status with a generic error message.
 
 PUT /osd
 ==========================
@@ -482,7 +480,6 @@ PUT /osd
     capabilities           Mid or Low
     array_assembly         AA0.5, AA1 or any Array Assembly
     ===================    ============================================================
-
 
 
 2. For example:
@@ -665,18 +662,17 @@ PUT /osd
 
     1. If ``cycle_id``, ``capabilities`` and ``array_assembly`` are provided together with valid data in the request body, the API will update the capabilities JSON for the specified mid/low capabilities and return a 200 OK status code with the updated resource.
 
-    2. If ``cycle_id``, ``capabilities`` are provided together and the request body contains ``basic_capabilities``, the API will update the basic_capabilities and return a 200 OK status code.
+    2. If ``cycle_id``, ``capabilities`` are provided together and the request body contains ``basic_capabilities``, the API will update the ``basic_capabilities`` and return a 200 OK status code.
 
     3. If invalid ``cycle_id`` is provided in the request, the API will return a 404 Not Found status with an appropriate error message.
 
-    4. If an invalid ``array_assembly`` value is provided (values other than 'AA0.5', 'AA1', or 'AA2'), the API will return a 400 Bad Request status with an error message indicating the allowed array_assembly values.
+    4. If an invalid ``array_assembly`` value is provided (values other than 'AA0.5', 'AA1', or 'AA2'), the API will return a 400 Bad Request status with an error message indicating the allowed ``array_assembly`` values.
 
     5. If the ``array_assembly`` value doesn't match the required pattern (must be 'AA' followed by a number), the API will return a 400 Bad Request status with a message indicating the correct format pattern.
 
     6. If the request body is missing required fields or contains invalid data formats, the API will return a 400 Bad Request status with validation error details.
     
-    7. If the API encounters an unexpected server-side error (such as database connection failures, internal processing errors, or system-level issues), the API will return a 500 Internal Server Error status with 
-       a generic error message.
+    7. If the API encounters an unexpected server-side error (such as database connection failures, internal processing errors, or system-level issues), the API will return a 500 Internal Server Error status with a generic error message.
 
 
 
@@ -695,7 +691,7 @@ Error Handling
 
     .. code:: python
 
-        Capability {capabilities} doesn not exists. Available are low, mid
+        Capability {capabilities} does not exists. Available are low, mid
 
 
     if ``array_assembly`` value is not valid following error will be raised.
