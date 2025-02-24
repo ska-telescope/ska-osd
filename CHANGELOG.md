@@ -5,6 +5,13 @@ Change Log
 All notable changes to this project will be documented in this file.
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
+3.1.0
+**********
+* Decoupled Release process of TMData from `ska-ost-osd` source code.
+* Now OSD User can publish TMData automatically from OSD UI Editor.
+* Introduced new APIs to automate TMData release process. 
+* Updated OSD User guide.
+
 3.0.0
 **********
 * [BREAKING] Added `number_dish_ids` in Mid Capabilities.

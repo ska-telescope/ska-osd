@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ska-ost-osd"
-version = "3.0.0"
+version = "3.1.0"
 description = "Simplest form OSD consists of configuration files that are required by OSO tools."
 authors =  ["Team Nakshatra"]
 license= "BSD-3-Clause"
