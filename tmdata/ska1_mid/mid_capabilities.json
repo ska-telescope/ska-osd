@@ -36,72 +36,63 @@
         ]
     },
     "AA0.5": {
-        "available_receivers": [
-            "Band_1",
-            "Band_2"
-        ],
-        "number_ska_dishes": 4,
-        "number_meerkat_dishes": 0,
-        "number_meerkatplus_dishes": 0,
-        "max_baseline_km": 1.5,
-        "available_bandwidth_hz": 800000000.0,
-        "cbf_modes": [
-            "correlation",
-            "pst"
-        ],
-        "number_zoom_windows": 0,
-        "number_zoom_channels": 0,
-        "number_pss_beams": 0,
-        "number_pst_beams": 1,
-        "ps_beam_bandwidth_hz": 400000000.0,
-        "number_fsps": 4,
-        "allowed_channel_width_values": [
-            13440
+        "allowed_channel_count_range_max": [
+            58982
         ],
         "allowed_channel_count_range_min": [
             1
         ],
-        "allowed_channel_count_range_max": [
-            58982
+        "allowed_channel_width_values": [
+            13440
         ],
+        "available_bandwidth_hz": 800000000,
+        "available_receivers": [
+            "Band_1",
+            "Band_2"
+        ],
+        "cbf_modes": [
+            "correlation",
+            "pst"
+        ],
+        "max_baseline_km": 1.5,
         "number_dish_ids": [
             "SKA001",
             "SKA036",
             "SKA063",
             "SKA100"
-        ]
+        ],
+        "number_fsps": 4,
+        "number_meerkat_dishes": 0,
+        "number_meerkatplus_dishes": 0,
+        "number_pss_beams": 0,
+        "number_pst_beams": 1,
+        "number_ska_dishes": 4,
+        "number_zoom_channels": 0,
+        "number_zoom_windows": 0,
+        "ps_beam_bandwidth_hz": 400000000
     },
     "AA1": {
+        "allowed_channel_count_range_max": [
+            58982
+        ],
+        "allowed_channel_count_range_min": [
+            1
+        ],
+        "allowed_channel_width_values": [
+            13440
+        ],
+        "available_bandwidth_hz": 800000000,
         "available_receivers": [
             "Band_1",
             "Band_2",
             "Band_5a",
             "Band_5b"
         ],
-        "number_ska_dishes": 8,
-        "number_meerkat_dishes": 0,
-        "number_meerkatplus_dishes": 0,
-        "max_baseline_km": 1.5,
-        "available_bandwidth_hz": 800000000.0,
         "cbf_modes": [
             "correlation",
             "pst"
         ],
-        "number_zoom_windows": 0,
-        "number_zoom_channels": 0,
-        "number_pss_beams": 0,
-        "number_pst_beams": 1,
-        "ps_beam_bandwidth_hz": 400000000.0,
-        "number_fsps": 8,
-        "allowed_channel_width_values": [
-            13440
-        ],
-        "allowed_channel_count_range_min": [
-            1
-        ],
-        "allowed_channel_count_range_max": [
-            58982
-        ],
+        "max_baseline_km": 1.5,
         "number_dish_ids": [
             "SKA001",
             "SKA036",
@@ -111,31 +102,24 @@
             "SKA077",
             "SKA081",
             "SKA100"
-        ]
+        ],
+        "number_fsps": 9,
+        "number_meerkat_dishes": 0,
+        "number_meerkatplus_dishes": 0,
+        "number_pss_beams": 0,
+        "number_pst_beams": 1,
+        "number_ska_dishes": 8,
+        "number_zoom_channels": 0,
+        "number_zoom_windows": 0,
+        "ps_beam_bandwidth_hz": 400000000
     },
     "AA2": {
-        "available_receivers": [
-            "Band_1",
-            "Band_2",
-            "Band_5a",
-            "Band_5b"
+        "allowed_channel_count_range_max": [
+            214748647
         ],
-        "number_ska_dishes": 64,
-        "number_meerkat_dishes": 8,
-        "number_meerkatplus_dishes": 0,
-        "max_baseline_km": 110,
-        "available_bandwidth_hz": 800000000,
-        "cbf_modes": [
-            "correlation",
-            "pst",
-            "pss"
+        "allowed_channel_count_range_min": [
+            1
         ],
-        "number_zoom_windows": 16,
-        "number_zoom_channels": 14880,
-        "number_pss_beams": 385,
-        "number_pst_beams": 6,
-        "ps_beam_bandwidth_hz": 800000000,
-        "number_fsps": 35,
         "allowed_channel_width_values": [
             210,
             420,
@@ -156,12 +140,19 @@
             430080,
             645120
         ],
-        "allowed_channel_count_range_min": [
-            1
+        "available_bandwidth_hz": 800000000,
+        "available_receivers": [
+            "Band_1",
+            "Band_2",
+            "Band_5a",
+            "Band_5b"
         ],
-        "allowed_channel_count_range_max": [
-            214748647
+        "cbf_modes": [
+            "correlation",
+            "pst",
+            "pss"
         ],
+        "max_baseline_km": 110,
         "number_dish_ids": [
             "SKA001",
             "SKA008",
@@ -227,6 +218,15 @@
             "SKA123",
             "SKA125",
             "SKA126"
-        ]
+        ],
+        "number_fsps": 35,
+        "number_meerkat_dishes": 8,
+        "number_meerkatplus_dishes": 0,
+        "number_pss_beams": 385,
+        "number_pst_beams": 6,
+        "number_ska_dishes": 64,
+        "number_zoom_channels": 14880,
+        "number_zoom_windows": 16,
+        "ps_beam_bandwidth_hz": 800000000
     }
 }
