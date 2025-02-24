@@ -146,7 +146,7 @@ Add path of environment variable into environment.yaml file.
 VALIDATION_STRICTNESS: {{.Values.validation_strictness  | quote }}
 ```
 
-# `push_to_gitlab flag use cases.
+# Publish tmdata
 
 Now OSD is handling releases separately for tmdata and ska-ost-osd codebase. 
 User can now update tmdata with the help of [ OSD UI editor](https://k8s.stfc.skao.int/ska-oso-integration/osd) and publish it separately on artefact repository with enabling `push_to_gitlab` environment variable to "1".
@@ -162,11 +162,11 @@ To view tmdata releases, [ Click here](https://gitlab.com/ska-telescope/ost/ska-
 
 It's not recommended  to set this flag value as "1" while doing testing on local environment.
 
-Install charts
+# Install charts
+
 ```
 make k8s-install-chart
 ```
-
 
 # Documentation
 
