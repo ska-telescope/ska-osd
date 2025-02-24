@@ -149,8 +149,10 @@ VALIDATION_STRICTNESS: {{.Values.validation_strictness  | quote }}
 # `push_to_gitlab flag use cases.
 
 Added `push_to_gitlab` environment variable into values.yaml file in chart directory
-which allow retrict tmdata publish on artefact. default set as "0" for local environment.
+which allow restrict tmdata publish on artefact. default set as "0" for local environment.
 it's not recommended way to export this flag locally.
+`push_to_gitlab` = 0 ## for local environment, it won't publish tmdata on artefact repository.
+`push_to_gitlab` = 1 ## it will publish tmdata on artefact repository.
 
 Install charts
 

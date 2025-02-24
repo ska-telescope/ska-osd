@@ -68,7 +68,6 @@ def manage_version_release(
     )
     with open(version_mapping_path, "r", encoding="utf-8") as f:
         version_mapping = json.load(f)
-        logger.info("modified files----->>>: %s", f.read())
 
     # Validate cycle_id exists in mapping
     if cycle_id not in version_mapping:
@@ -102,6 +101,4 @@ def manage_version_release(
     latest_release_path = project_root / "tmdata/version_mapping/latest_release.txt"
     with open(latest_release_path, "w", encoding="utf-8") as f:
         f.write(f'"{new_version}"')
-    with open(latest_release_path, "r", encoding="utf-8") as f:
-        logger.info("Skipping unmodified file: %s", f.read())
     return new_version, cycle_id
