@@ -121,7 +121,7 @@
             "Band_5b"
         ],
         "number_ska_dishes": 64,
-        "number_meerkat_dishes": 6,
+        "number_meerkat_dishes": 8,
         "number_meerkatplus_dishes": 0,
         "max_baseline_km": 110,
         "available_bandwidth_hz": 800000000,
@@ -135,7 +135,7 @@
         "number_pss_beams": 385,
         "number_pst_beams": 6,
         "ps_beam_bandwidth_hz": 800000000,
-        "number_fsps": 30,
+        "number_fsps": 35,
         "allowed_channel_width_values": [
             210,
             420,
