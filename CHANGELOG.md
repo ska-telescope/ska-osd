@@ -5,6 +5,10 @@ Change Log
 All notable changes to this project will be documented in this file.
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
+Unreleased
+**********
+* refactoring `check_cycle_id()` function in `osd.osd` module to nest the code in the case where cycle_id is specified
+
 3.1.0
 **********
 * Decoupled Release process of TMData from `ska-ost-osd` source code.
