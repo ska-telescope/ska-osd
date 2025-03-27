@@ -265,26 +265,29 @@ def check_cycle_id(
     if cycle_id is None and osd_version is None and gitlab_branch is None:
         osd_version = version("ska_ost_osd")
 
-    versions_dict = read_json("tmdata/" + osd_file_mapping["cycle_to_version_mapping"])
-    cycle_ids = [int(key.split("_")[-1]) for key in versions_dict]
-    cycle_id_exists = [cycle_id if cycle_id in cycle_ids else None][0]
-    string_ids = ",".join([str(i) for i in cycle_ids])
-
-    if cycle_id is not None and cycle_id_exists is None:
-        cycle_error_msg_list.append(
-            CYCLE_ID_ERROR_MESSAGE.format(cycle_id, string_ids),
+    if cycle_id is not None:
+        versions_dict = read_json(
+            "tmdata/" + osd_file_mapping["cycle_to_version_mapping"]
         )
+        cycle_ids = [int(key.split("_")[-1]) for key in versions_dict]
+        cycle_id_exists = [cycle_id if cycle_id in cycle_ids else None][0]
+        string_ids = ",".join([str(i) for i in cycle_ids])
 
-    elif cycle_id is not None and osd_version is None:
-        osd_version = versions_dict[f"cycle_{cycle_id}"][0]
-
-    elif cycle_id is not None and cycle_id_exists and osd_version is not None:
-        if osd_version not in versions_dict[f"cycle_{cycle_id}"]:
+        if cycle_id_exists is None:
             cycle_error_msg_list.append(
-                OSD_VERSION_ERROR_MESSAGE.format(
-                    osd_version, versions_dict[f"cycle_{cycle_id}"]
-                )
+                CYCLE_ID_ERROR_MESSAGE.format(cycle_id, string_ids),
             )
+
+        elif osd_version is None:
+            osd_version = versions_dict[f"cycle_{cycle_id}"][0]
+
+        elif cycle_id_exists and osd_version is not None:
+            if osd_version not in versions_dict[f"cycle_{cycle_id}"]:
+                cycle_error_msg_list.append(
+                    OSD_VERSION_ERROR_MESSAGE.format(
+                        osd_version, versions_dict[f"cycle_{cycle_id}"]
+                    )
+                )
 
     return osd_version, cycle_error_msg_list
 
