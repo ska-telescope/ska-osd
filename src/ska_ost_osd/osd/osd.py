@@ -22,13 +22,14 @@ from .constant import (
     BASE_FOLDER_NAME,
     BASE_URL,
     CAR_URL,
+    GITLAB_SOURCE,
     MID_CAPABILITIES_JSON_PATH,
     OBSERVATORY_POLICIES_JSON_PATH,
     SOURCES,
+    VER_FL_PATH,
     osd_file_mapping,
     osd_response_template,
 )
-from .helper import read_json
 
 
 class OSD:
@@ -264,8 +265,8 @@ def check_cycle_id(
 
     if cycle_id is None and osd_version is None and gitlab_branch is None:
         osd_version = version("ska_ost_osd")
-
-    versions_dict = read_json("tmdata/" + osd_file_mapping["cycle_to_version_mapping"])
+    tmdata = TMData(GITLAB_SOURCE, update=True)
+    versions_dict = tmdata[VER_FL_PATH].get_dict()
     cycle_ids = [int(key.split("_")[-1]) for key in versions_dict]
     cycle_id_exists = [cycle_id if cycle_id in cycle_ids else None][0]
     string_ids = ",".join([str(i) for i in cycle_ids])
