@@ -155,6 +155,7 @@ def test_invalid_osd_tmdata_source():
         osd_version="1.1.0",
         gitlab_branch="main",
         source="github",
+        versions_dict={"cycle_1": ["1.0.0"]},
     )
     assert error_msgs == [
         "Source is not valid available are file, car, gitlab",
