@@ -7,7 +7,7 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 3.1.1
 **********
-* Fixed version mapping file issue.
+* `Fixed version mapping file issue <https://gitlab.com/ska-telescope/ost/ska-ost-osd/-/merge_requests/76>`_.
 
 3.1.0
 **********
