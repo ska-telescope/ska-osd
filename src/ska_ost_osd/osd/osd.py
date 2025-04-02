@@ -22,13 +22,14 @@ from .constant import (
     BASE_FOLDER_NAME,
     BASE_URL,
     CAR_URL,
+    GITLAB_SOURCE,
     MID_CAPABILITIES_JSON_PATH,
     OBSERVATORY_POLICIES_JSON_PATH,
     SOURCES,
+    VERSION_FILE_PATH,
     osd_file_mapping,
     osd_response_template,
 )
-from .helper import read_json
 
 
 class OSD:
@@ -239,6 +240,7 @@ def check_cycle_id(
     cycle_id: int = None,
     osd_version: str = None,
     gitlab_branch: str = None,
+    versions_dict: Dict = None,
 ) -> str:
     """This function checks if a given cycle exists or not
         also raises OSDDataException if gitlab_branch and osd_version
@@ -265,7 +267,9 @@ def check_cycle_id(
     if cycle_id is None and osd_version is None and gitlab_branch is None:
         osd_version = version("ska_ost_osd")
 
-    versions_dict = read_json("tmdata/" + osd_file_mapping["cycle_to_version_mapping"])
+    if versions_dict is None:
+        versions_dict = {}
+
     cycle_ids = [int(key.split("_")[-1]) for key in versions_dict]
     cycle_id_exists = [cycle_id if cycle_id in cycle_ids else None][0]
     string_ids = ",".join([str(i) for i in cycle_ids])
@@ -294,6 +298,7 @@ def osd_tmdata_source(
     osd_version: str = None,
     source: str = "car",
     gitlab_branch: str = None,
+    versions_dict: Dict = None,
 ) -> str:
     """This function checks and returns source_uri for TMData class
 
@@ -319,7 +324,7 @@ def osd_tmdata_source(
         source_error_msg_list.append(SOURCE_ERROR_MESSAGE.format(source))
 
     osd_version, cycle_error_msg_list = check_cycle_id(
-        cycle_id, osd_version, gitlab_branch
+        cycle_id, osd_version, gitlab_branch, versions_dict
     )
 
     source_error_msg_list.extend(cycle_error_msg_list)
@@ -399,10 +404,14 @@ def get_osd_using_tmdata(
     except OSDModelError as error:
         errors.extend(error.args[0])
 
+    tmdata_version = TMData(GITLAB_SOURCE, update=True)
+    versions_dict = tmdata_version[VERSION_FILE_PATH].get_dict()
+
     _, cycle_errors = check_cycle_id(
         cycle_id=cycle_id,
         osd_version=osd_version,
         gitlab_branch=gitlab_branch,
+        versions_dict=versions_dict,
     )
     if cycle_errors:
         errors.extend(cycle_errors)
@@ -412,6 +421,7 @@ def get_osd_using_tmdata(
         osd_version=osd_version,
         source=source,
         gitlab_branch=gitlab_branch,
+        versions_dict=versions_dict,
     )
 
     if error:

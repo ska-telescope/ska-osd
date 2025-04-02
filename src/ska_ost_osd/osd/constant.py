@@ -6,13 +6,13 @@ MID_CONSTANT_JSON_FILE_PATH = "ska1_mid/mid_capabilities.json"
 LOW_CONSTANT_JSON_FILE_PATH = "ska1_low/low_capabilities.json"
 POLICIES_CONSTANT_JSON_FILE_PATH = "observatory_policies.json"
 RELEASE_FILE = "tmdata/version_mapping/latest_release.txt"
-VER_FL_PATH = "version_mapping/cycle_gitlab_release_version_mapping.json"
+VERSION_FILE_PATH = "version_mapping/cycle_gitlab_release_version_mapping.json"
 
 osd_file_mapping = {
     "low": LOW_CONSTANT_JSON_FILE_PATH,
     "mid": MID_CONSTANT_JSON_FILE_PATH,
     "observatory_policies": POLICIES_CONSTANT_JSON_FILE_PATH,
-    "cycle_to_version_mapping": VER_FL_PATH,
+    "cycle_to_version_mapping": VERSION_FILE_PATH,
     "latest_cycle_version_to_release": RELEASE_FILE,
 }
 
@@ -48,3 +48,4 @@ RELEASE_VERSION_MAPPING = (
 )
 # constant define to push gitlab flag.
 PUSH_TO_GITLAB_FLAG = "1"
+GITLAB_SOURCE = [f"gitlab:{BASE_URL}{CAR_URL}main#{BASE_FOLDER_NAME}"]
