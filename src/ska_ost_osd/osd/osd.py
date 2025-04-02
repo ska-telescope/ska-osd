@@ -26,7 +26,7 @@ from .constant import (
     MID_CAPABILITIES_JSON_PATH,
     OBSERVATORY_POLICIES_JSON_PATH,
     SOURCES,
-    VER_FL_PATH,
+    VERSION_FILE_PATH,
     osd_file_mapping,
     osd_response_template,
 )
@@ -405,7 +405,7 @@ def get_osd_using_tmdata(
         errors.extend(error.args[0])
 
     tmdata_version = TMData(GITLAB_SOURCE, update=True)
-    versions_dict = tmdata_version[VER_FL_PATH].get_dict()
+    versions_dict = tmdata_version[VERSION_FILE_PATH].get_dict()
 
     _, cycle_errors = check_cycle_id(
         cycle_id=cycle_id,
