@@ -5,6 +5,10 @@ Change Log
 All notable changes to this project will be documented in this file.
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
+3.1.1
+**********
+* Fixed version mapping file issue.
+
 3.1.0
 **********
 * Decoupled Release process of TMData from `ska-ost-osd` source code.
