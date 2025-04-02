@@ -48,4 +48,4 @@ RELEASE_VERSION_MAPPING = (
 )
 # constant define to push gitlab flag.
 PUSH_TO_GITLAB_FLAG = "1"
-GITLAB_SOURCE = ["gitlab://gitlab.com/ska-telescope/ost/ska-ost-osd?main#tmdata"]
+GITLAB_SOURCE = [f"gitlab:{BASE_URL}{CAR_URL}main#{BASE_FOLDER_NAME}"]
