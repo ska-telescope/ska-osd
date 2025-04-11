@@ -20,7 +20,6 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath("../../src"))
-# sys.path.insert(0, os.path.abspath('../..'))
 
 # Add debugging information
 autodoc_warningiserror = False
@@ -39,8 +38,9 @@ autodoc_mock_imports = ["astropy", "gitlab", "simpleeval", "ska_telmodel", "pyda
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 
-extensions = ['sphinx.ext.autodoc',
-              'sphinx.ext.napoleon',
+extensions = [
+    'sphinx.ext.napoleon',
+    'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
@@ -50,7 +50,8 @@ extensions = ['sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
     'myst_parser',
-    'sphinxcontrib.openapi']
+    'sphinxcontrib.openapi'
+    ]
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
