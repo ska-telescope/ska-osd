@@ -57,7 +57,7 @@ in ``semantic_validator`` for Mid, Low as well as Scheduling Block Definition (M
 
 Below are the commands to import JSON validator files.
 
-.. code:: python
+.. code-block:: python
 
     from ska_telmodel.data import TMData
 
@@ -72,7 +72,7 @@ Created a method that accepts 'interface' and 'telescope' as parameters. Inside 
 which have 'key' (SKA_LOW_TELESCOPE, SKA_MID_TELESCOPE, SKA_MID_SBD, SKA_LOW_SBD) and value pair. Based on the key provided it will return JSON path as 'value'.
 These keys are imported from constant.py.
 
-.. code:: python
+.. code-block:: python
 
     def get_validation_data(interface: str, telescope: str) -> Optional[str]:
     """
@@ -119,7 +119,7 @@ Example
 If a user wants to add any new parameter in JSON validator file so he can take reference of this example:
 
 
-.. code:: python
+.. code-block:: python
 
     "scan": {
             "tmc": {
@@ -151,7 +151,7 @@ If validation fails then the end user will get the list of errors.
 
 This framework can be access by below command:
 
-.. code:: python
+.. code-block:: python
 
     from ska_ost_osd.telvalidation.semantic_validator import semantic_validate
 
@@ -212,14 +212,14 @@ Steps to add and change the validation_strictness environment variable in 'value
       The VALIDATION_STRICTNESS parameter determines the level of validation applied. When set to 2, it enables the semantic 
       validation flag for OSD validation, while setting it to 1 only applies telmodel schema validation without OSD semantic checks.
 
-      .. code:: python
+      .. code-block:: python
 
             from os import environ
             VALIDATION_STRICTNESS = environ.get("VALIDATION_STRICTNESS", "2")
 
    * Changing the value: User can change the value by running below command with a different value from CLI.
 
-      .. code:: python
+      .. code-block:: python
       
             export VALIDATION_STRICTNESS="1"
 
@@ -291,7 +291,7 @@ How the rules are worked after get constraints values from OSD
 Consider we are applying semantic validation rule on dish i.e length of receptor_ids <= 4.
 This constraints value 4 is fetched from OSD by referring key ``number_ska_dishes``.
 
-.. code:: python
+.. code-block:: python
 
     "dish": {
                 "receptor_ids": [

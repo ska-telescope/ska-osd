@@ -6,11 +6,7 @@ These configuration files hold slowly changing information that is used to confi
 E.g. tools such as the PPT and ODT can use the information for constructing GUIs and validating setups, the Planning Tool can use it to inform itself of the capabilities available.
 The idea of OSD is to provide a single source of truth for these data.
 
-.. automodule:: ska_ost_osd.osd
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
+.. module:: ska_ost_osd.osd.osd
 
 .. contents::
 
@@ -81,7 +77,7 @@ If there is any error then the end user will get the appropriate error message.
 
 This framework can be access by below command:
 
-.. code:: python
+.. code-block:: python
 
     from ska_telmodel.data import TMData
     from ska_ost_osd.osd.osd import osd_tmdata_source, get_osd_data
@@ -174,14 +170,14 @@ GET /osd
 
 2. For example:
 
-.. code:: python
+.. code-block:: python
 
     "/ska-ost-osd/osd/api/v3/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
 
 
 3. CURL Example Request
 
-.. code:: python
+.. code-block:: python
 
     curl -X GET "/ska-ost-osd/osd/api/v3/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
 
@@ -193,7 +189,7 @@ GET /osd
         Calling API with parameters ``cycle_id``, ``source``, ``capabilities``
         their valid inputs will return the JSON containing the matched OSD data.
 
-    .. code:: python
+    .. code-block:: python
 
         client.get(
             "/ska-ost-osd/osd/api/v3/osd",
@@ -206,7 +202,7 @@ GET /osd
 
     * Response
 
-    .. code:: python
+    .. code-block:: python
 
         {
              "capabilities": {
@@ -344,14 +340,14 @@ GET /cycle
 
 2. For example:
 
-.. code:: python
+.. code-block:: python
 
     "/ska-ost-osd/osd/api/v3/cycle"
 
 
 3. CURL Example Request
 
-.. code:: python
+.. code-block:: python
 
     curl -X GET "/ska-ost-osd/osd/api/v3/cycle"
 
@@ -362,7 +358,7 @@ GET /cycle
 
         Calling API with parameters ``cycle_id`` and their valid inputs will return the JSON containing the matched OSD data.
 
-    .. code:: python
+    .. code-block:: python
 
         client.get(
             "/ska-ost-osd/osd/api/v3/cycle"
@@ -370,7 +366,7 @@ GET /cycle
 
     * Response
 
-    .. code:: python
+    .. code-block:: python
 
         {
             "cycles": [1]
@@ -414,14 +410,14 @@ POST /osd_release
 
 2. For example:
 
-    .. code:: python
+    .. code-block:: python
 
       "/ska-ost-osd/osd/api/v3/osd_release?cycle_id=1&release_type=patch"
 
 
 3. CURL Example Request
 
-    .. code:: python
+    .. code-block:: python
 
        curl -X POST "/ska-ost-osd/osd/api/v3/osd_release?cycle_id=1&release_type=patch"
 
@@ -430,7 +426,7 @@ POST /osd_release
 
     * The POST API initiate release process.
 
-    .. code:: python
+    .. code-block:: python
 
         client.put(
             "/ska-ost-osd/osd/api/v3/osd_release?cycle_id=1&release_type=patch",
@@ -489,14 +485,14 @@ PUT /osd
 
 2. For example:
 
-    .. code:: python
+    .. code-block:: python
 
      "/ska-ost-osd/osd/api/v3/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
 
 
 3. CURL Example Request
 
-    .. code:: python
+    .. code-block:: python
 
       curl -X PUT "/ska-ost-osd/osd/api/v3/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
 
@@ -510,7 +506,7 @@ PUT /osd
       that matches these parameters with the new data provided in the request body.
 
 
-    .. code:: python
+    .. code-block:: python
 
         client.put(
             "/ska-ost-osd/osd/api/v3/osd",
@@ -523,7 +519,7 @@ PUT /osd
 
     * Response
 
-    .. code:: python
+    .. code-block:: python
 
             {
         "AA0.5": {
@@ -688,20 +684,20 @@ Error Handling
 
     if ``osd_version`` value is not valid following error will be raised.
 
-    .. code:: python
+    .. code-block:: python
 
         osd_version {osd_version} is not valid
 
     if ``capabilities`` value is not valid following error will be raised.
 
-    .. code:: python
+    .. code-block:: python
 
         Capability {capabilities} does not exists. Available are low, mid
 
 
     if ``array_assembly`` value is not valid following error will be raised.
 
-    .. code:: python
+    .. code-block:: python
 
         array_assembly {array_assembly} is not valid
 
@@ -722,13 +718,13 @@ Release Steps
 
 2. Check the Current Version
 
-.. code:: bash
+.. code-block:: bash
 
     make show-version
 
 3. Bump the Version
 
-.. code:: bash
+.. code-block:: bash
 
     make bump-patch-release
 
@@ -740,7 +736,7 @@ also added a ``release.sh`` file inside ``osd`` ``resources`` folder which has t
 ``GetCycleId`` function gets ``cycle_number`` from ``observatory_policies.json`` file and triggers next function ``UpdateAndAddValue``
 which updates or add cycle_id values in version mapping json file.
 
-.. code:: bash
+.. code-block:: bash
 
     make osd-pre-release
 
