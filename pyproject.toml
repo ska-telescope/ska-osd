@@ -5,8 +5,10 @@ description = "Simplest form OSD consists of configuration files that are requir
 authors =  ["Team Nakshatra"]
 license= "BSD-3-Clause"
 readme = "README.md"
+
 repository = "https://gitlab.com/ska-telescope/ost/ska-ost-osd"
-documentation = "https://developer.skao.int/projects/ska-ost-osd/en/latest"
+documentation = "https://developer.skao.int/projects/ska-ost-osd/en/latest/index.html"
+
 packages = [
     { include = "ska_ost_osd", from = "src" }
 ]
@@ -53,7 +55,6 @@ flask = "2.2.5"
 Flask-Cors="^5.0.0"
 
 
-
 [tool.poetry.group.dev.dependencies]
 black = "^22.6.0"
 pylint = "^2.8.2"
@@ -77,8 +78,11 @@ requests-mock = "^1.9.3"
 [tool.poetry.group.docs.dependencies]
 recommonmark = "^0.7.1"
 sphinxcontrib-openapi = "^0.8.1"
-ska-ser-sphinx-theme = "^0.1.2"
+myst-parser = "^3.0.0"
+ska-ser-sphinx-theme = "^0.2.0"
 sphinx_autodoc_typehints = "^2.0.0"
+sphinx = "^7.0.2"
+prance = {version = "^23.6.21.0", extras = ["osv"]}
 
 
 [tool.pytest.ini_options]
