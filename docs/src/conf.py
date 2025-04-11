@@ -49,6 +49,7 @@ extensions = ['sphinx.ext.autodoc',
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
+    'myst_parser',
     'sphinxcontrib.openapi']
 
 # The suffix(es) of source filenames.
