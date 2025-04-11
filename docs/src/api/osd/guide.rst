@@ -76,7 +76,7 @@ If there is any error then the end user will get the appropriate error message.
 
 This framework can be access by below command:
 
-.. code::
+.. code:: python
 
     from ska_telmodel.data import TMData
     from ska_ost_osd.osd.osd import osd_tmdata_source, get_osd_data

@@ -32,7 +32,15 @@ autodoc_mock_imports = ["astropy", "gitlab", "simpleeval", "ska_telmodel", "pyda
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 
+# Show more detailed import errors
 autodoc_warningiserror = False
+
+# Full Python path to the module
+add_module_names = True
+
+# Make sure the master doc is specified
+master_doc = 'index'
+
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.napoleon',
     'sphinx.ext.doctest',
