@@ -6,6 +6,11 @@ These configuration files hold slowly changing information that is used to confi
 E.g. tools such as the PPT and ODT can use the information for constructing GUIs and validating setups, the Planning Tool can use it to inform itself of the capabilities available.
 The idea of OSD is to provide a single source of truth for these data.
 
+.. automodule:: ska_ost_osd.osd
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 
 .. contents::
 
