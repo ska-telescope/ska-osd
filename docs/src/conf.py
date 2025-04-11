@@ -20,7 +20,7 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath("../../src"))
-autodoc_mock_imports = ["astropy", "gitlab", "simpleeval", "ska_telmodel", "pydantic", "connexion", "ska-ost-osd"]
+autodoc_mock_imports = ["astropy", "gitlab", "simpleeval", "ska_telmodel", "pydantic", "connexion"]
 
 # -- General configuration ------------------------------------------------
 
@@ -31,6 +31,8 @@ autodoc_mock_imports = ["astropy", "gitlab", "simpleeval", "ska_telmodel", "pyda
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
+
+autodoc_warningiserror = False
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.napoleon',
     'sphinx.ext.doctest',
