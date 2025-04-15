@@ -1,6 +1,8 @@
 OSD Model
 -------------------
 
+.. currentmodule:: ska_ost_osd.osd.osd
+
 In its simplest form OSD consists of a set of science domain configuration files that are required by the OSO tools.
 These configuration files hold slowly changing information that is used to configure the science domain behavior of each tool.
 E.g. tools such as the PPT and ODT can use the information for constructing GUIs and validating setups, the Planning Tool can use it to inform itself of the capabilities available.
@@ -97,7 +99,11 @@ capabilities           Mid or Low
 array_assembly         AA0.5, AA1 or any Array Assembly
 ===================    ============================================================
 
-.. module:: ska_ost_osd.osd.osd
+.. automodule:: ska_ost_osd.osd.osd
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 
 .. autofunction:: get_osd_data
 
