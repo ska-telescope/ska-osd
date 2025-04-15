@@ -31,6 +31,7 @@ with open(PROJECT_ROOT / "pyproject.toml", "rb") as fh:
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 from ska_ost_osd import osd
+from ska_telmodel.data import TMData
 
 # -- General configuration ------------------------------------------------
 
@@ -57,7 +58,7 @@ extensions = [
     'sphinxcontrib.openapi'
     ]
 
-autodoc_mock_imports = ["astropy", "gitlab", "simpleeval", "ska_telmodel", "pydantic", "connexion"]
+autodoc_mock_imports = ["astropy", "gitlab", "simpleeval", "pydantic", "connexion"]
 
 
 # The suffix(es) of source filenames.
