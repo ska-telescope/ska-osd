@@ -17,16 +17,12 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-import os
 import sys
-sys.path.insert(0, os.path.abspath("../../src"))
-
-# Add debugging information
-autodoc_warningiserror = False
-add_module_names = True
+from pathlib import Path
 
 
-autodoc_mock_imports = ["astropy", "gitlab", "simpleeval", "ska_telmodel", "pydantic", "connexion"]
+project_root = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(project_root / 'src'))
 
 # -- General configuration ------------------------------------------------
 
@@ -41,17 +37,20 @@ autodoc_mock_imports = ["astropy", "gitlab", "simpleeval", "ska_telmodel", "pyda
 extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.autodoc',
-    'sphinx.ext.doctest',
+    'sphinx.ext.viewcode',
     'sphinx.ext.intersphinx',
+    'sphinx.ext.doctest',
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
     'sphinx.ext.ifconfig',
-    'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
     'myst_parser',
     'sphinxcontrib.openapi'
     ]
+
+autodoc_mock_imports = ["astropy", "gitlab", "simpleeval", "ska_telmodel", "pydantic", "connexion"]
+
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
