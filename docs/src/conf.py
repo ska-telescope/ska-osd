@@ -20,10 +20,17 @@
 import sys
 from pathlib import Path
 
+import tomli
 
-project_root = Path(__file__).parent.parent.parent
-sys.path.insert(0, str(project_root))
-sys.path.insert(0, str(project_root / 'src'))
+
+PROJECT_ROOT = Path(__file__).parents[2].resolve()
+
+with open(PROJECT_ROOT / "pyproject.toml", "rb") as fh:
+    pyproject = tomli.load(fh)
+
+sys.path.insert(0, str(PROJECT_ROOT / "src"))
+
+from ska_ost_osd import osd
 
 # -- General configuration ------------------------------------------------
 
