@@ -97,8 +97,11 @@ capabilities           Mid or Low
 array_assembly         AA0.5, AA1 or any Array Assembly
 ===================    ============================================================
 
-.. currentmodule:: ska_ost_osd.osd.osd
-    
+.. automodule:: ska_ost_osd.osd.osd
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 .. autofunction:: get_osd_data
 
 .. autofunction:: OSD
