@@ -172,8 +172,6 @@ There are some steps of this framework these are as follows:
     that it raises custom errors. All the custom errors are stored in a list named ``error_msg_list``.
     At the end this function returns a list containing all the error messages.
 
-    .. autofunction:: ska_ost_osd.telvalidation.oet_tmc_validators.validate_json
-
 * Step 3
     There is one more function ``semantic_validate`` which takes argument as
     observing_command_input, tm_data, osd_data, interface, array_assembly and raise_semantic.
@@ -190,10 +188,6 @@ There are some steps of this framework these are as follows:
     ``msg_list`` variable will remain empty.
 
     Also this function is not supporting low telescope schema validation currently.
-
-
-    .. autofunction:: ska_ost_osd.telvalidation.semantic_validator.semantic_validate
-
 
 
 Ability to turn Semantic Validation off/on in real-time
@@ -329,12 +323,7 @@ This module contains a function ``ra_dec_to_az_el`` which has logic for this con
 This function has been imported in the ``validate_target_is_visible`` function which is
 present in the ``oet_tmc_validators`` module.
 
-.. autofunction:: ska_ost_osd.telvalidation.oet_tmc_validators.validate_target_is_visible
-
-
 This is the main function for conversion.
-
-.. autofunction:: ska_ost_osd.telvalidation.coordinates_conversion.ra_dec_to_az_el
 
 
 Semantic Validation API Documentation
