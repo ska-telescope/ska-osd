@@ -30,8 +30,8 @@ with open(PROJECT_ROOT / "pyproject.toml", "rb") as fh:
 
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
-from ska_ost_osd import osd
 from ska_telmodel.data import TMData
+from ska_ost_osd.osd import osd
 
 # -- General configuration ------------------------------------------------
 
