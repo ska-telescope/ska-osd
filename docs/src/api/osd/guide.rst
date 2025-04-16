@@ -97,6 +97,10 @@ capabilities           Mid or Low
 array_assembly         AA0.5, AA1 or any Array Assembly
 ===================    ============================================================
 
+.. autofunction:: ska_ost_osd.osd.osd.get_osd_data
+
+.. autofunction:: ska_ost_osd.osd.osd.OSD
+
 
 API json response template
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
