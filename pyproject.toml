@@ -81,9 +81,6 @@ sphinxcontrib-openapi = "^0.8.1"
 myst-parser = "^3.0.0"
 ska-ser-sphinx-theme = "^0.2.0"
 sphinx_autodoc_typehints = "^2.0.0"
-sphinx = "^7.0.2"
-ska-telmodel = "^1.19.4"
-prance = {version = "^23.6.21.0", extras = ["osv"]}
 
 
 [tool.pytest.ini_options]
