@@ -30,6 +30,8 @@ with open(PROJECT_ROOT / "pyproject.toml", "rb") as fh:
 
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
+from ska_ost_osd.osd import osd
+
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
