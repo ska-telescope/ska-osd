@@ -55,7 +55,7 @@ extensions = [
     'sphinxcontrib.openapi'
     ]
 
-autodoc_mock_imports = ["astropy", "gitlab", "simpleeval", "pydantic", "connexion", "ska_telmodel"]
+autodoc_mock_imports = ["astropy", "gitlab", "simpleeval", "pydantic", "connexion", "ska_telmodel", "prance"]
 
 
 # The suffix(es) of source filenames.
