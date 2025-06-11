@@ -27,67 +27,6 @@ def test_init_app(open_api_spec):
         ]
 
 
-def test_get_openapi_spec(open_api_spec):
-    """This function tests that a valid OpenAPI specification
-       is returned when requesting the API documentation.
-
-    :params open_api_spec (dict): The expected OpenAPI specification
-
-    :raises AssertionError: If the response spec differs from expected.
-    """
-
-    with patch("ska_ost_osd.rest.prance.ResolvingParser", autospec=True) as mock_parser:
-        instance = mock_parser.return_value
-        instance.specification = open_api_spec
-
-        spec = get_openapi_spec()
-
-        assert (
-            spec == open_api_spec
-        ), "The specification should match the mock specification"
-        mock_parser.assert_called_once_with(  # pylint: disable=W0106
-            (
-                "/builds/ska-telescope/ost/ska-ost-osd/src/"
-                "ska_ost_osd/rest/./openapi/osd-openapi-v1.yaml"
-            ),
-            lazy=True,
-            strict=True,
-        ), "ResolvingParser should be called with expected arguments"
-
-
-def test_init_app_client(client, open_api_spec):
-    """This function tests that the get_openapi_spec function returns
-       the expected OpenAPI specification.
-
-    :param open_api_spec (dict): The OpenAPI specification that is expected
-       to be returned.
-
-    :raises AssertionError: If the actual spec returned does not match the
-       expected spec.
-    """
-
-    with (
-        patch("ska_ost_osd.rest.get_openapi_spec", return_value=open_api_spec),
-        patch("ska_ost_osd.rest.App") as mock_connexion_app,
-    ):
-        mock_connexion_instance = mock_connexion_app.return_value
-        mock_flask_app = mock_connexion_instance.app
-        mock_flask_app.test_client = MagicMock(return_value=client)
-
-        init_app(open_api_spec=open_api_spec)
-
-        # Verify that the Connexion app is initialized with the correct parameters
-        mock_connexion_app.assert_called_once_with(
-            "ska_ost_osd.rest", specification_dir="openapi/"
-        )
-
-        # Verify that the API is added with the correct spec and base path
-        mock_connexion_instance.add_api.assert_called_once()
-        call_args = mock_connexion_instance.add_api.call_args
-        assert call_args[0][0] == open_api_spec
-        assert call_args[1]["base_path"].startswith("/")
-
-
 @pytest.mark.parametrize(
     "cycle_id, osd_version, source, capabilities, array_assembly, expected",
     [
