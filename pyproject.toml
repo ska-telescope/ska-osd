@@ -79,7 +79,6 @@ sphinx_autodoc_typehints = "^2.0.0"
 
 [tool.pytest.ini_options]
 addopts = "-v"
-junit_family = "xunit1"
 
 [tool.flake8]
 docstring-style = "sphinx"
