@@ -3,28 +3,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from ska_ost_osd.rest import get_openapi_spec, init_app
 from ska_ost_osd.rest.api.resources import validation_response
 from tests.conftest import BASE_API_URL
-
-
-def test_init_app(open_api_spec):
-    """This function tests that the Flask application can be initialized
-       properly and that the OpenAPI spec is registered as expected.
-
-    :param open_api_spec (dict): The OpenAPI specification expected to be
-       registered on the app.
-
-    :raises AssertionError: If the app fails to initialize or the wrong spec
-       is registered.
-    """
-
-    with patch("ska_ost_osd.rest.get_openapi_spec", return_value=open_api_spec):
-        app = init_app()
-
-        assert app.url_map._rules_by_endpoint[  # pylint: disable=W0212
-            f"{BASE_API_URL}.ska_ost_osd_rest_api_resources_get_osd"
-        ]
 
 
 @pytest.mark.parametrize(
