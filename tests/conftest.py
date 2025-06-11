@@ -10,7 +10,6 @@ import pytest
 from ska_telmodel.data import TMData
 
 from ska_ost_osd.osd.osd import osd_tmdata_source
-from ska_ost_osd.rest import init_app
 from ska_ost_osd.telvalidation.constant import CAR_TELMODEL_SOURCE
 
 # flake8: noqa E501
@@ -298,20 +297,6 @@ def validate_gitlab_class():
         source="gitlab",
     )
     return tmdata_source
-
-
-@pytest.fixture
-def client():
-    """This fixture returns a Flask test client that can be used to make requests
-        to the application in tests. It handles setting up and tearing down the
-        application context.
-
-    :returns FlaskClient: The Flask test client
-    """
-
-    app = init_app()
-    with app.test_client() as client:  # pylint: disable=W0621
-        yield client
 
 
 @pytest.fixture
