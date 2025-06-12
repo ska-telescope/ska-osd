@@ -1,0 +1,97 @@
+# Reference taken from article and git repo
+# https://pre-commit.com/#intro
+# https://github.com/marvelousmlops/precommit-heaven
+
+
+#  Installation  steps:-
+#  pip3 install pre-commit
+#  pre-commit --version
+#  pre-commit install
+#  pre-commit run --all-files
+#  pre-commit run --files YOUR_FILENAME
+
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-ast
+      - id: check-added-large-files
+      - id: check-docstring-first
+      - id: debug-statements
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+      - id: trailing-whitespace
+      - id: check-json
+      - id: check-toml
+      - id: check-yaml
+      - id: check-merge-conflict
+  - repo: https://github.com/ambv/black
+    rev: 25.1.0
+    hooks:
+      - id: black
+        files: ^(src/|tests/)
+  - repo: https://github.com/pycqa/flake8.git
+    rev: 7.2.0
+    hooks:
+      - id: flake8
+        files: ^(src/|tests/)
+        args: ["--max-line-length=88"]
+  - repo: https://github.com/PyCQA/isort
+    rev: 6.0.1
+    hooks:
+      - id: isort
+        files: ^(src/|tests/)
+        args: [ "--profile", "black" ]
+  - repo: https://github.com/econchick/interrogate
+    rev: 1.7.0
+    hooks:
+      - id: interrogate
+        args: [--fail-under=80, --verbose, -i]
+  - repo: https://github.com/pycqa/pydocstyle
+    rev: 6.3.0
+    hooks:
+    -   id: pydocstyle
+        args: [--ignore=D107,D204]
+  - repo: https://github.com/PyCQA/docformatter
+    rev: v1.7.7
+    hooks:
+      - id: docformatter
+        # additional_dependencies: [tomli]
+        # args: [--in-place, --config, ./pyproject.toml]
+  - repo: https://github.com/crate-ci/typos.git
+    rev: v1
+    hooks:
+      - id: typos
+        args: [--write-changes, --force-exclude]
+        types: [text]
+  - repo: https://github.com/mrtazz/checkmake.git
+    rev: 0.2.2
+    hooks:
+    - id: checkmake
+      exclude: |
+        (?x)^(
+          src/.*|tests/.*|
+          fixtures/missing_phony\.make
+        )$
+  - repo: https://github.com/thoughtworks/talisman
+    rev: 'v1.37.0'
+    hooks:
+    - id: talisman-commit
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.1
+    hooks:
+    - id: codespell
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.16.0
+    hooks:
+      - id: mypy
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.8.3
+    hooks:
+      - id: bandit
+  - repo: https://github.com/PyCQA/autoflake
+    rev: v2.3.1
+    hooks:
+      - id: autoflake
+        args: [--remove-unused-variables, --in-place]
