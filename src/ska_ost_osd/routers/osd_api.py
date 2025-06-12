@@ -10,8 +10,8 @@ from os import environ
 from pathlib import Path
 from typing import Dict
 
+from fastapi import APIRouter
 from pydantic import ValidationError
-from ska_telmodel.data import TMData
 
 from ska_ost_osd.osd.constant import (
     CYCLE_TO_VERSION_MAPPING,
@@ -27,8 +27,8 @@ from ska_ost_osd.osd.osd import (
     get_osd_using_tmdata,
     update_file_storage,
 )
-from ska_ost_osd.osd.osd_schema_validator import CapabilityError, OSDModelError
-from ska_ost_osd.osd.osd_update_schema import (
+from ska_ost_osd.common.error_handling import CapabilityError, OSDModelError
+from ska_ost_osd.models.models import (
     UpdateRequestModel,
     ValidationOnCapabilities,
 )
@@ -36,18 +36,14 @@ from ska_ost_osd.osd.osd_validation_messages import (
     ARRAY_ASSEMBLY_DOESNOT_BELONGS_TO_CYCLE_ERROR_MESSAGE,
 )
 from ska_ost_osd.osd.version_manager import manage_version_release
-from ska_ost_osd.rest.api.utils import read_file
-from ska_ost_osd.telvalidation import SchematicValidationError, semantic_validate
-from ska_ost_osd.telvalidation.constant import (
-    CAR_TELMODEL_SOURCE,
-    SEMANTIC_VALIDATION_VALUE,
-)
-from ska_ost_osd.telvalidation.semantic_validator import VALIDATION_STRICTNESS
+from ska_ost_osd.common.utils import read_file
+from ska_ost_osd.telvalidation import SchematicValidationError
 
 # this variable is added for restricting tmdata publish from local/dev environment.
 # usage: "0" means disable tmdata publish to artefact.
 # "1" means allow to publish
 PUSH_TO_GITLAB = environ.get("PUSH_TO_GITLAB", "0")
+osd_router = APIRouter(prefix="")
 
 
 def error_handler(api_fn: callable) -> str:
@@ -154,10 +150,6 @@ def validation_response(
     response_body = {"status": status, "detail": detail, "title": title}
 
     return response_body, http_status
-
-
-def get_tmdata_sources(source):
-    return [source] if source else CAR_TELMODEL_SOURCE  # check source
 
 
 @error_handler
@@ -273,73 +265,11 @@ def release_osd_data(**kwargs):
             "cycle_id": cycle_id,
         }
 
-
-@error_handler
-def semantically_validate_json(body: dict):
-    """
-    This function validates the input JSON semantically
-
-    :param body:
-    A dictionary containing key-value pairs of parameters required for semantic
-     validation.
-             -observing_command_input: (required) Input JSON to be validated
-             -interface: Interface version of the input JSON
-             -raise_semantic: (Optional Default True) Raise semantic errors or not
-             -sources: (Optional) TMData source URL (gitlab/car) for Semantic Validation
-             -osd_data: (Optional) OSD data to be used for semantic validation
-
-    :returns: Flask.Response: A Flask response object that contains the validation
-               results. If the validation is successful, the response will indicate
-               a success status.
-              If the validation fails, the response will include details about the
-              semantic errors found. The HTTP status code of the
-              response will reflect the outcome of the validation
-              (e.g., 200 for success, 400 for bad request if semantic errors
-              are detected).
-
-    :raises: SemanticValidationError: If the input JSON is not
-             semantically valid semantic and raise semantic is true
-    """
-
-    error_details = []
-
-    sources = body.get("sources")
-    if sources and not isinstance(sources, str):
-        error_details.append("sources must be a string")
-    else:
-        sources = get_tmdata_sources(sources)
-
-    try:
-        tm_data = TMData(sources, update=True)
-        semantic_validate(
-            observing_command_input=body.get("observing_command_input"),
-            tm_data=tm_data,
-            raise_semantic=body.get("raise_semantic"),
-            interface=body.get("interface"),
-            osd_data=body.get("osd_data"),
-        )
-    except (RuntimeError, ValidationError) as err:
-        error_details.extend(handle_validation_error(err))
-
-    if error_details:
-        raise ValueError(error_details)
-
-    if int(VALIDATION_STRICTNESS) < int(SEMANTIC_VALIDATION_VALUE):
-        return validation_response(
-            status=0,
-            detail="Semantic Validation is currently disable",
-            title="Semantic validation",
-            http_status=HTTPStatus.OK,
-        )
-    else:
-        return validation_response(
-            status=0,
-            detail="JSON is semantically valid",
-            title="Semantic validation",
-            http_status=HTTPStatus.OK,
-        )
-
-
+@osd_router.get(
+    "/cycle",
+    tags=["OSD"],
+    summary="Get list of available cycles"
+)
 def get_cycle_list() -> Dict:
     """Get list of cycles from cycle_gitlab_release_version_mapping.json.
 

@@ -22,7 +22,7 @@ import astropy.units as u
 from astropy.time import Time
 from simpleeval import EvalWithCompoundTypes
 
-from .constant import MID_VALIDATION_CONSTANT_JSON_FILE_PATH
+from ..common.constant import MID_VALIDATION_CONSTANT_JSON_FILE_PATH
 from .coordinates_conversion import (
     dec_degs_str_formats,
     ra_dec_to_az_el,

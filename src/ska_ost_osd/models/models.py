@@ -1,8 +1,9 @@
 import re
-from typing import List, Optional
+from typing import Optional
 
 from pydantic import BaseModel, model_validator
 
+from ska_ost_osd.common.error_handling import CapabilityError, OSDModelError
 from ska_ost_osd.osd.constant import ARRAY_ASSEMBLY_PATTERN, OSD_VERSION_PATTERN
 from ska_ost_osd.osd.osd_validation_messages import (
     ARRAY_ASSEMBLY_INVALID_ERROR_MESSAGE,
@@ -11,22 +12,9 @@ from ska_ost_osd.osd.osd_validation_messages import (
     GITLAB_BRANCH_ERROR_MESSAGE,
     OSD_VERSION_INVALID_ERROR_MESSAGE,
 )
+from typing import Any, Dict, Optional
+from pydantic import BaseModel, Field, model_validator
 
-
-class OSDModelError(Exception):
-    """Custom exception class for validation errors."""
-
-    def __init__(self, errors: List[dict]):
-        self.errors = errors
-        super().__init__(errors)
-
-
-class CapabilityError(Exception):
-    """Custom exception class for validation errors."""
-
-    def __init__(self, errors: List[dict]):
-        self.errors = errors
-        super().__init__(errors)
 
 
 class OSDModel(BaseModel):
@@ -64,5 +52,35 @@ class OSDModel(BaseModel):
             errors.append(ARRAY_ASSEMBLY_INVALID_ERROR_MESSAGE.format(array_assembly))
         if errors:
             raise OSDModelError(errors)
+
+        return values
+
+
+class UpdateRequestModel(BaseModel):
+    cycle_id: Optional[int] = Field(..., description="Cycle ID must be an integer")
+    array_assembly: Optional[str] = Field(
+        ...,
+        pattern=ARRAY_ASSEMBLY_PATTERN,
+        description="Array assembly in format AA[0-9].[0-9]",
+    )
+    capabilities: Optional[str] = Field(..., description="Capabilites must be str")
+
+
+class ValidationOnCapabilities(BaseModel):
+    capabilities: Dict[str, Dict[str, Any]]
+
+    @model_validator(mode="before")
+    @classmethod
+    def validate_capabilities(cls, values):
+        if not values.get("capabilities"):
+            raise CapabilityError("capabilities field is required")
+
+        capabilities = values["capabilities"]
+        if not isinstance(capabilities, dict) or len(capabilities) != 1:
+            raise CapabilityError("capabilities must contain exactly one telescope key")
+
+        telescope_data = next(iter(capabilities.values()))
+        if not isinstance(telescope_data, dict):
+            raise CapabilityError("telescope data must be a dictionary")
 
         return values

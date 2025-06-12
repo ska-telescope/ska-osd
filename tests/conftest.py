@@ -10,7 +10,7 @@ import pytest
 from ska_telmodel.data import TMData
 
 from ska_ost_osd.osd.osd import osd_tmdata_source
-from ska_ost_osd.telvalidation.constant import CAR_TELMODEL_SOURCE
+from ska_ost_osd.common.constant import CAR_TELMODEL_SOURCE
 
 # flake8: noqa E501
 # pylint: disable=W0621
