@@ -33,6 +33,12 @@ RUN apt-get update && \
     openssh-client \
     && rm -rf /var/lib/apt/lists/*
 
+# create temporary .ssh folder to store ssh key.
+RUN mkdir -p /home/app/.ssh && \
+    chown -R app:app /home/app && \
+    chmod 700 /home/app/.ssh
+
+
 # The runtime image, used to just run the code provided its virtual environment
 FROM $RUNTIME_BASE_IMAGE AS runtime
 
