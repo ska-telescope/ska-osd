@@ -26,6 +26,13 @@ RUN poetry install --without dev --no-root && rm -rf $POETRY_CACHE_DIR
 # Copy application code
 COPY tmdata /app/src/tmdata
 
+# Install ssh client and git in order to push tmdata to artefact
+RUN apt-get update && \
+    apt-get install -y \
+    git \
+    openssh-client \
+    && rm -rf /var/lib/apt/lists/*
+
 # The runtime image, used to just run the code provided its virtual environment
 FROM $RUNTIME_BASE_IMAGE AS runtime
 
