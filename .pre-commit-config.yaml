@@ -74,14 +74,14 @@ repos:
           src/.*|tests/.*|
           fixtures/missing_phony\.make
         )$
-  # - repo: https://github.com/thoughtworks/talisman
-  #   rev: 'v1.37.0'
-  #   hooks:
-  #   - id: talisman-commit
-  # - repo: https://github.com/codespell-project/codespell
-  #   rev: v2.4.1
-  #   hooks:
-  #   - id: codespell
+  - repo: https://github.com/thoughtworks/talisman
+    rev: 'v1.37.0'
+    hooks:
+    - id: talisman-commit
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.1
+    hooks:
+    - id: codespell
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.16.0
     hooks:
