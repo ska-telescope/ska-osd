@@ -11,14 +11,14 @@ ENV POETRY_NO_INTERACTION=1 \
     POETRY_CACHE_DIR=/tmp/poetry_cache
 
 ENV APP_DIR="/app"
-WORKDIR $APP_DIR
 
 # Copy dependency files early for better caching
 COPY pyproject.toml poetry.lock ./
 
 RUN touch README.md
 
-# Install only dependencies (skip project install to leverage Docker layer cache)
+# Install no-root here so we get a docker layer cached with dependencies
+# but not app code, to rebuild quickly.
 RUN poetry install --without dev --no-root && rm -rf $POETRY_CACHE_DIR
 
 # The runtime image, used to just run the code provided its virtual environment
