@@ -1,7 +1,7 @@
 # ---------- Build Stage ----------
 ARG BUILD_IMAGE="artefact.skao.int/ska-build-python:0.1.3"
-FROM $BUILD_IMAGE AS buildenv
 ARG RUNTIME_BASE_IMAGE="artefact.skao.int/ska-python:0.1.4"
+FROM $BUILD_IMAGE AS buildenv
 FROM $RUNTIME_BASE_IMAGE AS runtime
 
 # Set up Poetry environment
