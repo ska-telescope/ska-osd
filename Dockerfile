@@ -4,6 +4,11 @@ ARG RUNTIME_BASE_IMAGE="artefact.skao.int/ska-python:0.1.4"
 FROM $BUILD_IMAGE AS buildenv
 FROM $RUNTIME_BASE_IMAGE AS runtime
 
+
+# Install Poetry
+RUN curl -sSL https://install.python-poetry.org | python3 - && \
+    ln -s ~/.local/bin/poetry /usr/local/bin/poetry
+
 # Set up Poetry environment
 ENV POETRY_NO_INTERACTION=1 \
     POETRY_VIRTUALENVS_IN_PROJECT=1 \
