@@ -1,6 +1,7 @@
 # ---------- Build Stage ----------
 ARG BUILD_IMAGE="artefact.skao.int/ska-build-python:0.1.3"
 ARG RUNTIME_BASE_IMAGE="artefact.skao.int/ska-python:0.1.4"
+
 FROM $BUILD_IMAGE AS buildenv
 
 
@@ -12,20 +13,26 @@ ENV POETRY_NO_INTERACTION=1 \
 
 ENV APP_DIR="/app"
 
+WORKDIR $APP_DIR
+
 # Copy dependency files early for better caching
 COPY pyproject.toml poetry.lock ./
-
 RUN touch README.md
 
 # Install no-root here so we get a docker layer cached with dependencies
 # but not app code, to rebuild quickly.
 RUN poetry install --without dev --no-root && rm -rf $POETRY_CACHE_DIR
 
+# Copy application code
+COPY tmdata /app/src/tmdata
+
 # The runtime image, used to just run the code provided its virtual environment
 FROM $RUNTIME_BASE_IMAGE AS runtime
 
-# Copy application code
-COPY tmdata /app/src/tmdata
+ENV APP_USER="tango"
+ENV APP_DIR="/app"
+ENV VIRTUAL_ENV="${APP_DIR}/.venv"
+ENV PATH="${VIRTUAL_ENV}/bin:$PATH"
 
 # Create non-root user
 RUN adduser $APP_USER --disabled-password --home $APP_DIR
