@@ -2,12 +2,7 @@
 ARG BUILD_IMAGE="artefact.skao.int/ska-build-python:0.1.3"
 ARG RUNTIME_BASE_IMAGE="artefact.skao.int/ska-python:0.1.4"
 FROM $BUILD_IMAGE AS buildenv
-FROM $RUNTIME_BASE_IMAGE AS runtime
 
-
-# Install Poetry
-RUN curl -sSL https://install.python-poetry.org | python3 - && \
-    ln -s ~/.local/bin/poetry /usr/local/bin/poetry
 
 # Set up Poetry environment
 ENV POETRY_NO_INTERACTION=1 \
@@ -15,30 +10,22 @@ ENV POETRY_NO_INTERACTION=1 \
     POETRY_VIRTUALENVS_CREATE=1 \
     POETRY_CACHE_DIR=/tmp/poetry_cache
 
-# Configure internal PyPI repository
-ARG CAR_PYPI_REPOSITORY_URL=https://artefact.skao.int/repository/pypi-internal
-ENV PIP_INDEX_URL=${CAR_PYPI_REPOSITORY_URL}
-
 ENV APP_DIR="/app"
 WORKDIR $APP_DIR
 
-USER root
-
 # Copy dependency files early for better caching
-COPY pyproject.toml poetry.lock* ./
+COPY pyproject.toml poetry.lock ./
+
+RUN touch README.md
 
 # Install only dependencies (skip project install to leverage Docker layer cache)
 RUN poetry install --without dev --no-root && rm -rf $POETRY_CACHE_DIR
 
+# The runtime image, used to just run the code provided its virtual environment
+FROM $RUNTIME_BASE_IMAGE AS runtime
+
 # Copy application code
 COPY tmdata /app/src/tmdata
-
-# ---------- Runtime Stage ----------
-
-ENV APP_USER="tango"
-ENV APP_DIR="/app"
-ENV VIRTUAL_ENV="${APP_DIR}/.venv"
-ENV PATH="${VIRTUAL_ENV}/bin:$PATH"
 
 # Create non-root user
 RUN adduser $APP_USER --disabled-password --home $APP_DIR
