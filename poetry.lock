@@ -2078,13 +2078,13 @@ reference = "ska-nexus"
 
 [[package]]
 name = "ska-ser-skuid"
-version = "3.3.2"
+version = "3.3.3"
 description = "Library that generates ID's for the SKA project"
 optional = false
 python-versions = ">=3.6,<4.0"
 files = [
-    {file = "ska-ser-skuid-3.3.2.tar.gz", hash = "sha256:8383b18a2f263a30f818dea8b203232900a86f37e7a3de3cb39f001b73fa4c21"},
-    {file = "ska_ser_skuid-3.3.2-py3-none-any.whl", hash = "sha256:6c9bbd42c0423a2b79ddfde1ac4c3e3bb717c355ade8a3a621085ad3ec4604bd"},
+    {file = "ska-ser-skuid-3.3.3.tar.gz", hash = "sha256:91ad1dda3e3a397e39dbb362046888f5a80e4f5ef022628cde7ccc93c4d9b057"},
+    {file = "ska_ser_skuid-3.3.3-py3-none-any.whl", hash = "sha256:743a4170024d208be49d262af2a326644356ef0933dd001cada05bbfcb1f67cd"},
 ]
 
 [package.dependencies]
@@ -2904,4 +2904,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "9e7b0951df43043d503c30f54bfebd96e9787e29d161222d51afc91fb285a239"
+content-hash = "da93e92291e467629ecf6f84d34f58a3c980cb98a90511caebfeeebbbaab3743"

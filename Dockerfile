@@ -1,6 +1,8 @@
 # ---------- Build Stage ----------
 ARG BUILD_IMAGE="artefact.skao.int/ska-build-python:0.1.3"
 FROM $BUILD_IMAGE AS buildenv
+ARG RUNTIME_BASE_IMAGE="artefact.skao.int/ska-python:0.1.4"
+FROM $RUNTIME_BASE_IMAGE AS runtime
 
 # Set up Poetry environment
 ENV POETRY_NO_INTERACTION=1 \
@@ -27,8 +29,6 @@ RUN poetry install --without dev --no-root && rm -rf $POETRY_CACHE_DIR
 COPY tmdata /app/src/tmdata
 
 # ---------- Runtime Stage ----------
-ARG RUNTIME_BASE_IMAGE="artefact.skao.int/ska-python:0.1.4"
-FROM $RUNTIME_BASE_IMAGE AS runtime
 
 ENV APP_USER="tango"
 ENV APP_DIR="/app"
