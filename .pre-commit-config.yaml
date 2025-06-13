@@ -10,6 +10,10 @@
 #  pre-commit run --all-files
 #  pre-commit run --files YOUR_FILENAME
 
+# To skip pre-commit hook steps use below command ( Not Recommended )
+# SKIP=<step> git commit -m "<message>"
+# eg: SKIP=mypy,interrogate,pydocstyle git commit -m "<message>"
+
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
