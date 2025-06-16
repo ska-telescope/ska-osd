@@ -1,8 +1,9 @@
-"""
-Functions which the HTTP requests to individual resources are mapped to.
+"""Functions which the HTTP requests to individual resources are mapped to.
 
-See the operationId fields of the Open API spec for the specific mappings.
+See the operationId fields of the Open API spec for the specific
+mappings.
 """
+
 import json
 from functools import wraps
 from http import HTTPStatus
@@ -51,13 +52,13 @@ PUSH_TO_GITLAB = environ.get("PUSH_TO_GITLAB", "0")
 
 
 def error_handler(api_fn: callable) -> str:
-    """
-    A decorator function to catch general errors and wrap in the correct HTTP response
+    """A decorator function to catch general errors and wrap in the correct
+    HTTP response.
 
-    :param api_fn: A function which accepts an entity identifier and returns
-        an HTTP response
-
-    :return str: A string containing the error message and HTTP status code.
+    :param api_fn: A function which accepts an entity identifier and
+        returns an HTTP response
+    :return str: A string containing the error message and HTTP status
+        code.
     """
 
     @wraps(api_fn)
@@ -115,12 +116,11 @@ def error_handler(api_fn: callable) -> str:
 
 @error_handler
 def get_osd(**kwargs) -> dict:
-    """This function takes query parameters and OSD data source objects
-      to generate a response containing matching OSD data.
+    """This function takes query parameters and OSD data source objects to
+    generate a response containing matching OSD data.
 
     :param query_params (QueryParams): The query parameters.
     :param tm_data_sources (list): A list of OSD data source objects.
-
     :returns dict: A dictionary with OSD data satisfying the query.
     """
     try:
@@ -144,8 +144,7 @@ def validation_response(
     title: str = HTTPStatus.INTERNAL_SERVER_ERROR.phrase,
     http_status: HTTPStatus = HTTPStatus.INTERNAL_SERVER_ERROR,
 ) -> dict:
-    """
-    Creates an error response in the case that our validation has failed.
+    """Creates an error response in the case that our validation has failed.
 
     :param detail: The error message if validation fails
     :param http_status: The HTTP status code to return
@@ -162,8 +161,7 @@ def get_tmdata_sources(source):
 
 @error_handler
 def update_osd_data(body: Dict, **kwargs) -> Dict:
-    """
-    This function updates the input JSON against the schema
+    """This function updates the input JSON against the schema.
 
     Args:
         body (Dict): A dictionary containing key-value pairs of
@@ -276,8 +274,7 @@ def release_osd_data(**kwargs):
 
 @error_handler
 def semantically_validate_json(body: dict):
-    """
-    This function validates the input JSON semantically
+    """This function validates the input JSON semantically.
 
     :param body:
     A dictionary containing key-value pairs of parameters required for semantic
@@ -366,8 +363,9 @@ def get_cycle_list() -> Dict:
 
 
 def handle_validation_error(err: object) -> list:
-    """
-    This function handles validation errors and returns a list of error details.
+    """This function handles validation errors and returns a list of error
+    details.
+
     :param err: error raised from exception
     :returns: List of errors
     """

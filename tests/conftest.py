@@ -328,7 +328,7 @@ def osd_versions():
 
 @pytest.fixture
 def mid_osd_data():
-    """This fixture returns data in MID_OSD_DATA_JSON file
+    """This fixture returns data in MID_OSD_DATA_JSON file.
 
     :returns dict: MID_OSD_DATA_JSON file data
     """
@@ -337,7 +337,7 @@ def mid_osd_data():
 
 @pytest.fixture
 def osd_observatory_policies():
-    """This fixture returns data in OBSERVATORY_MOCK_DATA file
+    """This fixture returns data in OBSERVATORY_MOCK_DATA file.
 
     :returns dict: OBSERVATORY_MOCK_DATA file data
     """
