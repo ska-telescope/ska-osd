@@ -1,56 +1,54 @@
-ARG BUILD_IMAGE="artefact.skao.int/ska-cicd-k8s-tools-build-deploy:0.12.0"
-ARG RUNTIME_BASE_IMAGE="artefact.skao.int/ska-cicd-k8s-tools-build-deploy:0.12.0"
+# ---------- Build Stage ----------
+ARG BUILD_IMAGE="artefact.skao.int/ska-build-python:0.1.3"
+ARG RUNTIME_BASE_IMAGE="artefact.skao.int/ska-python:0.1.4"
 
 FROM $BUILD_IMAGE AS buildenv
 
+
+# Set up Poetry environment
 ENV POETRY_NO_INTERACTION=1 \
     POETRY_VIRTUALENVS_IN_PROJECT=1 \
     POETRY_VIRTUALENVS_CREATE=1 \
     POETRY_CACHE_DIR=/tmp/poetry_cache
 
-ARG CAR_PYPI_REPOSITORY_URL=https://artefact.skao.int/repository/pypi-internal
-ENV PIP_INDEX_URL=${CAR_PYPI_REPOSITORY_URL}
-
 ENV APP_DIR="/app"
 
 WORKDIR $APP_DIR
 
-USER root
-
-# Copy poetry.lock* in case it doesn't exist in the repo
-COPY pyproject.toml poetry.lock* ./
-
-COPY tmdata /app/src/tmdata
+# Copy dependency files early for better caching
+COPY pyproject.toml poetry.lock ./
+RUN touch README.md
 
 # Install no-root here so we get a docker layer cached with dependencies
 # but not app code, to rebuild quickly.
 RUN poetry install --without dev --no-root && rm -rf $POETRY_CACHE_DIR
+
+# Copy application code
+COPY tmdata /app/src/tmdata
 
 # The runtime image, used to just run the code provided its virtual environment
 FROM $RUNTIME_BASE_IMAGE AS runtime
 
 ENV APP_USER="tango"
 ENV APP_DIR="/app"
+ENV VIRTUAL_ENV="${APP_DIR}/.venv"
+ENV PATH="${VIRTUAL_ENV}/bin:$PATH"
 
+# Create non-root user
 RUN adduser $APP_USER --disabled-password --home $APP_DIR
 
 WORKDIR $APP_DIR
 
-ENV VIRTUAL_ENV=/app/.venv \
-    PATH="/app/.venv/bin:$PATH"
-
+# Copy the virtual environment from the build image
 COPY --chown=$APP_USER:$APP_USER --from=buildenv ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
-# Now we copy and install the application code:
+# Copy the full application code
 COPY --chown=$APP_USER:$APP_USER . ./
 
+# Install the current application in editable mode into the virtual environment.
+# - Ensures app code is linked into the environment.
+# - Assumes dependencies were already installed in the build stage.
 RUN python -m pip --require-virtualenv install --no-deps -e .
-
-# Developers may want to add --dev to the poetry export for testing inside a container
-RUN poetry export --format requirements.txt --output poetry-requirements.txt --without-hashes && \
-    pip install -r poetry-requirements.txt && \
-    pip install . && \
-    rm poetry-requirements.txt
 
 USER ${APP_USER}
 

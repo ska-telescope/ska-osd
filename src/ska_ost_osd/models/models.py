@@ -1,7 +1,7 @@
 import re
-from typing import Optional
+from typing import Any, Dict, Optional
 
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, Field, model_validator
 
 from ska_ost_osd.common.error_handling import CapabilityError, OSDModelError
 from ska_ost_osd.osd.constant import ARRAY_ASSEMBLY_PATTERN, OSD_VERSION_PATTERN
@@ -12,9 +12,6 @@ from ska_ost_osd.osd.osd_validation_messages import (
     GITLAB_BRANCH_ERROR_MESSAGE,
     OSD_VERSION_INVALID_ERROR_MESSAGE,
 )
-from typing import Any, Dict, Optional
-from pydantic import BaseModel, Field, model_validator
-
 
 
 class OSDModel(BaseModel):

@@ -9,8 +9,8 @@ from typing import Dict
 import pytest
 from ska_telmodel.data import TMData
 
-from ska_ost_osd.osd.osd import osd_tmdata_source
 from ska_ost_osd.common.constant import CAR_TELMODEL_SOURCE
+from ska_ost_osd.osd.osd import osd_tmdata_source
 
 # flake8: noqa E501
 # pylint: disable=W0621
@@ -19,10 +19,9 @@ BASE_API_URL = f"/ska-ost-osd/osd/api/v{OSD_MAJOR_VERSION}"
 
 
 def read_json(json_file_location: Path) -> Dict:
-    """This function returns json file object from local file system
+    """This function returns json file object from local file system.
 
     :param json_file_location: json file.
-
     :returns: file content as json object
     """
     cwd, _ = os.path.split(__file__)
@@ -35,11 +34,10 @@ def read_json(json_file_location: Path) -> Dict:
 
 
 def create_mock_json_files(json_file_location: Path, json_data: Dict) -> None:
-    """This function create json file for mocking TMData object
+    """This function create json file for mocking TMData object.
 
     :param json_file_location: json file.
     :param json_data: json data to be saved.
-
     :returns: None
     """
     with open(json_file_location, "w") as f:  # pylint: disable=W1514
@@ -216,9 +214,7 @@ def tm_data():
 
 @pytest.fixture
 def tmdata_source():
-    """
-    TMData source URL fixture
-    """
+    """TMData source URL fixture."""
     return CAR_TELMODEL_SOURCE[0]
 
 
@@ -275,8 +271,8 @@ def tm_data_osd():
 
 @pytest.fixture(scope="module")
 def validate_car_class():
-    """This function is used as a fixture for osd_tmdata_source object
-        with osd_version as '1.11.0'
+    """This function is used as a fixture for osd_tmdata_source object with
+    osd_version as '1.11.0'.
 
     :returns: osd_tmdata_source object
     """
@@ -286,8 +282,8 @@ def validate_car_class():
 
 @pytest.fixture(scope="module")
 def validate_gitlab_class():
-    """This function is used as a fixture for osd_tmdata_source object
-        with parameters.
+    """This function is used as a fixture for osd_tmdata_source object with
+    parameters.
 
     :returns: osd_tmdata_source object
     """
@@ -301,12 +297,12 @@ def validate_gitlab_class():
 
 @pytest.fixture
 def osd_versions():
-    """
-    This fixture reads a JSON file containing cycle-to-version mappings,
+    """This fixture reads a JSON file containing cycle-to-version mappings,
     extracts all unique versions across all cycles, and returns them as a
     sorted list.
 
-    :returns list: A sorted list of unique OSD versions extracted from the JSON file.
+    :returns list: A sorted list of unique OSD versions extracted from
+        the JSON file.
     """
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -331,42 +327,26 @@ def osd_versions():
 
 
 @pytest.fixture
-def open_api_spec():
-    """This fixture returns the expected OpenAPI specification
-        that is returned from the API. It is used to validate
-        the response in tests.
-
-    :returns dict: The OpenAPI specification
-    """
-
-    return read_json("test_files/test_open_spec.json")
-
-
-@pytest.fixture
 def mid_osd_data():
-    """This fixture returns the expected OpenAPI specification
-        that is returned from the API. It is used to validate
-        the response in tests.
+    """This fixture returns data in MID_OSD_DATA_JSON file.
 
-    :returns dict: The OpenAPI specification
+    :returns dict: MID_OSD_DATA_JSON file data
     """
     return MID_OSD_DATA_JSON
 
 
 @pytest.fixture
 def osd_observatory_policies():
-    """This fixture returns the expected OpenAPI specification
-        that is returned from the API. It is used to validate
-        the response in tests.
+    """This fixture returns data in OBSERVATORY_MOCK_DATA file.
 
-    :returns dict: The OpenAPI specification
+    :returns dict: OBSERVATORY_MOCK_DATA file data
     """
     return OBSERVATORY_MOCK_DATA
 
 
 @pytest.fixture(scope="module")
 def mock_mid_data():
-    """This function is used as a fixture for mid json data
+    """This function is used as a fixture for mid json data.
 
     :returns: mid json data
     """
@@ -376,7 +356,7 @@ def mock_mid_data():
 
 @pytest.fixture(scope="module")
 def mock_low_data():
-    """This function is used as a fixture for low json data
+    """This function is used as a fixture for low json data.
 
     :returns: low json data
     """

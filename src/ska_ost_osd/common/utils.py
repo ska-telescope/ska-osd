@@ -4,8 +4,8 @@ import os
 from pathlib import Path
 from typing import Any, Dict
 
-
 logging.basicConfig(level=logging.INFO)
+
 
 def read_file(filename: Path) -> Dict:
     """

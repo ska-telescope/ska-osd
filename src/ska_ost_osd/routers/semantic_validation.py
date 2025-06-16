@@ -1,15 +1,23 @@
 from http import HTTPStatus
 
 from jsonschema import ValidationError
-from ska_ost_osd.common.constant import CAR_TELMODEL_SOURCE, SEMANTIC_VALIDATION_VALUE
-from ska_ost_osd.routers.osd_api import error_handler, handle_validation_error, validation_response
-from ska_ost_osd.telvalidation.semantic_validator import VALIDATION_STRICTNESS, semantic_validate
-
 from ska_telmodel.data import TMData
+
+from ska_ost_osd.common.constant import CAR_TELMODEL_SOURCE, SEMANTIC_VALIDATION_VALUE
+from ska_ost_osd.routers.osd_api import (
+    error_handler,
+    handle_validation_error,
+    validation_response,
+)
+from ska_ost_osd.telvalidation.semantic_validator import (
+    VALIDATION_STRICTNESS,
+    semantic_validate,
+)
 
 
 def get_tmdata_sources(source):
     return [source] if source else CAR_TELMODEL_SOURCE  # check source
+
 
 @error_handler
 def semantically_validate_json(body: dict):

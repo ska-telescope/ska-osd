@@ -1,8 +1,9 @@
-"""
-Functions which the HTTP requests to individual resources are mapped to.
+"""Functions which the HTTP requests to individual resources are mapped to.
 
-See the operationId fields of the Open API spec for the specific mappings.
+See the operationId fields of the Open API spec for the specific
+mappings.
 """
+
 import json
 from functools import wraps
 from http import HTTPStatus
@@ -13,6 +14,9 @@ from typing import Dict
 from fastapi import APIRouter
 from pydantic import ValidationError
 
+from ska_ost_osd.common.error_handling import CapabilityError, OSDModelError
+from ska_ost_osd.common.utils import read_file
+from ska_ost_osd.models.models import UpdateRequestModel, ValidationOnCapabilities
 from ska_ost_osd.osd.constant import (
     CYCLE_TO_VERSION_MAPPING,
     MID_CAPABILITIES_JSON_PATH,
@@ -27,16 +31,10 @@ from ska_ost_osd.osd.osd import (
     get_osd_using_tmdata,
     update_file_storage,
 )
-from ska_ost_osd.common.error_handling import CapabilityError, OSDModelError
-from ska_ost_osd.models.models import (
-    UpdateRequestModel,
-    ValidationOnCapabilities,
-)
 from ska_ost_osd.osd.osd_validation_messages import (
     ARRAY_ASSEMBLY_DOESNOT_BELONGS_TO_CYCLE_ERROR_MESSAGE,
 )
 from ska_ost_osd.osd.version_manager import manage_version_release
-from ska_ost_osd.common.utils import read_file
 from ska_ost_osd.telvalidation import SchematicValidationError
 
 # this variable is added for restricting tmdata publish from local/dev environment.
@@ -47,13 +45,13 @@ osd_router = APIRouter(prefix="")
 
 
 def error_handler(api_fn: callable) -> str:
-    """
-    A decorator function to catch general errors and wrap in the correct HTTP response
+    """A decorator function to catch general errors and wrap in the correct
+    HTTP response.
 
-    :param api_fn: A function which accepts an entity identifier and returns
-        an HTTP response
-
-    :return str: A string containing the error message and HTTP status code.
+    :param api_fn: A function which accepts an entity identifier and
+        returns an HTTP response
+    :return str: A string containing the error message and HTTP status
+        code.
     """
 
     @wraps(api_fn)
@@ -111,12 +109,11 @@ def error_handler(api_fn: callable) -> str:
 
 @error_handler
 def get_osd(**kwargs) -> dict:
-    """This function takes query parameters and OSD data source objects
-      to generate a response containing matching OSD data.
+    """This function takes query parameters and OSD data source objects to
+    generate a response containing matching OSD data.
 
     :param query_params (QueryParams): The query parameters.
     :param tm_data_sources (list): A list of OSD data source objects.
-
     :returns dict: A dictionary with OSD data satisfying the query.
     """
     try:
@@ -140,8 +137,7 @@ def validation_response(
     title: str = HTTPStatus.INTERNAL_SERVER_ERROR.phrase,
     http_status: HTTPStatus = HTTPStatus.INTERNAL_SERVER_ERROR,
 ) -> dict:
-    """
-    Creates an error response in the case that our validation has failed.
+    """Creates an error response in the case that our validation has failed.
 
     :param detail: The error message if validation fails
     :param http_status: The HTTP status code to return
@@ -154,8 +150,7 @@ def validation_response(
 
 @error_handler
 def update_osd_data(body: Dict, **kwargs) -> Dict:
-    """
-    This function updates the input JSON against the schema
+    """This function updates the input JSON against the schema.
 
     Args:
         body (Dict): A dictionary containing key-value pairs of
@@ -265,11 +260,8 @@ def release_osd_data(**kwargs):
             "cycle_id": cycle_id,
         }
 
-@osd_router.get(
-    "/cycle",
-    tags=["OSD"],
-    summary="Get list of available cycles"
-)
+
+@osd_router.get("/cycle", tags=["OSD"], summary="Get list of available cycles")
 def get_cycle_list() -> Dict:
     """Get list of cycles from cycle_gitlab_release_version_mapping.json.
 
@@ -296,8 +288,9 @@ def get_cycle_list() -> Dict:
 
 
 def handle_validation_error(err: object) -> list:
-    """
-    This function handles validation errors and returns a list of error details.
+    """This function handles validation errors and returns a list of error
+    details.
+
     :param err: error raised from exception
     :returns: List of errors
     """

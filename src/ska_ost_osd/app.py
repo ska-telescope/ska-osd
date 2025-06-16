@@ -2,17 +2,16 @@
 ska_ost_osd app.py
 """
 
-from importlib.metadata import version
 import logging
 import os
+from importlib.metadata import version
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from ska_ost_osd.common.error_handling import development_exception_handler
-from ska_ost_osd.routers.osd_api import osd_router
-
 from ska_ser_logging import configure_logging
 
+from ska_ost_osd.common.error_handling import development_exception_handler
+from ska_ost_osd.routers.osd_api import osd_router
 
 KUBE_NAMESPACE = os.getenv("KUBE_NAMESPACE", "ska-ost-osd")
 OSD_MAJOR_VERSION = version("ska-ost-osd").split(".")[0]
