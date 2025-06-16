@@ -1,6 +1,4 @@
-"""
-ska_ost_osd app.py
-"""
+"""ska_ost_osd app.py."""
 
 import logging
 import os
@@ -8,7 +6,7 @@ from importlib.metadata import version
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from ska_ser_logging import configure_logging
+from ska_set_logging import configure_logging
 
 from ska_ost_osd.common.error_handling import development_exception_handler
 from ska_ost_osd.routers.osd_api import osd_router
@@ -24,9 +22,7 @@ LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
 
 
 def create_app(production=PRODUCTION) -> FastAPI:
-    """
-    Create the FastAPI application with required config
-    """
+    """Create the FastAPI application with required config."""
     LOGGER.info("Creating FastAPI app")
     configure_logging(level=LOG_LEVEL)
 

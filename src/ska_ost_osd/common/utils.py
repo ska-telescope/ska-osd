@@ -8,8 +8,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 def read_file(filename: Path) -> Dict:
-    """
-    Read and parse a JSON file into a dictionary
+    """Read and parse a JSON file into a dictionary.
 
     :param filename: The path to the JSON file to be read
     :returns: A dictionary containing the contents of the file
@@ -21,8 +20,7 @@ def read_file(filename: Path) -> Dict:
 
 
 def update_file(filename: Path, json_data: Dict) -> None:
-    """
-    Write a dictionary to a JSON file
+    """Write a dictionary to a JSON file.
 
     :param filename: The path to the file to be written/updated
     :param json_data: The dictionary to be written to the file
@@ -34,10 +32,9 @@ def update_file(filename: Path, json_data: Dict) -> None:
 
 
 def read_json(json_file_location: str) -> dict[dict[str, Any]]:
-    """This function returns json file object from local file system
+    """This function returns json file object from local file system.
 
     :param json_file_location: json file.
-
     :returns: file content as json object
     """
 

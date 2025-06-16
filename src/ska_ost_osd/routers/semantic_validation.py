@@ -21,8 +21,7 @@ def get_tmdata_sources(source):
 
 @error_handler
 def semantically_validate_json(body: dict):
-    """
-    This function validates the input JSON semantically
+    """This function validates the input JSON semantically.
 
     :param body:
     A dictionary containing key-value pairs of parameters required for semantic
