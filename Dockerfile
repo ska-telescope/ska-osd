@@ -1,6 +1,6 @@
 # ---------- Build Stage ----------
-ARG BUILD_IMAGE="artefact.skao.int/ska-build-python:0.1.3"
-ARG RUNTIME_BASE_IMAGE="artefact.skao.int/ska-python:0.1.4"
+ARG BUILD_IMAGE="artefact.skao.int/ska-tango-images-pytango-builder:9.5.0"
+ARG RUNTIME_BASE_IMAGE="artefact.skao.int/ska-tango-images-pytango-runtime:9.5.0"
 
 FROM $BUILD_IMAGE AS buildenv
 
