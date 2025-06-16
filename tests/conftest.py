@@ -328,20 +328,18 @@ def osd_versions():
 
 @pytest.fixture
 def mid_osd_data():
-    """This fixture returns the expected OpenAPI specification that is returned
-    from the API. It is used to validate the response in tests.
+    """This fixture returns data in MID_OSD_DATA_JSON file
 
-    :returns dict: The OpenAPI specification
+    :returns dict: MID_OSD_DATA_JSON file data
     """
     return MID_OSD_DATA_JSON
 
 
 @pytest.fixture
 def osd_observatory_policies():
-    """This fixture returns the expected OpenAPI specification that is returned
-    from the API. It is used to validate the response in tests.
+    """This fixture returns data in OBSERVATORY_MOCK_DATA file
 
-    :returns dict: The OpenAPI specification
+    :returns dict: OBSERVATORY_MOCK_DATA file data
     """
     return OBSERVATORY_MOCK_DATA
 

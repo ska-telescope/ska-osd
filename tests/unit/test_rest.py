@@ -107,7 +107,6 @@ def test_invalid_osd_tmdata_source(
     :param capabilities: Mid or Low
     :param array_assembly: Array Assembly AA0.5, AA1
     :param expected: output of OSD API
-    :param client: Flask test client
 
     :returns: assert equals values
     """
@@ -141,7 +140,6 @@ def test_osd_endpoint(client, mock_mid_data):
     """This function tests that a request to the OSD endpoint for a
         specific OSD returns expected data for that OSD.
 
-    :param client (FlaskClient): The Flask test client.
     :param mid_osd_data (dict): The expected data for the OSD.
 
     :raises AssertionError: If the response does not contain the expected
@@ -168,8 +166,6 @@ def test_osd_endpoint(client, mock_mid_data):
 def test_invalid_osd_tmdata_source_capabilities(client):
     """This function tests that a request with an invalid capability
        returns the expected error response.
-
-    :param client (FlaskClient): The Flask test client.
 
     :raises AssertionError: If the response does not contain the
        expected error message.
@@ -212,7 +208,6 @@ def test_response_body():
 def test_osd_source(client):
     """This function tests that a request with an OSD source as car .
 
-    :param client (FlaskClient): The Flask test client.
     """
 
     response = client.get(
@@ -231,9 +226,7 @@ def test_osd_source(client):
 
 @pytest.mark.skip
 def test_osd_source_gitlab(client):
-    """This function tests that a request with an OSD source as car .
-
-    :param client (FlaskClient): The Flask test client.
+    """This function tests that a request with an OSD source as car
     """
 
     response = client.get(
