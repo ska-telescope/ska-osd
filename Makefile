@@ -41,7 +41,7 @@ endif
 # For the test, dev and integration environment, use the freshly built image in the GitLab registry
 ENV_CHECK := $(shell echo $(CI_ENVIRONMENT_SLUG) | egrep 'test|dev|integration')
 ifneq ($(ENV_CHECK),)
-K8S_CHART_PARAMS = --set ska-ost-osd.rest.image.tag=$(VERSION) \
+K8S_CHART_PARAMS = --set ska-ost-osd.rest.image.tag=$(VERSION)-dev.c$(CI_COMMIT_SHORT_SHA) \
 	--set ska-ost-osd.rest.image.registry=$(CI_REGISTRY)/ska-telescope/ost/ska-ost-osd
 endif
 
