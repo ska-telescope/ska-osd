@@ -2,13 +2,16 @@ import json
 import os
 import pathlib
 import tempfile
+from functools import partial
 from importlib.metadata import version
 from pathlib import Path
 from typing import Dict
 
 import pytest
+from fastapi.testclient import TestClient
 from ska_telmodel.data import TMData
 
+from ska_ost_osd.app import create_app
 from ska_ost_osd.common.constant import CAR_TELMODEL_SOURCE
 from ska_ost_osd.osd.osd import osd_tmdata_source
 
@@ -199,6 +202,30 @@ sources = [
 ]
 
 local_source = ["file://tmdata"]
+
+
+@pytest.fixture(scope="session")
+def client_get():
+    app = create_app()
+    client = TestClient(app)
+
+    return partial(client.get, headers={"accept": "application/json"})
+
+
+@pytest.fixture(scope="session")
+def client_put():
+    app = create_app()
+    client = TestClient(app)
+
+    return partial(client.put)
+
+
+@pytest.fixture(scope="session")
+def client_post():
+    app = create_app()
+    client = TestClient(app)
+
+    return partial(client.post)
 
 
 @pytest.fixture(scope="module")

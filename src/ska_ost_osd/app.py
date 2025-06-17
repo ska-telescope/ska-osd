@@ -6,7 +6,7 @@ from importlib.metadata import version
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from ska_set_logging import configure_logging
+from ska_ser_logging import configure_logging
 
 from ska_ost_osd.common.error_handling import development_exception_handler
 from ska_ost_osd.routers.osd_api import osd_router

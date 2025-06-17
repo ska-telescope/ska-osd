@@ -91,7 +91,7 @@ def test_invalid_osd_tmdata_source(
     capabilities,
     array_assembly,
     expected,
-    client,
+    client_get,
     osd_versions,
 ):
     """This test case checks the functionality of OSD API It will validate all
@@ -114,9 +114,9 @@ def test_invalid_osd_tmdata_source(
     if expected.get("detail") and isinstance(expected["detail"], list):
         expected["detail"][0] = expected["detail"][0].format(osd_versions=osd_versions)
 
-    response = client.get(
+    response = client_get(
         f"{BASE_API_URL}/osd",
-        query_string={
+        params={
             "cycle_id": cycle_id,
             "osd_version": osd_version,
             "source": source,
@@ -136,7 +136,7 @@ def test_invalid_osd_tmdata_source(
 
 @pytest.mark.skip
 @patch("ska_ost_osd.routers.osd_api.get_osd_using_tmdata")
-def test_osd_endpoint(client, mock_mid_data):
+def test_osd_endpoint(client_get, mock_mid_data):
     """This function tests that a request to the OSD endpoint for a specific
     OSD returns expected data for that OSD.
 
@@ -144,9 +144,9 @@ def test_osd_endpoint(client, mock_mid_data):
     :raises AssertionError: If the response does not contain the
         expected OSD data or returns an error status code.
     """
-    response = client.get(
+    response = client_get(
         f"{BASE_API_URL}/osd",
-        query_string={
+        params={
             "source": "file",
             "capabilities": "mid",
             "array_assembly": "AA0.5",
@@ -162,7 +162,7 @@ def test_osd_endpoint(client, mock_mid_data):
 
 
 @pytest.mark.skip
-def test_invalid_osd_tmdata_source_capabilities(client):
+def test_invalid_osd_tmdata_source_capabilities(client_get):
     """This function tests that a request with an invalid capability returns
     the expected error response.
 
@@ -170,9 +170,9 @@ def test_invalid_osd_tmdata_source_capabilities(client):
         expected error message.
     """
 
-    error_msgs = client.get(
+    error_msgs = client_get(
         f"{BASE_API_URL}/osd",
-        query_string={
+        params={
             "cycle_id": 1,
             "osd_version": "1.1.0",
             "source": "file",
@@ -204,11 +204,11 @@ def test_response_body():
 
 
 @pytest.mark.skip
-def test_osd_source(client):
+def test_osd_source(client_get):
     """This function tests that a request with an OSD source as car ."""
 
-    response = client.get(
-        f"{BASE_API_URL}/osd", query_string={"cycle_id": 1, "source": "car"}
+    response = client_get(
+        f"{BASE_API_URL}/osd", params={"cycle_id": 1, "source": "car"}
     )
     error_msg = {
         "detail": (
@@ -222,11 +222,11 @@ def test_osd_source(client):
 
 
 @pytest.mark.skip
-def test_osd_source_gitlab(client):
+def test_osd_source_gitlab(client_get):
     """This function tests that a request with an OSD source as car."""
 
-    response = client.get(
-        f"{BASE_API_URL}/osd", query_string={"cycle_id": 1, "source": "gitlab"}
+    response = client_get(
+        f"{BASE_API_URL}/osd", params={"cycle_id": 1, "source": "gitlab"}
     )
 
     error_msg = [
@@ -251,14 +251,14 @@ def test_osd_source_gitlab(client):
     ],
 )
 def test_semantic_validate_api(
-    mock_tmdata, client, request, json_body_to_validate, response
+    mock_tmdata, client_post, request, json_body_to_validate, response
 ):
     """Test semantic validation API with valid and invalid JSON."""
     mock_tmdata.return_value = ["file://tmdata"]
     json_body = request.getfixturevalue(json_body_to_validate)
     expected_response = request.getfixturevalue(response)
 
-    res = client.post(f"{BASE_API_URL}/semantic_validation", json=json_body)
+    res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body)
     assert res.get_json() == expected_response
 
 
@@ -274,27 +274,29 @@ def test_semantic_validate_api(
     ],
 )
 def test_disable_semantic_validate_api(
-    mock_tmdata, client, request, json_body_to_validate, response
+    mock_tmdata, client_post, request, json_body_to_validate, response
 ):
     """Test semantic validation API when VALIDATION_STRICTNESS is set to 1."""
     mock_tmdata.return_value = ["file://tmdata"]
     json_body = request.getfixturevalue(json_body_to_validate)
     expected_response = request.getfixturevalue(response)
 
-    res = client.post(f"{BASE_API_URL}/semantic_validation", json=json_body)
+    res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body)
 
     assert res.get_json() == expected_response
 
 
 @pytest.mark.skip
 def test_semantic_validate_api_not_passing_required_keys(
-    client, observing_command_input_missing_response, valid_semantic_validation_body
+    client_post,
+    observing_command_input_missing_response,
+    valid_semantic_validation_body,
 ):
     """Test semantic validation API response with missing input
     observing_command_input key."""
     json_body = valid_semantic_validation_body.copy()
     del json_body["observing_command_input"]
-    res = client.post(f"{BASE_API_URL}/semantic_validation", json=json_body)
+    res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body)
     assert res.get_json() == observing_command_input_missing_response
 
 
@@ -326,14 +328,14 @@ def test_semantic_validate_api_not_passing_required_keys(
     ],
 )
 def test_not_passing_optional_keys(
-    mock_tmdata, request, client, json_body_to_validate, response, key_to_delete
+    mock_tmdata, request, client_post, json_body_to_validate, response, key_to_delete
 ):
     """Test semantic validation API response by not passing optional keys."""
     mock_tmdata.return_value = ["file://tmdata"]
     json_body = request.getfixturevalue(json_body_to_validate).copy()
     del json_body[key_to_delete]
     expected_response = request.getfixturevalue(response)
-    res = client.post(f"{BASE_API_URL}/semantic_validation", json=json_body)
+    res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body)
     assert res.get_json() == expected_response
 
 
@@ -341,12 +343,12 @@ def test_not_passing_optional_keys(
 def test_wrong_values_and_no_observing_command_input(
     wrong_semantic_validation_parameter_value_response,
     wrong_semantic_validation_parameter_body,
-    client,
+    client_post,
 ):
     """Test semantic validation API response with wrong values."""
     json_body = wrong_semantic_validation_parameter_body
     expected_response = wrong_semantic_validation_parameter_value_response
-    res = client.post(f"{BASE_API_URL}/semantic_validation", json=json_body)
+    res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body)
     assert res.get_json() == expected_response
 
 
@@ -354,7 +356,7 @@ def test_wrong_values_and_no_observing_command_input(
 @patch("ska_ost_osd.routers.osd_api.get_tmdata_sources")
 def test_passing_only_required_keys(
     mock_tmdata,
-    client,
+    client_post,
     valid_only_observing_command_input_in_request_body,
     valid_semantic_validation_response,
 ):
@@ -362,5 +364,5 @@ def test_passing_only_required_keys(
     mock_tmdata.return_value = ["file://tmdata"]
     json_body = valid_only_observing_command_input_in_request_body
     expected_response = valid_semantic_validation_response
-    res = client.post(f"{BASE_API_URL}/semantic_validation", json=json_body)
+    res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body)
     assert res.get_json() == expected_response
