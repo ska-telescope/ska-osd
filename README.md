@@ -55,9 +55,9 @@ Install the Helm umbrella chart into a Kubernetes cluster with ingress enabled:
 make k8s-install-chart
 ```
 
-The Swagger UI should be available external to the cluster at `http://<KUBE_HOST>/<KUBE_NAMESPACE>/osd/api/<MAJOR_VERSION>/ui/ and the API accesible via the same URL.
+The Swagger UI should be available external to the cluster at `http://<KUBE_HOST>/<KUBE_NAMESPACE>/osd/api/<MAJOR_VERSION>/ui/ and the API accessible via the same URL.
 
-If using minikube, `KUBE_HOST` can be found by running `minikube ip`. 
+If using minikube, `KUBE_HOST` can be found by running `minikube ip`.
 `KUBE_NAMESPACE` is the namespace the chart was deployed to, likely `ska-ost-osd`
 
 To uninstall the chart, run
@@ -93,26 +93,20 @@ To find the URL for the environment, see the 'info' job of the CICD pipeline sta
 Generally the API URL should be available at  `https://k8s.stfc.skao.int/$KUBE_NAMESPACE/osd/api/v1`
 
 
-## Flask
-To start the Flask server run the following command in a terminal bash prompt
+## FastAPI
+To start the FastAPI server run the following command in a terminal bash prompt
 
 ```
-python src/ska_ost_osd/rest/wsgi.py
-```
-
-Alternatively use the following command
-
-```
-make rest
+fastapi run src/ska_ost_osd/app.py
 ```
 
 # Ability to turn Semantic Validation off/on in real-time
 
-To turn semantic validation off/on in real-time user need to create environment variable into helm charts. 
+To turn semantic validation off/on in real-time user need to create environment variable into helm charts.
 This will allow user to control semantic validation in real-time.
 
-The purpose of this environment variable, is likely to control whether semantic validation 
-should be performed in the program. By using an environment variable, the behavior can be easily 
+The purpose of this environment variable, is likely to control whether semantic validation
+should be performed in the program. By using an environment variable, the behavior can be easily
 changed without modifying the code itself, which is useful for different deployment environments or testing scenarios.
 
 Setting the environment variable:
@@ -126,13 +120,13 @@ VALIDATION_STRICTNESS = environ.get("VALIDATION_STRICTNESS", "2")
 
 User can turn off the semantic validation by running below command.
 
-```      
+```
 export VALIDATION_STRICTNESS="1"
 ```
 
 ## On Minikube Environment
 
-  
+
 Add the `validation_strictness` environment variable into values.yaml file in your chart directory
 This allows users to configure the value when installing or upgrading the chart.
 
@@ -148,7 +142,7 @@ VALIDATION_STRICTNESS: {{.Values.validation_strictness  | quote }}
 
 # Publish tmdata
 
-Now OSD is handling releases separately for tmdata and ska-ost-osd codebase. 
+Now OSD is handling releases separately for tmdata and ska-ost-osd codebase.
 User can now update tmdata with the help of [ OSD UI editor](https://k8s.stfc.skao.int/ska-oso-integration/osd) and publish it separately on artefact repository with enabling `push_to_gitlab` environment variable to "1".
 
 `push_to_gitlab` environment variable configured into values.yaml in chart directory
