@@ -37,3 +37,4 @@ MANIFEST.skao.int%
 *.tgz
 
 PrivateRules.mak
+.pre-commit-config.yaml
