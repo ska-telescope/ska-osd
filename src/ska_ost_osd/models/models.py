@@ -1,5 +1,6 @@
 import re
-from typing import Any, Dict, Optional
+from http import HTTPStatus
+from typing import Any, Dict, Generic, List, Optional, TypeVar
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -12,6 +13,8 @@ from ska_ost_osd.osd.osd_validation_messages import (
     GITLAB_BRANCH_ERROR_MESSAGE,
     OSD_VERSION_INVALID_ERROR_MESSAGE,
 )
+
+T = TypeVar("T")
 
 
 class OSDModel(BaseModel):
@@ -81,3 +84,19 @@ class ValidationOnCapabilities(BaseModel):
             raise CapabilityError("telescope data must be a dictionary")
 
         return values
+
+
+class ApiResponse(BaseModel, Generic[T]):
+    result_data: List[T] | Dict[str, T] | str
+    result_status: str
+    result_code: HTTPStatus = HTTPStatus.OK
+
+
+class CycleModel(BaseModel):
+    cycles: List[int]
+
+
+class ErrorResponseModel(BaseModel, Generic[T]):
+    result_data: List[T] | Dict[str, T] | str
+    result_status: str
+    result_code: HTTPStatus = HTTPStatus.INTERNAL_SERVER_ERROR

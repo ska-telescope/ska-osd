@@ -1,8 +1,14 @@
 import json
 import logging
 import os
+from encodings.punycode import T
+from http import HTTPStatus
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, List
+
+from fastapi import status
+
+from ska_ost_osd.models.models import ApiResponse, ErrorResponseModel
 
 logging.basicConfig(level=logging.INFO)
 
@@ -44,3 +50,40 @@ def read_json(json_file_location: str) -> dict[dict[str, Any]]:
         file_contents = json.load(user_file, parse_float=float)
 
     return file_contents
+
+
+def convert_to_response_object(
+    response: List[T] | Dict[str, T] | str, result_code: HTTPStatus
+) -> ApiResponse:
+    """Takes response as argument and returns ApiResponse object :param:
+    response: response.
+
+    Returns formatted response object
+    """
+
+    return ApiResponse(
+        result_data=[response],
+        result_code=result_code,
+        result_status="success",
+    )
+
+
+def get_responses(response_model) -> Dict[str, Any]:
+    """Takes response_model as argument and returns responses dict :param:
+    response_model: entity_object.
+
+    Returns formatted response dictionary
+    """
+
+    responses = {
+        status.HTTP_200_OK: {
+            "description": "Successful Response",
+            "model": response_model,
+        },
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {
+            "description": "Internal Server Error",
+            "model": ErrorResponseModel,
+        },
+    }
+
+    return responses

@@ -15,8 +15,17 @@ from fastapi import APIRouter
 from pydantic import ValidationError
 
 from ska_ost_osd.common.error_handling import CapabilityError, OSDModelError
-from ska_ost_osd.common.utils import read_file
-from ska_ost_osd.models.models import UpdateRequestModel, ValidationOnCapabilities
+from ska_ost_osd.common.utils import (
+    convert_to_response_object,
+    get_responses,
+    read_file,
+)
+from ska_ost_osd.models.models import (
+    ApiResponse,
+    CycleModel,
+    UpdateRequestModel,
+    ValidationOnCapabilities,
+)
 from ska_ost_osd.osd.constant import (
     CYCLE_TO_VERSION_MAPPING,
     MID_CAPABILITIES_JSON_PATH,
@@ -261,7 +270,13 @@ def release_osd_data(**kwargs):
         }
 
 
-@osd_router.get("/cycle", tags=["OSD"], summary="Get list of available cycles")
+@osd_router.get(
+    "/cycle",
+    tags=["OSD"],
+    summary="Get list of available cycles",
+    responses=get_responses(ApiResponse[CycleModel]),
+    response_model=ApiResponse[CycleModel],
+)
 def get_cycle_list() -> Dict:
     """Get list of cycles from cycle_gitlab_release_version_mapping.json.
 
@@ -282,7 +297,8 @@ def get_cycle_list() -> Dict:
                 except (IndexError, ValueError):
                     continue
 
-        return {"cycles": sorted(cycle_numbers)}
+        cycles = {"cycles": sorted(cycle_numbers)}
+        return convert_to_response_object(cycles, result_code=HTTPStatus.OK)
     except Exception as e:  # pylint: disable=W0718
         return {"error": str(e)}
 

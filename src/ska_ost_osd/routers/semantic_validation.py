@@ -32,7 +32,7 @@ def semantically_validate_json(body: dict):
              -sources: (Optional) TMData source URL (gitlab/car) for Semantic Validation
              -osd_data: (Optional) OSD data to be used for semantic validation
 
-    :returns: Flask.Response: A Flask response object that contains the validation
+    :returns: response object that contains the validation
                results. If the validation is successful, the response will indicate
                a success status.
               If the validation fails, the response will include details about the

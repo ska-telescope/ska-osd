@@ -1,6 +1,5 @@
 from typing import List
 
-from fastapi import Request
 from fastapi.responses import JSONResponse
 
 
@@ -20,7 +19,7 @@ class CapabilityError(Exception):
         super().__init__(errors)
 
 
-async def development_exception_handler(request: Request, exc: Exception):
+async def development_exception_handler(exc: Exception):
     return JSONResponse(
         status_code=500,
         content={"detail": "Internal Server Error (non-production)", "error": str(exc)},

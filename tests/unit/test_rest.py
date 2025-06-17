@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from ska_ost_osd.rest.api.resources import validation_response
+from ska_ost_osd.routers.osd_api import validation_response
 from tests.conftest import BASE_API_URL
 
 
@@ -135,7 +135,7 @@ def test_invalid_osd_tmdata_source(
 
 
 @pytest.mark.skip
-@patch("ska_ost_osd.rest.api.resources.get_osd_using_tmdata")
+@patch("ska_ost_osd.routers.osd_api.get_osd_using_tmdata")
 def test_osd_endpoint(client, mock_mid_data):
     """This function tests that a request to the OSD endpoint for a specific
     OSD returns expected data for that OSD.
@@ -242,7 +242,7 @@ def test_osd_source_gitlab(client):
 
 
 @pytest.mark.skip
-@patch("ska_ost_osd.rest.api.resources.get_tmdata_sources")
+@patch("ska_ost_osd.routers.osd_api.get_tmdata_sources")
 @pytest.mark.parametrize(
     "json_body_to_validate, response",
     [
@@ -264,8 +264,8 @@ def test_semantic_validate_api(
 
 @pytest.mark.skip
 @patch("ska_ost_osd.telvalidation.semantic_validator.VALIDATION_STRICTNESS", "1")
-@patch("ska_ost_osd.rest.api.resources.VALIDATION_STRICTNESS", "1")
-@patch("ska_ost_osd.rest.api.resources.get_tmdata_sources")
+@patch("ska_ost_osd.routers.osd_api.VALIDATION_STRICTNESS", "1")
+@patch("ska_ost_osd.routers.osd_api.get_tmdata_sources")
 @pytest.mark.parametrize(
     "json_body_to_validate, response",
     [
@@ -299,7 +299,7 @@ def test_semantic_validate_api_not_passing_required_keys(
 
 
 @pytest.mark.skip
-@patch("ska_ost_osd.rest.api.resources.get_tmdata_sources")
+@patch("ska_ost_osd.routers.osd_api.get_tmdata_sources")
 @pytest.mark.parametrize(
     "json_body_to_validate, response, key_to_delete",
     [
@@ -351,7 +351,7 @@ def test_wrong_values_and_no_observing_command_input(
 
 
 @pytest.mark.skip
-@patch("ska_ost_osd.rest.api.resources.get_tmdata_sources")
+@patch("ska_ost_osd.routers.osd_api.get_tmdata_sources")
 def test_passing_only_required_keys(
     mock_tmdata,
     client,

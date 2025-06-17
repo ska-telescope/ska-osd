@@ -3,8 +3,8 @@ from unittest.mock import patch
 
 import pytest
 
+from ska_ost_osd.models.models import ValidationOnCapabilities
 from ska_ost_osd.osd.osd import get_osd_data, osd_tmdata_source, update_file_storage
-from ska_ost_osd.osd.osd_update_schema import ValidationOnCapabilities
 from tests.conftest import (
     DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER,
     OSD_RESPONSE_WITH_CAPABILITIES_ARRAY_ASSEMBLY_PARAMETER,
@@ -38,16 +38,14 @@ def test_get_osd_data(
     expected,
     tm_data_osd,  # pylint: disable=W0621
 ):
-    """This test case checks the functionality of get_osd_data
-        it converts the python dict into list keys and checks
-        for equality with expected output.
+    """This test case checks the functionality of get_osd_data it converts the
+    python dict into list keys and checks for equality with expected output.
 
     :param capabilities: Mid or Low
     :param array_assembly: Array Assembly AA0.5, AA1
     :param tmdata: tmdata object
     :param expected: output of get_osd_data function
     :param tm_data_osd: tmdata fixture
-
     :returns: assert equals values
     """
 
@@ -59,8 +57,8 @@ def test_get_osd_data(
 
 
 def test_set_source_car_method(validate_car_class):
-    """This test case checks if the output of the osd_tmdata_source
-        function is as expected or not.
+    """This test case checks if the output of the osd_tmdata_source function is
+    as expected or not.
 
     :param osd_tmdata_source: validate_car_class fixture.
     """
@@ -69,8 +67,8 @@ def test_set_source_car_method(validate_car_class):
 
 
 def test_set_source_gitlab_method(validate_gitlab_class):
-    """This test case checks if the output of the osd_tmdata_source
-        function is as expected or not.
+    """This test case checks if the output of the osd_tmdata_source function is
+    as expected or not.
 
     :param osd_tmdata_source: validate_gitlab_class fixture.
     """
@@ -83,10 +81,8 @@ def test_set_source_gitlab_method(validate_gitlab_class):
 
 
 def test_validate_gitlab_with_both_invalid_param():
-    """This test case checks if the output of the osd_tmdata_source
-    when no parameter is given and latest version is
-    returned or not
-    """
+    """This test case checks if the output of the osd_tmdata_source when no
+    parameter is given and latest version is returned or not."""
 
     ost_osd_version = version("ska_ost_osd")
 
@@ -97,45 +93,40 @@ def test_validate_gitlab_with_both_invalid_param():
 
 
 def test_check_osd_version_method():
-    """This test case checks if the output of the osd_tmdata_source
-    when osd_version parameter is given it should return the correct URL
-    """
+    """This test case checks if the output of the osd_tmdata_source when
+    osd_version parameter is given it should return the correct URL."""
     tm_data_src, _ = osd_tmdata_source(osd_version="1.0.0")
     assert tm_data_src == ("car:ost/ska-ost-osd?1.0.0#tmdata",)
 
 
 def test_check_cycle_id_and_osd_version_method():
-    """This test case checks if the output of the osd_tmdata_source
-    when cycle_id and osd_version parameter is given
-    it should return the correct URL
-    """
+    """This test case checks if the output of the osd_tmdata_source when
+    cycle_id and osd_version parameter is given it should return the correct
+    URL."""
     tm_data_src, _ = osd_tmdata_source(cycle_id=1, osd_version="1.11.0")
     assert tm_data_src == ("car:ost/ska-ost-osd?1.11.0#tmdata",)
 
 
 def test_check_cycle_id_2_and_osd_version_method():
-    """This test case checks if the output of the osd_tmdata_source
-    when cycle_id and osd_version parameter is given
-    it should return the correct URL
-    """
+    """This test case checks if the output of the osd_tmdata_source when
+    cycle_id and osd_version parameter is given it should return the correct
+    URL."""
     tm_data_src, _ = osd_tmdata_source(cycle_id=2, osd_version="1.0.0")
     assert tm_data_src == ("car:ost/ska-ost-osd?1.0.0#tmdata",)
 
 
 def test_check_cycle_id_with_source_method():
-    """This test case checks if the output of the osd_tmdata_source
-    when cycle_id, osd_version and source parameter is given
-    it should return the correct URL
-    """
+    """This test case checks if the output of the osd_tmdata_source when
+    cycle_id, osd_version and source parameter is given it should return the
+    correct URL."""
     tm_data_src, _ = osd_tmdata_source(cycle_id=2, osd_version="1.0.0", source="file")
     assert tm_data_src == ("file://tmdata",)
 
 
 def test_check_master_branch_method():
-    """This test case checks if the output of the osd_tmdata_source
-    when cycle_id, gitlab_branch and source parameter is given
-    it should return the correct URL
-    """
+    """This test case checks if the output of the osd_tmdata_source when
+    cycle_id, gitlab_branch and source parameter is given it should return the
+    correct URL."""
     tm_data_src, _ = osd_tmdata_source(
         cycle_id=2, gitlab_branch="master", source="gitlab"
     )
@@ -145,10 +136,9 @@ def test_check_master_branch_method():
 
 
 def test_invalid_osd_tmdata_source():
-    """This test case checks if the output of the osd_tmdata_source
-    when cycle_id, gitlab_branch and source parameter and osd_version is given incorrect
-    it should return the appropriate error messages.
-    """
+    """This test case checks if the output of the osd_tmdata_source when
+    cycle_id, gitlab_branch and source parameter and osd_version is given
+    incorrect it should return the appropriate error messages."""
 
     _, error_msgs = osd_tmdata_source(
         cycle_id=100000,
@@ -187,9 +177,9 @@ def test_invalid_osd_tmdata_source():
 
 
 def test_invalid_get_osd_data_capability(tm_data_osd):  # pylint: disable=W0621
-    """This test case checks if the output of the get_osd_data
-    when capabilities is given incorrect with correct array_assembly
-    it should return the appropriate error messages.
+    """This test case checks if the output of the get_osd_data when
+    capabilities is given incorrect with correct array_assembly it should
+    return the appropriate error messages.
 
     :param tm_data_osd: tm_data_osd
     """
@@ -204,9 +194,9 @@ def test_invalid_get_osd_data_capability(tm_data_osd):  # pylint: disable=W0621
 
 
 def test_invalid_get_osd_data_array_assembly(tm_data_osd):  # pylint: disable=W0621
-    """This test case checks if the output of the get_osd_data
-    when array_assembly is given incorrect with correct capabilities
-    it should return the appropriate error messages.
+    """This test case checks if the output of the get_osd_data when
+    array_assembly is given incorrect with correct capabilities it should
+    return the appropriate error messages.
 
     :param tm_data_osd: tm_data_osd
     """
@@ -236,10 +226,8 @@ def sample_existing_data():
 
 
 def test_update_file_storage_1():
-    """
-    Test update_file_storage function when updating nested dictionary
-    fields and observatory policy.
-    """
+    """Test update_file_storage function when updating nested dictionary fields
+    and observatory policy."""
     validated_capabilities = {
         "capabilities": {
             "mid": {
@@ -280,7 +268,7 @@ def test_update_file_storage_1():
 def test_update_file_storage_invalid_input(
     sample_existing_data,
 ):  # pylint: disable=W0621
-    """Test update_file_storage with invalid input structure"""
+    """Test update_file_storage with invalid input structure."""
     invalid_input = {"invalid_key": {"telescope": "SKA-Mid"}}
     with patch("ska_ost_osd.osd.osd.update_file"):
         with pytest.raises(AttributeError):
@@ -290,7 +278,7 @@ def test_update_file_storage_invalid_input(
 def test_update_file_storage_nested_dict_update(
     sample_existing_data, mocker
 ):  # pylint: disable=W0621
-    """Test update_file_storage with nested dictionary updates"""
+    """Test update_file_storage with nested dictionary updates."""
     mock_update_file = mocker.patch("ska_ost_osd.osd.osd.update_file")
 
     update_data = {
@@ -339,7 +327,7 @@ def test_update_file_storage_non_existent_telescope(
 def test_update_file_storage_observatory_policy_update(
     sample_existing_data, mocker
 ):  # pylint: disable=W0621
-    """Test update_file_storage with observatory policy updates"""
+    """Test update_file_storage with observatory policy updates."""
     mock_update_file = mocker.patch("ska_ost_osd.osd.osd.update_file")
 
     update_data = {
