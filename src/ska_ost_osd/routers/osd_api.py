@@ -4,7 +4,6 @@ See the operationId fields of the Open API spec for the specific
 mappings.
 """
 
-import json
 from http import HTTPStatus
 from os import environ
 from pathlib import Path
@@ -212,9 +211,7 @@ def get_cycle_list() -> Dict:
         Dict: Dictionary containing list of cycle numbers
     """
     try:
-        json_file = "tmdata/version_mapping/cycle_gitlab_release_version_mapping.json"
-        with open(json_file, encoding="utf-8") as f:
-            data = json.load(f)
+        data = read_file(RELEASE_VERSION_MAPPING)
         cycle_numbers = []
         for key in data.keys():
             # Extract number from cycle_X format
