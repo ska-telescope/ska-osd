@@ -8,8 +8,14 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from ska_ser_logging import configure_logging
 
-from ska_ost_osd.common.error_handling import development_exception_handler
+from ska_ost_osd.common.error_handling import (
+    development_exception_handler,
+    schematic_validation_error_handler,
+)
 from ska_ost_osd.routers.osd_api import osd_router
+from ska_ost_osd.telvalidation.schematic_validation_exceptions import (
+    SchematicValidationError,
+)
 
 KUBE_NAMESPACE = os.getenv("KUBE_NAMESPACE", "ska-ost-osd")
 OSD_MAJOR_VERSION = version("ska-ost-osd").split(".")[0]
@@ -38,6 +44,9 @@ def create_app(production=PRODUCTION) -> FastAPI:
 
     # Assemble the constituent APIs:
     app.include_router(osd_router, prefix=API_PREFIX)
+
+    # Add handlers for different types of error
+    app.exception_handler(SchematicValidationError)(schematic_validation_error_handler)
 
     if not production:
         app.exception_handler(Exception)(development_exception_handler)

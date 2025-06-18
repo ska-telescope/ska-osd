@@ -5,7 +5,6 @@ mappings.
 """
 
 import json
-from functools import wraps
 from http import HTTPStatus
 from os import environ
 from pathlib import Path
@@ -20,12 +19,8 @@ from ska_ost_osd.common.utils import (
     get_responses,
     read_file,
 )
-from ska_ost_osd.models.models import (
-    ApiResponse,
-    CycleModel,
-    UpdateRequestModel,
-    ValidationOnCapabilities,
-)
+from ska_ost_osd.models.models import ApiResponse, CycleModel, UpdateRequestModel
+from ska_ost_osd.models.models_query import ValidationOnCapabilities
 from ska_ost_osd.osd.constant import (
     CYCLE_TO_VERSION_MAPPING,
     MID_CAPABILITIES_JSON_PATH,
@@ -44,7 +39,6 @@ from ska_ost_osd.osd.osd_validation_messages import (
     ARRAY_ASSEMBLY_DOESNOT_BELONGS_TO_CYCLE_ERROR_MESSAGE,
 )
 from ska_ost_osd.osd.version_manager import manage_version_release
-from ska_ost_osd.telvalidation import SchematicValidationError
 
 # this variable is added for restricting tmdata publish from local/dev environment.
 # usage: "0" means disable tmdata publish to artefact.
@@ -53,70 +47,6 @@ PUSH_TO_GITLAB = environ.get("PUSH_TO_GITLAB", "0")
 osd_router = APIRouter(prefix="")
 
 
-def error_handler(api_fn: callable) -> str:
-    """A decorator function to catch general errors and wrap in the correct
-    HTTP response.
-
-    :param api_fn: A function which accepts an entity identifier and
-        returns an HTTP response
-    :return str: A string containing the error message and HTTP status
-        code.
-    """
-
-    @wraps(api_fn)
-    def wrapper(*args, **kwargs):
-        try:
-            api_response = api_fn(*args, **kwargs)
-            if isinstance(api_response, str):
-                return validation_response(
-                    status=-1,
-                    detail=api_response,
-                    http_status=HTTPStatus.BAD_REQUEST,
-                    title=HTTPStatus.BAD_REQUEST.phrase,
-                )
-            return api_response
-        except SchematicValidationError as err:
-            return validation_response(
-                status=0,
-                detail=err.args[0].split("\n"),
-                title="Semantic Validation Error",
-                http_status=HTTPStatus.OK,
-            )
-
-        except ValueError as err:
-            return validation_response(
-                status=-1,
-                detail=err.args[0],
-                title="Value Error",
-                http_status=HTTPStatus.BAD_REQUEST,
-            )
-        except CapabilityError as err:
-            return validation_response(
-                status=-1,
-                detail=err.args[0],
-                title="Value Error",
-                http_status=HTTPStatus.BAD_REQUEST,
-            )
-        except RuntimeError as err:
-            return validation_response(
-                status=-1,
-                detail=str(err),
-                http_status=HTTPStatus.UNPROCESSABLE_ENTITY,
-                title=HTTPStatus.UNPROCESSABLE_ENTITY.phrase,
-            )
-
-        except Exception as err:  # pylint: disable=W0718
-            return validation_response(
-                status=-1,
-                detail=str(err),
-                http_status=HTTPStatus.INTERNAL_SERVER_ERROR,
-                title=HTTPStatus.INTERNAL_SERVER_ERROR.phrase,
-            )
-
-    return wrapper
-
-
-@error_handler
 def get_osd(**kwargs) -> dict:
     """This function takes query parameters and OSD data source objects to
     generate a response containing matching OSD data.
@@ -157,7 +87,6 @@ def validation_response(
     return response_body, http_status
 
 
-@error_handler
 def update_osd_data(body: Dict, **kwargs) -> Dict:
     """This function updates the input JSON against the schema.
 
@@ -215,7 +144,6 @@ def update_osd_data(body: Dict, **kwargs) -> Dict:
         raise ValueError(str(error)) from error
 
 
-@error_handler
 def release_osd_data(**kwargs):
     """Release OSD data with automatic version increment based on cycle ID.
 
