@@ -222,10 +222,10 @@ def test_osd_source(client_get):
 
 
 @pytest.mark.skip
-def test_osd_source_gitlab(client):
+def test_osd_source_gitlab(client_get):
     """This function tests that a request with an OSD source as car."""
 
-    response = client.get(
+    response = client_get(
         f"{BASE_API_URL}/osd", query_string={"cycle_id": 1, "source": "gitlab"}
     )
 
