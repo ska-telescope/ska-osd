@@ -33,3 +33,6 @@ CAR_TELMODEL_SOURCE = ("car:ost/ska-ost-osd?main#tmdata",)
 INTERFACE_PATTERN = r"^https://schema\.skao\.int/[a-zA-Z-]+/\d+\.\d+$"
 
 SEMANTIC_VALIDATION_VALUE = 2
+
+API_RESPONSE_RESULT_STATUS_SUCCESS = "success"
+API_RESPONSE_RESULT_STATUS_FAILED = "failed"

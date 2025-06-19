@@ -8,6 +8,10 @@ from typing import Any, Dict, List
 
 from fastapi import status
 
+from ska_ost_osd.common.constant import (
+    API_RESPONSE_RESULT_STATUS_FAILED,
+    API_RESPONSE_RESULT_STATUS_SUCCESS,
+)
 from ska_ost_osd.models.models import ApiResponse, ErrorResponseModel
 
 logging.basicConfig(level=logging.INFO)
@@ -64,14 +68,14 @@ def convert_to_response_object(
         return ApiResponse(
             result_data=[response],
             result_code=result_code,
-            result_status="success",
+            result_status=API_RESPONSE_RESULT_STATUS_SUCCESS,
         )
 
     if isinstance(response, str):
         return ErrorResponseModel(
             result_data=response,
             result_code=result_code,
-            result_status="failed",
+            result_status=API_RESPONSE_RESULT_STATUS_FAILED,
         )
 
 
