@@ -7,14 +7,12 @@ from tests.conftest import BASE_API_URL
 
 
 class TestCycleAPI:
-    """This class contains unit tests for the Cycle GET API,
-    which is responsible for fetching Dictionary containing list
-    of cycle numbers
-    """
+    """This class contains unit tests for the Cycle GET API, which is
+    responsible for fetching Dictionary containing list of cycle numbers."""
 
     @mock.patch("ska_ost_osd.routers.osd_api.read_file")
     def test_cycle_endpoint(self, mock_read_file, client_get):
-        """This function tests that a request to the GET /cycle endpoint
+        """This function tests that a request to the GET /cycle endpoint.
 
         :returns: cycle list
         """
@@ -36,10 +34,8 @@ class TestCycleAPI:
 
     @mock.patch("ska_ost_osd.routers.osd_api.read_file")
     def test_cycle_endpoint_file_not_found(self, mock_read_file, client_get):
-        """
-        Test that GET /cycle returns 500 or appropriate error
-        when read_file returns invalid data structure.
-        """
+        """Test that GET /cycle returns 500 or appropriate error when read_file
+        returns invalid data structure."""
 
         mock_read_file.side_effect = Exception("file not found")
 
