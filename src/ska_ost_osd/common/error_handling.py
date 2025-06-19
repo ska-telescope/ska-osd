@@ -1,8 +1,9 @@
 import logging
 from http import HTTPStatus
-from typing import List
+from typing import Any, Dict, List
 
 from fastapi import Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from ska_ost_osd.common.utils import convert_to_response_object
@@ -29,10 +30,39 @@ class CapabilityError(Exception):
         super().__init__(errors)
 
 
-async def development_exception_handler(exc: Exception):
+class ValidationErrorFormatter:
+    @staticmethod
+    def format(exc: RequestValidationError) -> Dict[str, Any]:
+        missing_fields = []
+        payload_str = ""
+        for err in exc.errors():
+            if err.get("type") == "missing":
+                missing_fields.append(err["loc"][-1])
+            payload_str = err["input"]
+
+        parts = []
+        if missing_fields:
+            parts.append(f"Missing field(s): {', '.join(missing_fields)}")
+
+        return ". ".join(parts) + f", invalid payload: {payload_str}"
+
+
+async def internal_server_error_handler(
+    _: Request, err: Exception, status=HTTPStatus.INTERNAL_SERVER_ERROR
+) -> JSONResponse:
+    """A custom handler function that returns a verbose HTTP 500 response
+    containing detailed traceback information."""
+
+    formatted = ValidationErrorFormatter.format(err)
+
+    result = convert_to_response_object(
+        formatted,
+        result_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+    )
+
     return JSONResponse(
-        status_code=500,
-        content={"detail": "Internal Server Error (non-production)", "error": str(exc)},
+        content=result.model_dump(mode="json", exclude_none=True),
+        status_code=status,
     )
 
 

@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from ska_ser_logging import configure_logging
 
 from ska_ost_osd.common.error_handling import (
-    development_exception_handler,
+    internal_server_error_handler,
     schematic_validation_error_handler,
 )
 from ska_ost_osd.routers.osd_api import osd_router
@@ -49,7 +49,7 @@ def create_app(production=PRODUCTION) -> FastAPI:
     app.exception_handler(SchematicValidationError)(schematic_validation_error_handler)
 
     if not production:
-        app.exception_handler(Exception)(development_exception_handler)
+        app.exception_handler(Exception)(internal_server_error_handler)
     return app
 
 
