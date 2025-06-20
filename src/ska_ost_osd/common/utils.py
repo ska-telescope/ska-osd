@@ -13,18 +13,6 @@ from ska_ost_osd.models.models import ApiResponse, ErrorResponseModel
 logging.basicConfig(level=logging.INFO)
 
 
-def read_file(filename: Path) -> Dict:
-    """Read and parse a JSON file into a dictionary.
-
-    :param filename: The path to the JSON file to be read
-    :returns: A dictionary containing the contents of the file
-    :raises: FileNotFoundError if file doesn't exist
-    :raises: JSONDecodeError if file contains invalid JSON
-    """
-    with open(filename, "r", encoding="utf-8") as file:
-        return json.load(file)
-
-
 def update_file(filename: Path, json_data: Dict) -> None:
     """Write a dictionary to a JSON file.
 

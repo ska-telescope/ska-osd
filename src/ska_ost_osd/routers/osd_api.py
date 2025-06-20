@@ -16,7 +16,7 @@ from ska_ost_osd.common.error_handling import CapabilityError, OSDModelError
 from ska_ost_osd.common.utils import (
     convert_to_response_object,
     get_responses,
-    read_file,
+    read_json,
 )
 from ska_ost_osd.models.models import ApiResponse, CycleModel, UpdateRequestModel
 from ska_ost_osd.models.models_query import ValidationOnCapabilities
@@ -119,7 +119,7 @@ def update_osd_data(body: Dict, **kwargs) -> Dict:
         if hasattr(validated_data, "cycle_id") and hasattr(
             validated_data, "array_assembly"
         ):
-            osd_data = read_file(OBSERVATORY_POLICIES_JSON_PATH)
+            osd_data = read_json(OBSERVATORY_POLICIES_JSON_PATH)
             if (
                 validated_data.cycle_id == osd_data["cycle_number"]
                 and validated_data.array_assembly
@@ -132,7 +132,7 @@ def update_osd_data(body: Dict, **kwargs) -> Dict:
                 )
 
         # Update storage with validated data
-        existing_data = read_file(MID_CAPABILITIES_JSON_PATH)
+        existing_data = read_json(MID_CAPABILITIES_JSON_PATH)
         observatory_policy = body.get("observatory_policy", None)
 
         return update_file_storage(
@@ -211,7 +211,7 @@ def get_cycle_list() -> Dict:
         Dict: Dictionary containing list of cycle numbers
     """
     try:
-        data = read_file(RELEASE_VERSION_MAPPING)
+        data = read_json(RELEASE_VERSION_MAPPING)
         cycle_numbers = []
         for key in data.keys():
             # Extract number from cycle_X format
