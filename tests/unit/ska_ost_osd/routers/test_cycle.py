@@ -1,6 +1,5 @@
 from unittest import mock
 
-import pytest
 from fastapi import status
 
 from tests.conftest import BASE_API_URL
@@ -12,10 +11,8 @@ class TestCycleAPI:
 
     @mock.patch("ska_ost_osd.routers.osd_api.read_file")
     def test_cycle_endpoint(self, mock_read_file, client_get):
-        """This function tests that a request to the GET /cycle endpoint.
-
-        :returns: cycle list
-        """
+        """Test that GET /cycle returns appropriate json response after
+        read_file returns cycle data."""
 
         mock_read_file.return_value = {
             "cycle_1": ["1.0.0", "1.0.1", "1.0.2"],
