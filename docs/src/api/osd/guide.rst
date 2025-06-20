@@ -62,10 +62,10 @@ General Structure
 .. note::
 
     * Created a separate JSON file for mapping ``cycle_id`` to version number ``cycle_gitlab_release_version_mapping.json`` inside ``version_mapping`` folder.
-    
-    * OSD supports backward compatibility for all existing released versions. If someone wants to retrieve older version then 
+
+    * OSD supports backward compatibility for all existing released versions. If someone wants to retrieve older version then
       they just need to point out that specific version in ``osd_version``.
-      
+
 .. note::
 
     Created a bash script ``release.sh`` in ``resource`` folder.
@@ -287,18 +287,18 @@ GET /osd
 
 5. Scenarios
 
-    1. If no parameters are provided to the API then latest version with 
+    1. If no parameters are provided to the API then latest version with
        cycle id is fetched from ``cycle_gitlab_release_version_mapping.json`` file.
 
-    2. Calling API with only one parameter cycle_id and no other parameter. First it will check if the 
-       cycle id is valid or not, and will fetch latest version stored in the 
+    2. Calling API with only one parameter cycle_id and no other parameter. First it will check if the
+       cycle id is valid or not, and will fetch latest version stored in the
        ``cycle_gitlab_release_version_mapping.json`` file.
-    
-    3. If source is not provided in the API call, the default is set to file. API will 
-       fetch data from file. other option is car and gitlab. 
+
+    3. If source is not provided in the API call, the default is set to file. API will
+       fetch data from file. other option is car and gitlab.
        If ``source`` is 'gitlab' and ``gitlab_branch`` is 'main' then it will fetch data from main branch.
        If ``source`` is 'car' then API will fetch data from Car Gitlab repo.
-    
+
     4. If ``osd_version`` and ``gitlab_branch`` are given together then API will return appropriate error message.
 
     5. If ``cycle_id`` and ``array_assembly`` are provided together then API will return appropriate error message.
@@ -315,7 +315,7 @@ GET /cycle
      - Resource URL
      - Description
    * - GET
-     - ``/ska-ost-osd/osd/api/v3/osd/``
+     - ``/ska-ost-osd/osd/api/v3/cycle``
      - **Getting Data**
 
        Return the OSD cycle_id data.
@@ -328,7 +328,7 @@ GET /cycle
     ===================    ============================================================
     Parameters             Description
     ===================    ============================================================
-    cycle_id               Cycle Id a integer value 1, 2, 3
+    cycle_id               Cycle Id with integer value 1, 2, 3
     ===================    ============================================================
 
 
@@ -354,7 +354,7 @@ GET /cycle
 
     .. code:: python
 
-        client.get(
+        client_get(
             "/ska-ost-osd/osd/api/v3/cycle"
          )
 
@@ -363,7 +363,15 @@ GET /cycle
     .. code:: python
 
         {
-            "cycles": [1]
+        "result_data": [
+            {
+            "cycles": [
+                1
+            ]
+            }
+        ],
+        "result_status": "success",
+        "result_code": 200
         }
 
 
@@ -397,7 +405,7 @@ POST /osd_release
     Parameters             Description
     ===================    ============================================================
     cycle_id               Cycle Id a integer value 1, 2, 3
-    release_type           Patch, Major and Minor 
+    release_type           Patch, Major and Minor
     ===================    ============================================================
 
 
@@ -444,7 +452,7 @@ POST /osd_release
     5. If the ``array_assembly`` value doesn't match the required pattern (must be 'AA' followed by a number), the API will return a 400 Bad Request status with a message indicating the correct format pattern.
 
     6. If the request body is missing required fields or contains invalid data formats, the API will return a 400 Bad Request status with validation error details.
-    
+
     7. If the API encounters an unexpected server-side error (such as database connection failures, internal processing errors, or system-level issues), the API will return a 500 Internal Server Error status with a generic error message.
 
 PUT /osd
@@ -495,8 +503,8 @@ PUT /osd
 
     * The PUT API allows updating the OSD data by providing a JSON object in the request body.
 
-      When calling the PUT API, provide a complete JSON object containing all required fields including 
-      ``cycle_id``, ``capabilities``, and ``array_assembly``. The API will replace the existing OSD data 
+      When calling the PUT API, provide a complete JSON object containing all required fields including
+      ``cycle_id``, ``capabilities``, and ``array_assembly``. The API will replace the existing OSD data
       that matches these parameters with the new data provided in the request body.
 
 
@@ -666,7 +674,7 @@ PUT /osd
     5. If the ``array_assembly`` value doesn't match the required pattern (must be 'AA' followed by a number), the API will return a 400 Bad Request status with a message indicating the correct format pattern.
 
     6. If the request body is missing required fields or contains invalid data formats, the API will return a 400 Bad Request status with validation error details.
-    
+
     7. If the API encounters an unexpected server-side error (such as database connection failures, internal processing errors, or system-level issues), the API will return a 500 Internal Server Error status with a generic error message.
 
 
