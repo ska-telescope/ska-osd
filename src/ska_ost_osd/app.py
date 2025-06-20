@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from ska_ser_logging import configure_logging
 
 from ska_ost_osd.common.error_handling import (
+    file_not_found_error_handler,
     internal_server_error_handler,
     response_validation_error_handler,
     schematic_validation_error_handler,
@@ -50,6 +51,8 @@ def create_app(production=PRODUCTION) -> FastAPI:
     # Add handlers for different types of error
     app.exception_handler(SchematicValidationError)(schematic_validation_error_handler)
     app.exception_handler(ResponseValidationError)(response_validation_error_handler)
+    app.exception_handler(ValueError)(response_validation_error_handler)
+    app.exception_handler(FileNotFoundError)(file_not_found_error_handler)
 
     if not production:
         app.exception_handler(Exception)(internal_server_error_handler)

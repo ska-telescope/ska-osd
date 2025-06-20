@@ -35,6 +35,8 @@ class ValidationErrorFormatter:
     def format(exc: RequestValidationError) -> Dict[str, Any]:
         missing_fields = []
         payload_str = ""
+        if isinstance(exc, Exception):
+            return str(exc)
         for err in exc.errors():
             if err.get("type") == "missing":
                 missing_fields.append(err["loc"][-1])
@@ -96,3 +98,21 @@ async def schematic_validation_error_handler(
     result = convert_to_response_object(err.message, result_code=HTTPStatus.OK)
 
     return JSONResponse(content=result.model_dump(), status_code=HTTPStatus.OK)
+
+
+async def file_not_found_error_handler(
+    _: Request, err: FileNotFoundError
+) -> JSONResponse:
+    """A custom handler function to deal with SchematicValidationError raised
+    while schema validation return the correct HTTP response."""
+
+    LOGGER.exception("File Not Found error")
+
+    formatted = ValidationErrorFormatter.format(err)
+
+    result = convert_to_response_object(
+        formatted,
+        result_code=HTTPStatus.NOT_FOUND,
+    )
+
+    return JSONResponse(content=result.model_dump(), status_code=HTTPStatus.NOT_FOUND)

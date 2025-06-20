@@ -210,22 +210,20 @@ def get_cycle_list() -> Dict:
     Returns:
         Dict: Dictionary containing list of cycle numbers
     """
-    try:
-        data = read_file(RELEASE_VERSION_MAPPING)
-        cycle_numbers = []
-        for key in data.keys():
-            # Extract number from cycle_X format
-            if key.startswith("cycle_"):
-                try:
-                    cycle_num = int(key.split("_")[1])
-                    cycle_numbers.append(cycle_num)
-                except (IndexError, ValueError):
-                    continue
+    # try:
+    data = read_file(RELEASE_VERSION_MAPPING)
+    cycle_numbers = []
+    for key in data.keys():
+        # Extract number from cycle_X format
+        if key.startswith("cycle_"):
+            try:
+                cycle_num = int(key.split("_")[1])
+                cycle_numbers.append(cycle_num)
+            except (IndexError, ValueError):
+                continue
 
-        cycles = {"cycles": sorted(cycle_numbers)}
-        return convert_to_response_object(cycles, result_code=HTTPStatus.OK)
-    except Exception as e:  # pylint: disable=W0718
-        return {"error": str(e)}
+    cycles = {"cycles": sorted(cycle_numbers)}
+    return convert_to_response_object(cycles, result_code=HTTPStatus.OK)
 
 
 def handle_validation_error(err: object) -> list:

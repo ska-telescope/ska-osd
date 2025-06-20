@@ -34,10 +34,10 @@ class TestCycleAPI:
         """Test that GET /cycle returns 500 or appropriate error when read_file
         returns invalid data structure."""
 
-        mock_read_file.side_effect = Exception("file not found")
+        mock_read_file.side_effect = FileNotFoundError("file not found")
 
         response = client_get(f"{BASE_API_URL}/cycle")
 
-        assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+        assert response.status_code == status.HTTP_404_NOT_FOUND
         assert response.json()["result_status"] == "failed"
         assert "file not found" in response.json()["result_data"]
