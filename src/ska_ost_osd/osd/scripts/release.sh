@@ -27,7 +27,7 @@ function UpdateAndAddValue ()
 {
     jq --arg new_cycle_id "$new_cycle_id" --arg version "$1" '
         if has($new_cycle_id) then
-            .[$new_cycle_id] += [$version] | 
+            .[$new_cycle_id] += [$version] |
             .[$new_cycle_id] = (.[$new_cycle_id] | unique)
         else
             .[$new_cycle_id] = [$version]
