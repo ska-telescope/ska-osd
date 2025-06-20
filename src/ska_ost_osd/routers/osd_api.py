@@ -200,12 +200,12 @@ def release_osd_data(**kwargs):
 @osd_router.get(
     "/cycle",
     tags=["OSD"],
-    summary="Get list of available cycles",
+    summary="GET list of available proposal cycles",
     responses=get_responses(ApiResponse[CycleModel]),
     response_model=ApiResponse[CycleModel],
 )
 def get_cycle_list() -> Dict:
-    """Get list of cycles from cycle_gitlab_release_version_mapping.json.
+    """GET list of all available proposal cycles.
 
     Returns:
         Dict: Dictionary containing list of cycle numbers
