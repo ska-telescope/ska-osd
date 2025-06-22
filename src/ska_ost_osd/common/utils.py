@@ -8,7 +8,7 @@ from typing import Any, Dict, List
 
 from fastapi import status
 
-from ska_ost_osd.models.models import ApiResponse, ErrorResponseModel
+from ska_ost_osd.common.models import ApiResponse, ErrorResponseModel
 
 logging.basicConfig(level=logging.INFO)
 

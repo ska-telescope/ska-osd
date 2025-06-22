@@ -13,14 +13,13 @@ from fastapi import APIRouter
 from pydantic import ValidationError
 
 from ska_ost_osd.common.error_handling import CapabilityError, OSDModelError
+from ska_ost_osd.common.models import ApiResponse
 from ska_ost_osd.common.utils import (
     convert_to_response_object,
     get_responses,
     read_json,
 )
-from ska_ost_osd.models.models import ApiResponse, CycleModel, UpdateRequestModel
-from ska_ost_osd.models.models_query import ValidationOnCapabilities
-from ska_ost_osd.osd.constant import (
+from ska_ost_osd.osd.common.constant import (
     CYCLE_TO_VERSION_MAPPING,
     MID_CAPABILITIES_JSON_PATH,
     OBSERVATORY_POLICIES_JSON_PATH,
@@ -28,14 +27,19 @@ from ska_ost_osd.osd.constant import (
     RELEASE_VERSION_MAPPING,
     osd_file_mapping,
 )
-from ska_ost_osd.osd.gitlab_helper import push_to_gitlab
+from ska_ost_osd.osd.common.gitlab_helper import push_to_gitlab
+from ska_ost_osd.osd.common.osd_validation_messages import (
+    ARRAY_ASSEMBLY_DOESNOT_BELONGS_TO_CYCLE_ERROR_MESSAGE,
+)
+from ska_ost_osd.osd.models.models import (
+    CycleModel,
+    UpdateRequestModel,
+    ValidationOnCapabilities,
+)
 from ska_ost_osd.osd.osd import (
     add_new_data_storage,
     get_osd_using_tmdata,
     update_file_storage,
-)
-from ska_ost_osd.osd.osd_validation_messages import (
-    ARRAY_ASSEMBLY_DOESNOT_BELONGS_TO_CYCLE_ERROR_MESSAGE,
 )
 from ska_ost_osd.osd.version_manager import manage_version_release
 

@@ -4,7 +4,7 @@ from jsonschema import ValidationError
 from ska_telmodel.data import TMData
 
 from ska_ost_osd.common.constant import CAR_TELMODEL_SOURCE, SEMANTIC_VALIDATION_VALUE
-from ska_ost_osd.routers.osd_api import handle_validation_error, validation_response
+from ska_ost_osd.osd.routers.api import handle_validation_error, validation_response
 from ska_ost_osd.telvalidation.semantic_validator import (
     VALIDATION_STRICTNESS,
     semantic_validate,

@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 import pytest
 
-from ska_ost_osd.models.models_query import ValidationOnCapabilities
+from ska_ost_osd.osd.models.models import ValidationOnCapabilities
 from ska_ost_osd.osd.osd import get_osd_data, osd_tmdata_source, update_file_storage
 from tests.conftest import tm_data_osd
 from tests.unit.ska_ost_osd.common.constant import (

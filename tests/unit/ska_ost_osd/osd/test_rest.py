@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from ska_ost_osd.routers.osd_api import validation_response
+from ska_ost_osd.osd.routers.api import validation_response
 from tests.conftest import BASE_API_URL
 
 
@@ -135,7 +135,7 @@ def test_invalid_osd_tmdata_source(
 
 
 @pytest.mark.skip
-@patch("ska_ost_osd.routers.osd_api.get_osd_using_tmdata")
+@patch("ska_ost_osd.osd.routers.api.get_osd_using_tmdata")
 def test_osd_endpoint(client_get, mock_mid_data):
     """This function tests that a request to the OSD endpoint for a specific
     OSD returns expected data for that OSD.

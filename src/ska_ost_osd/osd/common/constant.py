@@ -1,6 +1,4 @@
-"""
-  created file to maintain OSD Model constants
-"""
+"""Created file to maintain OSD Model constants."""
 
 MID_CONSTANT_JSON_FILE_PATH = "ska1_mid/mid_capabilities.json"
 LOW_CONSTANT_JSON_FILE_PATH = "ska1_low/low_capabilities.json"

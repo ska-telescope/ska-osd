@@ -1,11 +1,11 @@
 import re
-from typing import Any, Dict, Optional, TypeVar
+from typing import Any, Dict, List, Optional, TypeVar
 
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, Field, model_validator
 
 from ska_ost_osd.common.error_handling import CapabilityError, OSDModelError
-from ska_ost_osd.osd.constant import ARRAY_ASSEMBLY_PATTERN, OSD_VERSION_PATTERN
-from ska_ost_osd.osd.osd_validation_messages import (
+from ska_ost_osd.osd.common.constant import ARRAY_ASSEMBLY_PATTERN, OSD_VERSION_PATTERN
+from ska_ost_osd.osd.common.osd_validation_messages import (
     ARRAY_ASSEMBLY_INVALID_ERROR_MESSAGE,
     CYCLE_ID_ARRAY_ASSEMBLY_ERROR_MESSAGE,
     CYCLE_ID_CAPABILITIES_ERROR_MESSAGE,
@@ -14,6 +14,20 @@ from ska_ost_osd.osd.osd_validation_messages import (
 )
 
 T = TypeVar("T")
+
+
+class UpdateRequestModel(BaseModel):
+    cycle_id: Optional[int] = Field(..., description="Cycle ID must be an integer")
+    array_assembly: Optional[str] = Field(
+        ...,
+        pattern=ARRAY_ASSEMBLY_PATTERN,
+        description="Array assembly in format AA[0-9].[0-9]",
+    )
+    capabilities: Optional[str] = Field(..., description="Capabilities must be str")
+
+
+class CycleModel(BaseModel):
+    cycles: List[int]
 
 
 class OSDModel(BaseModel):

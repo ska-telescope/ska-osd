@@ -7,8 +7,7 @@ from ska_telmodel.data import TMData
 
 from ska_ost_osd.common.error_handling import OSDModelError
 from ska_ost_osd.common.utils import update_file
-from ska_ost_osd.models.models_query import OSDModel
-from ska_ost_osd.osd.osd_validation_messages import (
+from ska_ost_osd.osd.common.osd_validation_messages import (
     ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE,
     AVAILABLE_SOURCE_ERROR_MESSAGE,
     CAPABILITY_DOESNOT_EXIST_ERROR_MESSAGE,
@@ -17,8 +16,9 @@ from ska_ost_osd.osd.osd_validation_messages import (
     OSD_VERSION_ERROR_MESSAGE,
     SOURCE_ERROR_MESSAGE,
 )
+from ska_ost_osd.osd.models.models import OSDModel
 
-from .constant import (
+from .common.constant import (
     ARRAY_ASSEMBLY_PATTERN,
     BASE_FOLDER_NAME,
     BASE_URL,
@@ -143,9 +143,9 @@ class OSD:
                 if not self.array_assembly and not self.cycle_id:
                     for array_assembly_id in self.keys_list:
                         if array_assembly_id not in ["telescope", "basic_capabilities"]:
-                            osd_data["capabilities"][key.lower()][
-                                array_assembly_id
-                            ] = data[array_assembly_id]
+                            osd_data["capabilities"][key.lower()][array_assembly_id] = (
+                                data[array_assembly_id]
+                            )
                 else:
                     osd_data["capabilities"][key.lower()][value] = data[value]
 

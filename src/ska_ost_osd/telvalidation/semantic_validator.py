@@ -1,10 +1,10 @@
-"""
-This module contains the 'semantic_validate' functions which is exposed
-to outside for use. If observing command's input contains invalid
-values it will raise validation error's based on provided rules.
-Integrated OSD API function to fetch rule constraints values.
-"""
+"""This module contains the 'semantic_validate' functions which is exposed to
+outside for use.
 
+If observing command's input contains invalid values it will raise
+validation error's based on provided rules. Integrated OSD API function
+to fetch rule constraints values.
+"""
 
 import logging
 from os import environ
@@ -13,7 +13,7 @@ from typing import Any, Optional
 from pydantic import ValidationError
 from ska_telmodel.data import TMData
 
-from ska_ost_osd.telvalidation.semantic_schema_validator import SemanticModel
+from ska_ost_osd.telvalidation.models.semantic_schema_validator import SemanticModel
 
 from ..common.constant import (
     ASSIGN_RESOURCE,
@@ -37,11 +37,13 @@ VALIDATION_STRICTNESS = environ.get("VALIDATION_STRICTNESS", "2")
 
 
 def get_validation_data(interface: str, telescope: str) -> Optional[str]:
-    """
-    Get the validation constant JSON file path based on the provided interface URI.
+    """Get the validation constant JSON file path based on the provided
+    interface URI.
 
-    :param interface: str, the interface URI from the observing command input.
-    :return: str, the validation constant JSON file path, or None if not found.
+    :param interface: str, the interface URI from the observing command
+        input.
+    :return: str, the validation constant JSON file path, or None if not
+        found.
     """
     validation_constants = {
         SKA_LOW_TELESCOPE: LOW_VALIDATION_CONSTANT_JSON_FILE_PATH,
@@ -65,14 +67,18 @@ def fetch_capabilities_from_osd(
     tm_data: Optional[dict] = None,
     osd_data: Optional[dict] = None,
 ) -> tuple[dict, dict]:
-    """
-    Fetch capabilities and basic capabilities from the Observatory State Database (OSD).
+    """Fetch capabilities and basic capabilities from the Observatory State
+    Database (OSD).
 
-    :param telescope: str, the telescope identifier (e.g., 'mid' or 'low').
-    :param array_assembly: str, the specific capabilities (e.g., 'AAO.5', 'AA0.1').
+    :param telescope: str, the telescope identifier (e.g., 'mid' or
+        'low').
+    :param array_assembly: str, the specific capabilities (e.g.,
+        'AAO.5', 'AA0.1').
     :param tm_data: Optional[Dict], the telemodel data object.
-    :param osd_data: Optional[Dict], the OSD data dictionary passed externally.
-    :returns: A tuple containing the capabilities and basic capabilities dictionaries.
+    :param osd_data: Optional[Dict], the OSD data dictionary passed
+        externally.
+    :returns: A tuple containing the capabilities and basic capabilities
+        dictionaries.
     """
     from ska_ost_osd.osd.osd import get_osd_data
 
@@ -98,9 +104,8 @@ def fetch_capabilities_from_osd(
 def get_matched_values_from_basic_capabilities(
     data: list | dict, key_to_find: str
 ) -> dict | None:
-    """
-    Efficiently search a nested dictionary and list structure to find the value
-    for the given key from basic capabilities.
+    """Efficiently search a nested dictionary and list structure to find the
+    value for the given key from basic capabilities.
 
     Args:
         data (dict or list): The nested data structure to search.
@@ -131,16 +136,15 @@ def get_matched_values_from_basic_capabilities(
 def replace_matched_capabilities_values(
     nested_dict: dict, path: list[str], new_value: Any
 ) -> None:
-    """
-    Replace the value in capabilities data which matched from
-    basic capabilities.
+    """Replace the value in capabilities data which matched from basic
+    capabilities.
 
     :param nested_dict: Dict, the dictionary to modify.
-    :param path: List[str], the path to the key to replace,
-    represented as a list of keys.
+    :param path: List[str], the path to the key to replace, represented
+        as a list of keys.
     :param new_value: Any, the new value to assign to the key.
-    :raises KeyError: If any key in the path is
-    not found in the nested dictionary.
+    :raises KeyError: If any key in the path is not found in the nested
+        dictionary.
     :raises TypeError: If the path does not lead to a dictionary.
     """
     current = nested_dict
@@ -162,9 +166,9 @@ def replace_matched_capabilities_values(
 def fetch_matched_capabilities_from_basic_capabilities(
     capabilities: dict, basic_capabilities: dict
 ) -> list:
-    """
-    This methods returns matched capabilities data list based
-    on basic capabilities.
+    """This methods returns matched capabilities data list based on basic
+    capabilities.
+
     e.g after fetching capabilities and basic_capabilities from OSD needs
     to rearrange some data between basic capabilities and capabilities
     so that we can easily decided mapping between rules.
@@ -241,14 +245,15 @@ def validate_command_input(
     array_assembly: str,
     osd_data: dict,
 ) -> list:
-    """
-    This method invoking semantic validation for given command input.
-    :param observing_command_input: user json input for semantic validation
+    """This method invoking semantic validation for given command input.
+
+    :param observing_command_input: user json input for semantic
+        validation
     :param tm_data: TMData object which created externally
     :param interface: assign/configure resource schema interface name
     :param array_assembly: specific capabilities like AA0.5, AA1
-    :param osd_data: osd_data dict which passed externally
-    :return list of error messages in case of validation failed
+    :param osd_data: osd_data dict which passed externally :return list
+        of error messages in case of validation failed
     """
     semantic_validate_data = tm_data[
         get_validation_data(interface, telescope)
@@ -268,9 +273,7 @@ def validate_command_input(
     validation_data = semantic_validate_data[array_assembly].get(
         "assign_resource"
         if ASSIGN_RESOURCE in interface
-        else "configure"
-        if CONFIGURE in interface
-        else "sbd"
+        else "configure" if CONFIGURE in interface else "sbd"
     )
 
     msg_list = validate_json(
@@ -291,24 +294,22 @@ def semantic_validate(
     raise_semantic: bool = True,
     osd_data: Optional[dict] = None,
 ) -> Any:
-    """
-    This method is the entry point for semantic validation,
-    which can be consumed by other libraries like CDM.
+    """This method is the entry point for semantic validation, which can be
+    consumed by other libraries like CDM.
 
-    :param observing_command_input: dictionary containing details
-     of the command which needs validation.This is the same as
-     for ska_telmodel.schema.validate.
-     If the command is available as a JSON string,
-     first convert it to a dictionary using json.loads.
-    :param tm_data: telemodel tm data object using
-     which we can load the semantic validation JSON.
+    :param observing_command_input: dictionary containing details of the
+        command which needs validation.This is the same as for
+        ska_telmodel.schema.validate. If the command is available as a
+        JSON string, first convert it to a dictionary using json.loads.
+    :param tm_data: telemodel tm data object using which we can load the
+        semantic validation JSON.
     :param osd_data: osd_data dict which is passed externally.
-    :param interface: interface URI in full,
-     only provide if missing in observing_command_input.
+    :param interface: interface URI in full, only provide if missing in
+        observing_command_input.
     :param array_assembly: Array assembly like AA0.5, AA0.1.
-    :param raise_semantic: True (default) would require
-     the user to catch the SchematicValidationError somewhere.
-     Set False to only log the error messages.
+    :param raise_semantic: True (default) would require the user to
+        catch the SchematicValidationError somewhere. Set False to only
+        log the error messages.
     :returns: True if semantic validation passes, False otherwise.
     """
     if int(VALIDATION_STRICTNESS) == SEMANTIC_VALIDATION_VALUE:

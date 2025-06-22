@@ -273,7 +273,7 @@ def test_fetch_capabilities_from_osd_based_on_client_based_osd_data(mock1):
 
 
 @pytest.mark.skip
-@patch("ska_ost_osd.routers.osd_api.get_tmdata_sources")
+@patch("ska_ost_osd.osd.routers.api.get_tmdata_sources")
 @pytest.mark.parametrize(
     "json_body_to_validate, response",
     [
@@ -295,8 +295,8 @@ def test_semantic_validate_api(
 
 @pytest.mark.skip
 @patch("ska_ost_osd.telvalidation.semantic_validator.VALIDATION_STRICTNESS", "1")
-@patch("ska_ost_osd.routers.osd_api.VALIDATION_STRICTNESS", "1")
-@patch("ska_ost_osd.routers.osd_api.get_tmdata_sources")
+@patch("ska_ost_osd.osd.routers.api.VALIDATION_STRICTNESS", "1")
+@patch("ska_ost_osd.osd.routers.api.get_tmdata_sources")
 @pytest.mark.parametrize(
     "json_body_to_validate, response",
     [
@@ -332,7 +332,7 @@ def test_semantic_validate_api_not_passing_required_keys(
 
 
 @pytest.mark.skip
-@patch("ska_ost_osd.routers.osd_api.get_tmdata_sources")
+@patch("ska_ost_osd.osd.routers.api.get_tmdata_sources")
 @pytest.mark.parametrize(
     "json_body_to_validate, response, key_to_delete",
     [
@@ -384,7 +384,7 @@ def test_wrong_values_and_no_observing_command_input(
 
 
 @pytest.mark.skip
-@patch("ska_ost_osd.routers.osd_api.get_tmdata_sources")
+@patch("ska_ost_osd.osd.routers.api.get_tmdata_sources")
 def test_passing_only_required_keys(
     mock_tmdata,
     client_post,
