@@ -33,6 +33,8 @@ from ska_ost_osd.osd.common.osd_validation_messages import (
 )
 from ska_ost_osd.osd.models.models import (
     CycleModel,
+    OSDRelease,
+    ReleaseType,
     UpdateRequestModel,
     ValidationOnCapabilities,
 )
@@ -147,7 +149,16 @@ def update_osd_data(body: Dict, **kwargs) -> Dict:
         raise ValueError(str(error)) from error
 
 
-def release_osd_data(**kwargs):
+@osd_router.post(
+    "/osd_release",
+    tags=["OSD"],
+    summary="Release new osd version to Gitlab",
+    responses=get_responses(ApiResponse[OSDRelease]),
+    response_model=ApiResponse[OSDRelease],
+)
+def release_osd_data(
+    cycle_id: int, release_type: ReleaseType
+) -> ApiResponse[OSDRelease]:
     """Release OSD data with automatic version increment based on cycle ID.
 
     Args:
@@ -159,11 +170,11 @@ def release_osd_data(**kwargs):
     Returns:
         dict: Response containing the new version information
     """
-    cycle_id = kwargs.get("cycle_id")
+    cycle_id = cycle_id
     if not cycle_id:
         raise ValueError("cycle_id is required")
     cycle_id = "cycle_" + str(cycle_id)
-    release_type = kwargs.get("release_type")
+    release_type = release_type
     # provided support for patch as part of current implementation
     if release_type and release_type not in ["major", "minor"]:
         raise ValueError("release_type must be either 'major' or 'minor' if provided")
