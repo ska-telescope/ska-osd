@@ -6,20 +6,20 @@ from fastapi.responses import JSONResponse
 LOGGER = logging.getLogger(__name__)
 
 
-class OSDModelError(Exception):
-    """Custom exception class for validation errors."""
+class BaseOSDError(Exception):
+    """Base exception class for OSD errors."""
 
     def __init__(self, errors: List[dict]):
         self.errors = errors
         super().__init__(errors)
 
 
-class CapabilityError(Exception):
-    """Custom exception class for validation errors."""
+class OSDModelError(BaseOSDError):
+    """Exception raised for model validation errors."""
 
-    def __init__(self, errors: List[dict]):
-        self.errors = errors
-        super().__init__(errors)
+
+class CapabilityError(BaseOSDError):
+    """Exception raised for capability-related errors."""
 
 
 async def development_exception_handler(exc: Exception):
