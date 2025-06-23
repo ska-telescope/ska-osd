@@ -8,11 +8,11 @@ from typing import Any, Dict, List
 
 from fastapi import status
 
-from ska_ost_osd.common.models import ApiResponse, ErrorResponseModel
-from ska_ost_osd.osd.common.constant import (
+from ska_ost_osd.common.constant import (
     API_RESPONSE_RESULT_STATUS_FAILED,
     API_RESPONSE_RESULT_STATUS_SUCCESS,
 )
+from ska_ost_osd.common.models import ApiResponse, ErrorResponseModel
 
 logging.basicConfig(level=logging.INFO)
 
