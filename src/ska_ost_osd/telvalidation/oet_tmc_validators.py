@@ -1,16 +1,13 @@
-"""
-This module retrieves semantic validation constants
-constant file contains specific error messages and rules,
-while execution of assign resource, configure command
-from jupyter notebook or any UI we are validating json
+"""This module retrieves semantic validation constants constant file contains
+specific error messages and rules, while execution of assign resource,
+configure command from jupyter notebook or any UI we are validating json
 payload which provided for execution of specific command.
-Rule file contains constraints and those values are fetched from
-OSD capabilities.
-e.g: in rule file below is rule and error messages.
-"rule": "(0 < len(receptor_ids) <= number_ska_dishes)"
-"error": "receptor_ids are too many!Current Limit is {number_ska_dishes}"
-here 'number_ska_dishes' constraints value fetched from
-OSD capabilities.
+
+Rule file contains constraints and those values are fetched from OSD
+capabilities. e.g: in rule file below is rule and error messages.
+"rule": "(0 < len(receptor_ids) <= number_ska_dishes)" "error":
+"receptor_ids are too many!Current Limit is {number_ska_dishes}" here
+'number_ska_dishes' constraints value fetched from OSD capabilities.
 """
 
 import logging
@@ -22,15 +19,15 @@ import astropy.units as u
 from astropy.time import Time
 from simpleeval import EvalWithCompoundTypes
 
-from .constant import MID_VALIDATION_CONSTANT_JSON_FILE_PATH
+from .common.constant import MID_VALIDATION_CONSTANT_JSON_FILE_PATH
+from .common.schematic_validation_exceptions import (
+    SchemanticValidationKeyError,
+    SchematicValidationError,
+)
 from .coordinates_conversion import (
     dec_degs_str_formats,
     ra_dec_to_az_el,
     ra_degs_from_str_formats,
-)
-from .schematic_validation_exceptions import (
-    SchemanticValidationKeyError,
-    SchematicValidationError,
 )
 
 logging.getLogger("telvalidation")
@@ -40,9 +37,8 @@ from collections import deque
 
 
 def get_value_based_on_provided_path(nested_data: Union[dict, list], path: list) -> Any:
-    """
-    Retrieve a value from a nested dictionary or
-    list of dictionaries based on a given path.
+    """Retrieve a value from a nested dictionary or list of dictionaries based
+    on a given path.
 
     Args:
         nested_data (dict or list): The nested dictionary or
@@ -102,9 +98,8 @@ def get_value_based_on_provided_path(nested_data: Union[dict, list], path: list)
 def get_matched_rule_constraint_from_osd(
     basic_capabilities: dict, search_key: str, rule: str
 ) -> list:
-    """
-    This function returns a list of matched key-value dictionaries
-    based on the rule value.
+    """This function returns a list of matched key-value dictionaries based on
+    the rule value.
 
     Example:
     The updated structure of basic capabilities and rule is below:
@@ -167,17 +162,16 @@ def apply_validation_rule(
     parent_path_list: list,
     capabilities: dict,
 ) -> str:
-    """
-    Evaluate validation rules using simpleeval and
-    return an error message if the input is invalid.
+    """Evaluate validation rules using simpleeval and return an error message
+    if the input is invalid.
 
     :param key_to_validate: str, the user input data for validation.
-    :param validation_data: list[dict[str, Union[str, dict]]],
-    a list of dictionaries containing the rule and error.
-    :param command_input_json_config: dict,
-    the command input JSON from the operator.
+    :param validation_data: list[dict[str, Union[str, dict]]], a list of
+        dictionaries containing the rule and error.
+    :param command_input_json_config: dict, the command input JSON from
+        the operator.
     :param parent_path_list: list, representing the current parent path
-    to identify the correct child key.
+        to identify the correct child key.
     :param capabilities: dict, the capabilities dictionary.
     :return: str, the error message after applying the rule.
     """
@@ -216,14 +210,14 @@ def apply_validation_rule(
 
 
 def update_names_with_dependencies(rule_data: dict, names: dict) -> dict:
-    """
-    Update the 'names' dictionary with dependency values from rule_data.
+    """Update the 'names' dictionary with dependency values from rule_data.
 
-    :param key:rule_data (dict): A dictionary containing rule data,
-     including a "dependency_key" key.
-    :param key:names (dict): A dictionary to be updated with dependency values.
-
-    :return: dict: The updated 'names' dictionary with dependency values.
+    :param key: rule_data (dict): A dictionary containing rule data,
+        including a "dependency_key" key.
+    :param key: names (dict): A dictionary to be updated with dependency
+        values.
+    :return: dict: The updated 'names' dictionary with dependency
+        values.
     """
     if "dependency_key" in rule_data:
         dependency_values = get_semantic_variables()
@@ -242,15 +236,16 @@ def evaluate_rule(
     rule_data: dict[str, Union[str, dict]],
     osd_base_constraint: list[dict],
 ) -> bool:
-    """
-    Evaluate a single validation rule using simpleeval.
+    """Evaluate a single validation rule using simpleeval.
 
     :param key_to_validate: str, the user input key for search.
     :param res_value: Union[str, list], the value of the key.
-    :param rule_data: dict[str, Union[str, dict]], the rule and error data.
+    :param rule_data: dict[str, Union[str, dict]], the rule and error
+        data.
     :param osd_base_constraint: list[dict], the list of dictionaries
-    containing the rule keys.
-    :param eval_functions: dict, the dictionary of functions for simpleeval.
+        containing the rule keys.
+    :param eval_functions: dict, the dictionary of functions for
+        simpleeval.
     :return: bool, True if the rule is satisfied, False otherwise.
     """
     names = {}
@@ -294,11 +289,12 @@ def evaluate_rule(
 def format_error_message(
     rule_data: dict[str, Union[str, dict]], rule_key_dict: list[dict]
 ) -> str:
-    """
-    Format the error message for a failed validation rule.
+    """Format the error message for a failed validation rule.
 
-    :param rule_data: dict[str, Union[str, dict]], the rule and error data.
-    :param rule_key_dict: list[dict], the list of dictionaries containing the rule keys.
+    :param rule_data: dict[str, Union[str, dict]], the rule and error
+        data.
+    :param rule_key_dict: list[dict], the list of dictionaries
+        containing the rule keys.
     :return: str, the formatted error message.
     """
     if rule_key_dict:
@@ -313,22 +309,23 @@ def validate_json(
     parent_path_list: list = None,
     capabilities: dict = None,
 ) -> list:
-    """
-    This function is written to match keys from the user input command
-    and validation constant rules present in mid, low, and SBD validation constant JSON.
-    e.g., consider one of the assign resource command dish rules from the constant JSON.
-    Here, we are mapping the rule dish of receptor_ids to the user assign resource
-    command input payload.
+    """This function is written to match keys from the user input command and
+    validation constant rules present in mid, low, and SBD validation constant
+    JSON. e.g., consider one of the assign resource command dish rules from the
+    constant JSON. Here, we are mapping the rule dish of receptor_ids to the
+    user assign resource command input payload.
 
-    :param semantic_validate_constant_json: JSON containing all the parameters
-     along with its business semantic validation rules and error messages.
-    :param command_input_json_config: Dictionary containing details of the command input
-     which needs validation.
-     This is the same as for ska_telmodel.schema.validate.
+    :param semantic_validate_constant_json: JSON containing all the
+        parameters along with its business semantic validation rules and
+        error messages.
+    :param command_input_json_config: Dictionary containing details of
+        the command input which needs validation. This is the same as
+        for ska_telmodel.schema.validate.
     :param parent_path_list: List representing the current parent path.
-    :param capabilities: Defined key-value structure pair from the OSD API.
-    :return: error_msg_list: List containing all combined errors arising due
-     to semantic validation.
+    :param capabilities: Defined key-value structure pair from the OSD
+        API.
+    :return: error_msg_list: List containing all combined errors arising
+        due to semantic validation.
     """
     error_msg_list = []
     for key, value in semantic_validate_constant_json.items():
@@ -380,18 +377,17 @@ def validate_target_is_visible(
     tm_data,
     observing_time: datetime = datetime.utcnow(),
 ) -> str:
-    """
-    Check the target specific by ra,dec is visible
-    during observing_time at telescope site
+    """Check the target specific by ra,dec is visible during observing_time at
+    telescope site.
 
     :param ra_str: string containing value of ra
     :param dec_str: string containing value of dec
     :param telescope: string containing name of the telescope
     :param observing_time: string containing value of observing_time
     :param target_env: string containing the environment value(mid/low)
-            for the target
-    :param tm_data: telemodel tm data object using which
-            we can load semantic validate json.
+        for the target
+    :param tm_data: telemodel tm data object using which we can load
+        semantic validate json.
     """
     observing_time = observing_time.strftime("%Y-%m-%dT%H:%M:%S")
     utcoffset = +2 * u.hour if target_env == "target_mid" else +8 * u.hour

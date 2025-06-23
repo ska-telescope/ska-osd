@@ -1,7 +1,8 @@
 """This module contain functions to convert ra/dec to az/el.
-It answers if source is visible now and how long till
-elevation drops
+
+It answers if source is visible now and how long till elevation drops
 """
+
 from statistics import mean
 
 from astropy.coordinates import AltAz, EarthLocation, SkyCoord
@@ -10,46 +11,42 @@ from astropy.time import Time, TimeDelta
 # importing the modules
 from ska_telmodel.data import TMData
 
-from .constant import (
+from .common.constant import (
     LOW_LAYOUT_CONSTANT_JSON_FILE_PATH,
     MID_LAYOUT_CONSTANT_JSON_FILE_PATH,
 )
-from .schematic_validation_exceptions import SchematicValidationError
+from .common.schematic_validation_exceptions import SchematicValidationError
 
 
 # various functions
 def get_mid_telescope_mean_location(tm_data: TMData) -> list:
-    """
-    :parm tm_data: telemodel tm data object using which
-            we can load semantic validate json.
-    :returns: the mean location of mid telescope
-        as a list
+    """:parm tm_data: telemodel tm data object using which we can load semantic
+    validate json.
+
+    :returns: the mean location of mid telescope as a list
     """
     return get_geocentric_mean_location(MID_LAYOUT_CONSTANT_JSON_FILE_PATH, tm_data)
 
 
 def get_low_telescope_mean_location(tm_data: TMData) -> list:
-    """
-    :parm tm_data: telemodel tm data object using which
-            we can load semantic validate json.
-    :returns: the mean location of low telescope
-        as a list
+    """:parm tm_data: telemodel tm data object using which we can load semantic
+    validate json.
+
+    :returns: the mean location of low telescope as a list
     """
     return get_geocentric_mean_location(LOW_LAYOUT_CONSTANT_JSON_FILE_PATH, tm_data)
 
 
 def get_geocentric_mean_location(file_path: str, tm_data: TMData):
-    """
-    :parm tm_data: telemodel tm data object using which
-            we can load semantic validate json.
-    :returns: the mean location of mid telescope
-        as a list
-    :index 0: list of geocentric coordinates
-    :index 1: an eq <EarthLocation> object
-    :index 2: an eq<GeodeticLocation> object
-    :[[x,y,z]: an eq <EarthLocation> object,an eq<GeodeticLocation> object]
-    :parm tm_data: telemodel tm data object using which
-            we can load semantic validate json.
+    """:parm tm_data: telemodel tm data object using which we can load semantic
+    validate json.
+
+    :returns: the mean location of mid telescope as a list :index 0:
+        list of geocentric coordinates :index 1: an eq <EarthLocation>
+        object :index 2: an eq<GeodeticLocation> object :[[x,y,z]: an eq
+        <EarthLocation> object,an eq<GeodeticLocation> object] :parm
+        tm_data: telemodel tm data object using which we can load
+        semantic validate json.
     """
     tm_data = tm_data[file_path].get_dict()
     mean_x_array = []
@@ -181,16 +178,12 @@ def __get_info(
 
 
 def ra_degs_from_str_formats(ra_str: str, str_format: int = 1) -> list:
-    """
-    returns a list with the ra in float and error or success message
-    by reading from str
-    as given in either of the formats
-    [ra_sum,msg]
-    :param ra_str:Right Ascension
-    (one of the celestial coordinates in equatorial system)
-    :param str_format:int to give choice for str format.
-    1 for hh:mm:ss.ss (default)
-    2 for dd:mm:ss.ss
+    """Returns a list with the ra in float and error or success message by
+    reading from str as given in either of the formats [ra_sum,msg] :param
+    ra_str:Right Ascension (one of the celestial coordinates in equatorial
+    system) :param str_format:int to give choice for str format.
+
+    1 for hh:mm:ss.ss (default) 2 for dd:mm:ss.ss
     """
     ra_list = ra_str.split(":")
     hh_deg = int(
@@ -209,13 +202,9 @@ def ra_degs_from_str_formats(ra_str: str, str_format: int = 1) -> list:
 
 
 def dec_degs_str_formats(dec_str: str) -> list:
-    """
-    returns a list with dec in float and error or success message
-    by reading from str
-    :param dec_str:Declination
-    (one of the celestial coordinates in equatorial system)
-    in format ±dd:mm:ss.sss
-    """
+    """Returns a list with dec in float and error or success message by reading
+    from str :param dec_str:Declination (one of the celestial coordinates in
+    equatorial system) in format ±dd:mm:ss.sss."""
     dec_list = dec_str.split(":")
     deg = int(
         dec_list[0]
