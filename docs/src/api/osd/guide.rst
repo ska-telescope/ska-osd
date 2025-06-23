@@ -49,26 +49,40 @@ General Structure
 
 .. code-block:: bash
 
-    ├── constant.py
-    ├── helper.py
-    ├── __init__.py
-    ├── osd.py
-    ├── resource
-    │   └── release.sh
-    └── version_mapping
-        └── cycle_gitlab_release_version_mapping.json
+    ├── common
+    │   ├── __init__.py
+    │   ├── models.py
+    │   └── utils.py
+    ├── osd
+    │   ├── common
+    │   ├── models
+    │   ├── routers
+    │   ├── version_mapping
+    │   │   └── cycle_gitlab_release_version_mapping.json
+    │   ├── version_manager.py
+    │   └── osd.py
+    ├── scripts
+    │   └── release.sh
+    └── telvalidation
+        ├── common
+        ├── models
+        ├── routers
+        ├── __init__.py
+        ├── coordinates_conversion.py
+        ├── oet_tmc_validators.py
+        └── semantic_validator.py
 
 
 .. note::
 
     * Created a separate JSON file for mapping ``cycle_id`` to version number ``cycle_gitlab_release_version_mapping.json`` inside ``version_mapping`` folder.
-    
-    * OSD supports backward compatibility for all existing released versions. If someone wants to retrieve older version then 
+
+    * OSD supports backward compatibility for all existing released versions. If someone wants to retrieve older version then
       they just need to point out that specific version in ``osd_version``.
-      
+
 .. note::
 
-    Created a bash script ``release.sh`` in ``resource`` folder.
+    Created a bash script ``release.sh`` in ``scripts`` folder.
 
 
 If user wants to access this framework from CDM, Jupyter Notebook or any other client below is the example.
@@ -287,18 +301,18 @@ GET /osd
 
 5. Scenarios
 
-    1. If no parameters are provided to the API then latest version with 
+    1. If no parameters are provided to the API then latest version with
        cycle id is fetched from ``cycle_gitlab_release_version_mapping.json`` file.
 
-    2. Calling API with only one parameter cycle_id and no other parameter. First it will check if the 
-       cycle id is valid or not, and will fetch latest version stored in the 
+    2. Calling API with only one parameter cycle_id and no other parameter. First it will check if the
+       cycle id is valid or not, and will fetch latest version stored in the
        ``cycle_gitlab_release_version_mapping.json`` file.
-    
-    3. If source is not provided in the API call, the default is set to file. API will 
-       fetch data from file. other option is car and gitlab. 
+
+    3. If source is not provided in the API call, the default is set to file. API will
+       fetch data from file. other option is car and gitlab.
        If ``source`` is 'gitlab' and ``gitlab_branch`` is 'main' then it will fetch data from main branch.
        If ``source`` is 'car' then API will fetch data from Car Gitlab repo.
-    
+
     4. If ``osd_version`` and ``gitlab_branch`` are given together then API will return appropriate error message.
 
     5. If ``cycle_id`` and ``array_assembly`` are provided together then API will return appropriate error message.
@@ -397,7 +411,7 @@ POST /osd_release
     Parameters             Description
     ===================    ============================================================
     cycle_id               Cycle Id a integer value 1, 2, 3
-    release_type           Patch, Major and Minor 
+    release_type           Patch, Major and Minor
     ===================    ============================================================
 
 
@@ -444,7 +458,7 @@ POST /osd_release
     5. If the ``array_assembly`` value doesn't match the required pattern (must be 'AA' followed by a number), the API will return a 400 Bad Request status with a message indicating the correct format pattern.
 
     6. If the request body is missing required fields or contains invalid data formats, the API will return a 400 Bad Request status with validation error details.
-    
+
     7. If the API encounters an unexpected server-side error (such as database connection failures, internal processing errors, or system-level issues), the API will return a 500 Internal Server Error status with a generic error message.
 
 PUT /osd
@@ -495,8 +509,8 @@ PUT /osd
 
     * The PUT API allows updating the OSD data by providing a JSON object in the request body.
 
-      When calling the PUT API, provide a complete JSON object containing all required fields including 
-      ``cycle_id``, ``capabilities``, and ``array_assembly``. The API will replace the existing OSD data 
+      When calling the PUT API, provide a complete JSON object containing all required fields including
+      ``cycle_id``, ``capabilities``, and ``array_assembly``. The API will replace the existing OSD data
       that matches these parameters with the new data provided in the request body.
 
 
@@ -666,7 +680,7 @@ PUT /osd
     5. If the ``array_assembly`` value doesn't match the required pattern (must be 'AA' followed by a number), the API will return a 400 Bad Request status with a message indicating the correct format pattern.
 
     6. If the request body is missing required fields or contains invalid data formats, the API will return a 400 Bad Request status with validation error details.
-    
+
     7. If the API encounters an unexpected server-side error (such as database connection failures, internal processing errors, or system-level issues), the API will return a 500 Internal Server Error status with a generic error message.
 
 
@@ -725,7 +739,7 @@ Release Steps
 4. Run below command for OSD release
 
 Created a target called ``osd-pre-release`` in Makefile which will run when ska_ost_osd is released.
-also added a ``release.sh`` file inside ``osd`` ``resources`` folder which has two functions ``GetCycleId`` and ``UpdateAndAddValue``
+also added a ``release.sh`` file inside ``ska_ost_osd`` ``scripts`` folder which has two functions ``GetCycleId`` and ``UpdateAndAddValue``
 
 ``GetCycleId`` function gets ``cycle_number`` from ``observatory_policies.json`` file and triggers next function ``UpdateAndAddValue``
 which updates or add cycle_id values in version mapping json file.
