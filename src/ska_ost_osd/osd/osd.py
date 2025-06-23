@@ -143,9 +143,9 @@ class OSD:
                 if not self.array_assembly and not self.cycle_id:
                     for array_assembly_id in self.keys_list:
                         if array_assembly_id not in ["telescope", "basic_capabilities"]:
-                            osd_data["capabilities"][key.lower()][array_assembly_id] = (
-                                data[array_assembly_id]
-                            )
+                            osd_data["capabilities"][key.lower()][
+                                array_assembly_id
+                            ] = data[array_assembly_id]
                 else:
                     osd_data["capabilities"][key.lower()][value] = data[value]
 
