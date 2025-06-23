@@ -13,7 +13,7 @@ from ska_ost_osd.common.error_handling import (
     schematic_validation_error_handler,
 )
 from ska_ost_osd.osd.routers.api import osd_router
-from ska_ost_osd.telvalidation.schematic_validation_exceptions import (
+from ska_ost_osd.telvalidation.common.schematic_validation_exceptions import (
     SchematicValidationError,
 )
 

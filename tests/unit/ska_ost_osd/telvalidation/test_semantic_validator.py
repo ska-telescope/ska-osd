@@ -6,14 +6,14 @@ import pytest
 from ska_telmodel.data import TMData
 from ska_telmodel.schema import example_by_uri
 
+from ska_ost_osd.telvalidation.common.schematic_validation_exceptions import (
+    SchemanticValidationKeyError,
+    SchematicValidationError,
+)
 from ska_ost_osd.telvalidation.oet_tmc_validators import (
     get_matched_rule_constraint_from_osd,
     validate_json,
     validate_target_is_visible,
-)
-from ska_ost_osd.telvalidation.schematic_validation_exceptions import (
-    SchemanticValidationKeyError,
-    SchematicValidationError,
 )
 from ska_ost_osd.telvalidation.semantic_validator import (
     fetch_capabilities_from_osd,

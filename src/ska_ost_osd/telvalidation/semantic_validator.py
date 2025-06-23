@@ -28,8 +28,8 @@ from ..common.constant import (
     SKA_MID_SBD,
     SKA_MID_TELESCOPE,
 )
+from .common.schematic_validation_exceptions import SchematicValidationError
 from .oet_tmc_validators import clear_semantic_variable_data, validate_json
-from .schematic_validation_exceptions import SchematicValidationError
 
 logging.getLogger("telvalidation")
 
