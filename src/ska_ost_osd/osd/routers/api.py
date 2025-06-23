@@ -41,7 +41,7 @@ from ska_ost_osd.osd.osd import (
     get_osd_using_tmdata,
     update_file_storage,
 )
-from ska_ost_osd.osd.version_manager import manage_version_release
+from ska_ost_osd.osd.version_mapping.version_manager import manage_version_release
 
 # this variable is added for restricting tmdata publish from local/dev environment.
 # usage: "0" means disable tmdata publish to artefact.

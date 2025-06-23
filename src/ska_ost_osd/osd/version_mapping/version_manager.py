@@ -1,7 +1,9 @@
 """Version management module for OSD.
 
-This module handles version increments according to semantic versioning rules.
+This module handles version increments according to semantic versioning
+rules.
 """
+
 import json
 import logging
 from pathlib import Path
