@@ -49,14 +49,28 @@ General Structure
 
 .. code-block:: bash
 
-    ├── constant.py
-    ├── helper.py
-    ├── __init__.py
-    ├── osd.py
-    ├── resource
-    │   └── release.sh
-    └── version_mapping
-        └── cycle_gitlab_release_version_mapping.json
+    ├── common
+    │   ├── __init__.py
+    │   ├── models.py
+    │   └── utils.py
+    ├── osd
+    │   ├── common
+    │   ├── models
+    │   ├── routers
+    │   ├── version_mapping
+    │   │   └── cycle_gitlab_release_version_mapping.json
+    │   ├── version_manager.py
+    │   └── osd.py
+    ├── scripts
+    │   └── release.sh
+    └── telvalidation
+        ├── common
+        ├── models
+        ├── routers
+        ├── __init__.py
+        ├── coordinates_conversion.py
+        ├── oet_tmc_validators.py
+        └── semantic_validator.py
 
 
 .. note::
@@ -68,7 +82,7 @@ General Structure
 
 .. note::
 
-    Created a bash script ``release.sh`` in ``resource`` folder.
+    Created a bash script ``release.sh`` in ``scripts`` folder.
 
 
 If user wants to access this framework from CDM, Jupyter Notebook or any other client below is the example.
@@ -733,7 +747,7 @@ Release Steps
 4. Run below command for OSD release
 
 Created a target called ``osd-pre-release`` in Makefile which will run when ska_ost_osd is released.
-also added a ``release.sh`` file inside ``osd`` ``resources`` folder which has two functions ``GetCycleId`` and ``UpdateAndAddValue``
+also added a ``release.sh`` file inside ``ska_ost_osd`` ``scripts`` folder which has two functions ``GetCycleId`` and ``UpdateAndAddValue``
 
 ``GetCycleId`` function gets ``cycle_number`` from ``observatory_policies.json`` file and triggers next function ``UpdateAndAddValue``
 which updates or add cycle_id values in version mapping json file.

@@ -10,8 +10,8 @@
         "tags": [
           "OSD"
         ],
-        "summary": "Get list of available cycles",
-        "description": "Get list of cycles from cycle_gitlab_release_version_mapping.json.\n\nReturns:\n    Dict: Dictionary containing list of cycle numbers",
+        "summary": "GET list of available proposal cycles",
+        "description": "GET list of all available proposal cycles.\n\nReturns:\n    Dict: Dictionary containing list of cycle numbers",
         "operationId": "get_cycle_list_ska_ost_osd_osd_api_v3_cycle_get",
         "responses": {
           "200": {

@@ -6,19 +6,20 @@ import pytest
 from ska_telmodel.data import TMData
 from ska_telmodel.schema import example_by_uri
 
+from ska_ost_osd.telvalidation.common.schematic_validation_exceptions import (
+    SchemanticValidationKeyError,
+    SchematicValidationError,
+)
 from ska_ost_osd.telvalidation.oet_tmc_validators import (
     get_matched_rule_constraint_from_osd,
     validate_json,
     validate_target_is_visible,
 )
-from ska_ost_osd.telvalidation.schematic_validation_exceptions import (
-    SchemanticValidationKeyError,
-    SchematicValidationError,
-)
 from ska_ost_osd.telvalidation.semantic_validator import (
     fetch_capabilities_from_osd,
     semantic_validate,
 )
+from tests.conftest import BASE_API_URL
 from tests.unit.ska_ost_osd.common.constant import (
     ARRAY_ASSEMBLY,
     INPUT_COMMAND_CONFIG,
@@ -269,3 +270,130 @@ def test_fetch_capabilities_from_osd_based_on_client_based_osd_data(mock1):
     mock1.return_value = {}, []
     result = fetch_capabilities_from_osd(telescope="mid", array_assembly=ARRAY_ASSEMBLY)
     assert result == ({}, {})
+
+
+@pytest.mark.skip
+@patch("ska_ost_osd.osd.routers.api.get_tmdata_sources")
+@pytest.mark.parametrize(
+    "json_body_to_validate, response",
+    [
+        ("valid_semantic_validation_body", "valid_semantic_validation_response"),
+        ("invalid_semantic_validation_body", "invalid_semantic_validation_response"),
+    ],
+)
+def test_semantic_validate_api(
+    mock_tmdata, client_post, request, json_body_to_validate, response
+):
+    """Test semantic validation API with valid and invalid JSON."""
+    mock_tmdata.return_value = ["file://tmdata"]
+    json_body = request.getfixturevalue(json_body_to_validate)
+    expected_response = request.getfixturevalue(response)
+
+    res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body)
+    assert res.get_json() == expected_response
+
+
+@pytest.mark.skip
+@patch("ska_ost_osd.telvalidation.semantic_validator.VALIDATION_STRICTNESS", "1")
+@patch("ska_ost_osd.osd.routers.api.VALIDATION_STRICTNESS", "1")
+@patch("ska_ost_osd.osd.routers.api.get_tmdata_sources")
+@pytest.mark.parametrize(
+    "json_body_to_validate, response",
+    [
+        ("valid_semantic_validation_body", "semantic_validation_disable_response"),
+        ("invalid_semantic_validation_body", "semantic_validation_disable_response"),
+    ],
+)
+def test_disable_semantic_validate_api(
+    mock_tmdata, client_post, request, json_body_to_validate, response
+):
+    """Test semantic validation API when VALIDATION_STRICTNESS is set to 1."""
+    mock_tmdata.return_value = ["file://tmdata"]
+    json_body = request.getfixturevalue(json_body_to_validate)
+    expected_response = request.getfixturevalue(response)
+
+    res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body)
+
+    assert res.get_json() == expected_response
+
+
+@pytest.mark.skip
+def test_semantic_validate_api_not_passing_required_keys(
+    client_post,
+    observing_command_input_missing_response,
+    valid_semantic_validation_body,
+):
+    """Test semantic validation API response with missing input
+    observing_command_input key."""
+    json_body = valid_semantic_validation_body.copy()
+    del json_body["observing_command_input"]
+    res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body)
+    assert res.get_json() == observing_command_input_missing_response
+
+
+@pytest.mark.skip
+@patch("ska_ost_osd.osd.routers.api.get_tmdata_sources")
+@pytest.mark.parametrize(
+    "json_body_to_validate, response, key_to_delete",
+    [
+        (
+            "valid_semantic_validation_body",
+            "valid_semantic_validation_response",
+            "sources",
+        ),
+        (
+            "valid_semantic_validation_body",
+            "valid_semantic_validation_response",
+            "interface",
+        ),
+        (
+            "valid_semantic_validation_body",
+            "valid_semantic_validation_response",
+            "raise_semantic",
+        ),
+        (
+            "valid_semantic_validation_body",
+            "valid_semantic_validation_response",
+            "osd_data",
+        ),
+    ],
+)
+def test_not_passing_optional_keys(
+    mock_tmdata, request, client_post, json_body_to_validate, response, key_to_delete
+):
+    """Test semantic validation API response by not passing optional keys."""
+    mock_tmdata.return_value = ["file://tmdata"]
+    json_body = request.getfixturevalue(json_body_to_validate).copy()
+    del json_body[key_to_delete]
+    expected_response = request.getfixturevalue(response)
+    res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body)
+    assert res.get_json() == expected_response
+
+
+@pytest.mark.skip
+def test_wrong_values_and_no_observing_command_input(
+    wrong_semantic_validation_parameter_value_response,
+    wrong_semantic_validation_parameter_body,
+    client_post,
+):
+    """Test semantic validation API response with wrong values."""
+    json_body = wrong_semantic_validation_parameter_body
+    expected_response = wrong_semantic_validation_parameter_value_response
+    res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body)
+    assert res.get_json() == expected_response
+
+
+@pytest.mark.skip
+@patch("ska_ost_osd.osd.routers.api.get_tmdata_sources")
+def test_passing_only_required_keys(
+    mock_tmdata,
+    client_post,
+    valid_only_observing_command_input_in_request_body,
+    valid_semantic_validation_response,
+):
+    """Test semantic validation API response with only required keys."""
+    mock_tmdata.return_value = ["file://tmdata"]
+    json_body = valid_only_observing_command_input_in_request_body
+    expected_response = valid_semantic_validation_response
+    res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body)
+    assert res.get_json() == expected_response

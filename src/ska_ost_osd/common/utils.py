@@ -8,25 +8,13 @@ from typing import Any, Dict, List
 
 from fastapi import status
 
-from ska_ost_osd.common.constant import (
+from ska_ost_osd.common.models import ApiResponse, ErrorResponseModel
+from ska_ost_osd.osd.common.constant import (
     API_RESPONSE_RESULT_STATUS_FAILED,
     API_RESPONSE_RESULT_STATUS_SUCCESS,
 )
-from ska_ost_osd.models.models import ApiResponse, ErrorResponseModel
 
 logging.basicConfig(level=logging.INFO)
-
-
-def read_file(filename: Path) -> Dict:
-    """Read and parse a JSON file into a dictionary.
-
-    :param filename: The path to the JSON file to be read
-    :returns: A dictionary containing the contents of the file
-    :raises: FileNotFoundError if file doesn't exist
-    :raises: JSONDecodeError if file contains invalid JSON
-    """
-    with open(filename, "r", encoding="utf-8") as file:
-        return json.load(file)
 
 
 def update_file(filename: Path, json_data: Dict) -> None:

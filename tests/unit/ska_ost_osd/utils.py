@@ -11,7 +11,7 @@ def read_json(json_file_location: Path) -> Dict:
     :returns: file content as json object
     """
     cwd, _ = os.path.split(__file__)
-    path = os.path.join(cwd, "routers/", json_file_location)
+    path = os.path.join(cwd, "osd/", json_file_location)
 
     with open(path) as user_file:  # pylint: disable=W1514
         file_contents = json.load(user_file)

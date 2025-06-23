@@ -1,8 +1,8 @@
-"""This module allows custom exceptions for semantic validation"""
+"""This module allows custom exceptions for semantic validation."""
 
 
 class SchematicValidationError(ValueError):
-    """Class to accept the various error messages from validator module"""
+    """Class to accept the various error messages from validator module."""
 
     def __init__(self, message="Undefined error", **_):
         self.message = message
@@ -10,7 +10,7 @@ class SchematicValidationError(ValueError):
 
 
 class SchemanticValidationKeyError(KeyError):
-    """class to raise invalid input key for schemantic validation"""
+    """Class to raise invalid input key for schemantic validation."""
 
     # flake8: noqa E501
     def __init__(

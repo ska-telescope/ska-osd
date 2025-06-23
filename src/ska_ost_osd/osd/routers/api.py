@@ -12,15 +12,13 @@ from typing import Dict
 from fastapi import APIRouter
 from pydantic import ValidationError
 
-from ska_ost_osd.common.error_handling import CapabilityError, OSDModelError
+from ska_ost_osd.common.models import ApiResponse
 from ska_ost_osd.common.utils import (
     convert_to_response_object,
     get_responses,
-    read_file,
+    read_json,
 )
-from ska_ost_osd.models.models import ApiResponse, CycleModel, UpdateRequestModel
-from ska_ost_osd.models.models_query import ValidationOnCapabilities
-from ska_ost_osd.osd.constant import (
+from ska_ost_osd.osd.common.constant import (
     CYCLE_TO_VERSION_MAPPING,
     MID_CAPABILITIES_JSON_PATH,
     OBSERVATORY_POLICIES_JSON_PATH,
@@ -28,14 +26,20 @@ from ska_ost_osd.osd.constant import (
     RELEASE_VERSION_MAPPING,
     osd_file_mapping,
 )
-from ska_ost_osd.osd.gitlab_helper import push_to_gitlab
+from ska_ost_osd.osd.common.error_handling import CapabilityError, OSDModelError
+from ska_ost_osd.osd.common.gitlab_helper import push_to_gitlab
+from ska_ost_osd.osd.common.osd_validation_messages import (
+    ARRAY_ASSEMBLY_DOESNOT_BELONGS_TO_CYCLE_ERROR_MESSAGE,
+)
+from ska_ost_osd.osd.models.models import (
+    CycleModel,
+    UpdateRequestModel,
+    ValidationOnCapabilities,
+)
 from ska_ost_osd.osd.osd import (
     add_new_data_storage,
     get_osd_using_tmdata,
     update_file_storage,
-)
-from ska_ost_osd.osd.osd_validation_messages import (
-    ARRAY_ASSEMBLY_DOESNOT_BELONGS_TO_CYCLE_ERROR_MESSAGE,
 )
 from ska_ost_osd.osd.version_manager import manage_version_release
 
@@ -119,7 +123,7 @@ def update_osd_data(body: Dict, **kwargs) -> Dict:
         if hasattr(validated_data, "cycle_id") and hasattr(
             validated_data, "array_assembly"
         ):
-            osd_data = read_file(OBSERVATORY_POLICIES_JSON_PATH)
+            osd_data = read_json(OBSERVATORY_POLICIES_JSON_PATH)
             if (
                 validated_data.cycle_id == osd_data["cycle_number"]
                 and validated_data.array_assembly
@@ -132,7 +136,7 @@ def update_osd_data(body: Dict, **kwargs) -> Dict:
                 )
 
         # Update storage with validated data
-        existing_data = read_file(MID_CAPABILITIES_JSON_PATH)
+        existing_data = read_json(MID_CAPABILITIES_JSON_PATH)
         observatory_policy = body.get("observatory_policy", None)
 
         return update_file_storage(
@@ -200,18 +204,18 @@ def release_osd_data(**kwargs):
 @osd_router.get(
     "/cycle",
     tags=["OSD"],
-    summary="Get list of available cycles",
+    summary="GET list of available proposal cycles",
     responses=get_responses(ApiResponse[CycleModel]),
     response_model=ApiResponse[CycleModel],
 )
 def get_cycle_list() -> Dict:
-    """Get list of cycles from cycle_gitlab_release_version_mapping.json.
+    """GET list of all available proposal cycles.
 
     Returns:
         Dict: Dictionary containing list of cycle numbers
     """
     # try:
-    data = read_file(RELEASE_VERSION_MAPPING)
+    data = read_json(RELEASE_VERSION_MAPPING)
     cycle_numbers = []
     for key in data.keys():
         # Extract number from cycle_X format

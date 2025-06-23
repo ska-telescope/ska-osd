@@ -5,10 +5,9 @@ from typing import Any, Dict, Optional
 
 from ska_telmodel.data import TMData
 
-from ska_ost_osd.common.error_handling import OSDModelError
 from ska_ost_osd.common.utils import update_file
-from ska_ost_osd.models.models_query import OSDModel
-from ska_ost_osd.osd.osd_validation_messages import (
+from ska_ost_osd.osd.common.error_handling import OSDModelError
+from ska_ost_osd.osd.common.osd_validation_messages import (
     ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE,
     AVAILABLE_SOURCE_ERROR_MESSAGE,
     CAPABILITY_DOESNOT_EXIST_ERROR_MESSAGE,
@@ -17,8 +16,9 @@ from ska_ost_osd.osd.osd_validation_messages import (
     OSD_VERSION_ERROR_MESSAGE,
     SOURCE_ERROR_MESSAGE,
 )
+from ska_ost_osd.osd.models.models import OSDModel
 
-from .constant import (
+from .common.constant import (
     ARRAY_ASSEMBLY_PATTERN,
     BASE_FOLDER_NAME,
     BASE_URL,

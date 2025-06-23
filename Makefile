@@ -85,7 +85,7 @@ dev-down: k8s-uninstall-chart k8s-delete-namespace  ## tear down developer deplo
 
 osd-pre-release:
 
-	@./src/ska_ost_osd/osd/resource/release.sh $(VERSION)
+	@./src/ska_ost_osd/scripts/release.sh $(VERSION)
 
 CI_MERGE_REQUEST_SOURCE_BRANCH_NAME := $(shell cat tmdata/version_mapping/latest_release.txt)
 osddata-do-publish:

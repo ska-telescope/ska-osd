@@ -10,8 +10,8 @@ from fastapi.testclient import TestClient
 from ska_telmodel.data import TMData
 
 from ska_ost_osd.app import create_app
-from ska_ost_osd.common.constant import CAR_TELMODEL_SOURCE
 from ska_ost_osd.osd.osd import osd_tmdata_source
+from ska_ost_osd.telvalidation.common.constant import CAR_TELMODEL_SOURCE
 from tests.unit.ska_ost_osd.common.constant import (
     INVALID_MID_ASSIGN_JSON,
     LOW_MOCK_DATA,

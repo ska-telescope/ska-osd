@@ -3,7 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel, model_validator
 
-from ska_ost_osd.common.constant import INTERFACE_PATTERN
+from ska_ost_osd.telvalidation.common.constant import INTERFACE_PATTERN
 
 
 class SemanticModel(BaseModel):

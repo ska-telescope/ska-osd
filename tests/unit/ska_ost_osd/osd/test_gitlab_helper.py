@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, mock_open, patch
 
 import pytest
 
-from ska_ost_osd.osd.gitlab_helper import (
+from ska_ost_osd.osd.common.gitlab_helper import (
     check_file_modified,
     get_project_root,
     push_to_gitlab,
@@ -15,12 +15,12 @@ from ska_ost_osd.osd.gitlab_helper import (
 class TestGitlabHelper:
     @pytest.fixture
     def mock_check_file_modified(self):
-        with patch("ska_ost_osd.osd.gitlab_helper.check_file_modified") as mock:
+        with patch("ska_ost_osd.osd.common.gitlab_helper.check_file_modified") as mock:
             yield mock
 
     @pytest.fixture
     def mock_git_backend(self):
-        with patch("ska_ost_osd.osd.gitlab_helper.GitBackend") as mock:
+        with patch("ska_ost_osd.osd.common.gitlab_helper.GitBackend") as mock:
             yield mock
 
     def test_check_file_modified_empty_file(self, tmp_path):
@@ -95,23 +95,25 @@ class TestGitlabHelper:
         structure."""
         result = get_project_root()
         assert result.name == "ska-ost-osd"
-        assert (result / "src" / "ska_ost_osd" / "osd" / "gitlab_helper.py").exists()
+        assert (
+            result / "src" / "ska_ost_osd" / "osd" / "common" / "gitlab_helper.py"
+        ).exists()
 
-    @patch("ska_ost_osd.osd.gitlab_helper.Path")
+    @patch("ska_ost_osd.osd.common.gitlab_helper.Path")
     def test_get_project_root_file_not_found(self, mock_path):
         """Test get_project_root when __file__ is not found or accessible."""
         mock_path.side_effect = FileNotFoundError("File not found")
         with pytest.raises(FileNotFoundError):
             get_project_root()
 
-    @patch("ska_ost_osd.osd.gitlab_helper.Path")
+    @patch("ska_ost_osd.osd.common.gitlab_helper.Path")
     def test_get_project_root_os_error(self, mock_path):
         """Test get_project_root when there's a general OS error."""
         mock_path.return_value.resolve.side_effect = OSError("OS error")
         with pytest.raises(OSError):
             get_project_root()
 
-    @patch("ska_ost_osd.osd.gitlab_helper.Path")
+    @patch("ska_ost_osd.osd.common.gitlab_helper.Path")
     def test_get_project_root_permission_error(self, mock_path):
         """Test get_project_root when there's a permission error accessing the
         directory."""
@@ -132,7 +134,7 @@ class TestGitlabHelper:
         result = get_project_root()
         assert isinstance(result, Path)
 
-    @patch("ska_ost_osd.osd.gitlab_helper.setup_gitlab_access")
+    @patch("ska_ost_osd.osd.common.gitlab_helper.setup_gitlab_access")
     def test_push_to_gitlab_git_backend_exception(
         self,
         mock_setup,  # pylint: disable=W0613
@@ -147,9 +149,9 @@ class TestGitlabHelper:
             with patch("pathlib.Path.unlink"):
                 push_to_gitlab([(Path("/valid/path"), "target/path")], "Test commit")
 
-    @patch("ska_ost_osd.osd.gitlab_helper.setup_gitlab_access")
-    @patch("ska_ost_osd.osd.gitlab_helper.GitBackend")
-    @patch("ska_ost_osd.osd.gitlab_helper.check_file_modified")
+    @patch("ska_ost_osd.osd.common.gitlab_helper.setup_gitlab_access")
+    @patch("ska_ost_osd.osd.common.gitlab_helper.GitBackend")
+    @patch("ska_ost_osd.osd.common.gitlab_helper.check_file_modified")
     def test_push_to_gitlab_no_modified_files(
         self,
         mock_check_file_modified,
@@ -183,20 +185,23 @@ class TestGitlabHelper:
             mock_git_backend_instance.commit.assert_not_called()
             mock_git_backend_instance.commit_transaction.assert_not_called()
 
-    @patch("ska_ost_osd.osd.gitlab_helper.setup_gitlab_access")
+    @patch("ska_ost_osd.osd.common.gitlab_helper.setup_gitlab_access")
     def test_push_to_gitlab_with_modified_files(
         self, mock_gitlab
     ):  # pylint: disable=W0613
         """Test push_to_gitlab when there are modified files to push."""
         # Mock the GitBackend class
-        with patch("ska_ost_osd.osd.gitlab_helper.GitBackend") as mock_git_backend:
+        with patch(
+            "ska_ost_osd.osd.common.gitlab_helper.GitBackend"
+        ) as mock_git_backend:
             # Create a mock instance of GitBackend
             mock_git_repo = MagicMock()
             mock_git_backend.return_value = mock_git_repo
 
             # Mock check_file_modified to always return True
             with patch(
-                "ska_ost_osd.osd.gitlab_helper.check_file_modified", return_value=True
+                "ska_ost_osd.osd.common.gitlab_helper.check_file_modified",
+                return_value=True,
             ):
                 with patch("pathlib.Path.unlink"):
                     # Prepare test data
@@ -222,12 +227,13 @@ class TestGitlabHelper:
 
         with (
             patch(
-                "ska_ost_osd.osd.gitlab_helper.Path.home",
+                "ska_ost_osd.osd.common.gitlab_helper.Path.home",
                 return_value=Path("/mock/home"),
             ),
-            patch("ska_ost_osd.osd.gitlab_helper.subprocess.run") as mock_run,
+            patch("ska_ost_osd.osd.common.gitlab_helper.subprocess.run") as mock_run,
             patch(
-                "ska_ost_osd.osd.gitlab_helper.os.getenv", return_value="mock_ssh_key"
+                "ska_ost_osd.osd.common.gitlab_helper.os.getenv",
+                return_value="mock_ssh_key",
             ),
             patch("pathlib.Path.chmod") as mock_chmod,
             patch("pathlib.Path.open", mock_open()) as mock_file,

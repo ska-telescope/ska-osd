@@ -9,14 +9,14 @@ from fastapi.exceptions import ResponseValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from ska_ser_logging import configure_logging
 
-from ska_ost_osd.common.error_handling import (
+from ska_ost_osd.osd.common.error_handling import (
     file_not_found_error_handler,
     internal_server_error_handler,
     response_validation_error_handler,
     schematic_validation_error_handler,
 )
-from ska_ost_osd.routers.osd_api import osd_router
-from ska_ost_osd.telvalidation.schematic_validation_exceptions import (
+from ska_ost_osd.osd.routers.api import osd_router
+from ska_ost_osd.telvalidation.common.schematic_validation_exceptions import (
     SchematicValidationError,
 )
 

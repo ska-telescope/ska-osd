@@ -7,7 +7,7 @@ from fastapi.exceptions import RequestValidationError, ResponseValidationError
 from fastapi.responses import JSONResponse
 
 from ska_ost_osd.common.utils import convert_to_response_object
-from ska_ost_osd.telvalidation.schematic_validation_exceptions import (
+from ska_ost_osd.telvalidation.common.schematic_validation_exceptions import (
     SchematicValidationError,
 )
 

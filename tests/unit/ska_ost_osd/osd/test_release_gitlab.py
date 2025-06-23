@@ -2,13 +2,13 @@ from unittest.mock import patch
 
 import pytest
 
-from ska_ost_osd.routers.osd_api import release_osd_data
+from ska_ost_osd.osd.routers.api import release_osd_data
 
 
 @pytest.mark.skip
 class TestResources:
-    @patch("ska_ost_osd.routers.osd_api.manage_version_release")
-    @patch("ska_ost_osd.routers.osd_api.push_to_gitlab")
+    @patch("ska_ost_osd.osd.routers.api.manage_version_release")
+    @patch("ska_ost_osd.osd.routers.api.push_to_gitlab")
     def test_release_osd_data_2(self, mock_push_to_gitlab, mock_manage_version_release):
         """Test release_osd_data with valid cycle_id and invalid
         release_type."""
@@ -46,9 +46,9 @@ class TestResources:
         result = release_osd_data()
         assert result[0]["detail"] == "cycle_id is required"
 
-    @patch("ska_ost_osd.routers.osd_api.manage_version_release")
-    @patch("ska_ost_osd.routers.osd_api.push_to_gitlab")
-    @patch("ska_ost_osd.routers.osd_api.PUSH_TO_GITLAB", "1")
+    @patch("ska_ost_osd.osd.routers.api.manage_version_release")
+    @patch("ska_ost_osd.osd.routers.api.push_to_gitlab")
+    @patch("ska_ost_osd.osd.routers.api.PUSH_TO_GITLAB", "1")
     def test_release_osd_data_success(
         self, mock_push_to_gitlab, mock_manage_version_release
     ):
@@ -71,9 +71,9 @@ class TestResources:
         mock_manage_version_release.assert_called_once_with("cycle_1", None)
         mock_push_to_gitlab.assert_called_once()
 
-    @patch("ska_ost_osd.routers.osd_api.manage_version_release")
-    @patch("ska_ost_osd.routers.osd_api.push_to_gitlab")
-    @patch("ska_ost_osd.routers.osd_api.PUSH_TO_GITLAB", "1")
+    @patch("ska_ost_osd.osd.routers.api.manage_version_release")
+    @patch("ska_ost_osd.osd.routers.api.push_to_gitlab")
+    @patch("ska_ost_osd.osd.routers.api.PUSH_TO_GITLAB", "1")
     def test_release_osd_data_successful(
         self, mock_push_to_gitlab, mock_manage_version_release
     ):
@@ -102,9 +102,9 @@ class TestResources:
         result = release_osd_data(cycle_id=1, release_type=release_type)
         assert result["status"] == "success"
 
-    @patch("ska_ost_osd.routers.osd_api.manage_version_release")
-    @patch("ska_ost_osd.routers.osd_api.push_to_gitlab")
-    @patch("ska_ost_osd.routers.osd_api.PUSH_TO_GITLAB", "1")
+    @patch("ska_ost_osd.osd.routers.api.manage_version_release")
+    @patch("ska_ost_osd.osd.routers.api.push_to_gitlab")
+    @patch("ska_ost_osd.osd.routers.api.PUSH_TO_GITLAB", "1")
     def test_release_osd_data_with_release_type(
         self, mock_push_to_gitlab, mock_manage_version_release
     ):

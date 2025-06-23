@@ -1,4 +1,5 @@
 """GitLab helper functions for OSD."""
+
 import logging
 import os
 import subprocess
@@ -13,12 +14,13 @@ logger = logging.getLogger(__name__)
 
 def get_project_root() -> Path:
     """Get the project root directory."""
-    current_dir = Path(__file__).resolve().parent
+    current_dir = Path(__file__).resolve().parent.parent
     return current_dir.parent.parent.parent
 
 
 def check_file_modified(file_path: Path) -> bool:
-    """Check if a file has been modified by comparing its size with the original.
+    """Check if a file has been modified by comparing its size with the
+    original.
 
     Args:
         file_path: Path to the file to check
@@ -38,9 +40,7 @@ def check_file_modified(file_path: Path) -> bool:
 
 
 def setup_gitlab_access():
-    """
-    Set up GitLab SSH access with proper host key verification
-    """
+    """Set up GitLab SSH access with proper host key verification."""
     ssh_dir = Path.home() / ".ssh"
     known_hosts_file = ssh_dir / "known_hosts"
 
