@@ -6,13 +6,14 @@ from pydantic import BaseModel
 T = TypeVar("T")
 
 
-class ApiResponse(BaseModel, Generic[T]):
+class BaseResponseModel(BaseModel, Generic[T]):
     result_data: List[T] | Dict[str, T] | str
     result_status: str
+
+
+class ApiResponse(BaseResponseModel[T]):
     result_code: HTTPStatus = HTTPStatus.OK
 
 
-class ErrorResponseModel(BaseModel, Generic[T]):
-    result_data: List[T] | Dict[str, T] | str
-    result_status: str
+class ErrorResponseModel(BaseResponseModel[T]):
     result_code: HTTPStatus = HTTPStatus.INTERNAL_SERVER_ERROR
