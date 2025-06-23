@@ -97,5 +97,6 @@ class ReleaseType(str, Enum):
 
 
 class OSDRelease(BaseModel):
-    cycle_id: int
-    release_type: Optional[ReleaseType] = None
+    message: str
+    version: str
+    cycle_id: str

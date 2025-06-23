@@ -35,11 +35,13 @@ class ValidationErrorFormatter:
     def format(exc: RequestValidationError) -> Dict[str, Any]:
         missing_fields = []
         payload_str = ""
-        if isinstance(exc, Exception):
+
+        if isinstance(exc, Exception) and not isinstance(exc, RequestValidationError):
             return str(exc)
         for err in exc.errors():
             if err.get("type") == "missing":
                 missing_fields.append(err["loc"][-1])
+            # elif err.get("type") == "missing":
             payload_str = err["input"]
 
         parts = []
@@ -79,6 +81,25 @@ async def response_validation_error_handler(
     result = convert_to_response_object(
         formatted,
         result_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+    )
+
+    return JSONResponse(
+        content=result.model_dump(mode="json", exclude_none=True),
+        status_code=status,
+    )
+
+
+async def request_validation_error_handler(
+    _: Request, err: ResponseValidationError, status=HTTPStatus.INTERNAL_SERVER_ERROR
+) -> JSONResponse:
+    """A custom handler function that returns a verbose HTTP 500 response
+    containing detailed traceback information."""
+
+    formatted = ValidationErrorFormatter.format(err)
+
+    result = convert_to_response_object(
+        formatted,
+        result_code=HTTPStatus.UNPROCESSABLE_ENTITY,
     )
 
     return JSONResponse(

@@ -156,9 +156,7 @@ def update_osd_data(body: Dict, **kwargs) -> Dict:
     responses=get_responses(ApiResponse[OSDRelease]),
     response_model=ApiResponse[OSDRelease],
 )
-def release_osd_data(
-    cycle_id: int, release_type: ReleaseType
-) -> ApiResponse[OSDRelease]:
+def release_osd_data(cycle_id: int, release_type: ReleaseType) -> Dict:
     """Release OSD data with automatic version increment based on cycle ID.
 
     Args:
@@ -176,7 +174,7 @@ def release_osd_data(
     cycle_id = "cycle_" + str(cycle_id)
     release_type = release_type
     # provided support for patch as part of current implementation
-    if release_type and release_type not in ["major", "minor"]:
+    if release_type and release_type not in ["major", "minor", "patch"]:
         raise ValueError("release_type must be either 'major' or 'minor' if provided")
     if PUSH_TO_GITLAB == PUSH_TO_GITLAB_FLAG:
         # Use version manager to handle version release
@@ -196,20 +194,20 @@ def release_osd_data(
             commit_msg="updated tmdata",
         )
 
-        return {
-            "status": "success",
+        result = {
             "message": f"Released new version {new_version}",
             "version": str(new_version),
             "cycle_id": cycle_id,
         }
+        return convert_to_response_object(result, result_code=HTTPStatus.OK)
 
     else:
-        return {
-            "status": "success",
+        result = {
             "message": "Push to gitlab is disabled",
             "version": "0.0.0",
             "cycle_id": cycle_id,
         }
+        return convert_to_response_object(result, result_code=HTTPStatus.OK)
 
 
 @osd_router.get(

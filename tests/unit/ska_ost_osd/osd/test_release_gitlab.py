@@ -3,27 +3,30 @@ from unittest.mock import patch
 import pytest
 
 from ska_ost_osd.osd.routers.api import release_osd_data
+from tests.conftest import BASE_API_URL
 
 
-@pytest.mark.skip
 class TestResources:
     @patch("ska_ost_osd.osd.routers.api.manage_version_release")
     @patch("ska_ost_osd.osd.routers.api.push_to_gitlab")
-    def test_release_osd_data_2(self, mock_push_to_gitlab, mock_manage_version_release):
+    def test_release_osd_data_2(
+        self, mock_push_to_gitlab, mock_manage_version_release, client_post
+    ):
         """Test release_osd_data with valid cycle_id and invalid
         release_type."""
         # Arrange
-        cycle_id = 1
-        release_type = "invalid_type"
+        # cycle_id = 1
+        # release_type = "invalid_type"
+        data = {"cycle_id": 1, "release_type": "invalid_type"}
         mock_manage_version_release.return_value = ("1.0.1", "cycle_1")
 
         # Act
         # with pytest.raises(ValueError) as exc_info:
-        result = release_osd_data(cycle_id=cycle_id, release_type=release_type)
+        result = client_post(f"{BASE_API_URL}/osd_release", params=data).json()
 
         # Assert
         assert (
-            result[0]["detail"]
+            result["detail"]
             == "release_type must be either 'major' or 'minor' if provided"
         )
         mock_manage_version_release.assert_not_called()
