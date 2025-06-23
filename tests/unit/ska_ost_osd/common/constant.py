@@ -1,4 +1,4 @@
-from ska_ost_osd.common.constant import CAR_TELMODEL_SOURCE
+from ska_ost_osd.telvalidation.common.constant import CAR_TELMODEL_SOURCE
 from tests.unit.ska_ost_osd.utils import read_json
 
 MID_MOCK_DATA = read_json("test_files/mock_mid_capabilities.json")

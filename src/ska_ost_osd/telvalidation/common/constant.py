@@ -1,7 +1,4 @@
-"""
-  created file to maintain televalidation constant
-"""
-
+"""Created file to maintain televalidation constant."""
 
 # flake8: noqa E501
 

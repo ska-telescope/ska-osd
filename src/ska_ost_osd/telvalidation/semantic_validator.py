@@ -15,7 +15,7 @@ from ska_telmodel.data import TMData
 
 from ska_ost_osd.telvalidation.models.semantic_schema_validator import SemanticModel
 
-from ..common.constant import (
+from .common.constant import (
     ASSIGN_RESOURCE,
     CONFIGURE,
     LOW_SBD_VALIDATION_CONSTANT_JSON_FILE_PATH,

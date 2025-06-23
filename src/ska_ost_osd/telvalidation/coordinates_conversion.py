@@ -11,7 +11,7 @@ from astropy.time import Time, TimeDelta
 # importing the modules
 from ska_telmodel.data import TMData
 
-from ..common.constant import (
+from .common.constant import (
     LOW_LAYOUT_CONSTANT_JSON_FILE_PATH,
     MID_LAYOUT_CONSTANT_JSON_FILE_PATH,
 )
