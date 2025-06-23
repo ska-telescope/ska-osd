@@ -12,7 +12,6 @@ from typing import Dict
 from fastapi import APIRouter
 from pydantic import ValidationError
 
-from ska_ost_osd.common.error_handling import CapabilityError, OSDModelError
 from ska_ost_osd.common.models import ApiResponse
 from ska_ost_osd.common.utils import (
     convert_to_response_object,
@@ -27,6 +26,7 @@ from ska_ost_osd.osd.common.constant import (
     RELEASE_VERSION_MAPPING,
     osd_file_mapping,
 )
+from ska_ost_osd.osd.common.error_handling import CapabilityError, OSDModelError
 from ska_ost_osd.osd.common.gitlab_helper import push_to_gitlab
 from ska_ost_osd.osd.common.osd_validation_messages import (
     ARRAY_ASSEMBLY_DOESNOT_BELONGS_TO_CYCLE_ERROR_MESSAGE,
