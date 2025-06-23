@@ -4,7 +4,10 @@ from unittest.mock import mock_open, patch
 
 import pytest
 
-from ska_ost_osd.osd.version_manager import increment_version, manage_version_release
+from ska_ost_osd.osd.version_mapping.version_manager import (
+    increment_version,
+    manage_version_release,
+)
 
 
 class TestVersionManager:
