@@ -19,25 +19,17 @@ class TestResources:
         data = {"cycle_id": 1, "release_type": "invalid_type"}
         mock_manage_version_release.return_value = ("1.0.1", "cycle_1")
 
-        # Act
-        # with pytest.raises(ValueError) as exc_info:
         result = client_post(f"{BASE_API_URL}/osd_release", params=data).json()
 
-        # Assert
         assert (
             result["result_data"]
-            == "query.release_type: Input should be 'patch', 'minor' or 'major',"
+            == "query.release_type: Input should be 'minor' or 'major',"
             " invalid payload: invalid_type"
         )
         assert result["result_status"] == "failed"
         assert result["result_code"] == status.HTTP_422_UNPROCESSABLE_ENTITY
         mock_manage_version_release.assert_not_called()
         mock_push_to_gitlab.assert_not_called()
-
-    def test_release_osd_data_empty_release_type(self):
-        """Test release_osd_data with empty release_type."""
-        result = release_osd_data(cycle_id=1, release_type="").model_dump(mode="json")
-        assert result["result_status"] == "success"
 
     @pytest.mark.parametrize("cycle_id", [False, {}, set()])
     def test_release_osd_data_invalid_cycle_id_types(self, cycle_id, client_post):
@@ -53,7 +45,7 @@ class TestResources:
 
     def test_release_osd_data_missing_cycle_id(self, client_post):
         """Test release_osd_data with missing cycle_id."""
-        # Act & Assert
+
         data = {}
         result = client_post(f"{BASE_API_URL}/osd_release", params=data).json()
         assert (
@@ -69,16 +61,14 @@ class TestResources:
     ):
         """Test successful release of OSD data with valid cycle_id and no
         release_type."""
-        # Arrange
+
         mock_manage_version_release.return_value = ("1.0.1", "cycle_1")
         mock_push_to_gitlab.return_value = None
 
-        # Act
         result = release_osd_data(cycle_id=1, release_type="minor").model_dump(
             mode="json"
         )
 
-        # Assert
         assert result == {
             "result_data": [
                 {
@@ -101,16 +91,14 @@ class TestResources:
     ):
         """Test successful release of OSD data with valid cycle_id and no
         release_type."""
-        # Arrange
+
         mock_manage_version_release.return_value = ("1.0.1", "cycle_1")
         mock_push_to_gitlab.return_value = None
 
-        # Act
         result = release_osd_data(cycle_id=1, release_type="minor").model_dump(
             mode="json"
         )
 
-        # Assert
         assert result == {
             "result_data": [
                 {
@@ -125,7 +113,7 @@ class TestResources:
         mock_manage_version_release.assert_called_once_with("cycle_1", "minor")
         mock_push_to_gitlab.assert_called_once()
 
-    @pytest.mark.parametrize("release_type", [None, "major", "minor"])
+    @pytest.mark.parametrize("release_type", ["major", "minor"])
     def test_release_osd_data_valid_release_types(self, release_type):
         """Test release_osd_data with valid release types."""
         result = release_osd_data(cycle_id=1, release_type=release_type).model_dump(
@@ -140,16 +128,14 @@ class TestResources:
         self, mock_push_to_gitlab, mock_manage_version_release
     ):
         """Test release_osd_data with valid release_type."""
-        # Arrange
+
         mock_manage_version_release.return_value = ("2.0.0", "cycle_2")
         mock_push_to_gitlab.return_value = None
 
-        # Act
         result = release_osd_data(cycle_id=2, release_type="major").model_dump(
             mode="json"
         )
 
-        # Assert
         assert result == {
             "result_data": [
                 {

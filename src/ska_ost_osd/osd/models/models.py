@@ -91,7 +91,6 @@ class ValidationOnCapabilities(BaseModel):
 
 
 class ReleaseType(str, Enum):
-    patch = "patch"
     minor = "minor"
     major = "major"
 

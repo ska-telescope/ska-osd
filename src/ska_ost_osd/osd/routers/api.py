@@ -22,7 +22,6 @@ from ska_ost_osd.osd.common.constant import (
     CYCLE_TO_VERSION_MAPPING,
     MID_CAPABILITIES_JSON_PATH,
     OBSERVATORY_POLICIES_JSON_PATH,
-    PUSH_TO_GITLAB_FLAG,
     RELEASE_VERSION_MAPPING,
     osd_file_mapping,
 )
@@ -48,7 +47,7 @@ from ska_ost_osd.osd.version_mapping.version_manager import manage_version_relea
 # this variable is added for restricting tmdata publish from local/dev environment.
 # usage: "0" means disable tmdata publish to artefact.
 # "1" means allow to publish
-PUSH_TO_GITLAB = environ.get("PUSH_TO_GITLAB", "0")
+PUSH_TO_GITLAB = environ.get("PUSH_TO_GITLAB", 0)
 osd_router = APIRouter(prefix="")
 
 
@@ -160,21 +159,19 @@ def release_osd_data(cycle_id: int, release_type: ReleaseType) -> Dict:
     """Release OSD data with automatic version increment based on cycle ID.
 
     Args:
-        **kwargs: Keyword arguments including:
-            - cycle_id: Required. The cycle ID for version mapping
-            - release_type: Optional.
-            Type of release ('major' or 'minor', defaults to patch)
+        - cycle_id: Required. The cycle ID for version mapping
+        - release_type: Required. Type of release ('major' or 'minor')
 
     Returns:
-        dict: Response containing the new version information
+        Dict: Response containing the new version information
     """
-    if not cycle_id:
-        raise ValueError("cycle_id is required")
-    cycle_id = "cycle_" + str(cycle_id)
-    # provided support for patch as part of current implementation
-    if release_type and release_type not in ["major", "minor", "patch"]:
+
+    cycle_id = f"cycle_{cycle_id}"
+
+    if release_type not in ["minor", "major"]:
         raise ValueError("release_type must be either 'major' or 'minor' if provided")
-    if PUSH_TO_GITLAB == PUSH_TO_GITLAB_FLAG:
+
+    if PUSH_TO_GITLAB:
         # Use version manager to handle version release
         new_version, cycle_id = manage_version_release(cycle_id, release_type)
 
@@ -221,10 +218,12 @@ def get_cycle_list() -> Dict:
     Returns:
         Dict: Dictionary containing list of cycle numbers
     """
-    # TO DO: instead of relying on RELEASE_VERSION_MAPPING file
+    # TODO: instead of relying on RELEASE_VERSION_MAPPING file
     # we should find better approach to find out cycles
     data = read_json(RELEASE_VERSION_MAPPING)
+
     cycle_numbers = []
+
     for key in data.keys():
         # Extract number from cycle_X format
         if key.startswith("cycle_"):

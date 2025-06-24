@@ -368,7 +368,7 @@ GET /cycle
 
     .. code:: python
 
-        client_get(
+        client.get(
             "/ska-ost-osd/osd/api/v<majorversion>/cycle"
          )
 
@@ -419,7 +419,7 @@ POST /osd_release
     Parameters             Description
     ===================    ============================================================
     cycle_id               Cycle Id a integer value 1, 2, 3
-    release_type           Patch, Major and Minor
+    release_type           Major and Minor
     ===================    ============================================================
 
 
@@ -428,14 +428,14 @@ POST /osd_release
 
     .. code:: python
 
-      "/ska-ost-osd/osd/api/v<majorversion>/osd_release?cycle_id=1&release_type=patch"
+      "/ska-ost-osd/osd/api/v<majorversion>/osd_release?cycle_id=1&release_type=minor"
 
 
 3. CURL Example Request
 
     .. code:: python
 
-       curl -X POST "/ska-ost-osd/osd/api/v<majorversion>/osd_release?cycle_id=1&release_type=patch"
+       curl -X POST "/ska-ost-osd/osd/api/v<majorversion>/osd_release?cycle_id=1&release_type=minor"
 
 
 4. Example Response
@@ -444,13 +444,29 @@ POST /osd_release
 
     .. code:: python
 
-        client.put(
-            "/ska-ost-osd/osd/api/v<majorversion>/osd_release?cycle_id=1&release_type=patch",
-            query_string={
+        client.post(
+            "/ska-ost-osd/osd/api/v<majorversion>/osd_release?cycle_id=1&release_type=minor",
+            query_params={
                 "cycle_id": 1,
-                "release_type": "patch"
+                "release_type": "minor"
             },
         )
+
+    * Response
+
+    .. code:: python
+
+        {
+        "result_data": [
+            {
+            "message": f"Released new version 1.0.0",
+            "version": 1.0.0,
+            "cycle_id": 1,
+        }
+        ],
+        "result_status": "success",
+        "result_code": 200
+        }
 
 
 5. Scenarios

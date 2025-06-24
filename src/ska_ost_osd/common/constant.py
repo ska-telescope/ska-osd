@@ -1,5 +1,5 @@
 from fastapi import status
-from fastapi.exceptions import ResponseValidationError
+from fastapi.exceptions import RequestValidationError, ResponseValidationError
 
 API_RESPONSE_RESULT_STATUS_SUCCESS = "success"
 API_RESPONSE_RESULT_STATUS_FAILED = "failed"
@@ -11,4 +11,5 @@ EXCEPTION_STATUS_MAP = {
     KeyError: status.HTTP_400_BAD_REQUEST,
     TypeError: status.HTTP_422_UNPROCESSABLE_ENTITY,
     Exception: status.HTTP_500_INTERNAL_SERVER_ERROR,
+    RequestValidationError: status.HTTP_422_UNPROCESSABLE_ENTITY,
 }
