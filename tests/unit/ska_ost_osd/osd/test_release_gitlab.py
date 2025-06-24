@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
 import pytest
+from fastapi import status
 
 from ska_ost_osd.osd.routers.api import release_osd_data
 from tests.conftest import BASE_API_URL
@@ -14,9 +15,7 @@ class TestResources:
     ):
         """Test release_osd_data with valid cycle_id and invalid
         release_type."""
-        # Arrange
-        # cycle_id = 1
-        # release_type = "invalid_type"
+
         data = {"cycle_id": 1, "release_type": "invalid_type"}
         mock_manage_version_release.return_value = ("1.0.1", "cycle_1")
 
@@ -26,22 +25,31 @@ class TestResources:
 
         # Assert
         assert (
-            result["detail"]
-            == "release_type must be either 'major' or 'minor' if provided"
+            result["result_data"]
+            == "query.release_type: Input should be 'patch', 'minor' or 'major',"
+            " invalid payload: invalid_type"
         )
+        assert result["result_status"] == "failed"
+        assert result["result_code"] == status.HTTP_422_UNPROCESSABLE_ENTITY
         mock_manage_version_release.assert_not_called()
         mock_push_to_gitlab.assert_not_called()
 
     def test_release_osd_data_empty_release_type(self):
         """Test release_osd_data with empty release_type."""
-        result = release_osd_data(cycle_id=1, release_type="")
-        assert result["status"] == "success"
+        result = release_osd_data(cycle_id=1, release_type="").model_dump(mode="json")
+        assert result["result_status"] == "success"
 
     @pytest.mark.parametrize("cycle_id", [False, [], {}, set()])
-    def test_release_osd_data_invalid_cycle_id_types(self, cycle_id):
+    def test_release_osd_data_invalid_cycle_id_types(self, cycle_id, client_post):
         """Test release_osd_data with invalid cycle_id types."""
-        result = release_osd_data(cycle_id=cycle_id)
-        assert result[0]["title"] == "Value Error"
+
+        data = {"cycle_id": cycle_id, "release_type": "minor"}
+        result = client_post(f"{BASE_API_URL}/osd_release", params=data).json()
+        assert (
+            "query.cycle_id: Input should be a valid integer" in result["result_data"]
+        )
+        assert result["result_status"] == "failed"
+        assert result["result_code"] == status.HTTP_422_UNPROCESSABLE_ENTITY
 
     def test_release_osd_data_missing_cycle_id(self):
         """Test release_osd_data with missing cycle_id."""

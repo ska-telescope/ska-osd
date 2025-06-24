@@ -31,21 +31,39 @@ class ValidationErrorFormatter:
     @staticmethod
     def format(exc: RequestValidationError) -> Dict[str, Any]:
         missing_fields = []
+        parsing_errors = []
         payload_str = ""
 
-        if isinstance(exc, Exception) and not isinstance(exc, RequestValidationError):
+        if not isinstance(exc, RequestValidationError):
             return str(exc)
+
         for err in exc.errors():
-            if err.get("type") == "missing":
-                missing_fields.append(err["loc"][-1])
-            # elif err.get("type") == "missing":
-            payload_str = err["input"]
+            err_type = err.get("type")
+            loc = ".".join(str(loc_part) for loc_part in err.get("loc", []))
+            msg = err.get("msg", "Invalid input")
+            input_value = err.get("input", "")
+
+            if err_type == "missing":
+                missing_fields.append(loc)
+            elif err_type == "int_parsing":
+                parsing_errors.append(f"{loc}: {msg}, provided value: {input_value}")
+            else:
+                parsing_errors.append(f"{loc}: {msg}")
+
+            if input_value and not payload_str:
+                payload_str = str(input_value)
 
         parts = []
         if missing_fields:
             parts.append(f"Missing field(s): {', '.join(missing_fields)}")
+        if parsing_errors:
+            parts.extend(parsing_errors)
 
-        return ". ".join(parts) + f", invalid payload: {payload_str}"
+        error_message = ". ".join(parts)
+        if payload_str:
+            error_message += f", invalid payload: {payload_str}"
+
+        return error_message
 
 
 async def internal_server_error_handler(
