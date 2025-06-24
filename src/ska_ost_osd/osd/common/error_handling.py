@@ -3,7 +3,7 @@ from http import HTTPStatus
 from typing import Any, Dict, List
 
 from fastapi import Request
-from fastapi.exceptions import RequestValidationError, ResponseValidationError
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from ska_ost_osd.common.utils import convert_to_response_object
@@ -48,25 +48,6 @@ class ValidationErrorFormatter:
 
 async def internal_server_error_handler(
     _: Request, err: Exception, status=HTTPStatus.INTERNAL_SERVER_ERROR
-) -> JSONResponse:
-    """A custom handler function that returns a verbose HTTP 500 response
-    containing detailed traceback information."""
-
-    formatted = ValidationErrorFormatter.format(err)
-
-    result = convert_to_response_object(
-        formatted,
-        result_code=HTTPStatus.INTERNAL_SERVER_ERROR,
-    )
-
-    return JSONResponse(
-        content=result.model_dump(mode="json", exclude_none=True),
-        status_code=status,
-    )
-
-
-async def response_validation_error_handler(
-    _: Request, err: ResponseValidationError, status=HTTPStatus.INTERNAL_SERVER_ERROR
 ) -> JSONResponse:
     """A custom handler function that returns a verbose HTTP 500 response
     containing detailed traceback information."""
