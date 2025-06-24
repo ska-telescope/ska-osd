@@ -221,7 +221,8 @@ def get_cycle_list() -> Dict:
     Returns:
         Dict: Dictionary containing list of cycle numbers
     """
-    # try:
+    # TO DO: instead of relying on RELEASE_VERSION_MAPPING file
+    # we should find better approach to find out cycles
     data = read_json(RELEASE_VERSION_MAPPING)
     cycle_numbers = []
     for key in data.keys():

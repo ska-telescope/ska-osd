@@ -12,7 +12,7 @@ from ska_ost_osd.common.constant import (
     API_RESPONSE_RESULT_STATUS_FAILED,
     API_RESPONSE_RESULT_STATUS_SUCCESS,
 )
-from ska_ost_osd.common.models import ApiResponse, ErrorResponseModel
+from ska_ost_osd.common.models import ApiResponse
 
 logging.basicConfig(level=logging.INFO)
 
@@ -60,7 +60,7 @@ def convert_to_response_object(
         )
 
     if isinstance(response, str):
-        return ErrorResponseModel(
+        return ApiResponse(
             result_data=response,
             result_code=result_code,
             result_status=API_RESPONSE_RESULT_STATUS_FAILED,
@@ -78,11 +78,7 @@ def get_responses(response_model) -> Dict[str, Any]:
         status.HTTP_200_OK: {
             "description": "Successful Response",
             "model": response_model,
-        },
-        status.HTTP_500_INTERNAL_SERVER_ERROR: {
-            "description": "Internal Server Error",
-            "model": ErrorResponseModel,
-        },
+        }
     }
 
     return responses
