@@ -168,11 +168,9 @@ def release_osd_data(cycle_id: int, release_type: ReleaseType) -> Dict:
     Returns:
         dict: Response containing the new version information
     """
-    cycle_id = cycle_id
     if not cycle_id:
         raise ValueError("cycle_id is required")
     cycle_id = "cycle_" + str(cycle_id)
-    release_type = release_type
     # provided support for patch as part of current implementation
     if release_type and release_type not in ["major", "minor", "patch"]:
         raise ValueError("release_type must be either 'major' or 'minor' if provided")
