@@ -7,27 +7,24 @@ from fastapi.exceptions import RequestValidationError, ResponseValidationError
 from fastapi.responses import JSONResponse
 
 from ska_ost_osd.common.utils import convert_to_response_object
-from ska_ost_osd.telvalidation.common.schematic_validation_exceptions import (
-    SchematicValidationError,
-)
 
 LOGGER = logging.getLogger(__name__)
 
 
-class OSDModelError(Exception):
-    """Custom exception class for validation errors."""
+class BaseOSDError(Exception):
+    """Base exception class for OSD errors."""
 
     def __init__(self, errors: List[dict]):
         self.errors = errors
         super().__init__(errors)
 
 
-class CapabilityError(Exception):
-    """Custom exception class for validation errors."""
+class OSDModelError(BaseOSDError):
+    """Exception raised for model validation errors."""
 
-    def __init__(self, errors: List[dict]):
-        self.errors = errors
-        super().__init__(errors)
+
+class CapabilityError(BaseOSDError):
+    """Exception raised for capability-related errors."""
 
 
 class ValidationErrorFormatter:
@@ -106,19 +103,6 @@ async def request_validation_error_handler(
         content=result.model_dump(mode="json", exclude_none=True),
         status_code=status,
     )
-
-
-async def schematic_validation_error_handler(
-    _: Request, err: SchematicValidationError
-) -> JSONResponse:
-    """A custom handler function to deal with SchematicValidationError raised
-    while schema validation return the correct HTTP response."""
-
-    LOGGER.exception("Semantic Validation Error")
-
-    result = convert_to_response_object(err.message, result_code=HTTPStatus.OK)
-
-    return JSONResponse(content=result.model_dump(), status_code=HTTPStatus.OK)
 
 
 async def file_not_found_error_handler(
