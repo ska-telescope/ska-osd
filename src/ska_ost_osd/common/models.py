@@ -13,7 +13,3 @@ class BaseResponseModel(BaseModel, Generic[T]):
 
 class ApiResponse(BaseResponseModel[T]):
     result_code: HTTPStatus = HTTPStatus.OK
-
-
-class ErrorResponseModel(BaseResponseModel[T]):
-    result_code: HTTPStatus = HTTPStatus.INTERNAL_SERVER_ERROR
