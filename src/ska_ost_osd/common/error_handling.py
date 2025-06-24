@@ -1,14 +1,12 @@
 import logging
 from typing import Any, Dict
 
-from fastapi import Request
+from fastapi import Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
-from ska_ost_osd.common.utils import (
-    convert_to_response_object,
-    get_status_code_from_exception,
-)
+from ska_ost_osd.common.constant import EXCEPTION_STATUS_MAP
+from ska_ost_osd.common.utils import convert_to_response_object
 
 LOGGER = logging.getLogger(__name__)
 
@@ -40,7 +38,9 @@ async def generic_exception_handler(_: Request, err: Exception) -> JSONResponse:
     else:
         formatted = str(err)
 
-    status_code = get_status_code_from_exception(err)
+    status_code = EXCEPTION_STATUS_MAP.get(
+        err.__class__, status.HTTP_500_INTERNAL_SERVER_ERROR
+    )
 
     result = convert_to_response_object(
         formatted,

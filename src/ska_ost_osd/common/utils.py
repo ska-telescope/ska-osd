@@ -11,7 +11,6 @@ from fastapi import status
 from ska_ost_osd.common.constant import (
     API_RESPONSE_RESULT_STATUS_FAILED,
     API_RESPONSE_RESULT_STATUS_SUCCESS,
-    EXCEPTION_STATUS_MAP,
 )
 from ska_ost_osd.common.models import ApiResponse
 
@@ -83,10 +82,3 @@ def get_responses(response_model) -> Dict[str, Any]:
     }
 
     return responses
-
-
-def get_status_code_from_exception(exc: Exception) -> int:
-    for exc_type, http_status in EXCEPTION_STATUS_MAP.items():
-        if isinstance(exc, exc_type):
-            return http_status
-    return status.HTTP_500_INTERNAL_SERVER_ERROR
