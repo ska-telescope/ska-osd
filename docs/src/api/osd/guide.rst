@@ -153,7 +153,7 @@ GET /osd
      - Resource URL
      - Description
    * - GET
-     - ``/ska-ost-osd/osd/api/v2/osd/``
+     - ``/ska-ost-osd/osd/api/v<majorversion>/osd/``
      - **Getting Data**
 
        Return the OSD cycle_id data
@@ -180,14 +180,14 @@ GET /osd
 
 .. code:: python
 
-    "/ska-ost-osd/osd/api/v3/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
+    "/ska-ost-osd/osd/api/v<majorversion>/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
 
 
 3. CURL Example Request
 
 .. code:: python
 
-    curl -X GET "/ska-ost-osd/osd/api/v3/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
+    curl -X GET "/ska-ost-osd/osd/api/v<majorversion>/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
 
 
 4. Example Response
@@ -200,7 +200,7 @@ GET /osd
     .. code:: python
 
         client.get(
-            "/ska-ost-osd/osd/api/v3/osd",
+            "/ska-ost-osd/osd/api/v<majorversion>/osd",
             query_string={
                 "cycle_id": 1,
                 "source": "file",
@@ -329,7 +329,7 @@ GET /cycle
      - Resource URL
      - Description
    * - GET
-     - ``/ska-ost-osd/osd/api/v3/osd/``
+     - ``/ska-ost-osd/osd/api/v<majorversion>/cycle``
      - **Getting Data**
 
        Return the OSD cycle_id data.
@@ -342,7 +342,7 @@ GET /cycle
     ===================    ============================================================
     Parameters             Description
     ===================    ============================================================
-    cycle_id               Cycle Id a integer value 1, 2, 3
+    cycle_id               Cycle Id with integer value 1, 2, 3
     ===================    ============================================================
 
 
@@ -350,14 +350,14 @@ GET /cycle
 
 .. code:: python
 
-    "/ska-ost-osd/osd/api/v3/cycle"
+    "/ska-ost-osd/osd/api/v<majorversion>/cycle"
 
 
 3. CURL Example Request
 
 .. code:: python
 
-    curl -X GET "/ska-ost-osd/osd/api/v3/cycle"
+    curl -X GET "/ska-ost-osd/osd/api/v<majorversion>/cycle"
 
 
 4. Example Response
@@ -368,8 +368,8 @@ GET /cycle
 
     .. code:: python
 
-        client.get(
-            "/ska-ost-osd/osd/api/v3/cycle"
+        client_get(
+            "/ska-ost-osd/osd/api/v<majorversion>/cycle"
          )
 
     * Response
@@ -377,7 +377,15 @@ GET /cycle
     .. code:: python
 
         {
-            "cycles": [1]
+        "result_data": [
+            {
+            "cycles": [
+                1
+            ]
+            }
+        ],
+        "result_status": "success",
+        "result_code": 200
         }
 
 
@@ -397,7 +405,7 @@ POST /osd_release
      - Resource URL
      - Description
    * - PUT
-     - ``/ska-ost-osd/osd/api/v3/osd/``
+     - ``/ska-ost-osd/osd/api/v<majorversion>/osd/``
      - **Updating Data**
 
        Update the OSD capabilities data.
@@ -420,14 +428,14 @@ POST /osd_release
 
     .. code:: python
 
-      "/ska-ost-osd/osd/api/v3/osd_release?cycle_id=1&release_type=patch"
+      "/ska-ost-osd/osd/api/v<majorversion>/osd_release?cycle_id=1&release_type=patch"
 
 
 3. CURL Example Request
 
     .. code:: python
 
-       curl -X POST "/ska-ost-osd/osd/api/v3/osd_release?cycle_id=1&release_type=patch"
+       curl -X POST "/ska-ost-osd/osd/api/v<majorversion>/osd_release?cycle_id=1&release_type=patch"
 
 
 4. Example Response
@@ -437,7 +445,7 @@ POST /osd_release
     .. code:: python
 
         client.put(
-            "/ska-ost-osd/osd/api/v3/osd_release?cycle_id=1&release_type=patch",
+            "/ska-ost-osd/osd/api/v<majorversion>/osd_release?cycle_id=1&release_type=patch",
             query_string={
                 "cycle_id": 1,
                 "release_type": "patch"
@@ -472,7 +480,7 @@ PUT /osd
      - Resource URL
      - Description
    * - PUT
-     - ``/ska-ost-osd/osd/api/v3/osd/``
+     - ``/ska-ost-osd/osd/api/v<majorversion>/osd/``
      - **Updating Data**
 
        Update the OSD capabilities data.
@@ -495,14 +503,14 @@ PUT /osd
 
     .. code:: python
 
-     "/ska-ost-osd/osd/api/v3/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
+     "/ska-ost-osd/osd/api/v<majorversion>/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
 
 
 3. CURL Example Request
 
     .. code:: python
 
-      curl -X PUT "/ska-ost-osd/osd/api/v3/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
+      curl -X PUT "/ska-ost-osd/osd/api/v<majorversion>/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
 
 
 4. Example Response
@@ -517,7 +525,7 @@ PUT /osd
     .. code:: python
 
         client.put(
-            "/ska-ost-osd/osd/api/v3/osd",
+            "/ska-ost-osd/osd/api/v<majorversion>/osd",
             query_string={
                 "cycle_id": 1,
                 "capabilities": "mid",

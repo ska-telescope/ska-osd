@@ -1,8 +1,6 @@
 import logging
 from typing import List
 
-from fastapi.responses import JSONResponse
-
 LOGGER = logging.getLogger(__name__)
 
 
@@ -20,10 +18,3 @@ class OSDModelError(BaseOSDError):
 
 class CapabilityError(BaseOSDError):
     """Exception raised for capability-related errors."""
-
-
-async def development_exception_handler(exc: Exception):
-    return JSONResponse(
-        status_code=500,
-        content={"detail": "Internal Server Error (non-production)", "error": str(exc)},
-    )

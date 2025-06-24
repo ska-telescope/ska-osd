@@ -5,10 +5,11 @@ import os
 from importlib.metadata import version
 
 from fastapi import FastAPI
+from fastapi.exceptions import ResponseValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from ska_ser_logging import configure_logging
 
-from ska_ost_osd.osd.common.error_handling import development_exception_handler
+from ska_ost_osd.common.error_handling import generic_exception_handler
 from ska_ost_osd.osd.routers.api import osd_router
 from ska_ost_osd.telvalidation.common.error_handling import (
     schematic_validation_error_handler,
@@ -47,9 +48,12 @@ def create_app(production=PRODUCTION) -> FastAPI:
 
     # Add handlers for different types of error
     app.exception_handler(SchematicValidationError)(schematic_validation_error_handler)
+    app.exception_handler(ResponseValidationError)(generic_exception_handler)
+    app.exception_handler(ValueError)(generic_exception_handler)
+    app.exception_handler(FileNotFoundError)(generic_exception_handler)
 
     if not production:
-        app.exception_handler(Exception)(development_exception_handler)
+        app.exception_handler(Exception)(generic_exception_handler)
     return app
 
 
