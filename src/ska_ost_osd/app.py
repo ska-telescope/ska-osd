@@ -5,7 +5,7 @@ import os
 from importlib.metadata import version
 
 from fastapi import FastAPI
-from fastapi.exceptions import ResponseValidationError
+from fastapi.exceptions import RequestValidationError, ResponseValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from ska_ser_logging import configure_logging
 
@@ -48,6 +48,7 @@ def create_app(production=PRODUCTION) -> FastAPI:
 
     # Add handlers for different types of error
     app.exception_handler(SchematicValidationError)(schematic_validation_error_handler)
+    app.exception_handler(RequestValidationError)(generic_exception_handler)
     app.exception_handler(ResponseValidationError)(generic_exception_handler)
     app.exception_handler(ValueError)(generic_exception_handler)
     app.exception_handler(FileNotFoundError)(generic_exception_handler)

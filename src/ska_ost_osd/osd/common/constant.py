@@ -45,5 +45,4 @@ RELEASE_VERSION_MAPPING = (
     "tmdata/version_mapping/cycle_gitlab_release_version_mapping.json"
 )
 # constant define to push gitlab flag.
-PUSH_TO_GITLAB_FLAG = "1"
 GITLAB_SOURCE = [f"gitlab:{BASE_URL}{CAR_URL}main#{BASE_FOLDER_NAME}"]

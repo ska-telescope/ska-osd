@@ -22,7 +22,6 @@ from ska_ost_osd.osd.common.constant import (
     CYCLE_TO_VERSION_MAPPING,
     MID_CAPABILITIES_JSON_PATH,
     OBSERVATORY_POLICIES_JSON_PATH,
-    PUSH_TO_GITLAB_FLAG,
     RELEASE_VERSION_MAPPING,
     osd_file_mapping,
 )
@@ -33,6 +32,8 @@ from ska_ost_osd.osd.common.osd_validation_messages import (
 )
 from ska_ost_osd.osd.models.models import (
     CycleModel,
+    OSDRelease,
+    ReleaseType,
     UpdateRequestModel,
     ValidationOnCapabilities,
 )
@@ -44,9 +45,9 @@ from ska_ost_osd.osd.osd import (
 from ska_ost_osd.osd.version_mapping.version_manager import manage_version_release
 
 # this variable is added for restricting tmdata publish from local/dev environment.
-# usage: "0" means disable tmdata publish to artefact.
-# "1" means allow to publish
-PUSH_TO_GITLAB = environ.get("PUSH_TO_GITLAB", "0")
+# usage: 0 means disable tmdata publish to artefact.
+# 1 means allow to publish
+PUSH_TO_GITLAB = int(environ.get("PUSH_TO_GITLAB", 0))
 osd_router = APIRouter(prefix="")
 
 
@@ -147,27 +148,32 @@ def update_osd_data(body: Dict, **kwargs) -> Dict:
         raise ValueError(str(error)) from error
 
 
-def release_osd_data(**kwargs):
+@osd_router.post(
+    "/osd_release",
+    tags=["OSD"],
+    summary="Release new osd version to Gitlab",
+    responses=get_responses(ApiResponse[OSDRelease]),
+    response_model=ApiResponse[OSDRelease],
+)
+def release_osd_data(
+    cycle_id: int, release_type: ReleaseType
+) -> ApiResponse[OSDRelease]:
     """Release OSD data with automatic version increment based on cycle ID.
 
     Args:
-        **kwargs: Keyword arguments including:
-            - cycle_id: Required. The cycle ID for version mapping
-            - release_type: Optional.
-            Type of release ('major' or 'minor', defaults to patch)
+        - cycle_id: Required. The cycle ID for version mapping
+        - release_type: Required. Type of release ('major' or 'minor')
 
     Returns:
-        dict: Response containing the new version information
+        ApiResponse[OSDRelease]: Response containing the new version information
     """
-    cycle_id = kwargs.get("cycle_id")
-    if not cycle_id:
-        raise ValueError("cycle_id is required")
-    cycle_id = "cycle_" + str(cycle_id)
-    release_type = kwargs.get("release_type")
-    # provided support for patch as part of current implementation
-    if release_type and release_type not in ["major", "minor"]:
+
+    cycle_id = f"cycle_{cycle_id}"
+
+    if release_type not in ["minor", "major"]:
         raise ValueError("release_type must be either 'major' or 'minor' if provided")
-    if PUSH_TO_GITLAB == PUSH_TO_GITLAB_FLAG:
+
+    if PUSH_TO_GITLAB:
         # Use version manager to handle version release
         new_version, cycle_id = manage_version_release(cycle_id, release_type)
 
@@ -185,20 +191,20 @@ def release_osd_data(**kwargs):
             commit_msg="updated tmdata",
         )
 
-        return {
-            "status": "success",
+        result = {
             "message": f"Released new version {new_version}",
             "version": str(new_version),
             "cycle_id": cycle_id,
         }
+        return convert_to_response_object(result, result_code=HTTPStatus.OK)
 
     else:
-        return {
-            "status": "success",
+        result = {
             "message": "Push to gitlab is disabled",
             "version": "0.0.0",
             "cycle_id": cycle_id,
         }
+        return convert_to_response_object(result, result_code=HTTPStatus.OK)
 
 
 @osd_router.get(
@@ -208,16 +214,18 @@ def release_osd_data(**kwargs):
     responses=get_responses(ApiResponse[CycleModel]),
     response_model=ApiResponse[CycleModel],
 )
-def get_cycle_list() -> Dict:
+def get_cycle_list() -> ApiResponse[CycleModel]:
     """GET list of all available proposal cycles.
 
     Returns:
-        Dict: Dictionary containing list of cycle numbers
+        ApiResponse[CycleModel]: Response model containing list of cycle numbers
     """
-    # TO DO: instead of relying on RELEASE_VERSION_MAPPING file
+    # TODO: instead of relying on RELEASE_VERSION_MAPPING file
     # we should find better approach to find out cycles
     data = read_json(RELEASE_VERSION_MAPPING)
+
     cycle_numbers = []
+
     for key in data.keys():
         # Extract number from cycle_X format
         if key.startswith("cycle_"):
