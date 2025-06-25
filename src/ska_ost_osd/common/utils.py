@@ -52,19 +52,18 @@ def convert_to_response_object(
 
     Returns formatted response object
     """
-    if isinstance(response, (list, dict)):
-        return ApiResponse(
-            result_data=[response],
-            result_code=result_code,
-            result_status=API_RESPONSE_RESULT_STATUS_SUCCESS,
-        )
+    result_data = [response]
+    result_status = API_RESPONSE_RESULT_STATUS_SUCCESS
 
     if isinstance(response, str):
-        return ApiResponse(
-            result_data=response,
-            result_code=result_code,
-            result_status=API_RESPONSE_RESULT_STATUS_FAILED,
-        )
+        result_data = response
+        result_status = API_RESPONSE_RESULT_STATUS_FAILED
+
+    return ApiResponse(
+        result_data=result_data,
+        result_code=result_code,
+        result_status=result_status,
+    )
 
 
 def get_responses(response_model) -> Dict[str, Any]:

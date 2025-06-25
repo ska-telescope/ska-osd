@@ -45,9 +45,9 @@ from ska_ost_osd.osd.osd import (
 from ska_ost_osd.osd.version_mapping.version_manager import manage_version_release
 
 # this variable is added for restricting tmdata publish from local/dev environment.
-# usage: "0" means disable tmdata publish to artefact.
-# "1" means allow to publish
-PUSH_TO_GITLAB = environ.get("PUSH_TO_GITLAB", 0)
+# usage: 0 means disable tmdata publish to artefact.
+# 1 means allow to publish
+PUSH_TO_GITLAB = int(environ.get("PUSH_TO_GITLAB", 0))
 osd_router = APIRouter(prefix="")
 
 
@@ -155,7 +155,9 @@ def update_osd_data(body: Dict, **kwargs) -> Dict:
     responses=get_responses(ApiResponse[OSDRelease]),
     response_model=ApiResponse[OSDRelease],
 )
-def release_osd_data(cycle_id: int, release_type: ReleaseType) -> Dict:
+def release_osd_data(
+    cycle_id: int, release_type: ReleaseType
+) -> ApiResponse[OSDRelease]:
     """Release OSD data with automatic version increment based on cycle ID.
 
     Args:
@@ -163,7 +165,7 @@ def release_osd_data(cycle_id: int, release_type: ReleaseType) -> Dict:
         - release_type: Required. Type of release ('major' or 'minor')
 
     Returns:
-        Dict: Response containing the new version information
+        ApiResponse[OSDRelease]: Response containing the new version information
     """
 
     cycle_id = f"cycle_{cycle_id}"
@@ -212,11 +214,11 @@ def release_osd_data(cycle_id: int, release_type: ReleaseType) -> Dict:
     responses=get_responses(ApiResponse[CycleModel]),
     response_model=ApiResponse[CycleModel],
 )
-def get_cycle_list() -> Dict:
+def get_cycle_list() -> ApiResponse[CycleModel]:
     """GET list of all available proposal cycles.
 
     Returns:
-        Dict: Dictionary containing list of cycle numbers
+        ApiResponse[CycleModel]: Response model containing list of cycle numbers
     """
     # TODO: instead of relying on RELEASE_VERSION_MAPPING file
     # we should find better approach to find out cycles

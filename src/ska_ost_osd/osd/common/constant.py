@@ -42,7 +42,7 @@ LOW_CAPABILITIES_JSON_PATH = "tmdata/ska1_low/low_capabilities.json"
 OBSERVATORY_POLICIES_JSON_PATH = "tmdata/observatory_policies.json"
 CYCLE_TO_VERSION_MAPPING = "tmdata/version_mapping/latest_release.txt"
 RELEASE_VERSION_MAPPING = (
-    "ttmdata/version_mapping/cycle_gitlab_release_version_mapping.json"
+    "tmdata/version_mapping/cycle_gitlab_release_version_mapping.json"
 )
 # constant define to push gitlab flag.
 GITLAB_SOURCE = [f"gitlab:{BASE_URL}{CAR_URL}main#{BASE_FOLDER_NAME}"]
