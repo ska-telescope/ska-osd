@@ -55,7 +55,7 @@ def client_post():
     app = create_app()
     client = TestClient(app)
 
-    return partial(client.post)
+    return partial(client.post, headers={"accept": "application/json"})
 
 
 @pytest.fixture(scope="module")

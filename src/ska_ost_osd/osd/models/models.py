@@ -1,4 +1,5 @@
 import re
+from enum import Enum
 from typing import Any, Dict, List, Optional, TypeVar
 
 from pydantic import BaseModel, Field, model_validator
@@ -87,3 +88,14 @@ class ValidationOnCapabilities(BaseModel):
             raise CapabilityError("telescope data must be a dictionary")
 
         return values
+
+
+class ReleaseType(str, Enum):
+    minor = "minor"
+    major = "major"
+
+
+class OSDRelease(BaseModel):
+    message: str
+    version: str
+    cycle_id: str
