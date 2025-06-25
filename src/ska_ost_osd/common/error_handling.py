@@ -14,6 +14,30 @@ LOGGER = logging.getLogger(__name__)
 class ValidationErrorFormatter:
     @staticmethod
     def format(exc: RequestValidationError) -> Dict[str, Any]:
+        """
+        Format a FastAPI RequestValidationError into a structured
+        error message.
+
+        This method processes validation errors to identify:
+        - Missing required fields (`type == "missing"`)
+        - The invalid input value that triggered the error
+
+        Returns a dictionary with a single "error" key containing a
+        human-readable summary, including the names of missing
+        fields and the payload value that caused the failure.
+
+        Example return:
+        {
+            "error": "Missing field(s): cycle_id, osd_version, invalid payload: false"
+        }
+
+        Args:
+            exc (RequestValidationError): The exception raised during
+            request validation.
+
+        Returns:
+            Dict[str, Any]: A dictionary containing the formatted error message.
+        """
         missing_fields = []
         parsing_errors = []
         payload_str = ""
