@@ -37,3 +37,5 @@ MANIFEST.skao.int%
 *.tgz
 
 PrivateRules.mak
+
+.venv
