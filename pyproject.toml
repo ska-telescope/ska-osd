@@ -34,7 +34,7 @@ priority = 'primary'
 
 [tool.poetry.dependencies]
 python = "^3.10.0"
-connexion = {version = "3.2.0", extras = ["swagger-ui", "flask"]}
+connexion = {extras = ["swagger-ui"], version = "2.14.0"}
 ska-ser-logging = "^0.4.1"
 gunicorn = "^20.1.0"
 requests = "^2.27.1"
@@ -49,8 +49,8 @@ astropy = "^6.1"
 simpleeval = "^0.9.13"
 pydantic = "^2.10.3"
 deepdiff = "^7.0.0"
-flask = "3.0.0"
-Flask-Cors="^5.0.0"
+flask = "2.2.5"
+Flask-Cors="5.0.0"
 
 
 
