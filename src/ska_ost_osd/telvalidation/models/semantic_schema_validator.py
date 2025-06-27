@@ -1,5 +1,5 @@
 import re
-from typing import Optional
+from typing import Any, Dict, Optional
 
 from pydantic import BaseModel, model_validator
 
@@ -44,3 +44,11 @@ class SemanticModel(BaseModel):
             raise ValueError(errors)
 
         return values
+
+
+class SemanticValidationModel(BaseModel):
+    interface: Optional[str] = None
+    observing_command_input: Dict[str, Any]
+    osd_data: Optional[Dict[str, Any]] = None
+    raise_semantic: Optional[bool] = True
+    sources: Optional[str] = None

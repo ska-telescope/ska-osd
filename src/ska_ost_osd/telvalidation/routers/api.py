@@ -1,24 +1,54 @@
 from http import HTTPStatus
 
+from fastapi import APIRouter, Body
 from jsonschema import ValidationError
 from ska_telmodel.data import TMData
 
-from ska_ost_osd.osd.routers.api import handle_validation_error, validation_response
+from ska_ost_osd.common.models import ApiResponse
+from ska_ost_osd.common.utils import (
+    convert_to_response_object,
+    get_responses,
+    read_json,
+)
+from ska_ost_osd.osd.routers.api import handle_validation_error
 from ska_ost_osd.telvalidation.common.constant import (
     CAR_TELMODEL_SOURCE,
+    SEMANTIC_VALIDATION_JSON_FILE_PATH,
     SEMANTIC_VALIDATION_VALUE,
+)
+from ska_ost_osd.telvalidation.models.semantic_schema_validator import (
+    SemanticModel,
+    SemanticValidationModel,
 )
 from ska_ost_osd.telvalidation.semantic_validator import (
     VALIDATION_STRICTNESS,
     semantic_validate,
 )
 
+televalidation_router = APIRouter(prefix="")
+
 
 def get_tmdata_sources(source):
     return [source] if source else CAR_TELMODEL_SOURCE  # check source
 
 
-def semantically_validate_json(body: dict):
+@televalidation_router.post(
+    "/semantic_validation",
+    tags=["Telvalidation"],
+    summary=(
+        "Validate input json Semantically Semantic validation checks the"
+        " meaning of the input data and ensures that it is valid in the context of"
+        " the system. It checks whether the input data conforms to the business rules"
+        " and logic of the system"
+    ),
+    responses=get_responses(ApiResponse[SemanticModel]),
+    response_model=ApiResponse[SemanticModel],
+)
+def semantically_validate_json(
+    semantic_model: SemanticValidationModel = Body(
+        example=read_json(SEMANTIC_VALIDATION_JSON_FILE_PATH)
+    ),
+):
     """This function validates the input JSON semantically.
 
     :param body:
@@ -45,7 +75,7 @@ def semantically_validate_json(body: dict):
 
     error_details = []
 
-    sources = body.get("sources")
+    sources = semantic_model.sources
     if sources and not isinstance(sources, str):
         error_details.append("sources must be a string")
     else:
@@ -54,11 +84,11 @@ def semantically_validate_json(body: dict):
     try:
         tm_data = TMData(sources, update=True)
         semantic_validate(
-            observing_command_input=body.get("observing_command_input"),
+            observing_command_input=semantic_model.observing_command_input,
             tm_data=tm_data,
-            raise_semantic=body.get("raise_semantic"),
-            interface=body.get("interface"),
-            osd_data=body.get("osd_data"),
+            raise_semantic=semantic_model.raise_semantic,
+            interface=semantic_model.interface,
+            osd_data=semantic_model.osd_data,
         )
     except (RuntimeError, ValidationError) as err:
         error_details.extend(handle_validation_error(err))
@@ -67,16 +97,12 @@ def semantically_validate_json(body: dict):
         raise ValueError(error_details)
 
     if int(VALIDATION_STRICTNESS) < int(SEMANTIC_VALIDATION_VALUE):
-        return validation_response(
-            status=0,
-            detail="Semantic Validation is currently disable",
-            title="Semantic validation",
-            http_status=HTTPStatus.OK,
+        return convert_to_response_object(
+            response="Semantic Validation is currently disable",
+            result_code=HTTPStatus.OK,
         )
     else:
-        return validation_response(
-            status=0,
-            detail="JSON is semantically valid",
-            title="Semantic validation",
-            http_status=HTTPStatus.OK,
+        return convert_to_response_object(
+            response="JSON is semantically valid",
+            result_code=HTTPStatus.OK,
         )

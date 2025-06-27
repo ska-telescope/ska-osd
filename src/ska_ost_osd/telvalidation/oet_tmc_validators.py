@@ -279,6 +279,8 @@ def evaluate_rule(
         names = update_names_with_dependencies(rule_data, names)
 
         simple_eval.names = names
+        print(f"##############names: {names}")
+        print(f"##############rule_data: {rule_data}")
         eval_data = simple_eval.eval(rule_data["rule"])
         eval_new_data = (
             [not bool(eval_data)] if isinstance(eval_data, set) else [bool(eval_data)]
