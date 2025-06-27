@@ -91,7 +91,7 @@ These keys are imported from constant.py.
     for key, value in validation_constants.items():
         if key in interface or key == telescope:
             return value
-        
+
     # taking mid interface as default cause there is no any specific
     # key to differentiate the interface
     return validation_constants.get(SKA_MID_TELESCOPE)
@@ -198,18 +198,18 @@ There are some steps of this framework these are as follows:
 
 Ability to turn Semantic Validation off/on in real-time
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-To turn semantic validation off/on in real-time user need to create environment variable into helm charts. 
+To turn semantic validation off/on in real-time user need to create environment variable into helm charts.
 This will allow user to control semantic validation in real-time.
 
-The purpose of this environment variable, is likely to control whether semantic validation 
-should be performed in the program. By using an environment variable, the behavior can be easily 
+The purpose of this environment variable, is likely to control whether semantic validation
+should be performed in the program. By using an environment variable, the behavior can be easily
 changed without modifying the code itself, which is useful for different deployment environments or testing scenarios.
 
 Steps to add and change the validation_strictness environment variable in 'values.yaml' file:
 
    * Setting the environment variable:
 
-      The VALIDATION_STRICTNESS parameter determines the level of validation applied. When set to 2, it enables the semantic 
+      The VALIDATION_STRICTNESS parameter determines the level of validation applied. When set to 2, it enables the semantic
       validation flag for OSD validation, while setting it to 1 only applies telmodel schema validation without OSD semantic checks.
 
       .. code::
@@ -220,7 +220,7 @@ Steps to add and change the validation_strictness environment variable in 'value
    * Changing the value: User can change the value by running below command with a different value from CLI.
 
       .. code::
-      
+
             export VALIDATION_STRICTNESS="1"
 
 
@@ -1043,7 +1043,7 @@ Semantic Validation Success Response With Error
           {
             "beam_id": "vis0",
             "function": "visibilities"
-  
+
           }
         ],
         "scan_types": [
@@ -1230,7 +1230,7 @@ Semantic Validation Success Response With Error
         ],
         "receptors": [
           "0001",
-          "0002"    
+          "0002"
         ],
         "receive_nodes": 10
       }
@@ -1293,7 +1293,7 @@ Semantic Validation Success Response With Error
     "dish_allocations": {
       "receptor_ids": [
         "0001",
-        "0002"  
+        "0002"
       ]
     },
     "dish_configurations": [
@@ -1389,10 +1389,10 @@ Semantic Validation Success Response With Error
     }
   }
   }
-  
+
 
 Semantic Validation Success Response for SBD-Mid input.
- 
+
 .. code-block:: json
 
      {
@@ -1567,7 +1567,7 @@ Semantic Validation Success Response for SBD-Mid input.
           {
             "beam_id": "vis0",
             "function": "visibilities"
-  
+
           }
         ],
         "scan_types": [
@@ -1754,7 +1754,7 @@ Semantic Validation Success Response for SBD-Mid input.
         ],
         "receptors": [
           "0001",
-          "0002"    
+          "0002"
         ],
         "receive_nodes": 10
       }
@@ -1817,7 +1817,7 @@ Semantic Validation Success Response for SBD-Mid input.
     "dish_allocations": {
       "receptor_ids": [
         "0001",
-        "0002"  
+        "0002"
       ]
     },
     "dish_configurations": [
@@ -1931,7 +1931,7 @@ Semantic Validation Success Response With Error for SBD-Mid input.
 
 
 * Example 5: Invalid JSON input.
-  
+
   If user provide wrong interface or missed to add observing_command_input, then it will raise error.
 
 Semantic Validation Error Response
@@ -1952,11 +1952,11 @@ Semantic Validation Error Response
         }
 
 * Example 6:   'raise_semantic' and 'osd_data' both are optional parameters.
-  So, if user do not pass these parameters, then API will take as default value of 'raise_semantic' 
+  So, if user do not pass these parameters, then API will take as default value of 'raise_semantic'
   i.e. true and osd_data fetch from latest release of osd_data.
 
 .. code-block:: json
-  
+
    {
     "interface":"https://schema.skao.int/ska-oso-pdm-sbd/0.1",
     "observing_command_input":{
@@ -2120,7 +2120,7 @@ Semantic Validation Error Response
           {
             "beam_id": "vis0",
             "function": "visibilities"
-  
+
           }
         ],
         "scan_types": [
@@ -2307,7 +2307,7 @@ Semantic Validation Error Response
         ],
         "receptors": [
           "0001",
-          "0002"    
+          "0002"
         ],
         "receive_nodes": 10
       }
@@ -2370,7 +2370,7 @@ Semantic Validation Error Response
     "dish_allocations": {
       "receptor_ids": [
         "0001",
-        "0002"  
+        "0002"
       ]
     },
     "dish_configurations": [
@@ -2382,13 +2382,13 @@ Semantic Validation Error Response
   }}
 
 Semantic Validation Success Response for SBD-Mid input.
- 
+
 .. code-block:: json
 
      {
-        "title": "Semantic validation Successful"
-        "status": 0,
-        "details": "JSON is semantically valid",
+        "result_data": "JSON is semantically valid",
+        "result_status": "success",
+        "result_code": 200,
     }
 
 * Example 7: Missing key observing_command_input.
@@ -2406,11 +2406,7 @@ Getting error as observing_command_input is required field
 .. code-block:: json
 
   {
-    "detail": [
-      "Value error, [{'field': 'observing_command_input', 'msg': 'This field is required'}]"
-    ],
-    "status": -1,
-    "title": "Value Error"
-  }
-
-
+  "result_data": "Missing field(s): body.observing_command_input, invalid payload: {'raise_semantic': True, 'sources': 'car:ost/ska-ost-osd?3.1.1#tmdata', 'interface': 'https://schema.skao.int/ska-tmc-assignresources/2.1', 'osd_data': {'capabilities': {'mid': {'AA0.5': {'allowed_channel_count_range_max': [58982], 'allowed_channel_count_range_min': [1], 'allowed_channel_width_values': [13440], 'available_bandwidth_hz': 800000000, 'available_receivers': ['Band_1', 'Band_2'], 'cbf_modes': ['correlation', 'pst'], 'max_baseline_km': 1.5, 'number_dish_ids': ['SKA001', 'SKA036', 'SKA063', 'SKA100'], 'number_fsps': 4, 'number_meerkat_dishes': 0, 'number_meerkatplus_dishes': 0, 'number_pss_beams': 0, 'number_pst_beams': 1, 'number_ska_dishes': 4, 'number_zoom_channels': 0, 'number_zoom_windows': 0, 'ps_beam_bandwidth_hz': 400000000}, 'basic_capabilities': {'dish_elevation_limit_deg': 15, 'receiver_information': [{'max_frequency_hz': 1050000000, 'min_frequency_hz': 350000000, 'rx_id': 'Band_1'}, {'max_frequency_hz': 1760000000, 'min_frequency_hz': 950000000, 'rx_id': 'Band_2'}, {'max_frequency_hz': 3050000000, 'min_frequency_hz': 1650000000, 'rx_id': 'Band_3'}, {'max_frequency_hz': 5180000000, 'min_frequency_hz': 2800000000, 'rx_id': 'Band_4'}, {'max_frequency_hz': 8500000000, 'min_frequency_hz': 4600000000, 'rx_id': 'Band_5a'}, {'max_frequency_hz': 15400000000, 'min_frequency_hz': 8300000000, 'rx_id': 'Band_5b'}]}}}, 'observatory_policy': {'cycle_description': 'Science Verification', 'cycle_information': {'cycle_id': 'SKAO_2027_1', 'proposal_close': '2026-05-12T15:00:00.000Z', 'proposal_open': '2026-03-27T12:00:00.000Z'}, 'cycle_number': 2, 'cycle_policies': {'normal_max_hours': 100}, 'telescope_capabilities': {'Low': 'AA2', 'Mid': 'AA2'}}}}",
+  "result_status": "failed",
+  "result_code": 422
+}
