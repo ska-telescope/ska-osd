@@ -272,7 +272,7 @@ def test_fetch_capabilities_from_osd_based_on_client_based_osd_data(mock1):
     assert result == ({}, {})
 
 
-@patch("ska_ost_osd.osd.routers.api.get_tmdata_sources")
+@patch("ska_ost_osd.telvalidation.routers.api.get_tmdata_sources")
 @pytest.mark.parametrize(
     "json_body_to_validate, response",
     [
@@ -288,13 +288,13 @@ def test_semantic_validate_api(
     json_body = request.getfixturevalue(json_body_to_validate)
     expected_response = request.getfixturevalue(response)
 
-    res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body)
-    assert res.get_json() == expected_response
+    res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body).json()
+    assert res == expected_response
 
 
 @patch("ska_ost_osd.telvalidation.semantic_validator.VALIDATION_STRICTNESS", "1")
-@patch("ska_ost_osd.osd.routers.api.VALIDATION_STRICTNESS", "1")
-@patch("ska_ost_osd.osd.routers.api.get_tmdata_sources")
+@patch("ska_ost_osd.telvalidation.routers.api.VALIDATION_STRICTNESS", "1")
+@patch("ska_ost_osd.telvalidation.routers.api.get_tmdata_sources")
 @pytest.mark.parametrize(
     "json_body_to_validate, response",
     [
@@ -310,25 +310,24 @@ def test_disable_semantic_validate_api(
     json_body = request.getfixturevalue(json_body_to_validate)
     expected_response = request.getfixturevalue(response)
 
-    res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body)
+    res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body).json()
 
-    assert res.get_json() == expected_response
+    assert res == expected_response
 
 
 def test_semantic_validate_api_not_passing_required_keys(
     client_post,
-    observing_command_input_missing_response,
     valid_semantic_validation_body,
 ):
     """Test semantic validation API response with missing input
     observing_command_input key."""
     json_body = valid_semantic_validation_body.copy()
     del json_body["observing_command_input"]
-    res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body)
-    assert res.get_json() == observing_command_input_missing_response
+    res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body).json()
+    assert "Missing field(s): body.observing_command_input" in res["result_data"]
 
 
-@patch("ska_ost_osd.osd.routers.api.get_tmdata_sources")
+@patch("ska_ost_osd.telvalidation.routers.api.get_tmdata_sources")
 @pytest.mark.parametrize(
     "json_body_to_validate, response, key_to_delete",
     [
@@ -362,8 +361,8 @@ def test_not_passing_optional_keys(
     json_body = request.getfixturevalue(json_body_to_validate).copy()
     del json_body[key_to_delete]
     expected_response = request.getfixturevalue(response)
-    res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body)
-    assert res.get_json() == expected_response
+    res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body).json()
+    assert res == expected_response
 
 
 def test_wrong_values_and_no_observing_command_input(
@@ -374,11 +373,11 @@ def test_wrong_values_and_no_observing_command_input(
     """Test semantic validation API response with wrong values."""
     json_body = wrong_semantic_validation_parameter_body
     expected_response = wrong_semantic_validation_parameter_value_response
-    res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body)
-    assert res.get_json() == expected_response
+    res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body).json()
+    assert res == expected_response
 
 
-@patch("ska_ost_osd.osd.routers.api.get_tmdata_sources")
+@patch("ska_ost_osd.telvalidation.routers.api.get_tmdata_sources")
 def test_passing_only_required_keys(
     mock_tmdata,
     client_post,
@@ -389,5 +388,5 @@ def test_passing_only_required_keys(
     mock_tmdata.return_value = ["file://tmdata"]
     json_body = valid_only_observing_command_input_in_request_body
     expected_response = valid_semantic_validation_response
-    res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body)
-    assert res.get_json() == expected_response
+    res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body).json()
+    assert res == expected_response

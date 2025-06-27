@@ -17,7 +17,6 @@ from ska_ost_osd.telvalidation.common.constant import (
     SEMANTIC_VALIDATION_VALUE,
 )
 from ska_ost_osd.telvalidation.models.semantic_schema_validator import (
-    SemanticModel,
     SemanticValidationModel,
 )
 from ska_ost_osd.telvalidation.semantic_validator import (
@@ -41,8 +40,8 @@ def get_tmdata_sources(source):
         " the system. It checks whether the input data conforms to the business rules"
         " and logic of the system"
     ),
-    responses=get_responses(ApiResponse[SemanticModel]),
-    response_model=ApiResponse[SemanticModel],
+    responses=get_responses(ApiResponse),
+    response_model=ApiResponse,
 )
 def semantically_validate_json(
     semantic_model: SemanticValidationModel = Body(

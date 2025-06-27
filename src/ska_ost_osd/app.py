@@ -7,6 +7,7 @@ from importlib.metadata import version
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError, ResponseValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import ValidationError
 from ska_ser_logging import configure_logging
 
 from ska_ost_osd.common.error_handling import generic_exception_handler
@@ -54,6 +55,8 @@ def create_app(production=PRODUCTION) -> FastAPI:
     app.exception_handler(ResponseValidationError)(generic_exception_handler)
     app.exception_handler(ValueError)(generic_exception_handler)
     app.exception_handler(FileNotFoundError)(generic_exception_handler)
+    app.exception_handler(RuntimeError)(generic_exception_handler)
+    app.exception_handler(ValidationError)(generic_exception_handler)
 
     if not production:
         app.exception_handler(Exception)(generic_exception_handler)
