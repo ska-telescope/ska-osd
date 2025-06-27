@@ -18,7 +18,6 @@ from ska_ost_osd.telvalidation.common.error_handling import (
 from ska_ost_osd.telvalidation.common.schematic_validation_exceptions import (
     SchematicValidationError,
 )
-from ska_ost_osd.telvalidation.routers.api import televalidation_router
 
 KUBE_NAMESPACE = os.getenv("KUBE_NAMESPACE", "ska-ost-osd")
 OSD_MAJOR_VERSION = version("ska-ost-osd").split(".")[0]
@@ -46,8 +45,7 @@ def create_app(production=PRODUCTION) -> FastAPI:
     )
 
     # Assemble the constituent APIs:
-    app.include_router(osd_router, prefix=API_PREFIX)
-    app.include_router(televalidation_router, prefix=API_PREFIX)
+    app.include_router(osd_router, prefix=API_PREFIX, tags=["OSD"])
 
     # Add handlers for different types of error
     app.exception_handler(SchematicValidationError)(schematic_validation_error_handler)

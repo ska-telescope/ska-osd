@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from fastapi import APIRouter, Body
+from fastapi import Body
 from jsonschema import ValidationError
 from ska_telmodel.data import TMData
 
@@ -10,7 +10,7 @@ from ska_ost_osd.common.utils import (
     get_responses,
     read_json,
 )
-from ska_ost_osd.osd.routers.api import handle_validation_error
+from ska_ost_osd.osd.routers.api import handle_validation_error, osd_router
 from ska_ost_osd.telvalidation.common.constant import (
     CAR_TELMODEL_SOURCE,
     SEMANTIC_VALIDATION_JSON_FILE_PATH,
@@ -24,16 +24,13 @@ from ska_ost_osd.telvalidation.semantic_validator import (
     semantic_validate,
 )
 
-televalidation_router = APIRouter(prefix="")
-
 
 def get_tmdata_sources(source):
     return [source] if source else CAR_TELMODEL_SOURCE  # check source
 
 
-@televalidation_router.post(
+@osd_router.post(
     "/semantic_validation",
-    tags=["Telvalidation"],
     summary=(
         "Validate input json Semantically Semantic validation checks the"
         " meaning of the input data and ensures that it is valid in the context of"
@@ -69,7 +66,9 @@ def semantically_validate_json(
               are detected).
 
     :raises: SemanticValidationError: If the input JSON is not
-             semantically valid semantic and raise semantic is true
+             semantically valid semantic and raise semantic is true\n
+     **⚠️  This request body contains sample semantic validation JSON,
+     please provide value for {osd_version} in sources**
     """
 
     error_details = []

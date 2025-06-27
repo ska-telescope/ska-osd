@@ -150,7 +150,6 @@ def update_osd_data(body: Dict, **kwargs) -> Dict:
 
 @osd_router.post(
     "/osd_release",
-    tags=["OSD"],
     summary="Release new osd version to Gitlab",
     responses=get_responses(ApiResponse[OSDRelease]),
     response_model=ApiResponse[OSDRelease],
@@ -209,7 +208,6 @@ def release_osd_data(
 
 @osd_router.get(
     "/cycle",
-    tags=["OSD"],
     summary="GET list of available proposal cycles",
     responses=get_responses(ApiResponse[CycleModel]),
     response_model=ApiResponse[CycleModel],
