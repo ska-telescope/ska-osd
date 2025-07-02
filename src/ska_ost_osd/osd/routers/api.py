@@ -55,6 +55,12 @@ osd_router = APIRouter(prefix="")
 @osd_router.get(
     "/osd",
     summary="Get OSD data filter by the query parameter",
+    description="""Retrieves the OSD cycle_id data which match the query
+    parameters. Also requests without parameters will take
+    example and default values and return data based on that.
+    All query parameters has its own validation if user provide
+    any invalid value it will return the error message.
+    """,
     responses=get_responses(ApiResponse),
     response_model=ApiResponse,
 )
