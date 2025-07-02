@@ -206,25 +206,6 @@ def test_osd_source(client_get):
     response.json == error_msg  # pylint: disable=W0104
 
 
-@pytest.mark.skip
-def test_osd_source_gitlab(client_get):
-    """This function tests that a request with an OSD source as car."""
-
-    response = client_get(
-        f"{BASE_API_URL}/osd", params={"cycle_id": 1, "source": "gitlab"}
-    )
-    error_msg = [
-        {
-            "detail": "404: 404 Commit Not Found",
-            "status": 0,
-            "title": "Internal Server Error",
-        },
-        500,
-    ]
-
-    assert response.json() == error_msg
-
-
 @pytest.mark.parametrize(
     "cycle_id, osd_version, source, gitlab_branch, capabilities, array_assembly",
     [
