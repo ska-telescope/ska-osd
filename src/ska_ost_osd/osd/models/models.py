@@ -102,6 +102,36 @@ class OSDRelease(BaseModel):
 
 
 class OSDQueryParams(BaseModel):
+    """Query parameters for retrieving OSD details.
+
+    Attributes:
+        cycle_id (Optional[int]):
+            The ID of the release cycle.
+            Example: 1
+
+        osd_version (Optional[str]):
+            The version of the OSD to retrieve.
+            Example: "1.0.0"
+
+        source (Optional[Literal["car", "file", "gitlab"]]):
+            The source from which the OSD is obtained. Defaults to "file".
+            Valid options: "car", "file", "gitlab"
+            Example: "file"
+
+        gitlab_branch (Optional[str]):
+            The name of the GitLab branch associated with the OSD release.
+            Example: "gitlab_branch"
+
+        capabilities (Optional[Literal["mid", "low"]]):
+            The system capabilities used in the release.
+            Valid options: "mid", "low"
+            Example: "mid"
+
+        array_assembly (Optional[str]):
+            The version identifier of the Array Assembly component.
+            Example: "AA0.5"
+    """
+
     cycle_id: Optional[int] = Field(
         default=None, example=1, description="Cycle ID", title="Cycle ID"
     )
@@ -135,8 +165,3 @@ class OSDQueryParams(BaseModel):
         title="Array Assembly",
         example="AA0.5",
     )
-
-    # @field_validator("cycle_id", mode="before")
-    # @classmethod
-    # def convert_str_none(cls, v):
-    #     return None if v == "None" else v
