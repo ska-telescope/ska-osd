@@ -222,7 +222,7 @@ def test_osd_source_gitlab(client_get):
         500,
     ]
 
-    assert response.json() == error_msg  # pylint: disable=W0104
+    assert response.json() == error_msg
 
 
 @pytest.mark.parametrize(
@@ -327,3 +327,47 @@ def test_mid_low_response(
 
     assert capabilities in result_data.keys()
     assert array_assembly in result_data[capabilities].keys()
+
+
+@pytest.mark.parametrize(
+    "cycle_id, source, capabilities",
+    [
+        (
+            3,
+            "file",
+            "mid",
+        ),
+        (
+            2,
+            "file",
+            "low",
+        ),
+    ],
+)
+def test_invalid_cycle_id(
+    cycle_id,
+    source,
+    capabilities,
+    client_get,
+):
+    """This function tests that the response from the REST API contains the
+    expected body contents when retrieving OSD metadata.
+
+    :raises AssertionError: If the expected data is invalid.
+    """
+
+    params = {
+        "cycle_id": cycle_id,
+        "source": source,
+        "capabilities": capabilities,
+    }
+
+    response = client_get(
+        f"{BASE_API_URL}/osd",
+        params=params,
+    ).json()
+
+    expected = f"Cycle {cycle_id} is not valid,Available IDs are 1"
+
+    assert response["result_data"][0] == expected
+    assert response["result_code"] == HTTPStatus.BAD_REQUEST
