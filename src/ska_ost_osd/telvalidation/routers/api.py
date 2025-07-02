@@ -37,6 +37,8 @@ def get_tmdata_sources(source):
         " the system. It checks whether the input data conforms to the business rules"
         " and logic of the system"
     ),
+    description="""**⚠️  This request body contains sample semantic validation JSON,
+     please provide value for {osd_version} in sources**""",
     responses=get_responses(ApiResponse),
     response_model=ApiResponse,
 )
@@ -66,9 +68,7 @@ def semantically_validate_json(
               are detected).
 
     :raises: SemanticValidationError: If the input JSON is not
-             semantically valid semantic and raise semantic is true\n
-     **⚠️  This request body contains sample semantic validation JSON,
-     please provide value for {osd_version} in sources**
+             semantically valid semantic and raise semantic is true
     """
 
     error_details = []
