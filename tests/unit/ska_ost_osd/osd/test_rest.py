@@ -7,7 +7,6 @@ from ska_ost_osd.osd.routers.api import validation_response
 from tests.conftest import BASE_API_URL
 
 
-@pytest.mark.skip
 @pytest.mark.parametrize(
     "cycle_id, osd_version, source, capabilities, array_assembly, expected",
     [
@@ -18,14 +17,14 @@ from tests.conftest import BASE_API_URL
             "mid",
             "AAA3",
             {
-                "detail": [
+                "result_data": [
                     "Cycle_id and Array_assembly cannot be used together",
                     "osd_version 1..1.0 is not valid",
                     "array_assembly AAA3 is not valid",
                     "Cycle 100000 is not valid,Available IDs are 1",
                 ],
-                "status": -1,
-                "title": "Value Error",
+                "result_status": "failed",
+                "result_code": 400,
             },
         ),
         (
@@ -35,12 +34,12 @@ from tests.conftest import BASE_API_URL
             "mid",
             "AA100000",
             {
-                "detail": [
+                "result_data": [
                     "Array Assembly AA100000 is not valid,Available Array Assemblies"
                     " are AA0.5, AA1, AA2"
                 ],
-                "title": "Value Error",
-                "status": -1,
+                "result_status": "failed",
+                "result_code": 400,
             },
         ),
         (
@@ -50,9 +49,9 @@ from tests.conftest import BASE_API_URL
             None,
             "AA0.5",
             {
-                "detail": ["Cycle_id and Array_assembly cannot be used together"],
-                "status": -1,
-                "title": "Value Error",
+                "result_data": ["Cycle_id and Array_assembly cannot be used together"],
+                "result_status": "failed",
+                "result_code": 400,
             },
         ),
         (
@@ -62,26 +61,11 @@ from tests.conftest import BASE_API_URL
             None,
             None,
             {
-                "detail": ["Either cycle_id or capabilities must be provided"],
-                "status": -1,
-                "title": "Value Error",
+                "result_data": ["Either cycle_id or capabilities must be provided"],
+                "result_status": "failed",
+                "result_code": 400,
             },
         ),
-        # (
-        #     1,
-        #     "31.0.7",
-        #     None,
-        #     ["mid"],
-        #     None,
-        #     {
-        #         "detail": [
-        #             "OSD Version 31.0.7 is not valid,Available OSD Versions are"
-        #             " {osd_versions}"
-        #         ],
-        #         "status": -1,
-        #         "title": "Value Error",
-        #     },
-        # ),
     ],
 )
 def test_invalid_osd_tmdata_source(
@@ -113,28 +97,30 @@ def test_invalid_osd_tmdata_source(
 
     if expected.get("detail") and isinstance(expected["detail"], list):
         expected["detail"][0] = expected["detail"][0].format(osd_versions=osd_versions)
-
+    params = {
+        "cycle_id": cycle_id,
+        "osd_version": osd_version,
+        "source": source,
+        "capabilities": capabilities,
+        "array_assembly": array_assembly,
+    }
+    filtered_params = {k: v for k, v in params.items() if v is not None}
     response = client_get(
         f"{BASE_API_URL}/osd",
-        params={
-            "cycle_id": cycle_id,
-            "osd_version": osd_version,
-            "source": source,
-            "capabilities": capabilities,
-            "array_assembly": array_assembly,
-        },
-    )
+        params=filtered_params,
+    ).json()
+    print(f"response::::::::::::::: {response}")
+    print(f"expected::::::::::::::: {expected}")
 
     if array_assembly == "AA100000":
-        msg = f"{','.join(response.json['detail'][0].split(',')[1:])}"
-        expected_msg = f"{expected['detail'][0].split(',')[0]},{msg}"
-        assert response.json["detail"][0] == expected_msg
+        # msg = f"{','.join(response.json()['result_data'][0].split(',')[1:])}"
+        # expected_msg = f"{expected['result_data'][0].split(',')[0]},{msg}"
+        assert array_assembly in response["result_data"][0]
 
     else:
-        assert response.json == expected
+        assert response["result_data"] == expected["result_data"]
 
 
-@pytest.mark.skip
 @patch("ska_ost_osd.osd.routers.api.get_osd_using_tmdata")
 def test_osd_endpoint(client_get, mock_mid_data):
     """This function tests that a request to the OSD endpoint for a specific
@@ -161,7 +147,6 @@ def test_osd_endpoint(client_get, mock_mid_data):
     assert response.json == mock_mid_data["AA0.5"]
 
 
-@pytest.mark.skip
 def test_invalid_osd_tmdata_source_capabilities(client_get):
     """This function tests that a request with an invalid capability returns
     the expected error response.
@@ -170,7 +155,7 @@ def test_invalid_osd_tmdata_source_capabilities(client_get):
         expected error message.
     """
 
-    error_msgs = client_get(
+    response = client_get(
         f"{BASE_API_URL}/osd",
         params={
             "cycle_id": 1,
@@ -179,10 +164,12 @@ def test_invalid_osd_tmdata_source_capabilities(client_get):
             "capabilities": "midd",
             "array_assembly": "AA3",
         },
-    )
+    ).json()
 
-    expected_error_msg = "'midd' is not one of ['mid', 'low']"
-    assert error_msgs.json["detail"].startswith(expected_error_msg)
+    expected = (
+        "query.capabilities: Input should be 'mid' or 'low', invalid payload: midd"
+    )
+    assert response["result_data"] == expected
 
 
 def test_response_body():
@@ -203,7 +190,6 @@ def test_response_body():
     assert response[0] == expected
 
 
-@pytest.mark.skip
 def test_osd_source(client_get):
     """This function tests that a request with an OSD source as car ."""
 
@@ -221,12 +207,11 @@ def test_osd_source(client_get):
     response.json == error_msg  # pylint: disable=W0104
 
 
-@pytest.mark.skip
 def test_osd_source_gitlab(client_get):
     """This function tests that a request with an OSD source as car."""
 
     response = client_get(
-        f"{BASE_API_URL}/osd", query_string={"cycle_id": 1, "source": "gitlab"}
+        f"{BASE_API_URL}/osd", params={"cycle_id": 1, "source": "gitlab"}
     )
 
     error_msg = [

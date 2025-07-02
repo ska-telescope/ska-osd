@@ -11,6 +11,7 @@ from pydantic import ValidationError
 from ska_ser_logging import configure_logging
 
 from ska_ost_osd.common.error_handling import generic_exception_handler
+from ska_ost_osd.osd.common.error_handling import OSDModelError
 from ska_ost_osd.osd.routers.api import osd_router
 from ska_ost_osd.telvalidation.common.error_handling import (
     schematic_validation_error_handler,
@@ -48,6 +49,7 @@ def create_app(production=PRODUCTION) -> FastAPI:
     app.include_router(osd_router, prefix=API_PREFIX, tags=["OSD"])
 
     # Add handlers for different types of error
+    app.exception_handler(OSDModelError)(generic_exception_handler)
     app.exception_handler(SchematicValidationError)(schematic_validation_error_handler)
     app.exception_handler(RequestValidationError)(generic_exception_handler)
     app.exception_handler(ResponseValidationError)(generic_exception_handler)

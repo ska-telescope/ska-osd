@@ -1,6 +1,6 @@
 import re
 from enum import Enum
-from typing import Any, Dict, List, Optional, TypeVar
+from typing import Any, Dict, List, Literal, Optional, TypeVar
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -99,3 +99,44 @@ class OSDRelease(BaseModel):
     message: str
     version: str
     cycle_id: str
+
+
+class OSDQueryParams(BaseModel):
+    cycle_id: Optional[int] = Field(
+        default=None, example=1, description="Cycle ID", title="Cycle ID"
+    )
+    osd_version: Optional[str] = Field(
+        default=None,
+        example="1.0.0",
+        description="OSD Version (e.g., 1.0.0)",
+        title="OSD Version",
+    )
+    source: Optional[Literal["car", "file", "gitlab"]] = Field(
+        default="file",
+        description="Source of OSD release",
+        title="Source",
+        example="file",
+    )
+    gitlab_branch: Optional[str] = Field(
+        default=None,
+        description="GitLab branch name",
+        title="GitLab Branch",
+        example="gitlab_branch",
+    )
+    capabilities: Optional[Literal["mid", "low"]] = Field(
+        default=None,
+        description="System capabilities",
+        title="Capabilities",
+        example="mid",
+    )
+    array_assembly: Optional[str] = Field(
+        default=None,
+        description="Array Assembly version",
+        title="Array Assembly",
+        example="AA0.5",
+    )
+
+    # @field_validator("cycle_id", mode="before")
+    # @classmethod
+    # def convert_str_none(cls, v):
+    #     return None if v == "None" else v

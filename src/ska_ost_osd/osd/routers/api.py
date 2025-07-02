@@ -9,7 +9,7 @@ from os import environ
 from pathlib import Path
 from typing import Dict
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from pydantic import ValidationError
 
 from ska_ost_osd.common.models import ApiResponse
@@ -32,6 +32,7 @@ from ska_ost_osd.osd.common.osd_validation_messages import (
 )
 from ska_ost_osd.osd.models.models import (
     CycleModel,
+    OSDQueryParams,
     OSDRelease,
     ReleaseType,
     UpdateRequestModel,
@@ -51,7 +52,13 @@ PUSH_TO_GITLAB = int(environ.get("PUSH_TO_GITLAB", 0))
 osd_router = APIRouter(prefix="")
 
 
-def get_osd(**kwargs) -> dict:
+@osd_router.get(
+    "/osd",
+    summary="Get OSD data filter by the query parameter",
+    responses=get_responses(ApiResponse),
+    response_model=ApiResponse,
+)
+def get_osd(osd_model: OSDQueryParams = Depends()) -> Dict:
     """This function takes query parameters and OSD data source objects to
     generate a response containing matching OSD data.
 
@@ -60,18 +67,18 @@ def get_osd(**kwargs) -> dict:
     :returns dict: A dictionary with OSD data satisfying the query.
     """
     try:
-        cycle_id = kwargs.get("cycle_id")
-        osd_version = kwargs.get("osd_version")
-        source = kwargs.get("source")
-        gitlab_branch = kwargs.get("gitlab_branch")
-        capabilities = kwargs.get("capabilities")
-        array_assembly = kwargs.get("array_assembly")
+        cycle_id = osd_model.cycle_id
+        osd_version = osd_model.osd_version
+        source = osd_model.source
+        gitlab_branch = osd_model.gitlab_branch
+        capabilities = osd_model.capabilities
+        array_assembly = osd_model.array_assembly
         osd_data = get_osd_using_tmdata(
             cycle_id, osd_version, source, gitlab_branch, capabilities, array_assembly
         )
     except (OSDModelError, ValueError) as error:
         raise error
-    return osd_data
+    return convert_to_response_object(osd_data, result_code=HTTPStatus.OK)
 
 
 def validation_response(

@@ -143,9 +143,9 @@ class OSD:
                 if not self.array_assembly and not self.cycle_id:
                     for array_assembly_id in self.keys_list:
                         if array_assembly_id not in ["telescope", "basic_capabilities"]:
-                            osd_data["capabilities"][key.lower()][
-                                array_assembly_id
-                            ] = data[array_assembly_id]
+                            osd_data["capabilities"][key.lower()][array_assembly_id] = (
+                                data[array_assembly_id]
+                            )
                 else:
                     osd_data["capabilities"][key.lower()][value] = data[value]
 
@@ -262,7 +262,6 @@ def check_cycle_id(
     cycle_ids = [int(key.split("_")[-1]) for key in versions_dict]
     cycle_id_exists = [cycle_id if cycle_id in cycle_ids else None][0]
     string_ids = ",".join([str(i) for i in cycle_ids])
-
     if cycle_id is not None and cycle_id_exists is None:
         cycle_error_msg_list.append(
             CYCLE_ID_ERROR_MESSAGE.format(cycle_id, string_ids),
@@ -359,7 +358,7 @@ def get_osd_using_tmdata(
     gitlab_branch: Optional[str] = None,
     capabilities: Optional[str] = None,
     array_assembly: Optional[str] = None,
-) -> dict:
+) -> Dict:
     """Retrieve OSD data using TMData.
 
     Args:
@@ -391,7 +390,6 @@ def get_osd_using_tmdata(
 
     tmdata_version = TMData(GITLAB_SOURCE, update=True)
     versions_dict = tmdata_version[VERSION_FILE_PATH].get_dict()
-
     _, cycle_errors = check_cycle_id(
         cycle_id=cycle_id,
         osd_version=osd_version,

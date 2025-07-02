@@ -14,9 +14,8 @@ LOGGER = logging.getLogger(__name__)
 class ValidationErrorFormatter:
     @staticmethod
     def format(exc: RequestValidationError) -> Dict[str, Any]:
-        """
-        Format a FastAPI RequestValidationError into a structured
-        error message.
+        """Format a FastAPI RequestValidationError into a structured error
+        message.
 
         This method processes validation errors to identify:
         - Missing required fields (`type == "missing"`)
@@ -78,7 +77,10 @@ async def generic_exception_handler(_: Request, err: Exception) -> JSONResponse:
     if isinstance(err, RequestValidationError):
         formatted = ValidationErrorFormatter.format(err)
     else:
-        formatted = str(err)
+        if err.args and isinstance(err.args[0], (list, dict)):
+            formatted = err.args[0]
+        else:
+            formatted = str(err)
     status_code = EXCEPTION_STATUS_MAP.get(
         err.__class__, status.HTTP_500_INTERNAL_SERVER_ERROR
     )

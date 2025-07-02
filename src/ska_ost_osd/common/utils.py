@@ -52,12 +52,15 @@ def convert_to_response_object(
 
     Returns formatted response object
     """
-    result_data = [response] if isinstance(response, (int, dict, list)) else response
-    result_status = API_RESPONSE_RESULT_STATUS_SUCCESS
+    result_data = [response] if isinstance(response, (int, dict)) else response
+    result_status = (
+        API_RESPONSE_RESULT_STATUS_SUCCESS
+        if result_code == HTTPStatus.OK
+        else API_RESPONSE_RESULT_STATUS_FAILED
+    )
 
     if isinstance(response, str) and result_code != HTTPStatus.OK:
         result_data = response
-        result_status = API_RESPONSE_RESULT_STATUS_FAILED
 
     return ApiResponse(
         result_data=result_data,
