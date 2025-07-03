@@ -9,7 +9,7 @@ from os import environ
 from pathlib import Path
 from typing import Dict
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Body, Depends
 from pydantic import ValidationError
 
 from ska_ost_osd.common.models import ApiResponse
@@ -21,6 +21,7 @@ from ska_ost_osd.common.utils import (
 from ska_ost_osd.osd.common.constant import (
     CYCLE_TO_VERSION_MAPPING,
     MID_CAPABILITIES_JSON_PATH,
+    MID_OSD_DATA_JSON_FILE_PATH,
     OBSERVATORY_POLICIES_JSON_PATH,
     RELEASE_VERSION_MAPPING,
     osd_file_mapping,
@@ -104,7 +105,22 @@ def validation_response(
     return response_body, http_status
 
 
-def update_osd_data(body: Dict, **kwargs) -> Dict:
+@osd_router.put(
+    "/osd",
+    summary="Update OSD data filter by the query parameter",
+    description="""Update the OSD data which match the query
+    parameters. Also requests without parameters will take example
+    and default values and return data based on that. All query
+    parameters has its own validation if user provide any invalid
+    value it will return the error message.
+    """,
+    responses=get_responses(ApiResponse),
+    response_model=ApiResponse,
+)
+def update_osd_data(
+    body: Dict = Body(example=read_json(MID_OSD_DATA_JSON_FILE_PATH)),
+    update_model: UpdateRequestModel = Depends(),
+) -> Dict:
     """This function updates the input JSON against the schema.
 
     Args:
@@ -120,15 +136,15 @@ def update_osd_data(body: Dict, **kwargs) -> Dict:
         ValueError: If data validation or business logic checks fail
     """
     # Handle the simpler case first - when no cycle_id is present
-    if "cycle_id" not in kwargs:
+    if not update_model.cycle_id:
         return add_new_data_storage(body)
 
     try:
         # Validate input data
         input_parameters = {
-            "cycle_id": kwargs.get("cycle_id"),
-            "array_assembly": kwargs.get("array_assembly"),
-            "capabilities": kwargs.get("capabilities"),
+            "cycle_id": update_model.cycle_id,
+            "array_assembly": update_model.array_assembly,
+            "capabilities": update_model.capabilities,
         }
         validated_data = UpdateRequestModel(**input_parameters)
         validated_capabilities = ValidationOnCapabilities(**body)

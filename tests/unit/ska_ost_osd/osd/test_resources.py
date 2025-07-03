@@ -2,6 +2,7 @@ from unittest.mock import patch
 
 import pytest
 
+from ska_ost_osd.osd.models.models import UpdateRequestModel
 from ska_ost_osd.osd.routers.api import update_osd_data
 
 
@@ -45,7 +46,7 @@ class TestResources:
         kwargs = {"cycle_id": 2, "array_assembly": "AA4", "capabilities": "mid"}
 
         # Call the function
-        result = update_osd_data(body, **kwargs)
+        result = update_osd_data(body, UpdateRequestModel(kwargs))
         # Assert the result
         assert result == {"updated": "data"}
 
@@ -61,5 +62,5 @@ class TestResources:
 
         body = {"capabilities": {"telescope": {"mid": "test"}}}
         kwargs = {"cycle_id": 1, "array_assembly": "AA0", "capabilities": "mid"}
-        result = update_osd_data(body, **kwargs)
+        result = update_osd_data(body, UpdateRequestModel(kwargs))
         assert "Array Assembly AA0 does not belongs to cycle 1" == result[0]["detail"]

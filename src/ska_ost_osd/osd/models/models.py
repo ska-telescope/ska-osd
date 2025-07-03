@@ -24,7 +24,12 @@ class UpdateRequestModel(BaseModel):
         pattern=ARRAY_ASSEMBLY_PATTERN,
         description="Array assembly in format AA[0-9].[0-9]",
     )
-    capabilities: Optional[str] = Field(..., description="Capabilities must be str")
+    capabilities: Optional[Literal["mid", "low"]] = Field(
+        default=None,
+        description="System capabilities",
+        title="Capabilities",
+        example="mid",
+    )
 
 
 class CycleModel(BaseModel):
