@@ -1,5 +1,6 @@
 from fastapi import status
 from fastapi.exceptions import RequestValidationError, ResponseValidationError
+from gitlab import GitlabGetError
 
 API_RESPONSE_RESULT_STATUS_SUCCESS = "success"
 API_RESPONSE_RESULT_STATUS_FAILED = "failed"
@@ -12,4 +13,5 @@ EXCEPTION_STATUS_MAP = {
     TypeError: status.HTTP_422_UNPROCESSABLE_ENTITY,
     Exception: status.HTTP_500_INTERNAL_SERVER_ERROR,
     RequestValidationError: status.HTTP_422_UNPROCESSABLE_ENTITY,
+    GitlabGetError: status.HTTP_404_NOT_FOUND,
 }

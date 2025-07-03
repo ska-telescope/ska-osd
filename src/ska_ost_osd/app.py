@@ -7,6 +7,7 @@ from importlib.metadata import version
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError, ResponseValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from gitlab import GitlabGetError
 from pydantic import ValidationError
 from ska_ser_logging import configure_logging
 
@@ -57,6 +58,7 @@ def create_app(production=PRODUCTION) -> FastAPI:
     app.exception_handler(FileNotFoundError)(generic_exception_handler)
     app.exception_handler(RuntimeError)(generic_exception_handler)
     app.exception_handler(ValidationError)(generic_exception_handler)
+    app.exception_handler(GitlabGetError)(generic_exception_handler)
 
     if not production:
         app.exception_handler(Exception)(generic_exception_handler)
