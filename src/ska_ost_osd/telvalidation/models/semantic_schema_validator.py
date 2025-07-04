@@ -40,3 +40,12 @@ class SemanticValidationModel(BaseModel):
     osd_data: Optional[Dict[str, Any]] = None
     raise_semantic: Optional[bool] = True
     sources: Optional[str] = None
+
+    @field_validator("sources")
+    @classmethod
+    def validate_sources_contains_osd_version(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None and "{osd_version}" in v:
+            raise ValueError(
+                "Please provide 'osd_version' by replacing '{osd_version}' placeholder"
+            )
+        return v
