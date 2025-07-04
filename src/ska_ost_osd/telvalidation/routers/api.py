@@ -13,8 +13,10 @@ from ska_ost_osd.common.utils import (
 from ska_ost_osd.osd.routers.api import handle_validation_error, osd_router
 from ska_ost_osd.telvalidation.common.constant import (
     CAR_TELMODEL_SOURCE,
+    SEMANTIC_VALIDATION_DISABLED_MSG,
     SEMANTIC_VALIDATION_JSON_FILE_PATH,
     SEMANTIC_VALIDATION_VALUE,
+    SEMANTICALLY_VALID_JSON_MSG,
 )
 from ska_ost_osd.telvalidation.models.semantic_schema_validator import (
     SemanticValidationModel,
@@ -96,11 +98,11 @@ def semantically_validate_json(
 
     if int(VALIDATION_STRICTNESS) < int(SEMANTIC_VALIDATION_VALUE):
         return convert_to_response_object(
-            response="Semantic Validation is currently disable",
+            response=SEMANTIC_VALIDATION_DISABLED_MSG,
             result_code=HTTPStatus.OK,
         )
     else:
         return convert_to_response_object(
-            response="JSON is semantically valid",
+            response=SEMANTICALLY_VALID_JSON_MSG,
             result_code=HTTPStatus.OK,
         )
