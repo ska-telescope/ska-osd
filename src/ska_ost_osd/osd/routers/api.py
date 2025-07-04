@@ -169,9 +169,10 @@ def update_osd_data(
         existing_data = read_json(MID_CAPABILITIES_JSON_PATH)
         observatory_policy = body.get("observatory_policy", None)
 
-        return update_file_storage(
+        updated_data = update_file_storage(
             validated_capabilities, observatory_policy, existing_data
         )
+        return convert_to_response_object(updated_data, result_code=HTTPStatus.OK)
 
     except (ValidationError, KeyError, OSDModelError, CapabilityError) as error:
         raise ValueError(str(error)) from error
