@@ -192,15 +192,6 @@ def mid_osd_data():
     return MID_OSD_DATA_JSON
 
 
-@pytest.fixture
-def osd_observatory_policies():
-    """This fixture returns data in OBSERVATORY_MOCK_DATA file.
-
-    :returns dict: OBSERVATORY_MOCK_DATA file data
-    """
-    return OBSERVATORY_MOCK_DATA
-
-
 @pytest.fixture(scope="module")
 def mock_mid_data():
     """This function is used as a fixture for mid json data.
