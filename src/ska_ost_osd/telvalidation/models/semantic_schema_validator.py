@@ -1,7 +1,7 @@
 import re
 from typing import Any, Dict, Optional
 
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, field_validator
 
 from ska_ost_osd.telvalidation.common.constant import INTERFACE_PATTERN
 
@@ -14,36 +14,24 @@ class SemanticModel(BaseModel):
     osd_data: Optional[dict] = None
     tm_data: Optional[object] = None
 
-    @model_validator(mode="before")
+    @field_validator("observing_command_input")
     @classmethod
-    def validate_semantic_combinations(cls, values: dict) -> dict:
-        errors = []
-        # Validate that observing_command_input is present and is a dictionary
-        if "observing_command_input" not in values or not isinstance(
-            values.get("observing_command_input"), dict
-        ):
-            errors.append(
-                {"field": "observing_command_input", "msg": "This field is required"}
+    def validate_observing_command_input(cls, v: Any) -> dict:
+        if not isinstance(v, dict):
+            raise ValueError(
+                "observing_command_input field is required and must be a dictionary"
             )
+        return v
 
-        else:
-            interface = values.get("interface")
-            if interface and not isinstance(interface, str):
-                errors.append(
-                    {"field": "interface", "msg": "Interface must be a string"}
-                )
-            elif interface and not re.match(INTERFACE_PATTERN, interface):
-                errors.append(
-                    {
-                        "field": "interface",
-                        "msg": f"Interface must match pattern: {INTERFACE_PATTERN}",
-                    }
-                )
-
-        if errors:
-            raise ValueError(errors)
-
-        return values
+    @field_validator("interface")
+    @classmethod
+    def validate_interface(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None:
+            if not isinstance(v, str):
+                raise ValueError("Interface must be a string")
+            if not re.match(INTERFACE_PATTERN, v):
+                raise ValueError(f"Interface must match pattern: {INTERFACE_PATTERN}")
+        return v
 
 
 class SemanticValidationModel(BaseModel):

@@ -73,11 +73,9 @@ def get_responses(response_model) -> Dict[str, Any]:
     Returns formatted response dictionary
     """
 
-    responses = {
+    return {
         status.HTTP_200_OK: {
             "description": "Successful Response",
             "model": response_model,
         }
     }
-
-    return responses
