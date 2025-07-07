@@ -24,11 +24,6 @@ class SemanticModel(BaseModel):
             Optional. Holds relevant data from the OSD
         tm_data (Optional[object]):
             Optional. Can contain telemodel data
-
-    Validators:
-        - observing_command_input: Ensures the input is a dictionary.
-        - interface: Ensures the value is a string and matches the
-        specified regex pattern.
     """
 
     observing_command_input: dict
@@ -41,6 +36,7 @@ class SemanticModel(BaseModel):
     @field_validator("observing_command_input")
     @classmethod
     def validate_observing_command_input(cls, v: Any) -> dict:
+        """observing_command_input: Ensures the input is a dictionary."""
         if not isinstance(v, dict):
             raise ValueError(
                 "observing_command_input field is required and must be a dictionary"
@@ -50,6 +46,8 @@ class SemanticModel(BaseModel):
     @field_validator("interface")
     @classmethod
     def validate_interface(cls, v: Optional[str]) -> Optional[str]:
+        """interface: Ensures the value is a string and matches the
+        specified regex pattern."""
         if v is not None:
             if not isinstance(v, str):
                 raise ValueError("Interface must be a string")
@@ -80,10 +78,6 @@ class SemanticValidationModel(BaseModel):
         sources (Optional[str]):
             An optional string that may reference data sources, including dynamic
             placeholders such as '{osd_version}'.
-
-    Validators:
-        - sources: Ensures the 'sources' field does not contain an unreplaced
-          '{osd_version}' placeholder. Raises a ValueError if present.
     """
 
     interface: Optional[str] = None
@@ -95,6 +89,8 @@ class SemanticValidationModel(BaseModel):
     @field_validator("sources")
     @classmethod
     def validate_sources_contains_osd_version(cls, v: Optional[str]) -> Optional[str]:
+        """sources: Ensures the 'sources' field does not contain an unreplaced
+        '{osd_version}' placeholder. Raises a ValueError if present."""
         if v is not None and "{osd_version}" in v:
             raise ValueError(
                 "Please provide 'osd_version' by replacing '{osd_version}' placeholder"
