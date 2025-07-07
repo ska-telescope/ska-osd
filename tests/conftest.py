@@ -192,15 +192,6 @@ def mid_osd_data():
     return MID_OSD_DATA_JSON
 
 
-@pytest.fixture
-def osd_observatory_policies():
-    """This fixture returns data in OBSERVATORY_MOCK_DATA file.
-
-    :returns dict: OBSERVATORY_MOCK_DATA file data
-    """
-    return OBSERVATORY_MOCK_DATA
-
-
 @pytest.fixture(scope="module")
 def mock_mid_data():
     """This function is used as a fixture for mid json data.
@@ -247,18 +238,18 @@ def valid_semantic_validation_body(
 @pytest.fixture
 def valid_semantic_validation_response():
     return {
-        "status": 0,
-        "detail": "JSON is semantically valid",
-        "title": "Semantic validation",
+        "result_data": "JSON is semantically valid",
+        "result_status": "success",
+        "result_code": 200,
     }
 
 
 @pytest.fixture
 def semantic_validation_disable_response():
     return {
-        "status": 0,
-        "detail": "Semantic Validation is currently disable",
-        "title": "Semantic validation",
+        "result_data": "Semantic Validation is currently disable",
+        "result_status": "success",
+        "result_code": 200,
     }
 
 
@@ -278,22 +269,24 @@ def invalid_semantic_validation_body(
 @pytest.fixture
 def invalid_semantic_validation_response():
     return {
-        "detail": [
-            "receptor_ids are too many!Current Limit is 4",
-            (
-                "Invalid input for receptor_ids! Currently allowed ['SKA001', 'SKA036',"
-                " 'SKA063', 'SKA100']"
-            ),
-            "beams are too many! Current limit is 1",
-            "Invalid function for beams! Currently allowed visibilities",
-            "Invalid input for freq_min",
-            "Invalid input for freq_max",
-            "freq_min should be less than freq_max",
-            "length of receptor_ids should be same as length of receptors",
-            "receptor_ids did not match receptors",
+        "result_data": [
+            [
+                "receptor_ids are too many!Current Limit is 4",
+                (
+                    "Invalid input for receptor_ids! Currently allowed ['SKA001',"
+                    " 'SKA036', 'SKA063', 'SKA100']"
+                ),
+                "beams are too many! Current limit is 1",
+                "Invalid function for beams! Currently allowed visibilities",
+                "Invalid input for freq_min",
+                "Invalid input for freq_max",
+                "freq_min should be less than freq_max",
+                "length of receptor_ids should be same as length of receptors",
+                "receptor_ids did not match receptors",
+            ]
         ],
-        "status": 0,
-        "title": "Semantic Validation Error",
+        "result_status": "failed",
+        "result_code": 422,
     }
 
 
@@ -321,14 +314,15 @@ def wrong_semantic_validation_parameter_body():
 @pytest.fixture
 def wrong_semantic_validation_parameter_value_response():
     return {
-        "detail": [
-            (
-                "gitlab://gitlab.com/ska-telescope14.1?~default~#tmdata not found"
-                " in SKA CAR - make sure to add tmdata CI!"
-            ),
-        ],
-        "status": -1,
-        "title": "Value Error",
+        "result_data": (
+            "Missing field(s): body.observing_command_input. body.raise_semantic: Input"
+            " should be a valid boolean, unable to interpret input, invalid payload:"
+            " {'interface': 'https://schemka-tmc-assignresources/2.1',"
+            " 'raise_semantic': '123', 'sources':"
+            " 'car://gitlab.com/ska-telescope14.1#tmdata'}"
+        ),
+        "result_status": "failed",
+        "result_code": 422,
     }
 
 
