@@ -1,2 +1,2 @@
 global:
-  cluster_domain: techops.internal.skao.int
+  cluster_domain: cluster.local
