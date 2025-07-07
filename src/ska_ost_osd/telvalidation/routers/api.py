@@ -16,6 +16,10 @@ from ska_ost_osd.telvalidation.common.constant import (
     SEMANTIC_VALIDATION_JSON_FILE_PATH,
     SEMANTIC_VALIDATION_VALUE,
 )
+from ska_ost_osd.telvalidation.common.telvalidation_messages import (
+    SEMANTIC_VALIDATION_DISABLED_MSG,
+    SEMANTICALLY_VALID_JSON_MSG,
+)
 from ska_ost_osd.telvalidation.models.semantic_schema_validator import (
     SemanticValidationModel,
 )
@@ -37,6 +41,7 @@ def get_tmdata_sources(source):
         " the system. It checks whether the input data conforms to the business rules"
         " and logic of the system"
     ),
+    description="Checks if the Command Input JSON is semantically valid",
     responses=get_responses(ApiResponse),
     response_model=ApiResponse,
 )
@@ -96,11 +101,11 @@ def semantically_validate_json(
 
     if int(VALIDATION_STRICTNESS) < int(SEMANTIC_VALIDATION_VALUE):
         return convert_to_response_object(
-            response="Semantic Validation is currently disable",
+            response=SEMANTIC_VALIDATION_DISABLED_MSG,
             result_code=HTTPStatus.OK,
         )
     else:
         return convert_to_response_object(
-            response="JSON is semantically valid",
+            response=SEMANTICALLY_VALID_JSON_MSG,
             result_code=HTTPStatus.OK,
         )

@@ -385,7 +385,7 @@ The request body should be structure with following parameters:
      - string
      - No
      - TMData source.
-     - ``"car://gitlab.com/ska-telescope/ska-ost-osd?1.14.1#tmdata"``
+     - ``"car://gitlab.com/ska-telescope/ska-ost-osd?{osd_version}#tmdata"``
    * - ``raise_semantic``
      - boolean
      - No
@@ -641,11 +641,11 @@ Semantic Validation Success Response
 
 .. code-block:: json
 
-     {
-        "title": "Semantic validation Successful"
-        "status": 0,
-        "details": "JSON is semantically valid",
-    }
+  {
+  "result_data": "JSON is semantically valid",
+  "result_status": "success",
+  "result_code": 200
+  }
 
 * Example 2: Invalid MID assign resource JSON input.
 
@@ -866,16 +866,17 @@ In below example added extra dish into 'receptor_ids' currently allowed 4, due t
 Semantic Validation Success Response With Error
 
 .. code-block:: json
-
-     {
-            "title": "Semantic Validation Error",
-            "status": 0,
-            "detail": [
+    {
+          "result_data": [
+            [
                 "receptor_ids are too many!Current Limit is 4",
                 "length of receptor_ids should be same as length of receptors",
                 "receptor_ids did not match receptors",
             ]
-        }
+          ],
+          "result_status": "failed",
+          "result_code": 422
+    }
 
 * Example 3: valid SBD-Mid JSON input.
 
@@ -1396,10 +1397,10 @@ Semantic Validation Success Response for SBD-Mid input.
 .. code-block:: json
 
      {
-        "title": "Semantic validation Successful"
-        "status": 0,
-        "details": "JSON is semantically valid",
-    }
+        "result_data": "JSON is semantically valid",
+        "result_status": "success",
+        "result_code": 200
+      }
 
 * Example 4: Invalid SBD-Mid JSON input.
 
@@ -1939,16 +1940,9 @@ Semantic Validation Error Response
 .. code-block:: json
 
         {
-            "title": "Value Error",
-            "status": -1,
-            "detail": {
-                "interface": "interface is not valid",
-                "observing_command_output": "observing_command_input is missing",
-                "sources":
-                    "gitlab://gitlab.com/ska-telescope14.1?~default~#tmdata not found"
-                    " in SKA CAR - make sure to add tmdata CI!"
-                ,
-            }
+          "result_data": "Missing field(s): body.observing_command_input",
+          "result_status": "failed",
+          "result_code": 422
         }
 
 * Example 6:   'raise_semantic' and 'osd_data' both are optional parameters.
@@ -2406,7 +2400,7 @@ Getting error as observing_command_input is required field
 .. code-block:: json
 
   {
-  "result_data": "Missing field(s): body.observing_command_input, invalid payload: {'raise_semantic': True, 'sources': 'car:ost/ska-ost-osd?3.1.1#tmdata', 'interface': 'https://schema.skao.int/ska-tmc-assignresources/2.1', 'osd_data': {'capabilities': {'mid': {'AA0.5': {'allowed_channel_count_range_max': [58982], 'allowed_channel_count_range_min': [1], 'allowed_channel_width_values': [13440], 'available_bandwidth_hz': 800000000, 'available_receivers': ['Band_1', 'Band_2'], 'cbf_modes': ['correlation', 'pst'], 'max_baseline_km': 1.5, 'number_dish_ids': ['SKA001', 'SKA036', 'SKA063', 'SKA100'], 'number_fsps': 4, 'number_meerkat_dishes': 0, 'number_meerkatplus_dishes': 0, 'number_pss_beams': 0, 'number_pst_beams': 1, 'number_ska_dishes': 4, 'number_zoom_channels': 0, 'number_zoom_windows': 0, 'ps_beam_bandwidth_hz': 400000000}, 'basic_capabilities': {'dish_elevation_limit_deg': 15, 'receiver_information': [{'max_frequency_hz': 1050000000, 'min_frequency_hz': 350000000, 'rx_id': 'Band_1'}, {'max_frequency_hz': 1760000000, 'min_frequency_hz': 950000000, 'rx_id': 'Band_2'}, {'max_frequency_hz': 3050000000, 'min_frequency_hz': 1650000000, 'rx_id': 'Band_3'}, {'max_frequency_hz': 5180000000, 'min_frequency_hz': 2800000000, 'rx_id': 'Band_4'}, {'max_frequency_hz': 8500000000, 'min_frequency_hz': 4600000000, 'rx_id': 'Band_5a'}, {'max_frequency_hz': 15400000000, 'min_frequency_hz': 8300000000, 'rx_id': 'Band_5b'}]}}}, 'observatory_policy': {'cycle_description': 'Science Verification', 'cycle_information': {'cycle_id': 'SKAO_2027_1', 'proposal_close': '2026-05-12T15:00:00.000Z', 'proposal_open': '2026-03-27T12:00:00.000Z'}, 'cycle_number': 2, 'cycle_policies': {'normal_max_hours': 100}, 'telescope_capabilities': {'Low': 'AA2', 'Mid': 'AA2'}}}}",
+  "result_data": "Missing field(s): body.observing_command_input",
   "result_status": "failed",
   "result_code": 422
 }
