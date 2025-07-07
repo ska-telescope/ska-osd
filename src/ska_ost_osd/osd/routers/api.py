@@ -247,6 +247,6 @@ def handle_validation_error(err: object) -> list:
     :returns: List of errors
     """
     if isinstance(err, RuntimeError):
-        return [err.args[0]]
+        raise RuntimeError(err.args[0])
     elif isinstance(err, ValidationError):
-        return [error["msg"] for error in err.errors()]
+        raise ValidationError([error["msg"] for error in err.errors()])

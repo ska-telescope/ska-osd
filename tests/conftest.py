@@ -285,8 +285,8 @@ def invalid_semantic_validation_response():
                 "receptor_ids did not match receptors",
             ]
         ],
-        "result_status": "success",
-        "result_code": 200,
+        "result_status": "failed",
+        "result_code": 422,
     }
 
 
