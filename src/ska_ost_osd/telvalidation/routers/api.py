@@ -39,8 +39,7 @@ def get_tmdata_sources(source):
         " the system. It checks whether the input data conforms to the business rules"
         " and logic of the system"
     ),
-    description="""**⚠️  This request body contains sample semantic validation JSON,
-     please provide value for {osd_version} in sources**""",
+    description="Checks if the Command Input JSON is semantically valid",
     responses=get_responses(ApiResponse),
     response_model=ApiResponse,
 )

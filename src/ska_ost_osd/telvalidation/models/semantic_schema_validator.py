@@ -7,6 +7,30 @@ from ska_ost_osd.telvalidation.common.constant import INTERFACE_PATTERN
 
 
 class SemanticModel(BaseModel):
+    """SemanticModel represents the structured input required for executing an
+    observing command within the system.
+
+    Attributes:
+        observing_command_input (dict):
+            Mandatory. Contains the input parameters for the observing command.
+        interface (Optional[str]):
+            Optional. Specifies the interface type
+        raise_semantic (Optional[bool]):
+            Optional. Indicates whether to raise semantic validation errors.
+            Defaults to True.
+        array_assembly (Optional[str]):
+            Optional. Represents the array assembly ID or name.
+        osd_data (Optional[dict]):
+            Optional. Holds relevant data from the OSD
+        tm_data (Optional[object]):
+            Optional. Can contain telemodel data
+
+    Validators:
+        - observing_command_input: Ensures the input is a dictionary.
+        - interface: Ensures the value is a string and matches the
+        specified regex pattern.
+    """
+
     observing_command_input: dict
     interface: Optional[str] = None
     raise_semantic: Optional[bool] = True
@@ -35,6 +59,33 @@ class SemanticModel(BaseModel):
 
 
 class SemanticValidationModel(BaseModel):
+    """SemanticValidationModel defines the schema for validating semantic input
+    data related to observing commands and system configuration.
+
+    Attributes:
+        interface (Optional[str]):
+            An optional string representing the command interface type.
+
+        observing_command_input (Dict[str, Any]):
+            A required dictionary containing the core input parameters
+            for an observing command.
+
+        osd_data (Optional[Dict[str, Any]]):
+            Optional data fetched from the OSD
+
+        raise_semantic (Optional[bool]):
+            Flag to indicate whether semantic validation errors should be raised.
+            Defaults to True.
+
+        sources (Optional[str]):
+            An optional string that may reference data sources, including dynamic
+            placeholders such as '{osd_version}'.
+
+    Validators:
+        - sources: Ensures the 'sources' field does not contain an unreplaced
+          '{osd_version}' placeholder. Raises a ValueError if present.
+    """
+
     interface: Optional[str] = None
     observing_command_input: Dict[str, Any]
     osd_data: Optional[Dict[str, Any]] = None
