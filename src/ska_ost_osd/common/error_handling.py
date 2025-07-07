@@ -14,9 +14,8 @@ LOGGER = logging.getLogger(__name__)
 class ValidationErrorFormatter:
     @staticmethod
     def format(exc: RequestValidationError) -> Dict[str, Any]:
-        """
-        Format a FastAPI RequestValidationError into a structured
-        error message.
+        """Format a FastAPI RequestValidationError into a structured error
+        message.
 
         This method processes validation errors to identify:
         - Missing required fields (`type == "missing"`)
@@ -65,7 +64,7 @@ class ValidationErrorFormatter:
             parts.extend(parsing_errors)
 
         error_message = ". ".join(parts)
-        if payload_str:
+        if payload_str and not type(input_value) == dict:
             error_message += f", invalid payload: {payload_str}"
 
         return error_message

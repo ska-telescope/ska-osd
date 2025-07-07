@@ -91,7 +91,7 @@ These keys are imported from constant.py.
     for key, value in validation_constants.items():
         if key in interface or key == telescope:
             return value
-        
+
     # taking mid interface as default cause there is no any specific
     # key to differentiate the interface
     return validation_constants.get(SKA_MID_TELESCOPE)
@@ -198,18 +198,18 @@ There are some steps of this framework these are as follows:
 
 Ability to turn Semantic Validation off/on in real-time
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-To turn semantic validation off/on in real-time user need to create environment variable into helm charts. 
+To turn semantic validation off/on in real-time user need to create environment variable into helm charts.
 This will allow user to control semantic validation in real-time.
 
-The purpose of this environment variable, is likely to control whether semantic validation 
-should be performed in the program. By using an environment variable, the behavior can be easily 
+The purpose of this environment variable, is likely to control whether semantic validation
+should be performed in the program. By using an environment variable, the behavior can be easily
 changed without modifying the code itself, which is useful for different deployment environments or testing scenarios.
 
 Steps to add and change the validation_strictness environment variable in 'values.yaml' file:
 
    * Setting the environment variable:
 
-      The VALIDATION_STRICTNESS parameter determines the level of validation applied. When set to 2, it enables the semantic 
+      The VALIDATION_STRICTNESS parameter determines the level of validation applied. When set to 2, it enables the semantic
       validation flag for OSD validation, while setting it to 1 only applies telmodel schema validation without OSD semantic checks.
 
       .. code::
@@ -220,7 +220,7 @@ Steps to add and change the validation_strictness environment variable in 'value
    * Changing the value: User can change the value by running below command with a different value from CLI.
 
       .. code::
-      
+
             export VALIDATION_STRICTNESS="1"
 
 
@@ -385,7 +385,7 @@ The request body should be structure with following parameters:
      - string
      - No
      - TMData source.
-     - ``"car://gitlab.com/ska-telescope/ska-ost-osd?1.14.1#tmdata"``
+     - ``"car://gitlab.com/ska-telescope/ska-ost-osd?{osd_version}#tmdata"``
    * - ``raise_semantic``
      - boolean
      - No
@@ -641,11 +641,11 @@ Semantic Validation Success Response
 
 .. code-block:: json
 
-     {
-        "title": "Semantic validation Successful"
-        "status": 0,
-        "details": "JSON is semantically valid",
-    }
+  {
+  "result_data": "JSON is semantically valid",
+  "result_status": "success",
+  "result_code": 200
+  }
 
 * Example 2: Invalid MID assign resource JSON input.
 
@@ -866,16 +866,17 @@ In below example added extra dish into 'receptor_ids' currently allowed 4, due t
 Semantic Validation Success Response With Error
 
 .. code-block:: json
-
-     {
-            "title": "Semantic Validation Error",
-            "status": 0,
-            "detail": [
+    {
+          "result_data": [
+            [
                 "receptor_ids are too many!Current Limit is 4",
                 "length of receptor_ids should be same as length of receptors",
                 "receptor_ids did not match receptors",
             ]
-        }
+          ],
+          "result_status": "failed",
+          "result_code": 422
+    }
 
 * Example 3: valid SBD-Mid JSON input.
 
@@ -1043,7 +1044,7 @@ Semantic Validation Success Response With Error
           {
             "beam_id": "vis0",
             "function": "visibilities"
-  
+
           }
         ],
         "scan_types": [
@@ -1230,7 +1231,7 @@ Semantic Validation Success Response With Error
         ],
         "receptors": [
           "0001",
-          "0002"    
+          "0002"
         ],
         "receive_nodes": 10
       }
@@ -1293,7 +1294,7 @@ Semantic Validation Success Response With Error
     "dish_allocations": {
       "receptor_ids": [
         "0001",
-        "0002"  
+        "0002"
       ]
     },
     "dish_configurations": [
@@ -1389,17 +1390,17 @@ Semantic Validation Success Response With Error
     }
   }
   }
-  
+
 
 Semantic Validation Success Response for SBD-Mid input.
- 
+
 .. code-block:: json
 
      {
-        "title": "Semantic validation Successful"
-        "status": 0,
-        "details": "JSON is semantically valid",
-    }
+        "result_data": "JSON is semantically valid",
+        "result_status": "success",
+        "result_code": 200
+      }
 
 * Example 4: Invalid SBD-Mid JSON input.
 
@@ -1567,7 +1568,7 @@ Semantic Validation Success Response for SBD-Mid input.
           {
             "beam_id": "vis0",
             "function": "visibilities"
-  
+
           }
         ],
         "scan_types": [
@@ -1754,7 +1755,7 @@ Semantic Validation Success Response for SBD-Mid input.
         ],
         "receptors": [
           "0001",
-          "0002"    
+          "0002"
         ],
         "receive_nodes": 10
       }
@@ -1817,7 +1818,7 @@ Semantic Validation Success Response for SBD-Mid input.
     "dish_allocations": {
       "receptor_ids": [
         "0001",
-        "0002"  
+        "0002"
       ]
     },
     "dish_configurations": [
@@ -1931,7 +1932,7 @@ Semantic Validation Success Response With Error for SBD-Mid input.
 
 
 * Example 5: Invalid JSON input.
-  
+
   If user provide wrong interface or missed to add observing_command_input, then it will raise error.
 
 Semantic Validation Error Response
@@ -1939,24 +1940,17 @@ Semantic Validation Error Response
 .. code-block:: json
 
         {
-            "title": "Value Error",
-            "status": -1,
-            "detail": {
-                "interface": "interface is not valid",
-                "observing_command_output": "observing_command_input is missing",
-                "sources":
-                    "gitlab://gitlab.com/ska-telescope14.1?~default~#tmdata not found"
-                    " in SKA CAR - make sure to add tmdata CI!"
-                ,
-            }
+          "result_data": "Missing field(s): body.observing_command_input",
+          "result_status": "failed",
+          "result_code": 422
         }
 
 * Example 6:   'raise_semantic' and 'osd_data' both are optional parameters.
-  So, if user do not pass these parameters, then API will take as default value of 'raise_semantic' 
+  So, if user do not pass these parameters, then API will take as default value of 'raise_semantic'
   i.e. true and osd_data fetch from latest release of osd_data.
 
 .. code-block:: json
-  
+
    {
     "interface":"https://schema.skao.int/ska-oso-pdm-sbd/0.1",
     "observing_command_input":{
@@ -2120,7 +2114,7 @@ Semantic Validation Error Response
           {
             "beam_id": "vis0",
             "function": "visibilities"
-  
+
           }
         ],
         "scan_types": [
@@ -2307,7 +2301,7 @@ Semantic Validation Error Response
         ],
         "receptors": [
           "0001",
-          "0002"    
+          "0002"
         ],
         "receive_nodes": 10
       }
@@ -2370,7 +2364,7 @@ Semantic Validation Error Response
     "dish_allocations": {
       "receptor_ids": [
         "0001",
-        "0002"  
+        "0002"
       ]
     },
     "dish_configurations": [
@@ -2382,13 +2376,13 @@ Semantic Validation Error Response
   }}
 
 Semantic Validation Success Response for SBD-Mid input.
- 
+
 .. code-block:: json
 
      {
-        "title": "Semantic validation Successful"
-        "status": 0,
-        "details": "JSON is semantically valid",
+        "result_data": "JSON is semantically valid",
+        "result_status": "success",
+        "result_code": 200,
     }
 
 * Example 7: Missing key observing_command_input.
@@ -2406,11 +2400,7 @@ Getting error as observing_command_input is required field
 .. code-block:: json
 
   {
-    "detail": [
-      "Value error, [{'field': 'observing_command_input', 'msg': 'This field is required'}]"
-    ],
-    "status": -1,
-    "title": "Value Error"
-  }
-
-
+  "result_data": "Missing field(s): body.observing_command_input",
+  "result_status": "failed",
+  "result_code": 422
+}
