@@ -13,7 +13,7 @@ labels:
 
 global:
   minikube: true
-  cluster_domain: cluster.local
+  cluster_domain: techops.internal.skao.int
   id_rsa:
 
 rest:
