@@ -72,8 +72,6 @@ def semantically_validate_json(
 
     :raises: SemanticValidationError: If the input JSON is not
              semantically valid semantic and raise semantic is true\n
-     **⚠️  This request body contains sample semantic validation JSON,
-     please provide value for {osd_version} in sources**
     """
 
     error_details = []

@@ -112,8 +112,6 @@ def test_invalid_osd_tmdata_source(
     ).json()
 
     if array_assembly == "AA100000":
-        # msg = f"{','.join(response.json()['result_data'][0].split(',')[1:])}"
-        # expected_msg = f"{expected['result_data'][0].split(',')[0]},{msg}"
         assert array_assembly in response["result_data"][0]
 
     else:
