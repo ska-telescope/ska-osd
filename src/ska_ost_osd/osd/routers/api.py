@@ -88,23 +88,6 @@ def get_osd(osd_model: OSDQueryParams = Depends()) -> Dict:
     return convert_to_response_object(osd_data, result_code=HTTPStatus.OK)
 
 
-def validation_response(
-    detail: str,
-    status: int = 0,
-    title: str = HTTPStatus.INTERNAL_SERVER_ERROR.phrase,
-    http_status: HTTPStatus = HTTPStatus.INTERNAL_SERVER_ERROR,
-) -> dict:
-    """Creates an error response in the case that our validation has failed.
-
-    :param detail: The error message if validation fails
-    :param http_status: The HTTP status code to return
-    :return: HTTP response server error
-    """
-    response_body = {"status": status, "detail": detail, "title": title}
-
-    return response_body, http_status
-
-
 @osd_router.put(
     "/osd",
     summary="Update OSD data filter by the query parameter",

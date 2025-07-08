@@ -4,7 +4,6 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from ska_ost_osd.common.utils import remove_none_params
-from ska_ost_osd.osd.routers.api import validation_response
 from tests.conftest import BASE_API_URL
 
 
@@ -169,24 +168,6 @@ def test_invalid_osd_tmdata_source_capabilities(client_get):
         "query.capabilities: Input should be 'mid' or 'low', invalid payload: midd"
     )
     assert response["result_data"] == expected
-
-
-def test_response_body():
-    """This function tests that the response from the REST API contains the
-    expected body contents when retrieving OSD metadata.
-
-    :raises AssertionError: If the response body is invalid.
-    """
-
-    error_msg = "Validation failed"
-    response = validation_response(
-        detail=error_msg,
-        status=0,
-        title="Validation Error",
-        http_status=HTTPStatus.OK,
-    )
-    expected = {"detail": "Validation failed", "title": "Validation Error", "status": 0}
-    assert response[0] == expected
 
 
 def test_osd_source(client_get):
