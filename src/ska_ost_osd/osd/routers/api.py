@@ -126,8 +126,8 @@ def update_osd_data(
     Args:
         body (Dict): A dictionary containing key-value pairs of
         parameters required for validation.
-        **kwargs: Additional keyword arguments
-        including cycle_id and array_assembly
+        osd_model: pydantic model with fields
+        cycle_id, array_assembly and capabilities
 
     Returns:
         Dict: A dictionary with OSD data satisfying the query.
@@ -141,27 +141,19 @@ def update_osd_data(
 
     try:
         # Validate input data
-        input_parameters = {
-            "cycle_id": osd_model.cycle_id,
-            "array_assembly": osd_model.array_assembly,
-            "capabilities": osd_model.capabilities,
-        }
-        validated_data = OSDUpdateModel(**input_parameters)
         validated_capabilities = ValidationOnCapabilities(**body)
 
         # Check cycle and assembly compatibility if both attributes are present
-        if hasattr(validated_data, "cycle_id") and hasattr(
-            validated_data, "array_assembly"
-        ):
-            osd_model = read_json(OBSERVATORY_POLICIES_JSON_PATH)
+        if hasattr(osd_model, "cycle_id") and hasattr(osd_model, "array_assembly"):
+            osd_data = read_json(OBSERVATORY_POLICIES_JSON_PATH)
             if (
-                validated_data.cycle_id == osd_model["cycle_number"]
-                and validated_data.array_assembly
-                != osd_model["telescope_capabilities"]["Mid"]
+                osd_model.cycle_id == osd_data["cycle_number"]
+                and osd_model.array_assembly
+                != osd_data["telescope_capabilities"]["Mid"]
             ):
                 raise CapabilityError(
                     ARRAY_ASSEMBLY_DOESNOT_BELONGS_TO_CYCLE_ERROR_MESSAGE.format(
-                        validated_data.array_assembly, validated_data.cycle_id
+                        osd_model.array_assembly, osd_model.cycle_id
                     )
                 )
 
