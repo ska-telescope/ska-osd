@@ -31,6 +31,7 @@ from ska_ost_osd.osd.common.gitlab_helper import push_to_gitlab
 from ska_ost_osd.osd.common.osd_validation_messages import (
     ARRAY_ASSEMBLY_DOESNOT_BELONGS_TO_CYCLE_ERROR_MESSAGE,
 )
+from ska_ost_osd.osd.common.utils import load_json_from_file
 from ska_ost_osd.osd.models.models import (
     CycleModel,
     OSDQueryParams,
@@ -101,7 +102,7 @@ def get_osd(osd_model: OSDQueryParams = Depends()) -> Dict:
     response_model=ApiResponse,
 )
 def update_osd_data(
-    body: Dict = Body(example=read_json(MID_OSD_DATA_JSON_FILE_PATH)),
+    body: Dict = Body(example=load_json_from_file(MID_OSD_DATA_JSON_FILE_PATH)),
     osd_model: OSDUpdateModel = Depends(),
 ) -> Dict:
     """This function updates the input JSON against the schema.

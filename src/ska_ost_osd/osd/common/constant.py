@@ -46,4 +46,4 @@ RELEASE_VERSION_MAPPING = (
 )
 # constant define to push gitlab flag.
 GITLAB_SOURCE = [f"gitlab:{BASE_URL}{CAR_URL}main#{BASE_FOLDER_NAME}"]
-MID_OSD_DATA_JSON_FILE_PATH = "src/ska_ost_osd/osd/common/mid_osd_data.json"
+MID_OSD_DATA_JSON_FILE_PATH = "mid_osd_data.json"
