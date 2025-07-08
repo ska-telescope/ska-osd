@@ -20,7 +20,7 @@
           40320,
           53760
         ],
-        "available_bandwidth_hz": "800000000.0",
+        "available_bandwidth_hz": 800000000,
         "available_receivers": [
           "Band_1",
           "Band_2",
@@ -32,7 +32,7 @@
           "pst",
           "pss"
         ],
-        "max_baseline_km": "110.0",
+        "max_baseline_km": 110,
         "number_dish_ids": [
           "string"
         ],
@@ -44,14 +44,14 @@
         "number_ska_dishes": 64,
         "number_zoom_channels": 14880,
         "number_zoom_windows": 16,
-        "ps_beam_bandwidth_hz": "800000000.0"
+        "ps_beam_bandwidth_hz": 800000000
       },
       "basic_capabilities": {
-        "dish_elevation_limit_deg": "15.0",
+        "dish_elevation_limit_deg": 15,
         "receiver_information": [
           {
-            "max_frequency_hz": "350000000.0",
-            "min_frequency_hz": "1050000000.0",
+            "max_frequency_hz": 350000000,
+            "min_frequency_hz": 1050000000,
             "rx_id": "Band_1"
           }
         ]
