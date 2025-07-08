@@ -52,7 +52,6 @@ def convert_to_response_object(
 
     Returns formatted response object
     """
-    result_data = [response] if isinstance(response, (int, dict)) else response
     result_status = (
         API_RESPONSE_RESULT_STATUS_SUCCESS
         if result_code == HTTPStatus.OK
@@ -60,7 +59,7 @@ def convert_to_response_object(
     )
 
     return ApiResponse(
-        result_data=result_data,
+        result_data=response,
         result_code=result_code,
         result_status=result_status,
     )

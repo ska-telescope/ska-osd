@@ -159,7 +159,7 @@ def update_osd_data(
     summary="Release new osd version to Gitlab",
     description="Release OSD data with automatic version increment based on cycle ID",
     responses=get_responses(ApiResponse[OSDRelease]),
-    response_model=ApiResponse[OSDRelease],
+    response_model=ApiResponse,
 )
 def release_osd_data(
     cycle_id: int, release_type: ReleaseType
@@ -218,13 +218,13 @@ def release_osd_data(
     summary="GET list of available proposal cycles",
     description="GET list of all available proposal cycles",
     responses=get_responses(ApiResponse[CycleModel]),
-    response_model=ApiResponse[CycleModel],
+    response_model=ApiResponse,
 )
 def get_cycle_list() -> ApiResponse[CycleModel]:
     """GET list of all available proposal cycles.
 
     Returns:
-        ApiResponse[CycleModel]: Response model containing list of cycle numbers
+        ApiResponse: Response model containing list of cycle numbers
     """
     # TODO: instead of relying on RELEASE_VERSION_MAPPING file
     # we should find better approach to find out cycles
