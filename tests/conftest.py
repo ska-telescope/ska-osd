@@ -192,15 +192,6 @@ def mid_osd_data():
     return MID_OSD_DATA_JSON
 
 
-@pytest.fixture
-def osd_observatory_policies():
-    """This fixture returns data in OBSERVATORY_MOCK_DATA file.
-
-    :returns dict: OBSERVATORY_MOCK_DATA file data
-    """
-    return OBSERVATORY_MOCK_DATA
-
-
 @pytest.fixture(scope="module")
 def mock_mid_data():
     """This function is used as a fixture for mid json data.
@@ -292,8 +283,8 @@ def invalid_semantic_validation_response():
             "length of receptor_ids should be same as length of receptors",
             "receptor_ids did not match receptors",
         ],
-        "result_status": "success",
-        "result_code": 200,
+        "result_status": "failed",
+        "result_code": 422,
     }
 
 

@@ -181,6 +181,7 @@ def update_osd_data(
 @osd_router.post(
     "/osd_release",
     summary="Release new osd version to Gitlab",
+    description="Release OSD data with automatic version increment based on cycle ID",
     responses=get_responses(ApiResponse[OSDRelease]),
     response_model=ApiResponse[OSDRelease],
 )
@@ -239,6 +240,7 @@ def release_osd_data(
 @osd_router.get(
     "/cycle",
     summary="GET list of available proposal cycles",
+    description="GET list of all available proposal cycles",
     responses=get_responses(ApiResponse[CycleModel]),
     response_model=ApiResponse[CycleModel],
 )
@@ -275,6 +277,6 @@ def handle_validation_error(err: object) -> list:
     :returns: List of errors
     """
     if isinstance(err, RuntimeError):
-        return [err.args[0]]
+        raise RuntimeError(err.args[0])
     elif isinstance(err, ValidationError):
-        return [error["msg"] for error in err.errors()]
+        raise ValidationError([error["msg"] for error in err.errors()])

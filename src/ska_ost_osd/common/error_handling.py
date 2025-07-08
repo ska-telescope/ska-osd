@@ -64,7 +64,7 @@ class ValidationErrorFormatter:
             parts.extend(parsing_errors)
 
         error_message = ". ".join(parts)
-        if payload_str:
+        if payload_str and not type(input_value) == dict:
             error_message += f", invalid payload: {payload_str}"
 
         return error_message

@@ -21,6 +21,8 @@ async def schematic_validation_error_handler(
     LOGGER.exception("Semantic Validation Error")
     error_list = err.message.split("\n")
 
-    result = convert_to_response_object(error_list, result_code=HTTPStatus.OK)
+    result = convert_to_response_object(
+        error_list, result_code=HTTPStatus.UNPROCESSABLE_ENTITY
+    )
 
     return JSONResponse(content=result.model_dump(), status_code=HTTPStatus.OK)

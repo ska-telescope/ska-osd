@@ -59,9 +59,6 @@ def convert_to_response_object(
         else API_RESPONSE_RESULT_STATUS_FAILED
     )
 
-    if isinstance(response, str) and result_code != HTTPStatus.OK:
-        result_data = response
-
     return ApiResponse(
         result_data=result_data,
         result_code=result_code,
@@ -76,14 +73,12 @@ def get_responses(response_model) -> Dict[str, Any]:
     Returns formatted response dictionary
     """
 
-    responses = {
+    return {
         status.HTTP_200_OK: {
             "description": "Successful Response",
             "model": response_model,
         }
     }
-
-    return responses
 
 
 def remove_none_params(params: Dict[str, Any]) -> Dict[str, Any]:
