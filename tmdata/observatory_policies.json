@@ -7,7 +7,7 @@
     },
     "cycle_number": 1,
     "cycle_policies": {
-        "normal_max_hours": "100.0"
+        "normal_max_hours": 100
     },
     "telescope_capabilities": {
         "Low": "AA2",
