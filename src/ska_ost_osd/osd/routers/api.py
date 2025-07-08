@@ -35,8 +35,8 @@ from ska_ost_osd.osd.models.models import (
     CycleModel,
     OSDQueryParams,
     OSDRelease,
+    OSDUpdateModel,
     ReleaseType,
-    UpdateRequestModel,
     ValidationOnCapabilities,
 )
 from ska_ost_osd.osd.osd import (
@@ -119,7 +119,7 @@ def validation_response(
 )
 def update_osd_data(
     body: Dict = Body(example=read_json(MID_OSD_DATA_JSON_FILE_PATH)),
-    update_model: UpdateRequestModel = Depends(),
+    osd_model: OSDUpdateModel = Depends(),
 ) -> Dict:
     """This function updates the input JSON against the schema.
 
@@ -136,28 +136,28 @@ def update_osd_data(
         ValueError: If data validation or business logic checks fail
     """
     # Handle the simpler case first - when no cycle_id is present
-    if not update_model.cycle_id:
+    if not osd_model.cycle_id:
         return add_new_data_storage(body)
 
     try:
         # Validate input data
         input_parameters = {
-            "cycle_id": update_model.cycle_id,
-            "array_assembly": update_model.array_assembly,
-            "capabilities": update_model.capabilities,
+            "cycle_id": osd_model.cycle_id,
+            "array_assembly": osd_model.array_assembly,
+            "capabilities": osd_model.capabilities,
         }
-        validated_data = UpdateRequestModel(**input_parameters)
+        validated_data = OSDUpdateModel(**input_parameters)
         validated_capabilities = ValidationOnCapabilities(**body)
 
         # Check cycle and assembly compatibility if both attributes are present
         if hasattr(validated_data, "cycle_id") and hasattr(
             validated_data, "array_assembly"
         ):
-            osd_data = read_json(OBSERVATORY_POLICIES_JSON_PATH)
+            osd_model = read_json(OBSERVATORY_POLICIES_JSON_PATH)
             if (
-                validated_data.cycle_id == osd_data["cycle_number"]
+                validated_data.cycle_id == osd_model["cycle_number"]
                 and validated_data.array_assembly
-                != osd_data["telescope_capabilities"]["Mid"]
+                != osd_model["telescope_capabilities"]["Mid"]
             ):
                 raise CapabilityError(
                     ARRAY_ASSEMBLY_DOESNOT_BELONGS_TO_CYCLE_ERROR_MESSAGE.format(

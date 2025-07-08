@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 import pytest
 
-from ska_ost_osd.osd.models.models import UpdateRequestModel
+from ska_ost_osd.osd.models.models import OSDUpdateModel
 from ska_ost_osd.osd.routers.api import update_osd_data
 from tests.conftest import BASE_API_URL
 
@@ -48,7 +48,7 @@ class TestResources:
 
         # Call the function
         result = update_osd_data(  # pylint: disable=E1101
-            body, UpdateRequestModel(**kwargs)
+            body, OSDUpdateModel(**kwargs)
         ).model_dump(mode="json", exclude_none=True)
 
         # Assert the result

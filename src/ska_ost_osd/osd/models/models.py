@@ -17,7 +17,7 @@ from ska_ost_osd.osd.common.osd_validation_messages import (
 T = TypeVar("T")
 
 
-class UpdateRequestModel(BaseModel):
+class OSDUpdateModel(BaseModel):
     cycle_id: Optional[int] = Field(..., description="Cycle ID must be an integer")
     array_assembly: Optional[str] = Field(
         ...,
