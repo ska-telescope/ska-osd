@@ -1,6 +1,6 @@
 import re
 from enum import Enum
-from typing import Any, Dict, List, Optional, TypeVar
+from typing import Any, Dict, List, Literal, Optional, TypeVar
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -17,14 +17,19 @@ from ska_ost_osd.osd.common.osd_validation_messages import (
 T = TypeVar("T")
 
 
-class UpdateRequestModel(BaseModel):
+class OSDUpdateModel(BaseModel):
     cycle_id: Optional[int] = Field(..., description="Cycle ID must be an integer")
     array_assembly: Optional[str] = Field(
         ...,
         pattern=ARRAY_ASSEMBLY_PATTERN,
         description="Array assembly in format AA[0-9].[0-9]",
     )
-    capabilities: Optional[str] = Field(..., description="Capabilities must be str")
+    capabilities: Optional[Literal["mid", "low"]] = Field(
+        default=None,
+        description="System capabilities",
+        title="Capabilities",
+        example="mid",
+    )
 
 
 class CycleModel(BaseModel):
@@ -99,3 +104,69 @@ class OSDRelease(BaseModel):
     message: str
     version: str
     cycle_id: str
+
+
+class OSDQueryParams(BaseModel):
+    """Query parameters for retrieving OSD details.
+
+    Attributes:
+        cycle_id (Optional[int]):
+            The ID of the release cycle.
+            Example: 1
+
+        osd_version (Optional[str]):
+            The version of the OSD to retrieve.
+            Example: "1.0.0"
+
+        source (Optional[Literal["car", "file", "gitlab"]]):
+            The source from which the OSD is obtained. Defaults to "file".
+            Valid options: "car", "file", "gitlab"
+            Example: "file"
+
+        gitlab_branch (Optional[str]):
+            The name of the GitLab branch associated with the OSD release.
+            Example: "gitlab_branch"
+
+        capabilities (Optional[Literal["mid", "low"]]):
+            The system capabilities used in the release.
+            Valid options: "mid", "low"
+            Example: "mid"
+
+        array_assembly (Optional[str]):
+            The version identifier of the Array Assembly component.
+            Example: "AA0.5"
+    """
+
+    cycle_id: Optional[int] = Field(
+        default=None, example=1, description="Cycle ID", title="Cycle ID"
+    )
+    osd_version: Optional[str] = Field(
+        default=None,
+        example="1.0.0",
+        description="OSD Version (e.g., 1.0.0)",
+        title="OSD Version",
+    )
+    source: Optional[Literal["car", "file", "gitlab"]] = Field(
+        default="file",
+        description="Source of OSD release",
+        title="Source",
+        example="file",
+    )
+    gitlab_branch: Optional[str] = Field(
+        default=None,
+        description="GitLab branch name",
+        title="GitLab Branch",
+        example="gitlab_branch",
+    )
+    capabilities: Optional[Literal["mid", "low"]] = Field(
+        default=None,
+        description="System capabilities",
+        title="Capabilities",
+        example="mid",
+    )
+    array_assembly: Optional[str] = Field(
+        default=None,
+        description="Array Assembly version",
+        title="Array Assembly",
+        example="AA0.5",
+    )
