@@ -7,9 +7,9 @@ mappings.
 from http import HTTPStatus
 from os import environ
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Optional
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Body, Depends
 from pydantic import ValidationError
 
 from ska_ost_osd.common.models import ApiResponse
@@ -21,6 +21,7 @@ from ska_ost_osd.common.utils import (
 from ska_ost_osd.osd.common.constant import (
     CYCLE_TO_VERSION_MAPPING,
     MID_CAPABILITIES_JSON_PATH,
+    MID_OSD_DATA_JSON_FILE_PATH,
     OBSERVATORY_POLICIES_JSON_PATH,
     RELEASE_VERSION_MAPPING,
     osd_file_mapping,
@@ -30,12 +31,13 @@ from ska_ost_osd.osd.common.gitlab_helper import push_to_gitlab
 from ska_ost_osd.osd.common.osd_validation_messages import (
     ARRAY_ASSEMBLY_DOESNOT_BELONGS_TO_CYCLE_ERROR_MESSAGE,
 )
+from ska_ost_osd.osd.common.utils import load_json_from_file
 from ska_ost_osd.osd.models.models import (
     CycleModel,
     OSDQueryParams,
     OSDRelease,
+    OSDUpdateModel,
     ReleaseType,
-    UpdateRequestModel,
     ValidationOnCapabilities,
 )
 from ska_ost_osd.osd.osd import (
@@ -87,31 +89,29 @@ def get_osd(osd_model: OSDQueryParams = Depends()) -> Dict:
     return convert_to_response_object(osd_data, result_code=HTTPStatus.OK)
 
 
-def validation_response(
-    detail: str,
-    status: int = 0,
-    title: str = HTTPStatus.INTERNAL_SERVER_ERROR.phrase,
-    http_status: HTTPStatus = HTTPStatus.INTERNAL_SERVER_ERROR,
-) -> dict:
-    """Creates an error response in the case that our validation has failed.
-
-    :param detail: The error message if validation fails
-    :param http_status: The HTTP status code to return
-    :return: HTTP response server error
-    """
-    response_body = {"status": status, "detail": detail, "title": title}
-
-    return response_body, http_status
-
-
-def update_osd_data(body: Dict, **kwargs) -> Dict:
+@osd_router.put(
+    "/osd",
+    summary="Update OSD data filter by the query parameter",
+    description="""Update the OSD data which match the query
+    parameters. Also requests without parameters will take example
+    and default values and return data based on that. All query
+    parameters has its own validation if user provide any invalid
+    value it will return the error message.
+    """,
+    responses=get_responses(ApiResponse),
+    response_model=ApiResponse,
+)
+def update_osd_data(
+    body: Dict = Body(example=load_json_from_file(MID_OSD_DATA_JSON_FILE_PATH)),
+    osd_model: OSDUpdateModel = Depends(),
+) -> Dict:
     """This function updates the input JSON against the schema.
 
     Args:
         body (Dict): A dictionary containing key-value pairs of
         parameters required for validation.
-        **kwargs: Additional keyword arguments
-        including cycle_id and array_assembly
+        osd_model: pydantic model with fields
+        cycle_id, array_assembly and capabilities
 
     Returns:
         Dict: A dictionary with OSD data satisfying the query.
@@ -120,32 +120,24 @@ def update_osd_data(body: Dict, **kwargs) -> Dict:
         ValueError: If data validation or business logic checks fail
     """
     # Handle the simpler case first - when no cycle_id is present
-    if "cycle_id" not in kwargs:
+    if not osd_model.cycle_id:
         return add_new_data_storage(body)
 
     try:
         # Validate input data
-        input_parameters = {
-            "cycle_id": kwargs.get("cycle_id"),
-            "array_assembly": kwargs.get("array_assembly"),
-            "capabilities": kwargs.get("capabilities"),
-        }
-        validated_data = UpdateRequestModel(**input_parameters)
         validated_capabilities = ValidationOnCapabilities(**body)
 
         # Check cycle and assembly compatibility if both attributes are present
-        if hasattr(validated_data, "cycle_id") and hasattr(
-            validated_data, "array_assembly"
-        ):
+        if hasattr(osd_model, "cycle_id") and hasattr(osd_model, "array_assembly"):
             osd_data = read_json(OBSERVATORY_POLICIES_JSON_PATH)
             if (
-                validated_data.cycle_id == osd_data["cycle_number"]
-                and validated_data.array_assembly
+                osd_model.cycle_id == osd_data["cycle_number"]
+                and osd_model.array_assembly
                 != osd_data["telescope_capabilities"]["Mid"]
             ):
                 raise CapabilityError(
                     ARRAY_ASSEMBLY_DOESNOT_BELONGS_TO_CYCLE_ERROR_MESSAGE.format(
-                        validated_data.array_assembly, validated_data.cycle_id
+                        osd_model.array_assembly, osd_model.cycle_id
                     )
                 )
 
@@ -153,9 +145,10 @@ def update_osd_data(body: Dict, **kwargs) -> Dict:
         existing_data = read_json(MID_CAPABILITIES_JSON_PATH)
         observatory_policy = body.get("observatory_policy", None)
 
-        return update_file_storage(
+        updated_data = update_file_storage(
             validated_capabilities, observatory_policy, existing_data
         )
+        return convert_to_response_object(updated_data, result_code=HTTPStatus.OK)
 
     except (ValidationError, KeyError, OSDModelError, CapabilityError) as error:
         raise ValueError(str(error)) from error
@@ -169,7 +162,7 @@ def update_osd_data(body: Dict, **kwargs) -> Dict:
     response_model=ApiResponse[OSDRelease],
 )
 def release_osd_data(
-    cycle_id: int, release_type: ReleaseType
+    cycle_id: int, release_type: Optional[ReleaseType] = None
 ) -> ApiResponse[OSDRelease]:
     """Release OSD data with automatic version increment based on cycle ID.
 
@@ -183,7 +176,7 @@ def release_osd_data(
 
     cycle_id = f"cycle_{cycle_id}"
 
-    if release_type not in ["minor", "major"]:
+    if release_type and release_type not in ["minor", "major"]:
         raise ValueError("release_type must be either 'major' or 'minor' if provided")
 
     if PUSH_TO_GITLAB:
@@ -225,13 +218,13 @@ def release_osd_data(
     summary="GET list of available proposal cycles",
     description="GET list of all available proposal cycles",
     responses=get_responses(ApiResponse[CycleModel]),
-    response_model=ApiResponse[CycleModel],
+    response_model=ApiResponse,
 )
 def get_cycle_list() -> ApiResponse[CycleModel]:
     """GET list of all available proposal cycles.
 
     Returns:
-        ApiResponse[CycleModel]: Response model containing list of cycle numbers
+        ApiResponse: Response model containing list of cycle numbers
     """
     # TODO: instead of relying on RELEASE_VERSION_MAPPING file
     # we should find better approach to find out cycles

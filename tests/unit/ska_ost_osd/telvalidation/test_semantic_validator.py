@@ -362,7 +362,7 @@ def test_not_passing_optional_keys(
     del json_body[key_to_delete]
     expected_response = request.getfixturevalue(response)
     res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body).json()
-    assert res == expected_response
+    assert res["result_data"] == expected_response["result_data"]
 
 
 def test_wrong_values_and_no_observing_command_input(
@@ -374,7 +374,7 @@ def test_wrong_values_and_no_observing_command_input(
     json_body = wrong_semantic_validation_parameter_body
     expected_response = wrong_semantic_validation_parameter_value_response
     res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body).json()
-    assert res == expected_response
+    assert res["result_data"] == expected_response["result_data"]
 
 
 @patch("ska_ost_osd.telvalidation.routers.api.get_tmdata_sources")

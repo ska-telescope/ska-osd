@@ -17,14 +17,19 @@ from ska_ost_osd.osd.common.osd_validation_messages import (
 T = TypeVar("T")
 
 
-class UpdateRequestModel(BaseModel):
+class OSDUpdateModel(BaseModel):
     cycle_id: Optional[int] = Field(..., description="Cycle ID must be an integer")
     array_assembly: Optional[str] = Field(
         ...,
         pattern=ARRAY_ASSEMBLY_PATTERN,
         description="Array assembly in format AA[0-9].[0-9]",
     )
-    capabilities: Optional[str] = Field(..., description="Capabilities must be str")
+    capabilities: Optional[Literal["mid", "low"]] = Field(
+        default=None,
+        description="System capabilities",
+        title="Capabilities",
+        example="mid",
+    )
 
 
 class CycleModel(BaseModel):
