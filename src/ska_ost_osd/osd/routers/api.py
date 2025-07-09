@@ -159,7 +159,7 @@ def update_osd_data(
     summary="Release new osd version to Gitlab",
     description="Release OSD data with automatic version increment based on cycle ID",
     responses=get_responses(ApiResponse[OSDRelease]),
-    response_model=ApiResponse,
+    response_model=ApiResponse[OSDRelease],
 )
 def release_osd_data(
     cycle_id: int, release_type: Optional[ReleaseType] = None
