@@ -15,7 +15,7 @@ def get_http_status_from_map(exc: Exception) -> int:
     exc_type = type(exc)
     for key, status_code in EXCEPTION_STATUS_MAP.items():
         if isinstance(key, tuple):
-            if exc_type in key:  # pylint: disable=E1135
+            if exc_type in key:  # pylint: disable=I0021
                 return status_code
         elif exc_type == key:
             return status_code
