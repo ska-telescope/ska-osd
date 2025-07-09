@@ -11,6 +11,17 @@ from ska_ost_osd.common.utils import convert_to_response_object
 LOGGER = logging.getLogger(__name__)
 
 
+def get_http_status_from_map(exc: Exception) -> int:
+    exc_type = type(exc)
+    for key, status_code in EXCEPTION_STATUS_MAP.items():
+        if isinstance(key, tuple):
+            if exc_type in key:  # pylint: disable=I0021
+                return status_code
+        elif exc_type == key:
+            return status_code
+    return status.HTTP_500_INTERNAL_SERVER_ERROR  # Default fallback
+
+
 class ValidationErrorFormatter:
     @staticmethod
     def format(exc: RequestValidationError) -> Dict[str, Any]:
@@ -77,10 +88,12 @@ async def generic_exception_handler(_: Request, err: Exception) -> JSONResponse:
     if isinstance(err, RequestValidationError):
         formatted = ValidationErrorFormatter.format(err)
     else:
-        formatted = str(err)
-    status_code = EXCEPTION_STATUS_MAP.get(
-        err.__class__, status.HTTP_500_INTERNAL_SERVER_ERROR
-    )
+        if err.args and isinstance(err.args[0], (list, dict)):
+            formatted = err.args[0]
+        else:
+            formatted = str(err)
+
+    status_code = get_http_status_from_map(err)
 
     result = convert_to_response_object(
         formatted,

@@ -71,7 +71,7 @@ def semantically_validate_json(
               are detected).
 
     :raises: SemanticValidationError: If the input JSON is not
-             semantically valid semantic and raise semantic is true
+             semantically valid semantic and raise semantic is true\n
     """
 
     error_details = []

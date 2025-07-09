@@ -2,7 +2,9 @@ from unittest.mock import patch
 
 import pytest
 
+from ska_ost_osd.osd.models.models import OSDUpdateModel
 from ska_ost_osd.osd.routers.api import update_osd_data
+from tests.conftest import BASE_API_URL
 
 
 class TestResources:
@@ -45,21 +47,30 @@ class TestResources:
         kwargs = {"cycle_id": 2, "array_assembly": "AA4", "capabilities": "mid"}
 
         # Call the function
-        result = update_osd_data(body, **kwargs)
-        # Assert the result
-        assert result == {"updated": "data"}
+        result = update_osd_data(  # pylint: disable=E1101
+            body, OSDUpdateModel(**kwargs)
+        ).model_dump(mode="json", exclude_none=True)
 
-    @pytest.mark.skip
+        # Assert the result
+        assert result["result_data"] == {"updated": "data"}
+
     @patch("ska_ost_osd.osd.routers.api.read_json")
-    def test_update_osd_data_invalid_array_assembly(self, mock_read_file):
+    def test_update_osd_data_invalid_array_assembly(self, mock_read_file, client_put):
         """Test update_osd_data when array_assembly is invalid for the current
         cycle."""
         mock_read_file.return_value = {
             "cycle_number": 1,
             "telescope_capabilities": {"Mid": "AA5"},
         }
-
         body = {"capabilities": {"telescope": {"mid": "test"}}}
-        kwargs = {"cycle_id": 1, "array_assembly": "AA0", "capabilities": "mid"}
-        result = update_osd_data(body, **kwargs)
-        assert "Array Assembly AA0 does not belongs to cycle 1" == result[0]["detail"]
+        params = {"cycle_id": 1, "array_assembly": "AA0", "capabilities": "mid"}
+
+        response = client_put(
+            f"{BASE_API_URL}/osd",
+            params=params,
+            json=body,
+        ).json()
+
+        assert (
+            "Array Assembly AA0 does not belongs to cycle 1" == response["result_data"]
+        )
