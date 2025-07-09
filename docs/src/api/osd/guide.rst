@@ -471,13 +471,12 @@ GET /cycle
     .. code:: python
 
         {
-        "result_data": [
+        "result_data":
             {
             "cycles": [
                 1
             ]
-            }
-        ],
+            },
         "result_status": "success",
         "result_code": 200
         }
@@ -551,13 +550,13 @@ POST /osd_release
     .. code:: python
 
         {
-        "result_data": [
+        "result_data":
             {
             "message": f"Released new version 1.0.0",
             "version": 1.0.0,
             "cycle_id": 1,
         }
-        ],
+        ,
         "result_status": "success",
         "result_code": 200
         }

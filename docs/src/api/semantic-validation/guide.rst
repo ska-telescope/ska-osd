@@ -867,13 +867,13 @@ Semantic Validation Success Response With Error
 
 .. code-block:: json
     {
-          "result_data": [
+          "result_data":
             [
                 "receptor_ids are too many!Current Limit is 4",
                 "length of receptor_ids should be same as length of receptors",
                 "receptor_ids did not match receptors",
             ]
-          ],
+          ,
           "result_status": "failed",
           "result_code": 422
     }
@@ -1920,14 +1920,14 @@ Semantic Validation Success Response With Error for SBD-Mid input.
 .. code-block:: json
 
      {
-      "detail": [
+      "result_data": [
         "Invalid input for freq_min",
         "Invalid input for freq_max",
         "freq_min should be less than freq_max",
         "frequency_slice_id did not match fsp_id"
       ],
-      "status": 0,
-      "title": "Semantic Validation Error"
+      "result_status": "failed",
+      "result_code": 422
     }
 
 
