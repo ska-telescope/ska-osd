@@ -7,7 +7,7 @@ mappings.
 from http import HTTPStatus
 from os import environ
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Optional
 
 from fastapi import APIRouter, Body, Depends
 from pydantic import ValidationError
@@ -162,7 +162,7 @@ def update_osd_data(
     response_model=ApiResponse,
 )
 def release_osd_data(
-    cycle_id: int, release_type: ReleaseType
+    cycle_id: int, release_type: Optional[ReleaseType] = None
 ) -> ApiResponse[OSDRelease]:
     """Release OSD data with automatic version increment based on cycle ID.
 
@@ -176,7 +176,7 @@ def release_osd_data(
 
     cycle_id = f"cycle_{cycle_id}"
 
-    if release_type not in ["minor", "major"]:
+    if release_type and release_type not in ["minor", "major"]:
         raise ValueError("release_type must be either 'major' or 'minor' if provided")
 
     if PUSH_TO_GITLAB:
