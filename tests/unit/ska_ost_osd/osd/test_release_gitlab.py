@@ -48,10 +48,7 @@ class TestResources:
 
         data = {}
         result = client_post(f"{BASE_API_URL}/osd_release", params=data).json()
-        assert (
-            result["result_data"]
-            == "Missing field(s): query.cycle_id, query.release_type"
-        )
+        assert result["result_data"] == "Missing field(s): query.cycle_id"
 
     @patch("ska_ost_osd.osd.routers.api.manage_version_release")
     @patch("ska_ost_osd.osd.routers.api.push_to_gitlab")
