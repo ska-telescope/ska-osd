@@ -70,13 +70,11 @@ class TestResources:
         )
 
         assert result == {
-            "result_data": [
-                {
-                    "message": "Released new version 1.0.1",
-                    "version": "1.0.1",
-                    "cycle_id": "cycle_1",
-                }
-            ],
+            "result_data": {
+                "message": "Released new version 1.0.1",
+                "version": "1.0.1",
+                "cycle_id": "cycle_1",
+            },
             "result_status": "success",
             "result_code": 200,
         }
@@ -100,13 +98,11 @@ class TestResources:
         )
 
         assert result == {
-            "result_data": [
-                {
-                    "message": "Released new version 1.0.1",
-                    "version": "1.0.1",
-                    "cycle_id": "cycle_1",
-                }
-            ],
+            "result_data": {
+                "message": "Released new version 1.0.1",
+                "version": "1.0.1",
+                "cycle_id": "cycle_1",
+            },
             "result_status": "success",
             "result_code": 200,
         }
@@ -137,13 +133,11 @@ class TestResources:
         )
 
         assert result == {
-            "result_data": [
-                {
-                    "message": "Released new version 2.0.0",
-                    "version": "2.0.0",
-                    "cycle_id": "cycle_2",
-                }
-            ],
+            "result_data": {
+                "message": "Released new version 2.0.0",
+                "version": "2.0.0",
+                "cycle_id": "cycle_2",
+            },
             "result_status": "success",
             "result_code": 200,
         }

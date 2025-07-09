@@ -52,7 +52,7 @@ class TestResources:
         ).model_dump(mode="json", exclude_none=True)
 
         # Assert the result
-        assert result["result_data"][0] == {"updated": "data"}
+        assert result["result_data"] == {"updated": "data"}
 
     @patch("ska_ost_osd.osd.routers.api.read_json")
     def test_update_osd_data_invalid_array_assembly(self, mock_read_file, client_put):

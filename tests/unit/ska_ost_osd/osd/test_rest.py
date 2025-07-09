@@ -285,7 +285,7 @@ def test_mid_low_response(
         params=remove_none_params(params),
     ).json()
 
-    result_data = response["result_data"][0]["capabilities"]
+    result_data = response["result_data"]["capabilities"]
 
     assert capabilities in result_data.keys()
     assert array_assembly in result_data[capabilities].keys()
