@@ -147,7 +147,7 @@ class OSDQueryParams(BaseModel):
         title="OSD Version",
     )
     source: Optional[Literal["car", "file", "gitlab"]] = Field(
-        default="file",
+        default="car",
         description="Source of OSD release",
         title="Source",
         example="file",
