@@ -42,6 +42,8 @@ def get_validation_data(interface: str, telescope: str) -> Optional[str]:
 
     :param interface: str, the interface URI from the observing command
         input.
+    :param telescope: str, the telescope identifier (e.g., 'mid' or
+        'low').
     :return: str, the validation constant JSON file path, or None if not
         found.
     """
@@ -171,7 +173,7 @@ def fetch_matched_capabilities_from_basic_capabilities(
 
     e.g after fetching capabilities and basic_capabilities from OSD needs
     to rearrange some data between basic capabilities and capabilities
-    so that we can easily decided mapping between rules.
+    so that we can easily decide mapping between rules.
     here Band_1 (min and max) frequency present in basic capabilities so
     value fetched according.
     capabilities = {
@@ -198,7 +200,7 @@ def fetch_matched_capabilities_from_basic_capabilities(
         ]
     : param capabilities: dict contains capabilities
         like AAO.5, AA0.1
-    : param basic_capabilities: dict dict contains basic
+    : param basic_capabilities: dict contains basic
         capabilities required for capabilities.
     : param matched_capabilities_list: replaceable data list
     : return: matched value from basic capabilities
@@ -273,9 +275,7 @@ def validate_command_input(
     validation_data = semantic_validate_data[array_assembly].get(
         "assign_resource"
         if ASSIGN_RESOURCE in interface
-        else "configure"
-        if CONFIGURE in interface
-        else "sbd"
+        else "configure" if CONFIGURE in interface else "sbd"
     )
 
     msg_list = validate_json(
