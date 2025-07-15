@@ -13,12 +13,10 @@ from ska_ost_osd.common.utils import (
 from ska_ost_osd.osd.routers.api import handle_validation_error, osd_router
 from ska_ost_osd.telvalidation.common.constant import (
     CAR_TELMODEL_SOURCE,
-    SEMANTIC_VALIDATION_VALUE,
-    SWAGGER_SEMANTIC_VALIDATION_JSON_FILE_PATH,
-)
-from ska_ost_osd.telvalidation.common.telvalidation_messages import (
     SEMANTIC_VALIDATION_DISABLED_MSG,
+    SEMANTIC_VALIDATION_VALUE,
     SEMANTICALLY_VALID_JSON_MSG,
+    SWAGGER_SEMANTIC_VALIDATION_JSON_FILE_PATH,
 )
 from ska_ost_osd.telvalidation.models.semantic_schema_validator import (
     SemanticValidationModel,
