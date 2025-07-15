@@ -41,14 +41,14 @@ def get_value_based_on_provided_path(nested_data: Union[dict, list], path: list)
     on a given path.
 
     Args:
-        nested_data (dict or list): The nested dictionary or
-        list of dictionaries to search.
-        path (list): A list of keys representing the path to the desired value.
-        e.g: This help to retrieve element from dict
-        based on given path like ['a', 'b', 'c']
+        nested_data (Union[dict, list]): The nested dictionary or
+            list of dictionaries to search.
+        path (List[str]): A list of keys representing the path to the desired value.
+            For example, this helps retrieve an element from a dictionary
+            based on a given path like ['a', 'b', 'c'].
 
     Returns:
-        The value at the specified path, or None if the path is invalid
+        Any: The value at the specified path, or None if the path is invalid
         or the value is not found.
     """
     stack = deque()
@@ -102,7 +102,8 @@ def get_matched_rule_constraint_from_osd(
     the rule value.
 
     Example:
-    The updated structure of basic capabilities and rule is below:
+    The updated structure of basic capabilities and rule is shown below:
+
     capabilities = {
         "available_receivers": [{
             "rx_id": "Band_1",
@@ -120,17 +121,22 @@ def get_matched_rule_constraint_from_osd(
         }
     ]
 
-    min_frequency_hz and max_frequency_hz rule constraints
-    are matched from
-    capabilities, hence the output list becomes
-    [{"min_frequency_hz": 350000000.0,
-    "max_frequency_hz": 1050000000.0}]
+    The `min_frequency_hz` and `max_frequency_hz` rule constraints
+    are matched from capabilities. Hence, the output list becomes:
+    [{
+        "min_frequency_hz": 350000000.0,
+        "max_frequency_hz": 1050000000.0
+    }]
 
-    :param basic_capabilities: dict, Capabilities from OSD
-    :param search_key: str, Keys from the rule file
-    :param rule: str, Rule for validating the data and error
-    :return: list, A list of matched capabilities based on the rule file keys
+    Args:
+        basic_capabilities (dict): Capabilities from OSD.
+        search_key (str): Key from the rule file.
+        rule (str): Rule for validating the data and associated error.
+
+    Returns:
+        list: A list of matched capabilities based on the rule file keys.
     """
+
     result = []
     stack = [basic_capabilities]
 
@@ -166,16 +172,20 @@ def apply_validation_rule(
     """Evaluate validation rules using simpleeval and return an error message
     if the input is invalid.
 
-    :param key_to_validate: str, the user input data for validation.
-    :param validation_data: list[dict[str, Union[str, dict]]], a list of
-        dictionaries containing the rule and error.
-    :param command_input_json_config: dict, the command input JSON from
-        the operator.
-    :param parent_path_list: list, representing the current parent path
-        to identify the correct child key.
-    :param capabilities: dict, the capabilities dictionary.
-    :return: str, the error message after applying the rule.
+    Args:
+        key_to_validate (str): The user input data for validation.
+        validation_data (list[dict[str, Union[str, dict]]]): A list of
+            dictionaries containing the rule and error.
+        command_input_json_config (dict): The command input JSON from
+            the operator.
+        parent_path_list (list): Represents the current parent path
+            to identify the correct child key.
+        capabilities (dict): The capabilities dictionary.
+
+    Returns:
+        str: The error message after applying the rule.
     """
+
     res_value = get_value_based_on_provided_path(
         command_input_json_config, parent_path_list
     )
@@ -213,13 +223,16 @@ def apply_validation_rule(
 def update_names_with_dependencies(rule_data: dict, names: dict) -> dict:
     """Update the 'names' dictionary with dependency values from rule_data.
 
-    :param key: rule_data (dict): A dictionary containing rule data,
-        including a "dependency_key" key.
-    :param key: names (dict): A dictionary to be updated with dependency
-        values.
-    :return: dict: The updated 'names' dictionary with dependency
-        values.
+    Args:
+        rule_data (dict): A dictionary containing rule data,
+            including a "dependency_key" key.
+        names (dict): A dictionary to be updated with dependency
+            values.
+
+    Returns:
+        dict: The updated 'names' dictionary with dependency values.
     """
+
     if "dependency_key" in rule_data:
         dependency_values = get_semantic_variables()
         for dependency_value in rule_data["dependency_key"]:
@@ -239,16 +252,17 @@ def evaluate_rule(
 ) -> bool:
     """Evaluate a single validation rule using simpleeval.
 
-    :param key_to_validate: str, the user input key for search.
-    :param res_value: Union[str, list], the value of the key.
-    :param rule_data: dict[str, Union[str, dict]], the rule and error
-        data.
-    :param osd_base_constraint: list[dict], the list of dictionaries
-        containing the rule keys.
-    :param eval_functions: dict, the dictionary of functions for
-        simpleeval.
-    :return: bool, True if the rule is satisfied, False otherwise.
+    Args:
+        key_to_validate (str): The user input key for search.
+        res_value (Union[str, list]): The value of the key.
+        rule_data (dict[str, Union[str, dict]]): The rule and error data.
+        osd_base_constraint (list[dict]): The list of dictionaries
+            containing the rule keys.
+
+    Returns:
+        bool: True if the rule is satisfied, False otherwise.
     """
+
     names = {}
     eval_new_data = []
     simple_eval = EvalWithCompoundTypes()
@@ -292,12 +306,14 @@ def format_error_message(
 ) -> str:
     """Format the error message for a failed validation rule.
 
-    :param rule_data: dict[str, Union[str, dict]], the rule and error
-        data.
-    :param rule_key_dict: list[dict], the list of dictionaries
-        containing the rule keys.
-    :return: str, the formatted error message.
+    Args:
+        rule_data (dict[str, Union[str, dict]]): The rule and error data.
+        rule_key_dict (list[dict]): The list of dictionaries containing the rule keys.
+
+    Returns:
+        str: The formatted error message.
     """
+
     if rule_key_dict:
         rule_key_dict_new = rule_key_dict[0]
         return rule_data["error"].format(**rule_key_dict_new)
@@ -312,22 +328,25 @@ def validate_json(
 ) -> list:
     """This function is written to match keys from the user input command and
     validation constant rules present in mid, low, and SBD validation constant
-    JSON. e.g., consider one of the assign resource command dish rules from the
-    constant JSON. Here, we are mapping the rule dish of receptor_ids to the
-    user assign resource command input payload.
+    JSON files. For example, consider one of the assign resource command dish
+    rules from the constant JSON—here, we are mapping the rule for `dish` of
+    `receptor_ids` to the user assign resource command input payload.
 
-    :param semantic_validate_constant_json: JSON containing all the
-        parameters along with its business semantic validation rules and
-        error messages.
-    :param command_input_json_config: Dictionary containing details of
-        the command input which needs validation. This is the same as
-        for ska_telmodel.schema.validate.
-    :param parent_path_list: List representing the current parent path.
-    :param capabilities: Defined key-value structure pair from the OSD
-        API.
-    :return: error_msg_list: List containing all combined errors arising
+    Args:
+        semantic_validate_constant_json (dict): JSON containing all the
+            parameters along with their business semantic validation rules and
+            error messages.
+        command_input_json_config (dict): Dictionary containing details of
+            the command input which needs validation. This is the same as
+            used in `ska_telmodel.schema.validate`.
+        parent_path_list (list): List representing the current parent path.
+        capabilities (dict): Defined key-value structure pair from the OSD API.
+
+    Returns:
+        list: A list (`error_msg_list`) containing all combined errors arising
         due to semantic validation.
     """
+
     error_msg_list = []
     for key, value in semantic_validate_constant_json.items():
         current_path = parent_path_list + [key]
@@ -378,18 +397,22 @@ def validate_target_is_visible(
     tm_data,
     observing_time: datetime = datetime.utcnow(),
 ) -> str:
-    """Check the target specific by ra,dec is visible during observing_time at
-    telescope site.
+    """Check if the target specified by RA and Dec is visible during the
+    observing time at the telescope site.
 
-    :param ra_str: string containing value of ra
-    :param dec_str: string containing value of dec
-    :param telescope: string containing name of the telescope
-    :param observing_time: string containing value of observing_time
-    :param target_env: string containing the environment value(mid/low)
-        for the target
-    :param tm_data: telemodel tm data object using which we can load
-        semantic validate json.
+    Args:
+        ra_str (str): String containing the value of right ascension (RA).
+        dec_str (str): String containing the value of declination (Dec).
+        telescope (str): String containing the name of the telescope.
+        observing_time (str): String containing the value of observing time.
+        target_env (str): String indicating the environment value ("mid"/"low")
+            for the target.
+        tm_data: Telemodel TM data object used to load the semantic validation JSON.
+
+    Returns:
+        bool: True if the target is visible, otherwise False.
     """
+
     observing_time = observing_time.strftime("%Y-%m-%dT%H:%M:%S")
     utcoffset = +2 * u.hour if target_env == "target_mid" else +8 * u.hour
     observing_time = (Time(observing_time) - utcoffset).strftime("%Y-%m-%dT%H:%M:%S")
