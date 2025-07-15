@@ -70,8 +70,7 @@ def get_osd(osd_model: OSDQueryParams = Depends()) -> Dict:
     """This function takes query parameters and OSD data source objects to
     generate a response containing matching OSD data.
 
-    :param query_params (QueryParams): The query parameters.
-    :param tm_data_sources (list): A list of OSD data source objects.
+    :param osd_model (OSDQueryParams): OSD query params model with required fields.
     :returns dict: A dictionary with OSD data satisfying the query.
     """
     try:

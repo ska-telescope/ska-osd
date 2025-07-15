@@ -78,7 +78,7 @@ def push_to_gitlab(
     Args:
         files_to_add: List of tuples containing (source_path, target_path)
         commit_msg: Commit message
-        branch: Branch name
+        branch_name: Branch name
 
     Raises:
         GitLabError: If there are any issues with GitLab operations
