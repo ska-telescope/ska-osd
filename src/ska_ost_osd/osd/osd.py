@@ -341,6 +341,7 @@ def get_osd_data(
     :param array_assembly: in mid there are AA0.5, AA2 and AA1 you can
         give any one
     :param tmdata: TMData class object.
+    :param cycle_id: cycle id
     :returns: json object
     """
     osd_data, data_error_msg_list = OSD(
