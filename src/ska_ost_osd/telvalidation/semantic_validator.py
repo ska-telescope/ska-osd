@@ -277,7 +277,9 @@ def validate_command_input(
     validation_data = semantic_validate_data[array_assembly].get(
         "assign_resource"
         if ASSIGN_RESOURCE in interface
-        else "configure" if CONFIGURE in interface else "sbd"
+        else "configure"
+        if CONFIGURE in interface
+        else "sbd"
     )
 
     msg_list = validate_json(

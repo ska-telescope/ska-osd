@@ -240,6 +240,7 @@ def check_cycle_id(
     :param cycle_id: cycle id integer value.
     :param osd_version: osd version i.e. 1.9.0
     :param gitlab_branch: branch name like master, dev etc.
+    :param versions_dict: version dict containing version data
     :returns: osd_version in string format i.e 1.9.0 or raises
         OSDDataException
     """
@@ -295,6 +296,7 @@ def osd_tmdata_source(
         master, dev etc.
     :param source: where to get OSD Data from car or file
     :param gitlab_branch: branch name like master, dev etc.
+    :param versions_dict: version dict containing version data
     :returns: source_uris as a string or raises exception
     """
     source_error_msg_list = []
@@ -434,8 +436,12 @@ def update_file_storage(
     capabilities file.
 
     Args:
-        validated_input_body (Dict): A dictionary containing the OSD data to insert
-        existing_stored_data (Dict): The existing stored capabilities data
+        validated_capabilities (Dict): A dictionary containing the
+        validated capabilities
+        observatory_policy (Dict): A dictionary containing the
+        observatory policies
+        existing_stored_data (Dict): The existing stored
+        capabilities data
 
     Returns:
         Dict: A dictionary with the processed capabilities data
