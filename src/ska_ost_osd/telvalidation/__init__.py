@@ -1,7 +1,7 @@
 """This package provides functions for semantic validations of various
 fields."""
 
-from .common.schematic_validation_exceptions import SchematicValidationError
+from .common.error_handling import SchematicValidationError
 from .coordinates_conversion import (
     dec_degs_str_formats,
     ra_dec_to_az_el,

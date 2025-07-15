@@ -6,7 +6,7 @@ import pytest
 from ska_telmodel.data import TMData
 from ska_telmodel.schema import example_by_uri
 
-from ska_ost_osd.telvalidation.common.schematic_validation_exceptions import (
+from ska_ost_osd.telvalidation.common.error_handling import (
     SchemanticValidationKeyError,
     SchematicValidationError,
 )

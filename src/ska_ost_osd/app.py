@@ -15,10 +15,8 @@ from ska_ost_osd.common.error_handling import generic_exception_handler
 from ska_ost_osd.osd.common.error_handling import OSDModelError
 from ska_ost_osd.osd.routers.api import osd_router
 from ska_ost_osd.telvalidation.common.error_handling import (
-    schematic_validation_error_handler,
-)
-from ska_ost_osd.telvalidation.common.schematic_validation_exceptions import (
     SchematicValidationError,
+    schematic_validation_error_handler,
 )
 
 KUBE_NAMESPACE = os.getenv("KUBE_NAMESPACE", "ska-ost-osd")

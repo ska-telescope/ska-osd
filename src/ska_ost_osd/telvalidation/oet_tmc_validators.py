@@ -20,7 +20,7 @@ from astropy.time import Time
 from simpleeval import EvalWithCompoundTypes
 
 from .common.constant import MID_VALIDATION_CONSTANT_JSON_FILE_PATH
-from .common.schematic_validation_exceptions import (
+from .common.error_handling import (
     SchemanticValidationKeyError,
     SchematicValidationError,
 )

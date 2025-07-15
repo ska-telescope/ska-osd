@@ -15,7 +15,7 @@ from .common.constant import (
     LOW_LAYOUT_CONSTANT_JSON_FILE_PATH,
     MID_LAYOUT_CONSTANT_JSON_FILE_PATH,
 )
-from .common.schematic_validation_exceptions import SchematicValidationError
+from .common.error_handling import SchematicValidationError
 
 
 # various functions
