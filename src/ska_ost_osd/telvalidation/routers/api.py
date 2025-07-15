@@ -13,8 +13,8 @@ from ska_ost_osd.common.utils import (
 from ska_ost_osd.osd.routers.api import handle_validation_error, osd_router
 from ska_ost_osd.telvalidation.common.constant import (
     CAR_TELMODEL_SOURCE,
-    SEMANTIC_VALIDATION_JSON_FILE_PATH,
     SEMANTIC_VALIDATION_VALUE,
+    SWAGGER_SEMANTIC_VALIDATION_JSON_FILE_PATH,
 )
 from ska_ost_osd.telvalidation.common.telvalidation_messages import (
     SEMANTIC_VALIDATION_DISABLED_MSG,
@@ -47,7 +47,7 @@ def get_tmdata_sources(source):
 )
 def semantically_validate_json(
     semantic_model: SemanticValidationModel = Body(
-        example=read_json(SEMANTIC_VALIDATION_JSON_FILE_PATH)
+        example=read_json(SWAGGER_SEMANTIC_VALIDATION_JSON_FILE_PATH)
     ),
 ):
     """This function validates the input JSON semantically.

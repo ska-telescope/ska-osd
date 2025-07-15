@@ -21,9 +21,9 @@ from ska_ost_osd.common.utils import (
 from ska_ost_osd.osd.common.constant import (
     CYCLE_TO_VERSION_MAPPING,
     MID_CAPABILITIES_JSON_PATH,
-    MID_OSD_DATA_JSON_FILE_PATH,
     OBSERVATORY_POLICIES_JSON_PATH,
     RELEASE_VERSION_MAPPING,
+    SWAGGER_MID_OSD_DATA_JSON_FILE_PATH,
     osd_file_mapping,
 )
 from ska_ost_osd.osd.common.error_handling import CapabilityError, OSDModelError
@@ -101,7 +101,7 @@ def get_osd(osd_model: OSDQueryParams = Depends()) -> Dict:
     response_model=ApiResponse,
 )
 def update_osd_data(
-    body: Dict = Body(example=load_json_from_file(MID_OSD_DATA_JSON_FILE_PATH)),
+    body: Dict = Body(example=load_json_from_file(SWAGGER_MID_OSD_DATA_JSON_FILE_PATH)),
     osd_model: OSDUpdateModel = Depends(),
 ) -> Dict:
     """This function updates the input JSON against the schema.
