@@ -14,14 +14,14 @@ from ska_ost_osd.osd.osd import osd_tmdata_source
 from ska_ost_osd.telvalidation.common.constant import CAR_TELMODEL_SOURCE
 from tests.unit.ska_ost_osd.common.constant import (
     INVALID_MID_ASSIGN_JSON,
-    LOW_MOCK_DATA,
+    LOW_CAPABILITIES_MOCK_DATA,
     LOW_SBD_VALIDATION_MOCK_DATA,
     LOW_VALIDATION_MOCK_DATA,
-    MID_MOCK_DATA,
+    MID_CAPABILITIES_MOCK_DATA,
     MID_OSD_DATA_JSON,
     MID_SBD_VALIDATION_MOCK_DATA,
     MID_VALIDATION_MOCK_DATA,
-    OBSERVATORY_MOCK_DATA,
+    OBSERVATORY_POLICIES_MOCK_DATA,
     VALID_MID_ASSIGN_JSON,
     local_source,
     sources,
@@ -80,14 +80,18 @@ def tm_data_osd():
     with tempfile.TemporaryDirectory("tmdata") as dirname:
         mid_parent = pathlib.Path(dirname, "ska1_mid")
         mid_parent.mkdir(parents=True)
-        create_mock_json_files(mid_parent / "mid_capabilities.json", MID_MOCK_DATA)
+        create_mock_json_files(
+            mid_parent / "mid_capabilities.json", MID_CAPABILITIES_MOCK_DATA
+        )
 
         low_parent = pathlib.Path(dirname, "ska1_low")
         low_parent.mkdir(parents=True)
-        create_mock_json_files(low_parent / "low_capabilities.json", LOW_MOCK_DATA)
+        create_mock_json_files(
+            low_parent / "low_capabilities.json", LOW_CAPABILITIES_MOCK_DATA
+        )
 
         create_mock_json_files(
-            f"{dirname}/observatory_policies.json", OBSERVATORY_MOCK_DATA
+            f"{dirname}/observatory_policies.json", OBSERVATORY_POLICIES_MOCK_DATA
         )
 
         mid_validation_parent = pathlib.Path(
@@ -199,7 +203,7 @@ def mock_mid_data():
     :returns: mid json data
     """
 
-    return MID_MOCK_DATA
+    return MID_CAPABILITIES_MOCK_DATA
 
 
 @pytest.fixture(scope="module")
@@ -209,7 +213,7 @@ def mock_low_data():
     :returns: low json data
     """
 
-    return LOW_MOCK_DATA
+    return LOW_CAPABILITIES_MOCK_DATA
 
 
 @pytest.fixture

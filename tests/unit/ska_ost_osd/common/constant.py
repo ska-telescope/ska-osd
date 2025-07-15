@@ -1,11 +1,11 @@
 from ska_ost_osd.telvalidation.common.constant import CAR_TELMODEL_SOURCE
 from tests.unit.ska_ost_osd.utils import read_json
 
-MID_MOCK_DATA = read_json("test_files/mock_mid_capabilities.json")
+MID_CAPABILITIES_MOCK_DATA = read_json("test_files/mock_mid_capabilities.json")
 
-LOW_MOCK_DATA = read_json("test_files/mock_low_capabilities.json")
+LOW_CAPABILITIES_MOCK_DATA = read_json("test_files/mock_low_capabilities.json")
 
-OBSERVATORY_MOCK_DATA = read_json("test_files/mock_observatory_policies.json")
+OBSERVATORY_POLICIES_MOCK_DATA = read_json("test_files/mock_observatory_policies.json")
 
 MID_VALIDATION_MOCK_DATA = read_json("test_files/mock-mid-validation-constants.json")
 

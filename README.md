@@ -100,6 +100,10 @@ To start the FastAPI server run the following command in a terminal bash prompt
 fastapi run src/ska_ost_osd/app.py
 ```
 
+After starting FastAPI server you can view swagger UI on below URL on local environment:
+
+http://0.0.0.0:8000/ska-ost-osd/osd/api/<MAJOR_VERSION>/ui/
+
 # Ability to turn Semantic Validation off/on in real-time
 
 To turn semantic validation off/on in real-time user need to create environment variable into helm charts.
