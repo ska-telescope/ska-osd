@@ -253,6 +253,8 @@ def validate_command_input(
         validation
     :param tm_data: TMData object which created externally
     :param interface: assign/configure resource schema interface name
+    :param telescope: str, the telescope identifier (e.g., 'mid' or
+        'low').
     :param array_assembly: specific capabilities like AA0.5, AA1
     :param osd_data: osd_data dict which passed externally :return list
         of error messages in case of validation failed

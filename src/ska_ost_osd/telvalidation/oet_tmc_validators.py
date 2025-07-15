@@ -126,9 +126,10 @@ def get_matched_rule_constraint_from_osd(
     [{"min_frequency_hz": 350000000.0,
     "max_frequency_hz": 1050000000.0}]
 
-    :param basic_capabilities: Capabilities from OSD
-    :param search_key: Keys from the rule file
-    :return: A list of matched capabilities based on the rule file keys
+    :param basic_capabilities: dict, Capabilities from OSD
+    :param search_key: str, Keys from the rule file
+    :param rule: str, Rule for validating the data and error
+    :return: list, A list of matched capabilities based on the rule file keys
     """
     result = []
     stack = [basic_capabilities]
