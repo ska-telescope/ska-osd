@@ -133,5 +133,5 @@ line_length = 88
 disable = "C,R,W3101,W0511"
 
 [build-system]
-requires = ["poetry-core>=2.1.13"]
+requires = ["poetry-core>=2.0.0"]
 build-backend = "poetry.core.masonry.api"
