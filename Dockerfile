@@ -1,6 +1,6 @@
 # ---------- Build Stage ----------
-ARG BUILD_IMAGE="artefact.skao.int/ska-build-python:0.1.3"
-ARG RUNTIME_BASE_IMAGE="artefact.skao.int/ska-python:0.1.4"
+ARG BUILD_IMAGE="artefact.skao.int/ska-build-python:0.3.1"
+ARG RUNTIME_BASE_IMAGE="artefact.skao.int/ska-python:0.2.3"
 
 FROM $BUILD_IMAGE AS buildenv
 
@@ -8,7 +8,8 @@ FROM $BUILD_IMAGE AS buildenv
 # Set up Poetry environment
 ENV POETRY_NO_INTERACTION=1 \
     POETRY_VIRTUALENVS_IN_PROJECT=1 \
-    POETRY_VIRTUALENVS_CREATE=1
+    POETRY_VIRTUALENVS_CREATE=1\
+    POETRY_CACHE_DIR=/tmp/poetry_cache
 
 ENV APP_DIR="/app"
 
@@ -20,7 +21,7 @@ RUN touch README.md
 
 # Install no-root here so we get a docker layer cached with dependencies
 # but not app code, to rebuild quickly.
-RUN poetry install --no-root
+RUN poetry install --without dev --no-root && rm -rf $POETRY_CACHE_DIR
 
 # Copy application code
 COPY tmdata /app/src/tmdata
