@@ -10,20 +10,15 @@ class SemanticModel(BaseModel):
     """SemanticModel represents the structured input required for executing an
     observing command within the system.
 
-    Attributes:
-        observing_command_input (dict):
-            Mandatory. Contains the input parameters for the observing command.
-        interface (Optional[str]):
-            Optional. Specifies the interface type
-        raise_semantic (Optional[bool]):
-            Optional. Indicates whether to raise semantic validation errors.
-            Defaults to True.
-        array_assembly (Optional[str]):
-            Optional. Represents the array assembly ID or name.
-        osd_data (Optional[dict]):
-            Optional. Holds relevant data from the OSD
-        tm_data (Optional[object]):
-            Optional. Can contain telemodel data
+    :param observing_command_input (dict): Mandatory. Contains the input
+        parameters for the observing command. :param interface
+        (Optional[str]): Optional. Specifies the interface type. :param
+        raise_semantic (Optional[bool]): Optional. Indicates whether to
+        raise semantic validation errors. Defaults to True. :param
+        array_assembly (Optional[str]): Optional. Represents the array
+        assembly ID or name. :param osd_data (Optional[dict]): Optional.
+        Holds relevant data from the OSD. :param tm_data
+        (Optional[object]): Optional. Can contain telemodel data.
     """
 
     observing_command_input: dict
@@ -60,24 +55,22 @@ class SemanticValidationModel(BaseModel):
     """SemanticValidationModel defines the schema for validating semantic input
     data related to observing commands and system configuration.
 
-    Attributes:
-        interface (Optional[str]):
-            An optional string representing the command interface type.
+    :param interface (Optional[str]): An optional string representing
+    the command interface type.
 
-        observing_command_input (Dict[str, Any]):
-            A required dictionary containing the core input parameters
-            for an observing command.
+    :param observing_command_input (Dict[str, Any]): A required
+    dictionary containing the core input parameters for an observing
+    command.
 
-        osd_data (Optional[Dict[str, Any]]):
-            Optional data fetched from the OSD
+    :param osd_data (Optional[Dict[str, Any]]): Optional data fetched
+    from the OSD.
 
-        raise_semantic (Optional[bool]):
-            Flag to indicate whether semantic validation errors should be raised.
-            Defaults to True.
+    :param raise_semantic (Optional[bool]): Flag to indicate whether
+    semantic validation errors should be raised. Defaults to True.
 
-        sources (Optional[str]):
-            An optional string that may reference data sources, including dynamic
-            placeholders such as '{osd_version}'.
+    :param sources (Optional[str]): An optional string that may
+    reference data sources, including dynamic placeholders such as
+    '{osd_version}'.
     """
 
     interface: Optional[str] = None
