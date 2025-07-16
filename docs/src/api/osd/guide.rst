@@ -872,3 +872,34 @@ which updates or add cycle_id values in version mapping json file.
 .. warning::
 
     This is a very crucial part for OSD, without this some functionality may break and exceptions and errors will be raised.
+
+
+OSD Integration
+===============
+
+This section explains how to integrate and use the **ska-ost-osd** package in your project.
+
+Installation
+------------
+
+Add the following entry under the `[tool.poetry.dependencies]` section in your `pyproject.toml`:
+
+.. code-block:: toml
+
+    [tool.poetry.dependencies]
+    ska-ost-osd = "^<majorversion>"
+
+This will ensure that Poetry installs the specified version (or a compatible one) of the `ska-ost-osd` package.
+
+Usage
+-----
+
+You can import the relevant components from the package as follows:
+
+.. code-block:: python
+
+    from ska_ost_osd.telvalidation.common.error_handling import (
+        SchematicValidationError,
+    )
+
+This allows you to catch or raise semantic validation-related exceptions when working with OSD validation workflows.
