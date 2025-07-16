@@ -212,7 +212,7 @@ GET /osd
 
     .. code:: python
 
-        {
+{
   "result_data": [
     {
       "observatory_policy": {
@@ -395,15 +395,15 @@ GET /osd
 
 5. Scenarios
 
-    1. If no parameters are provided to the API then latest version with
-       cycle id is fetched from ``cycle_gitlab_release_version_mapping.json`` file.
+    1. If no parameters are provided to the API then it should return error message for required
+        ``cycle_id`` or ``capabilities``.
 
     2. Calling API with only one parameter cycle_id and no other parameter. First it will check if the
        cycle id is valid or not, and will fetch latest version stored in the
        ``cycle_gitlab_release_version_mapping.json`` file.
 
-    3. If source is not provided in the API call, the default is set to file. API will
-       fetch data from file. other option is car and gitlab.
+    3. If source is not provided in the API call, the default is set to car. API will
+       fetch data from car. other option is file and gitlab.
        If ``source`` is 'gitlab' and ``gitlab_branch`` is 'main' then it will fetch data from main branch.
        If ``source`` is 'car' then API will fetch data from Car Gitlab repo.
 
