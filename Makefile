@@ -11,6 +11,14 @@ PROJECT_NAME = ska-ost-osd
 KUBE_NAMESPACE ?= ska-ost-osd
 RELEASE_NAME ?= test
 
+##
+SKA_K8S_TOOLS_BUILD_DEPLOY ?= $(CAR_OCI_REGISTRY_HOST)/ska-cicd-k8s-tools-build-deploy:0.14.1
+K8S_TEST_IMAGE_TO_TEST=$(SKA_K8S_TOOLS_BUILD_DEPLOY)
+# The source code is used in the tests, so we set the PYTHONPATH in the tests to the location
+# the source is copied into so that the imports work
+PYTHONPATH = /src
+
+
 # include makefile to pick up the standard Make targets from the submodule
 
 -include .make/helm.mk

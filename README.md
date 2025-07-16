@@ -24,7 +24,7 @@ Install dependencies with Poetry and activate the virtual environment
 
 ```
 poetry install
-poetry shell
+eval $(poetry env activate)
 ```
 
 To build a new Docker image for the OSD, run

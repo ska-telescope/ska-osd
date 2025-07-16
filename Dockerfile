@@ -8,8 +8,7 @@ FROM $BUILD_IMAGE AS buildenv
 # Set up Poetry environment
 ENV POETRY_NO_INTERACTION=1 \
     POETRY_VIRTUALENVS_IN_PROJECT=1 \
-    POETRY_VIRTUALENVS_CREATE=1 \
-    POETRY_CACHE_DIR=/tmp/poetry_cache
+    POETRY_VIRTUALENVS_CREATE=1
 
 ENV APP_DIR="/app"
 
@@ -21,7 +20,7 @@ RUN touch README.md
 
 # Install no-root here so we get a docker layer cached with dependencies
 # but not app code, to rebuild quickly.
-RUN poetry install --without dev --no-root && rm -rf $POETRY_CACHE_DIR
+RUN poetry install --no-root
 
 # Copy application code
 COPY tmdata /app/src/tmdata
