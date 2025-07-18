@@ -50,8 +50,8 @@ def test_get_osd_data(
     """
 
     result, _ = get_osd_data(capabilities, array_assembly, tmdata=tm_data_osd)
-    result_keys = list(result["capabilities"].keys())
-    expected_keys = list(expected["capabilities"].keys())
+    result_keys = result["capabilities"].keys()
+    expected_keys = expected["capabilities"].keys()
 
     assert result_keys == expected_keys
 
