@@ -71,11 +71,7 @@ def semantically_validate_json(
 
     error_details = []
 
-    sources = semantic_model.sources
-    if sources and not isinstance(sources, str):
-        error_details.append("sources must be a string")
-    else:
-        sources = get_tmdata_sources(sources)
+    sources = get_tmdata_sources(semantic_model.sources)
 
     try:
         tm_data = TMData(sources, update=True)
