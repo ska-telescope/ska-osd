@@ -251,7 +251,7 @@ def valid_semantic_validation_response():
 @pytest.fixture
 def semantic_validation_disable_response():
     return {
-        "result_data": "Semantic Validation is currently disable",
+        "result_data": "Semantic Validation is currently disabled",
         "result_status": "success",
         "result_code": 200,
     }
