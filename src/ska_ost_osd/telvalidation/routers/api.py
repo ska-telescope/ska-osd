@@ -24,8 +24,8 @@ from ska_ost_osd.telvalidation.semantic_validator import (
 )
 
 
-def get_tmdata_sources(source):
-    return [source] if source else CAR_TELMODEL_SOURCE  # check source
+def get_tmdata_sources(source=CAR_TELMODEL_SOURCE):
+    return [source]
 
 
 @osd_router.post(
