@@ -72,6 +72,12 @@ def semantically_validate_json(
              semantically valid semantic and raise semantic is true\n
     """
 
+    if int(VALIDATION_STRICTNESS) < int(SEMANTIC_VALIDATION_VALUE):
+        return convert_to_response_object(
+            response=SEMANTIC_VALIDATION_DISABLED_MSG,
+            result_code=HTTPStatus.OK,
+        )
+
     error_details = []
 
     sources = semantic_model.sources
@@ -95,13 +101,7 @@ def semantically_validate_json(
     if error_details:
         raise ValueError(error_details)
 
-    if int(VALIDATION_STRICTNESS) < int(SEMANTIC_VALIDATION_VALUE):
-        return convert_to_response_object(
-            response=SEMANTIC_VALIDATION_DISABLED_MSG,
-            result_code=HTTPStatus.OK,
-        )
-    else:
-        return convert_to_response_object(
-            response=SEMANTICALLY_VALID_JSON_MSG,
-            result_code=HTTPStatus.OK,
-        )
+    return convert_to_response_object(
+        response=SEMANTICALLY_VALID_JSON_MSG,
+        result_code=HTTPStatus.OK,
+    )

@@ -318,50 +318,49 @@ def semantic_validate(
         log the error messages.
     :returns: True if semantic validation passes, False otherwise.
     """
-    if int(VALIDATION_STRICTNESS) == SEMANTIC_VALIDATION_VALUE:
-        try:
-            SemanticModel(
-                observing_command_input=observing_command_input,
-                tm_data=tm_data,
-                array_assembly=array_assembly,
-                interface=interface,
-                raise_semantic=raise_semantic,
-                osd_data=osd_data,
-            )
-        except ValidationError as err:
-            raise err
-        except ValueError as semantic_error:
-            raise semantic_error
-        clear_semantic_variable_data()
-        version = observing_command_input.get("interface") or interface
-        telescope = observing_command_input.get("telescope")
-
-        if not version:
-            message = (
-                "Interface is missing from observing_command_input. Please provide"
-                " interface='...' explicitly."
-            )
-            logging.warning(message)
-            raise SchematicValidationError(message)
-
-        msg_list = validate_command_input(
-            observing_command_input,
-            tm_data,
-            version,
-            telescope,
-            array_assembly,
-            osd_data,
+    try:
+        SemanticModel(
+            observing_command_input=observing_command_input,
+            tm_data=tm_data,
+            array_assembly=array_assembly,
+            interface=interface,
+            raise_semantic=raise_semantic,
+            osd_data=osd_data,
         )
-        msg_list = [msg for msg in msg_list if msg]  # Remove None values
+    except ValidationError as err:
+        raise err
+    except ValueError as semantic_error:
+        raise semantic_error
+    clear_semantic_variable_data()
+    version = observing_command_input.get("interface") or interface
+    telescope = observing_command_input.get("telescope")
 
-        if msg_list:
-            msg = "\n".join(msg_list)
-            logging.error(
-                "Also following errors were encountered during semantic %s",
-                f"validations:\n{msg}",
-            )
-            if raise_semantic:
-                raise SchematicValidationError(msg)
-            return False
+    if not version:
+        message = (
+            "Interface is missing from observing_command_input. Please provide"
+            " interface='...' explicitly."
+        )
+        logging.warning(message)
+        raise SchematicValidationError(message)
+
+    msg_list = validate_command_input(
+        observing_command_input,
+        tm_data,
+        version,
+        telescope,
+        array_assembly,
+        osd_data,
+    )
+    msg_list = [msg for msg in msg_list if msg]  # Remove None values
+
+    if msg_list:
+        msg = "\n".join(msg_list)
+        logging.error(
+            "Also following errors were encountered during semantic %s",
+            f"validations:\n{msg}",
+        )
+        if raise_semantic:
+            raise SchematicValidationError(msg)
+        return False
 
     return True
