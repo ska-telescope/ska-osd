@@ -196,32 +196,46 @@ There are some steps of this framework these are as follows:
 
 
 
-Ability to turn Semantic Validation off/on in real-time
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-To turn semantic validation off/on in real-time user need to create environment variable into helm charts. 
-This will allow user to control semantic validation in real-time.
+Configuring Semantic Validation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The purpose of this environment variable, is likely to control whether semantic validation 
-should be performed in the program. By using an environment variable, the behavior can be easily 
-changed without modifying the code itself, which is useful for different deployment environments or testing scenarios.
+The semantic validation API endpoint ``POST /semantic_validate`` can be
+enabled or disabled by configuring the validation strictness level:
 
-Steps to add and change the validation_strictness environment variable in 'values.yaml' file:
+* For local development, set the ``VALIDATION_STRICTNESS`` environment
+  variable
+* For deployments, set the ``validation_strictness`` parameter in the Helm
+  ``values.yaml`` file
 
-   * Setting the environment variable:
+When enabled, semantic validation will return 200 for a semantically valid
+request, otherwise 400 with a list of semantic errors. When disabled, semantic
+validation will always return 200 with a message that semantic validation is
+disabled.
 
-      The VALIDATION_STRICTNESS parameter determines the level of validation applied. When set to 2, it enables the semantic 
-      validation flag for OSD validation, while setting it to 1 only applies telmodel schema validation without OSD semantic checks.
+The validation strictness level is used across multiple OSO services and also
+configures schema validation strictness in ``ska-telmodel``. A summary of
+the possible validation strictness levels and how they configure both
+syntactic validation in ``ska-telmodel`` and semantic validation in
+``ska-ost-osd`` is given below:
 
-      .. code::
++------------------------+--------------------------------------------------+---------------------------+
+| Validation Strictness  | Syntactic Validation (TelModel Schemas)          | Semantic Validation (OSD) |
++========================+==================================================+===========================+
+| 0                      | Permissive Warnings                              | Disabled                  |
++------------------------+--------------------------------------------------+---------------------------+
+| 1                      | Permissive Errors & Strict Warnings              | Disabled                  |
++------------------------+--------------------------------------------------+---------------------------+
+| 2                      | Permissive & Strict Errors                       | Enabled                   |
++------------------------+--------------------------------------------------+---------------------------+
 
-            from os import environ
-            VALIDATION_STRICTNESS = environ.get("VALIDATION_STRICTNESS", "2")
+.. warning::
 
-   * Changing the value: User can change the value by running below command with a different value from CLI.
-
-      .. code::
-      
-            export VALIDATION_STRICTNESS="1"
+   From version 1.24.0 ``ska-telmodel`` schema validation strictness level 0
+   will become obsolete. If validation strictness is configured to 0 then
+   schema validation will instead be run at validation strictness level 1.
+   Future versions of ``ska-telmodel`` may drop all validation strictness
+   levels, in which case the configuration of semantic validation is also
+   liable to change.
 
 
 Integration of OSD API into semantic validation

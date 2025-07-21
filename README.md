@@ -106,45 +106,38 @@ Alternatively use the following command
 make rest
 ```
 
-# Ability to turn Semantic Validation off/on in real-time
+# Configuring Semantic Validation
 
-To turn semantic validation off/on in real-time user need to create environment variable into helm charts. 
-This will allow user to control semantic validation in real-time.
+The semantic validation API endpoint `POST /semantic_validate` can be enabled
+or disabled by configuring the validation strictness level:
 
-The purpose of this environment variable, is likely to control whether semantic validation 
-should be performed in the program. By using an environment variable, the behavior can be easily 
-changed without modifying the code itself, which is useful for different deployment environments or testing scenarios.
+- For local development, set the `VALIDATION_STRICTNESS` environment variable
+- For deployments, set the `validation_strictness` parameter in the Helm
+  `values.yaml` file
 
-Setting the environment variable:
+When enabled, semantic validation will return 200 for a semantically valid
+request, otherwise 400 with a list of semantic errors. When disabled, semantic
+validation will always return 200 with a message that semantic validation is
+disabled.
 
-## On Local Environment
+The validation strictness level is used across multiple OSO services and also
+configures schema validation strictness in `ska-telmodel`. A summary of the
+possible validation strictness levels and how they configure both syntactic
+validation in `ska-telmodel` and semantic validation in `ska-ost-osd` is given
+below:
 
-```
-from os import environ
-VALIDATION_STRICTNESS = environ.get("VALIDATION_STRICTNESS", "2")
-```
+| Validation Strictness | Syntactic Validation (TelModel Schemas) | Semantic Validation (OSD) |
+|-----------------------|-----------------------------------------|---------------------------|
+| 0                     | Permissive Warnings                     | Disabled                  |
+| 1                     | Permissive Errors & Strict Warnings     | Disabled                  |
+| 2                     | Permissive & Strict Errors              | Enabled                   |
 
-User can turn off the semantic validation by running below command.
-
-```      
-export VALIDATION_STRICTNESS="1"
-```
-
-## On Minikube Environment
-
-  
-Add the `validation_strictness` environment variable into values.yaml file in your chart directory
-This allows users to configure the value when installing or upgrading the chart.
-
-```
-validation_strictness: 2
-```
-
-Add path of environment variable into environment.yaml file.
-
-```
-VALIDATION_STRICTNESS: {{.Values.validation_strictness  | quote }}
-```
+> ⚠️ **Warning**
+> From version 1.24.0, `ska-telmodel` schema validation strictness level 0 will
+> become obsolete. If validation strictness is configured to 0, schema
+> validation will instead run at validation strictness level 1. Future versions
+> of `ska-telmodel` may drop all validation strictness levels entirely, in which
+> case the configuration of semantic validation is also liable to change.
 
 # Publish tmdata
 
