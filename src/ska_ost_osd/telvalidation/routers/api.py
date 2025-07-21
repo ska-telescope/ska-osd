@@ -12,7 +12,6 @@ from ska_ost_osd.common.utils import (
 )
 from ska_ost_osd.osd.routers.api import handle_validation_error, osd_router
 from ska_ost_osd.telvalidation.common.constant import (
-    CAR_TELMODEL_SOURCE,
     SEMANTIC_VALIDATION_DISABLED_MSG,
     SEMANTIC_VALIDATION_VALUE,
     SEMANTICALLY_VALID_JSON_MSG,
@@ -25,10 +24,6 @@ from ska_ost_osd.telvalidation.semantic_validator import (
     VALIDATION_STRICTNESS,
     semantic_validate,
 )
-
-
-def get_tmdata_sources(source=CAR_TELMODEL_SOURCE):
-    return [source]
 
 
 @osd_router.post(
@@ -80,7 +75,7 @@ def semantically_validate_json(
 
     error_details = []
 
-    sources = get_tmdata_sources(semantic_model.sources)
+    sources = [semantic_model.sources]
 
     try:
         tm_data = TMData(sources, update=True)
