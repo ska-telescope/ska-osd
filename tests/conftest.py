@@ -72,7 +72,7 @@ def tm_data():
 @pytest.fixture
 def tmdata_source():
     """TMData source URL fixture."""
-    return CAR_TELMODEL_SOURCE[0]
+    return CAR_TELMODEL_SOURCE
 
 
 @pytest.fixture(scope="module")
