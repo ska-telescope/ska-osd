@@ -108,36 +108,8 @@ make rest
 
 # Configuring Semantic Validation
 
-The semantic validation API endpoint `POST /semantic_validate` can be enabled
-or disabled by configuring the validation strictness level:
-
-- For local development, set the `VALIDATION_STRICTNESS` environment variable
-- For deployments, set the `validation_strictness` parameter in the Helm
-  `values.yaml` file
-
-When enabled, semantic validation will return 200 for a semantically valid
-request, otherwise 400 with a list of semantic errors. When disabled, semantic
-validation will always return 200 with a message that semantic validation is
-disabled.
-
-The validation strictness level is used across multiple OSO services and also
-configures schema validation strictness in `ska-telmodel`. A summary of the
-possible validation strictness levels and how they configure both syntactic
-validation in `ska-telmodel` and semantic validation in `ska-ost-osd` is given
-below:
-
-| Validation Strictness | Syntactic Validation (TelModel Schemas) | Semantic Validation (OSD) |
-|-----------------------|-----------------------------------------|---------------------------|
-| 0                     | Permissive Warnings                     | Disabled                  |
-| 1                     | Permissive Errors & Strict Warnings     | Disabled                  |
-| 2                     | Permissive & Strict Errors              | Enabled                   |
-
-> ⚠️ **Warning**
-> From version 1.24.0, `ska-telmodel` schema validation strictness level 0 will
-> become obsolete. If validation strictness is configured to 0, schema
-> validation will instead run at validation strictness level 1. Future versions
-> of `ska-telmodel` may drop all validation strictness levels entirely, in which
-> case the configuration of semantic validation is also liable to change.
+An explanation of validation strictness levels and configuring OSD semantic validation can be found in the
+[ska-ost-osd Documentation](https://developer.skao.int/projects/ska-ost-osd/en/latest/api/semantic-validation/guide.html#configuring-semantic-validation).
 
 # Publish tmdata
 
