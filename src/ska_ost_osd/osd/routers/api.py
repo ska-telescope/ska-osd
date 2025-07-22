@@ -74,15 +74,7 @@ def get_osd(osd_model: OSDQueryParams = Depends()) -> Dict:
     :returns dict: A dictionary with OSD data satisfying the query.
     """
     try:
-        cycle_id = osd_model.cycle_id
-        osd_version = osd_model.osd_version
-        source = osd_model.source
-        gitlab_branch = osd_model.gitlab_branch
-        capabilities = osd_model.capabilities
-        array_assembly = osd_model.array_assembly
-        osd_data = get_osd_using_tmdata(
-            cycle_id, osd_version, source, gitlab_branch, capabilities, array_assembly
-        )
+        osd_data = get_osd_using_tmdata(**osd_model.model_dump())
     except (OSDModelError, ValueError) as error:
         raise error
     return convert_to_response_object(osd_data, result_code=HTTPStatus.OK)
@@ -178,38 +170,37 @@ def release_osd_data(
     if release_type and release_type not in ["minor", "major"]:
         raise ValueError("release_type must be either 'major' or 'minor' if provided")
 
-    if PUSH_TO_GITLAB:
-        # Use version manager to handle version release
-        new_version, cycle_id = manage_version_release(cycle_id, release_type)
-
-        files_to_add_small = [
-            (Path(MID_CAPABILITIES_JSON_PATH), osd_file_mapping["mid"]),
-            (Path(CYCLE_TO_VERSION_MAPPING), "version_mapping/latest_release.txt"),
-            (
-                Path(RELEASE_VERSION_MAPPING),
-                osd_file_mapping["cycle_to_version_mapping"],
-            ),
-        ]
-
-        push_to_gitlab(
-            files_to_add=files_to_add_small,
-            commit_msg="updated tmdata",
-        )
-
-        result = {
-            "message": f"Released new version {new_version}",
-            "version": str(new_version),
-            "cycle_id": cycle_id,
-        }
-        return convert_to_response_object(result, result_code=HTTPStatus.OK)
-
-    else:
+    if not PUSH_TO_GITLAB:
         result = {
             "message": "Push to gitlab is disabled",
             "version": "0.0.0",
             "cycle_id": cycle_id,
         }
         return convert_to_response_object(result, result_code=HTTPStatus.OK)
+
+    # Use version manager to handle version release
+    new_version, cycle_id = manage_version_release(cycle_id, release_type)
+
+    files_to_add_small = [
+        (Path(MID_CAPABILITIES_JSON_PATH), osd_file_mapping["mid"]),
+        (Path(CYCLE_TO_VERSION_MAPPING), "version_mapping/latest_release.txt"),
+        (
+            Path(RELEASE_VERSION_MAPPING),
+            osd_file_mapping["cycle_to_version_mapping"],
+        ),
+    ]
+
+    push_to_gitlab(
+        files_to_add=files_to_add_small,
+        commit_msg="updated tmdata",
+    )
+
+    result = {
+        "message": f"Released new version {new_version}",
+        "version": str(new_version),
+        "cycle_id": cycle_id,
+    }
+    return convert_to_response_object(result, result_code=HTTPStatus.OK)
 
 
 @osd_router.get(
