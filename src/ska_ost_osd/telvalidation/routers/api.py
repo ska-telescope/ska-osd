@@ -5,11 +5,7 @@ from jsonschema import ValidationError
 from ska_telmodel.data import TMData
 
 from ska_ost_osd.common.models import ApiResponse
-from ska_ost_osd.common.utils import (
-    convert_to_response_object,
-    get_responses,
-    read_json,
-)
+from ska_ost_osd.common.utils import convert_to_response_object, get_responses
 from ska_ost_osd.osd.routers.api import handle_validation_error, osd_router
 from ska_ost_osd.telvalidation.common.constant import (
     CAR_TELMODEL_SOURCE,
@@ -18,6 +14,7 @@ from ska_ost_osd.telvalidation.common.constant import (
     SEMANTICALLY_VALID_JSON_MSG,
     SWAGGER_SEMANTIC_VALIDATION_JSON_FILE_PATH,
 )
+from ska_ost_osd.telvalidation.common.utils import read_json
 from ska_ost_osd.telvalidation.models.semantic_schema_validator import (
     SemanticValidationModel,
 )

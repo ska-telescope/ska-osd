@@ -14,9 +14,7 @@ MID_SBD_VALIDATION_CONSTANT_JSON_FILE_PATH = (
 LOW_SBD_VALIDATION_CONSTANT_JSON_FILE_PATH = (
     "instrument/scheduling-block/validation/low_sbd-validation-constants.json"
 )
-SWAGGER_SEMANTIC_VALIDATION_JSON_FILE_PATH = (
-    "telvalidation/data/sample_semantic_validation.json"
-)
+SWAGGER_SEMANTIC_VALIDATION_JSON_FILE_PATH = "data/sample_semantic_validation.json"
 MID_LAYOUT_CONSTANT_JSON_FILE_PATH = "instrument/ska1_mid/layout/mid-layout.json"
 LOW_LAYOUT_CONSTANT_JSON_FILE_PATH = "instrument/ska1_low/layout/low-layout.json"
 
