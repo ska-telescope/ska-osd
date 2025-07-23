@@ -2,8 +2,8 @@
 
 base_path=$(dirname "$(readlink -f "release.sh")")
 
-observatory_file_location="$base_path/tmdata/observatory_policies.json"
-version_mapping_file_location="$base_path/tmdata/version_mapping/cycle_gitlab_release_version_mapping.json"
+observatory_file_location="tmdata/observatory_policies.json"
+version_mapping_file_location="tmdata/version_mapping/cycle_gitlab_release_version_mapping.json"
 
 function CheckFileExists (){
 
