@@ -13,11 +13,7 @@ from fastapi import APIRouter, Body, Depends
 from pydantic import ValidationError
 
 from ska_ost_osd.common.models import ApiResponse
-from ska_ost_osd.common.utils import (
-    convert_to_response_object,
-    get_responses,
-    read_json,
-)
+from ska_ost_osd.common.utils import convert_to_response_object, get_responses
 from ska_ost_osd.osd.common.constant import (
     CYCLE_TO_VERSION_MAPPING,
     MID_CAPABILITIES_JSON_PATH,
@@ -120,7 +116,7 @@ def update_osd_data(
 
         # Check cycle and assembly compatibility if both attributes are present
         if hasattr(osd_model, "cycle_id") and hasattr(osd_model, "array_assembly"):
-            osd_data = read_json(OBSERVATORY_POLICIES_JSON_PATH)
+            osd_data = read_file(OBSERVATORY_POLICIES_JSON_PATH)
             if (
                 osd_model.cycle_id == osd_data["cycle_number"]
                 and osd_model.array_assembly
