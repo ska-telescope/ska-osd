@@ -1,6 +1,5 @@
 import json
 import logging
-import os
 from encodings.punycode import T
 from http import HTTPStatus
 from pathlib import Path
