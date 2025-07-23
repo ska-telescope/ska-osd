@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 from encodings.punycode import T
 from http import HTTPStatus
 from pathlib import Path
@@ -28,14 +29,15 @@ def update_file(filename: Path, json_data: Dict) -> None:
         json.dump(json_data, file, indent=4)
 
 
-def read_json(json_file_location: str) -> dict[str, Any]:
-    """Returns the JSON file object from the given path.
+def read_json(json_file_location: str) -> dict[dict[str, Any]]:
+    """This function returns json file object from local file system.
 
-    :param json_file_location: Relative or absolute path to the JSON file.
-    :returns: File content as a JSON object.
+    :param json_file_location: json file.
+    :returns: file content as json object
     """
 
-    path = Path(json_file_location).expanduser().resolve()
+    cwd = Path(__file__).resolve().parent.parent.parent.parent
+    path = os.path.join(cwd, json_file_location)
     with open(path) as user_file:  # pylint: disable=W1514
         file_contents = json.load(user_file, parse_float=float)
 
