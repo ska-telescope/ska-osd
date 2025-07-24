@@ -13,7 +13,11 @@ from fastapi import APIRouter, Body, Depends
 from pydantic import ValidationError
 
 from ska_ost_osd.common.models import ApiResponse
-from ska_ost_osd.common.utils import convert_to_response_object, get_responses
+from ska_ost_osd.common.utils import (
+    convert_to_response_object,
+    get_responses,
+    read_json,
+)
 from ska_ost_osd.osd.common.constant import (
     CYCLE_TO_VERSION_MAPPING,
     MID_CAPABILITIES_JSON_PATH,
@@ -27,7 +31,7 @@ from ska_ost_osd.osd.common.gitlab_helper import push_to_gitlab
 from ska_ost_osd.osd.common.osd_validation_messages import (
     ARRAY_ASSEMBLY_DOESNOT_BELONGS_TO_CYCLE_ERROR_MESSAGE,
 )
-from ska_ost_osd.osd.common.utils import load_json_from_file, read_file
+from ska_ost_osd.osd.common.utils import load_json_from_file
 from ska_ost_osd.osd.models.models import (
     CycleModel,
     OSDQueryParams,
@@ -116,7 +120,7 @@ def update_osd_data(
 
         # Check cycle and assembly compatibility if both attributes are present
         if hasattr(osd_model, "cycle_id") and hasattr(osd_model, "array_assembly"):
-            osd_data = read_file(OBSERVATORY_POLICIES_JSON_PATH)
+            osd_data = read_json(OBSERVATORY_POLICIES_JSON_PATH)
             if (
                 osd_model.cycle_id == osd_data["cycle_number"]
                 and osd_model.array_assembly
@@ -129,7 +133,7 @@ def update_osd_data(
                 )
 
         # Update storage with validated data
-        existing_data = read_file(Path(MID_CAPABILITIES_JSON_PATH))
+        existing_data = read_json(MID_CAPABILITIES_JSON_PATH)
         observatory_policy = body.get("observatory_policy", None)
 
         updated_data = update_file_storage(
@@ -214,7 +218,7 @@ def get_cycle_list() -> ApiResponse[CycleModel]:
     """
     # TODO: instead of relying on RELEASE_VERSION_MAPPING file
     # we should find better approach to find out cycles
-    data = read_file(Path(RELEASE_VERSION_MAPPING))
+    data = read_json(RELEASE_VERSION_MAPPING)
 
     cycle_numbers = []
 
