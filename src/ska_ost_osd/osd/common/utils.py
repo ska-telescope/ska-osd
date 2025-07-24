@@ -29,8 +29,5 @@ def read_file(filename: Path) -> Dict:
     :raises: FileNotFoundError if file doesn't exist
     :raises: JSONDecodeError if file contains invalid JSON
     """
-    base_path = Path(__file__).resolve().parent.parent.parent.parent.parent
-    full_path = base_path / filename
-
-    with open(full_path, "r", encoding="utf-8") as file:
+    with open(filename, "r", encoding="utf-8") as file:
         return json.load(file)
