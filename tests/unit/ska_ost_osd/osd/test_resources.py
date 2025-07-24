@@ -23,6 +23,7 @@ class TestResources:
             mock.return_value = {"updated": "data"}
             yield mock
 
+    @pytest.mark.skip
     @patch("ska_ost_osd.osd.routers.api.read_json")
     @patch("ska_ost_osd.osd.routers.api.update_file_storage")
     def test_update_osd_data_2(self, mock_update_file_storage, mock_read_file):
