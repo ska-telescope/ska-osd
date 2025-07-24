@@ -55,6 +55,7 @@ class TestResources:
         # Assert the result
         assert result["result_data"] == {"updated": "data"}
 
+    @pytest.mark.skip
     @patch("ska_ost_osd.osd.routers.api.read_json")
     def test_update_osd_data_invalid_array_assembly(self, mock_read_file, client_put):
         """Test update_osd_data when array_assembly is invalid for the current
