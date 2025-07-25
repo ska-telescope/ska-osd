@@ -24,7 +24,7 @@ RUN touch README.md
 RUN poetry install --without dev --no-root && rm -rf $POETRY_CACHE_DIR
 
 # Copy application code
-COPY tmdata /app/src/ska_ost_osd/tmdata
+COPY tmdata /app/src/tmdata
 
 # The runtime image, used to just run the code provided its virtual environment
 FROM $RUNTIME_BASE_IMAGE AS runtime
