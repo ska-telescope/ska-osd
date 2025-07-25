@@ -38,8 +38,6 @@ def read_json(json_file_location: str) -> dict[dict[str, Any]]:
 
     cwd = Path(__file__).resolve().parent.parent.parent.parent
     path = os.path.join(cwd, json_file_location)
-    if "tmdata" in path:
-        path = path.replace("/ska_ost_osd", "")
     with open(path) as user_file:  # pylint: disable=W1514
         file_contents = json.load(user_file, parse_float=float)
 
