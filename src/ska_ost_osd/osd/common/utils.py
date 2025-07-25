@@ -29,9 +29,7 @@ def read_file(filename: Path) -> Dict:
     :raises: FileNotFoundError if file doesn't exist
     :raises: JSONDecodeError if file contains invalid JSON
     """
-    cwd = Path(__file__).resolve().parent.parent.parent.parent.parent.parent
-    path = os.path.join(cwd, filename)
-    with open(path) as user_file:  # pylint: disable=W1514
-        file_contents = json.load(user_file, parse_float=float)
+    with open(filename) as file:  # pylint: disable=W1514
+        file_contents = json.load(file, parse_float=float)
 
     return file_contents

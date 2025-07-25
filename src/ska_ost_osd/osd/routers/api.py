@@ -31,7 +31,7 @@ from ska_ost_osd.osd.common.gitlab_helper import push_to_gitlab
 from ska_ost_osd.osd.common.osd_validation_messages import (
     ARRAY_ASSEMBLY_DOESNOT_BELONGS_TO_CYCLE_ERROR_MESSAGE,
 )
-from ska_ost_osd.osd.common.utils import load_json_from_file
+from ska_ost_osd.osd.common.utils import load_json_from_file, read_file
 from ska_ost_osd.osd.models.models import (
     CycleModel,
     OSDQueryParams,
@@ -218,7 +218,7 @@ def get_cycle_list() -> ApiResponse[CycleModel]:
     """
     # TODO: instead of relying on RELEASE_VERSION_MAPPING file
     # we should find better approach to find out cycles
-    data = read_json(RELEASE_VERSION_MAPPING)
+    data = read_file(RELEASE_VERSION_MAPPING)
 
     cycle_numbers = []
 
