@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional
 
 from ska_telmodel.data import TMData
 
-from ska_ost_osd.common.utils import update_file
+from ska_ost_osd.common.utils import read_json, update_file
 from ska_ost_osd.osd.common.error_handling import OSDModelError
 from ska_ost_osd.osd.common.osd_validation_messages import (
     ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE,
@@ -15,7 +15,6 @@ from ska_ost_osd.osd.common.osd_validation_messages import (
     OSD_VERSION_ERROR_MESSAGE,
     SOURCE_ERROR_MESSAGE,
 )
-from ska_ost_osd.osd.common.utils import read_file
 from ska_ost_osd.osd.models.models import OSDModel
 
 from .common.constant import (
@@ -256,7 +255,7 @@ def check_cycle_id(
         osd_version = gitlab_branch
 
     if cycle_id is None and osd_version is None and gitlab_branch is None:
-        osd_version = read_file(
+        osd_version = read_json(
             RELEASE_FILE
         )  # get latest version from latest_release.txt file
 
