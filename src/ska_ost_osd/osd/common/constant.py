@@ -4,6 +4,7 @@ MID_CONSTANT_JSON_FILE_PATH = "ska1_mid/mid_capabilities.json"
 LOW_CONSTANT_JSON_FILE_PATH = "ska1_low/low_capabilities.json"
 POLICIES_CONSTANT_JSON_FILE_PATH = "observatory_policies.json"
 RELEASE_FILE = "tmdata/version_mapping/latest_release.txt"
+RELEASE_FILE_PATH_LATEST = "version_mapping/latest_release.txt"
 VERSION_FILE_PATH = "version_mapping/cycle_gitlab_release_version_mapping.json"
 
 osd_file_mapping = {
