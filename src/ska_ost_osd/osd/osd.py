@@ -26,7 +26,7 @@ from .common.constant import (
     GITLAB_SOURCE,
     MID_CAPABILITIES_JSON_PATH,
     OBSERVATORY_POLICIES_JSON_PATH,
-    RELEASE_FILE_PATH_LATEST,
+    RELEASE_FILE,
     SOURCES,
     VERSION_FILE_PATH,
     osd_file_mapping,
@@ -257,7 +257,7 @@ def check_cycle_id(
 
     if cycle_id is None and osd_version is None and gitlab_branch is None:
         osd_version = read_file(
-            RELEASE_FILE_PATH_LATEST
+            RELEASE_FILE
         )  # get latest version from latest_release.txt file
 
     if versions_dict is None:
