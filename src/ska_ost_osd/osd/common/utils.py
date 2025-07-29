@@ -3,8 +3,6 @@ import os
 from pathlib import Path
 from typing import Dict
 
-from ska_ost_osd.osd.common.constant import RELEASE_FILE
-
 
 def load_json_from_file(filename):
     """
@@ -35,7 +33,3 @@ def read_file(filename: Path) -> Dict:
         file_contents = json.load(file, parse_float=float)
 
     return file_contents
-
-
-def get_latest_osd_version():
-    return read_file(RELEASE_FILE)
