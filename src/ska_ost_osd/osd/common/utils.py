@@ -3,6 +3,10 @@ import os
 from pathlib import Path
 from typing import Dict
 
+from ska_telmodel.data import TMData
+
+from ska_ost_osd.osd.common.constant import GITLAB_SOURCE, RELEASE_FILE_PATH_LATEST
+
 
 def load_json_from_file(filename):
     """
@@ -33,3 +37,18 @@ def read_file(filename: Path) -> Dict:
         file_contents = json.load(file, parse_float=float)
 
     return file_contents
+
+
+def get_osd_latest_version() -> str:
+    """
+    Read latest_release.txt file and retrieve latest
+    OSD version from it
+
+    returns: A string containing latest OSD release version
+    """
+    tmdata_version = TMData(GITLAB_SOURCE, update=True)
+    osd_version = (
+        tmdata_version[RELEASE_FILE_PATH_LATEST].get().decode("utf-8").replace('"', "")
+    )
+
+    return osd_version
