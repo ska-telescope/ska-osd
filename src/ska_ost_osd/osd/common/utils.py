@@ -3,6 +3,8 @@ import os
 from pathlib import Path
 from typing import Dict
 
+from ska_ost_osd.osd.common.constant import RELEASE_FILE
+
 
 def load_json_from_file(filename):
     """
@@ -35,19 +37,5 @@ def read_file(filename: Path) -> Dict:
     return file_contents
 
 
-def read_file_with_base_path(filename: Path) -> Dict:
-    """
-    Read and parse a JSON file into a dictionary
-
-    :param filename: The path to the JSON file to be read
-    :returns: A dictionary containing the contents of the file
-    :raises: FileNotFoundError if file doesn't exist
-    :raises: JSONDecodeError if file contains invalid JSON
-    """
-
-    cwd = Path(__file__).resolve().parent.parent.parent.parent.parent
-    path = os.path.join(cwd, filename)
-    with open(path) as file:  # pylint: disable=W1514
-        file_contents = json.load(file, parse_float=float)
-
-    return file_contents
+def get_latest_osd_version():
+    return read_file(RELEASE_FILE)
