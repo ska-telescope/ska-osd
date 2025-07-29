@@ -15,7 +15,7 @@ from ska_ost_osd.osd.common.osd_validation_messages import (
     OSD_VERSION_ERROR_MESSAGE,
     SOURCE_ERROR_MESSAGE,
 )
-from ska_ost_osd.osd.common.utils import read_file
+from ska_ost_osd.osd.common.utils import read_file_with_base_path
 from ska_ost_osd.osd.models.models import OSDModel
 
 from .common.constant import (
@@ -256,7 +256,7 @@ def check_cycle_id(
         osd_version = gitlab_branch
 
     if cycle_id is None and osd_version is None and gitlab_branch is None:
-        osd_version = read_file(
+        osd_version = read_file_with_base_path(
             RELEASE_FILE
         )  # get latest version from latest_release.txt file
 
