@@ -165,78 +165,37 @@ def replace_matched_capabilities_values(
     current[last_key] = new_value
 
 
-def fetch_matched_capabilities_from_basic_capabilities(
-    capabilities: dict, basic_capabilities: dict
-) -> list:
-    """This methods returns matched capabilities data list based on basic
-    capabilities.
+def build_reference_lookups(source_data):
+    ref_lookups = {}
 
-    e.g after fetching capabilities and basic_capabilities from OSD needs
-    to rearrange some data between basic capabilities and capabilities
-    so that we can easily decide mapping between rules.
-    here Band_1 (min and max) frequency present in basic capabilities so
-    value fetched according.
-    capabilities = {
-                "available_receivers": ["Band_1"]
-            }
-    basic_capabilities = {
-                "dish_elevation_limit_deg": 15.0,
-                "receiver_information": [
-                    {
-                        "rx_id": "Band_1",
-                        "min_frequency_hz": 350000000.0,
-                        "max_frequency_hz": 1050000000.0,
-                    }]
-                }
-    matched 'rx_id:Band_1' from basic capabilities below is output dict
-    matched_capabilities_list = [
-            {
-                "Band_1":
-                    {
-                        "min_frequency_hz": 350000000.0,
-                        "max_frequency_hz": 1050000000.0,
-                    }
-            }
-        ]
-    : param capabilities: dict contains capabilities
-        like AAO.5, AA0.1
-    : param basic_capabilities: dict contains basic
-        capabilities required for capabilities.
-    : param matched_capabilities_list: replaceable data list
-    : return: matched value from basic capabilities
-    """
-    clone_capabilities = capabilities.copy()
-    stack = [(capabilities, [])]
-    replaceable_values = []
-    while stack:
-        current, path = stack.pop()
-        if isinstance(current, dict):
-            for key, value in current.items():
-                if isinstance(key, (str, int)) and isinstance(value, (str, int)):
-                    matched_values = get_matched_values_from_basic_capabilities(
-                        basic_capabilities, key
-                    )
-                    if matched_values:
-                        replaceable_values.append(matched_values)
-                if isinstance(value, (dict, list)):
-                    stack.append((value, path + [key]))
-
-        elif isinstance(current, list):
-            for item in reversed(current):
-                if isinstance(item, (dict, list)):
-                    stack.append((item, path))
+    def collect(node):
+        if isinstance(node, dict):
+            for _, v in node.items():
+                if isinstance(v, list) and all(isinstance(i, dict) for i in v):
+                    for item in v:
+                        for ik, _ in item.items():
+                            if ik.endswith("_id"):
+                                ref_lookups.setdefault(ik, {})[item[ik]] = item
                 else:
-                    # search key into basic capabilities
-                    matched_values = get_matched_values_from_basic_capabilities(
-                        basic_capabilities, item
-                    )
-                    if matched_values:
-                        replaceable_values.append(matched_values)
-    if replaceable_values and path:
-        replace_matched_capabilities_values(
-            clone_capabilities, path, replaceable_values
-        )
-    return clone_capabilities
+                    collect(v)
+        elif isinstance(node, list):
+            for item in node:
+                collect(item)
+
+    collect(source_data)
+    return ref_lookups
+
+
+def recursive_replace_references(target, lookups):
+    if isinstance(target, dict):
+        return {k: recursive_replace_references(v, lookups) for k, v in target.items()}
+    elif isinstance(target, list):
+        if all(isinstance(i, str) for i in target):
+            for _, mapping in lookups.items():
+                if all(val in mapping for val in target):
+                    return [mapping[val] for val in target]
+        return [recursive_replace_references(i, lookups) for i in target]
+    return target
 
 
 def validate_command_input(
@@ -269,11 +228,8 @@ def validate_command_input(
         tm_data=tm_data,
         osd_data=osd_data,
     )
-
-    matched_capabilities = fetch_matched_capabilities_from_basic_capabilities(
-        capabilities=capabilities, basic_capabilities=basic_capabilities
-    )
-
+    lookup_table = build_reference_lookups(basic_capabilities)
+    matched_capabilities = recursive_replace_references(capabilities, lookup_table)
     validation_data = semantic_validate_data[array_assembly].get(
         "assign_resource"
         if ASSIGN_RESOURCE in interface
