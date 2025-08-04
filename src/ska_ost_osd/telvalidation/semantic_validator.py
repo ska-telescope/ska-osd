@@ -8,7 +8,7 @@ to fetch rule constraints values.
 
 import logging
 from os import environ
-from typing import Any, Optional
+from typing import Any, Dict, Optional
 
 from pydantic import ValidationError
 from ska_telmodel.data import TMData
@@ -165,37 +165,93 @@ def replace_matched_capabilities_values(
     current[last_key] = new_value
 
 
-def build_reference_lookups(source_data):
-    ref_lookups = {}
+def build_reference_lookups(source_data: Any) -> Dict[str, Dict[str, Any]]:
+    """
+    Builds a reference lookup dictionary from nested source data.
 
-    def collect(node):
+    This function recursively traverses the source data structure, collecting all
+    dictionaries within lists that contain keys ending in '_id'. It then constructs
+    a lookup mapping from those keys to the full dictionary item they reference.
+
+    :param source_data: The nested data structure to extract references from.
+    :type source_data: Any
+    :returns: A dictionary where each key corresponds to a reference type
+    (e.g., 'user_id') and its value is a mapping from reference IDs to
+    the full dictionary item.
+    :rtype: dict[str, dict[str, Any]]
+
+    :example:
+        >>> data = {
+        ...     "users": [{"user_id": "u1", "name": "Alice"},
+        ...     {"user_id": "u2", "name": "Bob"}],
+        ...     "groups": [{"group_id": "g1", "members": ["u1", "u2"]}]
+        ... }
+        >>> build_reference_lookups(data)
+        {
+            "user_id": {
+                "u1": {"user_id": "u1", "name": "Alice"},
+                "u2": {"user_id": "u2", "name": "Bob"}
+            },
+            "group_id": {
+                "g1": {"group_id": "g1", "members": ["u1", "u2"]}
+            }
+        }
+    """
+    reference_lookups: Dict[str, Dict[str, Any]] = {}
+
+    def collect(node: Any) -> None:
         if isinstance(node, dict):
-            for _, v in node.items():
-                if isinstance(v, list) and all(isinstance(i, dict) for i in v):
-                    for item in v:
-                        for ik, _ in item.items():
-                            if ik.endswith("_id"):
-                                ref_lookups.setdefault(ik, {})[item[ik]] = item
+            for value in node.values():
+                if isinstance(value, list) and all(
+                    isinstance(item, dict) for item in value
+                ):
+                    for item in value:
+                        for key in item:
+                            if key.endswith("_id"):
+                                reference_lookups.setdefault(key, {})[item[key]] = item
                 else:
-                    collect(v)
+                    collect(value)
         elif isinstance(node, list):
             for item in node:
                 collect(item)
 
     collect(source_data)
-    return ref_lookups
+    return reference_lookups
 
 
-def recursive_replace_references(target, lookups):
-    if isinstance(target, dict):
-        return {k: recursive_replace_references(v, lookups) for k, v in target.items()}
-    elif isinstance(target, list):
-        if all(isinstance(i, str) for i in target):
-            for _, mapping in lookups.items():
-                if all(val in mapping for val in target):
-                    return [mapping[val] for val in target]
-        return [recursive_replace_references(i, lookups) for i in target]
-    return target
+def recursive_replace_references(
+    data: Any, reference_mappings: Dict[str, Dict[str, Any]]
+) -> Any:
+    """
+    Recursively traverses the input data structure and replaces lists of reference keys
+    with their corresponding values using provided lookup mappings.
+
+    :param data: The input data structure (can be a nested dict, list, or scalar).
+    :type data: Any
+    :param reference_mappings: A dictionary of lookup tables, where each key
+    maps to a dictionary of reference keys and their corresponding values.
+    :type reference_mappings: dict[str, dict[str, Any]]
+    :returns: The transformed data structure with references replaced where applicable.
+    :rtype: Any
+
+    :example:
+        >>> data = {"roles": ["admin", "user"]}
+        >>> lookups = {"roles": {"admin": "Administrator", "user": "Standard User"}}
+        >>> recursive_replace_references(data, lookups)
+        {'roles': ['Administrator', 'Standard User']}
+    """
+    if isinstance(data, dict):
+        return {
+            key: recursive_replace_references(value, reference_mappings)
+            for key, value in data.items()
+        }
+    elif isinstance(data, list):
+        if all(isinstance(item, str) for item in data):
+            for mapping in reference_mappings.values():
+                if all(ref in mapping for ref in data):
+                    return [mapping[ref] for ref in data]
+        return [recursive_replace_references(item, reference_mappings) for item in data]
+    return data
 
 
 def validate_command_input(
