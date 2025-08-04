@@ -165,39 +165,16 @@ def replace_matched_capabilities_values(
     current[last_key] = new_value
 
 
-def build_reference_lookups(source_data: Any) -> Dict[str, Dict[str, Any]]:
+def build_basic_capabilities_lookup(
+    basic_capabilities: Any,
+) -> Dict[str, Dict[str, Any]]:
+    """Builds reference lookup dictionary from nested basic capabilities data.
+
+    :param basic_capabilities: nested capability data containing lists
+        of items with '_id' fields :return dictionary mapping each
+        reference type to its corresponding item by id
     """
-    Builds a reference lookup dictionary from nested source data.
-
-    This function recursively traverses the source data structure, collecting all
-    dictionaries within lists that contain keys ending in '_id'. It then constructs
-    a lookup mapping from those keys to the full dictionary item they reference.
-
-    :param source_data: The nested data structure to extract references from.
-    :type source_data: Any
-    :returns: A dictionary where each key corresponds to a reference type
-    (e.g., 'user_id') and its value is a mapping from reference IDs to
-    the full dictionary item.
-    :rtype: dict[str, dict[str, Any]]
-
-    :example:
-        >>> data = {
-        ...     "users": [{"user_id": "u1", "name": "Alice"},
-        ...     {"user_id": "u2", "name": "Bob"}],
-        ...     "groups": [{"group_id": "g1", "members": ["u1", "u2"]}]
-        ... }
-        >>> build_reference_lookups(data)
-        {
-            "user_id": {
-                "u1": {"user_id": "u1", "name": "Alice"},
-                "u2": {"user_id": "u2", "name": "Bob"}
-            },
-            "group_id": {
-                "g1": {"group_id": "g1", "members": ["u1", "u2"]}
-            }
-        }
-    """
-    reference_lookups: Dict[str, Dict[str, Any]] = {}
+    capabilities_lookup: Dict[str, Dict[str, Any]] = {}
 
     def collect(node: Any) -> None:
         if isinstance(node, dict):
@@ -208,50 +185,48 @@ def build_reference_lookups(source_data: Any) -> Dict[str, Dict[str, Any]]:
                     for item in value:
                         for key in item:
                             if key.endswith("_id"):
-                                reference_lookups.setdefault(key, {})[item[key]] = item
+                                capabilities_lookup.setdefault(key, {})[
+                                    item[key]
+                                ] = item
                 else:
                     collect(value)
         elif isinstance(node, list):
             for item in node:
                 collect(item)
 
-    collect(source_data)
-    return reference_lookups
+    collect(basic_capabilities)
+    return capabilities_lookup
 
 
-def recursive_replace_references(
-    data: Any, reference_mappings: Dict[str, Dict[str, Any]]
+def fetch_matched_capabilities_from_basic_capabilities(
+    capabilities: Any, basic_capabilities: Dict[str, Dict[str, Any]]
 ) -> Any:
-    """
-    Recursively traverses the input data structure and replaces lists of reference keys
-    with their corresponding values using provided lookup mappings.
+    """Recursively matches and replaces capability references using basic
+    capability mappings.
 
-    :param data: The input data structure (can be a nested dict, list, or scalar).
-    :type data: Any
-    :param reference_mappings: A dictionary of lookup tables, where each key
-    maps to a dictionary of reference keys and their corresponding values.
-    :type reference_mappings: dict[str, dict[str, Any]]
-    :returns: The transformed data structure with references replaced where applicable.
-    :rtype: Any
-
-    :example:
-        >>> data = {"roles": ["admin", "user"]}
-        >>> lookups = {"roles": {"admin": "Administrator", "user": "Standard User"}}
-        >>> recursive_replace_references(data, lookups)
-        {'roles': ['Administrator', 'Standard User']}
+    :param capabilities: input capabilities data as nested dict, list,
+        or scalar
+    :param basic_capabilities: lookup dictionary mapping reference keys
+        to capability details :return transformed capabilities with
+        matched basic capability values
     """
-    if isinstance(data, dict):
+    if isinstance(capabilities, dict):
         return {
-            key: recursive_replace_references(value, reference_mappings)
-            for key, value in data.items()
+            key: fetch_matched_capabilities_from_basic_capabilities(
+                value, basic_capabilities
+            )
+            for key, value in capabilities.items()
         }
-    elif isinstance(data, list):
-        if all(isinstance(item, str) for item in data):
-            for mapping in reference_mappings.values():
-                if all(ref in mapping for ref in data):
-                    return [mapping[ref] for ref in data]
-        return [recursive_replace_references(item, reference_mappings) for item in data]
-    return data
+    elif isinstance(capabilities, list):
+        if all(isinstance(item, str) for item in capabilities):
+            for mapping in basic_capabilities.values():
+                if all(ref in mapping for ref in capabilities):
+                    return [mapping[ref] for ref in capabilities]
+        return [
+            fetch_matched_capabilities_from_basic_capabilities(item, basic_capabilities)
+            for item in capabilities
+        ]
+    return capabilities
 
 
 def validate_command_input(
@@ -284,8 +259,10 @@ def validate_command_input(
         tm_data=tm_data,
         osd_data=osd_data,
     )
-    lookup_table = build_reference_lookups(basic_capabilities)
-    matched_capabilities = recursive_replace_references(capabilities, lookup_table)
+    capabilities_lookup = build_basic_capabilities_lookup(basic_capabilities)
+    matched_capabilities = fetch_matched_capabilities_from_basic_capabilities(
+        capabilities, capabilities_lookup
+    )
     validation_data = semantic_validate_data[array_assembly].get(
         "assign_resource"
         if ASSIGN_RESOURCE in interface
