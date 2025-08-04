@@ -104,45 +104,10 @@ After starting FastAPI server you can view swagger UI on below URL on local envi
 
 http://0.0.0.0:8000/ska-ost-osd/osd/api/<MAJOR_VERSION>/ui/
 
-# Ability to turn Semantic Validation off/on in real-time
+# Configuring Semantic Validation
 
-To turn semantic validation off/on in real-time user need to create environment variable into helm charts.
-This will allow user to control semantic validation in real-time.
-
-The purpose of this environment variable, is likely to control whether semantic validation
-should be performed in the program. By using an environment variable, the behavior can be easily
-changed without modifying the code itself, which is useful for different deployment environments or testing scenarios.
-
-Setting the environment variable:
-
-## On Local Environment
-
-```
-from os import environ
-VALIDATION_STRICTNESS = environ.get("VALIDATION_STRICTNESS", "2")
-```
-
-User can turn off the semantic validation by running below command.
-
-```
-export VALIDATION_STRICTNESS="1"
-```
-
-## On Minikube Environment
-
-
-Add the `validation_strictness` environment variable into values.yaml file in your chart directory
-This allows users to configure the value when installing or upgrading the chart.
-
-```
-validation_strictness: 2
-```
-
-Add path of environment variable into environment.yaml file.
-
-```
-VALIDATION_STRICTNESS: {{.Values.validation_strictness  | quote }}
-```
+An explanation of validation strictness levels and configuring OSD semantic validation can be found in the
+[ska-ost-osd Documentation](https://developer.skao.int/projects/ska-ost-osd/en/latest/api/semantic-validation/guide.html#configuring-semantic-validation).
 
 # Publish tmdata
 
