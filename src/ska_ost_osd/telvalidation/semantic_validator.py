@@ -174,19 +174,26 @@ def build_basic_capabilities_lookup(
         of items with '_id' fields :return dictionary mapping each
         reference type to its corresponding item by id
     :example:
-        >>> data = {
-        ...     "users": [{"user_id": "u1", "name": "Alice"},
-        ...               {"user_id": "u2", "name": "Bob"}],
-        ...     "groups": [{"group_id": "g1", "members": ["u1", "u2"]}]
+        >>> basic_capabilities = {
+        ...     'dish_elevation_limit_deg': 15,
+        ...     'receiver_information': [
+        ...         {'max_frequency_hz': 1050000000, 'min_frequency_hz': 350000000,
+        'rx_id': 'Band_1'},
+        ...         {'max_frequency_hz': 1760000000, 'min_frequency_hz': 950000000,
+        'rx_id': 'Band_2'},
+        ...         {'max_frequency_hz': 3050000000, 'min_frequency_hz': 1650000000,
+        'rx_id': 'Band_3'}
+        ...     ]
         ... }
-        >>> build_basic_capabilities_lookup(data)
+        >>> build_basic_capabilities_lookup(basic_capabilities)
         {
-            "user_id": {
-                "u1": {"user_id": "u1", "name": "Alice"},
-                "u2": {"user_id": "u2", "name": "Bob"}
-            },
-            "group_id": {
-                "g1": {"group_id": "g1", "members": ["u1", "u2"]}
+            'rx_id': {
+                'Band_1': {'max_frequency_hz': 1050000000,
+                'min_frequency_hz': 350000000, 'rx_id': 'Band_1'},
+                'Band_2': {'max_frequency_hz': 1760000000,
+                'min_frequency_hz': 950000000, 'rx_id': 'Band_2'},
+                'Band_3': {'max_frequency_hz': 3050000000,
+                'min_frequency_hz': 1650000000, 'rx_id': 'Band_3'}
             }
         }
     """
@@ -227,17 +234,61 @@ def fetch_matched_capabilities_from_basic_capabilities(
         matched basic capability values
 
     :example:
-    >>> capabilities = {"roles": ["admin", "user"]}
-    >>> basic_capabilities = {
-    ...     "roles": {
-    ...         "admin": {"role_id": "admin", "label": "Administrator"},
-    ...         "user": {"role_id": "user", "label": "Standard User"}
-    ...     }
-    ... }
-    >>> fetch_matched_capabilities_from_basic_capabilities(capabilities,
-            basic_capabilities)
-        {'roles': [{'role_id': 'admin', 'label': 'Administrator'},
-                {'role_id': 'user', 'label': 'Standard User'}]}
+        >>> capabilities = {
+        ...     'allowed_channel_count_range_max': [58982],
+        ...     'allowed_channel_count_range_min': [1],
+        ...     'allowed_channel_width_values': [13440],
+        ...     'available_bandwidth_hz': 800000000,
+        ...     'available_receivers': ['Band_1', 'Band_2'],
+        ...     'cbf_modes': ['correlation', 'pst'],
+        ...     'max_baseline_km': 1.5,
+        ...     'number_dish_ids': ['SKA001', 'SKA036', 'SKA063', 'SKA100'],
+        ...     'number_fsps': 4,
+        ...     'number_meerkat_dishes': 0,
+        ...     'number_meerkatplus_dishes': 0,
+        ...     'number_pss_beams': 0,
+        ...     'number_pst_beams': 1,
+        ...     'number_ska_dishes': 4,
+        ...     'number_zoom_channels': 0,
+        ...     'number_zoom_windows': 0,
+        ...     'ps_beam_bandwidth_hz': 400000000
+        ... }
+        >>> basic_capabilities = {
+        ...     'rx_id': {
+        ...         'Band_1': {'max_frequency_hz': 1050000000,
+        'min_frequency_hz': 350000000,
+        'rx_id': 'Band_1'},
+        ...         'Band_2': {'max_frequency_hz': 1760000000,
+        'min_frequency_hz': 950000000,
+        'rx_id': 'Band_2'}
+        ...     }
+        ... }
+        >>> fetch_matched_capabilities_from_basic_capabilities(capabilities,
+        basic_capabilities)
+        {
+            'allowed_channel_count_range_max': [58982],
+            'allowed_channel_count_range_min': [1],
+            'allowed_channel_width_values': [13440],
+            'available_bandwidth_hz': 800000000,
+            'available_receivers': [
+                {'max_frequency_hz': 1050000000, 'min_frequency_hz': 350000000,
+                'rx_id': 'Band_1'},
+                {'max_frequency_hz': 1760000000, 'min_frequency_hz': 950000000,
+                'rx_id': 'Band_2'}
+            ],
+            'cbf_modes': ['correlation', 'pst'],
+            'max_baseline_km': 1.5,
+            'number_dish_ids': ['SKA001', 'SKA036', 'SKA063', 'SKA100'],
+            'number_fsps': 4,
+            'number_meerkat_dishes': 0,
+            'number_meerkatplus_dishes': 0,
+            'number_pss_beams': 0,
+            'number_pst_beams': 1,
+            'number_ska_dishes': 4,
+            'number_zoom_channels': 0,
+            'number_zoom_windows': 0,
+            'ps_beam_bandwidth_hz': 400000000
+        }
     """
     if isinstance(capabilities, dict):
         return {
