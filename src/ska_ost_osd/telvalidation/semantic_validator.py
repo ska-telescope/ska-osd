@@ -8,7 +8,7 @@ to fetch rule constraints values.
 
 import logging
 from os import environ
-from typing import Any, Optional
+from typing import Any, Dict, Optional
 
 from pydantic import ValidationError
 from ska_telmodel.data import TMData
@@ -165,78 +165,97 @@ def replace_matched_capabilities_values(
     current[last_key] = new_value
 
 
-def fetch_matched_capabilities_from_basic_capabilities(
-    capabilities: dict, basic_capabilities: dict
-) -> list:
-    """This methods returns matched capabilities data list based on basic
-    capabilities.
+def build_basic_capabilities_lookup(
+    basic_capabilities: Any,
+) -> Dict[str, Dict[str, Any]]:
+    """Builds reference lookup dictionary from nested basic capabilities data.
 
-    e.g after fetching capabilities and basic_capabilities from OSD needs
-    to rearrange some data between basic capabilities and capabilities
-    so that we can easily decide mapping between rules.
-    here Band_1 (min and max) frequency present in basic capabilities so
-    value fetched according.
-    capabilities = {
-                "available_receivers": ["Band_1"]
+    :param basic_capabilities: nested capability data containing lists
+        of items with '_id' fields :return dictionary mapping each
+        reference type to its corresponding item by id
+    :example:
+        >>> data = {
+        ...     "users": [{"user_id": "u1", "name": "Alice"},
+        ...               {"user_id": "u2", "name": "Bob"}],
+        ...     "groups": [{"group_id": "g1", "members": ["u1", "u2"]}]
+        ... }
+        >>> build_basic_capabilities_lookup(data)
+        {
+            "user_id": {
+                "u1": {"user_id": "u1", "name": "Alice"},
+                "u2": {"user_id": "u2", "name": "Bob"}
+            },
+            "group_id": {
+                "g1": {"group_id": "g1", "members": ["u1", "u2"]}
             }
-    basic_capabilities = {
-                "dish_elevation_limit_deg": 15.0,
-                "receiver_information": [
-                    {
-                        "rx_id": "Band_1",
-                        "min_frequency_hz": 350000000.0,
-                        "max_frequency_hz": 1050000000.0,
-                    }]
-                }
-    matched 'rx_id:Band_1' from basic capabilities below is output dict
-    matched_capabilities_list = [
-            {
-                "Band_1":
-                    {
-                        "min_frequency_hz": 350000000.0,
-                        "max_frequency_hz": 1050000000.0,
-                    }
-            }
-        ]
-    : param capabilities: dict contains capabilities
-        like AAO.5, AA0.1
-    : param basic_capabilities: dict contains basic
-        capabilities required for capabilities.
-    : param matched_capabilities_list: replaceable data list
-    : return: matched value from basic capabilities
+        }
     """
-    clone_capabilities = capabilities.copy()
-    stack = [(capabilities, [])]
-    replaceable_values = []
-    while stack:
-        current, path = stack.pop()
-        if isinstance(current, dict):
-            for key, value in current.items():
-                if isinstance(key, (str, int)) and isinstance(value, (str, int)):
-                    matched_values = get_matched_values_from_basic_capabilities(
-                        basic_capabilities, key
-                    )
-                    if matched_values:
-                        replaceable_values.append(matched_values)
-                if isinstance(value, (dict, list)):
-                    stack.append((value, path + [key]))
+    capabilities_lookup: Dict[str, Dict[str, Any]] = {}
 
-        elif isinstance(current, list):
-            for item in reversed(current):
-                if isinstance(item, (dict, list)):
-                    stack.append((item, path))
+    def collect(node: Any) -> None:
+        if isinstance(node, dict):
+            for value in node.values():
+                if isinstance(value, list) and all(
+                    isinstance(item, dict) for item in value
+                ):
+                    for item in value:
+                        for key in item:
+                            if key.endswith("_id"):
+                                capabilities_lookup.setdefault(key, {})[
+                                    item[key]
+                                ] = item
                 else:
-                    # search key into basic capabilities
-                    matched_values = get_matched_values_from_basic_capabilities(
-                        basic_capabilities, item
-                    )
-                    if matched_values:
-                        replaceable_values.append(matched_values)
-    if replaceable_values and path:
-        replace_matched_capabilities_values(
-            clone_capabilities, path, replaceable_values
-        )
-    return clone_capabilities
+                    collect(value)
+        elif isinstance(node, list):
+            for item in node:
+                collect(item)
+
+    collect(basic_capabilities)
+    return capabilities_lookup
+
+
+def fetch_matched_capabilities_from_basic_capabilities(
+    capabilities: Any, basic_capabilities: Dict[str, Dict[str, Any]]
+) -> Any:
+    """Recursively matches and replaces capability references using basic
+    capability mappings.
+
+    :param capabilities: input capabilities data as nested dict, list,
+        or scalar
+    :param basic_capabilities: lookup dictionary mapping reference keys
+        to capability details :return transformed capabilities with
+        matched basic capability values
+
+    :example:
+    >>> capabilities = {"roles": ["admin", "user"]}
+    >>> basic_capabilities = {
+    ...     "roles": {
+    ...         "admin": {"role_id": "admin", "label": "Administrator"},
+    ...         "user": {"role_id": "user", "label": "Standard User"}
+    ...     }
+    ... }
+    >>> fetch_matched_capabilities_from_basic_capabilities(capabilities,
+            basic_capabilities)
+        {'roles': [{'role_id': 'admin', 'label': 'Administrator'},
+                {'role_id': 'user', 'label': 'Standard User'}]}
+    """
+    if isinstance(capabilities, dict):
+        return {
+            key: fetch_matched_capabilities_from_basic_capabilities(
+                value, basic_capabilities
+            )
+            for key, value in capabilities.items()
+        }
+    elif isinstance(capabilities, list):
+        if all(isinstance(item, str) for item in capabilities):
+            for mapping in basic_capabilities.values():
+                if all(ref in mapping for ref in capabilities):
+                    return [mapping[ref] for ref in capabilities]
+        return [
+            fetch_matched_capabilities_from_basic_capabilities(item, basic_capabilities)
+            for item in capabilities
+        ]
+    return capabilities
 
 
 def validate_command_input(
@@ -269,11 +288,10 @@ def validate_command_input(
         tm_data=tm_data,
         osd_data=osd_data,
     )
-
+    capabilities_lookup = build_basic_capabilities_lookup(basic_capabilities)
     matched_capabilities = fetch_matched_capabilities_from_basic_capabilities(
-        capabilities=capabilities, basic_capabilities=basic_capabilities
+        capabilities, capabilities_lookup
     )
-
     validation_data = semantic_validate_data[array_assembly].get(
         "assign_resource"
         if ASSIGN_RESOURCE in interface
