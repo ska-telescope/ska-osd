@@ -173,6 +173,22 @@ def build_basic_capabilities_lookup(
     :param basic_capabilities: nested capability data containing lists
         of items with '_id' fields :return dictionary mapping each
         reference type to its corresponding item by id
+    :example:
+        >>> data = {
+        ...     "users": [{"user_id": "u1", "name": "Alice"},
+        ...               {"user_id": "u2", "name": "Bob"}],
+        ...     "groups": [{"group_id": "g1", "members": ["u1", "u2"]}]
+        ... }
+        >>> build_basic_capabilities_lookup(data)
+        {
+            "user_id": {
+                "u1": {"user_id": "u1", "name": "Alice"},
+                "u2": {"user_id": "u2", "name": "Bob"}
+            },
+            "group_id": {
+                "g1": {"group_id": "g1", "members": ["u1", "u2"]}
+            }
+        }
     """
     capabilities_lookup: Dict[str, Dict[str, Any]] = {}
 
@@ -209,6 +225,19 @@ def fetch_matched_capabilities_from_basic_capabilities(
     :param basic_capabilities: lookup dictionary mapping reference keys
         to capability details :return transformed capabilities with
         matched basic capability values
+
+    :example:
+    >>> capabilities = {"roles": ["admin", "user"]}
+    >>> basic_capabilities = {
+    ...     "roles": {
+    ...         "admin": {"role_id": "admin", "label": "Administrator"},
+    ...         "user": {"role_id": "user", "label": "Standard User"}
+    ...     }
+    ... }
+    >>> fetch_matched_capabilities_from_basic_capabilities(capabilities,
+            basic_capabilities)
+        {'roles': [{'role_id': 'admin', 'label': 'Administrator'},
+                {'role_id': 'user', 'label': 'Standard User'}]}
     """
     if isinstance(capabilities, dict):
         return {
