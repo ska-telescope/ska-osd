@@ -11,6 +11,14 @@ PROJECT_NAME = ska-ost-osd
 KUBE_NAMESPACE ?= ska-ost-osd
 RELEASE_NAME ?= test
 
+##
+SKA_K8S_TOOLS_BUILD_DEPLOY ?= $(CAR_OCI_REGISTRY_HOST)/ska-cicd-k8s-tools-build-deploy:0.14.1
+K8S_TEST_IMAGE_TO_TEST=$(SKA_K8S_TOOLS_BUILD_DEPLOY)
+# The source code is used in the tests, so we set the PYTHONPATH in the tests to the location
+# the source is copied into so that the imports work
+PYTHONPATH = /src
+
+
 # include makefile to pick up the standard Make targets from the submodule
 
 -include .make/helm.mk
@@ -69,9 +77,6 @@ PYTHON_TEST_FILE = tests/unit/
 
 REST_POD_NAME=$(shell kubectl get pods -o name -n $(KUBE_NAMESPACE) -l app=ska-ost-osd,component=rest | cut -c 5-)
 
-rest: ## start OSD REST server
-	docker run --rm -p 5000:5000 --name=$(PROJECT_NAME) $(IMAGE_TO_TEST) gunicorn --chdir src \
-		--bind 0.0.0.0:5000 --logger-class=ska_ost_osd.rest.wsgi.UniformLogger --log-level=$(LOG_LEVEL) ska_ost_osd.rest.wsgi:app
 
 # install helm plugin from https://github.com/helm-unittest/helm-unittest.git
 k8s-chart-test:
@@ -88,7 +93,7 @@ dev-down: k8s-uninstall-chart k8s-delete-namespace  ## tear down developer deplo
 
 osd-pre-release:
 
-	@./src/ska_ost_osd/osd/resource/release.sh $(VERSION)
+	@./src/ska_ost_osd/scripts/release.sh $(VERSION)
 
 CI_MERGE_REQUEST_SOURCE_BRANCH_NAME := $(shell cat tmdata/version_mapping/latest_release.txt)
 osddata-do-publish:

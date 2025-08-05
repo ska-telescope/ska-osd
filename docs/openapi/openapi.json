@@ -1,0 +1,966 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "FastAPI",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/dev-ska-ost-osd-nak-1313-osd-fastapi-migration-feature/osd/api/v3/osd": {
+      "get": {
+        "tags": [
+          "OSD"
+        ],
+        "summary": "Get OSD data filter by the query parameter",
+        "description": "Retrieves the OSD cycle_id data which match the query\n    parameters. Also requests without parameters will take\n    example and default values and return data based on that.\n    All query parameters has its own validation if user provide\n    any invalid value it will return the error message.",
+        "operationId": "get_osd_dev_ska_ost_osd_nak_1313_osd_fastapi_migration_feature_osd_api_v3_osd_get",
+        "parameters": [
+          {
+            "name": "cycle_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cycle Id"
+            }
+          },
+          {
+            "name": "osd_version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Osd Version"
+            }
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "car",
+                    "file",
+                    "gitlab"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "car",
+              "title": "Source"
+            }
+          },
+          {
+            "name": "gitlab_branch",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Gitlab Branch"
+            }
+          },
+          {
+            "name": "capabilities",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "mid",
+                    "low"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Capabilities"
+            }
+          },
+          {
+            "name": "array_assembly",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Array Assembly"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "OSD"
+        ],
+        "summary": "Update OSD data filter by the query parameter",
+        "description": "Update the OSD data which match the query\n    parameters. Also requests without parameters will take example\n    and default values and return data based on that. All query\n    parameters has its own validation if user provide any invalid\n    value it will return the error message.",
+        "operationId": "update_osd_data_dev_ska_ost_osd_nak_1313_osd_fastapi_migration_feature_osd_api_v3_osd_put",
+        "parameters": [
+          {
+            "name": "cycle_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cycle Id"
+            }
+          },
+          {
+            "name": "array_assembly",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^AA(\\d+|\\d+\\.\\d+)"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Array Assembly"
+            }
+          },
+          {
+            "name": "capabilities",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "mid",
+                    "low"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Capabilities"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true,
+                "title": "Body"
+              },
+              "example": {
+                "capabilities": {
+                  "mid": {
+                    "AA2": {
+                      "allowed_channel_count_range_max": [214748647],
+                      "allowed_channel_count_range_min": [1],
+                      "allowed_channel_width_values": [210, 420, 840, 1680, 3360, 6720, 13440, 26880, 40320, 53760],
+                      "available_bandwidth_hz": 800000000,
+                      "available_receivers": [
+                        "Band_1",
+                        "Band_2",
+                        "Band_5a",
+                        "Band_5b"
+                      ],
+                      "cbf_modes": [
+                        "correlation",
+                        "pst",
+                        "pss"
+                      ],
+                      "max_baseline_km": 110,
+                      "number_dish_ids": [
+                        "string"
+                      ],
+                      "number_fsps": 26,
+                      "number_meerkat_dishes": 4,
+                      "number_meerkatplus_dishes": 0,
+                      "number_pss_beams": 384,
+                      "number_pst_beams": 6,
+                      "number_ska_dishes": 64,
+                      "number_zoom_channels": 14880,
+                      "number_zoom_windows": 16,
+                      "ps_beam_bandwidth_hz": 800000000
+                    },
+                    "basic_capabilities": {
+                      "dish_elevation_limit_deg": 15,
+                      "receiver_information": [
+                        {
+                          "max_frequency_hz": 350000000,
+                          "min_frequency_hz": 1050000000,
+                          "rx_id": "Band_1"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "observatory_policy": {
+                  "cycle_description": "Science Verification",
+                  "cycle_information": {
+                    "cycle_id": "SKAO_2027_1",
+                    "proposal_close": "20260512T15:00:00.000z",
+                    "proposal_open": "20260327T12:00:00.000Z"
+                  },
+                  "cycle_number": 1,
+                  "cycle_policies": {
+                    "normal_max_hours": 100
+                  },
+                  "telescope_capabilities": {
+                    "Low": "AA2",
+                    "Mid": "AA2"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dev-ska-ost-osd-nak-1313-osd-fastapi-migration-feature/osd/api/v3/osd_release": {
+      "post": {
+        "tags": [
+          "OSD"
+        ],
+        "summary": "Release new osd version to Gitlab",
+        "description": "Release OSD data with automatic version increment based on cycle ID",
+        "operationId": "release_osd_data_dev_ska_ost_osd_nak_1313_osd_fastapi_migration_feature_osd_api_v3_osd_release_post",
+        "parameters": [
+          {
+            "name": "cycle_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Cycle Id"
+            }
+          },
+          {
+            "name": "release_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ReleaseType"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Release Type"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse_OSDRelease_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dev-ska-ost-osd-nak-1313-osd-fastapi-migration-feature/osd/api/v3/cycle": {
+      "get": {
+        "tags": [
+          "OSD"
+        ],
+        "summary": "GET list of available proposal cycles",
+        "description": "GET list of all available proposal cycles",
+        "operationId": "get_cycle_list_dev_ska_ost_osd_nak_1313_osd_fastapi_migration_feature_osd_api_v3_cycle_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse_CycleModel_"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dev-ska-ost-osd-nak-1313-osd-fastapi-migration-feature/osd/api/v3/semantic_validation": {
+      "post": {
+        "tags": [
+          "OSD"
+        ],
+        "summary": "Validate input json Semantically Semantic validation checks the meaning of the input data and ensures that it is valid in the context of the system. It checks whether the input data conforms to the business rules and logic of the system",
+        "description": "Checks if the Command Input JSON is semantically valid",
+        "operationId": "semantically_validate_json_dev_ska_ost_osd_nak_1313_osd_fastapi_migration_feature_osd_api_v3_semantic_validation_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SemanticValidationModel"
+              },
+              "example": {
+                "raise_semantic": true,
+                "sources": "car:ost/ska-ost-osd?{osd_version}#tmdata",
+                "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
+                "observing_command_input": {
+                  "dish": {
+                    "receptor_ids": [
+                      "SKA001",
+                      "SKA100"
+                    ]
+                  },
+                  "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
+                  "sdp": {
+                    "execution_block": {
+                      "beams": [
+                        {
+                          "beam_id": "vis0",
+                          "function": "visibilities"
+                        }
+                      ],
+                      "channels": [
+                        {
+                          "channels_id": "vis_channels",
+                          "spectral_windows": [
+                            {
+                              "count": 14880,
+                              "freq_max": 368000000,
+                              "freq_min": 350000000,
+                              "link_map": [
+                                [0, 0],
+                                [200, 1],
+                                [744, 2],
+                                [944, 3]
+                              ],
+                              "spectral_window_id": "fsp_1_channels",
+                              "start": 0,
+                              "stride": 2
+                            }
+                          ]
+                        }
+                      ],
+                      "context": {
+
+                      },
+                      "eb_id": "eb-test-20220916-00000",
+                      "fields": [
+                        {
+                          "field_id": "field_a",
+                          "phase_dir": {
+                            "dec": [80, 0.1],
+                            "ra": [123, 0.1],
+                            "reference_frame": "ICRF3",
+                            "reference_time": "2023-02-16T01:23:45.678900"
+                          },
+                          "pointing_fqdn": "low-tmc/telstate/0/pointing"
+                        }
+                      ],
+                      "max_length": 100,
+                      "polarisations": [
+                        {
+                          "corr_type": [
+                            "XX",
+                            "XY",
+                            "YY",
+                            "YX"
+                          ],
+                          "polarisations_id": "all"
+                        }
+                      ],
+                      "scan_types": [
+                        {
+                          "beams": {
+                            "pss1": {
+                              "channels_id": "pulsar_channels",
+                              "field_id": "field_a",
+                              "polarisations_id": "all"
+                            },
+                            "vis0": {
+                              "channels_id": "vis_channels",
+                              "polarisations_id": "all"
+                            }
+                          },
+                          "scan_type_id": ".default"
+                        },
+                        {
+                          "beams": {
+                            "vis0": {
+                              "field_id": "field_a"
+                            }
+                          },
+                          "derive_from": ".default",
+                          "scan_type_id": "target:a"
+                        }
+                      ]
+                    },
+                    "interface": "https://schema.skao.int/ska-sdp-assignres/0.4",
+                    "processing_blocks": [
+                      {
+                        "parameters": {
+
+                        },
+                        "pb_id": "pb-mvp01-20200325-00001",
+                        "script": {
+                          "kind": "realtime",
+                          "name": "vis_receive",
+                          "version": "0.1.0"
+                        }
+                      },
+                      {
+                        "parameters": {
+
+                        },
+                        "pb_id": "pb-mvp01-20200325-00002",
+                        "script": {
+                          "kind": "realtime",
+                          "name": "test_realtime",
+                          "version": "0.1.0"
+                        }
+                      },
+                      {
+                        "dependencies": [
+                          {
+                            "kind": [
+                              "visibilities"
+                            ],
+                            "pb_id": "pb-mvp01-20200325-00001"
+                          }
+                        ],
+                        "parameters": {
+
+                        },
+                        "pb_id": "pb-mvp01-20200325-00003",
+                        "sbi_ids": [
+                          "sbi-mvp01-20200325-00001"
+                        ],
+                        "script": {
+                          "kind": "batch",
+                          "name": "ical",
+                          "version": "0.1.0"
+                        }
+                      },
+                      {
+                        "dependencies": [
+                          {
+                            "kind": [
+                              "calibration"
+                            ],
+                            "pb_id": "pb-mvp01-20200325-00003"
+                          }
+                        ],
+                        "parameters": {
+
+                        },
+                        "pb_id": "pb-mvp01-20200325-00004",
+                        "script": {
+                          "kind": "batch",
+                          "name": "dpreb",
+                          "version": "0.1.0"
+                        }
+                      }
+                    ],
+                    "resources": {
+                      "csp_links": [1, 2, 3, 4],
+                      "receptors": [
+                        "SKA001",
+                        "SKA100"
+                      ]
+                    }
+                  },
+                  "subarray_id": 1
+                },
+                "osd_data": {
+                  "capabilities": {
+                    "mid": {
+                      "AA0.5": {
+                        "allowed_channel_count_range_max": [58982],
+                        "allowed_channel_count_range_min": [1],
+                        "allowed_channel_width_values": [13440],
+                        "available_bandwidth_hz": 800000000,
+                        "available_receivers": [
+                          "Band_1",
+                          "Band_2"
+                        ],
+                        "cbf_modes": [
+                          "correlation",
+                          "pst"
+                        ],
+                        "max_baseline_km": 1.5,
+                        "number_dish_ids": [
+                          "SKA001",
+                          "SKA036",
+                          "SKA063",
+                          "SKA100"
+                        ],
+                        "number_fsps": 4,
+                        "number_meerkat_dishes": 0,
+                        "number_meerkatplus_dishes": 0,
+                        "number_pss_beams": 0,
+                        "number_pst_beams": 1,
+                        "number_ska_dishes": 4,
+                        "number_zoom_channels": 0,
+                        "number_zoom_windows": 0,
+                        "ps_beam_bandwidth_hz": 400000000
+                      },
+                      "basic_capabilities": {
+                        "dish_elevation_limit_deg": 15,
+                        "receiver_information": [
+                          {
+                            "max_frequency_hz": 1050000000,
+                            "min_frequency_hz": 350000000,
+                            "rx_id": "Band_1"
+                          },
+                          {
+                            "max_frequency_hz": 1760000000,
+                            "min_frequency_hz": 950000000,
+                            "rx_id": "Band_2"
+                          },
+                          {
+                            "max_frequency_hz": 3050000000,
+                            "min_frequency_hz": 1650000000,
+                            "rx_id": "Band_3"
+                          },
+                          {
+                            "max_frequency_hz": 5180000000,
+                            "min_frequency_hz": 2800000000,
+                            "rx_id": "Band_4"
+                          },
+                          {
+                            "max_frequency_hz": 8500000000,
+                            "min_frequency_hz": 4600000000,
+                            "rx_id": "Band_5a"
+                          },
+                          {
+                            "max_frequency_hz": 15400000000,
+                            "min_frequency_hz": 8300000000,
+                            "rx_id": "Band_5b"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "observatory_policy": {
+                    "cycle_description": "Science Verification",
+                    "cycle_information": {
+                      "cycle_id": "SKAO_2027_1",
+                      "proposal_close": "2026-05-12T15:00:00.000Z",
+                      "proposal_open": "2026-03-27T12:00:00.000Z"
+                    },
+                    "cycle_number": 2,
+                    "cycle_policies": {
+                      "normal_max_hours": 100
+                    },
+                    "telescope_capabilities": {
+                      "Low": "AA2",
+                      "Mid": "AA2"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiResponse": {
+        "properties": {
+          "result_data": {
+            "anyOf": [
+              {
+                "items": {
+
+                },
+                "type": "array"
+              },
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Result Data"
+          },
+          "result_status": {
+            "type": "string",
+            "title": "Result Status"
+          },
+          "result_code": {
+            "$ref": "#/components/schemas/HTTPStatus",
+            "default": 200
+          }
+        },
+        "type": "object",
+        "required": [
+          "result_data",
+          "result_status"
+        ],
+        "title": "ApiResponse"
+      },
+      "ApiResponse_CycleModel_": {
+        "properties": {
+          "result_data": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/CycleModel"
+                },
+                "type": "array"
+              },
+              {
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/CycleModel"
+                },
+                "type": "object"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Result Data"
+          },
+          "result_status": {
+            "type": "string",
+            "title": "Result Status"
+          },
+          "result_code": {
+            "$ref": "#/components/schemas/HTTPStatus",
+            "default": 200
+          }
+        },
+        "type": "object",
+        "required": [
+          "result_data",
+          "result_status"
+        ],
+        "title": "ApiResponse[CycleModel]"
+      },
+      "ApiResponse_OSDRelease_": {
+        "properties": {
+          "result_data": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/OSDRelease"
+                },
+                "type": "array"
+              },
+              {
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/OSDRelease"
+                },
+                "type": "object"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Result Data"
+          },
+          "result_status": {
+            "type": "string",
+            "title": "Result Status"
+          },
+          "result_code": {
+            "$ref": "#/components/schemas/HTTPStatus",
+            "default": 200
+          }
+        },
+        "type": "object",
+        "required": [
+          "result_data",
+          "result_status"
+        ],
+        "title": "ApiResponse[OSDRelease]"
+      },
+      "CycleModel": {
+        "properties": {
+          "cycles": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Cycles"
+          }
+        },
+        "type": "object",
+        "required": [
+          "cycles"
+        ],
+        "title": "CycleModel"
+      },
+      "HTTPStatus": {
+        "type": "integer",
+        "enum": [100, 101, 102, 103, 200, 201, 202, 203, 204, 205, 206, 207, 208, 226, 300, 301, 302, 303, 304, 305, 307, 308, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416, 417, 418, 421, 422, 423, 424, 425, 426, 428, 429, 431, 451, 500, 501, 502, 503, 504, 505, 506, 507, 508, 510, 511],
+        "title": "HTTPStatus",
+        "description": "HTTP status codes and reason phrases\n\nStatus codes from the following RFCs are all observed:\n\n    * RFC 7231: Hypertext Transfer Protocol (HTTP/1.1), obsoletes 2616\n    * RFC 6585: Additional HTTP Status Codes\n    * RFC 3229: Delta encoding in HTTP\n    * RFC 4918: HTTP Extensions for WebDAV, obsoletes 2518\n    * RFC 5842: Binding Extensions to WebDAV\n    * RFC 7238: Permanent Redirect\n    * RFC 2295: Transparent Content Negotiation in HTTP\n    * RFC 2774: An HTTP Extension Framework\n    * RFC 7725: An HTTP Status Code to Report Legal Obstacles\n    * RFC 7540: Hypertext Transfer Protocol Version 2 (HTTP/2)\n    * RFC 2324: Hyper Text Coffee Pot Control Protocol (HTCPCP/1.0)\n    * RFC 8297: An HTTP Status Code for Indicating Hints\n    * RFC 8470: Using Early Data in HTTP"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "OSDRelease": {
+        "properties": {
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "cycle_id": {
+            "type": "string",
+            "title": "Cycle Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "message",
+          "version",
+          "cycle_id"
+        ],
+        "title": "OSDRelease"
+      },
+      "ReleaseType": {
+        "type": "string",
+        "enum": [
+          "minor",
+          "major"
+        ],
+        "title": "ReleaseType"
+      },
+      "SemanticValidationModel": {
+        "properties": {
+          "interface": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interface"
+          },
+          "observing_command_input": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Observing Command Input"
+          },
+          "osd_data": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Osd Data"
+          },
+          "raise_semantic": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Raise Semantic",
+            "default": true
+          },
+          "sources": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sources"
+          }
+        },
+        "type": "object",
+        "required": [
+          "observing_command_input"
+        ],
+        "title": "SemanticValidationModel",
+        "description": "SemanticValidationModel defines the schema for validating semantic input\ndata related to observing commands and system configuration.\n\n:param interface (Optional[str]): An optional string representing\nthe command interface type.\n\n:param observing_command_input (Dict[str, Any]): A required\ndictionary containing the core input parameters for an observing\ncommand.\n\n:param osd_data (Optional[Dict[str, Any]]): Optional data fetched\nfrom the OSD.\n\n:param raise_semantic (Optional[bool]): Flag to indicate whether\nsemantic validation errors should be raised. Defaults to True.\n\n:param sources (Optional[str]): An optional string that may\nreference data sources, including dynamic placeholders such as\n'{osd_version}'."
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

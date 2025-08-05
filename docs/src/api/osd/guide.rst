@@ -49,26 +49,40 @@ General Structure
 
 .. code-block:: bash
 
-    ├── constant.py
-    ├── helper.py
-    ├── __init__.py
-    ├── osd.py
-    ├── resource
-    │   └── release.sh
-    └── version_mapping
-        └── cycle_gitlab_release_version_mapping.json
+    ├── common
+    │   ├── __init__.py
+    │   ├── models.py
+    │   └── utils.py
+    ├── osd
+    │   ├── common
+    │   ├── models
+    │   ├── routers
+    │   ├── version_mapping
+    │   │   └── cycle_gitlab_release_version_mapping.json
+    │   ├── version_manager.py
+    │   └── osd.py
+    ├── scripts
+    │   └── release.sh
+    └── telvalidation
+        ├── common
+        ├── models
+        ├── routers
+        ├── __init__.py
+        ├── coordinates_conversion.py
+        ├── oet_tmc_validators.py
+        └── semantic_validator.py
 
 
 .. note::
 
     * Created a separate JSON file for mapping ``cycle_id`` to version number ``cycle_gitlab_release_version_mapping.json`` inside ``version_mapping`` folder.
-    
-    * OSD supports backward compatibility for all existing released versions. If someone wants to retrieve older version then 
+
+    * OSD supports backward compatibility for all existing released versions. If someone wants to retrieve older version then
       they just need to point out that specific version in ``osd_version``.
-      
+
 .. note::
 
-    Created a bash script ``release.sh`` in ``resource`` folder.
+    Created a bash script ``release.sh`` in ``scripts`` folder.
 
 
 If user wants to access this framework from CDM, Jupyter Notebook or any other client below is the example.
@@ -139,7 +153,7 @@ GET /osd
      - Resource URL
      - Description
    * - GET
-     - ``/ska-ost-osd/osd/api/v2/osd/``
+     - ``/ska-ost-osd/osd/api/v<majorversion>/osd/``
      - **Getting Data**
 
        Return the OSD cycle_id data
@@ -166,14 +180,14 @@ GET /osd
 
 .. code:: python
 
-    "/ska-ost-osd/osd/api/v3/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
+    "/ska-ost-osd/osd/api/v<majorversion>/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
 
 
 3. CURL Example Request
 
 .. code:: python
 
-    curl -X GET "/ska-ost-osd/osd/api/v3/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
+    curl -X GET "/ska-ost-osd/osd/api/v<majorversion>/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
 
 
 4. Example Response
@@ -186,7 +200,7 @@ GET /osd
     .. code:: python
 
         client.get(
-            "/ska-ost-osd/osd/api/v3/osd",
+            "/ska-ost-osd/osd/api/v<majorversion>/osd",
             query_string={
                 "cycle_id": 1,
                 "source": "file",
@@ -199,106 +213,200 @@ GET /osd
     .. code:: python
 
         {
-             "capabilities": {
-                "mid": {
-                "AA2": {
-                    "available_receivers": [
-                    "Band_1",
-                    "Band_2",
-                    "Band_5a",
-                    "Band_5b"
-                ],
-                "number_ska_dishes": 64,
-                "number_meerkat_dishes": 4,
-                "number_meerkatplus_dishes": 0,
-                "max_baseline_km": 110.0,
-                "available_bandwidth_hz": 800000000.0,
-                "cbf_modes": [
-                    "correlation",
-                    "pst",
-                    "pss"
-                ],
-                "number_zoom_windows": 16,
-                "number_zoom_channels": 14880,
-                "number_pss_beams": 384,
-                "number_pst_beams": 6,
-                "ps_beam_bandwidth_hz": 800000000.0,
-                "number_fsps": 26,
-                "allowed_channel_width_values": [210, 420, 840, 1680, 3360, 6720, 13440, 26880, 40320, 53760, 80640, 107520, 161280, 215040, 322560, 416640, 430080, 645120],
-                "allowed_channel_count_range_min": [1],
-                "allowed_channel_count_range_max": [214748647],
-                "number_dish_ids": ["SKA001", "SKA008", "SKA013", "SKA014", "SKA015", "SKA016", "SKA019", "SKA024", "SKA025", "SKA027", "SKA028", "SKA030", "SKA031", "SKA032", "SKA033", "SKA034", "SKA035", "SKA036", "SKA037", "SKA038", "SKA039", "SKA040", "SKA041", "SKA042", "SKA043", "SKA045", "SKA046", "SKA048", "SKA049", "SKA050", "SKA051", "SKA055", "SKA061", "SKA063", "SKA067", "SKA068", "SKA070", "SKA075", "SKA077", "SKA079", "SKA081", "SKA082", "SKA083", "SKA089", "SKA091", "SKA092", "SKA095", "SKA096", "SKA097", "SKA098", "SKA099", "SKA100", "SKA101", "SKA102", "SKA103", "SKA104", "SKA106", "SKA108", "SKA109", "SKA113", "SKA114", "SKA123", "SKA125", "SKA126"]
+          "result_data": [
+            {
+              "observatory_policy": {
+                "cycle_number": 1,
+                "cycle_description": "Science Verification",
+                "cycle_information": {
+                  "cycle_id": "SKAO_2027_1",
+                  "proposal_open": "20260327T12:00:00.000Z",
+                  "proposal_close": "20260512T15:00:00.000z"
                 },
-                "basic_capabilities": {
+                "cycle_policies": {
+                  "normal_max_hours": 100
+                },
+                "telescope_capabilities": {
+                  "Mid": "AA2",
+                  "Low": "AA2"
+                }
+              },
+              "capabilities": {
+                "mid": {
+                  "basic_capabilities": {
                     "dish_elevation_limit_deg": 15,
                     "receiver_information": [
-                    {
+                      {
                         "max_frequency_hz": 1050000000,
                         "min_frequency_hz": 350000000,
                         "rx_id": "Band_1"
-                    },
-                    {
+                      },
+                      {
                         "max_frequency_hz": 1760000000,
                         "min_frequency_hz": 950000000,
                         "rx_id": "Band_2"
-                    },
-                    {
+                      },
+                      {
                         "max_frequency_hz": 3050000000,
                         "min_frequency_hz": 1650000000,
                         "rx_id": "Band_3"
-                    },
-                    {
+                      },
+                      {
                         "max_frequency_hz": 5180000000,
                         "min_frequency_hz": 2800000000,
                         "rx_id": "Band_4"
-                    },
-                    {
+                      },
+                      {
                         "max_frequency_hz": 8500000000,
                         "min_frequency_hz": 4600000000,
                         "rx_id": "Band_5a"
-                    },
-                    {
+                      },
+                      {
                         "max_frequency_hz": 15400000000,
                         "min_frequency_hz": 8300000000,
                         "rx_id": "Band_5b"
-                    }
+                      }
                     ]
+                  },
+                  "AA2": {
+                    "allowed_channel_count_range_max": [
+                      214748647
+                    ],
+                    "allowed_channel_count_range_min": [
+                      1
+                    ],
+                    "allowed_channel_width_values": [
+                      210,
+                      420,
+                      840,
+                      1680,
+                      3360,
+                      6720,
+                      13440,
+                      26880,
+                      40320,
+                      53760,
+                      80640,
+                      107520,
+                      161280,
+                      215040,
+                      322560,
+                      416640,
+                      430080,
+                      645120
+                    ],
+                    "available_bandwidth_hz": 800000000,
+                    "available_receivers": [
+                      "Band_1",
+                      "Band_2",
+                      "Band_5a",
+                      "Band_5b"
+                    ],
+                    "cbf_modes": [
+                      "correlation",
+                      "pst",
+                      "pss"
+                    ],
+                    "max_baseline_km": 110,
+                    "number_dish_ids": [
+                      "SKA001",
+                      "SKA008",
+                      "SKA013",
+                      "SKA014",
+                      "SKA015",
+                      "SKA016",
+                      "SKA019",
+                      "SKA024",
+                      "SKA025",
+                      "SKA027",
+                      "SKA028",
+                      "SKA030",
+                      "SKA031",
+                      "SKA032",
+                      "SKA033",
+                      "SKA034",
+                      "SKA035",
+                      "SKA036",
+                      "SKA037",
+                      "SKA038",
+                      "SKA039",
+                      "SKA040",
+                      "SKA041",
+                      "SKA042",
+                      "SKA043",
+                      "SKA045",
+                      "SKA046",
+                      "SKA048",
+                      "SKA049",
+                      "SKA050",
+                      "SKA051",
+                      "SKA055",
+                      "SKA061",
+                      "SKA063",
+                      "SKA067",
+                      "SKA068",
+                      "SKA070",
+                      "SKA075",
+                      "SKA077",
+                      "SKA079",
+                      "SKA081",
+                      "SKA082",
+                      "SKA083",
+                      "SKA089",
+                      "SKA091",
+                      "SKA092",
+                      "SKA095",
+                      "SKA096",
+                      "SKA097",
+                      "SKA098",
+                      "SKA099",
+                      "SKA100",
+                      "SKA101",
+                      "SKA102",
+                      "SKA103",
+                      "SKA104",
+                      "SKA106",
+                      "SKA108",
+                      "SKA109",
+                      "SKA113",
+                      "SKA114",
+                      "SKA123",
+                      "SKA125",
+                      "SKA126"
+                    ],
+                    "number_fsps": 35,
+                    "number_meerkat_dishes": 20,
+                    "number_meerkatplus_dishes": 0,
+                    "number_pss_beams": 385,
+                    "number_pst_beams": 6,
+                    "number_ska_dishes": 64,
+                    "number_zoom_channels": 14880,
+                    "number_zoom_windows": 17,
+                    "ps_beam_bandwidth_hz": 800000000
+                  }
                 }
-                }
-            },
-            "observatory_policy": {
-                "cycle_description": "Science Verification",
-                "cycle_information": {
-                "cycle_id": "SKAO_2027_1",
-                "proposal_close": "20260512T15:00:00.000z",
-                "proposal_open": "20260327T12:00:00.000Z"
-                },
-                "cycle_number": 1,
-                "cycle_policies": {
-                "normal_max_hours": 100
-                },
-                "telescope_capabilities": {
-                "Low": "AA2",
-                "Mid": "AA2"
-                }
+              }
             }
+          ],
+          "result_status": "success",
+          "result_code": 200
         }
 
 
 5. Scenarios
 
-    1. If no parameters are provided to the API then latest version with 
-       cycle id is fetched from ``cycle_gitlab_release_version_mapping.json`` file.
+    1. If no parameters are provided to the API then it should return error message for required
+    ``cycle_id`` or ``capabilities``.
 
-    2. Calling API with only one parameter cycle_id and no other parameter. First it will check if the 
-       cycle id is valid or not, and will fetch latest version stored in the 
+    2. Calling API with only one parameter cycle_id and no other parameter. First it will check if the
+       cycle id is valid or not, and will fetch latest version stored in the
        ``cycle_gitlab_release_version_mapping.json`` file.
-    
-    3. If source is not provided in the API call, the default is set to file. API will 
-       fetch data from file. other option is car and gitlab. 
+
+    3. If source is not provided in the API call, the default is set to car. API will
+       fetch data from car. other option is file and gitlab.
        If ``source`` is 'gitlab' and ``gitlab_branch`` is 'main' then it will fetch data from main branch.
        If ``source`` is 'car' then API will fetch data from Car Gitlab repo.
-    
+
     4. If ``osd_version`` and ``gitlab_branch`` are given together then API will return appropriate error message.
 
     5. If ``cycle_id`` and ``array_assembly`` are provided together then API will return appropriate error message.
@@ -315,7 +423,7 @@ GET /cycle
      - Resource URL
      - Description
    * - GET
-     - ``/ska-ost-osd/osd/api/v3/osd/``
+     - ``/ska-ost-osd/osd/api/v<majorversion>/cycle``
      - **Getting Data**
 
        Return the OSD cycle_id data.
@@ -328,7 +436,7 @@ GET /cycle
     ===================    ============================================================
     Parameters             Description
     ===================    ============================================================
-    cycle_id               Cycle Id a integer value 1, 2, 3
+    cycle_id               Cycle Id with integer value 1, 2, 3
     ===================    ============================================================
 
 
@@ -336,14 +444,14 @@ GET /cycle
 
 .. code:: python
 
-    "/ska-ost-osd/osd/api/v3/cycle"
+    "/ska-ost-osd/osd/api/v<majorversion>/cycle"
 
 
 3. CURL Example Request
 
 .. code:: python
 
-    curl -X GET "/ska-ost-osd/osd/api/v3/cycle"
+    curl -X GET "/ska-ost-osd/osd/api/v<majorversion>/cycle"
 
 
 4. Example Response
@@ -355,7 +463,7 @@ GET /cycle
     .. code:: python
 
         client.get(
-            "/ska-ost-osd/osd/api/v3/cycle"
+            "/ska-ost-osd/osd/api/v<majorversion>/cycle"
          )
 
     * Response
@@ -363,7 +471,14 @@ GET /cycle
     .. code:: python
 
         {
-            "cycles": [1]
+        "result_data":
+            {
+            "cycles": [
+                1
+            ]
+            },
+        "result_status": "success",
+        "result_code": 200
         }
 
 
@@ -383,7 +498,7 @@ POST /osd_release
      - Resource URL
      - Description
    * - PUT
-     - ``/ska-ost-osd/osd/api/v3/osd/``
+     - ``/ska-ost-osd/osd/api/v<majorversion>/osd/``
      - **Updating Data**
 
        Update the OSD capabilities data.
@@ -397,7 +512,7 @@ POST /osd_release
     Parameters             Description
     ===================    ============================================================
     cycle_id               Cycle Id a integer value 1, 2, 3
-    release_type           Patch, Major and Minor 
+    release_type           Major and Minor
     ===================    ============================================================
 
 
@@ -406,14 +521,14 @@ POST /osd_release
 
     .. code:: python
 
-      "/ska-ost-osd/osd/api/v3/osd_release?cycle_id=1&release_type=patch"
+      "/ska-ost-osd/osd/api/v<majorversion>/osd_release?cycle_id=1&release_type=minor"
 
 
 3. CURL Example Request
 
     .. code:: python
 
-       curl -X POST "/ska-ost-osd/osd/api/v3/osd_release?cycle_id=1&release_type=patch"
+       curl -X POST "/ska-ost-osd/osd/api/v<majorversion>/osd_release?cycle_id=1&release_type=minor"
 
 
 4. Example Response
@@ -422,13 +537,29 @@ POST /osd_release
 
     .. code:: python
 
-        client.put(
-            "/ska-ost-osd/osd/api/v3/osd_release?cycle_id=1&release_type=patch",
-            query_string={
+        client.post(
+            "/ska-ost-osd/osd/api/v<majorversion>/osd_release?cycle_id=1&release_type=minor",
+            query_params={
                 "cycle_id": 1,
-                "release_type": "patch"
+                "release_type": "minor"
             },
         )
+
+    * Response
+
+    .. code:: python
+
+        {
+        "result_data":
+            {
+            "message": f"Released new version 1.0.0",
+            "version": 1.0.0,
+            "cycle_id": 1,
+        }
+        ,
+        "result_status": "success",
+        "result_code": 200
+        }
 
 
 5. Scenarios
@@ -444,7 +575,7 @@ POST /osd_release
     5. If the ``array_assembly`` value doesn't match the required pattern (must be 'AA' followed by a number), the API will return a 400 Bad Request status with a message indicating the correct format pattern.
 
     6. If the request body is missing required fields or contains invalid data formats, the API will return a 400 Bad Request status with validation error details.
-    
+
     7. If the API encounters an unexpected server-side error (such as database connection failures, internal processing errors, or system-level issues), the API will return a 500 Internal Server Error status with a generic error message.
 
 PUT /osd
@@ -458,7 +589,7 @@ PUT /osd
      - Resource URL
      - Description
    * - PUT
-     - ``/ska-ost-osd/osd/api/v3/osd/``
+     - ``/ska-ost-osd/osd/api/v<majorversion>/osd/``
      - **Updating Data**
 
        Update the OSD capabilities data.
@@ -481,29 +612,29 @@ PUT /osd
 
     .. code:: python
 
-     "/ska-ost-osd/osd/api/v3/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
+     "/ska-ost-osd/osd/api/v<majorversion>/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
 
 
 3. CURL Example Request
 
     .. code:: python
 
-      curl -X PUT "/ska-ost-osd/osd/api/v3/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
+      curl -X PUT "/ska-ost-osd/osd/api/v<majorversion>/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
 
 
 4. Example Response
 
     * The PUT API allows updating the OSD data by providing a JSON object in the request body.
 
-      When calling the PUT API, provide a complete JSON object containing all required fields including 
-      ``cycle_id``, ``capabilities``, and ``array_assembly``. The API will replace the existing OSD data 
+      When calling the PUT API, provide a complete JSON object containing all required fields including
+      ``cycle_id``, ``capabilities``, and ``array_assembly``. The API will replace the existing OSD data
       that matches these parameters with the new data provided in the request body.
 
 
     .. code:: python
 
         client.put(
-            "/ska-ost-osd/osd/api/v3/osd",
+            "/ska-ost-osd/osd/api/v<majorversion>/osd",
             query_string={
                 "cycle_id": 1,
                 "capabilities": "mid",
@@ -666,7 +797,7 @@ PUT /osd
     5. If the ``array_assembly`` value doesn't match the required pattern (must be 'AA' followed by a number), the API will return a 400 Bad Request status with a message indicating the correct format pattern.
 
     6. If the request body is missing required fields or contains invalid data formats, the API will return a 400 Bad Request status with validation error details.
-    
+
     7. If the API encounters an unexpected server-side error (such as database connection failures, internal processing errors, or system-level issues), the API will return a 500 Internal Server Error status with a generic error message.
 
 
@@ -725,7 +856,7 @@ Release Steps
 4. Run below command for OSD release
 
 Created a target called ``osd-pre-release`` in Makefile which will run when ska_ost_osd is released.
-also added a ``release.sh`` file inside ``osd`` ``resources`` folder which has two functions ``GetCycleId`` and ``UpdateAndAddValue``
+also added a ``release.sh`` file inside ``ska_ost_osd`` ``scripts`` folder which has two functions ``GetCycleId`` and ``UpdateAndAddValue``
 
 ``GetCycleId`` function gets ``cycle_number`` from ``observatory_policies.json`` file and triggers next function ``UpdateAndAddValue``
 which updates or add cycle_id values in version mapping json file.
@@ -741,3 +872,34 @@ which updates or add cycle_id values in version mapping json file.
 .. warning::
 
     This is a very crucial part for OSD, without this some functionality may break and exceptions and errors will be raised.
+
+
+OSD Integration
+===============
+
+This section explains how to integrate and use the **ska-ost-osd** package in your project.
+
+Installation
+------------
+
+Add the following entry under the `[tool.poetry.dependencies]` section in your `pyproject.toml`:
+
+.. code-block:: toml
+
+    [tool.poetry.dependencies]
+    ska-ost-osd = "^<majorversion>"
+
+This will ensure that Poetry installs the specified version (or a compatible one) of the `ska-ost-osd` package.
+
+Usage
+-----
+
+You can import the relevant components from the package as follows:
+
+.. code-block:: python
+
+    from ska_ost_osd.telvalidation.common.error_handling import (
+        SchematicValidationError,
+    )
+
+This allows you to catch or raise semantic validation-related exceptions when working with OSD validation workflows.

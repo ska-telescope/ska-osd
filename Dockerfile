@@ -1,40 +1,61 @@
-FROM artefact.skao.int/ska-tango-images-pytango-builder:9.5.0 AS buildenv
-FROM artefact.skao.int/ska-tango-images-pytango-runtime:9.5.0 AS runtime
+# ---------- Build Stage ----------
+ARG BUILD_IMAGE="artefact.skao.int/ska-build-python:0.3.1"
+ARG RUNTIME_BASE_IMAGE="artefact.skao.int/ska-python:0.2.3"
+
+FROM $BUILD_IMAGE AS buildenv
 
 
-ARG CAR_PYPI_REPOSITORY_URL=https://artefact.skao.int/repository/pypi-internal
-ENV PIP_INDEX_URL=${CAR_PYPI_REPOSITORY_URL}
+# Set up Poetry environment
+ENV POETRY_NO_INTERACTION=1 \
+    POETRY_VIRTUALENVS_IN_PROJECT=1 \
+    POETRY_VIRTUALENVS_CREATE=1\
+    POETRY_CACHE_DIR=/tmp/poetry_cache
 
-USER root
+ENV APP_DIR="/app"
 
-WORKDIR /app
+WORKDIR $APP_DIR
 
-# Copy poetry.lock* in case it doesn't exist in the repo
-COPY pyproject.toml poetry.lock* ./
+# Copy dependency files early for better caching
+COPY pyproject.toml poetry.lock ./
+RUN touch README.md
 
+# Install no-root here so we get a docker layer cached with dependencies
+# but not app code, to rebuild quickly.
+RUN poetry install --without dev --no-root && rm -rf $POETRY_CACHE_DIR
+
+# Copy application code
 COPY tmdata /app/src/tmdata
 
-# Install runtime dependencies and the app
-RUN poetry config virtualenvs.create false
+# The runtime image, used to just run the code provided its virtual environment
+FROM $RUNTIME_BASE_IMAGE AS runtime
 
-# Install ssh client and git in order to push tmdata to artefact
-RUN apt-get update && \
-    apt-get install -y \
-    git \
-    openssh-client \
-    && rm -rf /var/lib/apt/lists/*
-# create temporary .ssh folder to store ssh key.
-RUN mkdir -p /home/tango/.ssh && \
-    chown -R tango:tango /home/tango && \
-    chmod 700 /home/tango/.ssh
+ENV APP_USER="tango"
+ENV APP_DIR="/app"
+ENV VIRTUAL_ENV="${APP_DIR}/.venv"
+ENV PATH="${VIRTUAL_ENV}/bin:$PATH"
 
-RUN pip install poetry==1.8.3
-# Developers may want to add --dev to the poetry export for testing inside a container
-RUN poetry export --format requirements.txt --output poetry-requirements.txt --without-hashes && \
-    pip install -r poetry-requirements.txt && \
-    pip install . && \
-    rm poetry-requirements.txt
+# Create non-root user
+RUN adduser $APP_USER --disabled-password --home $APP_DIR
 
-USER tango
+WORKDIR $APP_DIR
 
-CMD ["python3", "-m", "ska_ost_osd.rest.wsgi"]
+# Copy the virtual environment from the build image
+COPY --chown=$APP_USER:$APP_USER --from=buildenv ${VIRTUAL_ENV} ${VIRTUAL_ENV}
+
+# Copy the full application code
+COPY --chown=$APP_USER:$APP_USER . ./
+
+# Install the current application in editable mode into the virtual environment.
+# - Ensures app code is linked into the environment.
+# - Assumes dependencies were already installed in the build stage.
+RUN python -m pip --require-virtualenv install --no-deps -e .
+
+USER ${APP_USER}
+
+CMD ["fastapi", \
+    "run", \
+    "src/ska_ost_osd/app.py", \
+    # Trust TLS headers set by nginx ingress:
+    "--proxy-headers", \
+    "--port", "5000" \
+]

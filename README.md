@@ -24,7 +24,7 @@ Install dependencies with Poetry and activate the virtual environment
 
 ```
 poetry install
-poetry shell
+eval $(poetry env activate)
 ```
 
 To build a new Docker image for the OSD, run
@@ -55,9 +55,9 @@ Install the Helm umbrella chart into a Kubernetes cluster with ingress enabled:
 make k8s-install-chart
 ```
 
-The Swagger UI should be available external to the cluster at `http://<KUBE_HOST>/<KUBE_NAMESPACE>/osd/api/<MAJOR_VERSION>/ui/ and the API accesible via the same URL.
+The Swagger UI should be available external to the cluster at `http://<KUBE_HOST>/<KUBE_NAMESPACE>/osd/api/<MAJOR_VERSION>/ui/ and the API accessible via the same URL.
 
-If using minikube, `KUBE_HOST` can be found by running `minikube ip`. 
+If using minikube, `KUBE_HOST` can be found by running `minikube ip`.
 `KUBE_NAMESPACE` is the namespace the chart was deployed to, likely `ska-ost-osd`
 
 To uninstall the chart, run
@@ -93,18 +93,16 @@ To find the URL for the environment, see the 'info' job of the CICD pipeline sta
 Generally the API URL should be available at  `https://k8s.stfc.skao.int/$KUBE_NAMESPACE/osd/api/v1`
 
 
-## Flask
-To start the Flask server run the following command in a terminal bash prompt
+## FastAPI
+To start the FastAPI server run the following command in a terminal bash prompt
 
 ```
-python src/ska_ost_osd/rest/wsgi.py
+fastapi run src/ska_ost_osd/app.py
 ```
 
-Alternatively use the following command
+After starting FastAPI server you can view swagger UI on below URL on local environment:
 
-```
-make rest
-```
+http://0.0.0.0:8000/ska-ost-osd/osd/api/<MAJOR_VERSION>/ui/
 
 # Configuring Semantic Validation
 
@@ -113,7 +111,7 @@ An explanation of validation strictness levels and configuring OSD semantic vali
 
 # Publish tmdata
 
-Now OSD is handling releases separately for tmdata and ska-ost-osd codebase. 
+Now OSD is handling releases separately for tmdata and ska-ost-osd codebase.
 User can now update tmdata with the help of [ OSD UI editor](https://k8s.stfc.skao.int/ska-oso-integration/osd) and publish it separately on artefact repository with enabling `push_to_gitlab` environment variable to "1".
 
 `push_to_gitlab` environment variable configured into values.yaml in chart directory
