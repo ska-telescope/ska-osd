@@ -26,3 +26,4 @@ Dockerfile
 .release
 .gitlab-ci.yml
 .gitignore
+.pre-commit-config.yaml
