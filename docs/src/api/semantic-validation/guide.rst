@@ -880,16 +880,17 @@ In below example added extra dish into 'receptor_ids' currently allowed 4, due t
 Semantic Validation Success Response With Error
 
 .. code-block:: json
+
     {
-          "result_data":
-            [
-                "receptor_ids are too many!Current Limit is 4",
-                "length of receptor_ids should be same as length of receptors",
-                "receptor_ids did not match receptors",
-            ]
-          ,
-          "result_status": "failed",
-          "result_code": 422
+    "result_data":
+      [
+          "receptor_ids are too many! Current Limit is 4",
+          "length of receptor_ids should be same as length of receptors",
+          "receptor_ids did not match receptors",
+      ]
+    ,
+    "result_status": "failed",
+    "result_code": 422
     }
 
 * Example 3: valid SBD-Mid JSON input.
@@ -897,7 +898,7 @@ Semantic Validation Success Response With Error
 .. code-block:: json
 
     {
-  "observing_command_input": {
+    "observing_command_input": {
     "interface": "https://schema.skao.int/ska-oso-pdm-sbd/0.1",
     "sbd_id": "sbi-mvp01-20200325-00001",
     "telescope": "ska_mid",
@@ -1420,7 +1421,7 @@ Semantic Validation Success Response for SBD-Mid input.
 
 .. code-block:: json
 
-   {
+  {
   "observing_command_input": {
     "interface": "https://schema.skao.int/ska-oso-pdm-sbd/0.1",
     "sbd_id": "sbi-mvp01-20200325-00001",
@@ -1933,7 +1934,7 @@ Semantic Validation Success Response With Error for SBD-Mid input.
 
 .. code-block:: json
 
-     {
+    {
       "result_data": [
         "Invalid input for freq_min",
         "Invalid input for freq_max",
@@ -1953,11 +1954,11 @@ Semantic Validation Error Response
 
 .. code-block:: json
 
-        {
-          "result_data": "Missing field(s): body.observing_command_input",
-          "result_status": "failed",
-          "result_code": 422
-        }
+    {
+      "result_data": "Missing field(s): body.observing_command_input",
+      "result_status": "failed",
+      "result_code": 422
+    }
 
 * Example 6:   'raise_semantic' and 'osd_data' both are optional parameters.
   So, if user do not pass these parameters, then API will take as default value of 'raise_semantic'
@@ -2417,4 +2418,4 @@ Getting error as observing_command_input is required field
   "result_data": "Missing field(s): body.observing_command_input",
   "result_status": "failed",
   "result_code": 422
-}
+  }
