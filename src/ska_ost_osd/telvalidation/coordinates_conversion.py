@@ -104,39 +104,48 @@ def ra_dec_to_az_el(
     """Calculates az el in degrees from ra dec at a given time for the
     specified telescope.
 
-    Returns:
-        list: A list containing the following:
-            - index 0: Azimuth in degrees.
-            - index 1: Elevation in degrees.
-            - index 2: `info_isvisible` (bool): True if the source is visible
-            (i.e., elevation is above or equal to `el_limit`) at the given time,
-            otherwise False.
-
-    Args:
-        telesc (str): "mid" for Mid or "low" for Low telescope.
-        ra (float): Right Ascension in degrees (e.g., 123.5 for 123d30').
-            If provided in hh:mm:ss format, convert to degrees before passing.
-        dec (float): Declination in degrees with decimal precision.
-        obs_time (str): Observation time as a string when the source position
-            (azimuth and elevation) should be calculated.
-            Example: '2023-04-18 20:12:18'.
-        time_format (str): Format of the observation time. Should be one of
-            `astropy.time.Time.FORMATS`. Default is "iso".
-        if_set (bool): Boolean value for if_set
-        time_scale (str): Time scale of the observation time. Should be one of
-            `astropy.time.Time.SCALES`. Default is "utc".
-        coord_frame (str): Astronomical coordinate system to be used
-            (e.g., "icrs", "fk5", etc.).
-        el_limit (float): Elevation limit in degrees. Telescope cannot observe
-            below this elevation.
-        prec (float): Precision in degrees to match elevation with `el_limit`.
-            Default is 0.0001 degrees (i.e., < 1 arcsecond).
-        max_iter (int): Maximum number of iterations the root finder can use
-            before stopping or reaching the required precision. Default is 200.
-            Set higher only if suggested by output messages.
-            A separate message is generated if the root finder fails to converge
-            from the given starting time.
-        tm_data: Telemodel TM data object used to load semantic validation JSON.
+    :param telesc: "mid" for Mid or "low" for Low telescope.
+    :type telesc: str
+    :param ra: Right Ascension in degrees (e.g., 123.5 for 123d30').
+        If provided in hh:mm:ss format, convert to degrees before passing.
+    :type ra: float
+    :param dec: Declination in degrees with decimal precision.
+    :type dec: float
+    :param obs_time: Observation time as a string when the source position
+        (azimuth and elevation) should be calculated.
+        Example: '2023-04-18 20:12:18'.
+    :type obs_time: str
+    :param time_format: Format of the observation time. Should be one of
+        `astropy.time.Time.FORMATS`. Default is "iso".
+    :type time_format: str
+    :param if_set: Boolean value for if_set
+    :type if_set: bool
+    :param time_scale: Time scale of the observation time. Should be one of
+        `astropy.time.Time.SCALES`. Default is "utc".
+    :type time_scale: str
+    :param coord_frame: Astronomical coordinate system to be used
+        (e.g., "icrs", "fk5", etc.).
+    :type coord_frame: str
+    :param el_limit: Elevation limit in degrees. Telescope cannot observe
+        below this elevation.
+    :type el_limit: float
+    :param prec: Precision in degrees to match elevation with `el_limit`.
+        Default is 0.0001 degrees (i.e., < 1 arcsecond).
+    :type prec: float
+    :param max_iter: Maximum number of iterations the root finder can use
+        before stopping or reaching the required precision. Default is 200.
+        Set higher only if suggested by output messages.
+        A separate message is generated if the root finder fails to converge
+        from the given starting time.
+    :type max_iter: int
+    :param tm_data: Telemodel TM data object used to load semantic validation JSON.
+    :returns: A list containing the following:
+        - index 0: Azimuth in degrees.
+        - index 1: Elevation in degrees.
+        - index 2: `info_isvisible` (bool): True if the source is visible
+        (i.e., elevation is above or equal to `el_limit`) at the given time,
+        otherwise False.
+    :rtype: list
     """
     earth_location = None
     if str.lower(telesc) == "mid":
