@@ -5,7 +5,7 @@
     "version": "0.1.0"
   },
   "paths": {
-    "/dev-ska-ost-osd-nak-1313-osd-fastapi-migration-feature/osd/api/v3/osd": {
+    "/dev-ska-ost-osd-nak-1313-osd-fastapi-migration-feature/osd/api/v4/osd": {
       "get": {
         "tags": [
           "OSD"
@@ -304,7 +304,7 @@
         }
       }
     },
-    "/dev-ska-ost-osd-nak-1313-osd-fastapi-migration-feature/osd/api/v3/osd_release": {
+    "/dev-ska-ost-osd-nak-1313-osd-fastapi-migration-feature/osd/api/v4/osd_release": {
       "post": {
         "tags": [
           "OSD"
@@ -363,7 +363,7 @@
         }
       }
     },
-    "/dev-ska-ost-osd-nak-1313-osd-fastapi-migration-feature/osd/api/v3/cycle": {
+    "/dev-ska-ost-osd-nak-1313-osd-fastapi-migration-feature/osd/api/v4/cycle": {
       "get": {
         "tags": [
           "OSD"
@@ -385,7 +385,7 @@
         }
       }
     },
-    "/dev-ska-ost-osd-nak-1313-osd-fastapi-migration-feature/osd/api/v3/semantic_validation": {
+    "/dev-ska-ost-osd-nak-1313-osd-fastapi-migration-feature/osd/api/v4/semantic_validation": {
       "post": {
         "tags": [
           "OSD"
