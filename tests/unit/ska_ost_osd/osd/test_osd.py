@@ -1,8 +1,8 @@
-from importlib.metadata import version
 from unittest.mock import patch
 
 import pytest
 
+from ska_ost_osd.osd.common.utils import get_osd_latest_version
 from ska_ost_osd.osd.models.models import ValidationOnCapabilities
 from ska_ost_osd.osd.osd import get_osd_data, osd_tmdata_source, update_file_storage
 from tests.conftest import tm_data_osd
@@ -84,7 +84,7 @@ def test_validate_gitlab_with_both_invalid_param():
     """This test case checks if the output of the osd_tmdata_source when no
     parameter is given and latest version is returned or not."""
 
-    ost_osd_version = version("ska_ost_osd")
+    ost_osd_version = get_osd_latest_version()
 
     msg = f"car:ost/ska-ost-osd?{ost_osd_version}#tmdata"
     tm_data_src, _ = osd_tmdata_source()

@@ -5,6 +5,13 @@ Change Log
 All notable changes to this project will be documented in this file.
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
+4.0.0
+**********
+* Migrated APIs from Flask to FastAPI
+* [BREAKING] Refactored folder structure
+* [BREAKING] Separated OSD and TelValidation modules
+* [BREAKING] Introduced a generalized response format
+
 3.1.1
 **********
 * Fixed version mapping file path issue while checking cycle_id present or not.
