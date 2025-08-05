@@ -1,8 +1,8 @@
 """Created file to maintain OSD Model constants."""
 
-MID_CONSTANT_JSON_FILE_PATH = "ska1_mid/mid_capabilities.json"
-LOW_CONSTANT_JSON_FILE_PATH = "ska1_low/low_capabilities.json"
-POLICIES_CONSTANT_JSON_FILE_PATH = "observatory_policies.json"
+MID_CONSTANT_JSON_FILE_PATH = "ska-ost-capabilities/v0/ska_mid.json"
+LOW_CONSTANT_JSON_FILE_PATH = "ska-ost-capabilities/v0/ska_low.json"
+POLICIES_CONSTANT_JSON_FILE_PATH = "ska-ost-observatory-policies/v0/policies.json"
 RELEASE_FILE = "tmdata/version_mapping/latest_release.txt"
 RELEASE_FILE_PATH_LATEST = "version_mapping/latest_release.txt"
 VERSION_FILE_PATH = "version_mapping/cycle_gitlab_release_version_mapping.json"
@@ -38,9 +38,9 @@ QUERY_FIELDS = [
     "array_assembly",
 ]
 
-MID_CAPABILITIES_JSON_PATH = "tmdata/ska1_mid/mid_capabilities.json"
-LOW_CAPABILITIES_JSON_PATH = "tmdata/ska1_low/low_capabilities.json"
-OBSERVATORY_POLICIES_JSON_PATH = "tmdata/observatory_policies.json"
+MID_CAPABILITIES_JSON_PATH = "tmdata/ska-ost-capabilities/v0/ska_mid.json"
+LOW_CAPABILITIES_JSON_PATH = "tmdata/ska-ost-capabilities/v0/ska_low.json"
+OBSERVATORY_POLICIES_JSON_PATH = "tmdata/ska-ost-observatory-policies/v0/policies.json"
 CYCLE_TO_VERSION_MAPPING = "tmdata/version_mapping/latest_release.txt"
 RELEASE_VERSION_MAPPING = (
     "tmdata/version_mapping/cycle_gitlab_release_version_mapping.json"

@@ -118,8 +118,8 @@ def push_to_gitlab(
                 current_dir = Path(__file__).resolve().parent
                 project_root = current_dir.parent.parent.parent
                 src_path = project_root / src_path
-                if src_path.name == "mid_capabilities.json":
-                    src_path = Path("tmdata/ska1_mid/mid_capabilities.json")
+                if src_path.name == "ska_mid.json":
+                    src_path = Path("tmdata/ska-ost-capabilities/v0/ska_mid.json")
                 git_repo.add_data(src_path, target_path)
 
             # Commit and push
