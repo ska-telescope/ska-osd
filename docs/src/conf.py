@@ -20,7 +20,15 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath("../../src"))
-autodoc_mock_imports = ["astropy", "gitlab", "simpleeval", "ska_telmodel", "pydantic"]
+autodoc_mock_imports = [ "astropy", 
+    "gitlab", 
+    "simpleeval", 
+    "ska_telmodel", 
+    "pydantic",
+    "requests",
+    "ska_ser_logging",
+    "ska_ser_skuid",
+    "fastapi"]
 
 # -- General configuration ------------------------------------------------
 
