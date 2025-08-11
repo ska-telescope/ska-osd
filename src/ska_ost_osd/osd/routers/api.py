@@ -55,7 +55,7 @@ osd_router = APIRouter(prefix="")
 
 
 @osd_router.get(
-    "/osd",
+    "/osd_get_data",
     summary="Get OSD data filter by the query parameter",
     description="""Retrieves the OSD cycle_id data which match the query
     parameters. Also requests without parameters will take
@@ -82,7 +82,7 @@ def get_osd(osd_model: OSDQueryParams = Depends()) -> Dict:
 
 
 @osd_router.put(
-    "/osd",
+    "/osd_put_data",
     summary="Update OSD data filter by the query parameter",
     description="""Update the OSD data which match the query
     parameters. Also requests without parameters will take example

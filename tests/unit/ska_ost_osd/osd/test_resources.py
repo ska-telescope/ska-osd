@@ -66,7 +66,7 @@ class TestResources:
         params = {"cycle_id": 1, "array_assembly": "AA0", "capabilities": "mid"}
 
         response = client_put(
-            f"{BASE_API_URL}/osd",
+            f"{BASE_API_URL}/osd_put_data",
             params=params,
             json=body,
         ).json()

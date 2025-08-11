@@ -106,7 +106,7 @@ def test_invalid_osd_tmdata_source(
     }
 
     response = client_get(
-        f"{BASE_API_URL}/osd",
+        f"{BASE_API_URL}/osd_get_data",
         params=remove_none_params(params),
     ).json()
 
@@ -127,7 +127,7 @@ def test_osd_endpoint(client_get, mock_mid_data):
         expected OSD data or returns an error status code.
     """
     response = client_get(
-        f"{BASE_API_URL}/osd",
+        f"{BASE_API_URL}/osd_get_data",
         params={
             "source": "file",
             "capabilities": "mid",
@@ -152,7 +152,7 @@ def test_invalid_osd_tmdata_source_capabilities(client_get):
     """
 
     response = client_get(
-        f"{BASE_API_URL}/osd",
+        f"{BASE_API_URL}/osd_get_data",
         params={
             "cycle_id": 1,
             "osd_version": "1.1.0",
@@ -172,7 +172,7 @@ def test_osd_source(client_get):
     """This function tests that a request with an OSD source as car ."""
 
     response = client_get(
-        f"{BASE_API_URL}/osd", params={"cycle_id": 1, "source": "car"}
+        f"{BASE_API_URL}/osd_get_data", params={"cycle_id": 1, "source": "car"}
     )
     error_msg = {
         "detail": (
@@ -327,7 +327,7 @@ def test_mid_low_response(
     }
 
     response = client_get(
-        f"{BASE_API_URL}/osd",
+        f"{BASE_API_URL}/osd_get_data",
         params=remove_none_params(params),
     ).json()
 
@@ -371,7 +371,7 @@ def test_invalid_cycle_id(
     }
 
     response = client_get(
-        f"{BASE_API_URL}/osd",
+        f"{BASE_API_URL}/osd_get_data",
         params=params,
     ).json()
 
