@@ -70,7 +70,8 @@ def get_osd(osd_model: OSDQueryParams = Depends()) -> Dict:
     """This function takes query parameters and OSD data source objects to
     generate a response containing matching OSD data.
 
-    :param osd_model (OSDQueryParams): OSD query params model with required fields.
+    :param osd_model (OSDQueryParams): OSD query params model with
+        required fields.
     :returns dict: A dictionary with OSD data satisfying the query.
     """
     try:
@@ -96,19 +97,15 @@ def update_osd_data(
     body: Dict = Body(example=load_json_from_file(SWAGGER_MID_OSD_DATA_JSON_FILE_PATH)),
     osd_model: OSDUpdateModel = Depends(),
 ) -> Dict:
-    """This function updates the input JSON against the schema.
+    """Update the input JSON against the schema.
 
-    Args:
-        body (Dict): A dictionary containing key-value pairs of
+    :param body: Dict, dictionary containing key-value pairs of
         parameters required for validation.
-        osd_model: pydantic model with fields
-        cycle_id, array_assembly and capabilities
-
-    Returns:
-        Dict: A dictionary with OSD data satisfying the query.
-
-    Raises:
-        ValueError: If data validation or business logic checks fail
+    :param osd_model: OSDUpdateModel, pydantic model with fields
+        cycle_id, array_assembly, and capabilities.
+    :return: Dict, dictionary with OSD data satisfying the query.
+    :raises ValueError: If data validation or business logic checks
+        fail.
     """
     # Handle the simpler case first - when no cycle_id is present
     if not osd_model.cycle_id:
@@ -157,12 +154,13 @@ def release_osd_data(
 ) -> ApiResponse[OSDRelease]:
     """Release OSD data with automatic version increment based on cycle ID.
 
-    Args:
-        - cycle_id: Required. The cycle ID for version mapping
-        - release_type: Required. Type of release ('major' or 'minor')
-
-    Returns:
-        ApiResponse[OSDRelease]: Response containing the new version information
+    :param cycle_id: int, the cycle ID for version mapping.
+    :param release_type: Optional[ReleaseType], type of release ("major"
+        or "minor").
+    :return: ApiResponse[OSDRelease], response containing the new
+        version information.
+    :raises ValueError: If release_type is provided and is not "major"
+        or "minor".
     """
 
     cycle_id = f"cycle_{cycle_id}"
@@ -211,10 +209,10 @@ def release_osd_data(
     response_model=ApiResponse,
 )
 def get_cycle_list() -> ApiResponse[CycleModel]:
-    """GET list of all available proposal cycles.
+    """Get the list of all available proposal cycles.
 
-    Returns:
-        ApiResponse: Response model containing list of cycle numbers
+    :return: ApiResponse[CycleModel], response model containing the list
+        of cycle numbers.
     """
     # TODO: instead of relying on RELEASE_VERSION_MAPPING file
     # we should find better approach to find out cycles
@@ -236,11 +234,10 @@ def get_cycle_list() -> ApiResponse[CycleModel]:
 
 
 def handle_validation_error(err: object) -> list:
-    """This function handles validation errors and returns a list of error
-    details.
+    """Handle validation errors and return a list of error details.
 
-    :param err: error raised from exception
-    :returns: List of errors
+    :param err: object, error raised from an exception.
+    :return: list, list of errors.
     """
     if isinstance(err, RuntimeError):
         raise RuntimeError(err.args[0])

@@ -10,7 +10,10 @@ LOGGER = logging.getLogger(__name__)
 
 
 class SchematicValidationError(ValueError):
-    """Class to accept the various error messages from validator module."""
+    """Class to accept various error messages from the validator module.
+
+    :param message: str, error message (default: "Undefined error").
+    """
 
     def __init__(self, message="Undefined error", **_):
         self.message = message
@@ -18,7 +21,12 @@ class SchematicValidationError(ValueError):
 
 
 class SchemanticValidationKeyError(KeyError):
-    """Class to raise invalid input key for schemantic validation."""
+    """Class to raise invalid input key errors for schematic validation.
+
+    :param message: str, error message (default: "It seems there is an
+        issue with Validator JSON schema file, Please check and correct
+        the JSON keys and try again.").
+    """
 
     # flake8: noqa E501
     def __init__(
@@ -33,8 +41,13 @@ class SchemanticValidationKeyError(KeyError):
 async def schematic_validation_error_handler(
     _: Request, err: SchematicValidationError
 ) -> JSONResponse:
-    """A custom handler function to deal with SchematicValidationError raised
-    while schema validation return the correct HTTP response."""
+    """Handle SchematicValidationError raised during schema validation and
+    return the appropriate HTTP response.
+
+    :param _: Request, the incoming HTTP request.
+    :param err: SchematicValidationError, the validation error raised.
+    :return: JSONResponse, HTTP response with error details.
+    """
 
     LOGGER.exception("Semantic Validation Error")
     error_list = err.message.split("\n")

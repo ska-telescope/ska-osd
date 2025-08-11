@@ -13,7 +13,10 @@ logger = logging.getLogger(__name__)
 
 
 def get_project_root() -> Path:
-    """Get the project root directory."""
+    """Get the project root directory.
+
+    :return: Path, the absolute path to the project root directory.
+    """
     current_dir = Path(__file__).resolve().parent.parent
     return current_dir.parent.parent.parent
 
@@ -22,11 +25,8 @@ def check_file_modified(file_path: Path) -> bool:
     """Check if a file has been modified by comparing its size with the
     original.
 
-    Args:
-        file_path: Path to the file to check
-
-    Returns:
-        bool: True if file was modified, False otherwise
+    :param file_path: Path, the path to the file to check.
+    :return: bool, True if the file was modified, False otherwise.
     """
     if not file_path.exists():
         return False
@@ -40,7 +40,16 @@ def check_file_modified(file_path: Path) -> bool:
 
 
 def setup_gitlab_access():
-    """Set up GitLab SSH access with proper host key verification."""
+    """Set up GitLab SSH access with proper host key verification.
+
+    This function configures the local SSH environment so that the system can
+    securely connect to GitLab via SSH. It ensures that the `.ssh` directory
+    exists with the correct permissions, adds GitLab's host key to the
+    `known_hosts` file for host verification, and writes a private SSH key
+    (retrieved from the `ID_RSA` environment variable) to the `id_rsa` file.
+
+    :return: None
+    """
     ssh_dir = Path.home() / ".ssh"
     known_hosts_file = ssh_dir / "known_hosts"
 
@@ -73,16 +82,28 @@ def setup_gitlab_access():
 def push_to_gitlab(
     files_to_add: List[Tuple[Path, str]], commit_msg: str, branch_name: str = None
 ) -> None:
-    """Push files to GitLab repository.
+    """Push modified files to a GitLab repository.
 
-    Args:
-        files_to_add: List of tuples containing (source_path, target_path)
-        commit_msg: Commit message
-        branch_name: Branch name
+    This function automates the process of pushing files to a GitLab
+    repository. It sets up SSH access to GitLab, optionally creates or
+    switches to a branch, filters the given file list to include only
+    modified files, stages them in the repository, commits with the
+    given message, and pushes to GitLab.
 
-    Raises:
-        GitLabError: If there are any issues with GitLab operations
-        ValueError: If the branch already exists or other validation errors
+    If a branch name is provided and does not exist, a new branch will
+    be created. If it already exists, the function will log an error and
+    check out the same branch.
+
+    :param files_to_add: List[Tuple[Path, str]], a list of tuples where
+        each tuple contains (source_path, target_path) for files to be
+        committed.
+    :param commit_msg: str, the commit message to use.
+    :param branch_name: str, optional branch name to create or switch to
+        before committing.
+    :return: None
+    :raises GitLabError: If there are any issues with GitLab operations.
+    :raises ValueError: If the branch already exists or if other
+        validation errors occur.
     """
     repo = "ska-telescope/ost/ska-ost-osd"
     id_rsa_path = Path.home() / ".ssh/id_rsa"
@@ -99,7 +120,7 @@ def push_to_gitlab(
                 if str(err) == "Branch Already Exists":
                     logger.error("Branch already exists, try a different branch name")
                     git_repo.checkout_branch(branch_name)
-                    logger.error("Cheking out same branch")
+                    logger.error("Checking out same branch")
 
         modified_files = []
         for src_path, target_path in files_to_add:

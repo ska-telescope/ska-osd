@@ -45,28 +45,21 @@ def semantically_validate_json(
         example=read_json(SWAGGER_SEMANTIC_VALIDATION_JSON_FILE_PATH)
     ),
 ):
-    """This function validates the input JSON semantically.
+    """Validate the input JSON semantically.
 
-    :param body:
-    A dictionary containing key-value pairs of parameters required for semantic
-     validation.
-             -observing_command_input: (required) Input JSON to be validated
-             -interface: Interface version of the input JSON
-             -raise_semantic: (Optional Default True) Raise semantic errors or not
-             -sources: (Optional) TMData source URL (gitlab/car) for Semantic Validation
-             -osd_data: (Optional) OSD data to be used for semantic validation
-
-    :returns: response object that contains the validation
-               results. If the validation is successful, the response will indicate
-               a success status.
-              If the validation fails, the response will include details about the
-              semantic errors found. The HTTP status code of the
-              response will reflect the outcome of the validation
-              (e.g., 200 for success, 400 for bad request if semantic errors
-              are detected).
-
-    :raises: SemanticValidationError: If the input JSON is not
-             semantically valid semantic and raise semantic is true\n
+    :param body: dict, dictionary containing key-value pairs of parameters required for
+    semantic validation.
+        - observing_command_input: (required) Input JSON to be validated.
+        - interface: Interface version of the input JSON.
+        - raise_semantic: Optional[bool], default True, whether to
+        raise semantic errors.
+        - sources: Optional[str], TMData source URL (gitlab/car) for
+        semantic validation.
+        - osd_data: Optional, OSD data to be used for semantic validation.
+    :return: response object, containing validation results with HTTP status reflecting
+    success or errors.
+    :raises SemanticValidationError: If the input JSON is not semantically valid
+    and raise_semantic is True.
     """
 
     error_details = []

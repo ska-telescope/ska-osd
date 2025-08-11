@@ -20,48 +20,38 @@ from .common.error_handling import SchematicValidationError
 
 # various functions
 def get_mid_telescope_mean_location(tm_data: TMData) -> list:
-    """
-    Args:
-        tm_data: Telemodel TM data object using which we can load semantic
-            validation JSON.
+    """Get the mean location of the Mid telescope.
 
-    Returns:
-        list: The mean location of the Mid telescope as a list.
+    :param tm_data: TMData, telemodel TM data object used to load
+        semantic validation JSON.
+    :return: list, the mean location of the Mid telescope.
     """
 
     return get_geocentric_mean_location(MID_LAYOUT_CONSTANT_JSON_FILE_PATH, tm_data)
 
 
 def get_low_telescope_mean_location(tm_data: TMData) -> list:
-    """Retrieves the mean location of the Low telescope from the telemodel
-    data.
+    """Retrieve the mean location of the Low telescope.
 
-    Args:
-        tm_data (TMData): Telemodel TM data object used to load the semantic
-            validation JSON.
-
-    Returns:
-        list: The mean location of the Low telescope
+    :param tm_data: TMData, telemodel TM data object used to load
+        semantic validation JSON.
+    :return: list, the mean location of the Low telescope.
     """
 
     return get_geocentric_mean_location(LOW_LAYOUT_CONSTANT_JSON_FILE_PATH, tm_data)
 
 
 def get_geocentric_mean_location(file_path: str, tm_data: TMData):
-    """Retrieves the mean location of the Mid telescope from the provided
-    telemodel data.
+    """Retrieve the mean location of the telescope from telemodel data.
 
-    Args:
-        file_path (str): Path to the `tm_data` file used to
-        retrieve the data dictionary.
-        tm_data: Telemodel TM data object used to load
-        semantic validation JSON.
-
-    Returns:
-        list: A list containing:
-            - index 0: List of geocentric coordinates [x, y, z].
-            - index 1: An `EarthLocation` object representing the location.
-            - index 2: A `GeodeticLocation` object representing the location.
+    :param file_path: str, path to the tm_data file used to retrieve the
+    data dictionary.
+    :param tm_data: TMData, telemodel TM data object used to load semantic
+    validation JSON.
+    :return: list, containing:
+        - index 0: list of geocentric coordinates [x, y, z].
+        - index 1: EarthLocation object representing the location.
+        - index 2: GeodeticLocation object representing the location.
     """
 
     tm_data = tm_data[file_path].get_dict()
@@ -101,51 +91,27 @@ def ra_dec_to_az_el(
     prec: float = 0.0001,
     max_iter: int = 200,
 ) -> list:
-    """Calculates az el in degrees from ra dec at a given time for the
-    specified telescope.
+    """Calculate azimuth and elevation in degrees from RA and Dec at a given
+    time for a specified telescope.
 
-    :param telesc: "mid" for Mid or "low" for Low telescope.
-    :type telesc: str
-    :param ra: Right Ascension in degrees (e.g., 123.5 for 123d30').
-        If provided in hh:mm:ss format, convert to degrees before passing.
-    :type ra: float
-    :param dec: Declination in degrees with decimal precision.
-    :type dec: float
-    :param obs_time: Observation time as a string when the source position
-        (azimuth and elevation) should be calculated.
-        Example: '2023-04-18 20:12:18'.
-    :type obs_time: str
-    :param time_format: Format of the observation time. Should be one of
-        `astropy.time.Time.FORMATS`. Default is "iso".
-    :type time_format: str
-    :param if_set: Boolean value for if_set
-    :type if_set: bool
-    :param time_scale: Time scale of the observation time. Should be one of
-        `astropy.time.Time.SCALES`. Default is "utc".
-    :type time_scale: str
-    :param coord_frame: Astronomical coordinate system to be used
-        (e.g., "icrs", "fk5", etc.).
-    :type coord_frame: str
-    :param el_limit: Elevation limit in degrees. Telescope cannot observe
-        below this elevation.
-    :type el_limit: float
-    :param prec: Precision in degrees to match elevation with `el_limit`.
-        Default is 0.0001 degrees (i.e., < 1 arcsecond).
-    :type prec: float
-    :param max_iter: Maximum number of iterations the root finder can use
-        before stopping or reaching the required precision. Default is 200.
-        Set higher only if suggested by output messages.
-        A separate message is generated if the root finder fails to converge
-        from the given starting time.
-    :type max_iter: int
-    :param tm_data: Telemodel TM data object used to load semantic validation JSON.
-    :returns: A list containing the following:
-        - index 0: Azimuth in degrees.
-        - index 1: Elevation in degrees.
-        - index 2: `info_isvisible` (bool): True if the source is visible
-        (i.e., elevation is above or equal to `el_limit`) at the given time,
-        otherwise False.
-    :rtype: list
+    :param telesc: str, "mid" for Mid or "low" for Low telescope.
+    :param ra: float, Right Ascension in degrees (convert from hh:mm:ss if needed).
+    :param dec: float, Declination in degrees.
+    :param obs_time: str, observation time (e.g., '2023-04-18 20:12:18').
+    :param el_limit: float, elevation limit in degrees; telescope cannot
+    observe below this.
+    :param tm_data: TMData, telemodel TM data object used to load semantic
+    validation JSON.
+    :param time_format: str, format of observation time, default "iso".
+    :param if_set: bool, optional boolean flag (default False).
+    :param time_scale: str, time scale of observation time, default "utc".
+    :param coord_frame: str, astronomical coordinate system (e.g., "icrs", "fk5").
+    :param prec: float, precision in degrees for elevation matching, default 0.0001.
+    :param max_iter: int, max iterations for root finder, default 200.
+    :return: list containing:
+        - index 0: azimuth in degrees,
+        - index 1: elevation in degrees,
+        - index 2: info_isvisible (bool), True if elevation ≥ el_limit, else False.
     """
     earth_location = None
     if str.lower(telesc) == "mid":
@@ -180,21 +146,21 @@ def ra_dec_to_az_el(
 def __get_info(
     observing_time, az_alt, prec, max_iter, el_limit, coord, earth_location
 ) -> list:
-    """Performs root finding to determine when the elevation just touches the
-    specified elevation limit.
+    """Perform root finding to determine when elevation just touches the
+    specified limit.
 
-    Args:
-        observing_time (astropy.time.Time): The initial observing time.
-        az_alt (list): A list containing azimuth and elevation values.
-        prec (float): Precision threshold for stopping the iteration (in degrees).
-        max_iter (int): Maximum number of iterations allowed.
-        el_limit (float): Elevation limit to compare against (in degrees).
-        coord (astropy.coordinates.SkyCoord): Sky coordinate of the target.
-        earth_location (astropy.coordinates.EarthLocation): Location of the observer.
-
-    Returns:
-        list: The original `az_alt` list, possibly appended with
-        [info_date_time, info_secs_remaining, info_msg]
+    :param observing_time: astropy.time.Time, initial observing time.
+    :param az_alt: list, azimuth and elevation values.
+    :param prec: float, precision threshold in degrees for stopping
+        iteration.
+    :param max_iter: int, maximum allowed iterations.
+    :param el_limit: float, elevation limit in degrees.
+    :param coord: astropy.coordinates.SkyCoord, sky coordinate of the
+        target.
+    :param earth_location: astropy.coordinates.EarthLocation, observer
+        location.
+    :return: list, original az_alt list, possibly appended with
+        [info_date_time, info_secs_remaining, info_msg].
     """
 
     temp_t = observing_time
@@ -217,20 +183,14 @@ def __get_info(
 
 
 def ra_degs_from_str_formats(ra_str: str, str_format: int = 1) -> list:
-    """Returns a list containing the Right Ascension (RA) in float format and
-    an error or success message by parsing the input string. The result is
-    returned in the format: [ra_sum, msg].
+    """Parse Right Ascension (RA) string and return RA in degrees with status
+    message.
 
-    Args:
-        ra_str (str): Right Ascension (one of the celestial coordinates in the
-            equatorial system).
-        str_format (int): Integer flag to choose the string format.
-            - 1: hh:mm:ss.ss (default)
-            - 2: dd:mm:ss.ss
-
-    Returns:
-        list: A list containing the parsed RA as a float and either an error
-        or success message.
+    :param ra_str: str, Right Ascension string (e.g., "hh:mm:ss.ss" or "dd:mm:ss.ss").
+    :param str_format: int, string format flag:
+        - 1: hh:mm:ss.ss (default)
+        - 2: dd:mm:ss.ss
+    :return: list, [RA in degrees as float, message string].
     """
 
     ra_list = ra_str.split(":")
@@ -250,17 +210,11 @@ def ra_degs_from_str_formats(ra_str: str, str_format: int = 1) -> list:
 
 
 def dec_degs_str_formats(dec_str: str) -> list:
-    """Returns a list containing the declination in float format and an error
-    or success message by parsing the input string.
+    """Parse declination string and return declination in degrees with status
+    message.
 
-    Args:
-        dec_str (str): Declination (one of the celestial
-        coordinates in the equatorial system) in the
-        format ±dd:mm:ss.sss.
-
-    Returns:
-        list: A list containing the parsed declination
-        as a float and either an error or success message.
+    :param dec_str: str, Declination string in format ±dd:mm:ss.sss.
+    :return: list, [declination in degrees as float, message string].
     """
 
     dec_list = dec_str.split(":")
