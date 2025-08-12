@@ -2,13 +2,33 @@ import logging
 from typing import Any, Dict
 
 from fastapi import Request, status
-from fastapi.exceptions import RequestValidationError
+from fastapi.exceptions import RequestValidationError, ResponseValidationError
 from fastapi.responses import JSONResponse
+from gitlab import GitlabGetError
+from pydantic import ValidationError
 
 from ska_ost_osd.common.constant import EXCEPTION_STATUS_MAP
 from ska_ost_osd.common.utils import convert_to_response_object
+from ska_ost_osd.osd.common.error_handling import OSDModelError
+from ska_ost_osd.telvalidation.common.error_handling import (
+    SchematicValidationError,
+    schematic_validation_error_handler,
+)
 
 LOGGER = logging.getLogger(__name__)
+
+
+exception_types = [
+    OSDModelError,
+    SchematicValidationError,
+    RequestValidationError,
+    ResponseValidationError,
+    ValueError,
+    FileNotFoundError,
+    RuntimeError,
+    ValidationError,
+    GitlabGetError,
+]
 
 
 def get_http_status_from_map(exc: Exception) -> int:
@@ -128,3 +148,15 @@ async def generic_exception_handler(_: Request, err: Exception) -> JSONResponse:
         content=result.model_dump(mode="json", exclude_none=True),
         status_code=status_code,
     )
+
+
+class UnifiedExceptionHandler:
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, request: Request, exc: Exception):
+        # Dispatch to different handlers based on exception type
+        if isinstance(exc, SchematicValidationError):
+            return await schematic_validation_error_handler(request, exc)
+        else:
+            return await generic_exception_handler(request, exc)
