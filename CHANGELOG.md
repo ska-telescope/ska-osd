@@ -8,6 +8,7 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 Development
 ***********
 * NAK-1300 Migrate tmdata files to schmea-mapped directories
+* NAK-1300 Update to ska-telmodel 1.23.2 for key aliasing
 
 4.0.0
 **********
