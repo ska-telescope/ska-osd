@@ -1,0 +1,9 @@
+{
+  "instrument/scheduling-block/validation/low_sbd-validation-constants.json": "ska-ost-sbd-validation-rules/v0/ska_low.json",
+  "instrument/scheduling-block/validation/mid_sbd-validation-constants.json": "ska-ost-sbd-validation-rules/v0/ska_mid.json",
+  "instrument/ska1_low/validation/low-validation-constants.json": "ska-ost-observing-command-validation-rules/v0/ska_low.json",
+  "instrument/ska1_mid/validation/mid-validation-constants.json": "ska-ost-observing-command-validation-rules/v0/ska_mid.json",
+  "observatory_policies.json": "ska-ost-observatory-policies/v0/cycle_1.json",
+  "ska1_low/low_capabilities.json": "ska-ost-capabilities/v0/ska_low.json",
+  "ska1_mid/mid_capabilities.json": "ska-ost-capabilities/v0/ska_mid.json"
+}
