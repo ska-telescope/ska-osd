@@ -5,8 +5,8 @@ Change Log
 All notable changes to this project will be documented in this file.
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
-Development
-***********
+4.1.0
+*****
 * NAK-1300 Migrate tmdata files to schmea-mapped directories
 * NAK-1300 Update to ska-telmodel 1.23.2 for key aliasing
 
