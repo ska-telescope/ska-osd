@@ -1,11 +1,17 @@
 from ska_ost_osd.telvalidation.common.constant import CAR_TELMODEL_SOURCE
 from tests.unit.ska_ost_osd.utils import read_json
 
+DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER = read_json(
+    "test_files/default_osd_response.json"
+)
+
 MID_CAPABILITIES_MOCK_DATA = read_json("test_files/mock_mid_capabilities.json")
 
 LOW_CAPABILITIES_MOCK_DATA = read_json("test_files/mock_low_capabilities.json")
 
-OBSERVATORY_POLICIES_MOCK_DATA = read_json("test_files/mock_observatory_policies.json")
+OBSERVATORY_POLICIES_MOCK_DATA = DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER.get(
+    "observatory_policy"
+)
 
 MID_VALIDATION_MOCK_DATA = read_json("test_files/mock-mid-validation-constants.json")
 
@@ -21,23 +27,32 @@ LOW_SBD_VALIDATION_MOCK_DATA = read_json(
 
 MID_OSD_DATA_JSON = read_json("test_files/testfile_mid_osd_data.json")
 
-VALID_MID_ASSIGN_JSON = read_json("test_files/testfile_valid_mid_assign.json")
-INVALID_MID_ASSIGN_JSON = read_json("test_files/testfile_invalid_mid_assign.json")
-VALID_MID_CONFIGURE_JSON = read_json("test_files/testfile_valid_mid_configure.json")
-VALID_MID_SBD_JSON = read_json("test_files/testfile_valid_mid_sbd.json")
-INVALID_MID_SBD_JSON = read_json("test_files/testfile_invalid_mid_sbd.json")
-VALID_LOW_SBD_JSON = read_json("test_files/testfile_valid_low_sbd.json")
-INVALID_LOW_SBD_JSON = read_json("test_files/testfile_invalid_low_sbd.json")
-INVALID_MID_CONFIGURE_JSON = read_json("test_files/testfile_invalid_mid_configure.json")
-VALID_LOW_ASSIGN_JSON = read_json("test_files/testfile_valid_low_assign.json")
-INVALID_LOW_ASSIGN_JSON = read_json("test_files/testfile_invalid_low_assign.json")
-VALID_LOW_CONFIGURE_JSON = read_json("test_files/testfile_valid_low_configure.json")
-INVALID_LOW_CONFIGURE_JSON = read_json("test_files/testfile_invalid_low_configure.json")
+VALID_MID_ASSIGN_JSON = read_json("test_files/testfile_mid_assign.json").get("valid")
+INVALID_MID_ASSIGN_JSON = read_json("test_files/testfile_mid_assign.json").get(
+    "invalid"
+)
+VALID_MID_CONFIGURE_JSON = read_json("test_files/testfile_mid_configure.json").get(
+    "valid"
+)
+VALID_MID_SBD_JSON = read_json("test_files/testfile_mid_sbd.json").get("valid")
+INVALID_MID_SBD_JSON = read_json("test_files/testfile_mid_sbd.json").get("invalid")
+VALID_LOW_SBD_JSON = read_json("test_files/testfile_low_sbd.json").get("valid")
+INVALID_LOW_SBD_JSON = read_json("test_files/testfile_low_sbd.json").get("invalid")
+INVALID_MID_CONFIGURE_JSON = read_json("test_files/testfile_mid_configure.json").get(
+    "invalid"
+)
+VALID_LOW_ASSIGN_JSON = read_json("test_files/testfile_low_assign.json").get("valid")
+INVALID_LOW_ASSIGN_JSON = read_json("test_files/testfile_low_assign.json").get(
+    "invalid"
+)
+VALID_LOW_CONFIGURE_JSON = read_json("test_files/testfile_low_configure.json").get(
+    "valid"
+)
+INVALID_LOW_CONFIGURE_JSON = read_json("test_files/testfile_low_configure.json").get(
+    "invalid"
+)
 capabilities = read_json("test_files/testfile_capabilities.json")
 
-DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER = read_json(
-    "test_files/default_osd_response.json"
-)
 OSD_RESPONSE_WITH_ONLY_CAPABILITIES_PARAMETER = read_json(
     "test_files/osd_response_with_capabilities.json"
 )
