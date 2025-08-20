@@ -13,9 +13,13 @@ OBSERVATORY_POLICIES_MOCK_DATA = DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER.get(
     "observatory_policy"
 )
 
-MID_VALIDATION_MOCK_DATA = read_json("test_files/mock-mid-validation-constants.json")
+MID_VALIDATION_MOCK_DATA = read_json("test_files/mock-validation-constants.json").get(
+    "mid_validation"
+)
 
-LOW_VALIDATION_MOCK_DATA = read_json("test_files/mock-low-validation-constants.json")
+LOW_VALIDATION_MOCK_DATA = read_json("test_files/mock-validation-constants.json").get(
+    "low_validation"
+)
 
 MID_SBD_VALIDATION_MOCK_DATA = read_json(
     "test_files/mock_mid_sbd-validation-constants.json"

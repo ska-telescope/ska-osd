@@ -26,12 +26,20 @@ from tests.unit.ska_ost_osd.common.constant import (
     local_source,
     sources,
 )
-from tests.unit.ska_ost_osd.utils import create_mock_json_files
+from tests.unit.ska_ost_osd.utils import create_mock_json_files, read_json
 
 # flake8: noqa E501
 # pylint: disable=W0621
 OSD_MAJOR_VERSION = version("ska-ost-osd").split(".")[0]
 BASE_API_URL = f"/ska-ost-osd/osd/api/v{OSD_MAJOR_VERSION}"
+
+
+@pytest.fixture
+def create_entity_object():
+    def _create_entity_object(filepath: str):
+        return read_json(filepath)
+
+    return _create_entity_object
 
 
 @pytest.fixture(scope="session")
@@ -224,6 +232,192 @@ def valid_observing_command_input():
 @pytest.fixture
 def invalid_observing_command_input():
     return INVALID_MID_ASSIGN_JSON
+
+
+@pytest.fixture(
+    scope="module",
+    params=[
+        (
+            None,
+            "1.0.0",
+            "car",
+            None,
+            "mid",
+            "AA0.5",
+        ),
+        (
+            None,
+            "1.0.0",
+            "car",
+            None,
+            "low",
+            "AA0.5",
+        ),
+        (
+            None,
+            None,
+            "car",
+            None,
+            "mid",
+            "AA0.5",
+        ),
+        (
+            None,
+            None,
+            "car",
+            None,
+            "low",
+            "AA0.5",
+        ),
+        (
+            None,
+            None,
+            "file",
+            None,
+            "mid",
+            "AA0.5",
+        ),
+        (
+            None,
+            None,
+            "file",
+            None,
+            "low",
+            "AA0.5",
+        ),
+        (
+            None,
+            None,
+            "car",
+            None,
+            "low",
+            "AA1",
+        ),
+        (
+            None,
+            None,
+            "file",
+            None,
+            "mid",
+            "AA1",
+        ),
+        (
+            None,
+            None,
+            "file",
+            None,
+            "low",
+            "AA1",
+        ),
+        (
+            None,
+            None,
+            "car",
+            None,
+            "low",
+            "AA2",
+        ),
+        (
+            None,
+            None,
+            "file",
+            None,
+            "mid",
+            "AA2",
+        ),
+        (
+            None,
+            None,
+            "file",
+            None,
+            "low",
+            "AA2",
+        ),
+        (
+            None,
+            None,
+            "gitlab",
+            "main",
+            "mid",
+            "AA0.5",
+        ),
+        (
+            None,
+            None,
+            "gitlab",
+            "main",
+            "low",
+            "AA0.5",
+        ),
+    ],
+)
+def mid_low_response_input(request):
+    return request.param
+
+
+@pytest.fixture(
+    scope="module",
+    params=[
+        (
+            100000,
+            "1..1.0",
+            "file",
+            "mid",
+            "AAA3",
+            {
+                "result_data": [
+                    "Cycle_id and Array_assembly cannot be used together",
+                    "osd_version 1..1.0 is not valid",
+                    "array_assembly AAA3 is not valid",
+                    "Cycle 100000 is not valid,Available IDs are 1",
+                ],
+                "result_status": "failed",
+                "result_code": 400,
+            },
+        ),
+        (
+            None,
+            None,
+            "file",
+            "mid",
+            "AA100000",
+            {
+                "result_data": [
+                    "Array Assembly AA100000 is not valid,Available Array Assemblies"
+                    " are AA0.5, AA1, AA2"
+                ],
+                "result_status": "failed",
+                "result_code": 400,
+            },
+        ),
+        (
+            1,
+            None,
+            None,
+            None,
+            "AA0.5",
+            {
+                "result_data": ["Cycle_id and Array_assembly cannot be used together"],
+                "result_status": "failed",
+                "result_code": 400,
+            },
+        ),
+        (
+            None,
+            None,
+            None,
+            None,
+            None,
+            {
+                "result_data": ["Either cycle_id or capabilities must be provided"],
+                "result_status": "failed",
+                "result_code": 400,
+            },
+        ),
+    ],
+)
+def invalid_osd_tmdata_source_input(request):
+    return request.param
 
 
 @pytest.fixture
