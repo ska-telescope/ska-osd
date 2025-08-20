@@ -71,6 +71,9 @@ PYTHON_LINE_LENGTH = 88
 # Set python-test make target to run unit tests and not the component tests
 PYTHON_TEST_FILE = tests/unit/
 
+openapi:
+	python -c "from docs.openapi.export_openapi import export_openapi; export_openapi()"
+
 
 # include your own private variables for custom deployment configuration
 -include PrivateRules.mak
