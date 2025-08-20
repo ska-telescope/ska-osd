@@ -233,6 +233,7 @@ def valid_semantic_validation_body(
     return {
         "observing_command_input": valid_observing_command_input,
         "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
+        "array_assembly": "AA0.5",
         "sources": tmdata_source,
         "raise_semantic": True,
         "osd_data": mid_osd_data,
@@ -264,6 +265,7 @@ def invalid_semantic_validation_body(
     return {
         "observing_command_input": invalid_observing_command_input,
         "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
+        "array_assembly": "AA0.5",
         "sources": tmdata_source,
         "raise_semantic": True,
         "osd_data": mid_osd_data,
@@ -309,6 +311,7 @@ def wrong_semantic_validation_parameter_body():
     return {
         "interface": "https://schemka-tmc-assignresources/2.1",
         "raise_semantic": "123",
+        "array_assembly": "AA0.5",
         "sources": "car://gitlab.com/ska-telescope14.1#tmdata",
     }
 
@@ -320,7 +323,7 @@ def wrong_semantic_validation_parameter_value_response():
             "Missing field(s): body.observing_command_input. body.raise_semantic: Input"
             " should be a valid boolean, unable to interpret input, invalid payload:"
             " {'interface': 'https://schemka-tmc-assignresources/2.1',"
-            " 'raise_semantic': '123', 'sources':"
+            " 'raise_semantic': '123', 'array_assembly': 'AA0.5', 'sources':"
             " 'car://gitlab.com/ska-telescope14.1#tmdata'}"
         ),
         "result_status": "failed",

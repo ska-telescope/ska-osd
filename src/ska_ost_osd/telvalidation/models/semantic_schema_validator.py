@@ -1,8 +1,9 @@
 import re
 from typing import Any, Dict, Optional
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, Field, field_validator
 
+from ska_ost_osd.osd.common.constant import ARRAY_ASSEMBLY_PATTERN
 from ska_ost_osd.telvalidation.common.constant import INTERFACE_PATTERN
 
 
@@ -71,6 +72,11 @@ class SemanticValidationModel(BaseModel):
     """
 
     interface: Optional[str] = None
+    array_assembly: Optional[str] = Field(
+        default="AA0.5",
+        pattern=ARRAY_ASSEMBLY_PATTERN,
+        description="Array assembly in format AA[0-9].[0-9]",
+    )
     observing_command_input: Dict[str, Any]
     osd_data: Optional[Dict[str, Any]] = None
     raise_semantic: Optional[bool] = True

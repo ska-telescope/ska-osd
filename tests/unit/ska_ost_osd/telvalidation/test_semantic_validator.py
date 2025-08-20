@@ -390,3 +390,7 @@ def test_passing_only_required_keys(
     expected_response = valid_semantic_validation_response
     res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body).json()
     assert res == expected_response
+
+
+def test_semantic_validate_array_assembly():
+    pass

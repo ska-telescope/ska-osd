@@ -75,6 +75,7 @@ def semantically_validate_json(
         semantic_validate(
             observing_command_input=semantic_model.observing_command_input,
             tm_data=tm_data,
+            array_assembly=semantic_model.array_assembly,
             raise_semantic=semantic_model.raise_semantic,
             interface=semantic_model.interface,
             osd_data=semantic_model.osd_data,
