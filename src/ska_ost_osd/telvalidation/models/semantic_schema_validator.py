@@ -3,7 +3,10 @@ from typing import Any, Dict, Optional
 
 from pydantic import BaseModel, field_validator
 
-from ska_ost_osd.telvalidation.common.constant import INTERFACE_PATTERN
+from ska_ost_osd.telvalidation.common.constant import (
+    CAR_TELMODEL_SOURCE,
+    INTERFACE_PATTERN,
+)
 
 
 class SemanticModel(BaseModel):
@@ -68,23 +71,21 @@ class SemanticValidationModel(BaseModel):
     :param raise_semantic (Optional[bool]): Flag to indicate whether
     semantic validation errors should be raised. Defaults to True.
 
-    :param sources (Optional[str]): An optional string that may
-    reference data sources, including dynamic placeholders such as
-    '{osd_version}'.
+    :param sources (str): A string specifying a TelModel data source.
     """
 
     interface: Optional[str] = None
     observing_command_input: Dict[str, Any]
     osd_data: Optional[Dict[str, Any]] = None
     raise_semantic: Optional[bool] = True
-    sources: Optional[str] = None
+    sources: str = CAR_TELMODEL_SOURCE
 
     @field_validator("sources")
     @classmethod
     def validate_sources_contains_osd_version(cls, v: Optional[str]) -> Optional[str]:
         """sources: Ensures the 'sources' field does not contain an unreplaced
         '{osd_version}' placeholder. Raises a ValueError if present."""
-        if v is not None and "{osd_version}" in v:
+        if "{osd_version}" in v:
             raise ValueError(
                 "Please provide 'osd_version' by replacing '{osd_version}' placeholder"
             )

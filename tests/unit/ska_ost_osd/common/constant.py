@@ -151,7 +151,7 @@ low_sbd_expected_result_for_invalid_data = (
 )
 
 sources = [
-    CAR_TELMODEL_SOURCE[0],
+    CAR_TELMODEL_SOURCE,
     "car:ska-telmodel-data?main",
 ]
 
