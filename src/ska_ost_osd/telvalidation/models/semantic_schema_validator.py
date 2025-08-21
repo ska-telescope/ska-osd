@@ -4,7 +4,10 @@ from typing import Any, Dict, Optional
 from pydantic import BaseModel, Field, field_validator
 
 from ska_ost_osd.osd.common.constant import ARRAY_ASSEMBLY_PATTERN
-from ska_ost_osd.telvalidation.common.constant import INTERFACE_PATTERN
+from ska_ost_osd.telvalidation.common.constant import (
+    CAR_TELMODEL_SOURCE,
+    INTERFACE_PATTERN,
+)
 
 
 class SemanticModel(BaseModel):
@@ -59,16 +62,20 @@ class SemanticValidationModel(BaseModel):
     """Defines the schema for validating semantic input data related to
     observing commands and system configuration.
 
-    :param interface: Optional[str], optional. Command interface type.
-    :param observing_command_input: Dict[str, Any], required. Core input
-        parameters for an observing command.
-    :param osd_data: Optional[Dict[str, Any]], optional. Data fetched
-        from the OSD.
-    :param raise_semantic: Optional[bool], optional. Flag to indicate
-        whether semantic validation errors should be raised. Defaults to
-        True.
-    :param sources: Optional[str], optional. Data sources, may include
-        placeholders such as '{osd_version}'.
+    :param interface (Optional[str]): An optional string representing
+    the command interface type.
+
+    :param observing_command_input (Dict[str, Any]): A required
+    dictionary containing the core input parameters for an observing
+    command.
+
+    :param osd_data (Optional[Dict[str, Any]]): Optional data fetched
+    from the OSD.
+
+    :param raise_semantic (Optional[bool]): Flag to indicate whether
+    semantic validation errors should be raised. Defaults to True.
+
+    :param sources (str): A string specifying a TelModel data source.
     """
 
     interface: Optional[str] = None
@@ -80,14 +87,14 @@ class SemanticValidationModel(BaseModel):
     observing_command_input: Dict[str, Any]
     osd_data: Optional[Dict[str, Any]] = None
     raise_semantic: Optional[bool] = True
-    sources: Optional[str] = None
+    sources: str = CAR_TELMODEL_SOURCE
 
     @field_validator("sources")
     @classmethod
     def validate_sources_contains_osd_version(cls, v: Optional[str]) -> Optional[str]:
         """sources: Ensures the 'sources' field does not contain an unreplaced
         '{osd_version}' placeholder. Raises a ValueError if present."""
-        if v is not None and "{osd_version}" in v:
+        if "{osd_version}" in v:
             raise ValueError(
                 "Please provide 'osd_version' by replacing '{osd_version}' placeholder"
             )

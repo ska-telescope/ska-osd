@@ -90,7 +90,7 @@ def tm_data():
 @pytest.fixture
 def tmdata_source():
     """TMData source URL fixture."""
-    return CAR_TELMODEL_SOURCE[0]
+    return CAR_TELMODEL_SOURCE
 
 
 @pytest.fixture(scope="module")
@@ -461,7 +461,7 @@ def valid_semantic_validation_response():
 @pytest.fixture
 def semantic_validation_disable_response():
     return {
-        "result_data": "Semantic Validation is currently disable",
+        "result_data": "Semantic Validation is currently disabled",
         "result_status": "success",
         "result_code": 200,
     }

@@ -8,7 +8,6 @@ from ska_ost_osd.common.models import ApiResponse
 from ska_ost_osd.common.utils import convert_to_response_object, get_responses
 from ska_ost_osd.osd.routers.api import handle_validation_error, osd_router
 from ska_ost_osd.telvalidation.common.constant import (
-    CAR_TELMODEL_SOURCE,
     SEMANTIC_VALIDATION_DISABLED_MSG,
     SEMANTIC_VALIDATION_VALUE,
     SEMANTICALLY_VALID_JSON_MSG,
@@ -22,10 +21,6 @@ from ska_ost_osd.telvalidation.semantic_validator import (
     VALIDATION_STRICTNESS,
     semantic_validate,
 )
-
-
-def get_tmdata_sources(source):
-    return [source] if source else CAR_TELMODEL_SOURCE  # check source
 
 
 @osd_router.post(
@@ -64,11 +59,7 @@ def semantically_validate_json(
 
     error_details = []
 
-    sources = semantic_model.sources
-    if sources and not isinstance(sources, str):
-        error_details.append("sources must be a string")
-    else:
-        sources = get_tmdata_sources(sources)
+    sources = [semantic_model.sources]
 
     try:
         tm_data = TMData(sources, update=True)
