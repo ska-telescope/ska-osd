@@ -14,6 +14,7 @@ Welcome to ska-ost-osd's documentation!
 
    api/osd/guide
    api/semantic-validation/guide
+   api/semantic-validation/validation-rules-update
 
 Indices and tables
 ==================
