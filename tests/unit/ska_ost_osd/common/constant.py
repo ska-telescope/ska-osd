@@ -7,8 +7,6 @@ MID_CAPABILITIES_MOCK_DATA = "test_files/mock_mid_capabilities.json"
 
 LOW_CAPABILITIES_MOCK_DATA = "test_files/mock_low_capabilities.json"
 
-OBSERVATORY_POLICIES_MOCK_DATA = DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER
-
 VALIDATION_MOCK_DATA = "test_files/mock-validation-constants.json"
 
 MID_SBD_VALIDATION_MOCK_DATA = "test_files/mock_mid_sbd-validation-constants.json"

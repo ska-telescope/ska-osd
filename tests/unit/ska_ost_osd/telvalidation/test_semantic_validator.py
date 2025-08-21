@@ -3,6 +3,7 @@ from datetime import datetime
 from unittest.mock import patch
 
 import pytest
+from fastapi import status
 from ska_telmodel.data import TMData
 from ska_telmodel.schema import example_by_uri
 
@@ -352,5 +353,15 @@ def test_passing_only_required_keys(
     assert res == expected_response
 
 
-def test_semantic_validate_array_assembly():
-    pass
+def test_semantic_validate_invalid_array_assembly(
+    semantic_validation_invalid_array_assembly, client_post
+):
+    """Test semantic validation API response with invalid array assembly."""
+    json_body = semantic_validation_invalid_array_assembly
+    expected_response = (
+        "body.array_assembly: String should match pattern '^AA(\\d+|\\d+\\.\\d+)',"
+        " invalid payload: AAA121"
+    )
+    res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body).json()
+    assert res["result_data"] == expected_response
+    assert res["result_code"] == status.HTTP_422_UNPROCESSABLE_ENTITY

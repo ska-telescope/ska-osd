@@ -13,6 +13,7 @@ from ska_ost_osd.app import create_app
 from ska_ost_osd.osd.osd import osd_tmdata_source
 from ska_ost_osd.telvalidation.common.constant import CAR_TELMODEL_SOURCE
 from tests.unit.ska_ost_osd.common.constant import (
+    DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER,
     INVALID_MID_CONFIGURE_JSON,
     LOW_ASSIGN_JSON,
     LOW_CAPABILITIES_MOCK_DATA,
@@ -24,7 +25,6 @@ from tests.unit.ska_ost_osd.common.constant import (
     MID_OSD_DATA_JSON,
     MID_SBD_JSON,
     MID_SBD_VALIDATION_MOCK_DATA,
-    OBSERVATORY_POLICIES_MOCK_DATA,
     VALID_MID_CONFIGURE_JSON,
     VALIDATION_MOCK_DATA,
     local_source,
@@ -112,7 +112,7 @@ def tm_data_osd(create_entity_object):
 
         create_mock_json_files(
             f"{dirname}/observatory_policies.json",
-            create_entity_object(OBSERVATORY_POLICIES_MOCK_DATA).get(
+            create_entity_object(DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER).get(
                 "observatory_policy"
             ),
         )
@@ -537,6 +537,17 @@ def wrong_semantic_validation_parameter_value_response():
         ),
         "result_status": "failed",
         "result_code": 422,
+    }
+
+
+@pytest.fixture
+def semantic_validation_invalid_array_assembly(valid_observing_command_input):
+    return {
+        "observing_command_input": valid_observing_command_input,
+        "interface": "https://schemka-tmc-assignresources/2.1",
+        "raise_semantic": True,
+        "array_assembly": "AAA121",
+        "sources": "car://gitlab.com/ska-telescope14.1#tmdata",
     }
 
 
