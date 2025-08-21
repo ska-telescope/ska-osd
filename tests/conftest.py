@@ -34,7 +34,7 @@ OSD_MAJOR_VERSION = version("ska-ost-osd").split(".")[0]
 BASE_API_URL = f"/ska-ost-osd/osd/api/v{OSD_MAJOR_VERSION}"
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def create_entity_object():
     def _create_entity_object(filepath: str):
         return read_json(filepath)
@@ -84,22 +84,27 @@ def tmdata_source():
 
 
 @pytest.fixture(scope="module")
-def tm_data_osd():
+def tm_data_osd(create_entity_object):
     with tempfile.TemporaryDirectory("tmdata") as dirname:
         mid_parent = pathlib.Path(dirname, "ska1_mid")
         mid_parent.mkdir(parents=True)
         create_mock_json_files(
-            mid_parent / "mid_capabilities.json", MID_CAPABILITIES_MOCK_DATA
+            mid_parent / "mid_capabilities.json",
+            create_entity_object(MID_CAPABILITIES_MOCK_DATA),
         )
 
         low_parent = pathlib.Path(dirname, "ska1_low")
         low_parent.mkdir(parents=True)
         create_mock_json_files(
-            low_parent / "low_capabilities.json", LOW_CAPABILITIES_MOCK_DATA
+            low_parent / "low_capabilities.json",
+            create_entity_object(LOW_CAPABILITIES_MOCK_DATA),
         )
 
         create_mock_json_files(
-            f"{dirname}/observatory_policies.json", OBSERVATORY_POLICIES_MOCK_DATA
+            f"{dirname}/observatory_policies.json",
+            create_entity_object(OBSERVATORY_POLICIES_MOCK_DATA).get(
+                "observatory_policy"
+            ),
         )
 
         mid_validation_parent = pathlib.Path(
@@ -126,12 +131,12 @@ def tm_data_osd():
         mid_sbd_validation_parent.mkdir(parents=True)
         create_mock_json_files(
             mid_sbd_validation_parent / "mid_sbd-validation-constants.json",
-            MID_SBD_VALIDATION_MOCK_DATA,
+            create_entity_object(MID_SBD_VALIDATION_MOCK_DATA),
         )
 
         create_mock_json_files(
             mid_sbd_validation_parent / "low_sbd-validation-constants.json",
-            LOW_SBD_VALIDATION_MOCK_DATA,
+            create_entity_object(LOW_SBD_VALIDATION_MOCK_DATA),
         )
 
         print(f"Dirname: {dirname} {mid_parent} {os.listdir(dirname)}")
@@ -205,23 +210,23 @@ def mid_osd_data():
 
 
 @pytest.fixture(scope="module")
-def mock_mid_data():
+def mock_mid_data(create_entity_object):
     """This function is used as a fixture for mid json data.
 
     :returns: mid json data
     """
 
-    return MID_CAPABILITIES_MOCK_DATA
+    return create_entity_object(MID_CAPABILITIES_MOCK_DATA)
 
 
 @pytest.fixture(scope="module")
-def mock_low_data():
+def mock_low_data(create_entity_object):
     """This function is used as a fixture for low json data.
 
     :returns: low json data
     """
 
-    return LOW_CAPABILITIES_MOCK_DATA
+    return create_entity_object(LOW_CAPABILITIES_MOCK_DATA)
 
 
 @pytest.fixture

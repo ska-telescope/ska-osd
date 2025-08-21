@@ -14,7 +14,7 @@ from tests.unit.ska_ost_osd.common.constant import (
 
 
 @pytest.mark.parametrize(
-    "capabilities, array_assembly, tmdata, expected",
+    "capabilities, array_assembly, tmdata, file_path",
     [
         (None, None, tm_data_osd, DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER),
         (
@@ -35,7 +35,8 @@ def test_get_osd_data(
     capabilities,
     array_assembly,
     tmdata,  # pylint: disable=W0613
-    expected,
+    file_path,
+    create_entity_object,
     tm_data_osd,  # pylint: disable=W0621
 ):
     """This test case checks the functionality of get_osd_data it converts the
@@ -51,6 +52,7 @@ def test_get_osd_data(
 
     result, _ = get_osd_data(capabilities, array_assembly, tmdata=tm_data_osd)
     result_keys = result["capabilities"].keys()
+    expected = create_entity_object(file_path)
     expected_keys = expected["capabilities"].keys()
 
     assert result_keys == expected_keys

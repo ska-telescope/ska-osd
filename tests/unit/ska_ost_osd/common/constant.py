@@ -1,17 +1,13 @@
 from ska_ost_osd.telvalidation.common.constant import CAR_TELMODEL_SOURCE
 from tests.unit.ska_ost_osd.utils import read_json
 
-DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER = read_json(
-    "test_files/default_osd_response.json"
-)
+DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER = "test_files/default_osd_response.json"
 
-MID_CAPABILITIES_MOCK_DATA = read_json("test_files/mock_mid_capabilities.json")
+MID_CAPABILITIES_MOCK_DATA = "test_files/mock_mid_capabilities.json"
 
-LOW_CAPABILITIES_MOCK_DATA = read_json("test_files/mock_low_capabilities.json")
+LOW_CAPABILITIES_MOCK_DATA = "test_files/mock_low_capabilities.json"
 
-OBSERVATORY_POLICIES_MOCK_DATA = DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER.get(
-    "observatory_policy"
-)
+OBSERVATORY_POLICIES_MOCK_DATA = DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER
 
 MID_VALIDATION_MOCK_DATA = read_json("test_files/mock-validation-constants.json").get(
     "mid_validation"
@@ -21,13 +17,9 @@ LOW_VALIDATION_MOCK_DATA = read_json("test_files/mock-validation-constants.json"
     "low_validation"
 )
 
-MID_SBD_VALIDATION_MOCK_DATA = read_json(
-    "test_files/mock_mid_sbd-validation-constants.json"
-)
+MID_SBD_VALIDATION_MOCK_DATA = "test_files/mock_mid_sbd-validation-constants.json"
 
-LOW_SBD_VALIDATION_MOCK_DATA = read_json(
-    "test_files/mock_low_sbd-validation-constants.json"
-)
+LOW_SBD_VALIDATION_MOCK_DATA = "test_files/mock_low_sbd-validation-constants.json"
 
 MID_OSD_DATA_JSON = read_json("test_files/testfile_mid_osd_data.json")
 
@@ -57,14 +49,12 @@ INVALID_LOW_CONFIGURE_JSON = read_json("test_files/testfile_low_configure.json")
 )
 capabilities = read_json("test_files/testfile_capabilities.json")
 
-OSD_RESPONSE_WITH_ONLY_CAPABILITIES_PARAMETER = read_json(
+OSD_RESPONSE_WITH_ONLY_CAPABILITIES_PARAMETER = (
     "test_files/osd_response_with_capabilities.json"
 )
 
 file_name = "osd_response_with_capabilities_and_array_assembly.json"
-OSD_RESPONSE_WITH_CAPABILITIES_ARRAY_ASSEMBLY_PARAMETER = read_json(
-    f"test_files/{file_name}"
-)
+OSD_RESPONSE_WITH_CAPABILITIES_ARRAY_ASSEMBLY_PARAMETER = f"test_files/{file_name}"
 
 # This is dummy constant json for testing "Invalid rule and error key passed" scenario.
 INVALID_MID_VALIDATE_CONSTANT = {
