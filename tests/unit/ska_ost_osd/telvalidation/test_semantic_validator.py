@@ -23,72 +23,34 @@ from tests.conftest import BASE_API_URL
 from tests.unit.ska_ost_osd.common.constant import (
     ARRAY_ASSEMBLY,
     INPUT_COMMAND_CONFIG,
-    INVALID_LOW_ASSIGN_JSON,
-    INVALID_LOW_CONFIGURE_JSON,
-    INVALID_LOW_SBD_JSON,
-    INVALID_MID_ASSIGN_JSON,
     INVALID_MID_CONFIGURE_JSON,
-    INVALID_MID_SBD_JSON,
     INVALID_MID_VALIDATE_CONSTANT,
-    VALID_LOW_ASSIGN_JSON,
-    VALID_LOW_CONFIGURE_JSON,
-    VALID_LOW_SBD_JSON,
-    VALID_MID_ASSIGN_JSON,
-    VALID_MID_CONFIGURE_JSON,
-    VALID_MID_SBD_JSON,
     capabilities,
-    low_configure_expected_result_for_invalid_data,
-    low_expected_result_for_invalid_data,
-    low_sbd_expected_result_for_invalid_data,
-    mid_configure_expected_result_for_invalid_data,
-    mid_expected_result_for_invalid_data,
-    mid_sbd_expected_result_for_invalid_data,
     sources,
 )
 
 
 @patch("ska_ost_osd.telvalidation.semantic_validator.fetch_capabilities_from_osd")
-@pytest.mark.parametrize(
-    "config, telescope, expected_result, is_exception",
-    [
-        (VALID_MID_ASSIGN_JSON, "MID", True, False),
-        (INVALID_MID_ASSIGN_JSON, "MID", mid_expected_result_for_invalid_data, True),
-        (VALID_LOW_ASSIGN_JSON, "LOW", True, False),
-        (INVALID_LOW_ASSIGN_JSON, "LOW", low_expected_result_for_invalid_data, True),
-        (VALID_MID_CONFIGURE_JSON, "MID", True, False),
-        (
-            INVALID_MID_CONFIGURE_JSON,
-            "MID",
-            mid_configure_expected_result_for_invalid_data,
-            True,
-        ),
-        (VALID_LOW_CONFIGURE_JSON, "LOW", True, False),
-        (
-            INVALID_LOW_CONFIGURE_JSON,
-            "LOW",
-            low_configure_expected_result_for_invalid_data,
-            True,
-        ),
-        (VALID_MID_SBD_JSON, "MID", True, False),
-        (INVALID_MID_SBD_JSON, "MID", mid_sbd_expected_result_for_invalid_data, True),
-        (VALID_LOW_SBD_JSON, "LOW", True, False),
-        (INVALID_LOW_SBD_JSON, "LOW", low_sbd_expected_result_for_invalid_data, True),
-        # # Add more test cases here
-    ],
-)
 def test_semantic_validate_para(
     mock_fetch_capabilities,
-    config,
-    telescope,
-    expected_result,
-    is_exception,
+    semantic_validation_param_input,
     tm_data_osd,
+    create_entity_object,
 ):
     """Parameterized test case to verify semantic validation for different
     inputs.
 
     Test semantic validate assign resource command with valid inputs.
     """
+
+    (
+        config,
+        config_type,
+        telescope,
+        expected_result,
+        is_exception,
+    ) = semantic_validation_param_input
+    config = create_entity_object(config).get(config_type)
     if telescope == "MID":
         osd_capabilities = capabilities["capabilities"]["mid"]
     else:
@@ -141,11 +103,11 @@ def test_validate_schemantic_json_input_keys(mock6):
         )
 
 
-def test_tmc_configure_ra_dec():
+def test_tmc_configure_ra_dec(create_entity_object):
     """Test if error is raised only when target is not possible to be observed
     at given time."""
     # check for a src which is always below 15 degrees for mid telescope
-    config = INVALID_MID_CONFIGURE_JSON
+    config = create_entity_object(INVALID_MID_CONFIGURE_JSON).get("invalid")
     configure_ver = config["interface"]
     config = example_by_uri(configure_ver)
     # check no error is raised for a src which

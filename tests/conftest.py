@@ -13,7 +13,12 @@ from ska_ost_osd.app import create_app
 from ska_ost_osd.osd.osd import osd_tmdata_source
 from ska_ost_osd.telvalidation.common.constant import CAR_TELMODEL_SOURCE
 from tests.unit.ska_ost_osd.common.constant import (
+    INVALID_LOW_ASSIGN_JSON,
+    INVALID_LOW_CONFIGURE_JSON,
+    INVALID_LOW_SBD_JSON,
     INVALID_MID_ASSIGN_JSON,
+    INVALID_MID_CONFIGURE_JSON,
+    INVALID_MID_SBD_JSON,
     LOW_CAPABILITIES_MOCK_DATA,
     LOW_SBD_VALIDATION_MOCK_DATA,
     LOW_VALIDATION_MOCK_DATA,
@@ -22,8 +27,19 @@ from tests.unit.ska_ost_osd.common.constant import (
     MID_SBD_VALIDATION_MOCK_DATA,
     MID_VALIDATION_MOCK_DATA,
     OBSERVATORY_POLICIES_MOCK_DATA,
+    VALID_LOW_ASSIGN_JSON,
+    VALID_LOW_CONFIGURE_JSON,
+    VALID_LOW_SBD_JSON,
     VALID_MID_ASSIGN_JSON,
+    VALID_MID_CONFIGURE_JSON,
+    VALID_MID_SBD_JSON,
     local_source,
+    low_configure_expected_result_for_invalid_data,
+    low_expected_result_for_invalid_data,
+    low_sbd_expected_result_for_invalid_data,
+    mid_configure_expected_result_for_invalid_data,
+    mid_expected_result_for_invalid_data,
+    mid_sbd_expected_result_for_invalid_data,
     sources,
 )
 from tests.unit.ska_ost_osd.utils import create_mock_json_files, read_json
@@ -113,7 +129,7 @@ def tm_data_osd(create_entity_object):
         mid_validation_parent.mkdir(parents=True)
         create_mock_json_files(
             mid_validation_parent / "mid-validation-constants.json",
-            MID_VALIDATION_MOCK_DATA,
+            create_entity_object(MID_VALIDATION_MOCK_DATA).get("mid_validation"),
         )
 
         low_validation_parent = pathlib.Path(
@@ -122,7 +138,7 @@ def tm_data_osd(create_entity_object):
         low_validation_parent.mkdir(parents=True)
         create_mock_json_files(
             low_validation_parent / "low-validation-constants.json",
-            LOW_VALIDATION_MOCK_DATA,
+            create_entity_object(LOW_VALIDATION_MOCK_DATA).get("low_validation"),
         )
 
         mid_sbd_validation_parent = pathlib.Path(
@@ -230,13 +246,13 @@ def mock_low_data(create_entity_object):
 
 
 @pytest.fixture
-def valid_observing_command_input():
-    return VALID_MID_ASSIGN_JSON
+def valid_observing_command_input(create_entity_object):
+    return create_entity_object(VALID_MID_ASSIGN_JSON).get("valid")
 
 
 @pytest.fixture
-def invalid_observing_command_input():
-    return INVALID_MID_ASSIGN_JSON
+def invalid_observing_command_input(create_entity_object):
+    return create_entity_object(INVALID_MID_ASSIGN_JSON).get("invalid")
 
 
 @pytest.fixture(
@@ -533,3 +549,61 @@ def wrong_semantic_validation_parameter_value_response():
 @pytest.fixture
 def valid_only_observing_command_input_in_request_body(valid_observing_command_input):
     return {"observing_command_input": valid_observing_command_input}
+
+
+@pytest.fixture(
+    scope="module",
+    params=[
+        (VALID_MID_ASSIGN_JSON, "valid", "MID", True, False),
+        (
+            INVALID_MID_ASSIGN_JSON,
+            "invalid",
+            "MID",
+            mid_expected_result_for_invalid_data,
+            True,
+        ),
+        (VALID_LOW_ASSIGN_JSON, "valid", "LOW", True, False),
+        (
+            INVALID_LOW_ASSIGN_JSON,
+            "invalid",
+            "LOW",
+            low_expected_result_for_invalid_data,
+            True,
+        ),
+        (VALID_MID_CONFIGURE_JSON, "valid", "MID", True, False),
+        (
+            INVALID_MID_CONFIGURE_JSON,
+            "invalid",
+            "MID",
+            mid_configure_expected_result_for_invalid_data,
+            True,
+        ),
+        (VALID_LOW_CONFIGURE_JSON, "valid", "LOW", True, False),
+        (
+            INVALID_LOW_CONFIGURE_JSON,
+            "invalid",
+            "LOW",
+            low_configure_expected_result_for_invalid_data,
+            True,
+        ),
+        (VALID_MID_SBD_JSON, "valid", "MID", True, False),
+        (
+            INVALID_MID_SBD_JSON,
+            "invalid",
+            "MID",
+            mid_sbd_expected_result_for_invalid_data,
+            True,
+        ),
+        (VALID_LOW_SBD_JSON, "valid", "LOW", True, False),
+        (
+            INVALID_LOW_SBD_JSON,
+            "invalid",
+            "LOW",
+            low_sbd_expected_result_for_invalid_data,
+            True,
+        ),
+        # # Add more test cases here
+    ],
+)
+def semantic_validation_param_input(request):
+    return request.param
