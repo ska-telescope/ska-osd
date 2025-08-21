@@ -5,6 +5,10 @@ Change Log
 All notable changes to this project will be documented in this file.
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
+Development
+***********
+* NAK-1352 Refactor handling of TelModel data sources including default
+
 4.1.0
 *****
 * NAK-1300 Migrate tmdata files to schmea-mapped directories
