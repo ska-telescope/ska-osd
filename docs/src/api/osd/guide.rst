@@ -646,66 +646,78 @@ PUT /osd
 
     .. code:: python
 
+     {
+      "result_data": {
+        "telescope": "Mid",
+        "basic_capabilities": {
+          "dish_elevation_limit_deg": 15,
+          "receiver_information": [
             {
+              "max_frequency_hz": 350000000,
+              "min_frequency_hz": 1050000000,
+              "rx_id": "Band_1"
+            }
+          ]
+        },
         "AA0.5": {
-            "allowed_channel_count_range_max": [
+          "allowed_channel_count_range_max": [
             58982
-            ],
-            "allowed_channel_count_range_min": [
+          ],
+          "allowed_channel_count_range_min": [
             1
-            ],
-            "allowed_channel_width_values": [
+          ],
+          "allowed_channel_width_values": [
             13440
-            ],
-            "available_bandwidth_hz": 800000000,
-            "available_receivers": [
+          ],
+          "available_bandwidth_hz": 800000000,
+          "available_receivers": [
             "Band_1",
             "Band_2"
-            ],
-            "cbf_modes": [
+          ],
+          "cbf_modes": [
             "correlation",
             "pst"
-            ],
-            "max_baseline_km": 1.5,
-            "number_dish_ids": [
+          ],
+          "max_baseline_km": 1.5,
+          "number_dish_ids": [
             "SKA001",
             "SKA036",
             "SKA063",
             "SKA100"
-            ],
-            "number_fsps": 4,
-            "number_meerkat_dishes": 0,
-            "number_meerkatplus_dishes": 0,
-            "number_pss_beams": 0,
-            "number_pst_beams": 1,
-            "number_ska_dishes": 4,
-            "number_zoom_channels": 0,
-            "number_zoom_windows": 0,
-            "ps_beam_bandwidth_hz": 400000000
+          ],
+          "number_fsps": 4,
+          "number_meerkat_dishes": 0,
+          "number_meerkatplus_dishes": 0,
+          "number_pss_beams": 0,
+          "number_pst_beams": 1,
+          "number_ska_dishes": 4,
+          "number_zoom_channels": 0,
+          "number_zoom_windows": 0,
+          "ps_beam_bandwidth_hz": 400000000
         },
         "AA1": {
-            "allowed_channel_count_range_max": [
+          "allowed_channel_count_range_max": [
             58982
-            ],
-            "allowed_channel_count_range_min": [
+          ],
+          "allowed_channel_count_range_min": [
             1
-            ],
-            "allowed_channel_width_values": [
+          ],
+          "allowed_channel_width_values": [
             13440
-            ],
-            "available_bandwidth_hz": 800000000,
-            "available_receivers": [
+          ],
+          "available_bandwidth_hz": 800000000,
+          "available_receivers": [
             "Band_1",
             "Band_2",
             "Band_5a",
             "Band_5b"
-            ],
-            "cbf_modes": [
+          ],
+          "cbf_modes": [
             "correlation",
             "pst"
-            ],
-            "max_baseline_km": 1.5,
-            "number_dish_ids": [
+          ],
+          "max_baseline_km": 1.5,
+          "number_dish_ids": [
             "SKA001",
             "SKA036",
             "SKA046",
@@ -714,25 +726,25 @@ PUT /osd
             "SKA077",
             "SKA081",
             "SKA100"
-            ],
-            "number_fsps": 8,
-            "number_meerkat_dishes": 0,
-            "number_meerkatplus_dishes": 0,
-            "number_pss_beams": 0,
-            "number_pst_beams": 1,
-            "number_ska_dishes": 8,
-            "number_zoom_channels": 0,
-            "number_zoom_windows": 0,
-            "ps_beam_bandwidth_hz": 400000000
+          ],
+          "number_fsps": 9,
+          "number_meerkat_dishes": 0,
+          "number_meerkatplus_dishes": 0,
+          "number_pss_beams": 0,
+          "number_pst_beams": 1,
+          "number_ska_dishes": 8,
+          "number_zoom_channels": 0,
+          "number_zoom_windows": 0,
+          "ps_beam_bandwidth_hz": 400000000
         },
         "AA2": {
-            "allowed_channel_count_range_max": [
+          "allowed_channel_count_range_max": [
             214748647
-            ],
-            "allowed_channel_count_range_min": [
+          ],
+          "allowed_channel_count_range_min": [
             1
-            ],
-            "allowed_channel_width_values": [
+          ],
+          "allowed_channel_width_values": [
             210,
             420,
             840,
@@ -743,45 +755,37 @@ PUT /osd
             26880,
             40320,
             53760
-            ],
-            "available_bandwidth_hz": "800000000.0",
-            "available_receivers": [
+          ],
+          "available_bandwidth_hz": 800000000,
+          "available_receivers": [
             "Band_1",
             "Band_2",
             "Band_5a",
             "Band_5b"
-            ],
-            "cbf_modes": [
+          ],
+          "cbf_modes": [
             "correlation",
             "pst",
             "pss"
-            ],
-            "max_baseline_km": "110.0",
-            "number_dish_ids": [
+          ],
+          "max_baseline_km": 110,
+          "number_dish_ids": [
             "string"
-            ],
-            "number_fsps": 26,
-            "number_meerkat_dishes": 4,
-            "number_meerkatplus_dishes": 0,
-            "number_pss_beams": 384,
-            "number_pst_beams": 6,
-            "number_ska_dishes": 64,
-            "number_zoom_channels": 14880,
-            "number_zoom_windows": 16,
-            "ps_beam_bandwidth_hz": "800000000.0"
-        },
-        "basic_capabilities": {
-            "dish_elevation_limit_deg": "15.0",
-            "receiver_information": [
-            {
-                "max_frequency_hz": "350000000.0",
-                "min_frequency_hz": "1050000000.0",
-                "rx_id": "Band_1"
-            }
-            ]
-        },
-        "telescope": "Mid"
+          ],
+          "number_fsps": 26,
+          "number_meerkat_dishes": 4,
+          "number_meerkatplus_dishes": 0,
+          "number_pss_beams": 384,
+          "number_pst_beams": 6,
+          "number_ska_dishes": 64,
+          "number_zoom_channels": 14880,
+          "number_zoom_windows": 16,
+          "ps_beam_bandwidth_hz": 800000000
         }
+      },
+      "result_status": "success",
+      "result_code": 200
+    }
 
 
 5. Scenarios
@@ -865,10 +869,10 @@ Trigger pipeline with makefile target
 .. note::
 
     The ``push_to_gitlab`` environment variable controls TMData publishing:
-    
+
     - ``push_to_gitlab=0``: Local environment (default) - won't publish to artifact repository
     - ``push_to_gitlab=1``: Publishes TMData to artifact repository
-    
+
     It's not recommended to set this flag to "1" during local testing.
 
 View TMData Releases
