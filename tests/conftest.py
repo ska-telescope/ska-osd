@@ -179,7 +179,7 @@ def validate_gitlab_class():
     return tmdata_source
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def osd_versions():
     """This fixture reads a JSON file containing cycle-to-version mappings,
     extracts all unique versions across all cycles, and returns them as a

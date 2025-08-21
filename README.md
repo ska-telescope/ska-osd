@@ -78,6 +78,15 @@ Run Below command from Command line.
 make osd-pre-release
 ```
 
+To update `openapi.json` file with updated API format and version
+
+Run Below command from Command line.
+
+```
+make openapi
+```
+Above command will update `openapi.json` file content to latest API format
+
 
 # Deployments from CICD
 
