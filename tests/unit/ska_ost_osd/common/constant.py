@@ -9,9 +9,7 @@ LOW_CAPABILITIES_MOCK_DATA = "test_files/mock_low_capabilities.json"
 
 OBSERVATORY_POLICIES_MOCK_DATA = DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER
 
-MID_VALIDATION_MOCK_DATA = "test_files/mock-validation-constants.json"
-
-LOW_VALIDATION_MOCK_DATA = "test_files/mock-validation-constants.json"
+VALIDATION_MOCK_DATA = "test_files/mock-validation-constants.json"
 
 MID_SBD_VALIDATION_MOCK_DATA = "test_files/mock_mid_sbd-validation-constants.json"
 
@@ -19,22 +17,16 @@ LOW_SBD_VALIDATION_MOCK_DATA = "test_files/mock_low_sbd-validation-constants.jso
 
 MID_OSD_DATA_JSON = read_json("test_files/testfile_mid_osd_data.json")
 
-VALID_MID_ASSIGN_JSON = "test_files/testfile_mid_assign.json"
-INVALID_MID_ASSIGN_JSON = "test_files/testfile_mid_assign.json"
+MID_ASSIGN_JSON = "test_files/testfile_mid_assign.json"
 VALID_MID_CONFIGURE_JSON = "test_files/testfile_mid_configure.json"
 
-VALID_MID_SBD_JSON = "test_files/testfile_mid_sbd.json"
-INVALID_MID_SBD_JSON = "test_files/testfile_mid_sbd.json"
-VALID_LOW_SBD_JSON = "test_files/testfile_low_sbd.json"
-INVALID_LOW_SBD_JSON = "test_files/testfile_low_sbd.json"
+MID_SBD_JSON = "test_files/testfile_mid_sbd.json"
+LOW_SBD_JSON = "test_files/testfile_low_sbd.json"
 INVALID_MID_CONFIGURE_JSON = "test_files/testfile_mid_configure.json"
 
-VALID_LOW_ASSIGN_JSON = "test_files/testfile_low_assign.json"
-INVALID_LOW_ASSIGN_JSON = "test_files/testfile_low_assign.json"
+LOW_ASSIGN_JSON = "test_files/testfile_low_assign.json"
 
-VALID_LOW_CONFIGURE_JSON = "test_files/testfile_low_configure.json"
-
-INVALID_LOW_CONFIGURE_JSON = "test_files/testfile_low_configure.json"
+LOW_CONFIGURE_JSON = "test_files/testfile_low_configure.json"
 
 capabilities = read_json("test_files/testfile_capabilities.json")
 

@@ -313,6 +313,11 @@ def test_semantic_validate_api_not_passing_required_keys(
             "valid_semantic_validation_response",
             "osd_data",
         ),
+        (
+            "valid_semantic_validation_body",
+            "valid_semantic_validation_response",
+            "array_assembly",
+        ),
     ],
 )
 def test_not_passing_optional_keys(
