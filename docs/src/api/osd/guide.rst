@@ -849,7 +849,7 @@ TMData releases are now handled separately from the main ska-ost-osd codebase th
 4. **Automated Publishing**: TMData is published automatically through the ``tmdata_publish`` process
 
 API Usage
-^^^^^^^^^
+~~~~~~~~~~
 
 .. code-block:: bash
 
@@ -859,7 +859,7 @@ API Usage
          -d '{"cycle_id": <cycle_number>, "release_type": "minor"}'
 
 Trigger pipeline with makefile target
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: bash
 
@@ -876,7 +876,7 @@ Trigger pipeline with makefile target
     It's not recommended to set this flag to "1" during local testing.
 
 View TMData Releases
-^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~
 
 To view current TMData releases: `TMData Releases <https://gitlab.com/ska-telescope/ost/ska-ost-osd/-/blob/main/tmdata/version_mapping/latest_release.txt?ref_type=heads>`_
 
