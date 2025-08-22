@@ -31,12 +31,6 @@ PYTHONPATH = /src
 # in .readthedocs.yaml as well)
 DOCS_SPHINXOPTS ?= -W --keep-going
 
-docs-pre-build:
-	poetry config virtualenvs.create false
-	poetry install --no-root --only docs
-
-.PHONY: docs-pre-build
-
 IMAGE_TO_TEST = $(CAR_OCI_REGISTRY_HOST)/$(strip $(OCI_IMAGE)):$(VERSION)
 K8S_CHART = ska-ost-osd-umbrella
 
@@ -73,7 +67,6 @@ PYTHON_TEST_FILE = tests/unit/
 
 openapi:
 	python -c "from docs.openapi.export_openapi import export_openapi; export_openapi()"
-
 
 # include your own private variables for custom deployment configuration
 -include PrivateRules.mak
