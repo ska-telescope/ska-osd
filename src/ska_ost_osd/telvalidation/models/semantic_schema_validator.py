@@ -82,7 +82,7 @@ class SemanticValidationModel(BaseModel):
     array_assembly: Optional[str] = Field(
         default="AA0.5",
         pattern=ARRAY_ASSEMBLY_PATTERN,
-        description="Array assembly in format AA[0-9].[0-9]",
+        description="Array assembly in format AA[0-9] or AA[0-9].[0-9]",
     )
     observing_command_input: Dict[str, Any]
     osd_data: Optional[Dict[str, Any]] = None

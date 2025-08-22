@@ -5,15 +5,19 @@ import os
 from importlib.metadata import version
 
 from fastapi import FastAPI
+from fastapi.exceptions import RequestValidationError, ResponseValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from gitlab import GitlabGetError
+from pydantic import ValidationError
 from ska_ser_logging import configure_logging
 
-from ska_ost_osd.common.error_handling import (
-    UnifiedExceptionHandler,
-    exception_types,
-    generic_exception_handler,
-)
+from ska_ost_osd.common.error_handling import generic_exception_handler
+from ska_ost_osd.osd.common.error_handling import OSDModelError
 from ska_ost_osd.osd.routers.api import osd_router
+from ska_ost_osd.telvalidation.common.error_handling import (
+    SchematicValidationError,
+    schematic_validation_error_handler,
+)
 
 KUBE_NAMESPACE = os.getenv("KUBE_NAMESPACE", "ska-ost-osd")
 OSD_MAJOR_VERSION = version("ska-ost-osd").split(".")[0]
@@ -44,9 +48,16 @@ def create_app(production=PRODUCTION) -> FastAPI:
     app.include_router(osd_router, prefix=API_PREFIX, tags=["OSD"])
 
     # Add handlers for different types of error
-    handler_instance = UnifiedExceptionHandler(app)
-    for exc_type in exception_types:
-        app.add_exception_handler(exc_type, handler_instance)
+    # Add handlers for different types of error
+    app.exception_handler(OSDModelError)(generic_exception_handler)
+    app.exception_handler(SchematicValidationError)(schematic_validation_error_handler)
+    app.exception_handler(RequestValidationError)(generic_exception_handler)
+    app.exception_handler(ResponseValidationError)(generic_exception_handler)
+    app.exception_handler(ValueError)(generic_exception_handler)
+    app.exception_handler(FileNotFoundError)(generic_exception_handler)
+    app.exception_handler(RuntimeError)(generic_exception_handler)
+    app.exception_handler(ValidationError)(generic_exception_handler)
+    app.exception_handler(GitlabGetError)(generic_exception_handler)
 
     if not production:
         app.exception_handler(Exception)(generic_exception_handler)
