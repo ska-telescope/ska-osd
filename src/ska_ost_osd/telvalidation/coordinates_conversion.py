@@ -113,6 +113,7 @@ def ra_dec_to_az_el(
         - index 1: elevation in degrees,
         - index 2: info_isvisible (bool), True if elevation ≥ el_limit, else False.
     """
+
     earth_location = None
     if str.lower(telesc) == "mid":
         earth_location = get_mid_telescope_mean_location(tm_data=tm_data)[1]

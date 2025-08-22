@@ -785,7 +785,7 @@ PUT /osd_put_data
       },
       "result_status": "success",
       "result_code": 200
-    }
+     }
 
 5. Scenarios
 

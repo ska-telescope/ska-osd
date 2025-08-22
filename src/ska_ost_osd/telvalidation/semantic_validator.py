@@ -82,6 +82,7 @@ def fetch_capabilities_from_osd(
     :return: Tuple[Dict, Dict], a tuple containing the capabilities and
         basic capabilities dictionaries.
     """
+
     from ska_ost_osd.osd.osd import get_osd_data
 
     if osd_data:
@@ -114,6 +115,7 @@ def get_matched_values_from_basic_capabilities(
     :return: The value associated with the given key, or None if the key
         is not found.
     """
+
     if data is None:
         return None
 
@@ -147,6 +149,7 @@ def replace_matched_capabilities_values(
         dictionary.
     :raises TypeError: If the path does not lead to a dictionary.
     """
+
     current = nested_dict
     for key in path[:-1]:
         if not isinstance(current, dict) or key not in current:
@@ -195,6 +198,7 @@ def build_basic_capabilities_lookup(
             }
         }
     """
+
     capabilities_lookup: Dict[str, Dict[str, Any]] = {}
 
     def collect(node: Any) -> None:
@@ -288,6 +292,7 @@ def fetch_matched_capabilities_from_basic_capabilities(
             'ps_beam_bandwidth_hz': 400000000
         }
     """
+
     if isinstance(capabilities, dict):
         return {
             key: fetch_matched_capabilities_from_basic_capabilities(
@@ -330,6 +335,7 @@ def validate_command_input(
     :return: list, error messages if validation fails; empty list
         otherwise.
     """
+
     semantic_validate_data = tm_data[
         get_validation_data(interface, telescope)
     ].get_dict()
@@ -386,6 +392,7 @@ def semantic_validate(
         if False, only logs errors and returns False.
     :return: bool, True if semantic validation passes, False otherwise.
     """
+
     if int(VALIDATION_STRICTNESS) == SEMANTIC_VALIDATION_VALUE:
         try:
             SemanticModel(
