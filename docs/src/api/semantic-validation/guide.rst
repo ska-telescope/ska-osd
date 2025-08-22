@@ -2429,289 +2429,289 @@ Getting error as observing_command_input is required field
   "result_code": 422
   }
 
-  * Example 8: Passing invalid array_assembly value
+* Example 8: Passing invalid array_assembly value
 
 .. code-block:: json
 
   {
-  "raise_semantic": true,
-  "sources": "car:ost/ska-ost-osd?3.1.1#tmdata",
-  "array_assembly": "AAAA0.5",
-  "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
-  "observing_command_input": {
-    "dish": {
-      "receptor_ids": [
-        "SKA001",
-        "SKA100"
-      ]
-    },
+    "raise_semantic": true,
+    "sources": "car:ost/ska-ost-osd?3.1.1#tmdata",
+    "array_assembly": "AAAA0.5",
     "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
-    "sdp": {
-      "execution_block": {
-        "beams": [
-          {
-            "beam_id": "vis0",
-            "function": "visibilities"
-          }
-        ],
-        "channels": [
-          {
-            "channels_id": "vis_channels",
-            "spectral_windows": [
-              {
-                "count": 14880,
-                "freq_max": 368000000,
-                "freq_min": 350000000,
-                "link_map": [
-                  [
-                    0,
-                    0
-                  ],
-                  [
-                    200,
-                    1
-                  ],
-                  [
-                    744,
-                    2
-                  ],
-                  [
-                    944,
-                    3
-                  ]
-                ],
-                "spectral_window_id": "fsp_1_channels",
-                "start": 0,
-                "stride": 2
-              }
-            ]
-          }
-        ],
-        "context": {},
-        "eb_id": "eb-test-20220916-00000",
-        "fields": [
-          {
-            "field_id": "field_a",
-            "phase_dir": {
-              "dec": [
-                80,
-                0.1
-              ],
-              "ra": [
-                123,
-                0.1
-              ],
-              "reference_frame": "ICRF3",
-              "reference_time": "2023-02-16T01:23:45.678900"
-            },
-            "pointing_fqdn": "low-tmc/telstate/0/pointing"
-          }
-        ],
-        "max_length": 100,
-        "polarisations": [
-          {
-            "corr_type": [
-              "XX",
-              "XY",
-              "YY",
-              "YX"
-            ],
-            "polarisations_id": "all"
-          }
-        ],
-        "scan_types": [
-          {
-            "beams": {
-              "pss1": {
-                "channels_id": "pulsar_channels",
-                "field_id": "field_a",
-                "polarisations_id": "all"
-              },
-              "vis0": {
-                "channels_id": "vis_channels",
-                "polarisations_id": "all"
-              }
-            },
-            "scan_type_id": ".default"
-          },
-          {
-            "beams": {
-              "vis0": {
-                "field_id": "field_a"
-              }
-            },
-            "derive_from": ".default",
-            "scan_type_id": "target:a"
-          }
-        ]
-      },
-      "interface": "https://schema.skao.int/ska-sdp-assignres/0.4",
-      "processing_blocks": [
-        {
-          "parameters": {},
-          "pb_id": "pb-mvp01-20200325-00001",
-          "script": {
-            "kind": "realtime",
-            "name": "vis_receive",
-            "version": "0.1.0"
-          }
-        },
-        {
-          "parameters": {},
-          "pb_id": "pb-mvp01-20200325-00002",
-          "script": {
-            "kind": "realtime",
-            "name": "test_realtime",
-            "version": "0.1.0"
-          }
-        },
-        {
-          "dependencies": [
-            {
-              "kind": [
-                "visibilities"
-              ],
-              "pb_id": "pb-mvp01-20200325-00001"
-            }
-          ],
-          "parameters": {},
-          "pb_id": "pb-mvp01-20200325-00003",
-          "sbi_ids": [
-            "sbi-mvp01-20200325-00001"
-          ],
-          "script": {
-            "kind": "batch",
-            "name": "ical",
-            "version": "0.1.0"
-          }
-        },
-        {
-          "dependencies": [
-            {
-              "kind": [
-                "calibration"
-              ],
-              "pb_id": "pb-mvp01-20200325-00003"
-            }
-          ],
-          "parameters": {},
-          "pb_id": "pb-mvp01-20200325-00004",
-          "script": {
-            "kind": "batch",
-            "name": "dpreb",
-            "version": "0.1.0"
-          }
-        }
-      ],
-      "resources": {
-        "csp_links": [
-          1,
-          2,
-          3,
-          4
-        ],
-        "receptors": [
+    "observing_command_input": {
+      "dish": {
+        "receptor_ids": [
           "SKA001",
           "SKA100"
         ]
-      }
-    },
-    "subarray_id": 1
-  },
-  "osd_data": {
-    "capabilities": {
-      "mid": {
-        "AA0.5": {
-          "allowed_channel_count_range_max": [
-            58982
-          ],
-          "allowed_channel_count_range_min": [
-            1
-          ],
-          "allowed_channel_width_values": [
-            13440
-          ],
-          "available_bandwidth_hz": 800000000,
-          "available_receivers": [
-            "Band_1",
-            "Band_2"
-          ],
-          "cbf_modes": [
-            "correlation",
-            "pst"
-          ],
-          "max_baseline_km": 1.5,
-          "number_dish_ids": [
-            "SKA001",
-            "SKA036",
-            "SKA063",
-            "SKA100"
-          ],
-          "number_fsps": 4,
-          "number_meerkat_dishes": 0,
-          "number_meerkatplus_dishes": 0,
-          "number_pss_beams": 0,
-          "number_pst_beams": 1,
-          "number_ska_dishes": 4,
-          "number_zoom_channels": 0,
-          "number_zoom_windows": 0,
-          "ps_beam_bandwidth_hz": 400000000
-        },
-        "basic_capabilities": {
-          "dish_elevation_limit_deg": 15,
-          "receiver_information": [
+      },
+      "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
+      "sdp": {
+        "execution_block": {
+          "beams": [
             {
-              "max_frequency_hz": 1050000000,
-              "min_frequency_hz": 350000000,
-              "rx_id": "Band_1"
+              "beam_id": "vis0",
+              "function": "visibilities"
+            }
+          ],
+          "channels": [
+            {
+              "channels_id": "vis_channels",
+              "spectral_windows": [
+                {
+                  "count": 14880,
+                  "freq_max": 368000000,
+                  "freq_min": 350000000,
+                  "link_map": [
+                    [
+                      0,
+                      0
+                    ],
+                    [
+                      200,
+                      1
+                    ],
+                    [
+                      744,
+                      2
+                    ],
+                    [
+                      944,
+                      3
+                    ]
+                  ],
+                  "spectral_window_id": "fsp_1_channels",
+                  "start": 0,
+                  "stride": 2
+                }
+              ]
+            }
+          ],
+          "context": {},
+          "eb_id": "eb-test-20220916-00000",
+          "fields": [
+            {
+              "field_id": "field_a",
+              "phase_dir": {
+                "dec": [
+                  80,
+                  0.1
+                ],
+                "ra": [
+                  123,
+                  0.1
+                ],
+                "reference_frame": "ICRF3",
+                "reference_time": "2023-02-16T01:23:45.678900"
+              },
+              "pointing_fqdn": "low-tmc/telstate/0/pointing"
+            }
+          ],
+          "max_length": 100,
+          "polarisations": [
+            {
+              "corr_type": [
+                "XX",
+                "XY",
+                "YY",
+                "YX"
+              ],
+              "polarisations_id": "all"
+            }
+          ],
+          "scan_types": [
+            {
+              "beams": {
+                "pss1": {
+                  "channels_id": "pulsar_channels",
+                  "field_id": "field_a",
+                  "polarisations_id": "all"
+                },
+                "vis0": {
+                  "channels_id": "vis_channels",
+                  "polarisations_id": "all"
+                }
+              },
+              "scan_type_id": ".default"
             },
             {
-              "max_frequency_hz": 1760000000,
-              "min_frequency_hz": 950000000,
-              "rx_id": "Band_2"
-            },
-            {
-              "max_frequency_hz": 3050000000,
-              "min_frequency_hz": 1650000000,
-              "rx_id": "Band_3"
-            },
-            {
-              "max_frequency_hz": 5180000000,
-              "min_frequency_hz": 2800000000,
-              "rx_id": "Band_4"
-            },
-            {
-              "max_frequency_hz": 8500000000,
-              "min_frequency_hz": 4600000000,
-              "rx_id": "Band_5a"
-            },
-            {
-              "max_frequency_hz": 15400000000,
-              "min_frequency_hz": 8300000000,
-              "rx_id": "Band_5b"
+              "beams": {
+                "vis0": {
+                  "field_id": "field_a"
+                }
+              },
+              "derive_from": ".default",
+              "scan_type_id": "target:a"
             }
           ]
+        },
+        "interface": "https://schema.skao.int/ska-sdp-assignres/0.4",
+        "processing_blocks": [
+          {
+            "parameters": {},
+            "pb_id": "pb-mvp01-20200325-00001",
+            "script": {
+              "kind": "realtime",
+              "name": "vis_receive",
+              "version": "0.1.0"
+            }
+          },
+          {
+            "parameters": {},
+            "pb_id": "pb-mvp01-20200325-00002",
+            "script": {
+              "kind": "realtime",
+              "name": "test_realtime",
+              "version": "0.1.0"
+            }
+          },
+          {
+            "dependencies": [
+              {
+                "kind": [
+                  "visibilities"
+                ],
+                "pb_id": "pb-mvp01-20200325-00001"
+              }
+            ],
+            "parameters": {},
+            "pb_id": "pb-mvp01-20200325-00003",
+            "sbi_ids": [
+              "sbi-mvp01-20200325-00001"
+            ],
+            "script": {
+              "kind": "batch",
+              "name": "ical",
+              "version": "0.1.0"
+            }
+          },
+          {
+            "dependencies": [
+              {
+                "kind": [
+                  "calibration"
+                ],
+                "pb_id": "pb-mvp01-20200325-00003"
+              }
+            ],
+            "parameters": {},
+            "pb_id": "pb-mvp01-20200325-00004",
+            "script": {
+              "kind": "batch",
+              "name": "dpreb",
+              "version": "0.1.0"
+            }
+          }
+        ],
+        "resources": {
+          "csp_links": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "receptors": [
+            "SKA001",
+            "SKA100"
+          ]
         }
-      }
+      },
+      "subarray_id": 1
     },
-    "observatory_policy": {
-      "cycle_description": "Science Verification",
-      "cycle_information": {
-        "cycle_id": "SKAO_2027_1",
-        "proposal_close": "2026-05-12T15:00:00.000Z",
-        "proposal_open": "2026-03-27T12:00:00.000Z"
+    "osd_data": {
+      "capabilities": {
+        "mid": {
+          "AA0.5": {
+            "allowed_channel_count_range_max": [
+              58982
+            ],
+            "allowed_channel_count_range_min": [
+              1
+            ],
+            "allowed_channel_width_values": [
+              13440
+            ],
+            "available_bandwidth_hz": 800000000,
+            "available_receivers": [
+              "Band_1",
+              "Band_2"
+            ],
+            "cbf_modes": [
+              "correlation",
+              "pst"
+            ],
+            "max_baseline_km": 1.5,
+            "number_dish_ids": [
+              "SKA001",
+              "SKA036",
+              "SKA063",
+              "SKA100"
+            ],
+            "number_fsps": 4,
+            "number_meerkat_dishes": 0,
+            "number_meerkatplus_dishes": 0,
+            "number_pss_beams": 0,
+            "number_pst_beams": 1,
+            "number_ska_dishes": 4,
+            "number_zoom_channels": 0,
+            "number_zoom_windows": 0,
+            "ps_beam_bandwidth_hz": 400000000
+          },
+          "basic_capabilities": {
+            "dish_elevation_limit_deg": 15,
+            "receiver_information": [
+              {
+                "max_frequency_hz": 1050000000,
+                "min_frequency_hz": 350000000,
+                "rx_id": "Band_1"
+              },
+              {
+                "max_frequency_hz": 1760000000,
+                "min_frequency_hz": 950000000,
+                "rx_id": "Band_2"
+              },
+              {
+                "max_frequency_hz": 3050000000,
+                "min_frequency_hz": 1650000000,
+                "rx_id": "Band_3"
+              },
+              {
+                "max_frequency_hz": 5180000000,
+                "min_frequency_hz": 2800000000,
+                "rx_id": "Band_4"
+              },
+              {
+                "max_frequency_hz": 8500000000,
+                "min_frequency_hz": 4600000000,
+                "rx_id": "Band_5a"
+              },
+              {
+                "max_frequency_hz": 15400000000,
+                "min_frequency_hz": 8300000000,
+                "rx_id": "Band_5b"
+              }
+            ]
+          }
+        }
       },
-      "cycle_number": 2,
-      "cycle_policies": {
-        "normal_max_hours": 100
-      },
-      "telescope_capabilities": {
-        "Low": "AA2",
-        "Mid": "AA2"
+      "observatory_policy": {
+        "cycle_description": "Science Verification",
+        "cycle_information": {
+          "cycle_id": "SKAO_2027_1",
+          "proposal_close": "2026-05-12T15:00:00.000Z",
+          "proposal_open": "2026-03-27T12:00:00.000Z"
+        },
+        "cycle_number": 2,
+        "cycle_policies": {
+          "normal_max_hours": 100
+        },
+        "telescope_capabilities": {
+          "Low": "AA2",
+          "Mid": "AA2"
+        }
       }
     }
   }
-}
 
 Returns invalid payload with required array_assembly pattern
 
@@ -2721,4 +2721,4 @@ Returns invalid payload with required array_assembly pattern
   "result_data": "body.array_assembly: String should match pattern '^AA(\\d+|\\d+\\.\\d+)', invalid payload: AAAA0.5",
   "result_status": "failed",
   "result_code": 422
-}
+    }

@@ -99,9 +99,9 @@ def ra_dec_to_az_el(
     :param dec: float, Declination in degrees.
     :param obs_time: str, observation time (e.g., '2023-04-18 20:12:18').
     :param el_limit: float, elevation limit in degrees; telescope cannot
-    observe below this.
+     observe below this.
     :param tm_data: TMData, telemodel TM data object used to load semantic
-    validation JSON.
+     validation JSON.
     :param time_format: str, format of observation time, default "iso".
     :param if_set: bool, optional boolean flag (default False).
     :param time_scale: str, time scale of observation time, default "utc".
@@ -109,9 +109,9 @@ def ra_dec_to_az_el(
     :param prec: float, precision in degrees for elevation matching, default 0.0001.
     :param max_iter: int, max iterations for root finder, default 200.
     :return: list containing:
-        - index 0: azimuth in degrees,
-        - index 1: elevation in degrees,
-        - index 2: info_isvisible (bool), True if elevation ≥ el_limit, else False.
+     - index 0: azimuth in degrees,
+     - index 1: elevation in degrees,
+     - index 2: info_isvisible (bool), True if elevation ≥ el_limit, else False.
     """
 
     earth_location = None

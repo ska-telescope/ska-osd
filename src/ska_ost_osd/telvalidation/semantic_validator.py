@@ -47,6 +47,7 @@ def get_validation_data(interface: str, telescope: str) -> Optional[str]:
     :return: Optional[str], the validation constant JSON file path, or
         None if not found.
     """
+
     validation_constants = {
         SKA_LOW_TELESCOPE: LOW_VALIDATION_CONSTANT_JSON_FILE_PATH,
         SKA_MID_TELESCOPE: MID_VALIDATION_CONSTANT_JSON_FILE_PATH,
@@ -325,15 +326,12 @@ def validate_command_input(
     :param observing_command_input: dict, user JSON input for semantic
         validation.
     :param tm_data: TMData, the TMData object created externally.
-    :param interface: str, assign/configure resource schema interface
-        name.
-    :param telescope: str, the telescope identifier (e.g., 'mid' or
-        'low').
-    :param array_assembly: str, specific capabilities like 'AA0.5',
-        'AA1'.
+    :param interface: str, assign/configure resource schema interface name.
+    :param telescope: str, the telescope identifier (e.g., 'mid' or 'low').
+    :param array_assembly: str, specific capabilities like 'AA0.5', 'AA1'.
     :param osd_data: dict, externally passed OSD data dictionary.
     :return: list, error messages if validation fails; empty list
-        otherwise.
+    otherwise.
     """
 
     semantic_validate_data = tm_data[
@@ -379,17 +377,17 @@ def semantic_validate(
     """Entry point for semantic validation, usable by other libraries like CDM.
 
     :param observing_command_input: dict, details of the command to validate.
-        This should match the structure expected by `ska_telmodel.schema.validate`.
-        If the command is a JSON string, convert it to a dictionary with
-        `json.loads` first.
+     This should match the structure expected by `ska_telmodel.schema.validate`.
+     If the command is a JSON string, convert it to a dictionary with
+     `json.loads` first.
     :param tm_data: TMData, telemodel data object used to load semantic validation JSON.
     :param osd_data: Optional[dict], externally passed OSD data dictionary.
     :param interface: Optional[str], full interface URI; provide only if missing
-    in `observing_command_input`.
+     in `observing_command_input`.
     :param array_assembly: str, array assembly version like 'AA0.5' or 'AA0.1'.
-    :param raise_semantic: bool, default True. If True, raises
-    `SchematicValidationError` on validation failure;
-        if False, only logs errors and returns False.
+    :param raise_semantic: bool, default True. If True,
+     raises `SchematicValidationError` on validation failure;
+     if False, only logs errors and returns False.
     :return: bool, True if semantic validation passes, False otherwise.
     """
 
