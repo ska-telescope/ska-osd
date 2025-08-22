@@ -834,9 +834,54 @@ Error Handling
 
     All the error_messages are combined in a single string.
 
+TMData Release Process using API.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Release Steps
-~~~~~~~~~~~~~~
+TMData releases are now handled separately from the main ska-ost-osd codebase through an automated process:
+
+1. **Automatic Release via API**: Use the ``POST /osd_release`` endpoint to trigger automated TMData releases
+
+2. **Version Mapping Update**: The release process creates a new entry in ``cycle_gitlab_release_version_mapping.json`` with the new version
+
+3. **Latest Release Update**: Automatically updates ``latest_release.txt`` with the current version
+
+4. **Automated Publishing**: TMData is published automatically through the ``tmdata_publish`` process
+
+API Usage
+~~~~~~~~~~
+
+.. code-block:: bash
+
+    # Trigger TMData release
+    curl -X POST "/ska-ost-osd/osd/api/v<majorversion>/osd_release" \
+         -H "Content-Type: application/json" \
+         -d '{"cycle_id": <cycle_number>, "release_type": "minor"}'
+
+Trigger pipeline with makefile target
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: bash
+
+    # Publish TMData to artifact repository
+    make tmdata-publish
+
+.. note::
+
+    The ``push_to_gitlab`` environment variable controls TMData publishing:
+
+    - ``push_to_gitlab=0``: Local environment (default) - won't publish to artifact repository
+    - ``push_to_gitlab=1``: Publishes TMData to artifact repository
+
+    It's not recommended to set this flag to "1" during local testing.
+
+View TMData Releases
+~~~~~~~~~~~~~~~~~~~~~
+
+To view current TMData releases: `TMData Releases <https://gitlab.com/ska-telescope/ost/ska-ost-osd/-/blob/main/tmdata/version_mapping/latest_release.txt?ref_type=heads>`_
+
+
+Manual tmdata Release Steps
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 1. Create a JIRA issue and the branch
 

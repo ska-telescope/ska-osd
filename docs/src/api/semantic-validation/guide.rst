@@ -286,6 +286,66 @@ below is code sample to call ``semantic_validate()``
         except SchematicValidationError as exc:
             raise exc
 
+* scenario 3
+    For direct integration with OSD API, you can use the router functions:
+
+    .. code-block:: python
+
+        from ska_ost_osd.osd.routers.api import get_osd
+        from ska_ost_osd.osd.models.models import OSDQueryParams 
+        
+        params = OSDQueryParams(cycle=1)
+        osd_data = get_osd(params)
+
+    When querying with cycle=1, the response includes cycle 1 specific data:
+
+    .. code-block:: json
+
+        {
+          "result_data": [
+            {
+              "observatory_policy": {
+                "cycle_number": 1,
+                "cycle_description": "Science Verification",
+                "cycle_information": {
+                  "cycle_id": "SKAO_2027_1",
+                  "proposal_open": "20260327T12:00:00.000Z",
+                  "proposal_close": "20260512T15:00:00.000z"
+                },
+                "cycle_policies": {
+                  "normal_max_hours": 100
+                },
+                "telescope_capabilities": {
+                  "Mid": "AA2",
+                  "Low": "AA2"
+                }
+              },
+              "capabilities": {
+                "mid": {
+                  "basic_capabilities": {
+                    "dish_elevation_limit_deg": 15,
+                    "receiver_information": [
+                      {
+                        "max_frequency_hz": 1050000000,
+                        "min_frequency_hz": 350000000,
+                        "rx_id": "Band_1"
+                      }
+                    ]
+                  },
+                  "AA2": {
+                    "allowed_channel_count_range_max": [214748647],
+                    "allowed_channel_count_range_min": [1],
+                    "available_bandwidth_hz": 800000000,
+                    "available_receivers": ["Band_1", "Band_2"],
+                    "number_ska_dishes": 64
+                  }
+                }
+              }
+            }
+          ]
+        }
+
+
 
 ========================    ================================================================================
 Parameters                   Description
@@ -328,9 +388,6 @@ Limitation
 
 if OSD keys got removed/changed and those are not in validation rule file
 it will raise SchemanticValidationKeyError saying ``Invalid rule and error key passed``
-
-
-
 
 
 Target visibility validation
@@ -400,6 +457,11 @@ The request body should be structure with following parameters:
      - No
      - Interface version of the input JSON.
      - ``"https://schema.skao.int/ska-tmc-assignresources/2.1"``
+   * - ``array_assembly``
+     - string
+     - No
+     - Array assembly in format AA[0-9].[0-9] (default: AA0.5).
+     - ``"AA0.5"``
    * - ``sources``
      - string
      - No
@@ -408,7 +470,7 @@ The request body should be structure with following parameters:
    * - ``raise_semantic``
      - boolean
      - No
-     - Whether to raise a semantic validation error.
+     - Whether to raise a semantic validation error (default: true).
      - ``true``
    * - ``osd_data``
      - object
