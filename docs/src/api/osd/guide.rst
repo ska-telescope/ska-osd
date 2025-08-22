@@ -142,7 +142,7 @@ Low                       file content of ``low_capabilities.json`` with ``basic
 Endpoints
 ~~~~~~~~~~~~~~~~~
 
-GET /osd_get_data
+GET /osd
 ==========================
 
 .. list-table:: OSD REST resources
@@ -153,7 +153,7 @@ GET /osd_get_data
      - Resource URL
      - Description
    * - GET
-     - ``/ska-ost-osd/osd/api/v<majorversion>/osd_get_data/``
+     - ``/ska-ost-osd/osd/api/v<majorversion>/osd/``
      - **Getting Data**
 
        Return the OSD cycle_id data
@@ -180,14 +180,14 @@ GET /osd_get_data
 
 .. code:: python
 
-    "/ska-ost-osd/osd/api/v<majorversion>/osd_get_data?cycle_id=1&capabilities=mid&array_assembly=AA2"
+    "/ska-ost-osd/osd/api/v<majorversion>/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
 
 
 3. CURL Example Request
 
 .. code:: python
 
-    curl -X GET "/ska-ost-osd/osd/api/v<majorversion>/osd_get_data?cycle_id=1&capabilities=mid&array_assembly=AA2"
+    curl -X GET "/ska-ost-osd/osd/api/v<majorversion>/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
 
 
 4. Example Response
@@ -200,7 +200,7 @@ GET /osd_get_data
     .. code:: python
 
         client.get(
-            "/ska-ost-osd/osd/api/v<majorversion>/osd_get_data",
+            "/ska-ost-osd/osd/api/v<majorversion>/osd",
             query_string={
                 "cycle_id": 1,
                 "source": "file",
@@ -578,7 +578,7 @@ POST /osd_release
 
     7. If the API encounters an unexpected server-side error (such as database connection failures, internal processing errors, or system-level issues), the API will return a 500 Internal Server Error status with a generic error message.
 
-PUT /osd_put_data
+PUT /osd
 ==========================
 
 .. list-table:: OSD REST resources
@@ -589,7 +589,7 @@ PUT /osd_put_data
      - Resource URL
      - Description
    * - PUT
-     - ``/ska-ost-osd/osd/api/v<majorversion>/osd_put_data/``
+     - ``/ska-ost-osd/osd/api/v<majorversion>/osd/``
      - **Updating Data**
 
        Update the OSD capabilities data.
@@ -612,14 +612,14 @@ PUT /osd_put_data
 
     .. code:: python
 
-     "/ska-ost-osd/osd/api/v<majorversion>/osd_put_data?cycle_id=1&capabilities=mid&array_assembly=AA2"
+     "/ska-ost-osd/osd/api/v<majorversion>/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
 
 
 3. CURL Example Request
 
     .. code:: python
 
-      curl -X PUT "/ska-ost-osd/osd/api/v<majorversion>/osd_put_data?cycle_id=1&capabilities=mid&array_assembly=AA2"
+      curl -X PUT "/ska-ost-osd/osd/api/v<majorversion>/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
 
 
 4. Example Response
@@ -634,7 +634,7 @@ PUT /osd_put_data
     .. code:: python
 
         client.put(
-            "/ska-ost-osd/osd/api/v<majorversion>/osd_put_data",
+            "/ska-ost-osd/osd/api/v<majorversion>/osd",
             query_string={
                 "cycle_id": 1,
                 "capabilities": "mid",
