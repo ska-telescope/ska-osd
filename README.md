@@ -78,15 +78,15 @@ Run Below command from Command line.
 make osd-pre-release
 ```
 
-To update `openapi.json` file with updated API format and version
+### Post-Release OpenAPI Specification Updates
 
-Run Below command from Command line.
+To ensure the openapi.json file reflects the latest API structure and version, run the following command from the command line:
 
 ```
 make openapi
 ```
-Above command will update `openapi.json` file content to latest API format
 
+This command will regenerate the openapi.json file and update its content to match the most recent API definitions. It will refresh all paths, schemas, and version details to keep the specification consistent with the current implementation.
 
 # Deployments from CICD
 
