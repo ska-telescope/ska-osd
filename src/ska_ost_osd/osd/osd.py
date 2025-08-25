@@ -34,20 +34,21 @@ from .common.constant import (
 
 
 class OSD:
-    """OSD Class for initialing OSD related variables and methods including
-    get_telescope_observatory_policies, get_data and get_osd_data."""
+    """Initialize OSD-related variables and methods, including
+    get_telescope_observatory_policies, get_data, and get_osd_data."""
 
     def __init__(
         self, capabilities: list, array_assembly: str, tmdata: TMData, cycle_id: int
     ) -> None:
-        """This is initializer method for Class OSD.
+        """Initialize the OSD class.
 
-        :param capabilities: mid or low
-        :param array_assembly: in mid there are AA0.5, AA2 and AA1 you
-            can give any one
-        :param tmdata: TMData class object
-        :param cycle_id: cycle_id
-        :returns: None
+        :param capabilities: list, capabilities of the telescope ("mid"
+            or "low").
+        :param array_assembly: str, for "mid" can be one of "AA0.5",
+            "AA2", or "AA1".
+        :param tmdata: TMData, TMData class object.
+        :param cycle_id: int, cycle identifier.
+        :return: None
         """
         self.cycle_id = cycle_id
         self.osd_data = copy.deepcopy(osd_response_template)
@@ -57,11 +58,14 @@ class OSD:
         self.keys_list = {}
 
     def check_capabilities(self, capabilities: list = None) -> None:
-        """This method checks if a given capability exists or not and raises
-        exception.
+        """Check if the given capabilities exist, and raise an exception if
+        not.
 
-        :param capabilities: mid, low, or basic_capability
-        :returns: raises OSDDataException for capabilities
+        :param capabilities: list, capabilities such as "mid", "low", or
+            "basic_capability".
+        :return: None.
+        :raises OSDDataException: If any provided capability does not
+            exist.
         """
 
         capabilities_list = list(osd_file_mapping.keys())[:3]
@@ -78,15 +82,14 @@ class OSD:
         capabilities: list = None,
         array_assembly: str = None,
     ) -> dict[dict[str, Any]]:
-        """This method checks if capabilities or array assembly exists or not
-        and gets it from observatory policies file and populates the dictionary
-        and returns it.
+        """Check if capabilities or array assembly exist, retrieve them from
+        observatory policies, populate the dictionary, and return it.
 
-        :param capabilities: mid or low
-        :param array_assembly: in mid there are AA0.5, AA2 and AA1 you
-            can give any one
-        :returns: returns dictionary of osd data and dictionary of
-            capabilities and array assembly
+        :param capabilities: list, capabilities such as "mid" or "low".
+        :param array_assembly: str, for "mid" can be one of "AA0.5",
+            "AA2", or "AA1".
+        :return: dict, dictionary of OSD data and dictionary of
+            capabilities and array assembly.
         """
         self.osd_data["observatory_policy"] = self.get_data(
             self.tmdata,
@@ -114,16 +117,18 @@ class OSD:
     def __get_capabilities_and_array_assembly(
         self, tmdata, telescope_capabilities_dict: dict, osd_data: dict
     ) -> dict[dict[str, Any]]:
-        """This method returns osd_data dictionary as mentioned in constant.py
-        variable osd_file_mapping with values populated.
+        """Return the osd_data dictionary with values populated as per
+        osd_file_mapping.
 
         :param tmdata: TMData class object.
-        :param telescope_capabilities_dict: mid or low
-        :param osd_data: dictionary with predefined keys and values as
-            mentioned in constant.py osd_file_mapping dictionary / json
-            response
-        :returns: osd_data dictionary with values populated or raises
-            OSDDataException Keyerror
+        :param telescope_capabilities_dict: dict, capabilities like
+            "mid" or "low".
+        :param osd_data: dict, dictionary with predefined keys and
+            values as mentioned in constant.py osd_file_mapping
+            dictionary / JSON response.
+        :return: dict, osd_data dictionary with values populated.
+            :raises OSDDataException, KeyError: If keys are missing or
+            invalid.
         """
         cap_err_msg_list = []
         for key, value in telescope_capabilities_dict.items():
@@ -157,14 +162,14 @@ class OSD:
         capability: str = None,
         array_assembly: str = None,
     ) -> dict[dict[str, Any]]:
-        """This method is for getting data from tmdata object and returns it
-        based on capability and array_assembly i.e. mid and AA0.5.
+        """Retrieve data from the tmdata object based on capability and array
+        assembly.
 
         :param tmdata: TMData class object.
-        :param capability: mid or low
-        :param array_assembly: in mid there are AA0.5, AA2 and AA1 you
-            can give any one
-        :returns: json object from tmdata
+        :param capability: str, capability such as "mid" or "low".
+        :param array_assembly: str, for "mid" can be one of "AA0.5",
+            "AA2", or "AA1".
+        :return: dict, JSON object from tmdata.
         """
 
         if "observatory_policies" in capability:
@@ -178,11 +183,13 @@ class OSD:
             )
 
     def get_osd_data(self) -> dict[dict[str, Any]]:
-        """This method calls get_telescope_observatory_policies function,
-        get_capabilities_and_array_assembly and returns osd_data dictionary.
+        """Call get_telescope_observatory_policies and
+        get_capabilities_and_array_assembly, then return the populated osd_data
+        dictionary.
 
-        :returns: osd_data dictionary with values populated or raises
-            OSDDataException
+        :return: dict, osd_data dictionary with values populated.
+        :raises OSDDataException: If any capability check or data
+            retrieval fails.
         """
 
         osd_err_msg_list = []
@@ -215,10 +222,12 @@ class OSD:
         return capabilities_and_array_assembly, osd_err_msg_list
 
     def check_array_assembly(self, value: str, key_list: dict) -> None:
-        """This method checks whether a array_assembly value like AA0.5 or AA1
-        in key_list dictionary exists or not and raises OSDDataException.
+        """Check whether an array_assembly value like "AA0.5" or "AA1" exists
+        in key_list, and raise OSDDataException if not.
 
-        :returns: None or raises OSDDataException
+        :param value: str, the array_assembly value to check.
+        :param key_list: dict, dictionary keys to validate against.
+        :return: None or raises OSDDataException.
         """
         if value not in key_list:
             msg = ", ".join(
@@ -241,7 +250,7 @@ def check_cycle_id(
     :param osd_version: osd version i.e. 1.9.0
     :param gitlab_branch: branch name like master, dev etc.
     :param versions_dict: version dict containing version data
-    :returns: osd_version in string format i.e 1.9.0 or raises
+    :return: osd_version in string format i.e 1.9.0 or raises
         OSDDataException
     """
     cycle_error_msg_list = []
@@ -299,7 +308,7 @@ def osd_tmdata_source(
     :param source: where to get OSD Data from car or file
     :param gitlab_branch: branch name like master, dev etc.
     :param versions_dict: version dict containing version data
-    :returns: source_uris as a string or raises exception
+    :return: source_uris as a string or raises exception
     """
     source_error_msg_list = []
     if source not in SOURCES:
@@ -344,7 +353,7 @@ def get_osd_data(
         give any one
     :param tmdata: TMData class object.
     :param cycle_id: cycle id
-    :returns: json object
+    :return: json object
     """
     osd_data, data_error_msg_list = OSD(
         capabilities=capabilities,
@@ -366,19 +375,14 @@ def get_osd_using_tmdata(
 ) -> Dict:
     """Retrieve OSD data using TMData.
 
-    Args:
-        cycle_id (int, optional): Cycle ID.
-        osd_version (str, optional): OSD version.
-        source (str, optional): Source.
-        gitlab_branch (str, optional): GitLab branch.
-        capabilities (str, optional): Capabilities.
-        array_assembly (str, optional): Array assembly.
-
-    Returns:
-        Dict[Dict[str, Any]]: OSD data.
-
-    Raises:
-        ValueError: If any validation or processing errors occur.
+    :param cycle_id: int, optional cycle ID.
+    :param osd_version: str, optional OSD version.
+    :param source: str, optional source.
+    :param gitlab_branch: str, optional GitLab branch.
+    :param capabilities: str, optional capabilities.
+    :param array_assembly: str, optional array assembly.
+    :return: Dict[Dict[str, Any]], OSD data.
+    :raises ValueError: If any validation or processing errors occur.
     """
     errors = []
 
@@ -435,23 +439,17 @@ def get_osd_using_tmdata(
 def update_file_storage(
     validated_capabilities: Dict, observatory_policy: Dict, existing_stored_data: Dict
 ) -> Dict:
-    """This function processes and validates OSD data for insertion into the
-    capabilities file.
+    """Process and validate OSD data for insertion into the capabilities file.
 
-    Args:
-        validated_capabilities (Dict): A dictionary containing the
-        validated capabilities
-        observatory_policy (Dict): A dictionary containing the
-        observatory policies
-        existing_stored_data (Dict): The existing stored
-        capabilities data
-
-    Returns:
-        Dict: A dictionary with the processed capabilities data
-
-    Raises:
-        OSDModelError: If validation fails
-        ValueError: If required data is missing or invalid
+    :param validated_capabilities: Dict, dictionary containing the
+        validated capabilities.
+    :param observatory_policy: Dict, dictionary containing the
+        observatory policies.
+    :param existing_stored_data: Dict, the existing stored capabilities
+        data.
+    :return: Dict, dictionary with the processed capabilities data.
+    :raises OSDModelError: If validation fails.
+    :raises ValueError: If required data is missing or invalid.
     """
     # Validate request body against schema
 
@@ -485,18 +483,12 @@ def update_file_storage(
 
 
 def add_new_data_storage(body: Dict) -> Dict:
-    """This function processes and validates OSD data for insertion into the
-    capabilities file.
+    """Process and validate OSD data for insertion into the capabilities file.
 
-    Args:
-        body (Dict): A dictionary containing the OSD data to insert
-
-    Returns:
-        Dict: A dictionary with the processed capabilities data
-
-    Raises:
-        OSDModelError: If validation fails
-        ValueError: If required data is missing or invalid
+    :param body: Dict, dictionary containing the OSD data to insert.
+    :return: Dict, dictionary with the processed capabilities data.
+    :raises OSDModelError: If validation fails.
+    :raises ValueError: If required data is missing or invalid.
     """
     mid_capabilities = {}
     result = {}

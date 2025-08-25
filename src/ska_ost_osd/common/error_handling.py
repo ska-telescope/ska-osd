@@ -2,16 +2,46 @@ import logging
 from typing import Any, Dict
 
 from fastapi import Request, status
-from fastapi.exceptions import RequestValidationError
+from fastapi.exceptions import RequestValidationError, ResponseValidationError
 from fastapi.responses import JSONResponse
+from gitlab import GitlabGetError
+from pydantic import ValidationError
 
 from ska_ost_osd.common.constant import EXCEPTION_STATUS_MAP
 from ska_ost_osd.common.utils import convert_to_response_object
+from ska_ost_osd.osd.common.error_handling import OSDModelError
+from ska_ost_osd.telvalidation.common.error_handling import SchematicValidationError
 
 LOGGER = logging.getLogger(__name__)
 
 
+exception_types = [
+    OSDModelError,
+    SchematicValidationError,
+    RequestValidationError,
+    ResponseValidationError,
+    ValueError,
+    FileNotFoundError,
+    RuntimeError,
+    ValidationError,
+    GitlabGetError,
+]
+
+
 def get_http_status_from_map(exc: Exception) -> int:
+    """Get the HTTP status code from the predefined exception-to-status
+    mapping.
+
+    This function checks the type of the given exception against a
+    mapping of exception types to HTTP status codes. If a match is
+    found, the corresponding status code is returned. If no match is
+    found, a default `500 Internal Server Error` status code is
+    returned.
+
+    :param exc: Exception, the exception instance for which the HTTP
+        status code is to be determined.
+    :return: int, the corresponding HTTP status code.
+    """
     exc_type = type(exc)
     for key, status_code in EXCEPTION_STATUS_MAP.items():
         if isinstance(key, tuple):
@@ -41,12 +71,9 @@ class ValidationErrorFormatter:
             "error": "Missing field(s): cycle_id, osd_version, invalid payload: false"
         }
 
-        Args:
-            exc (RequestValidationError): The exception raised during
+        :param exc: RequestValidationError, the exception raised during
             request validation.
-
-        Returns:
-            Dict[str, Any]: A dictionary containing the formatted error message.
+        :return: Dict[str, Any], a dictionary containing the formatted error message.
         """
         missing_fields = []
         parsing_errors = []
@@ -83,7 +110,21 @@ class ValidationErrorFormatter:
 
 async def generic_exception_handler(_: Request, err: Exception) -> JSONResponse:
     """A custom handler function that returns a verbose HTTP error response
-    containing detailed traceback information."""
+    containing detailed traceback information.
+
+    This handler processes both validation and generic exceptions. For validation
+    errors, it uses the ValidationErrorFormatter to create a structured message.
+    For other exceptions, it attempts to extract a list/dictionary message from
+    the exception arguments, or falls back to a string representation.
+
+    The HTTP status code is determined by mapping the exception type to a status
+    code using `get_http_status_from_map`. The final result is converted into a
+    standardized response object and returned as a JSONResponse.
+
+    :param _: Request, the incoming HTTP request (unused in this handler).
+    :param err: Exception, the exception instance to handle.
+    :return: JSONResponse, the structured HTTP error response.
+    """
 
     if isinstance(err, RequestValidationError):
         formatted = ValidationErrorFormatter.format(err)

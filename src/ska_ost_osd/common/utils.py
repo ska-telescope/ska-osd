@@ -66,10 +66,11 @@ def convert_to_response_object(
 
 
 def get_responses(response_model) -> Dict[str, Any]:
-    """Takes response_model as argument and returns responses dict :param:
-    response_model: entity_object.
+    """Return a formatted responses dictionary for FastAPI.
 
-    Returns formatted response dictionary
+    :param response_model: entity_object, the model class to be used in
+        the 200 OK response.
+    :return: Dict[str, Any], the formatted responses dictionary.
     """
 
     return {
@@ -81,8 +82,10 @@ def get_responses(response_model) -> Dict[str, Any]:
 
 
 def remove_none_params(params: Dict[str, Any]) -> Dict[str, Any]:
-    """Takes params dict containing None values.
+    """Filter out keys with None values from a dictionary.
 
-    Returns filtered params excluding None values
+    :param params: Dict[str, Any], the dictionary to filter.
+    :return: Dict[str, Any], the dictionary without keys that have None
+        values.
     """
     return {k: v for k, v in params.items() if v is not None}

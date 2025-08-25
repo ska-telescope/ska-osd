@@ -44,9 +44,10 @@ def get_validation_data(interface: str, telescope: str) -> Optional[str]:
         input.
     :param telescope: str, the telescope identifier (e.g., 'mid' or
         'low').
-    :return: str, the validation constant JSON file path, or None if not
-        found.
+    :return: Optional[str], the validation constant JSON file path, or
+        None if not found.
     """
+
     validation_constants = {
         SKA_LOW_TELESCOPE: LOW_VALIDATION_CONSTANT_JSON_FILE_PATH,
         SKA_MID_TELESCOPE: MID_VALIDATION_CONSTANT_JSON_FILE_PATH,
@@ -79,9 +80,10 @@ def fetch_capabilities_from_osd(
     :param tm_data: Optional[Dict], the telemodel data object.
     :param osd_data: Optional[Dict], the OSD data dictionary passed
         externally.
-    :returns: A tuple containing the capabilities and basic capabilities
-        dictionaries.
+    :return: Tuple[Dict, Dict], a tuple containing the capabilities and
+        basic capabilities dictionaries.
     """
+
     from ska_ost_osd.osd.osd import get_osd_data
 
     if osd_data:
@@ -109,13 +111,12 @@ def get_matched_values_from_basic_capabilities(
     """Efficiently search a nested dictionary and list structure to find the
     value for the given key from basic capabilities.
 
-    Args:
-        data (dict or list): The nested data structure to search.
-        key_to_find (str): The key to search for.
-
-    Returns:
-        The value associated with the given key, or None if the key is not found.
+    :param data: dict or list, the nested data structure to search.
+    :param key_to_find: str, the key to search for.
+    :return: The value associated with the given key, or None if the key
+        is not found.
     """
+
     if data is None:
         return None
 
@@ -138,17 +139,18 @@ def get_matched_values_from_basic_capabilities(
 def replace_matched_capabilities_values(
     nested_dict: dict, path: list[str], new_value: Any
 ) -> None:
-    """Replace the value in capabilities data which matched from basic
+    """Replace the value in capabilities data that matches a key from basic
     capabilities.
 
-    :param nested_dict: Dict, the dictionary to modify.
-    :param path: List[str], the path to the key to replace, represented
+    :param nested_dict: dict, the dictionary to modify.
+    :param path: list[str], the path to the key to replace, represented
         as a list of keys.
     :param new_value: Any, the new value to assign to the key.
     :raises KeyError: If any key in the path is not found in the nested
         dictionary.
     :raises TypeError: If the path does not lead to a dictionary.
     """
+
     current = nested_dict
     for key in path[:-1]:
         if not isinstance(current, dict) or key not in current:
@@ -197,6 +199,7 @@ def build_basic_capabilities_lookup(
             }
         }
     """
+
     capabilities_lookup: Dict[str, Dict[str, Any]] = {}
 
     def collect(node: Any) -> None:
@@ -290,6 +293,7 @@ def fetch_matched_capabilities_from_basic_capabilities(
             'ps_beam_bandwidth_hz': 400000000
         }
     """
+
     if isinstance(capabilities, dict):
         return {
             key: fetch_matched_capabilities_from_basic_capabilities(
@@ -317,18 +321,19 @@ def validate_command_input(
     array_assembly: str,
     osd_data: dict,
 ) -> list:
-    """This method invoking semantic validation for given command input.
+    """Invoke semantic validation for the given command input.
 
-    :param observing_command_input: user json input for semantic
-        validation
-    :param tm_data: TMData object which created externally
-    :param interface: assign/configure resource schema interface name
-    :param telescope: str, the telescope identifier (e.g., 'mid' or
-        'low').
-    :param array_assembly: specific capabilities like AA0.5, AA1
-    :param osd_data: osd_data dict which passed externally :return list
-        of error messages in case of validation failed
+    :param observing_command_input: dict, user JSON input for semantic
+        validation.
+    :param tm_data: TMData, the TMData object created externally.
+    :param interface: str, assign/configure resource schema interface name.
+    :param telescope: str, the telescope identifier (e.g., 'mid' or 'low').
+    :param array_assembly: str, specific capabilities like 'AA0.5', 'AA1'.
+    :param osd_data: dict, externally passed OSD data dictionary.
+    :return: list, error messages if validation fails; empty list
+    otherwise.
     """
+
     semantic_validate_data = tm_data[
         get_validation_data(interface, telescope)
     ].get_dict()
@@ -369,24 +374,23 @@ def semantic_validate(
     raise_semantic: bool = True,
     osd_data: Optional[dict] = None,
 ) -> Any:
-    """This method is the entry point for semantic validation, which can be
-    consumed by other libraries like CDM.
+    """Entry point for semantic validation, usable by other libraries like CDM.
 
-    :param observing_command_input: dictionary containing details of the
-        command which needs validation.This is the same as for
-        ska_telmodel.schema.validate. If the command is available as a
-        JSON string, first convert it to a dictionary using json.loads.
-    :param tm_data: telemodel tm data object using which we can load the
-        semantic validation JSON.
-    :param osd_data: osd_data dict which is passed externally.
-    :param interface: interface URI in full, only provide if missing in
-        observing_command_input.
-    :param array_assembly: Array assembly like AA0.5, AA0.1.
-    :param raise_semantic: True (default) would require the user to
-        catch the SchematicValidationError somewhere. Set False to only
-        log the error messages.
-    :returns: True if semantic validation passes, False otherwise.
+    :param observing_command_input: dict, details of the command to validate.
+     This should match the structure expected by `ska_telmodel.schema.validate`.
+     If the command is a JSON string, convert it to a dictionary with
+     `json.loads` first.
+    :param tm_data: TMData, telemodel data object used to load semantic validation JSON.
+    :param osd_data: Optional[dict], externally passed OSD data dictionary.
+    :param interface: Optional[str], full interface URI; provide only if missing
+     in `observing_command_input`.
+    :param array_assembly: str, array assembly version like 'AA0.5' or 'AA0.1'.
+    :param raise_semantic: bool, default True. If True,
+     raises `SchematicValidationError` on validation failure;
+     if False, only logs errors and returns False.
+    :return: bool, True if semantic validation passes, False otherwise.
     """
+
     if int(VALIDATION_STRICTNESS) == SEMANTIC_VALIDATION_VALUE:
         try:
             SemanticModel(

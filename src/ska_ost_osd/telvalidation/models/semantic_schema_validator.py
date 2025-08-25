@@ -1,8 +1,9 @@
 import re
 from typing import Any, Dict, Optional
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, Field, field_validator
 
+from ska_ost_osd.osd.common.constant import ARRAY_ASSEMBLY_PATTERN
 from ska_ost_osd.telvalidation.common.constant import (
     CAR_TELMODEL_SOURCE,
     INTERFACE_PATTERN,
@@ -10,18 +11,21 @@ from ska_ost_osd.telvalidation.common.constant import (
 
 
 class SemanticModel(BaseModel):
-    """SemanticModel represents the structured input required for executing an
-    observing command within the system.
+    """Represents the structured input required for executing an observing
+    command.
 
-    :param observing_command_input (dict): Mandatory. Contains the input
-        parameters for the observing command. :param interface
-        (Optional[str]): Optional. Specifies the interface type. :param
-        raise_semantic (Optional[bool]): Optional. Indicates whether to
-        raise semantic validation errors. Defaults to True. :param
-        array_assembly (Optional[str]): Optional. Represents the array
-        assembly ID or name. :param osd_data (Optional[dict]): Optional.
-        Holds relevant data from the OSD. :param tm_data
-        (Optional[object]): Optional. Can contain telemodel data.
+    :param observing_command_input: dict, mandatory. Input parameters
+        for the observing command.
+    :param interface: Optional[str], optional. Specifies the interface
+        type.
+    :param raise_semantic: Optional[bool], optional. Indicates whether
+        to raise semantic validation errors. Defaults to True.
+    :param array_assembly: Optional[str], optional. Represents the array
+        assembly ID or name.
+    :param osd_data: Optional[dict], optional. Holds relevant data from
+        the OSD.
+    :param tm_data: Optional[object], optional. Can contain telemodel
+        data.
     """
 
     observing_command_input: dict
@@ -55,8 +59,8 @@ class SemanticModel(BaseModel):
 
 
 class SemanticValidationModel(BaseModel):
-    """SemanticValidationModel defines the schema for validating semantic input
-    data related to observing commands and system configuration.
+    """Defines the schema for validating semantic input data related to
+    observing commands and system configuration.
 
     :param interface (Optional[str]): An optional string representing
     the command interface type.
@@ -75,6 +79,11 @@ class SemanticValidationModel(BaseModel):
     """
 
     interface: Optional[str] = None
+    array_assembly: Optional[str] = Field(
+        default="AA0.5",
+        pattern=ARRAY_ASSEMBLY_PATTERN,
+        description="Array assembly in format AA[0-9] or AA[0-9].[0-9]",
+    )
     observing_command_input: Dict[str, Any]
     osd_data: Optional[Dict[str, Any]] = None
     raise_semantic: Optional[bool] = True

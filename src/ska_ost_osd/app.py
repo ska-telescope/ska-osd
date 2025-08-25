@@ -48,6 +48,7 @@ def create_app(production=PRODUCTION) -> FastAPI:
     app.include_router(osd_router, prefix=API_PREFIX, tags=["OSD"])
 
     # Add handlers for different types of error
+    # Add handlers for different types of error
     app.exception_handler(OSDModelError)(generic_exception_handler)
     app.exception_handler(SchematicValidationError)(schematic_validation_error_handler)
     app.exception_handler(RequestValidationError)(generic_exception_handler)

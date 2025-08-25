@@ -7,74 +7,8 @@ from ska_ost_osd.common.utils import remove_none_params
 from tests.conftest import BASE_API_URL
 
 
-@pytest.mark.parametrize(
-    "cycle_id, osd_version, source, capabilities, array_assembly, expected",
-    [
-        (
-            100000,
-            "1..1.0",
-            "file",
-            "mid",
-            "AAA3",
-            {
-                "result_data": [
-                    "Cycle_id and Array_assembly cannot be used together",
-                    "osd_version 1..1.0 is not valid",
-                    "array_assembly AAA3 is not valid",
-                    "Cycle 100000 is not valid,Available IDs are 1",
-                ],
-                "result_status": "failed",
-                "result_code": 400,
-            },
-        ),
-        (
-            None,
-            None,
-            "file",
-            "mid",
-            "AA100000",
-            {
-                "result_data": [
-                    "Array Assembly AA100000 is not valid,Available Array Assemblies"
-                    " are AA0.5, AA1, AA2"
-                ],
-                "result_status": "failed",
-                "result_code": 400,
-            },
-        ),
-        (
-            1,
-            None,
-            None,
-            None,
-            "AA0.5",
-            {
-                "result_data": ["Cycle_id and Array_assembly cannot be used together"],
-                "result_status": "failed",
-                "result_code": 400,
-            },
-        ),
-        (
-            None,
-            None,
-            None,
-            None,
-            None,
-            {
-                "result_data": ["Either cycle_id or capabilities must be provided"],
-                "result_status": "failed",
-                "result_code": 400,
-            },
-        ),
-    ],
-)
 def test_invalid_osd_tmdata_source(
-    cycle_id,
-    osd_version,
-    source,
-    capabilities,
-    array_assembly,
-    expected,
+    invalid_osd_tmdata_source_input,
     client_get,
     osd_versions,
 ):
@@ -94,6 +28,15 @@ def test_invalid_osd_tmdata_source(
 
     :returns: assert equals values
     """
+
+    (
+        cycle_id,
+        osd_version,
+        source,
+        capabilities,
+        array_assembly,
+        expected,
+    ) = invalid_osd_tmdata_source_input
 
     if expected.get("detail") and isinstance(expected["detail"], list):
         expected["detail"][0] = expected["detail"][0].format(osd_versions=osd_versions)
@@ -185,130 +128,8 @@ def test_osd_source(client_get):
     response.json == error_msg  # pylint: disable=W0104
 
 
-@pytest.mark.parametrize(
-    "cycle_id, osd_version, source, gitlab_branch, capabilities, array_assembly",
-    [
-        (
-            None,
-            "1.0.0",
-            "car",
-            None,
-            "mid",
-            "AA0.5",
-        ),
-        (
-            None,
-            "1.0.0",
-            "car",
-            None,
-            "low",
-            "AA0.5",
-        ),
-        (
-            None,
-            None,
-            "car",
-            None,
-            "mid",
-            "AA0.5",
-        ),
-        (
-            None,
-            None,
-            "car",
-            None,
-            "low",
-            "AA0.5",
-        ),
-        (
-            None,
-            None,
-            "file",
-            None,
-            "mid",
-            "AA0.5",
-        ),
-        (
-            None,
-            None,
-            "file",
-            None,
-            "low",
-            "AA0.5",
-        ),
-        (
-            None,
-            None,
-            "car",
-            None,
-            "low",
-            "AA1",
-        ),
-        (
-            None,
-            None,
-            "file",
-            None,
-            "mid",
-            "AA1",
-        ),
-        (
-            None,
-            None,
-            "file",
-            None,
-            "low",
-            "AA1",
-        ),
-        (
-            None,
-            None,
-            "car",
-            None,
-            "low",
-            "AA2",
-        ),
-        (
-            None,
-            None,
-            "file",
-            None,
-            "mid",
-            "AA2",
-        ),
-        (
-            None,
-            None,
-            "file",
-            None,
-            "low",
-            "AA2",
-        ),
-        (
-            None,
-            None,
-            "gitlab",
-            "main",
-            "mid",
-            "AA0.5",
-        ),
-        (
-            None,
-            None,
-            "gitlab",
-            "main",
-            "low",
-            "AA0.5",
-        ),
-    ],
-)
 def test_mid_low_response(
-    cycle_id,
-    osd_version,
-    source,
-    gitlab_branch,
-    capabilities,
-    array_assembly,
+    mid_low_response_input,
     client_get,
 ):
     """This function tests that the response from the REST API contains the
@@ -317,6 +138,14 @@ def test_mid_low_response(
     :raises AssertionError: If the expected data is invalid.
     """
 
+    (
+        cycle_id,
+        osd_version,
+        source,
+        gitlab_branch,
+        capabilities,
+        array_assembly,
+    ) = mid_low_response_input
     params = {
         "cycle_id": cycle_id,
         "osd_version": osd_version,

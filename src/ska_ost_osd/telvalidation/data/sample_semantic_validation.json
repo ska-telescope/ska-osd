@@ -2,6 +2,7 @@
 
   "raise_semantic": true,
   "sources": "car:ost/ska-ost-osd?{osd_version}#tmdata",
+  "array_assembly": "AA0.5",
   "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
   "observing_command_input": {
     "dish": {
