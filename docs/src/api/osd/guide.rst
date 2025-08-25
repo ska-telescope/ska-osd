@@ -787,7 +787,6 @@ PUT /osd
       "result_code": 200
      }
 
-
 5. Scenarios
 
     1. If ``cycle_id``, ``capabilities`` and ``array_assembly`` are provided together with valid data in the request body, the API will update the capabilities JSON for the specified mid/low capabilities and return a 200 OK status code with the updated resource.

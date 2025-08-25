@@ -5,10 +5,10 @@ from typing import Any
 
 
 def read_json(json_file_location: str) -> dict[dict[str, Any]]:
-    """This function returns json file object from local file system.
+    """Return JSON object loaded from a local file.
 
-    :param json_file_location: json file.
-    :returns: file content as json object
+    :param json_file_location: str, path to the JSON file.
+    :return: dict, file content as a JSON object.
     """
 
     cwd = Path(__file__).resolve().parent.parent

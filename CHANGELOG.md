@@ -9,6 +9,13 @@ Development
 ***********
 * NAK-1352 Refactor handling of TelModel data sources including default
 
+Unreleased
+***********
+* Added support for `array_assembly` in `semantic_validation` API
+* Updated doc strings to sphinx style format
+* Refactoring of test cases
+* Added support to update `openapi.json` file using make
+
 4.1.0
 *****
 * NAK-1300 Migrate tmdata files to schmea-mapped directories

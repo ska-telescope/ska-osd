@@ -1,51 +1,39 @@
 from ska_ost_osd.telvalidation.common.constant import CAR_TELMODEL_SOURCE
 from tests.unit.ska_ost_osd.utils import read_json
 
-MID_CAPABILITIES_MOCK_DATA = read_json("test_files/mock_mid_capabilities.json")
+DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER = "test_files/default_osd_response.json"
 
-LOW_CAPABILITIES_MOCK_DATA = read_json("test_files/mock_low_capabilities.json")
+MID_CAPABILITIES_MOCK_DATA = "test_files/mock_mid_capabilities.json"
 
-OBSERVATORY_POLICIES_MOCK_DATA = read_json("test_files/mock_observatory_policies.json")
+LOW_CAPABILITIES_MOCK_DATA = "test_files/mock_low_capabilities.json"
 
-MID_VALIDATION_MOCK_DATA = read_json("test_files/mock-mid-validation-constants.json")
+VALIDATION_MOCK_DATA = "test_files/mock-validation-constants.json"
 
-LOW_VALIDATION_MOCK_DATA = read_json("test_files/mock-low-validation-constants.json")
+MID_SBD_VALIDATION_MOCK_DATA = "test_files/mock_mid_sbd-validation-constants.json"
 
-MID_SBD_VALIDATION_MOCK_DATA = read_json(
-    "test_files/mock_mid_sbd-validation-constants.json"
-)
-
-LOW_SBD_VALIDATION_MOCK_DATA = read_json(
-    "test_files/mock_low_sbd-validation-constants.json"
-)
+LOW_SBD_VALIDATION_MOCK_DATA = "test_files/mock_low_sbd-validation-constants.json"
 
 MID_OSD_DATA_JSON = read_json("test_files/testfile_mid_osd_data.json")
 
-VALID_MID_ASSIGN_JSON = read_json("test_files/testfile_valid_mid_assign.json")
-INVALID_MID_ASSIGN_JSON = read_json("test_files/testfile_invalid_mid_assign.json")
-VALID_MID_CONFIGURE_JSON = read_json("test_files/testfile_valid_mid_configure.json")
-VALID_MID_SBD_JSON = read_json("test_files/testfile_valid_mid_sbd.json")
-INVALID_MID_SBD_JSON = read_json("test_files/testfile_invalid_mid_sbd.json")
-VALID_LOW_SBD_JSON = read_json("test_files/testfile_valid_low_sbd.json")
-INVALID_LOW_SBD_JSON = read_json("test_files/testfile_invalid_low_sbd.json")
-INVALID_MID_CONFIGURE_JSON = read_json("test_files/testfile_invalid_mid_configure.json")
-VALID_LOW_ASSIGN_JSON = read_json("test_files/testfile_valid_low_assign.json")
-INVALID_LOW_ASSIGN_JSON = read_json("test_files/testfile_invalid_low_assign.json")
-VALID_LOW_CONFIGURE_JSON = read_json("test_files/testfile_valid_low_configure.json")
-INVALID_LOW_CONFIGURE_JSON = read_json("test_files/testfile_invalid_low_configure.json")
+MID_ASSIGN_JSON = "test_files/testfile_mid_assign.json"
+VALID_MID_CONFIGURE_JSON = "test_files/testfile_mid_configure.json"
+
+MID_SBD_JSON = "test_files/testfile_mid_sbd.json"
+LOW_SBD_JSON = "test_files/testfile_low_sbd.json"
+INVALID_MID_CONFIGURE_JSON = "test_files/testfile_mid_configure.json"
+
+LOW_ASSIGN_JSON = "test_files/testfile_low_assign.json"
+
+LOW_CONFIGURE_JSON = "test_files/testfile_low_configure.json"
+
 capabilities = read_json("test_files/testfile_capabilities.json")
 
-DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER = read_json(
-    "test_files/default_osd_response.json"
-)
-OSD_RESPONSE_WITH_ONLY_CAPABILITIES_PARAMETER = read_json(
+OSD_RESPONSE_WITH_ONLY_CAPABILITIES_PARAMETER = (
     "test_files/osd_response_with_capabilities.json"
 )
 
 file_name = "osd_response_with_capabilities_and_array_assembly.json"
-OSD_RESPONSE_WITH_CAPABILITIES_ARRAY_ASSEMBLY_PARAMETER = read_json(
-    f"test_files/{file_name}"
-)
+OSD_RESPONSE_WITH_CAPABILITIES_ARRAY_ASSEMBLY_PARAMETER = f"test_files/{file_name}"
 
 # This is dummy constant json for testing "Invalid rule and error key passed" scenario.
 INVALID_MID_VALIDATE_CONSTANT = {

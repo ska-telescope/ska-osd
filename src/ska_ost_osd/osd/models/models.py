@@ -18,6 +18,15 @@ T = TypeVar("T")
 
 
 class OSDUpdateModel(BaseModel):
+    """Pydantic model representing the OSD update payload.
+
+    :param cycle_id: Optional; ID of the cycle (must be an integer).
+    :param array_assembly: Optional; array assembly string in the format
+        ``AA[0-9].[0-9]``.
+    :param capabilities: Optional; system capabilities, can be either
+        ``"mid"`` or ``"low"``.
+    """
+
     cycle_id: Optional[int] = Field(..., description="Cycle ID must be an integer")
     array_assembly: Optional[str] = Field(
         ...,
@@ -33,10 +42,33 @@ class OSDUpdateModel(BaseModel):
 
 
 class CycleModel(BaseModel):
+    """Pydantic model representing a list of cycle IDs.
+
+    :param cycles: A list of integer cycle IDs.
+    """
+
     cycles: List[int]
 
 
 class OSDModel(BaseModel):
+    """Pydantic model representing the parameters used for retrieving or
+    validating an OSD (Observatory Science Data) release.
+
+    **Field Rules:**
+    - `gitlab_branch` and `osd_version` cannot both be set.
+    - `cycle_id` and `array_assembly` cannot both be set.
+    - At least one of `cycle_id` or `capabilities` must be provided.
+    - `osd_version` must match the pattern: ``OSD_VERSION_PATTERN``.
+    - `array_assembly` must match the pattern: ``ARRAY_ASSEMBLY_PATTERN``.
+
+    :param cycle_id: Integer ID representing the OSD cycle.
+    :param osd_version: String version identifier for the OSD release.
+    :param source: Source of the OSD data.
+    :param gitlab_branch: GitLab branch name used for retrieving OSD data.
+    :param capabilities: System capabilities (`"mid"` or `"low"`).
+    :param array_assembly: Array assembly identifier (format: `AA[0-9].[0-9]`).
+    """
+
     cycle_id: Optional[int] = None
     osd_version: Optional[str] = None
     source: Optional[str] = None
@@ -76,6 +108,20 @@ class OSDModel(BaseModel):
 
 
 class ValidationOnCapabilities(BaseModel):
+    """Validate the structure of the `capabilities` field.
+
+    This model enforces:
+    - The presence of the `capabilities` field.
+    - The field must contain exactly one telescope key.
+    - The value of the telescope key must be a dictionary.
+
+    :param capabilities: dict[str, dict[str, Any]], dictionary containing capabilities
+        for a single telescope. The key represents the telescope name
+        (e.g., "mid", "low") and its value contains the related configuration data.
+    :raises CapabilityError: If the `capabilities` field is missing, does not contain
+        exactly one telescope key, or the telescope key's value is not a dictionary.
+    """
+
     capabilities: Dict[str, Dict[str, Any]]
 
     @model_validator(mode="before")
@@ -96,11 +142,41 @@ class ValidationOnCapabilities(BaseModel):
 
 
 class ReleaseType(str, Enum):
+    """Enumeration of possible release types for OSD.
+
+    This enum is used to distinguish between major and minor releases.
+    It inherits from ``str`` to allow string comparisons and serialization.
+
+    :cvar minor: Represents a minor release.
+    :cvar major: Represents a major release.
+    """
+
     minor = "minor"
     major = "major"
 
 
 class OSDRelease(BaseModel):
+    """Represents an OSD (Observation Scheduling Data) release metadata object.
+
+    This model stores key details about a specific OSD release,
+    including a human-readable release message, the release version,
+    and the associated cycle ID.
+
+    :param message: str, description or notes about the release.
+    :param version: str, release version string (e.g., ``"1.2.0"``).
+    :param cycle_id: str, identifier for the cycle associated with this release.
+
+    **Example:**
+
+    .. code-block:: python
+
+        release = OSDRelease(
+            message="Updated observation constraints for mid telescope",
+            version="4.1.0",
+            cycle_id="4"
+        )
+    """
+
     message: str
     version: str
     cycle_id: str
@@ -109,32 +185,23 @@ class OSDRelease(BaseModel):
 class OSDQueryParams(BaseModel):
     """Query parameters for retrieving OSD details.
 
-    Attributes:
-        cycle_id (Optional[int]):
-            The ID of the release cycle.
-            Example: 1
-
-        osd_version (Optional[str]):
-            The version of the OSD to retrieve.
-            Example: "1.0.0"
-
-        source (Optional[Literal["car", "file", "gitlab"]]):
-            The source from which the OSD is obtained. Defaults to "file".
-            Valid options: "car", "file", "gitlab"
-            Example: "file"
-
-        gitlab_branch (Optional[str]):
-            The name of the GitLab branch associated with the OSD release.
-            Example: "gitlab_branch"
-
-        capabilities (Optional[Literal["mid", "low"]]):
-            The system capabilities used in the release.
-            Valid options: "mid", "low"
-            Example: "mid"
-
-        array_assembly (Optional[str]):
-            The version identifier of the Array Assembly component.
-            Example: "AA0.5"
+    :param cycle_id: Optional[int], the ID of the release cycle.
+        Example: 1
+    :param osd_version: Optional[str], the version of the OSD to retrieve.
+        Example: "1.0.0"
+    :param source: Optional[Literal["car", "file", "gitlab"]], the source from
+        which the OSD is obtained. Defaults to "file". Valid options: "car",
+        "file", "gitlab".
+        Example: "file"
+    :param gitlab_branch: Optional[str], the name of the GitLab branch
+        associated with the OSD release.
+        Example: "gitlab_branch"
+    :param capabilities: Optional[Literal["mid", "low"]], the system capabilities
+        used in the release. Valid options: "mid", "low".
+        Example: "mid"
+    :param array_assembly: Optional[str], the version identifier of the Array
+        Assembly component.
+        Example: "AA0.5"
     """
 
     cycle_id: Optional[int] = Field(

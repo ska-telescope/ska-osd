@@ -14,14 +14,14 @@ logger = logging.getLogger(__name__)
 
 
 def increment_version(current_version: str, release_type: Optional[str] = None) -> str:
-    """Increment version number based on semantic versioning rules.
+    """Increment the version number based on semantic versioning rules.
 
-    Args:
-        current_version: Current version string in format "X.Y.Z"
-        release_type: Optional type of release ('major', 'minor', or None for patch)
-
-    Returns:
-        New version string following semantic versioning rules
+    :param current_version: str, current version string in format
+        "X.Y.Z".
+    :param release_type: Optional[str], type of release ("major",
+        "minor", or None for patch).
+    :return: str, new version string following semantic versioning
+        rules.
     """
     major, minor, patch = map(int, current_version.strip('"').split("."))
 
@@ -48,16 +48,12 @@ def manage_version_release(
 ) -> Tuple[str, str]:
     """Manage version release for a given cycle ID.
 
-    Args:
-        cycle_id (str): The cycle ID for version mapping
-        release_type (Optional[str]): Type of release
-        ('major' or 'minor', defaults to patch)
-
-    Returns:
-        Tuple[str, str]: Tuple containing (new_version, cycle_id)
-
-    Raises:
-        ValueError: If cycle_id is invalid or no versions found for cycle
+    :param cycle_id: str, the cycle ID for version mapping.
+    :param release_type: Optional[str], type of release ("major",
+        "minor", defaults to patch).
+    :return: Tuple[str, str], tuple containing (new_version, cycle_id).
+    :raises ValueError: If cycle_id is invalid or no versions are found
+        for the cycle.
     """
     # Get the project root directory
     current_dir = Path(__file__).resolve().parent

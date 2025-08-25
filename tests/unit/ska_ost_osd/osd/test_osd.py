@@ -14,7 +14,7 @@ from tests.unit.ska_ost_osd.common.constant import (
 
 
 @pytest.mark.parametrize(
-    "capabilities, array_assembly, tmdata, expected",
+    "capabilities, array_assembly, tmdata, file_path",
     [
         (None, None, tm_data_osd, DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER),
         (
@@ -35,7 +35,8 @@ def test_get_osd_data(
     capabilities,
     array_assembly,
     tmdata,  # pylint: disable=W0613
-    expected,
+    file_path,
+    create_entity_object,
     tm_data_osd,  # pylint: disable=W0621
 ):
     """This test case checks the functionality of get_osd_data it converts the
@@ -51,6 +52,7 @@ def test_get_osd_data(
 
     result, _ = get_osd_data(capabilities, array_assembly, tmdata=tm_data_osd)
     result_keys = result["capabilities"].keys()
+    expected = create_entity_object(file_path)
     expected_keys = expected["capabilities"].keys()
 
     assert result_keys == expected_keys
@@ -152,28 +154,6 @@ def test_invalid_osd_tmdata_source():
         "Only one parameter is needed either osd_version or gitlab_branch",
         "Cycle 100000 is not valid,Available IDs are 1",
     ]
-
-
-# def test_invalid_source(osd_versions):
-#     """This test case checks when gitlab_branch is given source
-#     should be gitlab else will raise / return error.
-#     NOTE: This testcase has dependency on 'cycle_gitlab_release_version_mapping.json'
-#           file so make sure to run the 'make osd-pre-release' command which is
-#           mentioned in readme and document files.
-#     """
-#     _, error_msgs = osd_tmdata_source(
-#         cycle_id=1,
-#         gitlab_branch="main",
-#         source="file",
-#     )
-
-#     expected_error_msg = ", ".join([str(err) for err in error_msgs])
-
-#     assert (
-#         expected_error_msg
-#         == "Source file is not valid, OSD Version main is not valid,Available OSD"
-#         f" Versions are {osd_versions}"
-#     )
 
 
 def test_invalid_get_osd_data_capability(tm_data_osd):  # pylint: disable=W0621

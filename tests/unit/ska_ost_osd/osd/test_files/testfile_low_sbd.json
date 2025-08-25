@@ -1,4 +1,4 @@
-{
+{"invalid":{
     "interface": "https://schema.skao.int/ska-oso-pdm-sbd/0.1",
     "sbd_id": "sbi-mvp01-20200325-00001",
     "telescope": "ska_low",
@@ -157,3 +157,158 @@
       "scan 1"
     ]
   }
+,"valid":{
+    "interface": "https://schema.skao.int/ska-oso-pdm-sbd/0.1",
+    "sbd_id": "sbi-mvp01-20200325-00001",
+    "telescope": "ska_low",
+    "metadata": {
+      "version": 1,
+      "created_by": "Liz Bartlett",
+      "created_on": "2022-03-28T15:43:53.971548Z",
+      "last_modified_on": "2024-07-15T21:55:09.654185Z"
+    },
+    "activities": {
+      "allocate": {
+        "function_args": {
+          "init": {
+            "args": [
+              "posarg1",
+              "posarg2"
+            ],
+            "kwargs": {
+              "argname": "argval"
+            }
+          },
+          "main": {
+            "args": [
+              "posarg1",
+              "posarg2"
+            ],
+            "kwargs": {
+              "argname": "argval"
+            }
+          }
+        },
+        "kind": "filesystem",
+        "path": "/path/to/allocatescript.py"
+      },
+      "observe": {
+        "function_args": {
+          "init": {
+            "args": [
+              "posarg1",
+              "posarg2"
+            ],
+            "kwargs": {
+              "argname": "argval"
+            }
+          },
+          "main": {
+            "args": [
+              "posarg1",
+              "posarg2"
+            ],
+            "kwargs": {
+              "argname": "argval"
+            }
+          }
+        },
+        "kind": "git",
+        "repo": "https://gitlab.com/script_repo/operational_scripts",
+        "path": "/relative/path/to/scriptinsiderepo.py",
+        "branch": "main",
+        "commit": "d234c257dadd18b3edcd990b8194c6ad94fc278a"
+      }
+    },
+    "targets": [
+      {
+        "target_id": "47 Tuc",
+        "pointing_pattern": {
+          "active": "SinglePointParameters",
+          "parameters": [
+            {
+              "kind": "SinglePointParameters",
+              "offset_x_arcsec": 0.0,
+              "offset_y_arcsec": 0.0
+            }
+          ]
+        },
+        "reference_coordinate": {
+          "kind": "equatorial",
+          "ra": "00:24:05.359",
+          "dec": "-72:04:53.20",
+          "reference_frame": "icrs",
+          "unit": [
+            "hourangle",
+            "deg"
+          ]
+        },
+        "radial_velocity": {
+          "quantity": {
+            "value": -17.2,
+            "unit": "km / s"
+          },
+          "definition": "OPTICAL",
+          "reference_frame": "BARYCENTRIC",
+          "redshift": 0.0
+        }
+      }
+    ],
+    "mccs_allocation": {
+      "mccs_config_id": "mccs config 123",
+      "configuration": "AA0.5",
+      "subarray_beams": [
+      {
+          "subarray_beam_id": 1,
+          "number_of_channels": 96,
+          "apertures": [
+          {
+              "station_id": 345,
+              "substation_id": 1,
+              "weighting_key": "uniform"
+          },
+          {
+              "station_id": 345,
+              "substation_id": 1,
+              "weighting_key": "uniform"
+          }
+          ]
+      }
+      ]
+  },
+    "csp_configurations": [
+      {
+        "config_id": "csp-mvp01-20220329-00001",
+        "lowcbf": {
+          "correlation_spws": [
+            {
+              "spw_id": 1,
+              "logical_fsp_ids": [
+                0,
+                1
+              ],
+              "zoom_factor": 0,
+              "centre_frequency": 199.609375e6,
+              "number_of_channels": 13824,
+              "integration_time_ms": 849
+            }
+          ]
+        }
+      }
+    ],
+    "scan_definitions": [
+      {
+        "scan_definition_id": "scan 1",
+        "target_ref": "47 Tuc",
+        "mccs_configuration_ref": "mccs config 123",
+        "csp_configuration_ref": "csp-mvp01-20220329-00001",
+        "scan_duration_ms": 64000,
+        "scan_intent": "Science",
+        "pointing_correction": "MAINTAIN"
+      }
+    ],
+    "scan_sequence": [
+      "scan 1"
+    ]
+  }
+}
