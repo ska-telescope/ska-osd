@@ -29,9 +29,35 @@
                 "rx_id": "Band_5a"
             },
             {
-                "max_frequency_hz": 15400000000,
-                "min_frequency_hz": 8300000000,
-                "rx_id": "Band_5b"
+                "max_frequency_hz": 13510000000,
+                "min_frequency_hz": 11450000000,
+                "rx_id": "Band_5b",
+                "sub_bands" : [
+                  {
+                    "sub_band" : 1,
+                    "max_frequency_hz": 12150000000,
+                    "min_frequency_hz": 11450000000,
+                    "lo_frequency_hz" : 11100000000,
+                    "sideband" : "high"
+                  },
+
+                  {
+                    "sub_band" : 2,
+                    "max_frequency_hz": 13510000000,
+                    "min_frequency_hz": 12810000000,
+                    "lo_frequency_hz" : 13860000000,
+                    "sideband" : "low"
+                  },
+
+                  {
+                    "sub_band" : 3,
+                    "max_frequency_hz": 12850000000,
+                    "min_frequency_hz": 12150000000,
+                    "lo_frequency_hz" : 11100000000,
+                    "sideband" : "high"
+                  }
+
+                ]
             }
         ]
     },

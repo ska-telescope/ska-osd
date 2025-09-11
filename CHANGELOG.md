@@ -15,6 +15,7 @@ Unreleased
 * Updated doc strings to sphinx style format
 * Refactoring of test cases
 * Added support to update `openapi.json` file using make
+* Add support for sub_bands in band 5b and adjusted 5b frequency range. 
 
 4.1.0
 *****
