@@ -16,7 +16,7 @@ Unreleased
 * Refactoring of test cases
 * Added support to update `openapi.json` file using make
 * Add support for sub_bands in band 5b and adjusted 5b frequency range. 
-* Modified rules to permit band 5b frequencies to be specified in the B1 frequency range.  
+* Modified rules to permit band 5b setups to be specified in the B1 frequency range.  
 
 4.1.0
 *****
