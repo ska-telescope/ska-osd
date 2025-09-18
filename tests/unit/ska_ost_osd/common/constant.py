@@ -17,10 +17,12 @@ MID_OSD_DATA_JSON = read_json("test_files/testfile_mid_osd_data.json")
 
 MID_ASSIGN_JSON = "test_files/testfile_mid_assign.json"
 VALID_MID_CONFIGURE_JSON = "test_files/testfile_mid_configure.json"
+VALID_MID_B5_CONFIGURE_JSON = "test_files/testfile_mid_configure_b5.json"
 
 MID_SBD_JSON = "test_files/testfile_mid_sbd.json"
 LOW_SBD_JSON = "test_files/testfile_low_sbd.json"
 INVALID_MID_CONFIGURE_JSON = "test_files/testfile_mid_configure.json"
+INVALID_MID_B5_CONFIGURE_JSON = "test_files/testfile_mid_configure_b5.json"
 
 LOW_ASSIGN_JSON = "test_files/testfile_low_assign.json"
 
@@ -83,7 +85,7 @@ low_expected_result_for_invalid_data = (
 )
 
 mid_configure_expected_result_for_invalid_data = (
-    "Invalid input for receiver_band! Currently allowed [1,2]\n"
+    "Invalid input for receiver_band! Currently allowed [1,2,5b]\n"
     "The fsp_ids should all be distinct\n"
     "fsp_ids are too many!Current Limit is 4\n"
     "Invalid fsp_ids! The range should not greater than 4\n"
@@ -95,6 +97,19 @@ mid_configure_expected_result_for_invalid_data = (
     "sdp_start_channel_id must be between 0 to 2147483647\n"
     "integration_factor must be between 1 to 10\n"
     "frequency_band did not match receiver_band"
+)
+
+mid_b5_configure_expected_result_for_invalid_data = (
+    "The fsp_ids should all be distinct\n"
+    "fsp_ids are too many!Current Limit is 4\n"
+    "Invalid fsp_ids! The range should not greater than 4\n"
+    "Invalid input for channel_width! Currently allowed [13440]\n"
+    "channel_count must be between 1 to 58982\n"
+    "channel_count must be a multiple of 20\n"
+    "Invalid input for start_freq\n"
+    "Invalid input for start_freq\n"
+    "sdp_start_channel_id must be between 0 to 2147483647\n"
+    "integration_factor must be between 1 to 10"
 )
 
 low_configure_expected_result_for_invalid_data = (
@@ -126,7 +141,7 @@ mid_sbd_expected_result_for_invalid_data = (
     " receptors\nreceptor_ids did not match receptors\nFSPs are too many!Current Limit"
     " = 4\nInvalid input for fsp_id!\nInvalid input for function_mode\nInvalid input"
     " for zoom_factor\nfrequency_slice_id did not match fsp_id\nInvalid input for"
-    " receiver_band! Currently allowed [1,2]"
+    " receiver_band! Currently allowed [1,2,5b]"
 )
 
 low_sbd_expected_result_for_invalid_data = (

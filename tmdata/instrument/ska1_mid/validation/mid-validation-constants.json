@@ -44,12 +44,12 @@
                             "freq_max": [
                                 {
                                     "rule": "min_frequency_hz <= freq_max <= max_frequency_hz",
-                                    "error": "Invalid input for freq_max"                                
+                                    "error": "Invalid input for freq_max"
                                 },
                                 {
                                     "rule": "freq_min < freq_max",
                                     "error": "freq_min should be less than freq_max",
-                                    "dependency_key": ["freq_min"]                     
+                                    "dependency_key": ["freq_min"]
                                 }
                             ]
                         }
@@ -75,8 +75,8 @@
             "dish": {
                 "receiver_band": [
                     {
-                        "rule": "receiver_band in ['1','2']",
-                        "error": "Invalid input for receiver_band! Currently allowed [1,2]"
+                        "rule": "receiver_band in ['1','2','5b']",
+                        "error": "Invalid input for receiver_band! Currently allowed [1,2,5b]"
                     }
                 ]
             },
@@ -115,15 +115,23 @@
                                 }
                             ],
                             "start_freq": [
-                                {
-                                    "rule": "min_frequency_hz <= start_freq <= max_frequency_hz",
-                                    "error": "Invalid input for start_freq"
-                                },
-                                {
-                                    "rule": "min_frequency_hz <= ((start_freq - channel_width/2) + channel_width*channel_count) <= max_frequency_hz",
-                                    "dependency_key": ["channel_width", "channel_count"],
-                                    "error": "Invalid input for start_freq"
-                                }
+                              {
+                                "rule": "(receiver_band != '5b' and (min_frequency_hz <= ((start_freq - channel_width/2) + channel_width*channel_count) <= max_frequency_hz)) or (receiver_band == '5b' and (350000000 <= ((start_freq - channel_width/2) + channel_width*channel_count) <= 1050000000))",
+                                "dependency_key": [
+                                  "channel_width",
+                                  "channel_count",
+                                  "receiver_band"
+                                ],
+                                "error": "Invalid input for start_freq"
+                              },
+                              {
+                                "rule": "(receiver_band != '5b' and (min_frequency_hz <= start_freq <= max_frequency_hz)) or (receiver_band == '5b' and (350000000 <= start_freq <= 1050000000))",
+                                "dependency_key": [
+                                  "receiver_band"
+                                ],
+                                "error": "Invalid input for start_freq"
+                              }
+
                             ],
                             "sdp_start_channel_id": [
                                 {

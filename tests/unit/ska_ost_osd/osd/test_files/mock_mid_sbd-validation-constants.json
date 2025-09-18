@@ -107,8 +107,8 @@
             "dish_configurations": {
                 "receiver_band": [
                     {
-                        "rule": "receiver_band in ['1','2']",
-                        "error": "Invalid input for receiver_band! Currently allowed [1,2]"
+                        "rule": "receiver_band in ['1','2','5b']",
+                        "error": "Invalid input for receiver_band! Currently allowed [1,2,5b]"
                     }
                 ]
             }
