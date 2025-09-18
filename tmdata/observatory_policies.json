@@ -1,16 +1,34 @@
 {
-    "cycle_number": 1,
-    "cycle_description": "Science Verification",
-    "cycle_information": {
-        "cycle_id": "SKAO_2027_1",
-        "proposal_open": "20260327T12:00:00.000Z",
-        "proposal_close": "20260512T15:00:00.000z"
+    "low_cycle_0": {
+        "cycle_number": 0,
+        "cycle_description": "Low Cycle 0",
+        "cycle_information": {
+            "cycle_id": "SKAO_2030_1",
+            "proposal_open": "20300327T12:00:00.000Z",
+            "proposal_close": "20300512T15:00:00.000Z"
+        },
+        "cycle_policies": {
+            "normal_max_hours": 100.0
+        },
+        "telescope_capabilities": {
+            "Mid": "AA*",
+            "Low": "AA*"
+        }
     },
-    "cycle_policies": {
-        "normal_max_hours": 100.0
-    },
-    "telescope_capabilities": {
-        "Mid": "AA2",
-        "Low": "AA2"
+    "low_aa2_sv": {
+        "cycle_number": 1,
+        "cycle_description": "Low AA2 Science Verification",
+        "cycle_information": {
+            "cycle_id": "SKAO_2027_Low_AA2_SV",
+            "proposal_open": "20260615T12:00:00.000Z",
+            "proposal_close": "20260915T15:00:00.000Z"
+        },
+        "cycle_policies": {
+            "normal_max_hours": 100.0
+        },
+        "telescope_capabilities": {
+            "Mid": "AA2",
+            "Low": "AA2"
+        }
     }
 }
