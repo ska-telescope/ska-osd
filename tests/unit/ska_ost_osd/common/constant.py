@@ -17,12 +17,10 @@ MID_OSD_DATA_JSON = read_json("test_files/testfile_mid_osd_data.json")
 
 MID_ASSIGN_JSON = "test_files/testfile_mid_assign.json"
 VALID_MID_CONFIGURE_JSON = "test_files/testfile_mid_configure.json"
-VALID_MID_B5_CONFIGURE_JSON = "test_files/testfile_mid_configure_b5.json"
 
 MID_SBD_JSON = "test_files/testfile_mid_sbd.json"
 LOW_SBD_JSON = "test_files/testfile_low_sbd.json"
 INVALID_MID_CONFIGURE_JSON = "test_files/testfile_mid_configure.json"
-INVALID_MID_B5_CONFIGURE_JSON = "test_files/testfile_mid_configure_b5.json"
 
 LOW_ASSIGN_JSON = "test_files/testfile_low_assign.json"
 

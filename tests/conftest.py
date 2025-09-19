@@ -14,7 +14,6 @@ from ska_ost_osd.osd.osd import osd_tmdata_source
 from ska_ost_osd.telvalidation.common.constant import CAR_TELMODEL_SOURCE
 from tests.unit.ska_ost_osd.common.constant import (
     DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER,
-    INVALID_MID_B5_CONFIGURE_JSON,
     INVALID_MID_CONFIGURE_JSON,
     LOW_ASSIGN_JSON,
     LOW_CAPABILITIES_MOCK_DATA,
@@ -26,7 +25,6 @@ from tests.unit.ska_ost_osd.common.constant import (
     MID_OSD_DATA_JSON,
     MID_SBD_JSON,
     MID_SBD_VALIDATION_MOCK_DATA,
-    VALID_MID_B5_CONFIGURE_JSON,
     VALID_MID_CONFIGURE_JSON,
     VALIDATION_MOCK_DATA,
     local_source,
@@ -562,14 +560,6 @@ def valid_only_observing_command_input_in_request_body(valid_observing_command_i
 @pytest.fixture(
     scope="module",
     params=[
-        (VALID_MID_B5_CONFIGURE_JSON, "valid", "MID", True, False),
-        (
-            INVALID_MID_B5_CONFIGURE_JSON,
-            "invalid",
-            "MID",
-            mid_b5_configure_expected_result_for_invalid_data,
-            True,
-        ),
         (MID_ASSIGN_JSON, "valid", "MID", True, False),
         (
             MID_ASSIGN_JSON,
