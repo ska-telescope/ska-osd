@@ -16,7 +16,7 @@
         }
     },
     "low_aa2_sv": {
-        "cycle_number": 1,
+        "cycle_number": 100,
         "cycle_description": "Low AA2 Science Verification",
         "cycle_information": {
             "cycle_id": "SKAO_2027_Low_AA2_SV",
