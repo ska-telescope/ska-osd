@@ -31,7 +31,6 @@ from tests.unit.ska_ost_osd.common.constant import (
     low_configure_expected_result_for_invalid_data,
     low_expected_result_for_invalid_data,
     low_sbd_expected_result_for_invalid_data,
-    mid_b5_configure_expected_result_for_invalid_data,
     mid_configure_expected_result_for_invalid_data,
     mid_expected_result_for_invalid_data,
     mid_sbd_expected_result_for_invalid_data,

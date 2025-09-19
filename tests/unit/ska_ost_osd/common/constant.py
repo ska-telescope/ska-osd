@@ -97,12 +97,6 @@ mid_configure_expected_result_for_invalid_data = (
     "frequency_band did not match receiver_band"
 )
 
-mid_b5_configure_expected_result_for_invalid_data = (
-    "Invalid input for start_freq\n"
-    "Invalid input for start_freq\n"
-    "frequency_band did not match receiver_band"
-)
-
 low_configure_expected_result_for_invalid_data = (
     "subarray_beam_id must be between 1 and 48\n"
     "update_rate must be greater than or equal to 0.0\n"
