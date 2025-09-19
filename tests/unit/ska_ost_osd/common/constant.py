@@ -100,7 +100,9 @@ mid_configure_expected_result_for_invalid_data = (
 )
 
 mid_b5_configure_expected_result_for_invalid_data = (
-    "Invalid input for start_freq\nInvalid input for start_freq"
+    "Invalid input for start_freq\n"
+    "Invalid input for start_freq\n"
+    "frequency_band did not match receiver_band"
 )
 
 low_configure_expected_result_for_invalid_data = (

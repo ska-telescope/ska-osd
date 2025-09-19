@@ -74,7 +74,7 @@
       "interface": "https://schema.skao.int/ska-csp-configurescan/4.0",
       "common": {
           "config_id": "sbi-mvp01-20200325-00001-science_A",
-          "frequency_band": "5b"
+          "frequency_band": "1"
       },
       "midcbf": {
           "frequency_band_offset_stream1": 80,

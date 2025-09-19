@@ -331,7 +331,7 @@
                 "common": {
                     "frequency_band": [
                         {
-                            "rule": "receiver_band==frequency_band",
+                            "rule": "(receiver_band != '5b' and receiver_band==frequency_band) or (receiver_band=='5b' and frequency_band=='1')",
                             "dependency_key": ["receiver_band"],
                             "error": "frequency_band did not match receiver_band"
                         }
