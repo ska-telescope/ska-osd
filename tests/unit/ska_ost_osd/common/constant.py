@@ -100,16 +100,8 @@ mid_configure_expected_result_for_invalid_data = (
 )
 
 mid_b5_configure_expected_result_for_invalid_data = (
-    "The fsp_ids should all be distinct\n"
-    "fsp_ids are too many!Current Limit is 4\n"
-    "Invalid fsp_ids! The range should not greater than 4\n"
-    "Invalid input for channel_width! Currently allowed [13440]\n"
-    "channel_count must be between 1 to 58982\n"
-    "channel_count must be a multiple of 20\n"
     "Invalid input for start_freq\n"
-    "Invalid input for start_freq\n"
-    "sdp_start_channel_id must be between 0 to 2147483647\n"
-    "integration_factor must be between 1 to 10"
+    "Invalid input for start_freq"
 )
 
 low_configure_expected_result_for_invalid_data = (

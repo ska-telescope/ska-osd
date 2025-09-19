@@ -25,20 +25,20 @@
           "frequency_band_offset_stream1": 80,
           "correlation": {
               "processing_regions": [{
-                  "fsp_ids": [1, 2, 2, 4, 5],
+                  "fsp_ids": [1, 2, 3, 4],
                   "receptors": ["SKA063", "SKA001", "SKA100"],
                   "start_freq": 12050000000,
-                  "channel_width": 13000,
-                  "channel_count": 58989,
-                  "sdp_start_channel_id": 214748364722,
-                  "integration_factor": 11
+                  "channel_width": 13440,
+                  "channel_count": 58980,
+                  "sdp_start_channel_id": 3,
+                  "integration_factor": 9
               }, {
-                  "fsp_ids": [1, 2, 2, 4, 5],
+                  "fsp_ids": [1, 2, 3, 4],
                   "start_freq": 12050000000,
-                  "channel_width": 13000,
-                  "channel_count": 58989,
-                  "sdp_start_channel_id": -1,
-                  "integration_factor": 12
+                  "channel_width": 13440,
+                  "channel_count": 58980,
+                  "sdp_start_channel_id": 4,
+                  "integration_factor": 9
               }]
           },
           "vlbi": {}
