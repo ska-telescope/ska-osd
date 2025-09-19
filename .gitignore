@@ -38,3 +38,5 @@ MANIFEST.skao.int%
 
 PrivateRules.mak
 .pre-commit-config.yaml
+
+wip_*.py
