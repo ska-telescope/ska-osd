@@ -83,7 +83,7 @@ low_expected_result_for_invalid_data = (
 )
 
 mid_configure_expected_result_for_invalid_data = (
-    "Invalid input for receiver_band! Currently allowed [1,2]\n"
+    "Invalid input for receiver_band! Currently allowed [1,2,5b]\n"
     "The fsp_ids should all be distinct\n"
     "fsp_ids are too many!Current Limit is 4\n"
     "Invalid fsp_ids! The range should not greater than 4\n"
@@ -126,7 +126,7 @@ mid_sbd_expected_result_for_invalid_data = (
     " receptors\nreceptor_ids did not match receptors\nFSPs are too many!Current Limit"
     " = 4\nInvalid input for fsp_id!\nInvalid input for function_mode\nInvalid input"
     " for zoom_factor\nfrequency_slice_id did not match fsp_id\nInvalid input for"
-    " receiver_band! Currently allowed [1,2]"
+    " receiver_band! Currently allowed [1,2,5b]"
 )
 
 low_sbd_expected_result_for_invalid_data = (

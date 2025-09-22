@@ -57,7 +57,7 @@ class OSD:
         self.tmdata = tmdata
         self.keys_list = {}
 
-    def check_capabilities(self, capabilities: list = None) -> None:
+    def check_capabilities(self, capabilities: list = None) -> str | None:
         """Check if the given capabilities exist, and raise an exception if
         not.
 
@@ -73,9 +73,10 @@ class OSD:
         if capabilities:
             cap_list = [i for i in capabilities if i.lower() not in capabilities_list]
 
-        if (capabilities is not None and isinstance(capabilities, list)) and (cap_list):
-            msg = ", ".join(capabilities_list)
-            return CAPABILITY_DOESNOT_EXIST_ERROR_MESSAGE.format(cap_list[0], msg)
+            if isinstance(capabilities, list) and cap_list:
+                msg = ", ".join(capabilities_list)
+                return CAPABILITY_DOESNOT_EXIST_ERROR_MESSAGE.format(cap_list[0], msg)
+        return None
 
     def get_telescope_observatory_policies(
         self,

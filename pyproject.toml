@@ -36,7 +36,7 @@ priority = 'primary'
 python = "^3.10"
 ska-ser-logging = "^0.4.1"
 ska-ser-skuid = "^3.3.3"
-ska-telmodel = "^1.23.2"
+ska-telmodel = "^1.24.3"
 astropy = "^6.1"
 simpleeval = "^0.9.13"
 pydantic = "^2.10.3"
@@ -46,12 +46,12 @@ fastapi = {extras = ["standard"], version = "^0.115.8"}
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.6.0"
-pylint = "^2.8.2"
+pylint = "^3.3.8"
 pytest = "^7.1.0"
 pytest-bdd = "^4.1.0"
 pytest-cov = "^2.10.1"
 isort = "^5.6.4"
-flake8 = "^5.0.4"
+flake8 = "^7.3.0"
 pylint-junit = "^0.3.2"
 coverage = "^6.1.1"
 pytest-json-report = "^1.4.1"
