@@ -86,8 +86,7 @@ def test_osd_endpoint(client_get, mock_mid_data):
     assert response.json == mock_mid_data["AA0.5"]
 
 
-@patch("ska_ost_osd.osd.routers.api.get_osd_using_tmdata")
-def test_osd_sub_bands_endpoint(client_get, mock_mid_data):
+def test_osd_sub_bands_endpoint(client_get):
     """This function checks that the sub_bands are defined for band 5b.
 
     :param mid_osd_data (dict): The expected data for the OSD.
@@ -101,15 +100,15 @@ def test_osd_sub_bands_endpoint(client_get, mock_mid_data):
             "capabilities": "mid",
             "array_assembly": "AA0.5",
         },
-    ).json()
+    )
+    assert response.status_code == 200
 
-    response = MagicMock()
-    response.status_code = 200
-    response.json = mock_mid_data["basic_capabilities"]
-
-    # Check that sub_bands have been defined for band 5b
-    sub_bands = response.json["receiver_information"][5]["sub_bands"]
-    assert len(sub_bands) == 3
+    result_data = response.json()["result_data"]
+    b5_info = result_data["capabilities"]["mid"]["basic_capabilities"][
+        "receiver_information"
+    ][5]
+    assert "sub_bands" in b5_info
+    assert len(b5_info["sub_bands"]) == 3
 
 
 def test_invalid_osd_tmdata_source_capabilities(client_get):
