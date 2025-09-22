@@ -12,6 +12,10 @@ Development
 Unreleased
 ***********
 
+4.2.1
+***********
+* Fix issue due to now running `make osd-pre-release`
+
 4.2.0
 ***********
 * Added support for `array_assembly` in `semantic_validation` API
