@@ -1,5 +1,5 @@
-CYCLE_ERROR_MESSAGE = "Only one parameter is needed either osd_version or gitlab_branch"
-CYCLE_ID_ERROR_MESSAGE = "Cycle {} is not valid,Available IDs are {}"
+CYCLE_ERROR_MESSAGE = "Only one parameter is needed, either osd_version or gitlab_branch"
+CYCLE_ID_ERROR_MESSAGE = "Cycle {} is not valid, Available IDs are {}"
 CAPABILITY_DOESNOT_EXIST_ERROR_MESSAGE = (
     "Capability {} is not valid,Available Capabilities are {}"
 )
