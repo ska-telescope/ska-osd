@@ -11,6 +11,9 @@ Development
 
 Unreleased
 ***********
+
+4.2.0
+***********
 * Added support for `array_assembly` in `semantic_validation` API
 * Updated doc strings to sphinx style format
 * Refactoring of test cases
