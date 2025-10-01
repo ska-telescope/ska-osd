@@ -61,7 +61,7 @@ class OSDModel(BaseModel):
     - `osd_version` must match the pattern: ``OSD_VERSION_PATTERN``.
     - `array_assembly` must match the pattern: ``ARRAY_ASSEMBLY_PATTERN``.
 
-    :param cycle_id: Integer ID representing the OSD cycle.
+    :param cycle_id: String ID representing the OSD cycle.
     :param osd_version: String version identifier for the OSD release.
     :param source: Source of the OSD data.
     :param gitlab_branch: GitLab branch name used for retrieving OSD data.
@@ -69,7 +69,7 @@ class OSDModel(BaseModel):
     :param array_assembly: Array assembly identifier (format: `AA[0-9].[0-9]`).
     """
 
-    cycle_id: Optional[int] = None
+    cycle_id: Optional[str] = None
     osd_version: Optional[str] = None
     source: Optional[str] = None
     gitlab_branch: Optional[str] = None

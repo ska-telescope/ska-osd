@@ -1,6 +1,5 @@
 {
     "low_cycle_0": {
-        "cycle_number": 0,
         "cycle_description": "Low Cycle 0",
         "cycle_information": {
             "cycle_id": "SKAO_2030_1",
@@ -15,7 +14,6 @@
         }
     },
     "low_sv_aa2": {
-        "cycle_number": 100,
         "cycle_description": "Low AA2 Science Verification",
         "cycle_information": {
             "cycle_id": "SKAO_2027_Low_AA2_SV",

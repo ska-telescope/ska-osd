@@ -6,6 +6,7 @@ POLICIES_CONSTANT_JSON_FILE_PATH = "observatory_policies.json"
 RELEASE_FILE = "tmdata/version_mapping/latest_release.txt"
 RELEASE_FILE_PATH_LATEST = "version_mapping/latest_release.txt"
 VERSION_FILE_PATH = "version_mapping/cycle_gitlab_release_version_mapping.json"
+OBSERVATORY_POLICIES_PATH = "observatory_policies.json"
 
 osd_file_mapping = {
     "low": LOW_CONSTANT_JSON_FILE_PATH,

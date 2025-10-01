@@ -32,6 +32,7 @@ from .common.constant import (
     osd_response_template,
 )
 
+
 class OSD:
     """Initialize OSD-related variables and methods, including
     get_telescope_observatory_policies, get_data, and get_osd_data."""
@@ -235,42 +236,11 @@ class OSD:
             return ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE.format(value, msg)
 
 
-def get_version_dict(gitlab_branch: str = None):
-    """
-    Get a version dictionary which relates to a given Cycle.
-    """
-    if gitlab_branch is not None:
-        tmdata_version = TMData(GITLAB_SOURCE, update=True)
-    else:
-        GITLAB_BRANCH_SOURCE = [re.sub("main", gitlab_branch, GITLAB_SOURCE[0])]
-        tmdata_version = TMData(GITLAB_BRANCH_SOURCE, update=True)
-    
-    versions_dict = tmdata_version[VERSION_FILE_PATH].get_dict()
-    
-    return versions_dict    
-
-def get_available_cycles(gitlab_branch: str = None):
-    """
-    Get the list of available cycles from the requested 
-    OSD version/gitlab_branch
-    """
-    if gitlab_branch is not None:
-        tmdata_version = TMData(GITLAB_SOURCE, update=True)
-    else:
-        GITLAB_BRANCH_SOURCE = [re.sub("main", gitlab_branch, GITLAB_SOURCE[0])]
-        tmdata_version = TMData(GITLAB_BRANCH_SOURCE, update=True)
-    
-    observ_policy_dict = tmdata_version[OBSERVATORY_POLICIES_JSON_PATH].get_dict()
-    cycle_ids = [key for key in observ_policy_dict]
-    
-    return cycle_ids    
-
-
-
 def check_cycle_id(
     cycle_id: int = None,
     osd_version: str = None,
     gitlab_branch: str = None,
+    versions_dict: Dict = None,
 ) -> str:
     """This function checks if a given cycle exists or not also raises
     OSDDataException if gitlab_branch and osd_version both is given. raises
@@ -279,66 +249,56 @@ def check_cycle_id(
     :param cycle_id: cycle id integer value.
     :param osd_version: osd version i.e. 1.9.0
     :param gitlab_branch: branch name like master, dev etc.
+    :param versions_dict: version dict containing version data
     :return: osd_version in string format i.e 1.9.0 or raises
         OSDDataException
     """
     cycle_error_msg_list = []
-
-    if cycle_id is None and osd_version is None and gitlab_branch is None:
-        # -- a user didn't specify any input param. of the OSD
-        # -- assume the latest version 
-        osd_version = (
-            get_osd_latest_version()
-        )
-        cycle_ids = get_available_cycles()
-
     if gitlab_branch is not None and osd_version is not None:
-        # -- User specified both an OSD version and gitlab branch.
-        # -- cannot proceed.
+        
         cycle_error_msg_list.append(
             CYCLE_ERROR_MESSAGE,
         )
 
     if gitlab_branch is not None:
-        # -- point to a gitlab_branch for osd_version 
-        # -- and versions_dict
         osd_version = gitlab_branch
-        versions_dict = get_version_dict(gitlab_branch)
-        cycle_ids = hack_get_available_cycles(mode = 'local')
 
-    # -- at this point there should be enough data to: 
-    # -- 1. check the cycle ID exists in the specified 
-    # --    OSD version
+    if cycle_id is None and osd_version is None and gitlab_branch is None:
+        osd_version = (
+            get_osd_latest_version()
+        )  # get latest version from latest_release.txt file
 
-    cycle_ids = hack_get_available_cycles(mode = 'local')
+    if versions_dict is None:
+        versions_dict = {}
+    
+    cycle_ids = [int(key.split("_")[-1]) for key in versions_dict]
     cycle_id_exists = [cycle_id if cycle_id in cycle_ids else None][0]
     string_ids = ",".join([str(i) for i in cycle_ids])
     if cycle_id is not None and cycle_id_exists is None:
-        # -- a user specified a cycle ID which doesn't exist
-        # -- in the list of cycle IDs for this OSD version.
         cycle_error_msg_list.append(
             CYCLE_ID_ERROR_MESSAGE.format(cycle_id, string_ids),
         )
 
     elif cycle_id is not None and osd_version is None:
-        versions_dict = get_version_dict()
-        osd_version = versions_dict[f"{cycle_id}"][-1] # to use latest
+        osd_version = versions_dict[f"cycle_{cycle_id}"][0]
 
     elif cycle_id is not None and cycle_id_exists and osd_version is not None:
-        if osd_version not in versions_dict[f"{cycle_id}"]:
+        if osd_version not in versions_dict[f"cycle_{cycle_id}"]:
             cycle_error_msg_list.append(
                 OSD_VERSION_ERROR_MESSAGE.format(
-                    osd_version, versions_dict[f"{cycle_id}"]
+                    osd_version, versions_dict[f"cycle_{cycle_id}"]
                 )
             )
 
     return osd_version, cycle_error_msg_list
+
 
 def osd_tmdata_source(
     cycle_id: int = None,
     osd_version: str = None,
     source: str = "car",
     gitlab_branch: str = None,
+    versions_dict: Dict = None,
 ) -> str:
     """This function checks and returns source_uri for TMData class.
 
@@ -363,7 +323,7 @@ def osd_tmdata_source(
         source_error_msg_list.append(SOURCE_ERROR_MESSAGE.format(source))
 
     osd_version, cycle_error_msg_list = check_cycle_id(
-        cycle_id, osd_version, gitlab_branch
+        cycle_id, osd_version, gitlab_branch, versions_dict
     )
 
     source_error_msg_list.extend(cycle_error_msg_list)
@@ -377,6 +337,7 @@ def osd_tmdata_source(
         source_url = (f"{source}:{CAR_URL}{osd_version}#{BASE_FOLDER_NAME}",)
 
     return source_url, source_error_msg_list
+
 
 def get_osd_data(
     capabilities: list = None,
@@ -403,8 +364,9 @@ def get_osd_data(
 
     return osd_data, data_error_msg_list
 
-def aa_get_osd_using_tmdata(
-    cycle_id: Optional[str] = None,
+
+def get_osd_using_tmdata(
+    cycle_id: Optional[int] = None,
     osd_version: Optional[str] = None,
     source: Optional[str] = None,
     gitlab_branch: Optional[str] = None,
@@ -413,7 +375,7 @@ def aa_get_osd_using_tmdata(
 ) -> Dict:
     """Retrieve OSD data using TMData.
 
-    :param cycle_id: str, optional cycle ID.
+    :param cycle_id: int, optional cycle ID.
     :param osd_version: str, optional OSD version.
     :param source: str, optional source.
     :param gitlab_branch: str, optional GitLab branch.
@@ -435,22 +397,23 @@ def aa_get_osd_using_tmdata(
     except OSDModelError as error:
         errors.extend(error.args[0])
 
-    
+    tmdata_version = TMData(GITLAB_SOURCE, update=True)
+    versions_dict = tmdata_version[VERSION_FILE_PATH].get_dict()
     _, cycle_errors = check_cycle_id(
         cycle_id=cycle_id,
         osd_version=osd_version,
         gitlab_branch=gitlab_branch,
+        versions_dict=versions_dict,
     )
-
     if cycle_errors:
         errors.extend(cycle_errors)
         raise ValueError(errors)
-
     tm_data_source, error = osd_tmdata_source(
         cycle_id=cycle_id,
         osd_version=osd_version,
         source=source,
         gitlab_branch=gitlab_branch,
+        versions_dict=versions_dict,
     )
 
     if error:
@@ -471,6 +434,7 @@ def aa_get_osd_using_tmdata(
     if errors:
         raise ValueError(errors)
     return osd_data
+
 
 def update_file_storage(
     validated_capabilities: Dict, observatory_policy: Dict, existing_stored_data: Dict
