@@ -259,35 +259,52 @@ class OSD:
             )
 
 
-def get_version_dict(gitlab_branch: str = None):
+def get_version_dict(
+        gitlab_branch: str = None,
+        osd_version: str = None,
+        ):
     """
     Get a version dictionary which relates to a given Cycle.
     """
-    if gitlab_branch is not None:
+    if gitlab_branch is None and osd_version is None:
         tmdata_version = TMData(GITLAB_SOURCE, update=True)
-    else:
+    elif gitlab_branch is not None:
         GITLAB_BRANCH_SOURCE = [
             re.sub("main", gitlab_branch, GITLAB_SOURCE[0])
         ]
         tmdata_version = TMData(GITLAB_BRANCH_SOURCE, update=True)
+    elif osd_version is not None:
+        GITLAB_VER_SOURCE = [
+            re.sub("main", osd_version, GITLAB_SOURCE[0])
+        ]
+        tmdata_version = TMData(GITLAB_VER_SOURCE, update=True)
 
     versions_dict = tmdata_version[VERSION_FILE_PATH].get_dict()
 
     return versions_dict
 
 
-def get_available_cycles(gitlab_branch: str = None):
+def get_available_cycles(
+        gitlab_branch: str = None,
+        osd_version: str = None,
+        ):
     """
     Get the list of available cycles from the requested
     OSD version/gitlab_branch
     """
-    if gitlab_branch is not None:
+    if gitlab_branch is None and osd_version is None:
+        # --- use main branch and latest
         tmdata_version = TMData(GITLAB_SOURCE, update=True)
-    else:
+    elif gitlab_branch is not None:
         GITLAB_BRANCH_SOURCE = [
             re.sub("main", gitlab_branch, GITLAB_SOURCE[0])
         ]
         tmdata_version = TMData(GITLAB_BRANCH_SOURCE, update=True)
+    elif osd_version is not None:
+        GITLAB_VER_SOURCE = [
+            re.sub("main", osd_version, GITLAB_SOURCE[0])
+        ]
+        tmdata_version = TMData(GITLAB_VER_SOURCE, update=True)
 
     observ_policy_dict = tmdata_version[OBSERVATORY_POLICIES_PATH].get_dict()
     cycle_ids = [key for key in observ_policy_dict]
@@ -334,6 +351,11 @@ def check_cycle_id(
         osd_version = gitlab_branch
         versions_dict = get_version_dict(gitlab_branch)
         cycle_ids = get_available_cycles(gitlab_branch)
+
+    if osd_version is not None:
+        versions_dict = get_version_dict()
+        cycle_ids = get_available_cycles()
+
 
     # -- below gives None if cycle_id is None or cycle_id not in cycle_ids
     cycle_id_exists = [cycle_id if cycle_id in cycle_ids else None][0]

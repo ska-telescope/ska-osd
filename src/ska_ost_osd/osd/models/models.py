@@ -33,7 +33,9 @@ class OSDUpdateModel(BaseModel):
         ``"mid"`` or ``"low"``.
     """
 
-    cycle_id: Optional[int] = Field(..., description="Cycle ID must be an integer")
+    cycle_id: Optional[str] = Field(
+        ..., description="Cycle ID must be a string"
+    )
     array_assembly: Optional[str] = Field(
         ...,
         pattern=ARRAY_ASSEMBLY_PATTERN,
@@ -104,8 +106,12 @@ class OSDModel(BaseModel):
 
         # Validate patterns
         if osd_version and not re.match(OSD_VERSION_PATTERN, osd_version):
-            errors.append(OSD_VERSION_INVALID_ERROR_MESSAGE.format(osd_version))
-        if array_assembly and not re.match(ARRAY_ASSEMBLY_PATTERN, array_assembly):
+            errors.append(
+                OSD_VERSION_INVALID_ERROR_MESSAGE.format(osd_version)
+            )
+        if array_assembly and not re.match(
+            ARRAY_ASSEMBLY_PATTERN, array_assembly
+        ):
             errors.append(ARRAY_ASSEMBLY_INVALID_ERROR_MESSAGE.format(array_assembly))
         if errors:
             raise OSDModelError(errors)

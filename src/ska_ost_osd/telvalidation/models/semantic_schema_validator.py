@@ -41,7 +41,8 @@ class SemanticModel(BaseModel):
         """observing_command_input: Ensures the input is a dictionary."""
         if not isinstance(v, dict):
             raise ValueError(
-                "observing_command_input field is required and must be a dictionary"
+                "observing_command_input field is required and must be a"
+                "dictionary"
             )
         return v
 
@@ -54,7 +55,9 @@ class SemanticModel(BaseModel):
             if not isinstance(v, str):
                 raise ValueError("Interface must be a string")
             if not re.match(INTERFACE_PATTERN, v):
-                raise ValueError(f"Interface must match pattern: {INTERFACE_PATTERN}")
+                raise ValueError(
+                    f"Interface must match pattern: {INTERFACE_PATTERN}"
+                )
         return v
 
 
@@ -91,11 +94,14 @@ class SemanticValidationModel(BaseModel):
 
     @field_validator("sources")
     @classmethod
-    def validate_sources_contains_osd_version(cls, v: Optional[str]) -> Optional[str]:
+    def validate_sources_contains_osd_version(
+        cls, v: Optional[str]
+    ) -> Optional[str]:
         """sources: Ensures the 'sources' field does not contain an unreplaced
         '{osd_version}' placeholder. Raises a ValueError if present."""
         if "{osd_version}" in v:
             raise ValueError(
-                "Please provide 'osd_version' by replacing '{osd_version}' placeholder"
+                "Please provide 'osd_version' by replacing '{osd_version}'"
+                " placeholder"
             )
         return v
