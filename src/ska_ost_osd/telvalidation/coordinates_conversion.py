@@ -27,7 +27,9 @@ def get_mid_telescope_mean_location(tm_data: TMData) -> list:
     :return: list, the mean location of the Mid telescope.
     """
 
-    return get_geocentric_mean_location(MID_LAYOUT_CONSTANT_JSON_FILE_PATH, tm_data)
+    return get_geocentric_mean_location(
+        MID_LAYOUT_CONSTANT_JSON_FILE_PATH, tm_data
+    )
 
 
 def get_low_telescope_mean_location(tm_data: TMData) -> list:
@@ -38,7 +40,9 @@ def get_low_telescope_mean_location(tm_data: TMData) -> list:
     :return: list, the mean location of the Low telescope.
     """
 
-    return get_geocentric_mean_location(LOW_LAYOUT_CONSTANT_JSON_FILE_PATH, tm_data)
+    return get_geocentric_mean_location(
+        LOW_LAYOUT_CONSTANT_JSON_FILE_PATH, tm_data
+    )
 
 
 def get_geocentric_mean_location(file_path: str, tm_data: TMData):
@@ -123,7 +127,9 @@ def ra_dec_to_az_el(
         raise SchematicValidationError(message="Invalid telescope name")
     observing_time = Time(obs_time, format=time_format, scale=time_scale)
     coord = SkyCoord(ra, dec, frame=coord_frame, unit="deg")
-    az_alt = coord.transform_to(AltAz(location=earth_location, obstime=observing_time))
+    az_alt = coord.transform_to(
+        AltAz(location=earth_location, obstime=observing_time)
+    )
     az_value = az_alt.az.value  # az value
     alt_value = az_alt.alt.value  # alt value
     az_calculated_Array = [az_value, alt_value]
@@ -171,7 +177,9 @@ def __get_info(
     while max_iter > 0 and abs(temp_el - el_limit) >= prec / 10:
         diff_el = temp_el - el_limit  # 1 deg=240 sec
         temp_t = temp_t + TimeDelta(diff_el * 240, format="sec")
-        temp_el = coord.transform_to(AltAz(location=earth_location, obstime=temp_t))
+        temp_el = coord.transform_to(
+            AltAz(location=earth_location, obstime=temp_t)
+        )
         temp_el = temp_el.alt.value
         list_diff.append(abs(diff_el))
         max_iter = max_iter - 1

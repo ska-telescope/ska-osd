@@ -5,7 +5,10 @@ from typing import Dict
 
 from ska_telmodel.data import TMData
 
-from ska_ost_osd.osd.common.constant import GITLAB_SOURCE, RELEASE_FILE_PATH_LATEST
+from ska_ost_osd.osd.common.constant import (
+    GITLAB_SOURCE,
+    RELEASE_FILE_PATH_LATEST,
+)
 
 
 def load_json_from_file(filename):

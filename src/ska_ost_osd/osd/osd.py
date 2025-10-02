@@ -26,18 +26,24 @@ from .common.constant import (
     GITLAB_SOURCE,
     MID_CAPABILITIES_JSON_PATH,
     OBSERVATORY_POLICIES_JSON_PATH,
+    OBSERVATORY_POLICIES_PATH,
     SOURCES,
     VERSION_FILE_PATH,
     osd_file_mapping,
     osd_response_template,
 )
 
+
 class OSD:
     """Initialize OSD-related variables and methods, including
     get_telescope_observatory_policies, get_data, and get_osd_data."""
 
     def __init__(
-        self, capabilities: list, array_assembly: str, tmdata: TMData, cycle_id: int
+        self,
+        capabilities: list,
+        array_assembly: str,
+        tmdata: TMData,
+        cycle_id: int,
     ) -> None:
         """Initialize the OSD class.
 
@@ -70,11 +76,17 @@ class OSD:
         capabilities_list = list(osd_file_mapping.keys())[:3]
 
         if capabilities:
-            cap_list = [i for i in capabilities if i.lower() not in capabilities_list]
+            cap_list = [
+                i for i in capabilities if i.lower() not in capabilities_list
+            ]
 
-        if (capabilities is not None and isinstance(capabilities, list)) and (cap_list):
+        if (capabilities is not None and isinstance(capabilities, list)) and (
+            cap_list
+        ):
             msg = ", ".join(capabilities_list)
-            return CAPABILITY_DOESNOT_EXIST_ERROR_MESSAGE.format(cap_list[0], msg)
+            return CAPABILITY_DOESNOT_EXIST_ERROR_MESSAGE.format(
+                cap_list[0], msg
+            )
 
     def get_telescope_observatory_policies(
         self,
@@ -105,10 +117,13 @@ class OSD:
         else:
             capabilities = [cap.capitalize() for cap in capabilities]
             if array_assembly:
-                capabilities_dict = {cap: array_assembly for cap in capabilities}
+                capabilities_dict = {
+                    cap: array_assembly for cap in capabilities
+                }
             else:
                 capabilities_dict = {
-                    cap: telescope_capabilities.get(cap, {}) for cap in capabilities
+                    cap: telescope_capabilities.get(cap, {})
+                    for cap in capabilities
                 }
 
         return self.osd_data, capabilities_dict
@@ -131,7 +146,9 @@ class OSD:
         """
         cap_err_msg_list = []
         for key, value in telescope_capabilities_dict.items():
-            data = self.get_data(tmdata, capability=osd_file_mapping[key.lower()])
+            data = self.get_data(
+                tmdata, capability=osd_file_mapping[key.lower()]
+            )
             self.keys_list = list(data.keys())
             err_msg = None
             if self.array_assembly:
@@ -141,12 +158,15 @@ class OSD:
                 cap_err_msg_list.append(err_msg)
             else:
                 osd_data["capabilities"][key.lower()] = {}
-                osd_data["capabilities"][key.lower()]["basic_capabilities"] = data[
+                osd_data["capabilities"][key.lower()][
                     "basic_capabilities"
-                ]
+                ] = data["basic_capabilities"]
                 if not self.array_assembly and not self.cycle_id:
                     for array_assembly_id in self.keys_list:
-                        if array_assembly_id not in ["telescope", "basic_capabilities"]:
+                        if array_assembly_id not in [
+                            "telescope",
+                            "basic_capabilities",
+                        ]:
                             osd_data["capabilities"][key.lower()][
                                 array_assembly_id
                             ] = data[array_assembly_id]
@@ -230,9 +250,13 @@ class OSD:
         """
         if value not in key_list:
             msg = ", ".join(
-                key for key in key_list if re.match(ARRAY_ASSEMBLY_PATTERN, key)
+                key
+                for key in key_list
+                if re.match(ARRAY_ASSEMBLY_PATTERN, key)
             )
-            return ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE.format(value, msg)
+            return ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE.format(
+                value, msg
+            )
 
 
 def get_version_dict(gitlab_branch: str = None):
@@ -242,29 +266,33 @@ def get_version_dict(gitlab_branch: str = None):
     if gitlab_branch is not None:
         tmdata_version = TMData(GITLAB_SOURCE, update=True)
     else:
-        GITLAB_BRANCH_SOURCE = [re.sub("main", gitlab_branch, GITLAB_SOURCE[0])]
+        GITLAB_BRANCH_SOURCE = [
+            re.sub("main", gitlab_branch, GITLAB_SOURCE[0])
+        ]
         tmdata_version = TMData(GITLAB_BRANCH_SOURCE, update=True)
-    
+
     versions_dict = tmdata_version[VERSION_FILE_PATH].get_dict()
-    
-    return versions_dict    
+
+    return versions_dict
+
 
 def get_available_cycles(gitlab_branch: str = None):
     """
-    Get the list of available cycles from the requested 
+    Get the list of available cycles from the requested
     OSD version/gitlab_branch
     """
     if gitlab_branch is not None:
         tmdata_version = TMData(GITLAB_SOURCE, update=True)
     else:
-        GITLAB_BRANCH_SOURCE = [re.sub("main", gitlab_branch, GITLAB_SOURCE[0])]
+        GITLAB_BRANCH_SOURCE = [
+            re.sub("main", gitlab_branch, GITLAB_SOURCE[0])
+        ]
         tmdata_version = TMData(GITLAB_BRANCH_SOURCE, update=True)
-    
-    observ_policy_dict = tmdata_version[OBSERVATORY_POLICIES_JSON_PATH].get_dict()
-    cycle_ids = [key for key in observ_policy_dict]
-    
-    return cycle_ids    
 
+    observ_policy_dict = tmdata_version[OBSERVATORY_POLICIES_PATH].get_dict()
+    cycle_ids = [key for key in observ_policy_dict]
+
+    return cycle_ids
 
 
 def check_cycle_id(
@@ -284,14 +312,7 @@ def check_cycle_id(
     """
     cycle_error_msg_list = []
 
-    if cycle_id is None and osd_version is None and gitlab_branch is None:
-        # -- a user didn't specify any input param. of the OSD
-        # -- assume the latest version 
-        osd_version = (
-            get_osd_latest_version()
-        )
-        cycle_ids = get_available_cycles()
-
+    # -- User spefiices conflicting information, break.
     if gitlab_branch is not None and osd_version is not None:
         # -- User specified both an OSD version and gitlab branch.
         # -- cannot proceed.
@@ -299,30 +320,36 @@ def check_cycle_id(
             CYCLE_ERROR_MESSAGE,
         )
 
+    # -- User gives no information, default to latest version & main branch
+    if cycle_id is None and osd_version is None and gitlab_branch is None:
+        # -- a user didn't specify any input param. of the OSD
+        # -- assume the latest version
+        osd_version = get_osd_latest_version()
+        cycle_ids = get_available_cycles()  # -- read cycle IDs from main
+
+    # -- User wants to use a gitlab branch, get all infor from this.
     if gitlab_branch is not None:
-        # -- point to a gitlab_branch for osd_version 
-        # -- and versions_dict
+        # -- point to a gitlab_branch for osd_version
+        # -- cycle_ids and versions_dict
         osd_version = gitlab_branch
         versions_dict = get_version_dict(gitlab_branch)
-        cycle_ids = hack_get_available_cycles(mode = 'local')
+        cycle_ids = get_available_cycles(gitlab_branch)
 
-    # -- at this point there should be enough data to: 
-    # -- 1. check the cycle ID exists in the specified 
-    # --    OSD version
-
-    cycle_ids = hack_get_available_cycles(mode = 'local')
+    # -- below gives None if cycle_id is None or cycle_id not in cycle_ids
     cycle_id_exists = [cycle_id if cycle_id in cycle_ids else None][0]
     string_ids = ",".join([str(i) for i in cycle_ids])
     if cycle_id is not None and cycle_id_exists is None:
         # -- a user specified a cycle ID which doesn't exist
         # -- in the list of cycle IDs for this OSD version.
+        # -- error.
         cycle_error_msg_list.append(
             CYCLE_ID_ERROR_MESSAGE.format(cycle_id, string_ids),
         )
 
     elif cycle_id is not None and osd_version is None:
+        # -- A user gave only the cycle_id.
         versions_dict = get_version_dict()
-        osd_version = versions_dict[f"{cycle_id}"][-1] # to use latest
+        osd_version = versions_dict[f"{cycle_id}"][-1]  # to use latest
 
     elif cycle_id is not None and cycle_id_exists and osd_version is not None:
         if osd_version not in versions_dict[f"{cycle_id}"]:
@@ -333,6 +360,7 @@ def check_cycle_id(
             )
 
     return osd_version, cycle_error_msg_list
+
 
 def osd_tmdata_source(
     cycle_id: int = None,
@@ -353,7 +381,9 @@ def osd_tmdata_source(
     source_error_msg_list = []
     if source not in SOURCES:
         source_msg = ", ".join(SOURCES)
-        source_error_msg_list.append(AVAILABLE_SOURCE_ERROR_MESSAGE.format(source_msg))
+        source_error_msg_list.append(
+            AVAILABLE_SOURCE_ERROR_MESSAGE.format(source_msg)
+        )
 
     if (
         gitlab_branch
@@ -368,7 +398,9 @@ def osd_tmdata_source(
 
     source_error_msg_list.extend(cycle_error_msg_list)
 
-    source_url = (f"{source}:{BASE_URL}{CAR_URL}{osd_version}#{BASE_FOLDER_NAME}",)
+    source_url = (
+        f"{source}:{BASE_URL}{CAR_URL}{osd_version}#{BASE_FOLDER_NAME}",
+    )
 
     if source == "file":
         source_url = (f"file://{BASE_FOLDER_NAME}",)
@@ -377,6 +409,7 @@ def osd_tmdata_source(
         source_url = (f"{source}:{CAR_URL}{osd_version}#{BASE_FOLDER_NAME}",)
 
     return source_url, source_error_msg_list
+
 
 def get_osd_data(
     capabilities: list = None,
@@ -403,7 +436,8 @@ def get_osd_data(
 
     return osd_data, data_error_msg_list
 
-def aa_get_osd_using_tmdata(
+
+def get_osd_using_tmdata(
     cycle_id: Optional[str] = None,
     osd_version: Optional[str] = None,
     source: Optional[str] = None,
@@ -435,7 +469,6 @@ def aa_get_osd_using_tmdata(
     except OSDModelError as error:
         errors.extend(error.args[0])
 
-    
     _, cycle_errors = check_cycle_id(
         cycle_id=cycle_id,
         osd_version=osd_version,
@@ -472,8 +505,11 @@ def aa_get_osd_using_tmdata(
         raise ValueError(errors)
     return osd_data
 
+
 def update_file_storage(
-    validated_capabilities: Dict, observatory_policy: Dict, existing_stored_data: Dict
+    validated_capabilities: Dict,
+    observatory_policy: Dict,
+    existing_stored_data: Dict,
 ) -> Dict:
     """Process and validate OSD data for insertion into the capabilities file.
 
@@ -501,7 +537,9 @@ def update_file_storage(
     for key, value in telescope_data.items():
         if key in updated_data:
             # Update existing fields
-            if isinstance(value, dict) and isinstance(existing_stored_data[key], dict):
+            if isinstance(value, dict) and isinstance(
+                existing_stored_data[key], dict
+            ):
                 updated_data[key].update(value)
             else:
                 updated_data[key] = value

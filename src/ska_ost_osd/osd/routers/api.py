@@ -26,7 +26,10 @@ from ska_ost_osd.osd.common.constant import (
     SWAGGER_MID_OSD_DATA_JSON_FILE_PATH,
     osd_file_mapping,
 )
-from ska_ost_osd.osd.common.error_handling import CapabilityError, OSDModelError
+from ska_ost_osd.osd.common.error_handling import (
+    CapabilityError,
+    OSDModelError,
+)
 from ska_ost_osd.osd.common.gitlab_helper import push_to_gitlab
 from ska_ost_osd.osd.common.osd_validation_messages import (
     ARRAY_ASSEMBLY_DOESNOT_BELONGS_TO_CYCLE_ERROR_MESSAGE,
@@ -45,7 +48,9 @@ from ska_ost_osd.osd.osd import (
     get_osd_using_tmdata,
     update_file_storage,
 )
-from ska_ost_osd.osd.version_mapping.version_manager import manage_version_release
+from ska_ost_osd.osd.version_mapping.version_manager import (
+    manage_version_release,
+)
 
 # this variable is added for restricting tmdata publish from local/dev environment.
 # usage: 0 means disable tmdata publish to artefact.
@@ -94,7 +99,9 @@ def get_osd(osd_model: OSDQueryParams = Depends()) -> Dict:
     response_model=ApiResponse,
 )
 def update_osd_data(
-    body: Dict = Body(example=load_json_from_file(SWAGGER_MID_OSD_DATA_JSON_FILE_PATH)),
+    body: Dict = Body(
+        example=load_json_from_file(SWAGGER_MID_OSD_DATA_JSON_FILE_PATH)
+    ),
     osd_model: OSDUpdateModel = Depends(),
 ) -> Dict:
     """Update the input JSON against the schema.
@@ -116,7 +123,9 @@ def update_osd_data(
         validated_capabilities = ValidationOnCapabilities(**body)
 
         # Check cycle and assembly compatibility if both attributes are present
-        if hasattr(osd_model, "cycle_id") and hasattr(osd_model, "array_assembly"):
+        if hasattr(osd_model, "cycle_id") and hasattr(
+            osd_model, "array_assembly"
+        ):
             osd_data = read_json(OBSERVATORY_POLICIES_JSON_PATH)
             if (
                 osd_model.cycle_id == osd_data["cycle_number"]
@@ -136,16 +145,25 @@ def update_osd_data(
         updated_data = update_file_storage(
             validated_capabilities, observatory_policy, existing_data
         )
-        return convert_to_response_object(updated_data, result_code=HTTPStatus.OK)
+        return convert_to_response_object(
+            updated_data, result_code=HTTPStatus.OK
+        )
 
-    except (ValidationError, KeyError, OSDModelError, CapabilityError) as error:
+    except (
+        ValidationError,
+        KeyError,
+        OSDModelError,
+        CapabilityError,
+    ) as error:
         raise ValueError(str(error)) from error
 
 
 @osd_router.post(
     "/osd_release",
     summary="Release new osd version to Gitlab",
-    description="Release OSD data with automatic version increment based on cycle ID",
+    description=(
+        "Release OSD data with automatic version increment based on cycle ID"
+    ),
     responses=get_responses(ApiResponse[OSDRelease]),
     response_model=ApiResponse[OSDRelease],
 )
@@ -166,7 +184,9 @@ def release_osd_data(
     cycle_id = f"cycle_{cycle_id}"
 
     if release_type and release_type not in ["minor", "major"]:
-        raise ValueError("release_type must be either 'major' or 'minor' if provided")
+        raise ValueError(
+            "release_type must be either 'major' or 'minor' if provided"
+        )
 
     if not PUSH_TO_GITLAB:
         result = {

@@ -13,7 +13,9 @@ from typing import Any, Dict, Optional
 from pydantic import ValidationError
 from ska_telmodel.data import TMData
 
-from ska_ost_osd.telvalidation.models.semantic_schema_validator import SemanticModel
+from ska_ost_osd.telvalidation.models.semantic_schema_validator import (
+    SemanticModel,
+)
 
 from .common.constant import (
     ASSIGN_RESOURCE,
@@ -307,9 +309,12 @@ def fetch_matched_capabilities_from_basic_capabilities(
                 if all(ref in mapping for ref in capabilities):
                     return [mapping[ref] for ref in capabilities]
         return [
-            fetch_matched_capabilities_from_basic_capabilities(item, basic_capabilities)
+            fetch_matched_capabilities_from_basic_capabilities(
+                item, basic_capabilities
+            )
             for item in capabilities
         ]
+
     return capabilities
 
 
@@ -411,8 +416,8 @@ def semantic_validate(
 
         if not version:
             message = (
-                "Interface is missing from observing_command_input. Please provide"
-                " interface='...' explicitly."
+                "Interface is missing from observing_command_input. Please"
+                " provide interface='...' explicitly."
             )
             logging.warning(message)
             raise SchematicValidationError(message)

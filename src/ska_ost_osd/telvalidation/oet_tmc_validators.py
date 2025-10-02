@@ -36,7 +36,9 @@ logging.getLogger("telvalidation")
 from collections import deque
 
 
-def get_value_based_on_provided_path(nested_data: Union[dict, list], path: list) -> Any:
+def get_value_based_on_provided_path(
+    nested_data: Union[dict, list], path: list
+) -> Any:
     """Retrieve a value from a nested dictionary or list of dictionaries based
     on a path.
 
@@ -71,7 +73,9 @@ def get_value_based_on_provided_path(nested_data: Union[dict, list], path: list)
                     elif isinstance(value, list):
                         for item in value:
                             if isinstance(item, dict):
-                                stack.append((item, [current_key] + remaining_path))
+                                stack.append(
+                                    (item, [current_key] + remaining_path)
+                                )
         elif isinstance(current_data, list):
             for item in current_data:
                 if isinstance(item, dict) and current_key in item:
@@ -194,7 +198,9 @@ def apply_validation_rule(
                     osd_base_constraint,
                 )
                 if eval_result and True not in eval_result:
-                    error_msg = format_error_message(rule_data, osd_base_constraint)
+                    error_msg = format_error_message(
+                        rule_data, osd_base_constraint
+                    )
                     error_msgs.append(error_msg)
             except KeyError as key_error:
                 logging.error(key_error)
@@ -279,7 +285,9 @@ def evaluate_rule(
         simple_eval.names = names
         eval_data = simple_eval.eval(rule_data["rule"])
         eval_new_data = (
-            [not bool(eval_data)] if isinstance(eval_data, set) else [bool(eval_data)]
+            [not bool(eval_data)]
+            if isinstance(eval_data, set)
+            else [bool(eval_data)]
         )
     return eval_new_data
 
@@ -399,9 +407,15 @@ def validate_target_is_visible(
 
     observing_time = observing_time.strftime("%Y-%m-%dT%H:%M:%S")
     utcoffset = +2 * u.hour if target_env == "target_mid" else +8 * u.hour
-    observing_time = (Time(observing_time) - utcoffset).strftime("%Y-%m-%dT%H:%M:%S")
-    validator_json_schema = tm_data[MID_VALIDATION_CONSTANT_JSON_FILE_PATH].get_dict()
-    dish_elevation_limit = validator_json_schema["AA0.5"]["dish_elevation_limit"]["min"]
+    observing_time = (Time(observing_time) - utcoffset).strftime(
+        "%Y-%m-%dT%H:%M:%S"
+    )
+    validator_json_schema = tm_data[
+        MID_VALIDATION_CONSTANT_JSON_FILE_PATH
+    ].get_dict()
+    dish_elevation_limit = validator_json_schema["AA0.5"][
+        "dish_elevation_limit"
+    ]["min"]
 
     ra_dec = [
         ra_degs_from_str_formats(ra_str)[0],

@@ -4,8 +4,14 @@ from typing import Any, Dict, List, Literal, Optional, TypeVar
 
 from pydantic import BaseModel, Field, model_validator
 
-from ska_ost_osd.osd.common.constant import ARRAY_ASSEMBLY_PATTERN, OSD_VERSION_PATTERN
-from ska_ost_osd.osd.common.error_handling import CapabilityError, OSDModelError
+from ska_ost_osd.osd.common.constant import (
+    ARRAY_ASSEMBLY_PATTERN,
+    OSD_VERSION_PATTERN,
+)
+from ska_ost_osd.osd.common.error_handling import (
+    CapabilityError,
+    OSDModelError,
+)
 from ska_ost_osd.osd.common.osd_validation_messages import (
     ARRAY_ASSEMBLY_INVALID_ERROR_MESSAGE,
     CYCLE_ID_ARRAY_ASSEMBLY_ERROR_MESSAGE,
