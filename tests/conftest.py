@@ -384,7 +384,7 @@ def mid_low_response_input(request):
                     "Cycle_id and Array_assembly cannot be used together",
                     "osd_version 1..1.0 is not valid",
                     "array_assembly AAA3 is not valid",
-                    "Cycle 100000 is not valid,Available IDs are 1",
+                    "Cycle 100000 is not valid, Available IDs are 1",
                 ],
                 "result_status": "failed",
                 "result_code": 400,

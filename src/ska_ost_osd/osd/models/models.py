@@ -78,7 +78,7 @@ class OSDModel(BaseModel):
     """
 
     cycle_id: Optional[str] = None
-    osd_version: Optional[str] = None
+    # osd_version: Optional[str] = None
     source: Optional[str] = None
     gitlab_branch: Optional[str] = None
     capabilities: Optional[str] = None
@@ -105,10 +105,10 @@ class OSDModel(BaseModel):
             errors.append(CYCLE_ID_CAPABILITIES_ERROR_MESSAGE)
 
         # Validate patterns
-        if osd_version and not re.match(OSD_VERSION_PATTERN, osd_version):
-            errors.append(
-                OSD_VERSION_INVALID_ERROR_MESSAGE.format(osd_version)
-            )
+        # if osd_version and not re.match(OSD_VERSION_PATTERN, osd_version):
+        #     errors.append(
+        #         OSD_VERSION_INVALID_ERROR_MESSAGE.format(osd_version)
+        #     )
         if array_assembly and not re.match(
             ARRAY_ASSEMBLY_PATTERN, array_assembly
         ):
@@ -216,15 +216,15 @@ class OSDQueryParams(BaseModel):
         Example: "AA0.5"
     """
 
-    cycle_id: Optional[int] = Field(
-        default=None, example=1, description="Cycle ID", title="Cycle ID"
+    cycle_id: Optional[str] = Field(
+        default=None, example='low_cycle_0', description="Cycle ID", title="Cycle ID"
     )
-    osd_version: Optional[str] = Field(
-        default=None,
-        example="1.0.0",
-        description="OSD Version (e.g., 1.0.0)",
-        title="OSD Version",
-    )
+    # osd_version: Optional[str] = Field(
+    #     default=None,
+    #     example="1.0.0",
+    #     description="OSD Version (e.g., 1.0.0)",
+    #     title="OSD Version",
+    # )
     source: Optional[Literal["car", "file", "gitlab"]] = Field(
         default="car",
         description="Source of OSD release",

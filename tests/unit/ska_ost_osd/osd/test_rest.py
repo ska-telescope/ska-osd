@@ -230,7 +230,7 @@ def test_invalid_cycle_id(
         params=params,
     ).json()
 
-    expected = f"Cycle {cycle_id} is not valid,Available IDs are 1"
+    expected = f"Cycle {cycle_id} is not valid, Available IDs are 1"
 
     assert response["result_data"][0] == expected
     assert response["result_code"] == HTTPStatus.BAD_REQUEST
