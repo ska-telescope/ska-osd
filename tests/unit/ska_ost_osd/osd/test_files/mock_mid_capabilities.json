@@ -64,7 +64,8 @@
     "AA0.5": {
         "available_receivers": [
             "Band_1",
-            "Band_2"
+            "Band_2",
+            "Band_5b"
         ],
         "number_ska_dishes": 4,
         "number_meerkat_dishes": 0,
