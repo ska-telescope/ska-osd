@@ -9,7 +9,7 @@ Development
 ***********
 * NAK-1352 Refactor handling of TelModel data sources including default
 
-Unreleased
+4.2.2
 ***********
 * Added band 5b to the available receivers for Mid AA0.5
 
