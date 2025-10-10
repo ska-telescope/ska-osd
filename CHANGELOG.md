@@ -11,6 +11,7 @@ Development
 
 Unreleased
 ***********
+* Added band 5b to the allowed bands for Mid AA0.5
 
 4.2.1
 ***********
