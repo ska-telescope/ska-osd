@@ -44,7 +44,7 @@ OSD_MAJOR_VERSION = version("ska-ost-osd").split(".")[0]
 BASE_API_URL = f"/ska-ost-osd/osd/api/v{OSD_MAJOR_VERSION}"
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def create_entity_object():
     def _create_entity_object(filepath: str):
         return read_json(filepath)
@@ -76,24 +76,24 @@ def client_post():
     return partial(client.post, headers={"accept": "application/json"})
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def git_tm_data():
     return TMData(sources)
 
 
 # re-defined TMData for local file source
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def tm_data():
     return TMData(local_source)
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def tmdata_source():
     """TMData source URL fixture."""
     return CAR_TELMODEL_SOURCE
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def tm_data_osd(create_entity_object):
     with tempfile.TemporaryDirectory("tmdata") as dirname:
         mid_parent = pathlib.Path(dirname, "ska1_mid")
@@ -153,7 +153,7 @@ def tm_data_osd(create_entity_object):
         yield TMData([f"file://{dirname}"])
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def validate_car_class():
     """This function is used as a fixture for osd_tmdata_source object with
     osd_version as '1.11.0'.
@@ -164,7 +164,7 @@ def validate_car_class():
     return tmdata_source
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def validate_gitlab_class():
     """This function is used as a fixture for osd_tmdata_source object with
     parameters.
@@ -179,7 +179,7 @@ def validate_gitlab_class():
     return tmdata_source
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def osd_versions():
     """This fixture reads a JSON file containing cycle-to-version mappings,
     extracts all unique versions across all cycles, and returns them as a
@@ -210,7 +210,7 @@ def osd_versions():
     return sorted(list(all_versions))
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def mid_osd_data():
     """This fixture returns data in MID_OSD_DATA_JSON file.
 
@@ -219,7 +219,7 @@ def mid_osd_data():
     return MID_OSD_DATA_JSON
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def mock_mid_data(create_entity_object):
     """This function is used as a fixture for mid json data.
 
@@ -229,7 +229,7 @@ def mock_mid_data(create_entity_object):
     return create_entity_object(MID_CAPABILITIES_MOCK_DATA)
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def mock_low_data(create_entity_object):
     """This function is used as a fixture for low json data.
 
@@ -239,18 +239,18 @@ def mock_low_data(create_entity_object):
     return create_entity_object(LOW_CAPABILITIES_MOCK_DATA)
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def valid_observing_command_input(create_entity_object):
     return create_entity_object(MID_ASSIGN_JSON).get("valid")
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def invalid_observing_command_input(create_entity_object):
     return create_entity_object(MID_ASSIGN_JSON).get("invalid")
 
 
 @pytest.fixture(
-    scope="module",
+    scope="session",
     params=[
         (
             None,
@@ -371,7 +371,7 @@ def mid_low_response_input(request):
 
 
 @pytest.fixture(
-    scope="module",
+    scope="session",
     params=[
         (
             100000,
@@ -435,7 +435,7 @@ def invalid_osd_tmdata_source_input(request):
     return request.param
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def valid_semantic_validation_body(
     tmdata_source, mid_osd_data, valid_observing_command_input
 ):
@@ -449,7 +449,7 @@ def valid_semantic_validation_body(
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def valid_semantic_validation_response():
     return {
         "result_data": "JSON is semantically valid",
@@ -458,7 +458,7 @@ def valid_semantic_validation_response():
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def semantic_validation_disable_response():
     return {
         "result_data": "Semantic Validation is currently disabled",
@@ -467,7 +467,7 @@ def semantic_validation_disable_response():
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def invalid_semantic_validation_body(
     tmdata_source, mid_osd_data, invalid_observing_command_input
 ):
@@ -481,7 +481,7 @@ def invalid_semantic_validation_body(
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def invalid_semantic_validation_response():
     return {
         "result_data": [
@@ -503,7 +503,7 @@ def invalid_semantic_validation_response():
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def observing_command_input_missing_response():
     return {
         "detail": [
@@ -515,7 +515,7 @@ def observing_command_input_missing_response():
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def wrong_semantic_validation_parameter_body():
     return {
         "interface": "https://schemka-tmc-assignresources/2.1",
@@ -525,7 +525,7 @@ def wrong_semantic_validation_parameter_body():
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def wrong_semantic_validation_parameter_value_response():
     return {
         "result_data": (
@@ -540,7 +540,7 @@ def wrong_semantic_validation_parameter_value_response():
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def semantic_validation_invalid_array_assembly(valid_observing_command_input):
     return {
         "observing_command_input": valid_observing_command_input,
@@ -551,13 +551,13 @@ def semantic_validation_invalid_array_assembly(valid_observing_command_input):
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def valid_only_observing_command_input_in_request_body(valid_observing_command_input):
     return {"observing_command_input": valid_observing_command_input}
 
 
 @pytest.fixture(
-    scope="module",
+    scope="session",
     params=[
         (MID_ASSIGN_JSON, "valid", "MID", True, False),
         (
