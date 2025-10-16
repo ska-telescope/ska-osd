@@ -6,8 +6,8 @@
                 "subarray_beams": {
                     "subarray_beam_id": [
                         {
-                            "rule": "1 <= subarray_beam_id <= 48",
-                            "error": "subarray_beam_id must be between 1 and 48"
+                            "rule": "1 <= subarray_beam_id <= number_beams",
+                            "error": "subarray_beam_id must be between 1 and {number_beams}"
                         }
                     ],
                     "number_of_channels": [

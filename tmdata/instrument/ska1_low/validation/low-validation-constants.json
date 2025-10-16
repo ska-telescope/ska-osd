@@ -6,8 +6,8 @@
                 "subarray_beams": {
                     "subarray_beam_id": [
                         {
-                            "rule": "1 <= subarray_beam_id <= 48",
-                            "error": "subarray_beam_id must be between 1 and 48"
+                            "rule": "1 <= subarray_beam_id <= number_beams",
+                            "error": "subarray_beam_id must be between 1 and {number_beams}"
                         }
                     ],
                     "number_of_channels": [
@@ -41,7 +41,7 @@
                 "execution_block": {
                     "parent_key_rule": [
                         {
-                            "rule": "len(beams) == number_beams",
+                            "rule": "len(beams) <= number_beams",
                             "error": "beams are too many! Current limit is {number_beams}"
                         }
                     ],
@@ -61,8 +61,8 @@
                 "subarray_beams": {
                     "subarray_beam_id": [
                         {
-                            "rule": "1 <= subarray_beam_id <= 48",
-                            "error": "subarray_beam_id must be between 1 and 48"
+                            "rule": "1 <= subarray_beam_id <= number_beams",
+                            "error": "subarray_beam_id must be between 1 and {number_beams}"
                         }
                     ],
                     "update_rate": [
@@ -152,8 +152,8 @@
                     "timing_beams": {
                         "beams": [
                             {
-                                "rule": "len(beams) == 1",
-                                "error": "beams are too many!Current Limit is 1"
+                                "rule": "len(beams) =< number_pst_beams",
+                                "error": "beams are too many!Current Limit is {number_pst_beams}"
                             }
                         ],
                         "fsp": {
@@ -169,7 +169,7 @@
                 "pst": {
                     "beams": [
                         {
-                            "rule": "len(beams) == number_pst_beams",
+                            "rule": "len(beams) =< number_pst_beams",
                             "error": "beams are too many! Current limit is {number_pst_beams}"
                         }
                     ]
