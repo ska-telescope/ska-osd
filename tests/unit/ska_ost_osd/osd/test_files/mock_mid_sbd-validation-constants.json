@@ -115,5 +115,28 @@
 
         }
     },
-    "AA1": {}
+    "AA1": {
+        "sbd": {
+            "dish_configurations": {
+                "receiver_band": [
+                    {
+                        "rule": "receiver_band in ['1','2', '5a','5b']",
+                        "error": "Invalid input for receiver_band! Currently allowed [1,2,5a,5b]"
+                    }
+                ]
+            }
+        }
+    },
+    "AA2": {
+        "sbd": {
+            "dish_configurations": {
+                "receiver_band": [
+                    {
+                        "rule": "receiver_band in ['1','2', '5a','5b']",
+                        "error": "Invalid input for receiver_band! Currently allowed [1,2,5a,5b]"
+                    }
+                ]
+            }
+    }
+}
 }
