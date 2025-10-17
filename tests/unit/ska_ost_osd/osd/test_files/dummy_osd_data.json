@@ -1,0 +1,27 @@
+{
+  "capabilities": {
+    "MID": {
+      "array_assembly": {
+        "template_mappings": {
+          "beam_templates": {
+            "file": "dummy_templates.json", 
+            "template_patterns": ["MID_*"]
+          }
+        }
+      }
+    },
+    "LOW": {
+      "array_assembly": {
+        "template_mappings": {
+          "beam_templates": {
+            "file": "dummy_templates.json",
+            "template_patterns": ["LOW_*"]
+          }
+        }
+      }
+    }
+  },
+  "other_data": {
+    "version": "1.0"
+  }
+}

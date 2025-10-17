@@ -27,7 +27,15 @@
       "number_pst_beams": 1,
       "number_vlbi_beams": 0,
       "ps_beam_bandwidth_hz": 75000000.0,
-      "number_fsps": 6
+      "number_fsps": 6,
+      "template_mappings": {
+            "subarray_templates_ref": {
+                "file": "tmdata/subarray_templates/subarray_template_library.json",
+                "template_patterns": [
+                "*_AA0.5"
+                ]
+            }
+      }
     },
     "AA1": {
       "number_stations": 16,
@@ -47,7 +55,15 @@
       "number_vlbi_beams": 0,
       "ps_beam_bandwidth_hz": 75000000.0,
       "number_fsps": 6,
-      "number_station_ids": [345, 346, 347, 348, 349, 350, 351, 352, 353, 354, 429, 430, 431, 432, 433, 434] 
+      "number_station_ids": [345, 346, 347, 348, 349, 350, 351, 352, 353, 354, 429, 430, 431, 432, 433, 434],
+      "template_mappings": {
+            "subarray_templates_ref": {
+                "file": "tmdata/subarray_templates/subarray_template_library.json",
+                "template_patterns": [
+                "*_AA1"
+                ]
+            }
+            }
     },
     "AA2": {
       "number_stations": 68,
@@ -68,7 +84,14 @@
       "number_vlbi_beams": 0,
       "ps_beam_bandwidth_hz": 118000000.0,
       "number_fsps": 10,
-      "number_station_ids": [315, 316, 317, 318, 321, 322, 323, 324, 345, 346, 347, 348, 349, 350, 351, 352, 353, 354, 375, 376, 377, 378, 381, 382, 383, 384, 387, 388, 389, 390, 405, 406, 407, 408, 429, 430, 431, 432, 433, 434, 447, 448, 449, 450, 459, 460, 461, 462, 465, 466, 467, 468, 471, 472, 473, 474, 489, 490, 491, 492, 501, 502, 503, 504, 507, 508, 509, 510] 
-      
+      "number_station_ids": [315, 316, 317, 318, 321, 322, 323, 324, 345, 346, 347, 348, 349, 350, 351, 352, 353, 354, 375, 376, 377, 378, 381, 382, 383, 384, 387, 388, 389, 390, 405, 406, 407, 408, 429, 430, 431, 432, 433, 434, 447, 448, 449, 450, 459, 460, 461, 462, 465, 466, 467, 468, 471, 472, 473, 474, 489, 490, 491, 492, 501, 502, 503, 504, 507, 508, 509, 510],
+      "template_mappings": {
+            "subarray_templates_ref": {
+                "file": "tmdata/subarray_templates/subarray_template_library.json",
+                "template_patterns": [
+                "*_AA2"
+                ]
+            }
+            }
     }
   }
