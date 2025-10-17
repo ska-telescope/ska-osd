@@ -97,14 +97,7 @@
         "number_zoom_channels": 0,
         "number_zoom_windows": 0,
         "ps_beam_bandwidth_hz": 400000000,
-        "template_mappings": {
-        "subarray_templates_ref": {
-            "file": "tmdata/subarray_templates/subarray_template_library.json",
-            "template_patterns": [
-            "*_AA0.5"
-            ]
-        }
-        }
+        "subarray_templates": ["*_AA0.5"]
     },
     "AA1": {
         "allowed_channel_count_range_max": [
@@ -147,14 +140,7 @@
         "number_zoom_channels": 0,
         "number_zoom_windows": 0,
         "ps_beam_bandwidth_hz": 400000000,
-        "template_mappings": {
-            "subarray_templates_ref": {
-                "file": "tmdata/subarray_templates/subarray_template_library.json",
-                "template_patterns": [
-                "*_AA1"
-                ]
-            }
-        }
+        "subarray_templates": ["*_AA1"]
     },
     "AA2": {
         "allowed_channel_count_range_max": [
@@ -271,13 +257,6 @@
         "number_zoom_channels": 14880,
         "number_zoom_windows": 17,
         "ps_beam_bandwidth_hz": 800000000,
-        "template_mappings": {
-            "subarray_templates_ref": {
-                "file": "tmdata/subarray_templates/subarray_template_library.json",
-                "template_patterns": [
-                "*_AA2"
-                ]
-            }
-        }
+        "subarray_templates": ["*_AA2"]
     }
 }

@@ -127,12 +127,7 @@ class TestProcessTemplateMappings:
 
         capabilities_data = {
             "array_assembly": {
-                "template_mappings": {
-                    "mapping1": {
-                        "file": "templates.json",
-                        "template_patterns": ["MID_*"],
-                    }
-                },
+                "subarray_templates": ["MID_*"],
                 "existing_key": "existing_value",
             }
         }
@@ -142,8 +137,10 @@ class TestProcessTemplateMappings:
         expected = {
             "array_assembly": {
                 "existing_key": "existing_value",
-                "mid_template1": {"config": "mid1"},
-                "mid_template2": {"config": "mid2"},
+                "subarray_templates": {
+                    "MID_Template1": {"config": "mid1"},
+                    "MID_Template2": {"config": "mid2"},
+                },
             }
         }
         assert result == expected
@@ -153,22 +150,16 @@ class TestProcessTemplateMappings:
         """Test handling of missing template file."""
         mock_load_template.side_effect = FileNotFoundError("File not found")
 
-        capabilities_data = {
-            "array_assembly": {
-                "template_mappings": {
-                    "mapping1": {"file": "missing.json", "template_patterns": ["*"]}
-                }
-            }
-        }
+        capabilities_data = {"array_assembly": {"subarray_templates": ["*"]}}
 
         with patch("builtins.print") as mock_print:
             result = process_template_mappings(capabilities_data)
 
-            assert "template_mappings" not in result["array_assembly"]
+            assert "subarray_templates" not in result["array_assembly"]
             mock_print.assert_called_once()
 
-    def test_process_template_mappings_no_template_mappings(self):
-        """Test processing data without template_mappings."""
+    def test_process_template_mappings_no_subarray_templates(self):
+        """Test processing data without subarray_templates."""
         capabilities_data = {"array_assembly": {"existing_key": "existing_value"}}
 
         result = process_template_mappings(capabilities_data)
@@ -188,8 +179,8 @@ class TestApplyTemplateMappingsToOsdData:
 
         osd_data = {
             "capabilities": {
-                "MID": {"template_mappings": {}},
-                "LOW": {"template_mappings": {}},
+                "MID": {"subarray_templates": ["*"]},
+                "LOW": {"subarray_templates": ["*"]},
             }
         }
 

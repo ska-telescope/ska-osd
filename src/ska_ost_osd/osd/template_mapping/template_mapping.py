@@ -12,6 +12,9 @@ from typing import Any, Dict
 
 from ska_ost_osd.common.utils import read_json
 
+# Constants
+SUBARRAY_TEMPLATES_PATH = "tmdata/subarray_templates/subarray_template_library.json"
+
 
 @lru_cache(maxsize=32)
 def load_template_file(file_path: str) -> Dict[str, Any]:
@@ -76,44 +79,30 @@ def process_template_mappings(
 
     # Process each array assembly in the capabilities data
     for value in updated_data.values():
-        if isinstance(value, dict) and "template_mappings" in value:
-            template_mappings = value["template_mappings"]
+        if isinstance(value, dict) and "subarray_templates" in value:
+            template_patterns = value["subarray_templates"]
 
-            # Process each template mapping
-            for mapping_key, mapping_config in template_mappings.items():
-                if isinstance(mapping_config, dict) and "file" in mapping_config:
-                    template_file = mapping_config["file"]
-                    template_patterns = mapping_config.get("template_patterns", [])
+            if isinstance(template_patterns, list):
+                try:
+                    # Load subarray template data from constant path
+                    template_data = load_template_file(SUBARRAY_TEMPLATES_PATH)
 
-                    # Use the file path as specified in the mapping config
-                    template_file_path = (
-                        template_file
-                        if template_file.startswith("tmdata/")
-                        else f"{base_path}/{template_file}"
+                    # Find templates matching the patterns
+                    matching_templates = find_matching_templates(
+                        template_data, template_patterns, base_path
                     )
 
-                    try:
-                        # Load template data from file
-                        template_data = load_template_file(template_file_path)
+                    # Replace the patterns list with the actual template data
+                    if matching_templates:
+                        value["subarray_templates"] = matching_templates
+                    else:
+                        # Remove the key if no templates match
+                        del value["subarray_templates"]
 
-                        # Find templates matching the patterns
-                        matching_templates = find_matching_templates(
-                            template_data, template_patterns, base_path
-                        )
-
-                        # Add matching templates directly with lowercase keys
-                        for template_key, template_value in matching_templates.items():
-                            value[template_key.lower()] = template_value
-
-                    except (FileNotFoundError, json.JSONDecodeError) as e:
-                        # Log error but continue processing
-                        print(
-                            "Warning: Could not process template mapping"
-                            f" {mapping_key}: {e}"
-                        )
-
-            # Remove the template_mappings key entirely
-            del value["template_mappings"]
+                except (FileNotFoundError, json.JSONDecodeError) as e:
+                    # Log error and remove the key
+                    print(f"Warning: Could not process subarray templates: {e}")
+                    del value["subarray_templates"]
 
     return updated_data
 

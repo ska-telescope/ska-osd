@@ -34,9 +34,11 @@ def create_app(production=PRODUCTION) -> FastAPI:
     LOGGER.info("Creating FastAPI app")
     configure_logging(level=LOG_LEVEL)
 
-    app = FastAPI(openapi_url=f"{API_PREFIX}/openapi.json", docs_url=f"{API_PREFIX}/ui")
+    fastapi_app = FastAPI(
+        openapi_url=f"{API_PREFIX}/openapi.json", docs_url=f"{API_PREFIX}/ui"
+    )
 
-    app.add_middleware(
+    fastapi_app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
         allow_methods=["*"],
@@ -45,23 +47,26 @@ def create_app(production=PRODUCTION) -> FastAPI:
     )
 
     # Assemble the constituent APIs:
-    app.include_router(osd_router, prefix=API_PREFIX, tags=["OSD"])
+    fastapi_app.include_router(osd_router, prefix=API_PREFIX, tags=["OSD"])
 
     # Add handlers for different types of error
     # Add handlers for different types of error
-    app.exception_handler(OSDModelError)(generic_exception_handler)
-    app.exception_handler(SchematicValidationError)(schematic_validation_error_handler)
-    app.exception_handler(RequestValidationError)(generic_exception_handler)
-    app.exception_handler(ResponseValidationError)(generic_exception_handler)
-    app.exception_handler(ValueError)(generic_exception_handler)
-    app.exception_handler(FileNotFoundError)(generic_exception_handler)
-    app.exception_handler(RuntimeError)(generic_exception_handler)
-    app.exception_handler(ValidationError)(generic_exception_handler)
-    app.exception_handler(GitlabGetError)(generic_exception_handler)
+    fastapi_app.exception_handler(OSDModelError)(generic_exception_handler)
+    fastapi_app.exception_handler(SchematicValidationError)(
+        schematic_validation_error_handler
+    )
+    fastapi_app.exception_handler(RequestValidationError)(generic_exception_handler)
+    fastapi_app.exception_handler(ResponseValidationError)(generic_exception_handler)
+    fastapi_app.exception_handler(ValueError)(generic_exception_handler)
+    fastapi_app.exception_handler(FileNotFoundError)(generic_exception_handler)
+    fastapi_app.exception_handler(RuntimeError)(generic_exception_handler)
+    fastapi_app.exception_handler(ValidationError)(generic_exception_handler)
+    fastapi_app.exception_handler(GitlabGetError)(generic_exception_handler)
 
     if not production:
-        app.exception_handler(Exception)(generic_exception_handler)
-    return app
+        fastapi_app.exception_handler(Exception)(generic_exception_handler)
+    return fastapi_app
 
 
-main = create_app()
+app = create_app()
+main = app
