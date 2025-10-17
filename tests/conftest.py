@@ -557,7 +557,7 @@ def valid_only_observing_command_input_in_request_body(valid_observing_command_i
 
 
 @pytest.fixture(
-    scope="session",
+    scope="module",
     params=[
         (MID_ASSIGN_JSON, "valid", "MID", True, False),
         (

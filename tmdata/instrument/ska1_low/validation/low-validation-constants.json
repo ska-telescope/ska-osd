@@ -127,10 +127,10 @@
                     },
                     "vis": {
                         "fsp": {
-                            "firmware": [
+                            "function_mode": [
                                 {
-                                    "rule": "firmware == 'vis'",
-                                    "error": "Invalid input for firmware! Currently allowed vis"
+                                    "rule": "function_mode == 'vis'",
+                                    "error": "Invalid input for {function_mode}! Currently allowed vis"
                                 }
                             ],
                             "fsp_ids": [
@@ -157,10 +157,10 @@
                             }
                         ],
                         "fsp": {
-                            "firmware": [
+                            "function_mode": [
                                 {
-                                    "rule": "firmware == 'pst'",
-                                    "error": "Invalid input for firmware! Currently allowed pst"
+                                    "rule": "function_mode == 'pst'",
+                                    "error": "Invalid input for {function_mode}! Currently allowed pst"
                                 }
                             ]
                         }   

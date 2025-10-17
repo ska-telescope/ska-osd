@@ -108,12 +108,12 @@ low_configure_expected_result_for_invalid_data = (
     "c1 must be between 0.0 and 360.0\n"
     "c2 must be between -90.0 and 90.0\n"
     "stations are too many! Current limit is 4\n"
-    "Invalid input for firmware! Currently allowed vis\n"
+    "Invalid input for function_mode! Currently allowed vis\n"
     "The fsp_ids should all be distinct\n"
     "fsp_ids are too many!Current Limit is 6\n"
     "Invalid fsp_ids! The range should not greater than 6\n"
     "beams are too many!Current Limit is 1\n"
-    "Invalid input for firmware! Currently allowed pst\n"
+    "Invalid input for function_mode! Currently allowed pst\n"
     "beams are too many! Current limit is 1"
 )
 

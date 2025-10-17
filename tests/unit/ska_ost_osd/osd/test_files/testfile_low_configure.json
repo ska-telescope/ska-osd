@@ -62,7 +62,7 @@
           },
           "vis": {
               "fsp": {
-                  "firmware": "pulsar_search",
+                  "function_mode": "pulsar_search",
                   "fsp_ids": [
                     1,
                     2,
@@ -81,7 +81,7 @@
           },
           "timing_beams": {
               "fsp": {
-                  "firmware": "pulsar_search",
+                  "function_mode": "pulsar_search",
                   "fsp_ids": [1,
                   2,
                   3,
@@ -226,7 +226,7 @@
           },
           "vis": {
               "fsp": {
-                  "firmware": "vis",
+                  "function_mode": "vis",
                   "fsp_ids": [1]
               },
               "stn_beams": [{
@@ -236,7 +236,7 @@
           },
           "timing_beams": {
               "fsp": {
-                  "firmware": "pst",
+                  "function_mode": "pst",
                   "fsp_ids": [2]
               },
               "beams": [{
