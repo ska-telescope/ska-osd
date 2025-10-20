@@ -8,6 +8,7 @@ actual template data.
 import fnmatch
 import json
 from functools import lru_cache
+from pathlib import Path
 from typing import Any, Dict
 
 from ska_ost_osd.common.utils import read_json
@@ -17,7 +18,7 @@ SUBARRAY_TEMPLATES_PATH = "tmdata/subarray_templates/subarray_template_library.j
 
 
 @lru_cache(maxsize=32)
-def load_template_file(file_path: str) -> Dict[str, Any]:
+def load_template_file(file_path: Path) -> Dict[str, Any]:
     """Load template data from a JSON file with caching.
 
     :param file_path: Path to the template file
@@ -36,13 +37,13 @@ def load_template_file(file_path: str) -> Dict[str, Any]:
 
 
 def find_matching_templates(
-    templates: Dict[str, Any], patterns: list, base_path: str = ""
+    templates: Dict[str, Any], patterns: list, base_path: Path = ""
 ) -> Dict[str, Any]:
     """Find templates that match the given patterns and telescope type.
 
     :param templates: Dictionary of all available templates
     :param patterns: List of patterns to match against template keys
-    :param base_path: Base path to determine telescope type
+    :param base_path: Path to determine telescope type
     :return: Dictionary of matching templates
     """
     matching_templates = {}
@@ -62,7 +63,7 @@ def find_matching_templates(
 
 
 def process_template_mappings(
-    capabilities_data: Dict[str, Any], base_path: str = "tmdata/ska1_mid"
+    capabilities_data: Dict[str, Any], base_path: Path = "tmdata/ska1_mid"
 ) -> Dict[str, Any]:
     """Process template mappings in capabilities data.
 
@@ -71,7 +72,7 @@ def process_template_mappings(
     template_mappings key with the actual template data as individual keys.
 
     :param capabilities_data: Dictionary containing capabilities data
-    :param base_path: Base path for template files
+    :param base_path: Path for template files
     :return: Updated capabilities data with template mappings resolved
     """
     # Create a deep copy to avoid modifying the original data

@@ -13,14 +13,6 @@ from ska_ost_osd.osd.template_mapping.template_mapping import (
 )
 
 
-@pytest.fixture(autouse=True)
-def clear_cache():
-    """Clear the lru_cache before each test."""
-    load_template_file.cache_clear()
-    yield
-    load_template_file.cache_clear()
-
-
 class TestLoadTemplateFile:
     """Test cases for load_template_file function."""
 
