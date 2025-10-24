@@ -73,7 +73,7 @@ mid_expected_result_for_invalid_data = (
 )
 
 low_expected_result_for_invalid_data = (
-    "subarray_beam_id must be between 1 and 48\n"
+    "subarray_beam_id must be between 1 and 1\n"
     "number_of_channels must be between 8 and 384\n"
     "Invalid input for station_id! Currently allowed [345, 350, 352, 431]\n"
     "Initials of aperture_id should be AP\n"
@@ -104,7 +104,7 @@ low_configure_expected_result_for_invalid_data = (
     "number_of_channels must be greater than or equal to 8 and less"
     " than or equal to 384\n"
     "Initials of aperture_id should be AP\n"
-    "Invalid reference frame! Currently allowed  [“topocentric”, “ICRS”, “galactic”]\n"
+    'Invalid reference frame! Currently allowed  ["topocentric", "ICRS", "galactic"]\n'
     "c1 must be between 0.0 and 360.0\n"
     "c2 must be between -90.0 and 90.0\n"
     "stations are too many! Current limit is 4\n"
@@ -130,7 +130,7 @@ mid_sbd_expected_result_for_invalid_data = (
 )
 
 low_sbd_expected_result_for_invalid_data = (
-    "subarray_beam_id must be between 1 and 48\n"
+    "subarray_beam_id must be between 1 and 1\n"
     "number_of_channels must be between 8 and 384\n"
     "Invalid input for station_id! Currently allowed [345, 350, 352, 431]\n"
     "The logical_fsp_ids should all be distinct\n"
