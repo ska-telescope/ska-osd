@@ -374,14 +374,14 @@ GET /osd
                       "SKA125",
                       "SKA126"
                     ],
-                    "number_fsps": 35,
-                    "number_meerkat_dishes": 20,
+                    "number_fsps": 26,
+                    "number_meerkat_dishes": 4,
                     "number_meerkatplus_dishes": 0,
-                    "number_pss_beams": 385,
+                    "number_pss_beams": 384,
                     "number_pst_beams": 6,
                     "number_ska_dishes": 64,
                     "number_zoom_channels": 14880,
-                    "number_zoom_windows": 17,
+                    "number_zoom_windows": 16,
                     "ps_beam_bandwidth_hz": 800000000
                   }
                 }
@@ -727,7 +727,7 @@ PUT /osd
             "SKA081",
             "SKA100"
           ],
-          "number_fsps": 9,
+          "number_fsps": 8,
           "number_meerkat_dishes": 0,
           "number_meerkatplus_dishes": 0,
           "number_pss_beams": 0,

@@ -97,7 +97,7 @@
                         "reference_frame": [
                             {
                                 "rule": "reference_frame in ['topocentric', 'ICRS', 'galactic']",
-                                "error": "Invalid reference frame! Currently allowed  [“topocentric”, “ICRS”, “galactic”]"
+                                "error": "Invalid reference frame! Currently allowed  [\"topocentric\", \"ICRS\", \"galactic\"]"
                             }
                         ],
                         "c1": [
@@ -152,7 +152,7 @@
                     "timing_beams": {
                         "beams": [
                             {
-                                "rule": "len(beams) =< number_pst_beams",
+                                "rule": "len(beams) <= number_pst_beams",
                                 "error": "beams are too many!Current Limit is {number_pst_beams}"
                             }
                         ],
@@ -169,7 +169,7 @@
                 "pst": {
                     "beams": [
                         {
-                            "rule": "len(beams) =< number_pst_beams",
+                            "rule": "len(beams) <= number_pst_beams",
                             "error": "beams are too many! Current limit is {number_pst_beams}"
                         }
                     ]
@@ -256,8 +256,8 @@
             "dish": {
                 "receiver_band": [
                     {
-                        "rule": "receiver_band in ['1','2','5a','5b']",
-                        "error": "Invalid input for receiver_band! Currently allowed [1,2,5a,5b]"
+                        "rule": "receiver_band in ['1','2','5b']",
+                        "error": "Invalid input for receiver_band! Currently allowed [1,2,5b]"
                     }
                 ]
             },
