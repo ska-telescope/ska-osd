@@ -126,7 +126,7 @@ mid_sbd_expected_result_for_invalid_data = (
     " receptors\nreceptor_ids did not match receptors\nFSPs are too many!Current Limit"
     " = 4\nInvalid input for fsp_id!\nInvalid input for function_mode\n"
     "frequency_slice_id did not match fsp_id\nInvalid input for"
-    " receiver_band! Currently allowed [1,2,5a,5b]"
+    " receiver_band! Currently allowed [1,2,5b]"
 )
 
 low_sbd_expected_result_for_invalid_data = (
