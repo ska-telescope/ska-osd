@@ -161,6 +161,24 @@
         }
     },
     "AA1": {
+        "assign_resource": {
+            "sdp": {
+                "resources": {
+                    "receptors": [
+                        {
+                            "rule": "len(receptor_ids)==len(receptors)",
+                            "dependency_key": ["receptor_ids"],
+                            "error": "length of receptor_ids should be same as length of receptors"
+                        },
+                        {
+                            "rule": "set(receptor_ids).difference(set(receptors))",
+                            "dependency_key": ["receptor_ids"],
+                            "error": "receptor_ids did not match receptors"
+                        }
+                    ]
+                }
+            }
+        },
         "configure": {
             "dish": {
                 "receiver_band": [
@@ -174,19 +192,101 @@
                 "midcbf": {
                     "correlation": {
                         "processing_regions": {
+                            "fsp_ids": [
+                                {
+                                    "rule": "len(set(fsp_ids)) == len(fsp_ids)",
+                                    "error": "The fsp_ids should all be distinct"
+                                },
+                                {
+                                    "rule": "(0 < len(fsp_ids) <= number_fsps)",
+                                    "error": "fsp_ids are too many!Current Limit is {number_fsps}"
+                                },
+                                {
+                                    "rule": "False if len([num for num in fsp_ids if num > number_fsps])> 0 else True",
+                                    "error": "Invalid fsp_ids! The range should not greater than {number_fsps}"
+                                }
+                            ],
                             "channel_width": [
                                     {
                                     "rule": "channel_width in allowed_channel_width_values",
                                     "error": "Invalid input for channel_width! Currently allowed {allowed_channel_width_values}"
                                     }
+                            ],
+                            "channel_count": [
+                                {
+                                    "rule": "allowed_channel_count_range_min[0] <= channel_count <= allowed_channel_count_range_max[0]",
+                                    "error": "channel_count must be between {allowed_channel_count_range_min[0]} to {allowed_channel_count_range_max[0]}"
+                                },
+                                {
+                                    "rule": "(channel_count % 20) == 0",
+                                    "error": "channel_count must be a multiple of 20"
+                                }
+                            ],
+                            "start_freq": [
+                              {
+                                "rule": "min_frequency_hz <= ((start_freq - channel_width/2) + channel_width*channel_count) <= max_frequency_hz",
+                                "dependency_key": [
+                                  "channel_width",
+                                  "channel_count",
+                                  "receiver_band"
+                                ],
+                                "error": "Invalid input for start_freq"
+                              },
+                              {
+                                "rule": "min_frequency_hz <= start_freq <= max_frequency_hz",
+                                "dependency_key": [
+                                  "receiver_band"
+                                ],
+                                "error": "Invalid input for start_freq"
+                              }
+
+                            ],
+                            "sdp_start_channel_id": [
+                                {
+                                    "rule": "0 <= sdp_start_channel_id <= 2147483647",
+                                    "error": "sdp_start_channel_id must be between 0 to 2147483647"
+                                }
+                            ],
+                            "integration_factor": [
+                                {
+                                    "rule": "1 <= integration_factor <= 10",
+                                    "error": "integration_factor must be between 1 to 10"
+                                }
                             ]
                         }
                     }
+                },
+                "common": {
+                    "frequency_band": [
+                        {
+                          "rule": "(receiver_band != '5b' and receiver_band==frequency_band) or (receiver_band=='5b' and frequency_band=='1')",
+                          "dependency_key": ["receiver_band"],
+                            "error": "frequency_band did not match receiver_band"
+                        }
+                    ]
                 }
             }
         }
     },
     "AA2": {
+        "assign_resource": {
+            "sdp": {
+                "resources": {
+                    "receptors": [
+                        {
+                            "rule": "len(receptor_ids)==len(receptors)",
+                            "dependency_key": ["receptor_ids"],
+                            "error": "length of receptor_ids should be same as length of receptors"
+                        },
+                        {
+                            "rule": "set(receptor_ids).difference(set(receptors))",
+                            "dependency_key": ["receptor_ids"],
+                            "error": "receptor_ids did not match receptors"
+                        }
+                    ]
+                }
+            }
+        },
         "configure": {
             "dish": {
                 "receiver_band": [
@@ -200,14 +300,78 @@
                 "midcbf": {
                     "correlation": {
                         "processing_regions": {
+                            "fsp_ids": [
+                                {
+                                    "rule": "len(set(fsp_ids)) == len(fsp_ids)",
+                                    "error": "The fsp_ids should all be distinct"
+                                },
+                                {
+                                    "rule": "(0 < len(fsp_ids) <= number_fsps)",
+                                    "error": "fsp_ids are too many!Current Limit is {number_fsps}"
+                                },
+                                {
+                                    "rule": "False if len([num for num in fsp_ids if num > number_fsps])> 0 else True",
+                                    "error": "Invalid fsp_ids! The range should not greater than {number_fsps}"
+                                }
+                            ],
                             "channel_width": [
                                     {
                                     "rule": "channel_width in allowed_channel_width_values",
                                     "error": "Invalid input for channel_width! Currently allowed {allowed_channel_width_values}"
                                     }
+                            ],
+                            "channel_count": [
+                                {
+                                    "rule": "allowed_channel_count_range_min[0] <= channel_count <= allowed_channel_count_range_max[0]",
+                                    "error": "channel_count must be between {allowed_channel_count_range_min[0]} to {allowed_channel_count_range_max[0]}"
+                                },
+                                {
+                                    "rule": "(channel_count % 20) == 0",
+                                    "error": "channel_count must be a multiple of 20"
+                                }
+                            ],
+                            "start_freq": [
+                              {
+                                "rule": "min_frequency_hz <= ((start_freq - channel_width/2) + channel_width*channel_count) <= max_frequency_hz",
+                                "dependency_key": [
+                                  "channel_width",
+                                  "channel_count",
+                                  "receiver_band"
+                                ],
+                                "error": "Invalid input for start_freq"
+                              },
+                              {
+                                "rule": "min_frequency_hz <= start_freq <= max_frequency_hz",
+                                "dependency_key": [
+                                  "receiver_band"
+                                ],
+                                "error": "Invalid input for start_freq"
+                              }
+
+                            ],
+                            "sdp_start_channel_id": [
+                                {
+                                    "rule": "0 <= sdp_start_channel_id <= 2147483647",
+                                    "error": "sdp_start_channel_id must be between 0 to 2147483647"
+                                }
+                            ],
+                            "integration_factor": [
+                                {
+                                    "rule": "1 <= integration_factor <= 10",
+                                    "error": "integration_factor must be between 1 to 10"
+                                }
                             ]
                         }
                     }
+                },
+                "common": {
+                    "frequency_band": [
+                        {
+                          "rule": "(receiver_band != '5b' and receiver_band==frequency_band) or (receiver_band=='5b' and frequency_band=='1')",
+                          "dependency_key": ["receiver_band"],
+                            "error": "frequency_band did not match receiver_band"
+                        }
+                    ]
                 }
             }
         }
