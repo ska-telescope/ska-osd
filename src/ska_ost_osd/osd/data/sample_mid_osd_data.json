@@ -3,46 +3,109 @@
     "mid": {
       "AA2": {
         "allowed_channel_count_range_max": [
-          214748647
+            214748647
         ],
         "allowed_channel_count_range_min": [
-          1
+            1
         ],
         "allowed_channel_width_values": [
-          210,
-          420,
-          840,
-          1680,
-          3360,
-          6720,
-          13440,
-          26880,
-          40320,
-          53760,
-          80640,
-          107520,
-          161280,
-          215040,
-          322560,
-          416640,
-          430080,
-          645120
+            210,
+            420,
+            840,
+            1680,
+            3360,
+            6720,
+            13440,
+            26880,
+            40320,
+            53760,
+            80640,
+            107520,
+            161280,
+            215040,
+            322560,
+            416640,
+            430080,
+            645120
         ],
         "available_bandwidth_hz": 800000000,
         "available_receivers": [
-          "Band_1",
-          "Band_2",
-          "Band_5a",
-          "Band_5b"
+            "Band_1",
+            "Band_2",
+            "Band_5a",
+            "Band_5b"
         ],
         "cbf_modes": [
-          "correlation",
-          "pst",
-          "pss"
+            "correlation",
+            "pst",
+            "pss"
         ],
         "max_baseline_km": 110,
         "number_dish_ids": [
-          "string"
+            "SKA001",
+            "SKA008",
+            "SKA013",
+            "SKA014",
+            "SKA015",
+            "SKA016",
+            "SKA019",
+            "SKA024",
+            "SKA025",
+            "SKA027",
+            "SKA028",
+            "SKA030",
+            "SKA031",
+            "SKA032",
+            "SKA033",
+            "SKA034",
+            "SKA035",
+            "SKA036",
+            "SKA037",
+            "SKA038",
+            "SKA039",
+            "SKA040",
+            "SKA041",
+            "SKA042",
+            "SKA043",
+            "SKA045",
+            "SKA046",
+            "SKA048",
+            "SKA049",
+            "SKA050",
+            "SKA051",
+            "SKA055",
+            "SKA061",
+            "SKA063",
+            "SKA067",
+            "SKA068",
+            "SKA070",
+            "SKA075",
+            "SKA077",
+            "SKA079",
+            "SKA081",
+            "SKA082",
+            "SKA083",
+            "SKA089",
+            "SKA091",
+            "SKA092",
+            "SKA095",
+            "SKA096",
+            "SKA097",
+            "SKA098",
+            "SKA099",
+            "SKA100",
+            "SKA101",
+            "SKA102",
+            "SKA103",
+            "SKA104",
+            "SKA106",
+            "SKA108",
+            "SKA109",
+            "SKA113",
+            "SKA114",
+            "SKA123",
+            "SKA125",
+            "SKA126"
         ],
         "number_fsps": 26,
         "number_meerkat_dishes": 4,
@@ -57,11 +120,62 @@
       "basic_capabilities": {
         "dish_elevation_limit_deg": 15,
         "receiver_information": [
-          {
-            "max_frequency_hz": 350000000,
-            "min_frequency_hz": 1050000000,
-            "rx_id": "Band_1"
-          }
+            {
+                "max_frequency_hz": 1050000000,
+                "min_frequency_hz": 350000000,
+                "rx_id": "Band_1"
+            },
+            {
+                "max_frequency_hz": 1760000000,
+                "min_frequency_hz": 950000000,
+                "rx_id": "Band_2"
+            },
+            {
+                "max_frequency_hz": 3050000000,
+                "min_frequency_hz": 1650000000,
+                "rx_id": "Band_3"
+            },
+            {
+                "max_frequency_hz": 5180000000,
+                "min_frequency_hz": 2800000000,
+                "rx_id": "Band_4"
+            },
+            {
+                "max_frequency_hz": 8500000000,
+                "min_frequency_hz": 4600000000,
+                "rx_id": "Band_5a"
+            },
+            {
+                "max_frequency_hz": 13510000000,
+                "min_frequency_hz": 11450000000,
+                "rx_id": "Band_5b",
+                "sub_bands" : [
+                  {
+                    "sub_band" : 1,
+                    "max_frequency_hz": 12150000000,
+                    "min_frequency_hz": 11450000000,
+                    "lo_frequency_hz" : 11100000000,
+                    "sideband" : "high"
+                  },
+
+                  {
+                    "sub_band" : 2,
+                    "max_frequency_hz": 13510000000,
+                    "min_frequency_hz": 12810000000,
+                    "lo_frequency_hz" : 13860000000,
+                    "sideband" : "low"
+                  },
+
+                  {
+                    "sub_band" : 3,
+                    "max_frequency_hz": 12850000000,
+                    "min_frequency_hz": 12150000000,
+                    "lo_frequency_hz" : 11100000000,
+                    "sideband" : "high"
+                  }
+
+                ]
+            }
         ]
       }
     }
@@ -70,16 +184,16 @@
     "cycle_description": "Science Verification",
     "cycle_information": {
       "cycle_id": "SKAO_2027_1",
-      "proposal_close": "20260512T15:00:00.000z",
-      "proposal_open": "20260327T12:00:00.000Z"
+      "proposal_open": "20260327T12:00:00.000Z",
+        "proposal_close": "20260512T15:00:00.000z"
     },
     "cycle_number": 0,
     "cycle_policies": {
-      "normal_max_hours": 100
+      "normal_max_hours": 100.0
     },
     "telescope_capabilities": {
-      "Low": "AA2",
-      "Mid": "AA2"
+       "Mid": "AA2",
+       "Low": "AA2"
     }
   }
 }
