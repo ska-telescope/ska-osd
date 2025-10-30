@@ -12,7 +12,7 @@ class TestResources:
     def mock_read_file(self):
         with patch("ska_ost_osd.osd.routers.api.read_json") as mock:
             mock.return_value = {
-                "cycle_number": 1,
+                "cycle_number": 0,
                 "telescope_capabilities": {"Mid": "4"},
             }
             yield mock
@@ -30,7 +30,7 @@ class TestResources:
         # Mock the read_json function
         mock_read_file.side_effect = [
             {
-                "cycle_number": 1,
+                "cycle_number": 0,
                 "telescope_capabilities": {"Mid": "4"},
             },  # OBSERVATORY_POLICIES_JSON_PATH
             {"existing": "data"},  # MID_CAPABILITIES_JSON_PATH
@@ -59,11 +59,11 @@ class TestResources:
         """Test update_osd_data when array_assembly is invalid for the current
         cycle."""
         mock_read_file.return_value = {
-            "cycle_number": 1,
+            "cycle_number": 0,
             "telescope_capabilities": {"Mid": "AA5"},
         }
         body = {"capabilities": {"telescope": {"mid": "test"}}}
-        params = {"cycle_id": 1, "array_assembly": "AA0", "capabilities": "mid"}
+        params = {"cycle_id": 0, "array_assembly": "AA0", "capabilities": "mid"}
 
         response = client_put(
             f"{BASE_API_URL}/osd",

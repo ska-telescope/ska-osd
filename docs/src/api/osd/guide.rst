@@ -120,7 +120,7 @@ API json response template
 
     {
     "observatory_policy": {
-      "cycle_number": 1,
+      "cycle_number": 0,
     "telescope_capabilities": []},
     "capabilities": {
       "mid": {},
@@ -216,7 +216,7 @@ GET /osd
           "result_data": [
             {
               "observatory_policy": {
-                "cycle_number": 1,
+                "cycle_number": 0,
                 "cycle_description": "Science Verification",
                 "cycle_information": {
                   "cycle_id": "SKAO_2027_1",

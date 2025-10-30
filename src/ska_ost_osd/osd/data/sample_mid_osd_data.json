@@ -73,7 +73,7 @@
       "proposal_close": "20260512T15:00:00.000z",
       "proposal_open": "20260327T12:00:00.000Z"
     },
-    "cycle_number": 1,
+    "cycle_number": 0,
     "cycle_policies": {
       "normal_max_hours": 100
     },
