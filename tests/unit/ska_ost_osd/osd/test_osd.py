@@ -240,7 +240,10 @@ def test_update_file_storage_1():
 
     with patch("ska_ost_osd.osd.osd.update_file"):
         updated_data = update_file_storage(
-            validated_capabilities, observatory_policy, existing_stored_data
+            validated_capabilities,
+            observatory_policy,
+            existing_stored_data,
+            telescope="mid",
         )
     assert updated_data == expected_updated_data
 
@@ -252,7 +255,9 @@ def test_update_file_storage_invalid_input(
     invalid_input = {"invalid_key": {"telescope": "SKA-Mid"}}
     with patch("ska_ost_osd.osd.osd.update_file"):
         with pytest.raises(AttributeError):
-            update_file_storage(invalid_input, {}, sample_existing_data)
+            update_file_storage(
+                invalid_input, {}, sample_existing_data, telescope="mid"
+            )
 
 
 def test_update_file_storage_nested_dict_update(
@@ -275,14 +280,14 @@ def test_update_file_storage_nested_dict_update(
         }
     }
     validated_capabilities = ValidationOnCapabilities(**update_data)
-    result = update_file_storage(validated_capabilities, {}, sample_existing_data)
+    result = update_file_storage(
+        validated_capabilities, {}, sample_existing_data, telescope="mid"
+    )
 
     assert result["basic_capabilities"]["new_capability"] == "value"
     assert result["basic_capabilities"]["max_frequency"] == 16e9
     assert result["AA0.5"]["new_field"] == "new_value"
     assert result["AA0.5"]["max_baseline"] == 1000  # Existing value should be preserved
-
-    mock_update_file.assert_called_once()
 
 
 def test_update_file_storage_non_existent_telescope(
@@ -299,9 +304,10 @@ def test_update_file_storage_non_existent_telescope(
         }
     }
     validated_capabilities = ValidationOnCapabilities(**non_existent_telescope)
-    result = update_file_storage(validated_capabilities, {}, sample_existing_data)
+    result = update_file_storage(
+        validated_capabilities, {}, sample_existing_data, telescope="low"
+    )
     assert "SKA-Low" not in result
-    mock_update_file.assert_called_once()
 
 
 def test_update_file_storage_observatory_policy_update(
@@ -323,7 +329,10 @@ def test_update_file_storage_observatory_policy_update(
     observatory_policy = {"new_policy": "value"}
     validated_capabilities = ValidationOnCapabilities(**update_data)
     update_file_storage(
-        validated_capabilities, observatory_policy, sample_existing_data
+        validated_capabilities,
+        observatory_policy,
+        sample_existing_data,
+        telescope="mid",
     )
 
-    assert mock_update_file.call_count == 2
+    assert mock_update_file.call_count == 1

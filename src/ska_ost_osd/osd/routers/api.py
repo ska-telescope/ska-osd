@@ -13,25 +13,21 @@ from fastapi import APIRouter, Body, Depends
 from pydantic import ValidationError
 
 from ska_ost_osd.common.models import ApiResponse
-from ska_ost_osd.common.utils import (
-    convert_to_response_object,
-    get_responses,
-    read_json,
-)
+from ska_ost_osd.common.utils import convert_to_response_object, get_responses
 from ska_ost_osd.osd.common.constant import (
     CYCLE_TO_VERSION_MAPPING,
     MID_CAPABILITIES_JSON_PATH,
-    OBSERVATORY_POLICIES_JSON_PATH,
     RELEASE_VERSION_MAPPING,
     SWAGGER_MID_OSD_DATA_JSON_FILE_PATH,
     osd_file_mapping,
 )
 from ska_ost_osd.osd.common.error_handling import CapabilityError, OSDModelError
 from ska_ost_osd.osd.common.gitlab_helper import push_to_gitlab
-from ska_ost_osd.osd.common.osd_validation_messages import (
-    ARRAY_ASSEMBLY_DOESNOT_BELONGS_TO_CYCLE_ERROR_MESSAGE,
+from ska_ost_osd.osd.common.utils import (
+    get_mid_low_capabilities,
+    load_json_from_file,
+    read_file,
 )
-from ska_ost_osd.osd.common.utils import load_json_from_file, read_file
 from ska_ost_osd.osd.models.models import (
     CycleModel,
     OSDQueryParams,
@@ -108,33 +104,17 @@ def update_osd_data(
         fail.
     """
     # Handle the simpler case first - when no cycle_id is present
-    if not osd_model.cycle_id:
+    if osd_model.cycle_id is None:
         return add_new_data_storage(body)
 
     try:
         # Validate input data
         validated_capabilities = ValidationOnCapabilities(**body)
 
-        # Check cycle and assembly compatibility if both attributes are present
-        if hasattr(osd_model, "cycle_id") and hasattr(osd_model, "array_assembly"):
-            osd_data = read_json(OBSERVATORY_POLICIES_JSON_PATH)
-            if (
-                osd_model.cycle_id == osd_data["cycle_number"]
-                and osd_model.array_assembly
-                != osd_data["telescope_capabilities"]["Mid"]
-            ):
-                raise CapabilityError(
-                    ARRAY_ASSEMBLY_DOESNOT_BELONGS_TO_CYCLE_ERROR_MESSAGE.format(
-                        osd_model.array_assembly, osd_model.cycle_id
-                    )
-                )
-
-        # Update storage with validated data
-        existing_data = read_json(MID_CAPABILITIES_JSON_PATH)
-        observatory_policy = body.get("observatory_policy", None)
+        existing_data, observatory_policy, telescope = get_mid_low_capabilities(body)
 
         updated_data = update_file_storage(
-            validated_capabilities, observatory_policy, existing_data
+            validated_capabilities, observatory_policy, existing_data, telescope
         )
         return convert_to_response_object(updated_data, result_code=HTTPStatus.OK)
 

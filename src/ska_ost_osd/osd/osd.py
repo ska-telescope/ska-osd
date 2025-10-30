@@ -24,6 +24,7 @@ from .common.constant import (
     BASE_URL,
     CAR_URL,
     GITLAB_SOURCE,
+    LOW_CAPABILITIES_JSON_PATH,
     MID_CAPABILITIES_JSON_PATH,
     OBSERVATORY_POLICIES_JSON_PATH,
     SOURCES,
@@ -438,7 +439,10 @@ def get_osd_using_tmdata(
 
 
 def update_file_storage(
-    validated_capabilities: Dict, observatory_policy: Dict, existing_stored_data: Dict
+    validated_capabilities: Dict,
+    observatory_policy: Dict,
+    existing_stored_data: Dict,
+    telescope: str,
 ) -> Dict:
     """Process and validate OSD data for insertion into the capabilities file.
 
@@ -448,6 +452,7 @@ def update_file_storage(
         observatory policies.
     :param existing_stored_data: Dict, the existing stored capabilities
         data.
+    :param telescope: str, mid or low
     :return: Dict, dictionary with the processed capabilities data.
     :raises OSDModelError: If validation fails.
     :raises ValueError: If required data is missing or invalid.
@@ -474,8 +479,7 @@ def update_file_storage(
             # Add new fields
             updated_data[key] = value
 
-    # Write updated data to file
-    update_file(MID_CAPABILITIES_JSON_PATH, updated_data)
+    _get_data(telescope, updated_data)
 
     if observatory_policy:
         update_file(OBSERVATORY_POLICIES_JSON_PATH, observatory_policy)
@@ -518,3 +522,19 @@ def add_new_data_storage(body: Dict) -> Dict:
         result.update(body["observatory_policy"])
     result.update(mid_capabilities)
     return mid_capabilities
+
+
+def _get_data(telescope: str, data: Dict) -> None:
+    """Update capabilities file based on telescope type.
+
+    :param data: Dict, dictionary containing the
+        observatory policies.
+    :param telescope: str, mid or low
+    """
+
+    match telescope:
+        case "mid":
+            update_file(MID_CAPABILITIES_JSON_PATH, data)
+
+        case "low":
+            update_file(LOW_CAPABILITIES_JSON_PATH, data)
