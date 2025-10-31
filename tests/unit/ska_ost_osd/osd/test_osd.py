@@ -261,10 +261,9 @@ def test_update_file_storage_invalid_input(
 
 
 def test_update_file_storage_nested_dict_update(
-    sample_existing_data, mocker
+    sample_existing_data,
 ):  # pylint: disable=W0621
     """Test update_file_storage with nested dictionary updates."""
-    mock_update_file = mocker.patch("ska_ost_osd.osd.osd.update_file")
 
     update_data = {
         "capabilities": {
@@ -291,9 +290,8 @@ def test_update_file_storage_nested_dict_update(
 
 
 def test_update_file_storage_non_existent_telescope(
-    sample_existing_data, mocker
+    sample_existing_data,
 ):  # pylint: disable=W0621
-    mock_update_file = mocker.patch("ska_ost_osd.osd.osd.update_file")
     non_existent_telescope = {
         "capabilities": {
             "SKA-Low": {  # This telescope doesn't exist in the sample data
