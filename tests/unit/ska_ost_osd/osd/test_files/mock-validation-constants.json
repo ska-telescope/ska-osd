@@ -130,7 +130,7 @@
                             "function_mode": [
                                 {
                                     "rule": "function_mode == 'vis'",
-                                    "error": "Invalid input for {function_mode}! Currently allowed vis"
+                                    "error": "Invalid input for function_mode! Currently allowed vis"
                                 }
                             ],
                             "fsp_ids": [
@@ -160,7 +160,7 @@
                             "function_mode": [
                                 {
                                     "rule": "function_mode == 'pst'",
-                                    "error": "Invalid input for {function_mode}! Currently allowed pst"
+                                    "error": "Invalid input for function_mode! Currently allowed pst"
                                 }
                             ]
                         }
