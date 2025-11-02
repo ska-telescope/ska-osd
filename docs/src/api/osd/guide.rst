@@ -951,3 +951,78 @@ You can import the relevant components from the package as follows:
     )
 
 This allows you to catch or raise semantic validation-related exceptions when working with OSD validation workflows.
+
+Subarray Template Support
+=========================
+
+OSD now supports subarray templates through the ``subarray_templates`` field in array assembly configurations. This feature enables dynamic template loading and processing for different telescope configurations.
+
+Configuration
+-------------
+
+Each array assembly (AA0.5, AA1, AA2) can specify subarray templates using wildcard patterns:
+
+.. code-block:: json
+
+    {
+        "AA0.5": {
+            "subarray_templates": ["*_AA0.5"],
+            "other_config": "..."
+        },
+        "AA1": {
+            "subarray_templates": ["*_AA1"],
+            "other_config": "..."
+        },
+        "AA2": {
+            "subarray_templates": ["*_AA2"],
+            "other_config": "..."
+        }
+    }
+
+Template Processing
+-------------------
+
+The template mapping system processes subarray templates through:
+
+1. **Pattern Matching**: Uses fnmatch patterns to find matching templates
+2. **Telescope Filtering**: Automatically filters templates based on telescope type (MID/LOW)
+3. **Dynamic Loading**: Templates are loaded from JSON files and merged into capabilities
+4. **Key Normalization**: Template keys are converted to lowercase for consistency
+
+Template File Structure
+-----------------------
+
+Template files should contain telescope-specific templates:
+
+.. code-block:: json
+
+    {
+        "MID_Template_AA0.5": {
+            "frequency_band": "1",
+            "config": {
+                "beam_id": 1,
+                "channels": [[0, 1], [744, 8191]]
+            }
+        },
+        "LOW_Template_AA1": {
+            "frequency_band": "low1",
+            "config": {
+                "beam_id": 1,
+                "stations": [[0, 1], [2, 3]]
+            }
+        }
+    }
+
+API Integration
+---------------
+
+Subarray templates are automatically processed when retrieving OSD data:
+
+.. code-block:: python
+
+    # Templates are automatically loaded and merged
+    response = client.get("/ska-ost-osd/osd/api/v1/osd?cycle_id=1&capabilities=mid")
+    
+    # Response includes processed templates
+    capabilities = response["capabilities"]["mid"]
+    # Templates now available as lowercase keys alongside array assembly config
