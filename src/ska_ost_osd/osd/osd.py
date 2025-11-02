@@ -17,6 +17,7 @@ from ska_ost_osd.osd.common.osd_validation_messages import (
 )
 from ska_ost_osd.osd.common.utils import get_osd_latest_version
 from ska_ost_osd.osd.models.models import OSDModel
+from ska_ost_osd.osd.template_mapping.template_mapping import process_template_mappings
 
 from .common.constant import (
     ARRAY_ASSEMBLY_PATTERN,
@@ -38,7 +39,12 @@ class OSD:
     get_telescope_observatory_policies, get_data, and get_osd_data."""
 
     def __init__(
-        self, capabilities: list, array_assembly: str, tmdata: TMData, cycle_id: int
+        self,
+        capabilities: list,
+        array_assembly: str,
+        tmdata: TMData,
+        cycle_id: int,
+        process_templates: bool = False,
     ) -> None:
         """Initialize the OSD class.
 
@@ -48,6 +54,7 @@ class OSD:
             "AA2", or "AA1".
         :param tmdata: TMData, TMData class object.
         :param cycle_id: int, cycle identifier.
+        :param process_templates: bool, whether to process template mappings.
         :return: None
         """
         self.cycle_id = cycle_id
@@ -56,6 +63,7 @@ class OSD:
         self.array_assembly = array_assembly
         self.tmdata = tmdata
         self.keys_list = {}
+        self.process_templates = process_templates
 
     def check_capabilities(self, capabilities: list = None) -> str | None:
         """Check if the given capabilities exist, and raise an exception if
@@ -133,7 +141,11 @@ class OSD:
         """
         cap_err_msg_list = []
         for key, value in telescope_capabilities_dict.items():
-            data = self.get_data(tmdata, capability=osd_file_mapping[key.lower()])
+            data = self.get_data(
+                tmdata,
+                capability=osd_file_mapping[key.lower()],
+                process_templates=self.process_templates,
+            )
             self.keys_list = list(data.keys())
             err_msg = None
             if self.array_assembly:
@@ -162,6 +174,7 @@ class OSD:
         tmdata: TMData,
         capability: str = None,
         array_assembly: str = None,
+        process_templates: bool = False,
     ) -> dict[dict[str, Any]]:
         """Retrieve data from the tmdata object based on capability and array
         assembly.
@@ -170,18 +183,21 @@ class OSD:
         :param capability: str, capability such as "mid" or "low".
         :param array_assembly: str, for "mid" can be one of "AA0.5",
             "AA2", or "AA1".
+        :param process_templates: bool, whether to process template mappings.
         :return: dict, JSON object from tmdata.
         """
 
         if "observatory_policies" in capability:
             return tmdata[capability].get_dict()
-
         else:
-            return (
+            data = (
                 tmdata[capability].get_dict()[array_assembly]
                 if array_assembly
                 else tmdata[capability].get_dict()
             )
+            if process_templates:
+                data = process_template_mappings(data, capability, tmdata)
+            return data
 
     def get_osd_data(self) -> dict[dict[str, Any]]:
         """Call get_telescope_observatory_policies and
@@ -345,6 +361,7 @@ def get_osd_data(
     array_assembly: str = None,
     tmdata: TMData = None,
     cycle_id: int = None,
+    process_templates: bool = False,
 ) -> dict[dict[str, Any]]:
     """This function creates OSD class object and returns osd_data dictionary
     as json object.
@@ -354,6 +371,7 @@ def get_osd_data(
         give any one
     :param tmdata: TMData class object.
     :param cycle_id: cycle id
+    :param process_templates: bool, whether to process template mappings
     :return: json object
     """
     osd_data, data_error_msg_list = OSD(
@@ -361,6 +379,7 @@ def get_osd_data(
         array_assembly=array_assembly,
         tmdata=tmdata,
         cycle_id=cycle_id,
+        process_templates=process_templates,
     ).get_osd_data()
 
     return osd_data, data_error_msg_list
@@ -373,6 +392,7 @@ def get_osd_using_tmdata(
     gitlab_branch: Optional[str] = None,
     capabilities: Optional[str] = None,
     array_assembly: Optional[str] = None,
+    process_templates: bool = False,
 ) -> Dict:
     """Retrieve OSD data using TMData.
 
@@ -430,10 +450,12 @@ def get_osd_using_tmdata(
         tmdata=tm_data,
         array_assembly=array_assembly,
         cycle_id=cycle_id,
+        process_templates=process_templates,
     )
     errors.extend(osd_errors)
     if errors:
         raise ValueError(errors)
+
     return osd_data
 
 

@@ -50,7 +50,9 @@ def test_get_osd_data(
     :returns: assert equals values
     """
 
-    result, _ = get_osd_data(capabilities, array_assembly, tmdata=tm_data_osd)
+    result, _ = get_osd_data(
+        capabilities, array_assembly, tmdata=tm_data_osd, process_templates=False
+    )
     result_keys = result["capabilities"].keys()
     expected = create_entity_object(file_path)
     expected_keys = expected["capabilities"].keys()
@@ -165,7 +167,10 @@ def test_invalid_get_osd_data_capability(tm_data_osd):  # pylint: disable=W0621
     """
 
     _, error_msgs = get_osd_data(
-        capabilities=["midd"], array_assembly="AA1", tmdata=tm_data_osd
+        capabilities=["midd"],
+        array_assembly="AA1",
+        tmdata=tm_data_osd,
+        process_templates=False,
     )
     assert error_msgs == [
         "Capability midd is not valid,Available Capabilities are low, mid,"
@@ -183,7 +188,10 @@ def test_invalid_get_osd_data_array_assembly(tm_data_osd):  # pylint: disable=W0
     aa_value = "AA100000"
 
     _, error_msgs = get_osd_data(
-        capabilities=["mid"], array_assembly=aa_value, tmdata=tm_data_osd
+        capabilities=["mid"],
+        array_assembly=aa_value,
+        tmdata=tm_data_osd,
+        process_templates=False,
     )
     msg = ",".join(error_msgs[0].split(",")[1:])
 
@@ -327,3 +335,28 @@ def test_update_file_storage_observatory_policy_update(
     )
 
     assert mock_update_file.call_count == 2
+
+
+def test_get_osd_data_with_process_templates(tm_data_osd):  # pylint: disable=W0621
+    """Test that process_templates parameter is properly passed through."""
+    # Test with process_templates=False (default)
+    result_false, _ = get_osd_data(
+        capabilities=["mid"],
+        array_assembly="AA0.5",
+        tmdata=tm_data_osd,
+        process_templates=False,
+    )
+
+    # Test with process_templates=True
+    result_true, _ = get_osd_data(
+        capabilities=["mid"],
+        array_assembly="AA0.5",
+        tmdata=tm_data_osd,
+        process_templates=True,
+    )
+
+    # Both should return valid data structures
+    assert "capabilities" in result_false
+    assert "capabilities" in result_true
+    assert "mid" in result_false["capabilities"]
+    assert "mid" in result_true["capabilities"]

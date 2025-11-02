@@ -45,9 +45,6 @@ from ska_ost_osd.osd.osd import (
     get_osd_using_tmdata,
     update_file_storage,
 )
-from ska_ost_osd.osd.template_mapping.template_mapping import (
-    apply_template_mappings_to_osd_data,
-)
 from ska_ost_osd.osd.version_mapping.version_manager import manage_version_release
 
 # this variable is added for restricting tmdata publish from local/dev environment.
@@ -78,9 +75,9 @@ def get_osd(osd_model: OSDQueryParams = Depends()) -> Dict:
     :returns dict: A dictionary with OSD data satisfying the query.
     """
     try:
-        osd_data = get_osd_using_tmdata(**osd_model.model_dump())
-        # Apply template mapping processing to resolve template_mappings
-        osd_data = apply_template_mappings_to_osd_data(osd_data)
+        model_data = osd_model.model_dump()
+        model_data["process_templates"] = True
+        osd_data = get_osd_using_tmdata(**model_data)
     except (OSDModelError, ValueError) as error:
         raise error
     return convert_to_response_object(osd_data, result_code=HTTPStatus.OK)
