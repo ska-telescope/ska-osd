@@ -135,7 +135,9 @@ class TestProcessTemplateMappings:
 
     @patch("ska_ost_osd.osd.template_mapping.template_mapping.load_template_file")
     @patch("ska_ost_osd.osd.template_mapping.template_mapping.LOGGER")
-    def test_process_template_mappings_file_not_found(self, mock_logger, mock_load_template):
+    def test_process_template_mappings_file_not_found(
+        self, mock_logger, mock_load_template
+    ):
         """Test handling of missing template file."""
         mock_load_template.side_effect = FileNotFoundError("File not found")
         mock_tmdata = Mock()
