@@ -1020,9 +1020,50 @@ Subarray templates are automatically processed when retrieving OSD data:
 
 .. code-block:: python
 
-    # Templates are automatically loaded and merged
     response = client.get("/ska-ost-osd/osd/api/v1/osd?cycle_id=1&capabilities=mid")
-    
-    # Response includes processed templates
-    capabilities = response["capabilities"]["mid"]
-    # Templates now available as lowercase keys alongside array assembly config
+
+* Complete response structure with processed templates:
+
+.. code-block:: json
+
+    {
+        "result_data": [
+            {
+                "observatory_policy": {
+                    "cycle_number": 1,
+                    "telescope_capabilities": {
+                        "Mid": "AA2",
+                        "Low": "AA2"
+                    }
+                },
+                "capabilities": {
+                    "mid": {
+                        "basic_capabilities": {
+                            "dish_elevation_limit_deg": 15,
+                            "receiver_information": [
+                                {
+                                    "max_frequency_hz": 1050000000,
+                                    "min_frequency_hz": 350000000,
+                                    "rx_id": "Band_1"
+                                }
+                            ]
+                        },
+                        "AA2": {
+                            "available_receivers": ["Band_1", "Band_2"],
+                            "number_ska_dishes": 64,
+                            "cbf_modes": ["correlation", "pst", "pss"],
+                            "subarray_templates": {
+                                "LOW_FULL_AA2": {
+                                    "subarray_type": "AA2",
+                                    "custom_stations": "",
+                                    "description": "Full SKA-Low array, AA2 release."
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        ],
+        "result_status": "success",
+        "result_code": 200
+    }
