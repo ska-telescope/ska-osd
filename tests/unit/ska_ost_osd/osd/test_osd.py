@@ -4,7 +4,7 @@ import pytest
 
 from ska_ost_osd.osd.common.utils import get_osd_latest_version
 from ska_ost_osd.osd.models.models import ValidationOnCapabilities
-from ska_ost_osd.osd.osd import get_osd_data, osd_tmdata_source, update_file_storage
+from ska_ost_osd.osd.osd import get_osd_data, osd_tmdata_source, update_osd_file
 from tests.conftest import tm_data_osd
 from tests.unit.ska_ost_osd.common.constant import (
     DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER,
@@ -205,8 +205,8 @@ def sample_existing_data():
     }
 
 
-def test_update_file_storage_1():
-    """Test update_file_storage function when updating nested dictionary fields
+def test_update_osd_file_1():
+    """Test update_osd_file function when updating nested dictionary fields
     and observatory policy."""
     validated_capabilities = {
         "capabilities": {
@@ -239,7 +239,7 @@ def test_update_file_storage_1():
     }
 
     with patch("ska_ost_osd.osd.osd.update_file"):
-        updated_data = update_file_storage(
+        updated_data = update_osd_file(
             validated_capabilities,
             observatory_policy,
             existing_stored_data,
@@ -248,22 +248,20 @@ def test_update_file_storage_1():
     assert updated_data == expected_updated_data
 
 
-def test_update_file_storage_invalid_input(
+def test_update_osd_file_invalid_input(
     sample_existing_data,
 ):  # pylint: disable=W0621
-    """Test update_file_storage with invalid input structure."""
+    """Test update_osd_file with invalid input structure."""
     invalid_input = {"invalid_key": {"telescope": "SKA-Mid"}}
     with patch("ska_ost_osd.osd.osd.update_file"):
         with pytest.raises(AttributeError):
-            update_file_storage(
-                invalid_input, {}, sample_existing_data, telescope="mid"
-            )
+            update_osd_file(invalid_input, {}, sample_existing_data, telescope="mid")
 
 
-def test_update_file_storage_nested_dict_update(
+def test_update_osd_file_nested_dict_update(
     sample_existing_data,
 ):  # pylint: disable=W0621
-    """Test update_file_storage with nested dictionary updates."""
+    """Test update_osd_file with nested dictionary updates."""
 
     update_data = {
         "capabilities": {
@@ -279,7 +277,7 @@ def test_update_file_storage_nested_dict_update(
         }
     }
     validated_capabilities = ValidationOnCapabilities(**update_data)
-    result = update_file_storage(
+    result = update_osd_file(
         validated_capabilities, {}, sample_existing_data, telescope="mid"
     )
 
@@ -289,7 +287,7 @@ def test_update_file_storage_nested_dict_update(
     assert result["AA0.5"]["max_baseline"] == 1000  # Existing value should be preserved
 
 
-def test_update_file_storage_non_existent_telescope(
+def test_update_osd_file_non_existent_telescope(
     sample_existing_data,
 ):  # pylint: disable=W0621
     non_existent_telescope = {
@@ -302,16 +300,16 @@ def test_update_file_storage_non_existent_telescope(
         }
     }
     validated_capabilities = ValidationOnCapabilities(**non_existent_telescope)
-    result = update_file_storage(
+    result = update_osd_file(
         validated_capabilities, {}, sample_existing_data, telescope="low"
     )
     assert "SKA-Low" not in result
 
 
-def test_update_file_storage_observatory_policy_update(
+def test_update_osd_file_observatory_policy_update(
     sample_existing_data, mocker
 ):  # pylint: disable=W0621
-    """Test update_file_storage with observatory policy updates."""
+    """Test update_osd_file with observatory policy updates."""
     mock_update_file = mocker.patch("ska_ost_osd.osd.osd.update_file")
 
     update_data = {
@@ -326,7 +324,7 @@ def test_update_file_storage_observatory_policy_update(
 
     observatory_policy = {"new_policy": "value"}
     validated_capabilities = ValidationOnCapabilities(**update_data)
-    update_file_storage(
+    update_osd_file(
         validated_capabilities,
         observatory_policy,
         sample_existing_data,

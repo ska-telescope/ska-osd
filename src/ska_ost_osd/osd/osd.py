@@ -438,7 +438,7 @@ def get_osd_using_tmdata(
     return osd_data
 
 
-def update_file_storage(
+def update_osd_file(
     validated_capabilities: Dict,
     observatory_policy: Dict,
     existing_stored_data: Dict,

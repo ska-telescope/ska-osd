@@ -17,19 +17,19 @@ class TestResources:
             yield mock
 
     @pytest.fixture
-    def mock_update_file_storage(self):
-        with patch("ska_ost_osd.osd.routers.api.update_file_storage") as mock:
+    def mock_update_osd_file(self):
+        with patch("ska_ost_osd.osd.routers.api.update_osd_file") as mock:
             mock.return_value = {"updated": "data"}
             yield mock
 
     @patch("ska_ost_osd.common.utils.read_json")
-    @patch("ska_ost_osd.osd.routers.api.update_file_storage")
-    def test_update_osd_data_2(self, mock_update_file_storage, mock_read_file):
+    @patch("ska_ost_osd.osd.routers.api.update_osd_file")
+    def test_update_osd_data_2(self, mock_update_osd_file, mock_read_file):
         """Test update_osd_data when cycle_id and array_assembly are valid."""
 
         mock_read_file.return_value = {"existing": "data"}
 
-        mock_update_file_storage.return_value = {"updated": "data"}
+        mock_update_osd_file.return_value = {"updated": "data"}
 
         body = {
             "capabilities": {"mid": {"new_capability": "value"}},

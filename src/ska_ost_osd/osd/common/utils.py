@@ -61,7 +61,14 @@ def get_osd_latest_version() -> str:
     return osd_version
 
 
-def get_mid_low_capabilities(data):
+def get_mid_low_capabilities(data: dict):
+    """This function retrieves the existing data from the mid or low
+
+    :params data (dict): OSD Data in dict format.
+
+    :returns tuple: returns tuple with existing_data, observatory_policy, telescope
+    """
+
     telescope = list(data["capabilities"].keys())[0]
 
     match telescope:

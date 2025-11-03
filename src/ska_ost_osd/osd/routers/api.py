@@ -39,7 +39,7 @@ from ska_ost_osd.osd.models.models import (
 from ska_ost_osd.osd.osd import (
     add_new_data_storage,
     get_osd_using_tmdata,
-    update_file_storage,
+    update_osd_file,
 )
 from ska_ost_osd.osd.version_mapping.version_manager import manage_version_release
 
@@ -113,7 +113,7 @@ def update_osd_data(
 
         existing_data, observatory_policy, telescope = get_mid_low_capabilities(body)
 
-        updated_data = update_file_storage(
+        updated_data = update_osd_file(
             validated_capabilities, observatory_policy, existing_data, telescope
         )
         return convert_to_response_object(updated_data, result_code=HTTPStatus.OK)
