@@ -134,20 +134,20 @@ class TestProcessTemplateMappings:
         assert result == expected
 
     @patch("ska_ost_osd.osd.template_mapping.template_mapping.load_template_file")
-    def test_process_template_mappings_file_not_found(self, mock_load_template):
+    @patch("ska_ost_osd.osd.template_mapping.template_mapping.LOGGER")
+    def test_process_template_mappings_file_not_found(self, mock_logger, mock_load_template):
         """Test handling of missing template file."""
         mock_load_template.side_effect = FileNotFoundError("File not found")
         mock_tmdata = Mock()
 
         capabilities_data = {"array_assembly": {"subarray_templates": ["*"]}}
 
-        with patch("builtins.print") as mock_print:
-            result = process_template_mappings(
-                capabilities_data, "ska1_mid.json", mock_tmdata
-            )
+        result = process_template_mappings(
+            capabilities_data, "ska1_mid.json", mock_tmdata
+        )
 
-            assert "subarray_templates" not in result["array_assembly"]
-            mock_print.assert_called_once()
+        assert "subarray_templates" not in result["array_assembly"]
+        mock_logger.error.assert_called()
 
     def test_process_template_mappings_no_subarray_templates(self):
         """Test processing data without subarray_templates."""

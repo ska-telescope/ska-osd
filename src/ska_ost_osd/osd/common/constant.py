@@ -48,3 +48,4 @@ RELEASE_VERSION_MAPPING = (
 # constant define to push gitlab flag.
 GITLAB_SOURCE = [f"gitlab:{BASE_URL}{CAR_URL}main#{BASE_FOLDER_NAME}"]
 SWAGGER_MID_OSD_DATA_JSON_FILE_PATH = "data/sample_mid_osd_data.json"
+SUBARRAY_TEMPLATES_PATH = "subarray_templates/subarray_template_library.json"
