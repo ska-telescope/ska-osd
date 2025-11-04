@@ -141,11 +141,15 @@ class OSD:
         """
         cap_err_msg_list = []
         for key, value in telescope_capabilities_dict.items():
-            data = self.get_data(
-                tmdata,
-                capability=osd_file_mapping[key.lower()],
-                process_templates=self.process_templates,
-            )
+            data = self.get_data(tmdata, capability=osd_file_mapping[key.lower()])
+
+            if self.process_templates:
+                template_data = self.get_data(
+                    tmdata, templates=osd_file_mapping["subarray_templates"]
+                )
+                data = process_template_mappings(
+                    data, osd_file_mapping[key.lower()], template_data
+                )
             self.keys_list = list(data.keys())
             err_msg = None
             if self.array_assembly:
@@ -174,7 +178,7 @@ class OSD:
         tmdata: TMData,
         capability: str = None,
         array_assembly: str = None,
-        process_templates: bool = False,
+        templates: str = None,
     ) -> dict[dict[str, Any]]:
         """Retrieve data from the tmdata object based on capability and array
         assembly.
@@ -183,21 +187,24 @@ class OSD:
         :param capability: str, capability such as "mid" or "low".
         :param array_assembly: str, for "mid" can be one of "AA0.5",
             "AA2", or "AA1".
-        :param process_templates: bool, whether to process template mappings.
+        :param templates: str, template file path for loading template data.
         :return: dict, JSON object from tmdata.
         """
+        if templates:
+            try:
+                return tmdata[templates].get_dict()
+            except (KeyError, AttributeError):
+                return {}
 
         if "observatory_policies" in capability:
             return tmdata[capability].get_dict()
+
         else:
-            data = (
+            return (
                 tmdata[capability].get_dict()[array_assembly]
                 if array_assembly
                 else tmdata[capability].get_dict()
             )
-            if process_templates:
-                data = process_template_mappings(data, capability, tmdata)
-            return data
 
     def get_osd_data(self) -> dict[dict[str, Any]]:
         """Call get_telescope_observatory_policies and
@@ -402,6 +409,7 @@ def get_osd_using_tmdata(
     :param gitlab_branch: str, optional GitLab branch.
     :param capabilities: str, optional capabilities.
     :param array_assembly: str, optional array assembly.
+    :param process_templates: bool, whether to process template mappings.
     :return: Dict[Dict[str, Any]], OSD data.
     :raises ValueError: If any validation or processing errors occur.
     """
