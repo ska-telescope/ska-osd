@@ -1,5 +1,4 @@
 from http import HTTPStatus
-from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -60,8 +59,7 @@ def test_invalid_osd_tmdata_source(
         assert response["result_data"] == expected["result_data"]
 
 
-@patch("ska_ost_osd.osd.routers.api.get_osd_using_tmdata")
-def test_osd_endpoint(client_get, mock_mid_data):
+def test_osd_endpoint(client_get):
     """This function tests that a request to the OSD endpoint for a specific
     OSD returns expected data for that OSD.
 
@@ -69,6 +67,7 @@ def test_osd_endpoint(client_get, mock_mid_data):
     :raises AssertionError: If the response does not contain the
         expected OSD data or returns an error status code.
     """
+
     response = client_get(
         f"{BASE_API_URL}/osd",
         params={
@@ -76,14 +75,10 @@ def test_osd_endpoint(client_get, mock_mid_data):
             "capabilities": "mid",
             "array_assembly": "AA0.5",
         },
-    )
+    ).json()
 
-    response = MagicMock()
-    response.status_code = 200
-    response.json = mock_mid_data["AA0.5"]
-
-    assert response.status_code == 200
-    assert response.json == mock_mid_data["AA0.5"]
+    assert response["result_code"] == 200
+    assert "AA0.5" in response["result_data"]["capabilities"]["mid"].keys()
 
 
 def test_osd_sub_bands_endpoint(client_get):

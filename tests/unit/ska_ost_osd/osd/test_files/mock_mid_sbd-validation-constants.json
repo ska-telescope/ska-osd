@@ -104,8 +104,60 @@
         }
     },
     "AA1": {
+         "dish_elevation_limit": {
+            "min": 15
+        },
         "assign_resource": {
+            "dish": {
+                "receptor_ids": [
+                    {
+                        "rule": "(0 < len(receptor_ids) <= number_ska_dishes)",
+                        "error": "receptor_ids are too many!Current Limit is {number_ska_dishes}"
+                    },
+                    {
+                        "rule": "set(receptor_ids).difference(set(number_dish_ids))",
+                        "error": "Invalid input for receptor_ids! Currently allowed {number_dish_ids}"
+                    }
+                ]
+            },
             "sdp": {
+                "execution_block": {
+                    "parent_key_rule": [
+                        {
+                            "rule": "len(beams) == 1",
+                            "error": "beams are too many! Current limit is 1"
+                        }
+                    ],
+                    "beams": {
+                        "function": [
+                            {
+                                "rule": "function == 'visibilities'",
+                                "error": "Invalid function for beams! Currently allowed visibilities"
+                            }
+                        ]
+                    },
+                    "channels": {
+                        "spectral_windows": {
+                            "freq_min": [
+                                {
+                                    "rule": "min_frequency_hz <= freq_min <= max_frequency_hz",
+                                    "error": "Invalid input for freq_min"
+                                }
+                            ],
+                            "freq_max": [
+                                {
+                                    "rule": "min_frequency_hz <= freq_max <= max_frequency_hz",
+                                    "error": "Invalid input for freq_max"
+                                },
+                                {
+                                    "rule": "freq_min < freq_max",
+                                    "error": "freq_min should be less than freq_max",
+                                    "dependency_key": ["freq_min"]
+                                }
+                            ]
+                        }
+                    }
+                },
                 "resources": {
                     "receptors": [
                         {
@@ -200,20 +252,66 @@
                     }
                 },
                 "common": {
-                    "frequency_band": [
-                        {
-                          "rule": "(receiver_band != '5b' and receiver_band==frequency_band) or (receiver_band=='5b' and frequency_band=='1')",
-                          "dependency_key": ["receiver_band"],
-                            "error": "frequency_band did not match receiver_band"
-                        }
-                    ]
+                    
                 }
             }
         }
     },
     "AA2": {
+        "dish_elevation_limit": {
+            "min": 15
+        },
         "assign_resource": {
+            "dish": {
+                "receptor_ids": [
+                    {
+                        "rule": "(0 < len(receptor_ids) <= number_ska_dishes)",
+                        "error": "receptor_ids are too many!Current Limit is {number_ska_dishes}"
+                    },
+                    {
+                        "rule": "set(receptor_ids).difference(set(number_dish_ids))",
+                        "error": "Invalid input for receptor_ids! Currently allowed {number_dish_ids}"
+                    }
+                ]
+            },
             "sdp": {
+                "execution_block": {
+                    "parent_key_rule": [
+                        {
+                            "rule": "len(beams) == 1",
+                            "error": "beams are too many! Current limit is 1"
+                        }
+                    ],
+                    "beams": {
+                        "function": [
+                            {
+                                "rule": "function == 'visibilities'",
+                                "error": "Invalid function for beams! Currently allowed visibilities"
+                            }
+                        ]
+                    },
+                    "channels": {
+                        "spectral_windows": {
+                            "freq_min": [
+                                {
+                                    "rule": "min_frequency_hz <= freq_min <= max_frequency_hz",
+                                    "error": "Invalid input for freq_min"
+                                }
+                            ],
+                            "freq_max": [
+                                {
+                                    "rule": "min_frequency_hz <= freq_max <= max_frequency_hz",
+                                    "error": "Invalid input for freq_max"
+                                },
+                                {
+                                    "rule": "freq_min < freq_max",
+                                    "error": "freq_min should be less than freq_max",
+                                    "dependency_key": ["freq_min"]
+                                }
+                            ]
+                        }
+                    }
+                },
                 "resources": {
                     "receptors": [
                         {
@@ -308,13 +406,7 @@
                     }
                 },
                 "common": {
-                    "frequency_band": [
-                        {
-                          "rule": "(receiver_band != '5b' and receiver_band==frequency_band) or (receiver_band=='5b' and frequency_band=='1')",
-                          "dependency_key": ["receiver_band"],
-                            "error": "frequency_band did not match receiver_band"
-                        }
-                    ]
+                    
                 }
             }
         }
