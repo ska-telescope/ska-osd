@@ -951,3 +951,119 @@ You can import the relevant components from the package as follows:
     )
 
 This allows you to catch or raise semantic validation-related exceptions when working with OSD validation workflows.
+
+Subarray Template Support
+=========================
+
+OSD now supports subarray templates through the ``subarray_templates`` field in array assembly configurations. This feature enables dynamic template loading and processing for different telescope configurations.
+
+Configuration
+-------------
+
+Each array assembly (AA0.5, AA1, AA2) can specify subarray templates using wildcard patterns:
+
+.. code-block:: json
+
+    {
+        "AA0.5": {
+            "subarray_templates": ["*_AA0.5"],
+            "other_config": "..."
+        },
+        "AA1": {
+            "subarray_templates": ["*_AA1"],
+            "other_config": "..."
+        },
+        "AA2": {
+            "subarray_templates": ["*_AA2"],
+            "other_config": "..."
+        }
+    }
+
+Template Processing
+-------------------
+
+The template mapping system processes subarray templates through:
+
+1. **Pattern Matching**: Uses fnmatch patterns to find matching templates
+2. **Telescope Filtering**: Automatically filters templates based on telescope type (MID/LOW)
+3. **Dynamic Loading**: Templates are loaded from JSON files and merged into capabilities
+4. **Key Normalization**: Template keys are converted to lowercase for consistency
+
+Template File Structure
+-----------------------
+
+Template files should contain telescope-specific templates:
+
+.. code-block:: json
+
+    {
+        "MID_Template_AA0.5": {
+            "frequency_band": "1",
+            "config": {
+                "beam_id": 1,
+                "channels": [[0, 1], [744, 8191]]
+            }
+        },
+        "LOW_Template_AA1": {
+            "frequency_band": "low1",
+            "config": {
+                "beam_id": 1,
+                "stations": [[0, 1], [2, 3]]
+            }
+        }
+    }
+
+API Integration
+---------------
+
+Subarray templates are automatically processed when retrieving OSD data:
+
+.. code-block:: python
+
+    response = client.get("/ska-ost-osd/osd/api/v1/osd?cycle_id=1&capabilities=mid")
+
+* Complete response structure with processed templates:
+
+.. code-block:: json
+
+    {
+        "result_data": [
+            {
+                "observatory_policy": {
+                    "cycle_number": 1,
+                    "telescope_capabilities": {
+                        "Mid": "AA2",
+                        "Low": "AA2"
+                    }
+                },
+                "capabilities": {
+                    "mid": {
+                        "basic_capabilities": {
+                            "dish_elevation_limit_deg": 15,
+                            "receiver_information": [
+                                {
+                                    "max_frequency_hz": 1050000000,
+                                    "min_frequency_hz": 350000000,
+                                    "rx_id": "Band_1"
+                                }
+                            ]
+                        },
+                        "AA2": {
+                            "available_receivers": ["Band_1", "Band_2"],
+                            "number_ska_dishes": 64,
+                            "cbf_modes": ["correlation", "pst", "pss"],
+                            "subarray_templates": {
+                                "LOW_FULL_AA2": {
+                                    "subarray_type": "AA2",
+                                    "custom_stations": "",
+                                    "description": "Full SKA-Low array, AA2 release."
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        ],
+        "result_status": "success",
+        "result_code": 200
+    }
