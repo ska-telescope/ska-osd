@@ -7,130 +7,130 @@ actual template data.
 
 import fnmatch
 import json
-from functools import lru_cache
-from pathlib import Path
-from typing import Any, Dict
+import logging
+from typing import Any, Dict, List
 
-from ska_ost_osd.common.utils import read_json
+from ska_ser_logging import configure_logging
 
-# Constants
-SUBARRAY_TEMPLATES_PATH = "tmdata/subarray_templates/subarray_template_library.json"
-
-
-@lru_cache(maxsize=32)
-def load_template_file(file_path: Path) -> Dict[str, Any]:
-    """Load template data from a JSON file with caching.
-
-    :param file_path: Path to the template file
-    :return: Dictionary containing template data
-    :raises FileNotFoundError: If the template file doesn't exist
-    :raises json.JSONDecodeError: If the file contains invalid JSON
-    """
-    try:
-        return read_json(file_path)
-    except FileNotFoundError as exc:
-        raise FileNotFoundError(f"Template file not found: {file_path}") from exc
-    except json.JSONDecodeError as e:
-        raise json.JSONDecodeError(
-            f"Invalid JSON in template file {file_path}: {e}", e.doc, e.pos
-        ) from e
+configure_logging(level="INFO")
+LOGGER = logging.getLogger(__name__)
 
 
 def find_matching_templates(
-    templates: Dict[str, Any], patterns: list, base_path: Path = ""
+    template_data: Dict[str, Any], patterns: List[str], base_path: str = ""
 ) -> Dict[str, Any]:
     """Find templates that match the given patterns and telescope type.
 
-    :param templates: Dictionary of all available templates
+    :param template_data: template data
     :param patterns: List of patterns to match against template keys
     :param base_path: Path to determine telescope type
     :return: Dictionary of matching templates
     """
     matching_templates = {}
     telescope_type = "mid" if "ska1_mid" in base_path else "low"
+    excluded_prefix = "low_" if telescope_type == "mid" else "mid_"
+
+    LOGGER.info(
+        "Finding templates for telescope type: %s with patterns: %s",
+        telescope_type,
+        patterns,
+    )
 
     for pattern in patterns:
-        for template_key, template_data in templates.items():
-            if fnmatch.fnmatch(template_key, pattern):
-                # Filter out templates that don't match telescope type
-                template_lower = template_key.lower()
-                if telescope_type == "mid" and not template_lower.startswith("low_"):
-                    matching_templates[template_key] = template_data
-                elif telescope_type == "low" and not template_lower.startswith("mid_"):
-                    matching_templates[template_key] = template_data
+        for template_key, data in template_data.items():
+            if not fnmatch.fnmatch(template_key, pattern):
+                continue
 
+            if template_key.lower().startswith(excluded_prefix):
+                continue
+
+            matching_templates[template_key] = data
+            LOGGER.info("Matched template: %s for pattern: %s", template_key, pattern)
+
+    LOGGER.info("Found %d matching templates", len(matching_templates))
     return matching_templates
 
 
 def process_template_mappings(
-    capabilities_data: Dict[str, Any], base_path: Path = "tmdata/ska1_mid"
+    capabilities_data: Dict[str, Any],
+    capability: str = None,
+    template_data: Dict[str, Any] = None,
 ) -> Dict[str, Any]:
     """Process template mappings in capabilities data.
 
-    This function finds template_mappings in the capabilities data, loads the referenced
-    template files, finds templates matching the specified patterns, and replaces the
-    template_mappings key with the actual template data as individual keys.
+    This function finds subarray_templates in the capabilities data, finds templates
+    matching the specified patterns, and replaces the subarray_templates list with
+    the actual template data as a dictionary.
 
     :param capabilities_data: Dictionary containing capabilities data
-    :param base_path: Path for template files
+    :param capability: Capability string to determine base path
+    :param template_data: template data
     :return: Updated capabilities data with template mappings resolved
     """
-    # Create a deep copy to avoid modifying the original data
+    if not capabilities_data:
+        LOGGER.info("No capabilities data provided")
+        return capabilities_data
+
+    base_path = (
+        f"tmdata/{capability.replace('.json', '')}" if capability else "tmdata/ska1_mid"
+    )
+    LOGGER.info(
+        "Processing template mappings for capability: %s, base_path: %s",
+        capability,
+        base_path,
+    )
     updated_data = json.loads(json.dumps(capabilities_data))
 
-    # Process each array assembly in the capabilities data
+    # Collect all unique patterns to process templates only once
+    all_patterns = set()
+    values_with_templates = []
+
     for value in updated_data.values():
         if isinstance(value, dict) and "subarray_templates" in value:
             template_patterns = value["subarray_templates"]
-
             if isinstance(template_patterns, list):
-                try:
-                    # Load subarray template data from constant path
-                    template_data = load_template_file(SUBARRAY_TEMPLATES_PATH)
+                all_patterns.update(template_patterns)
+                values_with_templates.append((value, template_patterns))
+            else:
+                # Remove invalid format (not a list)
+                del value["subarray_templates"]
+                LOGGER.warning(
+                    "Removed invalid subarray_templates format: %s",
+                    type(template_patterns),
+                )
 
-                    # Find templates matching the patterns
-                    matching_templates = find_matching_templates(
-                        template_data, template_patterns, base_path
+    # Process all templates once if we have patterns
+    if all_patterns:
+        try:
+            all_matching_templates = find_matching_templates(
+                template_data, list(all_patterns), base_path
+            )
+
+            # Apply matching templates to each value
+            for value, patterns in values_with_templates:
+                matching_templates = {
+                    k: v
+                    for k, v in all_matching_templates.items()
+                    if any(fnmatch.fnmatch(k, pattern) for pattern in patterns)
+                }
+
+                if matching_templates:
+                    value["subarray_templates"] = matching_templates
+                    LOGGER.info(
+                        "Successfully processed %d templates",
+                        len(matching_templates),
+                    )
+                else:
+                    del value["subarray_templates"]
+                    LOGGER.info(
+                        "No matching templates found, removing subarray_templates key"
                     )
 
-                    # Replace the patterns list with the actual template data
-                    if matching_templates:
-                        value["subarray_templates"] = matching_templates
-                    else:
-                        # Remove the key if no templates match
-                        del value["subarray_templates"]
-
-                except (FileNotFoundError, json.JSONDecodeError) as e:
-                    # Log error and remove the key
-                    print(f"Warning: Could not process subarray templates: {e}")
+        except (KeyError, AttributeError, TypeError, FileNotFoundError) as e:
+            LOGGER.error("Failed to process templates: %s", e)
+            # Remove subarray_templates from all values on error
+            for value, _ in values_with_templates:
+                if "subarray_templates" in value:
                     del value["subarray_templates"]
 
     return updated_data
-
-
-def apply_template_mappings_to_osd_data(osd_data: Dict[str, Any]) -> Dict[str, Any]:
-    """Apply template mapping processing to OSD data.
-
-    This function processes the capabilities section of OSD data and applies
-    template mapping resolution to each telescope's capabilities.
-
-    :param osd_data: Complete OSD data dictionary
-    :return: Updated OSD data with template mappings resolved
-    """
-    if "capabilities" not in osd_data:
-        return osd_data
-
-    updated_osd_data = json.loads(json.dumps(osd_data))
-
-    # Process each telescope's capabilities
-    for telescope, telescope_data in updated_osd_data["capabilities"].items():
-        if isinstance(telescope_data, dict):
-            # Determine base path based on telescope type
-            base_path = f"tmdata/ska1_{telescope.lower()}"
-
-            # Process template mappings for this telescope's data
-            updated_osd_data["capabilities"][telescope] = process_template_mappings(
-                telescope_data, base_path
-            )
-
-    return updated_osd_data

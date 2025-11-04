@@ -6,6 +6,7 @@ POLICIES_CONSTANT_JSON_FILE_PATH = "observatory_policies.json"
 RELEASE_FILE = "tmdata/version_mapping/latest_release.txt"
 RELEASE_FILE_PATH_LATEST = "version_mapping/latest_release.txt"
 VERSION_FILE_PATH = "version_mapping/cycle_gitlab_release_version_mapping.json"
+SUBARRAY_TEMPLATES_PATH = "subarray_templates/subarray_template_library.json"
 
 osd_file_mapping = {
     "low": LOW_CONSTANT_JSON_FILE_PATH,
@@ -13,6 +14,7 @@ osd_file_mapping = {
     "observatory_policies": POLICIES_CONSTANT_JSON_FILE_PATH,
     "cycle_to_version_mapping": VERSION_FILE_PATH,
     "latest_cycle_version_to_release": RELEASE_FILE,
+    "subarray_templates": SUBARRAY_TEMPLATES_PATH,
 }
 
 osd_response_template = {
