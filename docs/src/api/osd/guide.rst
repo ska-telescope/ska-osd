@@ -989,6 +989,18 @@ The template mapping system processes subarray templates through:
 3. **Dynamic Loading**: Templates are loaded from JSON files and merged into capabilities
 4. **Key Normalization**: Template keys are converted to lowercase for consistency
 
+Template Processing Flag
+--------------------------------
+
+OSD uses an internal ``process_templates`` flag to differentiate between library usage and API usage. This flag is not exposed to end users but controls the behavior internally:
+
+* **Library Usage**: Returns raw capability data without template processing (process_templates=False internally)
+* **API Usage**: Automatically processes subarray_templates patterns and replaces them with actual template data (process_templates=True internally)
+
+.. note::
+
+    The ``process_templates`` parameter is an internal implementation detail and is not exposed through the REST API. Users cannot control this behavior - it is automatically determined based on whether the request comes through the API layer or direct library usage.
+
 Template File Structure
 -----------------------
 
