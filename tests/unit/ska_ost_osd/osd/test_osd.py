@@ -360,3 +360,42 @@ def test_get_osd_data_with_process_templates(tm_data_osd):  # pylint: disable=W0
     assert "capabilities" in result_true
     assert "mid" in result_false["capabilities"]
     assert "mid" in result_true["capabilities"]
+
+
+@patch("ska_ost_osd.osd.osd.process_template_mappings")
+def test_get_osd_data_template_processing_called(
+    mock_process_templates, tm_data_osd
+):  # pylint: disable=W0621
+    """Test that process_template_mappings is called when process_templates=True."""
+
+    # Mock the template processing function to return modified data
+    def mock_template_processing(data, _capability, _template_data):
+        # Add mock subarray_templates to the data
+        modified_data = data.copy()
+        if "AA0.5" in modified_data:
+            modified_data["AA0.5"]["subarray_templates"] = {
+                "mid_template_1": {"config": "test"}
+            }
+        return modified_data
+
+    mock_process_templates.side_effect = mock_template_processing
+
+    # Test with process_templates=True
+    result, _ = get_osd_data(
+        capabilities=["mid"],
+        array_assembly="AA0.5",
+        tmdata=tm_data_osd,
+        process_templates=True,
+    )
+
+    # Verify that process_template_mappings was called
+    assert mock_process_templates.called
+
+    # Verify the result contains the mocked template data
+    assert "capabilities" in result
+    assert "mid" in result["capabilities"]
+    assert "AA0.5" in result["capabilities"]["mid"]
+    assert "subarray_templates" in result["capabilities"]["mid"]["AA0.5"]
+    assert (
+        "mid_template_1" in result["capabilities"]["mid"]["AA0.5"]["subarray_templates"]
+    )

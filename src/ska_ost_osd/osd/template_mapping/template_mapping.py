@@ -91,6 +91,13 @@ def process_template_mappings(
             if isinstance(template_patterns, list):
                 all_patterns.update(template_patterns)
                 values_with_templates.append((value, template_patterns))
+            else:
+                # Remove invalid format (not a list)
+                del value["subarray_templates"]
+                LOGGER.warning(
+                    "Removed invalid subarray_templates format: %s",
+                    type(template_patterns),
+                )
 
     # Process all templates once if we have patterns
     if all_patterns:

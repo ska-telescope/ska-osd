@@ -130,8 +130,9 @@ class TestProcessTemplateMappings:
 
         result = process_template_mappings(capabilities_data, capability, template_data)
 
-        # Should return unchanged data when patterns are not a list
-        assert result["AA1"]["subarray_templates"] == "invalid_format"
+        # Should remove subarray_templates key when format is invalid (not a list)
+        assert "AA1" in result
+        assert "subarray_templates" not in result["AA1"]
 
     def test_process_template_mappings_exception_handling(self):
         """Test template mapping exception handling."""
