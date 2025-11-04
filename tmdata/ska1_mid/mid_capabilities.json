@@ -96,7 +96,8 @@
         "number_ska_dishes": 4,
         "number_zoom_channels": 0,
         "number_zoom_windows": 0,
-        "ps_beam_bandwidth_hz": 400000000
+        "ps_beam_bandwidth_hz": 400000000,
+        "subarray_templates": ["*_AA0.5"]
     },
     "AA1": {
         "allowed_channel_count_range_max": [
@@ -138,7 +139,8 @@
         "number_ska_dishes": 8,
         "number_zoom_channels": 0,
         "number_zoom_windows": 0,
-        "ps_beam_bandwidth_hz": 400000000
+        "ps_beam_bandwidth_hz": 400000000,
+        "subarray_templates": ["*_AA1"]
     },
     "AA2": {
         "allowed_channel_count_range_max": [
@@ -254,6 +256,7 @@
         "number_ska_dishes": 64,
         "number_zoom_channels": 14880,
         "number_zoom_windows": 17,
-        "ps_beam_bandwidth_hz": 800000000
+        "ps_beam_bandwidth_hz": 800000000,
+        "subarray_templates": ["*_AA2"]
     }
 }

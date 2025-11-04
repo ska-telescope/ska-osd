@@ -1,0 +1,16 @@
+{
+  "array_assembly": {
+    "template_mappings": {
+      "beam_templates": {
+        "file": "dummy_templates.json",
+        "template_patterns": ["MID_*", "OTHER_*"]
+      }
+    },
+    "existing_config": {
+      "max_beams": 10
+    }
+  },
+  "other_assembly": {
+    "no_mappings": true
+  }
+}
