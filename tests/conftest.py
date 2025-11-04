@@ -11,7 +11,6 @@ from ska_telmodel.data import TMData
 
 from ska_ost_osd.app import create_app
 from ska_ost_osd.osd.osd import osd_tmdata_source
-from ska_ost_osd.osd.template_mapping.template_mapping import load_template_file
 from ska_ost_osd.telvalidation.common.constant import CAR_TELMODEL_SOURCE
 from tests.unit.ska_ost_osd.common.constant import (
     DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER,
@@ -613,11 +612,3 @@ def valid_only_observing_command_input_in_request_body(valid_observing_command_i
 )
 def semantic_validation_param_input(request):
     return request.param
-
-
-@pytest.fixture(autouse=True)
-def clear_cache():
-    """Clear the lru_cache before each test."""
-    load_template_file.cache_clear()
-    yield
-    load_template_file.cache_clear()
