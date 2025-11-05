@@ -672,7 +672,8 @@ PUT /osd
           "available_bandwidth_hz": 800000000,
           "available_receivers": [
             "Band_1",
-            "Band_2"
+            "Band_2",
+            "Band_5b"
           ],
           "cbf_modes": [
             "correlation",
