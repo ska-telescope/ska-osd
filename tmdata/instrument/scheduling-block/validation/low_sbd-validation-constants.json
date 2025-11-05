@@ -41,7 +41,7 @@
                         ],
                         "zoom_factor": [
                             {
-                                "rule": "zoom_factor == 0",
+                                "rule": "zoom_factor in allowed_zoom_factors",
                                 "error": "Invalid input for zoom_factor"
                             }
                         ]
