@@ -50,7 +50,9 @@ def test_get_osd_data(
     :returns: assert equals values
     """
 
-    result, _ = get_osd_data(capabilities, array_assembly, tmdata=tm_data_osd)
+    result, _ = get_osd_data(
+        capabilities, array_assembly, tmdata=tm_data_osd, process_templates=False
+    )
     result_keys = result["capabilities"].keys()
     expected = create_entity_object(file_path)
     expected_keys = expected["capabilities"].keys()
@@ -165,7 +167,10 @@ def test_invalid_get_osd_data_capability(tm_data_osd):  # pylint: disable=W0621
     """
 
     _, error_msgs = get_osd_data(
-        capabilities=["midd"], array_assembly="AA1", tmdata=tm_data_osd
+        capabilities=["midd"],
+        array_assembly="AA1",
+        tmdata=tm_data_osd,
+        process_templates=False,
     )
     assert error_msgs == [
         "Capability midd is not valid,Available Capabilities are low, mid,"
@@ -183,7 +188,10 @@ def test_invalid_get_osd_data_array_assembly(tm_data_osd):  # pylint: disable=W0
     aa_value = "AA100000"
 
     _, error_msgs = get_osd_data(
-        capabilities=["mid"], array_assembly=aa_value, tmdata=tm_data_osd
+        capabilities=["mid"],
+        array_assembly=aa_value,
+        tmdata=tm_data_osd,
+        process_templates=False,
     )
     msg = ",".join(error_msgs[0].split(",")[1:])
 
@@ -332,3 +340,67 @@ def test_update_osd_file_observatory_policy_update(
     )
 
     assert mock_update_file.call_count == 1
+
+
+def test_get_osd_data_with_process_templates(tm_data_osd):  # pylint: disable=W0621
+    """Test that process_templates parameter is properly passed through."""
+    # Test with process_templates=False (default)
+    result_false, _ = get_osd_data(
+        capabilities=["mid"],
+        array_assembly="AA0.5",
+        tmdata=tm_data_osd,
+        process_templates=False,
+    )
+
+    # Test with process_templates=True
+    result_true, _ = get_osd_data(
+        capabilities=["mid"],
+        array_assembly="AA0.5",
+        tmdata=tm_data_osd,
+        process_templates=True,
+    )
+
+    # Both should return valid data structures
+    assert "capabilities" in result_false
+    assert "capabilities" in result_true
+    assert "mid" in result_false["capabilities"]
+    assert "mid" in result_true["capabilities"]
+
+
+@patch("ska_ost_osd.osd.osd.process_template_mappings")
+def test_get_osd_data_template_processing_called(
+    mock_process_templates, tm_data_osd
+):  # pylint: disable=W0621
+    """Test that process_template_mappings is called when process_templates=True."""
+
+    # Mock the template processing function to return modified data
+    def mock_template_processing(data, _capability, _template_data):
+        # Add mock subarray_templates to the data
+        modified_data = data.copy()
+        if "AA0.5" in modified_data:
+            modified_data["AA0.5"]["subarray_templates"] = {
+                "mid_template_1": {"config": "test"}
+            }
+        return modified_data
+
+    mock_process_templates.side_effect = mock_template_processing
+
+    # Test with process_templates=True
+    result, _ = get_osd_data(
+        capabilities=["mid"],
+        array_assembly="AA0.5",
+        tmdata=tm_data_osd,
+        process_templates=True,
+    )
+
+    # Verify that process_template_mappings was called
+    assert mock_process_templates.called
+
+    # Verify the result contains the mocked template data
+    assert "capabilities" in result
+    assert "mid" in result["capabilities"]
+    assert "AA0.5" in result["capabilities"]["mid"]
+    assert "subarray_templates" in result["capabilities"]["mid"]["AA0.5"]
+    assert (
+        "mid_template_1" in result["capabilities"]["mid"]["AA0.5"]["subarray_templates"]
+    )

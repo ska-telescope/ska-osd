@@ -71,7 +71,9 @@ def get_osd(osd_model: OSDQueryParams = Depends()) -> Dict:
     :returns dict: A dictionary with OSD data satisfying the query.
     """
     try:
-        osd_data = get_osd_using_tmdata(**osd_model.model_dump())
+        model_data = osd_model.model_dump()
+        model_data["process_templates"] = True
+        osd_data = get_osd_using_tmdata(**model_data)
     except (OSDModelError, ValueError) as error:
         raise error
     return convert_to_response_object(osd_data, result_code=HTTPStatus.OK)

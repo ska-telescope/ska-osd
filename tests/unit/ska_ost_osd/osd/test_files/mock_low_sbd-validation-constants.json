@@ -50,5 +50,104 @@
             }
         }
     },
-    "AA1": {}
+    "AA1": {
+        "sbd": {
+            "mccs_allocation": {
+                "subarray_beams": {
+                    "subarray_beam_id": [
+                        {
+                            "rule": "1 <= subarray_beam_id <= number_beams",
+                            "error": "subarray_beam_id must be between 1 and {number_beams}"
+                        }
+                    ],
+                    "number_of_channels": [
+                        {
+                            "rule": "8 <= number_of_channels <= 384",
+                            "error": "number_of_channels must be between 8 and 384"
+                        }
+                    ],
+                    "apertures": {
+                        "station_id": [
+                            {
+                                "rule": "station_id in number_station_ids",
+                                "error": "Invalid input for station_id! Currently allowed {number_station_ids}"
+                            }
+                        ]
+                    }
+                }
+            },
+            "csp_configurations": {
+                "lowcbf": {
+                    "correlation_spws": {
+                        "logical_fsp_ids": [
+                            {
+                                "rule": "len(set(logical_fsp_ids)) == len(logical_fsp_ids)",
+                                "error": "The logical_fsp_ids should all be distinct"
+                            },
+                            {
+                                "rule": "(0 < len(logical_fsp_ids) <= number_fsps)",
+                                "error": "logical_fsp_ids are too many!Current Limit is {number_fsps}"
+                            }
+                        ],
+                        "zoom_factor": [
+                            {
+                                "rule": "zoom_factor == 0",
+                                "error": "Invalid input for zoom_factor"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "AA2": {
+        "sbd": {
+            "mccs_allocation": {
+                "subarray_beams": {
+                    "subarray_beam_id": [
+                        {
+                            "rule": "1 <= subarray_beam_id <= number_beams",
+                            "error": "subarray_beam_id must be between 1 and {number_beams}"
+                        }
+                    ],
+                    "number_of_channels": [
+                        {
+                            "rule": "8 <= number_of_channels <= 384",
+                            "error": "number_of_channels must be between 8 and 384"
+                        }
+                    ],
+                    "apertures": {
+                        "station_id": [
+                            {
+                                "rule": "station_id in number_station_ids",
+                                "error": "Invalid input for station_id! Currently allowed {number_station_ids}"
+                            }
+                        ]
+                    }
+                }
+            },
+            "csp_configurations": {
+                "lowcbf": {
+                    "correlation_spws": {
+                        "logical_fsp_ids": [
+                            {
+                                "rule": "len(set(logical_fsp_ids)) == len(logical_fsp_ids)",
+                                "error": "The logical_fsp_ids should all be distinct"
+                            },
+                            {
+                                "rule": "(0 < len(logical_fsp_ids) <= number_fsps)",
+                                "error": "logical_fsp_ids are too many!Current Limit is {number_fsps}"
+                            }
+                        ],
+                        "zoom_factor": [
+                            {
+                                "rule": "zoom_factor == 0",
+                                "error": "Invalid input for zoom_factor"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    }
 }
