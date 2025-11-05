@@ -1,0 +1,29 @@
+{
+  "MID_Template1": {
+    "frequency_band": "1",
+    "config": {
+      "beam_id": 1,
+      "channels": [[0, 1], [744, 8191]]
+    }
+  },
+  "MID_Template2": {
+    "frequency_band": "2", 
+    "config": {
+      "beam_id": 2,
+      "channels": [[0, 1], [744, 8191]]
+    }
+  },
+  "LOW_Template1": {
+    "frequency_band": "low1",
+    "config": {
+      "beam_id": 1,
+      "stations": [[0, 1], [2, 3]]
+    }
+  },
+  "OTHER_Template": {
+    "frequency_band": "other",
+    "config": {
+      "beam_id": 3
+    }
+  }
+}
