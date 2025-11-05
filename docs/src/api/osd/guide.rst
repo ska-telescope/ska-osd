@@ -120,7 +120,7 @@ API json response template
 
     {
     "observatory_policy": {
-      "cycle_number": 1,
+      "cycle_number": 0,
     "telescope_capabilities": []},
     "capabilities": {
       "mid": {},
@@ -216,7 +216,7 @@ GET /osd
           "result_data": [
             {
               "observatory_policy": {
-                "cycle_number": 1,
+                "cycle_number": 0,
                 "cycle_description": "Science Verification",
                 "cycle_information": {
                   "cycle_id": "SKAO_2027_1",
@@ -374,14 +374,14 @@ GET /osd
                       "SKA125",
                       "SKA126"
                     ],
-                    "number_fsps": 35,
-                    "number_meerkat_dishes": 20,
+                    "number_fsps": 26,
+                    "number_meerkat_dishes": 4,
                     "number_meerkatplus_dishes": 0,
-                    "number_pss_beams": 385,
+                    "number_pss_beams": 384,
                     "number_pst_beams": 6,
                     "number_ska_dishes": 64,
                     "number_zoom_channels": 14880,
-                    "number_zoom_windows": 17,
+                    "number_zoom_windows": 16,
                     "ps_beam_bandwidth_hz": 800000000
                   }
                 }
@@ -672,7 +672,8 @@ PUT /osd
           "available_bandwidth_hz": 800000000,
           "available_receivers": [
             "Band_1",
-            "Band_2"
+            "Band_2",
+            "Band_5b"
           ],
           "cbf_modes": [
             "correlation",
@@ -727,7 +728,7 @@ PUT /osd
             "SKA081",
             "SKA100"
           ],
-          "number_fsps": 9,
+          "number_fsps": 8,
           "number_meerkat_dishes": 0,
           "number_meerkatplus_dishes": 0,
           "number_pss_beams": 0,
@@ -754,7 +755,15 @@ PUT /osd
             13440,
             26880,
             40320,
-            53760
+            53760,
+            80640,
+            107520,
+            161280,
+            215040,
+            322560,
+            416640,
+            430080,
+            645120
           ],
           "available_bandwidth_hz": 800000000,
           "available_receivers": [

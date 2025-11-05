@@ -6,8 +6,8 @@
                 "subarray_beams": {
                     "subarray_beam_id": [
                         {
-                            "rule": "1 <= subarray_beam_id <= 48",
-                            "error": "subarray_beam_id must be between 1 and 48"
+                            "rule": "1 <= subarray_beam_id <= number_beams",
+                            "error": "subarray_beam_id must be between 1 and {number_beams}"
                         }
                     ],
                     "number_of_channels": [
@@ -41,7 +41,7 @@
                         ],
                         "zoom_factor": [
                             {
-                                "rule": "zoom_factor == 0",
+                                "rule": "zoom_factor in allowed_zoom_factors",
                                 "error": "Invalid input for zoom_factor"
                             }
                         ]
@@ -50,5 +50,359 @@
             }
         }
     },
-    "AA1": {}
+    "AA1": {
+        "assign_resource": {
+            "mccs": {
+                "subarray_beams": {
+                    "subarray_beam_id": [
+                        {
+                            "rule": "1 <= subarray_beam_id <= number_beams",
+                            "error": "subarray_beam_id must be between 1 and {number_beams}"
+                        }
+                    ],
+                    "number_of_channels": [
+                        {
+                            "rule": "8 <= number_of_channels <= 384",
+                            "error": "number_of_channels must be between 8 and 384"
+                        }
+                    ],
+                    "apertures": {
+                        "station_id": [
+                            {
+                                "rule": "station_id in number_station_ids",
+                                "error": "Invalid input for station_id! Currently allowed {number_station_ids}"
+                            }
+                        ],
+                        "aperture_id": [
+                            {
+                                "rule": "aperture_id[:2] == 'AP'",
+                                "error": "Initials of aperture_id should be AP"
+                            },
+                            {
+                                "rule": "station_id == int(re.search(r'\\d+', aperture_id).group())",
+                                "dependency_key": ["station_id"],
+                                "error": "station_id in aperture_id should be same as station_id"
+                            }
+                        ]
+                    }
+                }
+            },
+            "sdp": {
+                "execution_block": {
+                    "parent_key_rule": [
+                        {
+                            "rule": "len(beams) <= number_beams",
+                            "error": "beams are too many! Current limit is {number_beams}"
+                        }
+                    ],
+                    "beams": {
+                        "function": [
+                            {
+                                "rule": "function == 'visibilities'",
+                                "error": "Invalid function for beams! Currently allowed visibilities"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "configure": {
+            "mccs": {
+                "subarray_beams": {
+                    "subarray_beam_id": [
+                        {
+                            "rule": "1 <= subarray_beam_id <= number_beams",
+                            "error": "subarray_beam_id must be between 1 and {number_beams}"
+                        }
+                    ],
+                    "update_rate": [
+                        {
+                            "rule": "update_rate >= 0.0",
+                            "error": "update_rate must be greater than or equal to 0.0"
+                        }
+                    ],
+                    "logical_bands": {
+                        "start_channel": [
+                            {
+                                "rule": "2 < start_channel < 504",
+                                "error": "start_channel must be greater than 2 and less than 504"
+                            }
+                        ],
+                        "number_of_channels": [
+                            {
+                                "rule": "8 <= number_of_channels <= 384",
+                                "error": "number_of_channels must be greater than or equal to 8 and less than or equal to 384"
+                            }
+                        ]
+                    },
+                    "apertures": {
+                        "aperture_id": [
+                            {
+                                "rule": "aperture_id[:2] == 'AP'",
+                                "error": "Initials of aperture_id should be AP"
+                            }
+                        ]
+                    },
+                    "sky_coordinates": {
+                        "reference_frame": [
+                            {
+                                "rule": "reference_frame in ['topocentric', 'ICRS', 'galactic']",
+                                "error": "Invalid reference frame! Currently allowed  [\"topocentric\", \"ICRS\", \"galactic\"]"
+                            }
+                        ],
+                        "c1": [
+                            {
+                                "rule": "0.0 <= c1 <= 360.0",
+                                "error": "c1 must be between 0.0 and 360.0"
+                            }
+                        ],
+                        "c2": [
+                            {
+                                "rule": "-90.0 <= c2 <= 90.0",
+                                "error": "c2 must be between -90.0 and 90.0"
+                            }
+                        ]  
+                    }
+                }
+            },
+            "csp": {
+                "lowcbf": {
+                    "stations": {
+                        "stns": [
+                            {
+                                "rule": "0 < len(stns) <= number_stations",
+                                "error": "stations are too many! Current limit is {number_stations}"
+                            }
+                        ]
+                    },
+                    "vis": {
+                        "fsp": {
+                            "function_mode": [
+                                {
+                                    "rule": "function_mode == 'vis'",
+                                    "error": "Invalid input for function_mode! Currently allowed vis"
+                                }
+                            ],
+                            "fsp_ids": [
+                                {
+                                    "rule": "len(set(fsp_ids)) == len(fsp_ids)",
+                                    "error": "The fsp_ids should all be distinct"
+                                },
+                                {
+                                    "rule": "(0 < len(fsp_ids) <= number_fsps)",
+                                    "error": "fsp_ids are too many!Current Limit is {number_fsps}"
+                                },
+                                {
+                                    "rule": "False if len([num for num in fsp_ids if num > number_fsps])> 0 else True",
+                                    "error": "Invalid fsp_ids! The range should not greater than {number_fsps}"
+                                }
+                            ]
+                        }
+                    },
+                    "timing_beams": {
+                        "beams": [
+                            {
+                                "rule": "len(beams) <= number_pst_beams",
+                                "error": "beams are too many!Current Limit is {number_pst_beams}"
+                            }
+                        ],
+                        "fsp": {
+                            "function_mode": [
+                                {
+                                    "rule": "function_mode == 'pst'",
+                                    "error": "Invalid input for function_mode! Currently allowed pst"
+                                }
+                            ]
+                        }   
+                    }
+                },
+                "pst": {
+                    "beams": [
+                        {
+                            "rule": "len(beams) <= number_pst_beams",
+                            "error": "beams are too many! Current limit is {number_pst_beams}"
+                        }
+                    ]
+                }
+            }
+        }
+    },
+
+    "AA2": {
+        "assign_resource": {
+            "mccs": {
+                "subarray_beams": {
+                    "subarray_beam_id": [
+                        {
+                            "rule": "1 <= subarray_beam_id <= number_beams",
+                            "error": "subarray_beam_id must be between 1 and {number_beams}"
+                        }
+                    ],
+                    "number_of_channels": [
+                        {
+                            "rule": "8 <= number_of_channels <= 384",
+                            "error": "number_of_channels must be between 8 and 384"
+                        }
+                    ],
+                    "apertures": {
+                        "station_id": [
+                            {
+                                "rule": "station_id in number_station_ids",
+                                "error": "Invalid input for station_id! Currently allowed {number_station_ids}"
+                            }
+                        ],
+                        "aperture_id": [
+                            {
+                                "rule": "aperture_id[:2] == 'AP'",
+                                "error": "Initials of aperture_id should be AP"
+                            },
+                            {
+                                "rule": "station_id == int(re.search(r'\\d+', aperture_id).group())",
+                                "dependency_key": ["station_id"],
+                                "error": "station_id in aperture_id should be same as station_id"
+                            }
+                        ]
+                    }
+                }
+            },
+            "sdp": {
+                "execution_block": {
+                    "parent_key_rule": [
+                        {
+                            "rule": "len(beams) <= number_beams",
+                            "error": "beams are too many! Current limit is {number_beams}"
+                        }
+                    ],
+                    "beams": {
+                        "function": [
+                            {
+                                "rule": "function == 'visibilities'",
+                                "error": "Invalid function for beams! Currently allowed visibilities"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        "configure": {
+            "mccs": {
+                "subarray_beams": {
+                    "subarray_beam_id": [
+                        {
+                            "rule": "1 <= subarray_beam_id <= number_beams",
+                            "error": "subarray_beam_id must be between 1 and {number_beams}"
+                        }
+                    ],
+                    "update_rate": [
+                        {
+                            "rule": "update_rate >= 0.0",
+                            "error": "update_rate must be greater than or equal to 0.0"
+                        }
+                    ],
+                    "logical_bands": {
+                        "start_channel": [
+                            {
+                                "rule": "2 < start_channel < 504",
+                                "error": "start_channel must be greater than 2 and less than 504"
+                            }
+                        ],
+                        "number_of_channels": [
+                            {
+                                "rule": "8 <= number_of_channels <= 384",
+                                "error": "number_of_channels must be greater than or equal to 8 and less than or equal to 384"
+                            }
+                        ]
+                    },
+                    "apertures": {
+                        "aperture_id": [
+                            {
+                                "rule": "aperture_id[:2] == 'AP'",
+                                "error": "Initials of aperture_id should be AP"
+                            }
+                        ]
+                    },
+                    "sky_coordinates": {
+                        "reference_frame": [
+                            {
+                                "rule": "reference_frame in ['topocentric', 'ICRS', 'galactic']",
+                                "error": "Invalid reference frame! Currently allowed  [\"topocentric\", \"ICRS\", \"galactic\"]"
+                            }
+                        ],
+                        "c1": [
+                            {
+                                "rule": "0.0 <= c1 <= 360.0",
+                                "error": "c1 must be between 0.0 and 360.0"
+                            }
+                        ],
+                        "c2": [
+                            {
+                                "rule": "-90.0 <= c2 <= 90.0",
+                                "error": "c2 must be between -90.0 and 90.0"
+                            }
+                        ]  
+                    }
+                }
+            },
+            "csp": {
+                "lowcbf": {
+                    "stations": {
+                        "stns": [
+                            {
+                                "rule": "0 < len(stns) <= number_stations",
+                                "error": "stations are too many! Current limit is {number_stations}"
+                            }
+                        ]
+                    },
+                    "vis": {
+                        "fsp": {
+                            "function_mode": [
+                                {
+                                    "rule": "function_mode == 'vis'",
+                                    "error": "Invalid input for function_mode! Currently allowed vis"
+                                }
+                            ],
+                            "fsp_ids": [
+                                {
+                                    "rule": "len(set(fsp_ids)) == len(fsp_ids)",
+                                    "error": "The fsp_ids should all be distinct"
+                                },
+                                {
+                                    "rule": "(0 < len(fsp_ids) <= number_fsps)",
+                                    "error": "fsp_ids are too many!Current Limit is {number_fsps}"
+                                },
+                                {
+                                    "rule": "False if len([num for num in fsp_ids if num > number_fsps])> 0 else True",
+                                    "error": "Invalid fsp_ids! The range should not greater than {number_fsps}"
+                                }
+                            ]
+                        }
+                    },
+                    "timing_beams": {
+                        "beams": [
+                            {
+                                "rule": "len(beams) <= number_pst_beams",
+                                "error": "beams are too many!Current Limit is {number_pst_beams}"
+                            }
+                        ],
+                        "fsp": {
+                            "function_mode": [
+                                {
+                                    "rule": "function_mode == 'pst'",
+                                    "error": "Invalid input for function_mode! Currently allowed pst"
+                                }
+                            ]
+                        }   
+                    }
+                },
+                "pst": {
+                    "beams": [
+                        {
+                            "rule": "len(beams) <= number_pst_beams",
+                            "error": "beams are too many! Current limit is {number_pst_beams}"
+                        }
+                    ]
+                }
+            }
+        }
+    }
 }
