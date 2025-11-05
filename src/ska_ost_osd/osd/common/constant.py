@@ -30,7 +30,7 @@ BASE_FOLDER_NAME = "tmdata"
 SOURCES = ("file", "car", "gitlab")
 CAPABILITIES = ("mid", "low")
 OSD_VERSION_PATTERN = r"^\d+\.\d+\.\d+"
-ARRAY_ASSEMBLY_PATTERN = r"^AA(\d+|\d+\.\d+)"
+ARRAY_ASSEMBLY_PATTERN = r"^AA(\d+|\d+\.\d+)|^Low|^Mid"
 QUERY_FIELDS = [
     "cycle_id",
     "osd_version",

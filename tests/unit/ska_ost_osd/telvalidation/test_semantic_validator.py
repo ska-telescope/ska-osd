@@ -359,8 +359,8 @@ def test_semantic_validate_invalid_array_assembly(
     """Test semantic validation API response with invalid array assembly."""
     json_body = semantic_validation_invalid_array_assembly
     expected_response = (
-        "body.array_assembly: String should match pattern '^AA(\\d+|\\d+\\.\\d+)',"
-        " invalid payload: AAA121"
+        "body.array_assembly: String should match pattern"
+        " '^AA(\\d+|\\d+\\.\\d+)|^Low|^Mid', invalid payload: AAA121"
     )
     res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body).json()
     assert res["result_data"] == expected_response
