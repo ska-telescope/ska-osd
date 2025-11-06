@@ -1,43 +1,52 @@
 from ska_ost_osd.telvalidation.common.constant import CAR_TELMODEL_SOURCE
 from tests.unit.ska_ost_osd.utils import read_json
 
-DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER = "test_files/default_osd_response.json"
+BASE_FOLDER_NAME = "test_files"
 
-MID_CAPABILITIES_MOCK_DATA = "test_files/mock_mid_capabilities.json"
+DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER = f"{BASE_FOLDER_NAME}/default_osd_response.json"
 
-LOW_CAPABILITIES_MOCK_DATA = "test_files/mock_low_capabilities.json"
+MID_CAPABILITIES_MOCK_DATA = f"{BASE_FOLDER_NAME}/mock_mid_capabilities.json"
+LOW_CAPABILITIES_MOCK_DATA = f"{BASE_FOLDER_NAME}/mock_low_capabilities.json"
 
-VALIDATION_MOCK_DATA = "test_files/mock-validation-constants.json"
+VALIDATION_MOCK_DATA = f"{BASE_FOLDER_NAME}/mock-validation-constants.json"
 
-MID_SBD_VALIDATION_MOCK_DATA = "test_files/mock_mid_sbd-validation-constants.json"
+MID_SBD_VALIDATION_MOCK_DATA = (
+    f"{BASE_FOLDER_NAME}/mock_mid_sbd-validation-constants.json"
+)
+LOW_SBD_VALIDATION_MOCK_DATA = (
+    f"{BASE_FOLDER_NAME}/mock_low_sbd-validation-constants.json"
+)
 
-LOW_SBD_VALIDATION_MOCK_DATA = "test_files/mock_low_sbd-validation-constants.json"
+MID_OSD_DATA_JSON = read_json(f"{BASE_FOLDER_NAME}/testfile_mid_osd_data.json")
 
-MID_OSD_DATA_JSON = read_json("test_files/testfile_mid_osd_data.json")
+MID_ASSIGN_JSON = f"{BASE_FOLDER_NAME}/testfile_mid_assign.json"
+VALID_MID_CONFIGURE_JSON = f"{BASE_FOLDER_NAME}/testfile_mid_configure.json"
 
-MID_ASSIGN_JSON = "test_files/testfile_mid_assign.json"
-VALID_MID_CONFIGURE_JSON = "test_files/testfile_mid_configure.json"
+MID_SBD_JSON = f"{BASE_FOLDER_NAME}/testfile_mid_sbd.json"
+LOW_SBD_JSON = f"{BASE_FOLDER_NAME}/testfile_low_sbd.json"
+INVALID_MID_CONFIGURE_JSON = f"{BASE_FOLDER_NAME}/testfile_mid_configure.json"
 
-MID_SBD_JSON = "test_files/testfile_mid_sbd.json"
-LOW_SBD_JSON = "test_files/testfile_low_sbd.json"
-INVALID_MID_CONFIGURE_JSON = "test_files/testfile_mid_configure.json"
+LOW_ASSIGN_JSON = f"{BASE_FOLDER_NAME}/testfile_low_assign.json"
+LOW_CONFIGURE_JSON = f"{BASE_FOLDER_NAME}/testfile_low_configure.json"
 
-LOW_ASSIGN_JSON = "test_files/testfile_low_assign.json"
+capabilities = read_json(f"{BASE_FOLDER_NAME}/testfile_capabilities.json")
 
-LOW_CONFIGURE_JSON = "test_files/testfile_low_configure.json"
+ARRAY_ASSEMBLY = "AA0.5"
 
-capabilities = read_json("test_files/testfile_capabilities.json")
+local_source = ["file://tmdata"]
 
 OSD_RESPONSE_WITH_ONLY_CAPABILITIES_PARAMETER = (
-    "test_files/osd_response_with_capabilities.json"
+    f"{BASE_FOLDER_NAME}/osd_response_with_capabilities.json"
 )
 
 file_name = "osd_response_with_capabilities_and_array_assembly.json"
-OSD_RESPONSE_WITH_CAPABILITIES_ARRAY_ASSEMBLY_PARAMETER = f"test_files/{file_name}"
+OSD_RESPONSE_WITH_CAPABILITIES_ARRAY_ASSEMBLY_PARAMETER = (
+    f"{BASE_FOLDER_NAME}/{file_name}"
+)
 
 # This is dummy constant json for testing "Invalid rule and error key passed" scenario.
 INVALID_MID_VALIDATE_CONSTANT = {
-    "AA0.5": {
+    ARRAY_ASSEMBLY: {
         "assign_resource": {
             "dish": {
                 "receptor_ids": [
@@ -60,8 +69,6 @@ INPUT_COMMAND_CONFIG = {
     "subarray_id": 1,
     "dish": {"receptor_ids": ["SKA001"]},
 }
-
-ARRAY_ASSEMBLY = "AA0.5"
 
 mid_expected_result_for_invalid_data = (
     "receptor_ids are too many!Current Limit is 4\nInvalid input for receptor_ids!"
@@ -142,5 +149,3 @@ sources = [
     CAR_TELMODEL_SOURCE,
     "car:ska-telmodel-data?main",
 ]
-
-local_source = ["file://tmdata"]
