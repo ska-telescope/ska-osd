@@ -267,6 +267,16 @@ def valid_observing_command_input(create_entity_object):
 
 
 @pytest.fixture(scope="session")
+def valid_observing_command_input_aa1(create_entity_object):
+    return create_entity_object(MID_ASSIGN_JSON_AA1).get("valid")
+
+
+@pytest.fixture(scope="session")
+def valid_observing_command_input_aa2(create_entity_object):
+    return create_entity_object(MID_ASSIGN_JSON_AA2).get("valid")
+
+
+@pytest.fixture(scope="session")
 def invalid_observing_command_input(create_entity_object):
     return create_entity_object(MID_ASSIGN_JSON).get("invalid")
 
@@ -483,10 +493,10 @@ def valid_semantic_validation_body(
 
 @pytest.fixture(scope="session")
 def valid_semantic_validation_body_aa1(
-    tmdata_source, mid_osd_data_aa1, valid_observing_command_input
+    tmdata_source, mid_osd_data_aa1, valid_observing_command_input_aa1
 ):
     return {
-        "observing_command_input": valid_observing_command_input,
+        "observing_command_input": valid_observing_command_input_aa1,
         "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
         "array_assembly": "AA1",
         "sources": tmdata_source,
@@ -497,10 +507,10 @@ def valid_semantic_validation_body_aa1(
 
 @pytest.fixture(scope="session")
 def valid_semantic_validation_body_aa2(
-    tmdata_source, mid_osd_data_aa2, valid_observing_command_input
+    tmdata_source, mid_osd_data_aa2, valid_observing_command_input_aa2
 ):
     return {
-        "observing_command_input": valid_observing_command_input,
+        "observing_command_input": valid_observing_command_input_aa2,
         "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
         "array_assembly": "AA2",
         "sources": tmdata_source,

@@ -306,6 +306,16 @@ def test_semantic_validate_api_not_passing_required_keys(
     "json_body_to_validate, response, key_to_delete",
     [
         (
+            "valid_semantic_validation_body_aa1",
+            "valid_semantic_validation_response",
+            "sources",
+        ),
+        (
+            "valid_semantic_validation_body_aa2",
+            "valid_semantic_validation_response",
+            "sources",
+        ),
+        (
             "valid_semantic_validation_body",
             "valid_semantic_validation_response",
             "sources",
