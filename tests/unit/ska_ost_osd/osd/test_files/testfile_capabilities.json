@@ -86,7 +86,8 @@
                 "number_pst_beams": 1,
                 "number_vlbi_beams": 0,
                 "ps_beam_bandwidth_hz": 75000000.0,
-                "number_fsps": 6
+                "number_fsps": 6,
+                "allowed_zoom_factors": [0]
             },
             "basic_capabilities": {
                 "dish_elevation_limit_deg": 15.0,
