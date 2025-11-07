@@ -305,7 +305,7 @@ below is code sample to call ``semantic_validate()``
           "result_data": [
             {
               "observatory_policy": {
-                "cycle_number": 0,
+                "cycle_number": 1,
                 "cycle_description": "Science Verification",
                 "cycle_information": {
                   "cycle_id": "SKAO_2027_1",

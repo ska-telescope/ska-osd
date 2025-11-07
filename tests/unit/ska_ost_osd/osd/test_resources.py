@@ -11,7 +11,7 @@ class TestResources:
     def mock_read_file(self):
         with patch("ska_ost_osd.osd.routers.api.read_json") as mock:
             mock.return_value = {
-                "cycle_number": 0,
+                "cycle_number": 1,
                 "telescope_capabilities": {"Mid": "4"},
             }
             yield mock
