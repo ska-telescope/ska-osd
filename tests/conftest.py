@@ -21,6 +21,8 @@ from tests.unit.ska_ost_osd.common.constant import (
     LOW_SBD_JSON,
     LOW_SBD_VALIDATION_MOCK_DATA,
     MID_ASSIGN_JSON,
+    MID_ASSIGN_JSON_AA1,
+    MID_ASSIGN_JSON_AA2,
     MID_CAPABILITIES_MOCK_DATA,
     MID_OSD_DATA_JSON,
     MID_SBD_JSON,
@@ -249,6 +251,16 @@ def invalid_observing_command_input(create_entity_object):
     return create_entity_object(MID_ASSIGN_JSON).get("invalid")
 
 
+@pytest.fixture(scope="session")
+def invalid_observing_command_input_aa1(create_entity_object):
+    return create_entity_object(MID_ASSIGN_JSON_AA1).get("invalid")
+
+
+@pytest.fixture(scope="session")
+def invalid_observing_command_input_aa2(create_entity_object):
+    return create_entity_object(MID_ASSIGN_JSON_AA2).get("invalid")
+
+
 @pytest.fixture(
     scope="session",
     params=[
@@ -450,6 +462,34 @@ def valid_semantic_validation_body(
 
 
 @pytest.fixture(scope="session")
+def valid_semantic_validation_body_aa1(
+    tmdata_source, mid_osd_data, valid_observing_command_input
+):
+    return {
+        "observing_command_input": valid_observing_command_input,
+        "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
+        "array_assembly": "AA1",
+        "sources": tmdata_source,
+        "raise_semantic": True,
+        "osd_data": mid_osd_data,
+    }
+
+
+@pytest.fixture(scope="session")
+def valid_semantic_validation_body_aa2(
+    tmdata_source, mid_osd_data, valid_observing_command_input
+):
+    return {
+        "observing_command_input": valid_observing_command_input,
+        "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
+        "array_assembly": "AA2",
+        "sources": tmdata_source,
+        "raise_semantic": True,
+        "osd_data": mid_osd_data,
+    }
+
+
+@pytest.fixture(scope="session")
 def valid_semantic_validation_response():
     return {
         "result_data": "JSON is semantically valid",
@@ -475,6 +515,34 @@ def invalid_semantic_validation_body(
         "observing_command_input": invalid_observing_command_input,
         "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
         "array_assembly": "AA0.5",
+        "sources": tmdata_source,
+        "raise_semantic": True,
+        "osd_data": mid_osd_data,
+    }
+
+
+@pytest.fixture(scope="session")
+def invalid_semantic_validation_body_aa1(
+    tmdata_source, mid_osd_data, invalid_observing_command_input_aa1
+):
+    return {
+        "observing_command_input": invalid_observing_command_input_aa1,
+        "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
+        "array_assembly": "AA1",
+        "sources": tmdata_source,
+        "raise_semantic": True,
+        "osd_data": mid_osd_data,
+    }
+
+
+@pytest.fixture(scope="session")
+def invalid_semantic_validation_body_aa2(
+    tmdata_source, mid_osd_data, invalid_observing_command_input_aa2
+):
+    return {
+        "observing_command_input": invalid_observing_command_input_aa2,
+        "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
+        "array_assembly": "AA2",
         "sources": tmdata_source,
         "raise_semantic": True,
         "osd_data": mid_osd_data,

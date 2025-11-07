@@ -259,6 +259,14 @@ def test_semantic_validate_api(client_post, request, json_body_to_validate, resp
     [
         ("valid_semantic_validation_body", "semantic_validation_disable_response"),
         ("invalid_semantic_validation_body", "semantic_validation_disable_response"),
+        (
+            "invalid_semantic_validation_body_aa1",
+            "semantic_validation_disable_response",
+        ),
+        (
+            "invalid_semantic_validation_body_aa2",
+            "semantic_validation_disable_response",
+        ),
     ],
 )
 def test_disable_semantic_validate_api(

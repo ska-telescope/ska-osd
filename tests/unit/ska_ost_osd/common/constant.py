@@ -20,6 +20,8 @@ LOW_SBD_VALIDATION_MOCK_DATA = (
 MID_OSD_DATA_JSON = read_json(f"{BASE_FOLDER_NAME}/testfile_mid_osd_data.json")
 
 MID_ASSIGN_JSON = f"{BASE_FOLDER_NAME}/testfile_mid_assign.json"
+MID_ASSIGN_JSON_AA1 = f"{BASE_FOLDER_NAME}/testfile_mid_assign_aa1.json"
+MID_ASSIGN_JSON_AA2 = f"{BASE_FOLDER_NAME}/testfile_mid_assign_aa2.json"
 VALID_MID_CONFIGURE_JSON = f"{BASE_FOLDER_NAME}/testfile_mid_configure.json"
 
 MID_SBD_JSON = f"{BASE_FOLDER_NAME}/testfile_mid_sbd.json"
