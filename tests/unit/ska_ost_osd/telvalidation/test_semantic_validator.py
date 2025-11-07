@@ -240,6 +240,14 @@ def test_fetch_capabilities_from_osd_based_on_client_based_osd_data(mock1):
     [
         ("valid_semantic_validation_body", "valid_semantic_validation_response"),
         ("invalid_semantic_validation_body", "invalid_semantic_validation_response"),
+        (
+            "invalid_semantic_validation_body_aa1",
+            "invalid_semantic_validation_response_aa1",
+        ),
+        (
+            "invalid_semantic_validation_body_aa2",
+            "invalid_semantic_validation_response_aa2",
+        ),
     ],
 )
 def test_semantic_validate_api(client_post, request, json_body_to_validate, response):

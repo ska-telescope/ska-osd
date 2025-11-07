@@ -25,6 +25,8 @@ from tests.unit.ska_ost_osd.common.constant import (
     MID_ASSIGN_JSON_AA2,
     MID_CAPABILITIES_MOCK_DATA,
     MID_OSD_DATA_JSON,
+    MID_OSD_DATA_JSON_AA1,
+    MID_OSD_DATA_JSON_AA2,
     MID_SBD_JSON,
     MID_SBD_VALIDATION_MOCK_DATA,
     VALID_MID_CONFIGURE_JSON,
@@ -219,6 +221,24 @@ def mid_osd_data():
     :returns dict: MID_OSD_DATA_JSON file data
     """
     return MID_OSD_DATA_JSON
+
+
+@pytest.fixture(scope="session")
+def mid_osd_data_aa1():
+    """This fixture returns data in MID_OSD_DATA_JSON file.
+
+    :returns dict: MID_OSD_DATA_JSON file data
+    """
+    return MID_OSD_DATA_JSON_AA1
+
+
+@pytest.fixture(scope="session")
+def mid_osd_data_aa2():
+    """This fixture returns data in MID_OSD_DATA_JSON file.
+
+    :returns dict: MID_OSD_DATA_JSON file data
+    """
+    return MID_OSD_DATA_JSON_AA2
 
 
 @pytest.fixture(scope="session")
@@ -463,7 +483,7 @@ def valid_semantic_validation_body(
 
 @pytest.fixture(scope="session")
 def valid_semantic_validation_body_aa1(
-    tmdata_source, mid_osd_data, valid_observing_command_input
+    tmdata_source, mid_osd_data_aa1, valid_observing_command_input
 ):
     return {
         "observing_command_input": valid_observing_command_input,
@@ -471,13 +491,13 @@ def valid_semantic_validation_body_aa1(
         "array_assembly": "AA1",
         "sources": tmdata_source,
         "raise_semantic": True,
-        "osd_data": mid_osd_data,
+        "osd_data": mid_osd_data_aa1,
     }
 
 
 @pytest.fixture(scope="session")
 def valid_semantic_validation_body_aa2(
-    tmdata_source, mid_osd_data, valid_observing_command_input
+    tmdata_source, mid_osd_data_aa2, valid_observing_command_input
 ):
     return {
         "observing_command_input": valid_observing_command_input,
@@ -485,7 +505,7 @@ def valid_semantic_validation_body_aa2(
         "array_assembly": "AA2",
         "sources": tmdata_source,
         "raise_semantic": True,
-        "osd_data": mid_osd_data,
+        "osd_data": mid_osd_data_aa2,
     }
 
 
@@ -523,7 +543,7 @@ def invalid_semantic_validation_body(
 
 @pytest.fixture(scope="session")
 def invalid_semantic_validation_body_aa1(
-    tmdata_source, mid_osd_data, invalid_observing_command_input_aa1
+    tmdata_source, mid_osd_data_aa1, invalid_observing_command_input_aa1
 ):
     return {
         "observing_command_input": invalid_observing_command_input_aa1,
@@ -531,13 +551,13 @@ def invalid_semantic_validation_body_aa1(
         "array_assembly": "AA1",
         "sources": tmdata_source,
         "raise_semantic": True,
-        "osd_data": mid_osd_data,
+        "osd_data": mid_osd_data_aa1,
     }
 
 
 @pytest.fixture(scope="session")
 def invalid_semantic_validation_body_aa2(
-    tmdata_source, mid_osd_data, invalid_observing_command_input_aa2
+    tmdata_source, mid_osd_data_aa2, invalid_observing_command_input_aa2
 ):
     return {
         "observing_command_input": invalid_observing_command_input_aa2,
@@ -545,7 +565,7 @@ def invalid_semantic_validation_body_aa2(
         "array_assembly": "AA2",
         "sources": tmdata_source,
         "raise_semantic": True,
-        "osd_data": mid_osd_data,
+        "osd_data": mid_osd_data_aa2,
     }
 
 
@@ -565,6 +585,47 @@ def invalid_semantic_validation_response():
             "freq_min should be less than freq_max",
             "length of receptor_ids should be same as length of receptors",
             "receptor_ids did not match receptors",
+        ],
+        "result_status": "failed",
+        "result_code": 422,
+    }
+
+
+@pytest.fixture(scope="session")
+def invalid_semantic_validation_response_aa1():
+    return {
+        "result_data": [
+            "Invalid input for receiver_band! Currently allowed [1,2,5a,5b]",
+            "The fsp_ids should all be distinct",
+            "Invalid input for channel_width! Currently allowed [13440]",
+            "channel_count must be between 1 to 58982",
+            "channel_count must be a multiple of 20",
+            "Invalid input for start_freq",
+            "Invalid input for start_freq",
+            "sdp_start_channel_id must be between 0 to 2147483647",
+            "integration_factor must be between 1 to 10",
+        ],
+        "result_status": "failed",
+        "result_code": 422,
+    }
+
+
+@pytest.fixture(scope="session")
+def invalid_semantic_validation_response_aa2():
+    return {
+        "result_data": [
+            "Invalid input for receiver_band! Currently allowed [1,2,5a,5b]",
+            "The fsp_ids should all be distinct",
+            (
+                "Invalid input for channel_width! Currently allowed [210, 420, 840,"
+                " 1680, 3360, 6720, 13440, 26880, 40320, 53760, 80640, 107520, 161280,"
+                " 215040, 322560, 416640, 430080, 645120]"
+            ),
+            "channel_count must be a multiple of 20",
+            "Invalid input for start_freq",
+            "Invalid input for start_freq",
+            "sdp_start_channel_id must be between 0 to 2147483647",
+            "integration_factor must be between 1 to 10",
         ],
         "result_status": "failed",
         "result_code": 422,
