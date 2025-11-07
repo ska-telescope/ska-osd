@@ -699,6 +699,8 @@ def valid_only_observing_command_input_in_request_body(valid_observing_command_i
     scope="module",
     params=[
         (MID_ASSIGN_JSON, "valid", "MID", True, False),
+        (MID_ASSIGN_JSON_AA1, "valid", "MID", True, False),
+        (MID_ASSIGN_JSON_AA2, "valid", "MID", True, False),
         (
             MID_ASSIGN_JSON,
             "invalid",
