@@ -120,6 +120,9 @@ An explanation of validation strictness levels and configuring OSD semantic vali
 
 # Publish tmdata
 
+Please run `osd-tmdata-publish` job manually after merging / releasing into main.
+this is a required step, without this new tmdata will not be reflected on CAR.
+
 Now OSD is handling releases separately for tmdata and ska-ost-osd codebase.
 User can now update tmdata with the help of [ OSD UI editor](https://k8s.stfc.skao.int/ska-oso-integration/osd) and publish it separately on artefact repository with enabling `push_to_gitlab` environment variable to "1".
 
@@ -130,7 +133,7 @@ which allow restrict tmdata publish on artefact. Default set as "0" for local en
 
 `push_to_gitlab` = 1 ## it will publish tmdata on artefact repository.
 
-To view tmdata releases, [ Click here](https://gitlab.com/ska-telescope/ost/ska-ost-osd/-/blob/main/tmdata/version_mapping/latest_release.txt?ref_type=heads).
+To view tmdata releases, [Click here](https://gitlab.com/ska-telescope/ost/ska-ost-osd/-/blob/main/tmdata/version_mapping/latest_release.txt?ref_type=heads).
 
 It's not recommended  to set this flag value as "1" while doing testing on local environment.
 
