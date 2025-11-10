@@ -240,6 +240,14 @@ def test_fetch_capabilities_from_osd_based_on_client_based_osd_data(mock1):
     [
         ("valid_semantic_validation_body", "valid_semantic_validation_response"),
         ("invalid_semantic_validation_body", "invalid_semantic_validation_response"),
+        (
+            "invalid_semantic_validation_body_aa1",
+            "invalid_semantic_validation_response_aa1",
+        ),
+        (
+            "invalid_semantic_validation_body_aa2",
+            "invalid_semantic_validation_response_aa2",
+        ),
     ],
 )
 def test_semantic_validate_api(client_post, request, json_body_to_validate, response):
@@ -259,6 +267,14 @@ def test_semantic_validate_api(client_post, request, json_body_to_validate, resp
     [
         ("valid_semantic_validation_body", "semantic_validation_disable_response"),
         ("invalid_semantic_validation_body", "semantic_validation_disable_response"),
+        (
+            "invalid_semantic_validation_body_aa1",
+            "semantic_validation_disable_response",
+        ),
+        (
+            "invalid_semantic_validation_body_aa2",
+            "semantic_validation_disable_response",
+        ),
     ],
 )
 def test_disable_semantic_validate_api(
@@ -289,6 +305,16 @@ def test_semantic_validate_api_not_passing_required_keys(
 @pytest.mark.parametrize(
     "json_body_to_validate, response, key_to_delete",
     [
+        (
+            "valid_semantic_validation_body_aa1",
+            "valid_semantic_validation_response",
+            "sources",
+        ),
+        (
+            "valid_semantic_validation_body_aa2",
+            "valid_semantic_validation_response",
+            "sources",
+        ),
         (
             "valid_semantic_validation_body",
             "valid_semantic_validation_response",

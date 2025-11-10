@@ -1,0 +1,83 @@
+{
+    "capabilities": {
+        "mid": {
+            "AA1": {
+                "allowed_channel_count_range_max": [
+            58982
+        ],
+        "allowed_channel_count_range_min": [
+            1
+        ],
+        "allowed_channel_width_values": [
+            13440
+        ],
+        "available_bandwidth_hz": 800000000,
+        "available_receivers": [
+            "Band_1",
+            "Band_2",
+            "Band_5a",
+            "Band_5b"
+        ],
+        "cbf_modes": [
+            "correlation",
+            "pst"
+        ],
+        "max_baseline_km": 1.5,
+        "number_dish_ids": [
+            "SKA001",
+            "SKA036",
+            "SKA046",
+            "SKA048",
+            "SKA063",
+            "SKA077",
+            "SKA081",
+            "SKA100"
+        ],
+        "number_fsps": 8,
+        "number_meerkat_dishes": 0,
+        "number_meerkatplus_dishes": 0,
+        "number_pss_beams": 0,
+        "number_pst_beams": 1,
+        "number_ska_dishes": 8,
+        "number_zoom_channels": 0,
+        "number_zoom_windows": 0,
+        "ps_beam_bandwidth_hz": 400000000
+            },
+            "basic_capabilities": {
+                "dish_elevation_limit_deg": 15.0,
+                "receiver_information": [
+                    {
+                        "max_frequency_hz": 1050000000.0,
+                        "min_frequency_hz": 350000000.0,
+                        "rx_id": "Band_1"
+                    },
+                    {
+                        "max_frequency_hz": 1760000000.0,
+                        "min_frequency_hz": 950000000.0,
+                        "rx_id": "Band_2"
+                    },
+                    {
+                        "max_frequency_hz": 3050000000.0,
+                        "min_frequency_hz": 1650000000.0,
+                        "rx_id": "Band_3"
+                    },
+                    {
+                        "max_frequency_hz": 5180000000.0,
+                        "min_frequency_hz": 2800000000.0,
+                        "rx_id": "Band_4"
+                    },
+                    {
+                        "max_frequency_hz": 8500000000.0,
+                        "min_frequency_hz": 4600000000.0,
+                        "rx_id": "Band_5a"
+                    },
+                    {
+                        "max_frequency_hz": 15400000000.0,
+                        "min_frequency_hz": 8300000000.0,
+                        "rx_id": "Band_5b"
+                    }
+                ]
+            }
+        }
+    }
+}
