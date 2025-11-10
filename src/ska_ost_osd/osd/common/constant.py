@@ -18,7 +18,7 @@ osd_file_mapping = {
 }
 
 osd_response_template = {
-    "observatory_policy": {"cycle_number": 0, "telescope_capabilities": []},
+    "observatory_policy": {"cycle_number": 1, "telescope_capabilities": []},
     "capabilities": {},
 }
 

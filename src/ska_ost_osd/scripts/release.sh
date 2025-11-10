@@ -4,6 +4,7 @@ base_path=$(dirname "$(readlink -f "release.sh")")
 
 observatory_file_location="$base_path/tmdata/observatory_policies.json"
 version_mapping_file_location="$base_path/tmdata/version_mapping/cycle_gitlab_release_version_mapping.json"
+latest_release_file_location="$base_path/tmdata/version_mapping/latest_release.txt"
 
 function CheckFileExists (){
 
@@ -35,6 +36,11 @@ function UpdateAndAddValue ()
     ' "$version_mapping_file_location" > tmp.json && mv tmp.json "$version_mapping_file_location"
 }
 
+function UpdateLatestRelease ()
+{
+    echo "$1" > "$latest_release_file_location"
+}
+
 CheckFileExists $observatory_file_location
 
 if [ $? -eq 0 ]; then
@@ -45,4 +51,10 @@ CheckFileExists $version_mapping_file_location
 
 if [ $? -eq 0 ]; then
     UpdateAndAddValue $1
+fi
+
+CheckFileExists $latest_release_file_location
+
+if [ $? -eq 0 ]; then
+    UpdateLatestRelease $1
 fi
