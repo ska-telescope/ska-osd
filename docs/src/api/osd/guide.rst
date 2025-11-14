@@ -932,7 +932,7 @@ which updates or add cycle_id values in version mapping json file.
 
 
 OSD Integration
-===============
+~~~~~~~~~~~~~~~
 
 This section explains how to integrate and use the **ska-ost-osd** package in your project.
 
@@ -962,7 +962,7 @@ You can import the relevant components from the package as follows:
 This allows you to catch or raise semantic validation-related exceptions when working with OSD validation workflows.
 
 Subarray Template Support
-=========================
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 OSD now supports subarray templates through the ``subarray_templates`` field in array assembly configurations. This feature enables dynamic template loading and processing for different telescope configurations.
 

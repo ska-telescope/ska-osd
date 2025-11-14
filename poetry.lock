@@ -2564,27 +2564,6 @@ url = "https://artefact.skao.int/repository/pypi-internal/simple"
 reference = "ska-nexus"
 
 [[package]]
-name = "ska-ser-skuid"
-version = "3.3.3"
-description = "Library that generates ID's for the SKA project"
-optional = false
-python-versions = ">=3.6,<4.0"
-groups = ["main"]
-files = [
-    {file = "ska-ser-skuid-3.3.3.tar.gz", hash = "sha256:91ad1dda3e3a397e39dbb362046888f5a80e4f5ef022628cde7ccc93c4d9b057"},
-    {file = "ska_ser_skuid-3.3.3-py3-none-any.whl", hash = "sha256:743a4170024d208be49d262af2a326644356ef0933dd001cada05bbfcb1f67cd"},
-]
-
-[package.dependencies]
-requests = ">=2.25.1,<3.0.0"
-ska-ser-logging = ">=0.4.1,<0.5.0"
-
-[package.source]
-type = "legacy"
-url = "https://artefact.skao.int/repository/pypi-internal/simple"
-reference = "ska-nexus"
-
-[[package]]
 name = "ska-ser-sphinx-theme"
 version = "0.1.3"
 description = "A Sphinx ReadTheDocs theme for SKA"
@@ -3399,4 +3378,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10"
-content-hash = "2d4313b4af5bc90f99f9f52c24d561afc828eea2c121673e6bd546bf6b232560"
+content-hash = "7b4624071e84cd404af7da60db75064dbdef2ffa554f2452fe59b86e1d5298ee"
