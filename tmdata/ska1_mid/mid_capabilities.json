@@ -54,7 +54,7 @@
                     "max_frequency_hz": 12850000000,
                     "min_frequency_hz": 12150000000,
                     "lo_frequency_hz" : 11100000000,
-                    "sideband" : "high"
+                    "sideband" : "low"
                   }
 
                 ]

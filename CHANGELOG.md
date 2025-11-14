@@ -8,6 +8,7 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 Development
 ***********
 * NAK-1352 Refactor handling of TelModel data sources including default
+* Fixed sideband for 5b subband 3 from 'high' to 'low'
 
 4.2.2
 ***********
