@@ -27,7 +27,6 @@ autodoc_mock_imports = [ "astropy",
     "pydantic",
     "requests",
     "ska_ser_logging",
-    "ska_ser_skuid",
     "fastapi",
     "sphinx"]
 
