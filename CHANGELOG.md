@@ -9,6 +9,7 @@ Development
 ***********
 * NAK-1352 Refactor handling of TelModel data sources including default
 * Fixed sideband for 5b subband 3 from 'high' to 'low'
+* Removed unused SKUID python dependency
 
 4.2.2
 ***********
