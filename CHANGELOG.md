@@ -12,7 +12,7 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 * Modified GET PUT /OSD API to fetch and modify the newly added Mid_ITF and Low_ITF values.
 * Fixed sideband for 5b subband 3 from 'high' to 'low'
 * Removed unused SKUID python dependency
-* Added subarray template support for MID / LOW capabilities.
+* [BREAKING] Added subarray template support for MID / LOW capabilities.
 
 4.2.2
 ***********
