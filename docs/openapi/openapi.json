@@ -5,14 +5,14 @@
     "version": "0.1.0"
   },
   "paths": {
-    "/ska-ost-osd/osd/api/v4/osd": {
+    "/ska-ost-osd/osd/api/v5/osd": {
       "get": {
         "tags": [
           "OSD"
         ],
         "summary": "Get OSD data filter by the query parameter",
         "description": "Retrieves the OSD cycle_id data which match the query\n    parameters. Also requests without parameters will take\n    example and default values and return data based on that.\n    All query parameters has its own validation if user provide\n    any invalid value it will return the error message.",
-        "operationId": "get_osd_ska_ost_osd_osd_api_v4_osd_get",
+        "operationId": "get_osd_ska_ost_osd_osd_api_v5_osd_get",
         "parameters": [
           {
             "name": "cycle_id",
@@ -150,7 +150,7 @@
         ],
         "summary": "Update OSD data filter by the query parameter",
         "description": "Update the OSD data which match the query\n    parameters. Also requests without parameters will take example\n    and default values and return data based on that. All query\n    parameters has its own validation if user provide any invalid\n    value it will return the error message.",
-        "operationId": "update_osd_data_ska_ost_osd_osd_api_v4_osd_put",
+        "operationId": "update_osd_data_ska_ost_osd_osd_api_v5_osd_put",
         "parameters": [
           {
             "name": "cycle_id",
@@ -327,14 +327,14 @@
         }
       }
     },
-    "/ska-ost-osd/osd/api/v4/osd_release": {
+    "/ska-ost-osd/osd/api/v5/osd_release": {
       "post": {
         "tags": [
           "OSD"
         ],
         "summary": "Release new osd version to Gitlab",
         "description": "Release OSD data with automatic version increment based on cycle ID",
-        "operationId": "release_osd_data_ska_ost_osd_osd_api_v4_osd_release_post",
+        "operationId": "release_osd_data_ska_ost_osd_osd_api_v5_osd_release_post",
         "parameters": [
           {
             "name": "cycle_id",
@@ -386,14 +386,14 @@
         }
       }
     },
-    "/ska-ost-osd/osd/api/v4/cycle": {
+    "/ska-ost-osd/osd/api/v5/cycle": {
       "get": {
         "tags": [
           "OSD"
         ],
         "summary": "GET list of available proposal cycles",
         "description": "GET list of all available proposal cycles",
-        "operationId": "get_cycle_list_ska_ost_osd_osd_api_v4_cycle_get",
+        "operationId": "get_cycle_list_ska_ost_osd_osd_api_v5_cycle_get",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -408,14 +408,14 @@
         }
       }
     },
-    "/ska-ost-osd/osd/api/v4/semantic_validation": {
+    "/ska-ost-osd/osd/api/v5/semantic_validation": {
       "post": {
         "tags": [
           "OSD"
         ],
         "summary": "Validate input json Semantically Semantic validation checks the meaning of the input data and ensures that it is valid in the context of the system. It checks whether the input data conforms to the business rules and logic of the system",
         "description": "Checks if the Command Input JSON is semantically valid",
-        "operationId": "semantically_validate_json_ska_ost_osd_osd_api_v4_semantic_validation_post",
+        "operationId": "semantically_validate_json_ska_ost_osd_osd_api_v5_semantic_validation_post",
         "requestBody": {
           "content": {
             "application/json": {
