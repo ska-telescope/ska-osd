@@ -5,10 +5,14 @@ Change Log
 All notable changes to this project will be documented in this file.
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
-Development
+5.0.0
 ***********
+* Added AA1 and AA2 rule support.
+* Created new Mid_ITF and Low_ITF from MID AA0.5 and LOW AA1.
+* Modified GET PUT /OSD API to fetch and modify the newly added Mid_ITF and Low_ITF values.
 * Fixed sideband for 5b subband 3 from 'high' to 'low'
 * Removed unused SKUID python dependency
+* [BREAKING] Added subarray template support for MID / LOW capabilities.
 
 4.2.2
 ***********
