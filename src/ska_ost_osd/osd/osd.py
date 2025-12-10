@@ -315,8 +315,6 @@ def check_cycle_id(
                 )
             )
 
-    
-
     return osd_version, cycle_error_msg_list
 
 
