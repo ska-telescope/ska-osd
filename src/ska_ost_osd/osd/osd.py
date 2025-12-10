@@ -297,7 +297,6 @@ def check_cycle_id(
         versions_dict = {}
 
     cycle_ids = [int(key.split("_")[-1]) for key in versions_dict]
-    # breakpoint()
     cycle_id_exists = [cycle_id if cycle_id in cycle_ids else None][0]
     string_ids = ",".join([str(i) for i in cycle_ids])
     if cycle_id is not None and cycle_id_exists is None:
@@ -429,8 +428,6 @@ def get_osd_using_tmdata(
         )
     except OSDModelError as error:
         errors.extend(error.args[0])
-
-    # breakpoint()
 
     tmdata_version = TMData(GITLAB_SOURCE, update=True)
     versions_dict = tmdata_version[VERSION_FILE_PATH].get_dict()
