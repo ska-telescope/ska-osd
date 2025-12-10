@@ -10,7 +10,9 @@ from pydantic import ValidationError
 from ska_ost_osd.common.constant import EXCEPTION_STATUS_MAP
 from ska_ost_osd.common.utils import convert_to_response_object
 from ska_ost_osd.osd.common.error_handling import OSDModelError
-from ska_ost_osd.telvalidation.common.error_handling import SchematicValidationError
+from ska_ost_osd.telvalidation.common.error_handling import (
+    SchematicValidationError,
+)
 
 LOGGER = logging.getLogger(__name__)
 

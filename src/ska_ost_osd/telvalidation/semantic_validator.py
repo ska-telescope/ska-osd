@@ -13,7 +13,9 @@ from typing import Any, Dict, Optional
 from pydantic import ValidationError
 from ska_telmodel.data import TMData
 
-from ska_ost_osd.telvalidation.models.semantic_schema_validator import SemanticModel
+from ska_ost_osd.telvalidation.models.semantic_schema_validator import (
+    SemanticModel,
+)
 
 from .common.constant import (
     ASSIGN_RESOURCE,

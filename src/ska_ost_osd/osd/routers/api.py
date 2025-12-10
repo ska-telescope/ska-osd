@@ -21,7 +21,10 @@ from ska_ost_osd.osd.common.constant import (
     SWAGGER_MID_OSD_DATA_JSON_FILE_PATH,
     osd_file_mapping,
 )
-from ska_ost_osd.osd.common.error_handling import CapabilityError, OSDModelError
+from ska_ost_osd.osd.common.error_handling import (
+    CapabilityError,
+    OSDModelError,
+)
 from ska_ost_osd.osd.common.gitlab_helper import push_to_gitlab
 from ska_ost_osd.osd.common.utils import (
     get_mid_low_capabilities,
@@ -41,7 +44,9 @@ from ska_ost_osd.osd.osd import (
     get_osd_using_tmdata,
     update_osd_file,
 )
-from ska_ost_osd.osd.version_mapping.version_manager import manage_version_release
+from ska_ost_osd.osd.version_mapping.version_manager import (
+    manage_version_release,
+)
 
 # this variable is added for restricting tmdata publish from local/dev environment.
 # usage: 0 means disable tmdata publish to artefact.
