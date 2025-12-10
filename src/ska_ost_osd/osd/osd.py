@@ -17,9 +17,7 @@ from ska_ost_osd.osd.common.osd_validation_messages import (
 )
 from ska_ost_osd.osd.common.utils import get_osd_latest_version
 from ska_ost_osd.osd.models.models import OSDModel
-from ska_ost_osd.osd.template_mapping.template_mapping import (
-    process_template_mappings,
-)
+from ska_ost_osd.osd.template_mapping.template_mapping import process_template_mappings
 
 from .common.constant import (
     ARRAY_ASSEMBLY_PATTERN,
