@@ -5,6 +5,10 @@ Change Log
 All notable changes to this project will be documented in this file.
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
+Unreleased
+**********
+* Added capabilities for LOW Science Verification AA2_SV
+
 5.1.0
 ***********
 * Created a new cycle policy for Low telescope for science verification.
