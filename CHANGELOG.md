@@ -8,6 +8,7 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 Unreleased
 **********
 * Added capabilities for LOW Science Verification AA2_SV
+* Updated basic capabilities for LOW telescope
 
 5.1.0
 ***********
