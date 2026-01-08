@@ -2,7 +2,13 @@
     "telescope": "Low",
     "basic_capabilities": {
       "min_frequency_hz": 50000000.0,
-      "max_frequency_hz": 350000000.0
+      "max_frequency_hz": 350000000.0,
+      "min_coarse_channel": 64,
+      "max_coarse_channel": 447,
+      "coarse_channel_width": 781.25e3,
+      "number_continuum_channels_per_coarse_channel": 144,
+      "number_zoom_channels_per_coarse_channel": 432
+
     },
     "AA0.5": {
       "number_stations": 4,
@@ -16,7 +22,6 @@
       "number_beams": 1,
       "max_baseline_km": 3.0,
       "available_bandwidth_hz": 75000000.0,
-      "channel_width_hz": 5425.34722,
       "cbf_modes": [
         "vis",
         "pst"
@@ -37,7 +42,6 @@
       "number_beams": 8,
       "max_baseline_km": 6.0,
       "available_bandwidth_hz": 75000000.0,
-      "channel_width_hz": 5425.34722,
       "cbf_modes": [
         "vis",
         "pst"
@@ -59,7 +63,6 @@
       "number_beams": 8,
       "max_baseline_km": 40.0,
       "available_bandwidth_hz": 150000000.0,
-      "channel_width_hz": 5425.34722,
       "cbf_modes": [
         "vis",
         "pst",
@@ -82,7 +85,6 @@
       "number_beams": 8,
       "max_baseline_km": 6.0,
       "available_bandwidth_hz": 75000000.0,
-      "channel_width_hz": 5425.34722,
       "cbf_modes": [
         "vis",
         "pst"
@@ -103,7 +105,6 @@
       "number_beams": 1,
       "max_baseline_km": 40.0,
       "available_bandwidth_hz": 150000000.0,
-      "channel_width_hz": 5425.34722,
       "cbf_modes": [
         "vis",
         "pst"
