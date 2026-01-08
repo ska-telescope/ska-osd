@@ -2,7 +2,13 @@
     "telescope": "Low",
     "basic_capabilities": {
       "min_frequency_hz": 50000000.0,
-      "max_frequency_hz": 350000000.0
+      "max_frequency_hz": 350000000.0,
+      "min_coarse_channel": 64,
+      "max_coarse_channel": 447,
+      "coarse_channel_width": 781.25e3,
+      "number_continuum_channels_per_coarse_channel": 144,
+      "number_zoom_channels_per_coarse_channel": 432
+
     },
     "AA0.5": {
       "number_stations": 4,
@@ -16,7 +22,6 @@
       "number_beams": 1,
       "max_baseline_km": 3.0,
       "available_bandwidth_hz": 75000000.0,
-      "channel_width_hz": 5425.34722,
       "cbf_modes": [
         "vis",
         "pst"
@@ -37,7 +42,6 @@
       "number_beams": 8,
       "max_baseline_km": 6.0,
       "available_bandwidth_hz": 75000000.0,
-      "channel_width_hz": 5425.34722,
       "cbf_modes": [
         "vis",
         "pst"
@@ -50,7 +54,7 @@
       "ps_beam_bandwidth_hz": 75000000.0,
       "number_fsps": 6,
       "number_station_ids": [345, 346, 347, 348, 349, 350, 351, 352, 353, 354, 429, 430, 431, 432, 433, 434],
-      "allowed_zoom_factors": [1, 2, 4, 8, 16, 32, 64, 128],
+      "allowed_zoom_factors": [1, 2, 4, 8],
       "subarray_templates": ["*_AA1"]
     },
     "AA2": {
@@ -59,7 +63,6 @@
       "number_beams": 8,
       "max_baseline_km": 40.0,
       "available_bandwidth_hz": 150000000.0,
-      "channel_width_hz": 5425.34722,
       "cbf_modes": [
         "vis",
         "pst",
@@ -73,7 +76,7 @@
       "ps_beam_bandwidth_hz": 118000000.0,
       "number_fsps": 10,
       "number_station_ids": [315, 316, 317, 318, 321, 322, 323, 324, 345, 346, 347, 348, 349, 350, 351, 352, 353, 354, 375, 376, 377, 378, 381, 382, 383, 384, 387, 388, 389, 390, 405, 406, 407, 408, 429, 430, 431, 432, 433, 434, 447, 448, 449, 450, 459, 460, 461, 462, 465, 466, 467, 468, 471, 472, 473, 474, 489, 490, 491, 492, 501, 502, 503, 504, 507, 508, 509, 510],
-      "allowed_zoom_factors": [1, 2, 4, 8, 16, 32, 64, 128],
+      "allowed_zoom_factors": [1, 2, 4, 8],
       "subarray_templates": ["*_AA2"]
     },
     "Low_ITF": {
@@ -82,7 +85,6 @@
       "number_beams": 8,
       "max_baseline_km": 6.0,
       "available_bandwidth_hz": 75000000.0,
-      "channel_width_hz": 5425.34722,
       "cbf_modes": [
         "vis",
         "pst"
@@ -95,6 +97,27 @@
       "ps_beam_bandwidth_hz": 75000000.0,
       "number_fsps": 6,
       "number_station_ids": [345, 346, 347, 348, 349, 350, 351, 352, 353, 354, 429, 430, 431, 432, 433, 434],
-      "allowed_zoom_factors": [1, 2, 4, 8, 16, 32, 64, 128] 
+      "allowed_zoom_factors": [1, 2, 4, 8]
+    },
+    "AA2_SV": {
+      "number_stations": 68,
+      "number_substations": 0,
+      "number_beams": 1,
+      "max_baseline_km": 40.0,
+      "available_bandwidth_hz": 150000000.0,
+      "cbf_modes": [
+        "vis",
+        "pst"
+      ],
+      "number_zoom_windows": 16,
+      "number_zoom_channels": 4000,
+      "number_pss_beams": 0,
+      "number_pst_beams": 1,
+      "number_vlbi_beams": 0,
+      "ps_beam_bandwidth_hz": 118000000.0,
+      "number_fsps": 10,
+      "number_station_ids": [315, 316, 317, 318, 321, 322, 323, 324, 345, 346, 347, 348, 349, 350, 351, 352, 353, 354, 375, 376, 377, 378, 381, 382, 383, 384, 387, 388, 389, 390, 405, 406, 407, 408, 429, 430, 431, 432, 433, 434, 447, 448, 449, 450, 459, 460, 461, 462, 465, 466, 467, 468, 471, 472, 473, 474, 489, 490, 491, 492, 501, 502, 503, 504, 507, 508, 509, 510],
+      "allowed_zoom_factors": [1,2,4,8],
+      "subarray_templates": ["*_AA2"]
     }
-  }
+}
