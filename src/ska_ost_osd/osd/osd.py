@@ -266,7 +266,7 @@ def get_available_cycles() -> list[int]:
 
     :return: list[int], list of available cycle numbers.
     """
-    tmdata = TMData(CAR_URL, update=True)
+    tmdata = TMData(GITLAB_SOURCE, update=True)
     versions_dict = tmdata[VERSION_FILE_PATH].get_dict()
 
     return [
