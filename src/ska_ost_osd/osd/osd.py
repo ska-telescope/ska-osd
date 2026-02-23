@@ -261,6 +261,21 @@ class OSD:
             return ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE.format(value, msg)
 
 
+def get_available_cycles() -> list[int]:
+    """Fetch available cycle numbers from TMData version mapping.
+
+    :return: list[int], list of available cycle numbers.
+    """
+    tmdata = TMData([f"car:{CAR_URL}main#{BASE_FOLDER_NAME}"], update=True)
+    versions_dict = tmdata[VERSION_FILE_PATH].get_dict()
+
+    return [
+        int(key.split("_")[1])
+        for key in versions_dict.keys()
+        if key.startswith("cycle_") and "_" in key
+    ]
+
+
 def check_cycle_id(
     cycle_id: int = None,
     osd_version: str = None,
