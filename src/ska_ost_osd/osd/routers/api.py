@@ -23,11 +23,7 @@ from ska_ost_osd.osd.common.constant import (
 )
 from ska_ost_osd.osd.common.error_handling import CapabilityError, OSDModelError
 from ska_ost_osd.osd.common.gitlab_helper import push_to_gitlab
-from ska_ost_osd.osd.common.utils import (
-    get_mid_low_capabilities,
-    load_json_from_file,
-    read_file,
-)
+from ska_ost_osd.osd.common.utils import get_mid_low_capabilities, load_json_from_file
 from ska_ost_osd.osd.models.models import (
     CycleModel,
     OSDQueryParams,
@@ -38,6 +34,7 @@ from ska_ost_osd.osd.models.models import (
 )
 from ska_ost_osd.osd.osd import (
     add_new_data_storage,
+    get_available_cycles,
     get_osd_using_tmdata,
     update_osd_file,
 )
@@ -196,21 +193,7 @@ def get_cycle_list() -> ApiResponse[CycleModel]:
     :return: ApiResponse[CycleModel], response model containing the list
         of cycle numbers.
     """
-    # TODO: instead of relying on RELEASE_VERSION_MAPPING file
-    # we should find better approach to find out cycles
-    data = read_file(RELEASE_VERSION_MAPPING)
-
-    cycle_numbers = []
-
-    for key in data.keys():
-        # Extract number from cycle_X format
-        if key.startswith("cycle_"):
-            try:
-                cycle_num = int(key.split("_")[1])
-                cycle_numbers.append(cycle_num)
-            except (IndexError, ValueError):
-                continue
-
+    cycle_numbers = get_available_cycles()
     cycles = {"cycles": sorted(cycle_numbers)}
     return convert_to_response_object(cycles, result_code=HTTPStatus.OK)
 
