@@ -5,8 +5,11 @@ Change Log
 All notable changes to this project will be documented in this file.
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
-Unreleased
+
+5.2.1
 **********
+* Fixed Get cycle list API.
+* Fixed get_cycle_list() method to use it from when we installed OSD as library.
 
 5.2.0
 **********
