@@ -4,8 +4,7 @@ from unittest.mock import patch
 
 import pytest
 from fastapi import status
-from ska_telmodel.data import TMData
-from ska_telmodel.schema import example_by_uri
+from ska_telmodel_client import TMData
 
 from ska_ost_osd.telvalidation.common.error_handling import (
     SchemanticValidationKeyError,
@@ -104,18 +103,6 @@ def test_validate_schemantic_json_input_keys(mock6):
         )
 
 
-@pytest.mark.skip(reason="failing and will be removing this functionality")
-def test_tmc_configure_ra_dec(create_entity_object):
-    """Test if error is raised only when target is not possible to be observed
-    at given time."""
-    # check for a src which is always below 15 degrees for mid telescope
-    config = create_entity_object(INVALID_MID_CONFIGURE_JSON).get("invalid")
-    configure_ver = config["interface"]
-    config = example_by_uri(configure_ver)
-    # check no error is raised for a src which
-    # is always above 15 degrees for mid telescope
-    assert config["pointing"]["target"]["ra"] == "21:08:47.92"
-    assert config["pointing"]["target"]["dec"] == "-88:57:22.9"
 
 
 class TestTargetVisibility(unittest.TestCase):
