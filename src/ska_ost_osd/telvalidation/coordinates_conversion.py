@@ -9,7 +9,7 @@ from astropy.coordinates import AltAz, EarthLocation, SkyCoord
 from astropy.time import Time, TimeDelta
 
 # importing the modules
-from ska_telmodel.data import TMData
+from ska_telmodel_client import TMData
 
 from .common.constant import (
     LOW_LAYOUT_CONSTANT_JSON_FILE_PATH,
