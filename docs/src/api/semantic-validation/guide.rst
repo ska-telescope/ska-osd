@@ -59,7 +59,7 @@ Below are the commands to import JSON validator files.
 
 .. code::
 
-    from ska_telmodel.data import TMData
+    from ska_telmodel_client import TMData
 
     from .constant import (
         LOW_VALIDATION_CONSTANT_JSON_FILE_PATH,
@@ -258,7 +258,7 @@ below is code sample to call ``semantic_validate()``
 
     .. code-block:: python
 
-        from ska_telmodel.data import TMData
+        from ska_telmodel_client import TMData
         from ska_ost_osd.telvalidation.semantic_validator import SchematicValidationError
         tmdata = TMData()
         try:
@@ -276,7 +276,7 @@ below is code sample to call ``semantic_validate()``
 
     .. code-block:: python
 
-        from ska_telmodel.data import TMData
+        from ska_telmodel_client import TMData
         from ska_ost_osd.telvalidation.semantic_validator import SchematicValidationError
         from ska_ost_osd.osd.osd import get_osd_data
         osd_data = get_osd_data()
@@ -502,6 +502,10 @@ This table outlines the expected structure of the JSON object in the request bod
 
 Schemas
 ~~~~~~~
+
+The schema definitions are retrieved from ``ska-telmodel-client`` which provides access to the SKA schema registry
+at ``https://schema.skao.int/``. The interface URLs in the examples below reference specific schema versions
+maintained in this central registry.
 
 Semantic Validation Request
 ============================
