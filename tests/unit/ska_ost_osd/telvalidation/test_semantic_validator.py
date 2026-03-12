@@ -23,7 +23,6 @@ from tests.conftest import BASE_API_URL
 from tests.unit.ska_ost_osd.common.constant import (
     ARRAY_ASSEMBLY,
     INPUT_COMMAND_CONFIG,
-    INVALID_MID_CONFIGURE_JSON,
     INVALID_MID_VALIDATE_CONSTANT,
     capabilities,
     sources,
