@@ -103,8 +103,6 @@ def test_validate_schemantic_json_input_keys(mock6):
         )
 
 
-
-
 class TestTargetVisibility(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
