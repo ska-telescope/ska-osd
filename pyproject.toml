@@ -37,6 +37,7 @@ python = "^3.10"
 ska-ser-logging = "^0.4.1"
 ska-telmodel-client = "^1.30.0"
 astropy = "^6.1"
+numpy = "<2.0"
 simpleeval = "^0.9.13"
 pydantic = "^2.10.3"
 fastapi = {extras = ["standard"], version = "^0.115.8"}
