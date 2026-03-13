@@ -500,13 +500,6 @@ This table outlines the expected structure of the JSON object in the request bod
   - **Description**: Internal server error.
 
 
-Schemas
-~~~~~~~
-
-The schema definitions are retrieved from ``ska-telmodel-client`` which provides access to the SKA schema registry
-at ``https://schema.skao.int/``. The interface URLs in the examples below reference specific schema versions
-maintained in this central registry.
-
 Semantic Validation Request
 ============================
 Note: Below examples are given for MID telescope. For Low telescope need to change observing_command_input and interface.
