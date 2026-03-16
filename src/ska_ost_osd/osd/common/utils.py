@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from typing import Dict
 
-from ska_telmodel.data import TMData
+from ska_telmodel_client import TMData
 
 from ska_ost_osd.common.utils import read_json
 from ska_ost_osd.osd.common.constant import (

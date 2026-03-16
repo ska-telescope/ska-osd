@@ -7,7 +7,7 @@ from importlib.metadata import version
 
 import pytest
 from fastapi.testclient import TestClient
-from ska_telmodel.data import TMData
+from ska_telmodel_client import TMData
 
 from ska_ost_osd.app import create_app
 from ska_ost_osd.osd.osd import osd_tmdata_source

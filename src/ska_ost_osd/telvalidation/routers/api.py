@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 from fastapi import Body
 from jsonschema import ValidationError
-from ska_telmodel.data import TMData
+from ska_telmodel_client import TMData
 
 from ska_ost_osd.common.models import ApiResponse
 from ska_ost_osd.common.utils import convert_to_response_object, get_responses

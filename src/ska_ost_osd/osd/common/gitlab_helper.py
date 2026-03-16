@@ -6,7 +6,7 @@ import subprocess
 from pathlib import Path
 from typing import List, Tuple
 
-from ska_telmodel.data.new_data_backend import GitBackend
+from ska_telmodel_client.new_data_backend import GitBackend
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

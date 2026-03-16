@@ -92,7 +92,7 @@ This framework can be access by below command:
 
 .. code::
 
-    from ska_telmodel.data import TMData
+    from ska_telmodel_client import TMData
     from ska_ost_osd.osd.osd import osd_tmdata_source, get_osd_data
 
     source_uris = osd_tmdata_source()
