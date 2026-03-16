@@ -2,7 +2,7 @@ import copy
 import re
 from typing import Any, Dict, Optional
 
-from ska_telmodel.data import TMData
+from ska_telmodel_client import TMData
 
 from ska_ost_osd.common.utils import update_file
 from ska_ost_osd.osd.common.error_handling import OSDModelError
