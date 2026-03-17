@@ -118,3 +118,6 @@ include:
   # Telescope model data job
   - project: "ska-telescope/templates-repository"
     file: "gitlab-ci/includes/tmdata.gitlab-ci.yml"
+  # SonarQube
+  - project: 'ska-telescope/templates-repository'
+    file: 'gitlab-ci/includes/sonar-scan.gitlab-ci.yml'

@@ -11,6 +11,10 @@ Unreleased
 * Remove redundant semantic validation test
 
 
+Unreleased
+**********
+* SonarQube for static analysis of code quality
+
 5.2.1
 **********
 * Fixed Get cycle list API.
