@@ -7,13 +7,11 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 Unreleased
 **********
-* Fix dependencies to use ska-telmodel-client 
-* Remove redundant semantic validation test
-
-
-Unreleased
-**********
-* SonarQube for static analysis of code quality
+* Added constraints to both MID and LOW capabilities
+* Updated the available dishes for MID AA0.5 and AA1
+* Updated dependencies to use ska-telmodel-client 
+* Removed redundant semantic validation test
+* Added SonarQube for static analysis of code quality
 
 5.2.1
 **********
