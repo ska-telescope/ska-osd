@@ -1,5 +1,11 @@
 {
     "telescope": "Mid",
+    "constraints": {
+      "sun_avoidance_angle_deg": 30.0,
+      "moon_avoidance_angle_deg": 10.0,
+      "jupiter_avoidance_angle_deg": 10.0,
+      "elevation_limits_deg": [45.0, 90.0]
+    },
     "basic_capabilities": {
         "dish_elevation_limit_deg": 15,
         "receiver_information": [
