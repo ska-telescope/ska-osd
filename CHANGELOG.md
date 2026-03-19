@@ -5,7 +5,7 @@ Change Log
 All notable changes to this project will be documented in this file.
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
-Unreleased
+6.0.0
 **********
 * Added constraints to both MID and LOW capabilities
 * Updated the available dishes for MID AA0.5 and AA1
