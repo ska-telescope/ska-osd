@@ -1,11 +1,18 @@
 {
     "telescope": "Low",
+    "constraints": {
+      "sun_avoidance_angle_deg": 30.0,
+      "moon_avoidance_angle_deg": 10.0,
+      "jupiter_avoidance_angle_deg": 10.0,
+      "min_elevation_deg": 45.0,
+      "max_elevation_deg": 90.0
+    },
     "basic_capabilities": {
       "min_frequency_hz": 50000000.0,
       "max_frequency_hz": 350000000.0,
       "min_coarse_channel": 64,
       "max_coarse_channel": 447,
-      "coarse_channel_width": 781.25e3,
+      "coarse_channel_width_hz": 781.25e3,
       "number_continuum_channels_per_coarse_channel": 144,
       "number_zoom_channels_per_coarse_channel": 432
 

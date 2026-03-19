@@ -1,7 +1,13 @@
 {
     "telescope": "Mid",
+    "constraints": {
+      "sun_avoidance_angle_deg": 30.0,
+      "moon_avoidance_angle_deg": 10.0,
+      "jupiter_avoidance_angle_deg": 10.0,
+      "min_elevation_deg": 15.0,
+      "max_elevation_deg": 90.0
+    },
     "basic_capabilities": {
-        "dish_elevation_limit_deg": 15,
         "receiver_information": [
             {
                 "max_frequency_hz": 1050000000,
@@ -85,7 +91,7 @@
         "number_dish_ids": [
             "SKA001",
             "SKA036",
-            "SKA063",
+            "SKA077",
             "SKA100"
         ],
         "number_fsps": 4,
@@ -122,14 +128,14 @@
         ],
         "max_baseline_km": 1.5,
         "number_dish_ids": [
-            "SKA001",
             "SKA036",
+            "SKA040",
+            "SKA045",
             "SKA046",
             "SKA048",
-            "SKA063",
             "SKA077",
             "SKA081",
-            "SKA100"
+            "SKA101"
         ],
         "number_fsps": 8,
         "number_meerkat_dishes": 0,
