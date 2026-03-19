@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.abspath("../../src"))
 autodoc_mock_imports = [ "astropy", 
     "gitlab", 
     "simpleeval", 
-    "ska_telmodel", 
+    "ska_telmodel_client",
     "pydantic",
     "requests",
     "ska_ser_logging",
