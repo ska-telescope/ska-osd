@@ -13,6 +13,7 @@
       "min_coarse_channel": 64,
       "max_coarse_channel": 447,
       "coarse_channel_width_hz": 781.25e3,
+      "coarse_channel_width": 781.25e3,
       "number_continuum_channels_per_coarse_channel": 144,
       "number_zoom_channels_per_coarse_channel": 432
 
