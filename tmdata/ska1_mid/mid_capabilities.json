@@ -77,6 +77,9 @@
         "allowed_channel_width_values": [
             13440
         ],
+        "allowed_channel_width_values_hz": [
+            13440
+        ],
         "available_bandwidth_hz": 800000000,
         "available_receivers": [
             "Band_1",
@@ -113,6 +116,9 @@
             1
         ],
         "allowed_channel_width_values": [
+            13440
+        ],
+        "allowed_channel_width_values_hz": [
             13440
         ],
         "available_bandwidth_hz": 800000000,
@@ -156,6 +162,26 @@
             1
         ],
         "allowed_channel_width_values": [
+            210,
+            420,
+            840,
+            1680,
+            3360,
+            6720,
+            13440,
+            26880,
+            40320,
+            53760,
+            80640,
+            107520,
+            161280,
+            215040,
+            322560,
+            416640,
+            430080,
+            645120
+        ],
+        "allowed_channel_width_values_hz": [
             210,
             420,
             840,
@@ -273,6 +299,9 @@
             1
         ],
         "allowed_channel_width_values": [
+            13440
+        ],
+        "allowed_channel_width_values_hz": [
             13440
         ],
         "available_bandwidth_hz": 800000000,
