@@ -90,6 +90,9 @@ osd-tmdata-publish:
   script:
     - make osddata-do-publish
 
+tmdata-publish:
+  when: manual
+
 include:
   # Python
   - project: "ska-telescope/templates-repository"
