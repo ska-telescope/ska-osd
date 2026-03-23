@@ -90,9 +90,6 @@ osd-tmdata-publish:
   script:
     - make osddata-do-publish
 
-tmdata-publish:
-  when: manual
-
 include:
   # Python
   - project: "ska-telescope/templates-repository"
@@ -124,3 +121,6 @@ include:
   # SonarQube
   - project: 'ska-telescope/templates-repository'
     file: 'gitlab-ci/includes/sonar-scan.gitlab-ci.yml'
+
+tmdata-publish:
+  when: manual
