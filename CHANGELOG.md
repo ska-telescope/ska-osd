@@ -5,6 +5,10 @@ Change Log
 All notable changes to this project will be documented in this file.
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
+Unreleased
+**********
+* Updated MID and LOW capabilities TMData for better integration with other OSO applications
+
 6.0.2
 **********
 * Mock autodoc import for ska-telmodel-client
