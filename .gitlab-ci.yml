@@ -121,3 +121,6 @@ include:
   # SonarQube
   - project: 'ska-telescope/templates-repository'
     file: 'gitlab-ci/includes/sonar-scan.gitlab-ci.yml'
+
+tmdata-publish:
+  when: manual
