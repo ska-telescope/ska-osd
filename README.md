@@ -120,6 +120,12 @@ An explanation of validation strictness levels and configuring OSD semantic vali
 
 # Publish tmdata
 
+`tmdata-publish` (from gitlab) is needed when user need to test on main using OSD UI, in this no tag is pushed to gitlab or CAR.
+
+`osd-tmdata-publish` (from CAR) is needed when user need to fetch data using OSD UI / API. in this tag is published automatically using OSD UI.
+
+For now please run either of job manually as per need.
+
 Please run `osd-tmdata-publish` job manually after merging / releasing into main.
 this is a required step, without this new tmdata will not be reflected on CAR.
 
@@ -136,16 +142,6 @@ which allow restrict tmdata publish on artefact. Default set as "0" for local en
 To view tmdata releases, [Click here](https://gitlab.com/ska-telescope/ost/ska-ost-osd/-/blob/main/tmdata/version_mapping/latest_release.txt?ref_type=heads).
 
 It's not recommended  to set this flag value as "1" while doing testing on local environment.
-
-# Special Note
-
-`tmdata-publish` (from gitlab) is needed when user need to test on main using OSD UI, in this no tag is pushed to gitlab or CAR.
-
-`osd-tmdata-publish` (from CAR) is needed when user need to fetch data using OSD UI / API. in this tag is published automatically using OSD UI.
-
-Key difference from the default tmdata-do-publish: The Makefile overrides CI_MERGE_REQUEST_SOURCE_BRANCH_NAME on line 91 with the content of latest_release.txt (6.0.2). This ensures the tmdata is always tagged with the OSD release version from that file, regardless of the actual MR source branch.
-
-For now please run either of job manually as per need.
 
 # Install charts
 
