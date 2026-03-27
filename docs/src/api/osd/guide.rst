@@ -1088,3 +1088,14 @@ Subarray templates are automatically processed when retrieving OSD data:
         "result_status": "success",
         "result_code": 200
     }
+
+Special Note
+---------------
+
+`tmdata-publish` (from gitlab) is needed when user need to test on main using OSD UI, in this no tag is pushed to gitlab or CAR.
+
+`osd-tmdata-publish` (from CAR) is needed when user need to fetch data using OSD UI / API. in this tag is published automatically using OSD UI.
+
+Key difference from the default tmdata-do-publish: The Makefile overrides CI_MERGE_REQUEST_SOURCE_BRANCH_NAME on line 91 with the content of latest_release.txt (6.0.2). This ensures the tmdata is always tagged with the OSD release version from that file, regardless of the actual MR source branch.
+
+For now please run either of job manually as per need.
