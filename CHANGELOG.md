@@ -9,6 +9,14 @@ Unreleased
 **********
 * Updated MID and LOW capabilities TMData for better integration with other OSO applications
 
+6.0.4
+**********
+* Fixed RTD Docs issue.
+
+6.0.3
+**********
+* Made `tmdata-publish` and `osd-tmdata-publish` jobs manual for now.
+
 6.0.2
 **********
 * Mock autodoc import for ska-telmodel-client
