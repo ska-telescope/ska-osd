@@ -9,6 +9,10 @@ Unreleased
 **********
 * Updated MID and LOW capabilities TMData for better integration with other OSO applications
 
+6.0.5
+**********
+* Fixed CAR issue with v6.0.3 and v6.0.4.
+
 6.0.4
 **********
 * Fixed RTD Docs issue.
