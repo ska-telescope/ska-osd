@@ -7,6 +7,11 @@
       "min_elevation_deg": 45.0,
       "max_elevation_deg": 90.0
     },
+    "quality_attribute_metrics": {
+      "cbf": {
+        "alveo_configured_percent": 100
+      }
+    },
     "basic_capabilities": {
       "min_frequency_hz": 50000000.0,
       "max_frequency_hz": 350000000.0,
