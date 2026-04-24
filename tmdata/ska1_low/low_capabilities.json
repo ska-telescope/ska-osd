@@ -9,7 +9,8 @@
     },
     "quality_attribute_metrics": {
       "cbf": {
-        "alveo_configured_percent": 100
+        "alveo_configured_percent": 100,
+        "processors_ready_percent": 100
       }
     },
     "basic_capabilities": {
