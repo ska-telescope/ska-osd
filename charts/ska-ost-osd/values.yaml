@@ -15,12 +15,6 @@ global:
   minikube: true
   cluster_domain: techops.internal.skao.int
   id_rsa:
-  aws_server_bucket_name:
-  aws_server_public_key:
-  aws_server_secret_key:
-  aws_server_bucket_region:
-  jira_access_token:
-  jira_api_url:
 
 rest:
   component: rest
@@ -50,7 +44,6 @@ affinity: {}
 
 tolerations: []
 
-
 secretProvider:
   enabled: true
   provider:
@@ -59,28 +52,5 @@ secretProvider:
     roleName: "kube-role"
     secretsPath: "kv/data/users/dayanand_arade/gitlab_ssh_key"
     secrets:
-    - secretKey: "id_rsa"
-      targetEnv: ID_RSA
-
-existingSltClientSecret: # This is used for deployments where Secrets are managed externally, e.g. Low ITF
-  name: ~
-  key: ~
-
-vaultStaticSecret:
-  enabled: true
-  mount: "kv"
-  path: "users/dayanand_arade/s3_bucket"
-  refreshAfter: 60s
-  secrets:
-    - secretKey: aws_server_bucket_name
-      targetEnv: AWS_SERVER_BUCKET_NAME
-    - secretKey: aws_server_public_key
-      targetEnv: AWS_SERVER_PUBLIC_KEY
-    - secretKey: aws_server_secret_key
-      targetEnv: AWS_SERVER_SECRET_KEY
-    - secretKey: aws_server_bucket_region
-      targetEnv: AWS_SERVER_BUCKET_REGION
-    - secretKey: jira_access_token
-      targetEnv: JIRA_ACCESS_TOKEN
-    - secretKey: jira_api_url
-      targetEnv: JIRA_API_URL
+      - secretKey: "id_rsa"
+        targetEnv: ID_RSA

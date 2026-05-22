@@ -119,13 +119,6 @@ spec:
           - name: ID_RSA
             value: "{{ .Values.global.id_rsa }}"
           {{- end }}
-          {{- if .Values.existingSltClientSecret.name }}
-          - name: SLT_CLIENT_SECRET
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.existingSltClientSecret.name }}
-                key: {{ .Values.existingSltClientSecret.key }}
-          {{- end }}
           {{- range .Values.vaultStaticSecret.secrets }}
           - name: {{ .targetEnv | default .secretKey }}
             valueFrom:
