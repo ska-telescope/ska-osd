@@ -45,7 +45,6 @@ ENV_CHECK := $(shell echo $(CI_ENVIRONMENT_SLUG) | egrep 'test|dev|integration')
 ifneq ($(ENV_CHECK),)
 K8S_CHART_PARAMS = --set ska-ost-osd.rest.image.tag=$(VERSION)-dev.c$(CI_COMMIT_SHORT_SHA) \
 	--set ska-ost-osd.rest.image.registry=$(CI_REGISTRY)/ska-telescope/ost/ska-ost-osd \
-	--set ska-ost-osd.secretProvider.enabled=false \
 	--set ska-ost-osd.vaultStaticSecret.enabled=false
 endif
 
