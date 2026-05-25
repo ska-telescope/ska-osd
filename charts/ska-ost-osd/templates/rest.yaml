@@ -46,7 +46,7 @@ spec:
 {{- if .Values.secretProvider.enabled }}
 ---
 apiVersion: secrets-store.csi.x-k8s.io/v1
-kind: SecretProviderClass
+kind: SecretProvider
 metadata:
   name: {{ template "ska-ost-osd.name" . }}-{{ .Values.rest.component }}-{{ .Release.Name }}
   namespace: {{ .Release.Namespace }}
@@ -134,7 +134,7 @@ spec:
             driver: secrets-store.csi.k8s.io
             readOnly: true
             volumeAttributes:
-              secretProviderClass: {{ template "ska-ost-osd.name" . }}-{{ .Values.rest.component }}-{{ .Release.Name }}
+              secretProvider: {{ template "ska-ost-osd.name" . }}-{{ .Values.rest.component }}-{{ .Release.Name }}
         {{- end }}
   {{- with .Values.nodeSelector }}
 nodeSelector:
