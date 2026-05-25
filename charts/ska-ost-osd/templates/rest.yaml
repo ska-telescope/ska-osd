@@ -43,7 +43,7 @@ spec:
   selector:
     app: {{ template "ska-ost-osd.name" . }}
     component: {{ .Values.rest.component }}
-{{- if .Values.secretProvider.enabled }}
+{{- if .Values.vaultStaticSecret.enabled }}
 ---
 apiVersion: secrets-store.csi.x-k8s.io/v1
 kind: SecretProviderClass
@@ -51,21 +51,21 @@ metadata:
   name: {{ template "ska-ost-osd.name" . }}-{{ .Values.rest.component }}-{{ .Release.Name }}
   namespace: {{ .Release.Namespace }}
 spec:
-  provider: {{ .Values.secretProvider.provider.name }}
+  provider: {{ .Values.vaultStaticSecret.provider.name }}
   parameters:
-    vaultAddress: {{ .Values.secretProvider.provider.vaultAddress }}
-    roleName: {{ .Values.secretProvider.provider.roleName }}
+    vaultAddress: {{ .Values.vaultStaticSecret.provider.vaultAddress }}
+    roleName: {{ .Values.vaultStaticSecret.provider.roleName }}
     objects: |
-{{- range .Values.secretProvider.provider.secrets }}
+{{- range .Values.vaultStaticSecret.provider.secrets }}
       - objectName: {{ .secretKey }}
-        secretPath: {{ $.Values.secretProvider.provider.secretsPath }}
+        secretPath: {{ $.Values.vaultStaticSecret.provider.secretsPath }}
         secretKey: {{ .secretKey }}
 {{- end }}
   secretObjects:
-    - secretName: {{ template "ska-ost-osd.name" . }}-{{ .Values.rest.component }}-{{ .Release.Name }}-id-rsa-credentials
+    - secretName: {{ template "ska-ost-osd.bucket-secret-name" . }}
       type: Opaque
       data:
-{{- range .Values.secretProvider.provider.secrets }}
+{{- range .Values.vaultStaticSecret.secrets }}
         - objectName: {{ .secretKey }}
           key: {{ .secretKey }}
 {{- end }}
@@ -107,27 +107,20 @@ spec:
         ports:
           - containerPort: 5000
         env:
-        {{- if .Values.secretProvider.enabled }}
-        {{- range .Values.secretProvider.provider.secrets }}
-          - name: {{ .targetEnv | default .secretKey }}
-            valueFrom:
-              secretKeyRef:
-                name: {{ template "ska-ost-osd.name" $ }}-{{ $.Values.rest.component }}-{{ $.Release.Name }}-id-rsa-credentials
-                key: {{ .secretKey }}
-          {{- end }}
-          {{- else }}
-          - name: ID_RSA
-            value: "{{ .Values.global.id_rsa }}"
-          {{- end }}
-          {{- range .Values.vaultStaticSecret.secrets }}
+        {{- if .Values.vaultStaticSecret.enabled }}
+        {{- range .Values.vaultStaticSecret.secrets }}
           - name: {{ .targetEnv | default .secretKey }}
             valueFrom:
               secretKeyRef:
                 name: {{ template "ska-ost-osd.bucket-secret-name" $ }}
                 key: {{ .secretKey }}
-          {{- end }}
+        {{- end }}
+        {{- else }}
+          - name: ID_RSA
+            value: "{{ .Values.global.id_rsa }}"
+        {{- end }}
         volumeMounts:
-          {{- if .Values.secretProvider.enabled }}
+          {{- if .Values.vaultStaticSecret.enabled }}
           - name: secrets-store-inline
             mountPath: "/mnt/secrets-store"
             readOnly: true
@@ -135,7 +128,7 @@ spec:
         resources:
 {{ toYaml .Values.rest.resources | indent 10 }}
       volumes:
-        {{- if .Values.secretProvider.enabled }}
+        {{- if .Values.vaultStaticSecret.enabled }}
         - name: secrets-store-inline
           csi:
             driver: secrets-store.csi.k8s.io
