@@ -44,20 +44,11 @@ affinity: {}
 
 tolerations: []
 
-secretProvider:
-  enabled: true
-  provider:
-    name: "vault"
-    vaultAddress: "https://vault.skao.int"
-    roleName: "kube-role"
-    secretsPath: "kv/data/users/dayanand_arade/gitlab_ssh_key"
-    secrets:
-      - secretKey: "id_rsa"
-        targetEnv: ID_RSA
-
 vaultStaticSecret:
   enabled: true
   mount: "kv"
   path: "users/dayanand_arade/s3_bucket"
   refreshAfter: 60s
   secrets:
+    - secretKey: "id_rsa"
+      targetEnv: ID_RSA
