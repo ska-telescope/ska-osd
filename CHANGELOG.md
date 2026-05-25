@@ -8,6 +8,7 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 Unreleased
 **********
 * Updated MID and LOW capabilities TMData for better integration with other OSO applications
+* Migrated secret management from Secrets Store CSI Driver to Vault Secrets Operator (VaultStaticSecret) for improved reliability and consistency with other OSO services.
 
 6.0.4
 **********
