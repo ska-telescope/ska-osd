@@ -119,6 +119,13 @@ spec:
           - name: ID_RSA
             value: "{{ .Values.global.id_rsa }}"
           {{- end }}
+          {{- range .Values.vaultStaticSecret.secrets }}
+          - name: {{ .targetEnv | default .secretKey }}
+            valueFrom:
+              secretKeyRef:
+                name: {{ template "ska-ost-osd.bucket-secret-name" $ }}
+                key: {{ .secretKey }}
+          {{- end }}
         volumeMounts:
           {{- if .Values.secretProvider.enabled }}
           - name: secrets-store-inline
