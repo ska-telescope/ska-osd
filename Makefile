@@ -52,6 +52,7 @@ endif
 # change any values
 ENV_CHECK := $(shell echo $(CI_ENVIRONMENT_SLUG) | egrep 'staging')
 ifneq ($(ENV_CHECK),)
+K8S_CHART_PARAMS += --set ska-ost-osd.vaultStaticSecret.enabled=false
 endif
 
 # unset defaults so settings in pyproject.toml take effect
