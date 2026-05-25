@@ -62,7 +62,7 @@ spec:
         secretKey: {{ .secretKey }}
 {{- end }}
   secretObjects:
-    - secretName: {{ template "ska-ost-osd.name" . }}-{{ .Values.rest.component }}-{{ .Release.Name }}-id-rsa-credentials
+    - secretName: {{ template "ska-ost-osd.bucket-secret-name" . }}
       type: Opaque
       data:
 {{- range .Values.vaultStaticSecret.secrets }}
@@ -112,20 +112,13 @@ spec:
           - name: {{ .targetEnv | default .secretKey }}
             valueFrom:
               secretKeyRef:
-                name: {{ template "ska-ost-osd.name" $ }}-{{ $.Values.rest.component }}-{{ $.Release.Name }}-id-rsa-credentials
-                key: {{ .secretKey }}
-          {{- end }}
-          {{- else }}
-          - name: ID_RSA
-            value: "{{ .Values.global.id_rsa }}"
-          {{- end }}
-          {{- range .Values.vaultStaticSecret.secrets }}
-          - name: {{ .targetEnv | default .secretKey }}
-            valueFrom:
-              secretKeyRef:
                 name: {{ template "ska-ost-osd.bucket-secret-name" $ }}
                 key: {{ .secretKey }}
-          {{- end }}
+        {{- end }}
+        {{- else }}
+          - name: ID_RSA
+            value: "{{ .Values.global.id_rsa }}"
+        {{- end }}
         volumeMounts:
           {{- if .Values.vaultStaticSecret.enabled }}
           - name: secrets-store-inline
