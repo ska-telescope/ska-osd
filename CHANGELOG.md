@@ -5,6 +5,10 @@ Change Log
 All notable changes to this project will be documented in this file.
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
+Unreleased
+**********
+* Use ISO 8601 format for cycle proposal_open and proposal_close timestamps
+
 6.0.5
 **********
 * Updated MID and LOW capabilities TMData for better integration with other OSO applications
