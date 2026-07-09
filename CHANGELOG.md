@@ -8,6 +8,7 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 Unreleased
 **********
 * Use ISO 8601 format for cycle proposal_open and proposal_close timestamps
+* Update LOW SV cycle 0 policy data for PHT testing; drop unused cycle 1
 
 6.0.5
 **********
