@@ -5,9 +5,10 @@ Change Log
 All notable changes to this project will be documented in this file.
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
-Unreleased
+6.0.6
 **********
 * Use ISO 8601 format for cycle proposal_open and proposal_close timestamps
+* Update LOW SV cycle 0 policy data for PHT testing; drop unused cycle 1
 
 6.0.5
 **********
