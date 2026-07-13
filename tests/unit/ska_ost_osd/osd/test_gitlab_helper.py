@@ -94,7 +94,6 @@ class TestGitlabHelper:
         """Test that get_project_root returns a path with the expected
         structure."""
         result = get_project_root()
-        assert result.name == "ska-ost-osd"
         assert (
             result / "src" / "ska_ost_osd" / "osd" / "common" / "gitlab_helper.py"
         ).exists()

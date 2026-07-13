@@ -3,7 +3,7 @@ from unittest.mock import patch
 import pytest
 
 from ska_ost_osd.osd.common.utils import get_osd_latest_version
-from ska_ost_osd.osd.models.models import ValidationOnCapabilities
+from ska_ost_osd.osd.models.models import OSDModel, ValidationOnCapabilities
 from ska_ost_osd.osd.osd import get_osd_data, osd_tmdata_source, update_osd_file
 from tests.conftest import tm_data_osd
 from tests.unit.ska_ost_osd.common.constant import (
@@ -404,3 +404,9 @@ def test_get_osd_data_template_processing_called(
     assert (
         "mid_template_1" in result["capabilities"]["mid"]["AA0.5"]["subarray_templates"]
     )
+
+
+def test_osd_model_accepts_cycle_id_zero():
+    """Regression test that OSDModel with cycle_id=0 is valid"""
+    model = OSDModel(cycle_id=0)
+    assert model.cycle_id == 0
