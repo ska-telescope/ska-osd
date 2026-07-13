@@ -5,6 +5,11 @@ Change Log
 All notable changes to this project will be documented in this file.
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
+6.0.7
+**********
+* Fix client to accept 0 as a valid cycle number/ID
+* Change LOW SV cycle number to 1 to be forwards compatible
+
 6.0.6
 **********
 * Use ISO 8601 format for cycle proposal_open and proposal_close timestamps
