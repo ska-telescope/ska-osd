@@ -93,7 +93,7 @@ class OSDModel(BaseModel):
             errors.append(CYCLE_ID_ARRAY_ASSEMBLY_ERROR_MESSAGE)
 
         # Validate either combination
-        if not (cycle_id or capabilities):
+        if not (cycle_id is not None or capabilities):
             errors.append(CYCLE_ID_CAPABILITIES_ERROR_MESSAGE)
 
         # Validate patterns
