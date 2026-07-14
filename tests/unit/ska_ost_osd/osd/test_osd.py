@@ -2,6 +2,7 @@ from unittest.mock import patch
 
 import pytest
 
+from ska_ost_osd.osd.common.error_handling import OSDModelError
 from ska_ost_osd.osd.common.utils import get_osd_latest_version
 from ska_ost_osd.osd.models.models import OSDModel, ValidationOnCapabilities
 from ska_ost_osd.osd.osd import get_osd_data, osd_tmdata_source, update_osd_file
@@ -410,3 +411,10 @@ def test_osd_model_accepts_cycle_id_zero():
     """Regression test that OSDModel with cycle_id=0 is valid"""
     model = OSDModel(cycle_id=0)
     assert model.cycle_id == 0
+
+
+def test_osd_model_fails_cycle_id_zero_and_array_assembly():
+    """Regression test that OSDModel with cycle_id=0 and array_assembly raises
+    OSDModelError"""
+    with pytest.raises(OSDModelError):
+        OSDModel(cycle_id=0, array_assembly="AA0.5")
