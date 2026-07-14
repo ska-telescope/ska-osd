@@ -5,6 +5,10 @@ Change Log
 All notable changes to this project will be documented in this file.
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
+Unreleased
+**********
+* Updated OSDModel validator for case where cycle_id=0 and array_assembly
+
 6.0.7
 **********
 * Fix client to accept 0 as a valid cycle number/ID
