@@ -89,7 +89,7 @@ class OSDModel(BaseModel):
         # Validate forbidden combinations
         if gitlab_branch and osd_version:
             errors.append(GITLAB_BRANCH_ERROR_MESSAGE)
-        if cycle_id and array_assembly:
+        if cycle_id is not None and array_assembly:
             errors.append(CYCLE_ID_ARRAY_ASSEMBLY_ERROR_MESSAGE)
 
         # Validate either combination
