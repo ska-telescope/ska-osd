@@ -16,6 +16,6 @@
         "max_data_products": 1
     },
     "telescope_capabilities": {
-        "Low": "AA2"
+        "Low": "AA2_SV"
     }
 }
