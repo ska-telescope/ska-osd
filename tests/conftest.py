@@ -62,6 +62,20 @@ def patch_gitlab_source():
         yield
 
 
+@pytest.fixture(autouse=True)
+def patch_tmdata_source(monkeypatch):
+    """Patch osd_tmdata_source for all tests so that they use local tmdata"""
+
+    def patched_osd_tmdata_source(*args, **kwargs):
+        _, source_error_msg_list = osd_tmdata_source(*args, **kwargs)
+        return TESTS_TMDATA_SOURCE, source_error_msg_list
+
+    monkeypatch.setattr(
+        "ska_ost_osd.osd.osd.osd_tmdata_source",
+        patched_osd_tmdata_source,
+    )
+
+
 @pytest.fixture(scope="session")
 def create_entity_object():
     def _create_entity_object(filepath: str):
