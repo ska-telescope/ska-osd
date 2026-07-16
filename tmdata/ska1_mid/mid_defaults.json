@@ -13,15 +13,15 @@
                 "attenuation_2_x": 10.0,
                 "attenuation_2_y": 10.0,
                 "noise_diode": {
-                    "periodic_noise_diode_config": {
-                        "period_ms": 0,
-                        "duty_cycle_ms": 0,
-                        "phase_shift_ms": 0
+                    "periodic": {
+                        "period_ms": 0.0,
+                        "duty_cycle_ms": 0.0,
+                        "phase_shift_ms": 0.0
                     },
-                    "pseudo_random_noise_config": {
+                    "pseudo_random": {
                         "binary_polynomial": 0,
                         "seed": 0,
-                        "dwell_ms": 0
+                        "dwell_ms": 0.0
                     }
 
                 }
