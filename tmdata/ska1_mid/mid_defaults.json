@@ -1,0 +1,37 @@
+{
+    "telescope": "Mid",
+    "constraints": {
+        "sun_avoidance_angle_deg": 30.0,
+        "moon_avoidance_angle_deg": 10.0,
+        "jupiter_avoidance_angle_deg": 10.0
+    },
+    "defaults": {
+        "target": {
+            "dish_spfrx_params": {
+                "attenuation_1_x": 10.0,
+                "attenuation_1_y": 10.0,
+                "attenuation_2_x": 10.0,
+                "attenuation_2_y": 10.0,
+                "noise_diode": {
+                    "periodic_noise_diode_config": {
+                        "period_ms": 0,
+                        "duty_cycle_ms": 0,
+                        "phase_shift_ms": 0
+                    },
+                    "pseudo_random_noise_config": {
+                        "binary_polynomial": 0,
+                        "seed": 0,
+                        "dwell_ms": 0
+                    }
+
+                }
+            }
+        },
+        "csp_configuration": {
+            "spfrx": {
+                "sync_pps": false,
+                "saturation_threshold": 0.0
+            }
+        }
+    }
+}
