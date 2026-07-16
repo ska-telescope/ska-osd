@@ -5,7 +5,7 @@
       "moon_avoidance_angle_deg": 10.0,
       "jupiter_avoidance_angle_deg": 10.0,
       "min_elevation_deg": 15.0,
-      "max_elevation_deg": 90.0
+      "max_elevation_deg": 85.0
     },
     "basic_capabilities": {
         "receiver_information": [
