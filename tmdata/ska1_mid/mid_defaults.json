@@ -13,6 +13,7 @@
                 "attenuation_2_x": 10.0,
                 "attenuation_2_y": 10.0,
                 "noise_diode": {
+                    "mode": "off",
                     "periodic": {
                         "period_ms": 0.0,
                         "duty_cycle_ms": 0.0,
