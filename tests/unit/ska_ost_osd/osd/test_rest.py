@@ -1,4 +1,6 @@
 from http import HTTPStatus
+from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 
@@ -68,14 +70,17 @@ def test_osd_endpoint(client_get):
         expected OSD data or returns an error status code.
     """
 
-    response = client_get(
-        f"{BASE_API_URL}/osd",
-        params={
-            "source": "file",
-            "capabilities": "mid",
-            "array_assembly": "AA0.5",
-        },
-    ).json()
+    tests_tmdata_dir = Path(__file__).resolve().parents[3] / "tmdata"
+
+    with patch("ska_ost_osd.osd.osd.BASE_FOLDER_NAME", str(tests_tmdata_dir)):
+        response = client_get(
+            f"{BASE_API_URL}/osd",
+            params={
+                "source": "file",
+                "capabilities": "mid",
+                "array_assembly": "AA0.5",
+            },
+        ).json()
 
     assert response["result_code"] == 200
     assert "AA0.5" in response["result_data"]["capabilities"]["mid"].keys()
