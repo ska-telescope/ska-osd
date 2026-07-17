@@ -36,8 +36,6 @@ capabilities = read_json(f"{BASE_FOLDER_NAME}/testfile_capabilities.json")
 
 ARRAY_ASSEMBLY = "AA0.5"
 
-local_source = ["file://tmdata"]
-
 OSD_RESPONSE_WITH_ONLY_CAPABILITIES_PARAMETER = (
     f"{BASE_FOLDER_NAME}/osd_response_with_capabilities.json"
 )

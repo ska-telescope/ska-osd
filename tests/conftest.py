@@ -33,7 +33,6 @@ from tests.unit.ska_ost_osd.common.constant import (
     MID_SBD_VALIDATION_MOCK_DATA,
     VALID_MID_CONFIGURE_JSON,
     VALIDATION_MOCK_DATA,
-    local_source,
     low_configure_expected_result_for_invalid_data,
     low_expected_result_for_invalid_data,
     low_sbd_expected_result_for_invalid_data,
@@ -100,12 +99,6 @@ def client_post():
     client = TestClient(app)
 
     return partial(client.post, headers={"accept": "application/json"})
-
-
-# re-defined TMData for local file source
-@pytest.fixture(scope="session")
-def tm_data():
-    return TMData(local_source)
 
 
 @pytest.fixture(scope="session")
