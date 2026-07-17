@@ -47,6 +47,4 @@ CYCLE_TO_VERSION_MAPPING = "tmdata/version_mapping/latest_release.txt"
 RELEASE_VERSION_MAPPING = (
     "tmdata/version_mapping/cycle_gitlab_release_version_mapping.json"
 )
-# constant define to push gitlab flag.
-GITLAB_SOURCE = [f"gitlab:{BASE_URL}{CAR_URL}main#{BASE_FOLDER_NAME}"]
 SWAGGER_MID_OSD_DATA_JSON_FILE_PATH = "data/sample_mid_osd_data.json"

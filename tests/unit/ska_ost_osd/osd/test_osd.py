@@ -3,9 +3,13 @@ from unittest.mock import patch
 import pytest
 
 from ska_ost_osd.osd.common.error_handling import OSDModelError
-from ska_ost_osd.osd.common.utils import get_osd_latest_version
 from ska_ost_osd.osd.models.models import OSDModel, ValidationOnCapabilities
-from ska_ost_osd.osd.osd import get_osd_data, osd_tmdata_source, update_osd_file
+from ska_ost_osd.osd.osd import (
+    get_osd_data,
+    get_osd_latest_version,
+    osd_tmdata_source,
+    update_osd_file,
+)
 from tests.conftest import tm_data_osd
 from tests.unit.ska_ost_osd.common.constant import (
     DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER,

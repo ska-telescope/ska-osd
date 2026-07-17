@@ -4,7 +4,6 @@ import pathlib
 import tempfile
 from functools import partial
 from importlib.metadata import version
-from unittest.mock import patch
 
 import pytest
 from fastapi.testclient import TestClient
@@ -50,16 +49,6 @@ BASE_API_URL = f"/ska-ost-osd/osd/api/v{OSD_MAJOR_VERSION}"
 
 # Local tmdata snapshot with version-mapping and latest-release files
 TESTS_TMDATA_SOURCE = [f"file://{os.path.join(os.path.dirname(__file__), 'tmdata')}"]
-
-
-@pytest.fixture(autouse=True)
-def patch_gitlab_source():
-    """Patch ``GITLAB_SOURCE`` for all tests so that they use local version-mapping
-    and latest-release files instead of the remote GitLab backend."""
-    with patch("ska_ost_osd.osd.osd.GITLAB_SOURCE", TESTS_TMDATA_SOURCE), patch(
-        "ska_ost_osd.osd.common.utils.GITLAB_SOURCE", TESTS_TMDATA_SOURCE
-    ):
-        yield
 
 
 @pytest.fixture(autouse=True)

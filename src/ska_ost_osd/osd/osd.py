@@ -15,7 +15,6 @@ from ska_ost_osd.osd.common.osd_validation_messages import (
     OSD_VERSION_ERROR_MESSAGE,
     SOURCE_ERROR_MESSAGE,
 )
-from ska_ost_osd.osd.common.utils import get_osd_latest_version
 from ska_ost_osd.osd.models.models import OSDModel
 from ska_ost_osd.osd.template_mapping.template_mapping import process_template_mappings
 
@@ -24,10 +23,10 @@ from .common.constant import (
     BASE_FOLDER_NAME,
     BASE_URL,
     CAR_URL,
-    GITLAB_SOURCE,
     LOW_CAPABILITIES_JSON_PATH,
     MID_CAPABILITIES_JSON_PATH,
     OBSERVATORY_POLICIES_JSON_PATH,
+    RELEASE_FILE_PATH_LATEST,
     SOURCES,
     VERSION_FILE_PATH,
     osd_file_mapping,
@@ -276,6 +275,20 @@ def get_available_cycles() -> list[int]:
     ]
 
 
+def get_osd_latest_version() -> str:
+    """Read the latest_release.txt file and retrieve the latest OSD version.
+
+    :return: str, the latest OSD release version.
+    """
+    gitlab_source = list(osd_tmdata_source(source="gitlab", gitlab_branch="main")[0])
+    tmdata_version = TMData(gitlab_source, update=True)
+    osd_version = (
+        tmdata_version[RELEASE_FILE_PATH_LATEST].get().decode("utf-8").replace('"', "")
+    )
+
+    return osd_version
+
+
 def check_cycle_id(
     cycle_id: int = None,
     osd_version: str = None,
@@ -442,7 +455,8 @@ def get_osd_using_tmdata(
     except OSDModelError as error:
         errors.extend(error.args[0])
 
-    tmdata_version = TMData(GITLAB_SOURCE, update=True)
+    gitlab_source = list(osd_tmdata_source(source="gitlab", gitlab_branch="main")[0])
+    tmdata_version = TMData(gitlab_source, update=True)
     versions_dict = tmdata_version[VERSION_FILE_PATH].get_dict()
     _, cycle_errors = check_cycle_id(
         cycle_id=cycle_id,
