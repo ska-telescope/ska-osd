@@ -1,4 +1,3 @@
-from ska_ost_osd.telvalidation.common.constant import CAR_TELMODEL_SOURCE
 from tests.unit.ska_ost_osd.utils import read_json
 
 BASE_FOLDER_NAME = "test_files"
@@ -148,8 +147,3 @@ low_sbd_expected_result_for_invalid_data = (
     "logical_fsp_ids are too many!Current Limit is 6\n"
     "Invalid input for zoom_factor"
 )
-
-sources = [
-    CAR_TELMODEL_SOURCE,
-    "car:ska-telmodel-data?main",
-]

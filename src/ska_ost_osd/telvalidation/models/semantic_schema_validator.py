@@ -4,10 +4,10 @@ from typing import Any, Dict, Optional
 from pydantic import BaseModel, Field, field_validator
 
 from ska_ost_osd.osd.common.constant import ARRAY_ASSEMBLY_PATTERN
-from ska_ost_osd.telvalidation.common.constant import (
-    CAR_TELMODEL_SOURCE,
-    INTERFACE_PATTERN,
-)
+from ska_ost_osd.osd.osd import osd_tmdata_source
+from ska_ost_osd.telvalidation.common.constant import INTERFACE_PATTERN
+
+car_telmodel_source = osd_tmdata_source(osd_version="main")[0][0]
 
 
 class SemanticModel(BaseModel):
@@ -87,7 +87,7 @@ class SemanticValidationModel(BaseModel):
     observing_command_input: Dict[str, Any]
     osd_data: Optional[Dict[str, Any]] = None
     raise_semantic: Optional[bool] = True
-    sources: str = CAR_TELMODEL_SOURCE
+    sources: str = car_telmodel_source
 
     @field_validator("sources")
     @classmethod

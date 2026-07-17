@@ -11,7 +11,9 @@ from ska_telmodel_client import TMData
 
 from ska_ost_osd.app import create_app
 from ska_ost_osd.osd.osd import osd_tmdata_source
-from ska_ost_osd.telvalidation.common.constant import CAR_TELMODEL_SOURCE
+from ska_ost_osd.telvalidation.models.semantic_schema_validator import (
+    car_telmodel_source,
+)
 from tests.unit.ska_ost_osd.common.constant import (
     DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER,
     INVALID_MID_CONFIGURE_JSON,
@@ -38,7 +40,6 @@ from tests.unit.ska_ost_osd.common.constant import (
     mid_configure_expected_result_for_invalid_data,
     mid_expected_result_for_invalid_data,
     mid_sbd_expected_result_for_invalid_data,
-    sources,
 )
 from tests.unit.ska_ost_osd.utils import create_mock_json_files, read_json
 
@@ -61,6 +62,10 @@ def patch_tmdata_source(monkeypatch):
 
     monkeypatch.setattr(
         "ska_ost_osd.osd.osd.osd_tmdata_source",
+        patched_osd_tmdata_source,
+    )
+    monkeypatch.setattr(
+        "ska_ost_osd.telvalidation.models.semantic_schema_validator.osd_tmdata_source",
         patched_osd_tmdata_source,
     )
 
@@ -97,11 +102,6 @@ def client_post():
     return partial(client.post, headers={"accept": "application/json"})
 
 
-@pytest.fixture(scope="session")
-def git_tm_data():
-    return TMData(sources)
-
-
 # re-defined TMData for local file source
 @pytest.fixture(scope="session")
 def tm_data():
@@ -111,7 +111,7 @@ def tm_data():
 @pytest.fixture(scope="session")
 def tmdata_source():
     """TMData source URL fixture."""
-    return CAR_TELMODEL_SOURCE
+    return car_telmodel_source
 
 
 @pytest.fixture(scope="session")

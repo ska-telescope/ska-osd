@@ -19,13 +19,12 @@ from ska_ost_osd.telvalidation.semantic_validator import (
     fetch_capabilities_from_osd,
     semantic_validate,
 )
-from tests.conftest import BASE_API_URL
+from tests.conftest import BASE_API_URL, TESTS_TMDATA_SOURCE
 from tests.unit.ska_ost_osd.common.constant import (
     ARRAY_ASSEMBLY,
     INPUT_COMMAND_CONFIG,
     INVALID_MID_VALIDATE_CONSTANT,
     capabilities,
-    sources,
 )
 
 
@@ -105,7 +104,7 @@ def test_validate_schemantic_json_input_keys(mock6):
 class TestTargetVisibility(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.tm_data = TMData(sources)
+        cls.tm_data = TMData(TESTS_TMDATA_SOURCE)
 
     def test_target_is_visible_mid(self):
         ra_str = "21:08:47.92"
