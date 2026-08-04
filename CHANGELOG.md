@@ -7,7 +7,11 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 Unreleased
 **********
+
+6.0.8
+**********
 * Updated OSDModel validator for case where cycle_id=0 and array_assembly
+* Removed upper bound version constraint on FastAPI and ska-ser-logging to unblock upgrades for downstream projects.
 
 6.0.7
 **********
@@ -44,7 +48,7 @@ Unreleased
 **********
 * Added constraints to both MID and LOW capabilities
 * Updated the available dishes for MID AA0.5 and AA1
-* Updated dependencies to use ska-telmodel-client 
+* Updated dependencies to use ska-telmodel-client
 * Removed redundant semantic validation test
 * Added SonarQube for static analysis of code quality
 
@@ -86,8 +90,8 @@ Unreleased
 * Updated doc strings to sphinx style format
 * Refactoring of test cases
 * Added support to update `openapi.json` file using make
-* Add support for sub_bands in band 5b and adjusted 5b frequency range. 
-* Modified rules to ensure band 5b setups are specified in the B1 frequency range.  
+* Add support for sub_bands in band 5b and adjusted 5b frequency range.
+* Modified rules to ensure band 5b setups are specified in the B1 frequency range.
 
 4.1.0
 *****
@@ -109,7 +113,7 @@ Unreleased
 **********
 * Decoupled Release process of TMData from `ska-ost-osd` source code.
 * Now OSD User can publish TMData automatically from OSD UI Editor.
-* Introduced new APIs to automate TMData release process. 
+* Introduced new APIs to automate TMData release process.
 * Updated OSD User guide.
 
 3.0.0
@@ -153,7 +157,7 @@ Unreleased
 2.0.1
 *****
 * Added CHANGELOG.rst into doc folder.
-* Reverted ArgumentType of "TMData" in function "semantic_validate" and ReturnType of semantic_validate function 
+* Reverted ArgumentType of "TMData" in function "semantic_validate" and ReturnType of semantic_validate function
   which had been changed during refactoring and causing linting issue in CDM.
 
 2.0.0
