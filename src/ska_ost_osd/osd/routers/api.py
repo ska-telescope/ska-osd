@@ -11,6 +11,7 @@ from typing import Dict, Optional
 
 from fastapi import APIRouter, Body, Depends
 from pydantic import ValidationError
+from ska_telmodel_client import TMData
 
 from ska_ost_osd.common.models import ApiResponse
 from ska_ost_osd.common.utils import convert_to_response_object, get_responses
@@ -38,6 +39,7 @@ from ska_ost_osd.osd.osd import (
     get_osd_using_tmdata,
     update_osd_file,
 )
+from ska_ost_osd.osd.routers.dependencies import get_tmdata_car_main
 from ska_ost_osd.osd.version_mapping.version_manager import manage_version_release
 
 # this variable is added for restricting tmdata publish from local/dev environment.
@@ -187,13 +189,15 @@ def release_osd_data(
     responses=get_responses(ApiResponse[CycleModel]),
     response_model=ApiResponse,
 )
-def get_cycle_list() -> ApiResponse[CycleModel]:
+def get_cycle_list(
+    tmdata: TMData = Depends(get_tmdata_car_main),
+) -> ApiResponse[CycleModel]:
     """Get the list of all available proposal cycles.
 
     :return: ApiResponse[CycleModel], response model containing the list
         of cycle numbers.
     """
-    cycle_numbers = get_available_cycles()
+    cycle_numbers = get_available_cycles(tmdata)
     cycles = {"cycles": sorted(cycle_numbers)}
     return convert_to_response_object(cycles, result_code=HTTPStatus.OK)
 
