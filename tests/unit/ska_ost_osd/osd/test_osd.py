@@ -10,38 +10,28 @@ from ska_ost_osd.osd.osd import (
     osd_tmdata_source,
     update_osd_file,
 )
-from tests.conftest import tm_data_osd
-from tests.unit.ska_ost_osd.common.constant import (
-    DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER,
-    OSD_RESPONSE_WITH_CAPABILITIES_ARRAY_ASSEMBLY_PARAMETER,
-    OSD_RESPONSE_WITH_ONLY_CAPABILITIES_PARAMETER,
-)
 
 
 @pytest.mark.parametrize(
-    "capabilities, array_assembly, tmdata, file_path",
+    "capabilities, array_assembly, expected_keys",
     [
-        (None, None, tm_data_osd, DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER),
+        (None, None, ["mid", "low"]),
         (
             ["mid"],
             None,
-            tm_data_osd,
-            OSD_RESPONSE_WITH_ONLY_CAPABILITIES_PARAMETER,
+            ["mid"],
         ),
         (
             ["mid"],
             "AA0.5",
-            tm_data_osd,
-            OSD_RESPONSE_WITH_CAPABILITIES_ARRAY_ASSEMBLY_PARAMETER,
+            ["mid"],
         ),
     ],
 )
 def test_get_osd_data(
     capabilities,
     array_assembly,
-    tmdata,  # pylint: disable=W0613
-    file_path,
-    create_entity_object,
+    expected_keys,
     tm_data_osd,  # pylint: disable=W0621
 ):
     """This test case checks the functionality of get_osd_data it converts the
@@ -58,9 +48,7 @@ def test_get_osd_data(
     result, _ = get_osd_data(
         capabilities, array_assembly, tmdata=tm_data_osd, process_templates=False
     )
-    result_keys = result["capabilities"].keys()
-    expected = create_entity_object(file_path)
-    expected_keys = expected["capabilities"].keys()
+    result_keys = list(result["capabilities"].keys())
 
     assert result_keys == expected_keys
 
