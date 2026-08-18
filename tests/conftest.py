@@ -11,9 +11,6 @@ from ska_telmodel_client import TMData
 
 from ska_ost_osd.app import create_app
 from ska_ost_osd.osd.osd import osd_tmdata_source
-from ska_ost_osd.telvalidation.models.semantic_schema_validator import (
-    car_telmodel_source,
-)
 from tests.unit.ska_ost_osd.common.constant import (
     DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER,
     INVALID_MID_CONFIGURE_JSON,
@@ -104,7 +101,7 @@ def client_post():
 @pytest.fixture(scope="session")
 def tmdata_source():
     """TMData source URL fixture."""
-    return car_telmodel_source
+    return TESTS_TMDATA_SOURCE[0]
 
 
 @pytest.fixture(scope="session")

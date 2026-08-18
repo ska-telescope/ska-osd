@@ -7,7 +7,10 @@ from ska_ost_osd.osd.common.constant import ARRAY_ASSEMBLY_PATTERN
 from ska_ost_osd.osd.osd import osd_tmdata_source
 from ska_ost_osd.telvalidation.common.constant import INTERFACE_PATTERN
 
-car_telmodel_source = osd_tmdata_source(osd_version="main")[0][0]
+
+def default_telmodel_source() -> str:
+    """Return default TMData source for semantic validation."""
+    return osd_tmdata_source(osd_version="main")[0][0]
 
 
 class SemanticModel(BaseModel):
@@ -87,7 +90,7 @@ class SemanticValidationModel(BaseModel):
     observing_command_input: Dict[str, Any]
     osd_data: Optional[Dict[str, Any]] = None
     raise_semantic: Optional[bool] = True
-    sources: str = car_telmodel_source
+    sources: str = Field(default_factory=default_telmodel_source)
 
     @field_validator("sources")
     @classmethod
