@@ -32,7 +32,7 @@ from tests.unit.ska_ost_osd.common.constant import (
 def test_semantic_validate_para(
     mock_fetch_capabilities,
     semantic_validation_param_input,
-    tm_data_osd,
+    tests_tmdata,
     create_entity_object,
 ):
     """Parameterized test case to verify semantic validation for different
@@ -68,15 +68,15 @@ def test_semantic_validate_para(
             " interface='...' explicitly."
         ),
     ):
-        semantic_validate(config, tm_data_osd)
+        semantic_validate(config, tests_tmdata)
 
     config["interface"] = interface
 
     if not is_exception:
-        assert semantic_validate(config, tm_data=tm_data_osd), expected_result
+        assert semantic_validate(config, tm_data=tests_tmdata), expected_result
     else:
         try:
-            semantic_validate(config, tm_data=tm_data_osd)
+            semantic_validate(config, tm_data=tests_tmdata)
         except SchematicValidationError as error:
             assert error.message == expected_result
 

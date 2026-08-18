@@ -2,20 +2,6 @@ from tests.unit.ska_ost_osd.utils import read_json
 
 BASE_FOLDER_NAME = "test_files"
 
-DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER = f"{BASE_FOLDER_NAME}/default_osd_response.json"
-
-MID_CAPABILITIES_MOCK_DATA = f"{BASE_FOLDER_NAME}/mock_mid_capabilities.json"
-LOW_CAPABILITIES_MOCK_DATA = f"{BASE_FOLDER_NAME}/mock_low_capabilities.json"
-
-VALIDATION_MOCK_DATA = f"{BASE_FOLDER_NAME}/mock-validation-constants.json"
-
-MID_SBD_VALIDATION_MOCK_DATA = (
-    f"{BASE_FOLDER_NAME}/mock_mid_sbd-validation-constants.json"
-)
-LOW_SBD_VALIDATION_MOCK_DATA = (
-    f"{BASE_FOLDER_NAME}/mock_low_sbd-validation-constants.json"
-)
-
 MID_OSD_DATA_JSON = read_json(f"{BASE_FOLDER_NAME}/testfile_mid_osd_data.json")
 MID_OSD_DATA_JSON_AA1 = read_json(f"{BASE_FOLDER_NAME}/testfile_mid_osd_data_aa1.json")
 MID_OSD_DATA_JSON_AA2 = read_json(f"{BASE_FOLDER_NAME}/testfile_mid_osd_data_aa2.json")
@@ -106,7 +92,7 @@ mid_configure_expected_result_for_invalid_data = (
 )
 
 low_configure_expected_result_for_invalid_data = (
-    "subarray_beam_id must be between 1 and 48\n"
+    "subarray_beam_id must be between 1 and 1\n"
     "update_rate must be greater than or equal to 0.0\n"
     "start_channel must be greater than 2 and less than 504\n"
     "number_of_channels must be greater than or equal to 8 and less"

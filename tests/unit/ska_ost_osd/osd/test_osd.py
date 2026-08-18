@@ -32,7 +32,7 @@ def test_get_osd_data(
     capabilities,
     array_assembly,
     expected_keys,
-    tm_data_osd,  # pylint: disable=W0621
+    tests_tmdata,
 ):
     """This test case checks the functionality of get_osd_data it converts the
     python dict into list keys and checks for equality with expected output.
@@ -41,12 +41,12 @@ def test_get_osd_data(
     :param array_assembly: Array Assembly AA0.5, AA1
     :param tmdata: tmdata object
     :param expected: output of get_osd_data function
-    :param tm_data_osd: tmdata fixture
+    :param tests_tmdata: tmdata fixture
     :returns: assert equals values
     """
 
     result, _ = get_osd_data(
-        capabilities, array_assembly, tmdata=tm_data_osd, process_templates=False
+        capabilities, array_assembly, tmdata=tests_tmdata, process_templates=False
     )
     result_keys = list(result["capabilities"].keys())
 
@@ -151,18 +151,18 @@ def test_invalid_osd_tmdata_source():
     ]
 
 
-def test_invalid_get_osd_data_capability(tm_data_osd):  # pylint: disable=W0621
+def test_invalid_get_osd_data_capability(tests_tmdata):
     """This test case checks if the output of the get_osd_data when
     capabilities is given incorrect with correct array_assembly it should
     return the appropriate error messages.
 
-    :param tm_data_osd: tm_data_osd
+    :param tests_tmdata: tests_tmdata
     """
 
     _, error_msgs = get_osd_data(
         capabilities=["midd"],
         array_assembly="AA1",
-        tmdata=tm_data_osd,
+        tmdata=tests_tmdata,
         process_templates=False,
     )
     assert error_msgs == [
@@ -171,19 +171,19 @@ def test_invalid_get_osd_data_capability(tm_data_osd):  # pylint: disable=W0621
     ]
 
 
-def test_invalid_get_osd_data_array_assembly(tm_data_osd):  # pylint: disable=W0621
+def test_invalid_get_osd_data_array_assembly(tests_tmdata):
     """This test case checks if the output of the get_osd_data when
     array_assembly is given incorrect with correct capabilities it should
     return the appropriate error messages.
 
-    :param tm_data_osd: tm_data_osd
+    :param tests_tmdata: tests_tmdata
     """
     aa_value = "AA100000"
 
     _, error_msgs = get_osd_data(
         capabilities=["mid"],
         array_assembly=aa_value,
-        tmdata=tm_data_osd,
+        tmdata=tests_tmdata,
         process_templates=False,
     )
     msg = ",".join(error_msgs[0].split(",")[1:])
@@ -335,13 +335,13 @@ def test_update_osd_file_observatory_policy_update(
     assert mock_update_file.call_count == 1
 
 
-def test_get_osd_data_with_process_templates(tm_data_osd):  # pylint: disable=W0621
+def test_get_osd_data_with_process_templates(tests_tmdata):
     """Test that process_templates parameter is properly passed through."""
     # Test with process_templates=False (default)
     result_false, _ = get_osd_data(
         capabilities=["mid"],
         array_assembly="AA0.5",
-        tmdata=tm_data_osd,
+        tmdata=tests_tmdata,
         process_templates=False,
     )
 
@@ -349,7 +349,7 @@ def test_get_osd_data_with_process_templates(tm_data_osd):  # pylint: disable=W0
     result_true, _ = get_osd_data(
         capabilities=["mid"],
         array_assembly="AA0.5",
-        tmdata=tm_data_osd,
+        tmdata=tests_tmdata,
         process_templates=True,
     )
 
@@ -361,9 +361,7 @@ def test_get_osd_data_with_process_templates(tm_data_osd):  # pylint: disable=W0
 
 
 @patch("ska_ost_osd.osd.osd.process_template_mappings")
-def test_get_osd_data_template_processing_called(
-    mock_process_templates, tm_data_osd
-):  # pylint: disable=W0621
+def test_get_osd_data_template_processing_called(mock_process_templates, tests_tmdata):
     """Test that process_template_mappings is called when process_templates=True."""
 
     # Mock the template processing function to return modified data
@@ -382,7 +380,7 @@ def test_get_osd_data_template_processing_called(
     result, _ = get_osd_data(
         capabilities=["mid"],
         array_assembly="AA0.5",
-        tmdata=tm_data_osd,
+        tmdata=tests_tmdata,
         process_templates=True,
     )
 
