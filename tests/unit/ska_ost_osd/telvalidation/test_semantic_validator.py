@@ -1,10 +1,8 @@
-import unittest
 from datetime import datetime
 from unittest.mock import patch
 
 import pytest
 from fastapi import status
-from ska_telmodel_client import TMData
 
 from ska_ost_osd.telvalidation.common.error_handling import (
     SchemanticValidationKeyError,
@@ -19,7 +17,7 @@ from ska_ost_osd.telvalidation.semantic_validator import (
     fetch_capabilities_from_osd,
     semantic_validate,
 )
-from tests.conftest import BASE_API_URL, TESTS_TMDATA_SOURCE
+from tests.conftest import BASE_API_URL
 from tests.unit.ska_ost_osd.common.constant import (
     ARRAY_ASSEMBLY,
     INPUT_COMMAND_CONFIG,
@@ -68,7 +66,7 @@ def test_semantic_validate_para(
             " interface='...' explicitly."
         ),
     ):
-        semantic_validate(config, tests_tmdata)
+        semantic_validate(config, tm_data=tests_tmdata)
 
     config["interface"] = interface
 
@@ -101,46 +99,31 @@ def test_validate_schemantic_json_input_keys(mock6):
         )
 
 
-class TestTargetVisibility(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.tm_data = TMData(TESTS_TMDATA_SOURCE)
-
-    def test_target_is_visible_mid(self):
+class TestTargetVisibility:
+    def test_target_is_visible_mid(self, tests_tmdata):
         ra_str = "21:08:47.92"
         dec_str = "-88:57:22.9"
         telescope = "mid"
         observing_time = datetime(2023, 5, 8, 20, 30)
-
-        expected_output = True
-
-        self.assertEqual(
-            validate_target_is_visible(
-                ra_str,
-                dec_str,
-                telescope,
-                "target_mid",
-                tm_data=self.tm_data,
-                observing_time=observing_time,
-            ),
-            expected_output,
+        assert validate_target_is_visible(
+            ra_str,
+            dec_str,
+            telescope,
+            "target_mid",
+            tm_data=tests_tmdata,
+            observing_time=observing_time,
         )
 
-    def test_target_is_visible_low(self):
+    def test_target_is_visible_low(self, tests_tmdata):
         ra = "21:08:47.92"
         dec = "-88:57:22.9"
         telescope = "low"
         observing_time = datetime(2023, 5, 8, 20, 30)
-
-        expected_output = True
-        self.assertEqual(
-            validate_target_is_visible(
-                ra, dec, telescope, "target_low", self.tm_data, observing_time
-            ),
-            expected_output,
+        assert validate_target_is_visible(
+            ra, dec, telescope, "target_low", tests_tmdata, observing_time
         )
 
-    def test_target_is_visible_unknown_name(self):
+    def test_target_is_visible_unknown_name(self, tests_tmdata):
         ra = "21:08:47.92"
         dec = "-88:57:22.9"
         telescope = "asd"
@@ -151,11 +134,11 @@ class TestTargetVisibility(unittest.TestCase):
             match="Invalid telescope name",
         ):
             validate_target_is_visible(
-                ra, dec, telescope, "asd", self.tm_data, observing_time
+                ra, dec, telescope, "asd", tests_tmdata, observing_time
             )
 
     @patch("ska_ost_osd.telvalidation.oet_tmc_validators.ra_dec_to_az_el")
-    def test_temp_list_length_less_than_3(self, mock_ra_dec_to_az_el):
+    def test_temp_list_length_less_than_3(self, mock_ra_dec_to_az_el, tests_tmdata):
         # Mock ra_dec_to_az_el to return temp_list with length < 3
         mock_ra_dec_to_az_el.return_value = [180, 60]
 
@@ -167,25 +150,19 @@ class TestTargetVisibility(unittest.TestCase):
             "Telescope: low target observing during 2023-05-08T12:30:00 is not visible"
         )
 
-        with self.assertRaises(SchematicValidationError) as context:
+        with pytest.raises(SchematicValidationError) as context:
             validate_target_is_visible(
-                ra, dec, telescope, "target_low", self.tm_data, observing_time
+                ra, dec, telescope, "target_low", tests_tmdata, observing_time
             )
 
-        # Assert that the exception was raised
-        self.assertIsInstance(context.exception, SchematicValidationError)
-        # Assert that the error message matches the expected result
-        self.assertEqual(str(context.exception), expected_result)
+        assert str(context.value) == expected_result
 
-    def test_target_is_visible_low_with_utc(self):
+    def test_target_is_visible_low_with_utc(self, tests_tmdata):
         ra = "21:08:47.92"
         dec = "-88:57:22.9"
         telescope = "low"
-
-        expected_output = True
-        self.assertEqual(
-            validate_target_is_visible(ra, dec, telescope, "target_low", self.tm_data),
-            expected_output,
+        assert validate_target_is_visible(
+            ra, dec, telescope, "target_low", tests_tmdata
         )
 
 
