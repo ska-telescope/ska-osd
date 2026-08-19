@@ -40,8 +40,9 @@ from ska_ost_osd.osd.osd import (
     update_osd_file,
 )
 from ska_ost_osd.osd.routers.dependencies import (
-    get_osd_query_context,
+    get_osd_query_model,
     get_tmdata_car_main,
+    get_tmdata_for_osd_query,
 )
 from ska_ost_osd.osd.version_mapping.version_manager import manage_version_release
 
@@ -65,7 +66,8 @@ osd_router = APIRouter(prefix="")
     response_model=ApiResponse,
 )
 def get_osd(
-    osd_context: tuple[OSDQueryParams, TMData] = Depends(get_osd_query_context),
+    osd_model: OSDQueryParams = Depends(get_osd_query_model),
+    tm_data: TMData = Depends(get_tmdata_for_osd_query),
 ) -> Dict:
     """This function takes query parameters and OSD data source objects to
     generate a response containing matching OSD data.
@@ -74,7 +76,6 @@ def get_osd(
         required fields.
     :returns dict: A dictionary with OSD data satisfying the query.
     """
-    osd_model, tm_data = osd_context
     try:
         osd_data = get_osd_using_tmdata(
             tm_data=tm_data,

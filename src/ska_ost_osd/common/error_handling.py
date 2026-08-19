@@ -78,6 +78,8 @@ class ValidationErrorFormatter:
         missing_fields = []
         parsing_errors = []
         payload_str = ""
+        seen_missing = set()
+        seen_parsing = set()
 
         for err in exc.errors():
             err_type = err.get("type")
@@ -86,11 +88,19 @@ class ValidationErrorFormatter:
             input_value = err.get("input", "")
 
             if err_type == "missing":
-                missing_fields.append(loc)
+                if loc not in seen_missing:
+                    seen_missing.add(loc)
+                    missing_fields.append(loc)
             elif err_type == "int_parsing":
-                parsing_errors.append(f"{loc}: {msg}, provided value: {input_value}")
+                parsing_error = f"{loc}: {msg}, provided value: {input_value}"
+                if parsing_error not in seen_parsing:
+                    seen_parsing.add(parsing_error)
+                    parsing_errors.append(parsing_error)
             else:
-                parsing_errors.append(f"{loc}: {msg}")
+                parsing_error = f"{loc}: {msg}"
+                if parsing_error not in seen_parsing:
+                    seen_parsing.add(parsing_error)
+                    parsing_errors.append(parsing_error)
 
             if input_value and not payload_str:
                 payload_str = str(input_value)

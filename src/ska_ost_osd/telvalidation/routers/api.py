@@ -15,7 +15,10 @@ from ska_ost_osd.telvalidation.common.constant import (
 from ska_ost_osd.telvalidation.models.semantic_schema_validator import (
     SemanticValidationModel,
 )
-from ska_ost_osd.telvalidation.routers.dependencies import get_semantic_validation_context
+from ska_ost_osd.telvalidation.routers.dependencies import (
+    get_semantic_validation_model,
+    get_tmdata_for_semantic_validation,
+)
 from ska_ost_osd.telvalidation.semantic_validator import (
     VALIDATION_STRICTNESS,
     semantic_validate,
@@ -35,9 +38,8 @@ from ska_ost_osd.telvalidation.semantic_validator import (
     response_model=ApiResponse,
 )
 def semantically_validate_json(
-    semantic_context: tuple[SemanticValidationModel, TMData] = Depends(
-        get_semantic_validation_context
-    ),
+    semantic_model: SemanticValidationModel = Depends(get_semantic_validation_model),
+    tm_data: TMData = Depends(get_tmdata_for_semantic_validation),
 ):
     """Validate the input JSON semantically.
 
@@ -57,8 +59,6 @@ def semantically_validate_json(
     """
 
     error_details = []
-
-    semantic_model, tm_data = semantic_context
 
     try:
         semantic_validate(

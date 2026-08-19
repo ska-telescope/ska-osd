@@ -2,7 +2,7 @@ from unittest.mock import Mock
 
 from ska_ost_osd.osd.models.models import OSDQueryParams
 from ska_ost_osd.osd.routers.dependencies import (
-    get_osd_query_context,
+    get_tmdata_for_osd_query,
     get_tmdata_gitlab_main,
 )
 from tests import conftest as test_conftest
@@ -18,9 +18,7 @@ def test_get_osd_query_context_maps_cycle_1_to_first_tag(monkeypatch, tests_tmda
     monkeypatch.setattr("ska_ost_osd.osd.osd.TMData", tmdata_constructor)
 
     osd_model = OSDQueryParams(cycle_id=1, source="car")
-    model, tm_data = get_osd_query_context(osd_model, tests_tmdata)
-
-    assert model == osd_model
+    tm_data = get_tmdata_for_osd_query(osd_model, tests_tmdata)
     assert tm_data is tests_tmdata
     assert tmdata_constructor.call_count == 1
     assert tmdata_constructor.call_args.kwargs["source_uris"] == (
@@ -38,9 +36,7 @@ def test_get_osd_query_context_maps_cycle_10000_to_first_tag(monkeypatch, tests_
     monkeypatch.setattr("ska_ost_osd.osd.osd.TMData", tmdata_constructor)
 
     osd_model = OSDQueryParams(cycle_id=10000, source="car")
-    model, tm_data = get_osd_query_context(osd_model, tests_tmdata)
-
-    assert model == osd_model
+    tm_data = get_tmdata_for_osd_query(osd_model, tests_tmdata)
     assert tm_data is tests_tmdata
     assert tmdata_constructor.call_count == 1
     assert tmdata_constructor.call_args.kwargs["source_uris"] == (
