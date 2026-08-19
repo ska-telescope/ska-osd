@@ -265,7 +265,10 @@ def get_available_cycles(tmdata: TMData) -> list[int]:
 
     :return: list[int], list of available cycle numbers.
     """
-    versions_dict = tmdata[VERSION_FILE_PATH].get_dict()
+    try:
+        versions_dict = tmdata[VERSION_FILE_PATH].get_dict()
+    except KeyError as err:
+        raise FileNotFoundError(f"file not found: {VERSION_FILE_PATH}") from err
 
     return [
         int(key.split("_")[1])
