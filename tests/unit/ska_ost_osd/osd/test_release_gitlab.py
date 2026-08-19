@@ -11,7 +11,7 @@ class TestResources:
     @patch("ska_ost_osd.osd.routers.api.manage_version_release")
     @patch("ska_ost_osd.osd.routers.api.push_to_gitlab")
     def test_release_osd_data_2(
-        self, mock_push_to_gitlab, mock_manage_version_release, client_post
+        self, mock_push_to_gitlab, mock_manage_version_release, test_client
     ):
         """Test release_osd_data with valid cycle_id and invalid
         release_type."""
@@ -19,7 +19,7 @@ class TestResources:
         data = {"cycle_id": 1, "release_type": "invalid_type"}
         mock_manage_version_release.return_value = ("1.0.1", "cycle_1")
 
-        result = client_post(f"{BASE_API_URL}/osd_release", params=data).json()
+        result = test_client.post(f"{BASE_API_URL}/osd_release", params=data).json()
 
         assert (
             result["result_data"]
@@ -32,22 +32,22 @@ class TestResources:
         mock_push_to_gitlab.assert_not_called()
 
     @pytest.mark.parametrize("cycle_id", [False, {}, set()])
-    def test_release_osd_data_invalid_cycle_id_types(self, cycle_id, client_post):
+    def test_release_osd_data_invalid_cycle_id_types(self, cycle_id, test_client):
         """Test release_osd_data with invalid cycle_id types."""
 
         data = {"cycle_id": cycle_id, "release_type": "minor"}
-        result = client_post(f"{BASE_API_URL}/osd_release", params=data).json()
+        result = test_client.post(f"{BASE_API_URL}/osd_release", params=data).json()
         assert (
             "query.cycle_id: Input should be a valid integer" in result["result_data"]
         )
         assert result["result_status"] == "failed"
         assert result["result_code"] == status.HTTP_422_UNPROCESSABLE_ENTITY
 
-    def test_release_osd_data_missing_cycle_id(self, client_post):
+    def test_release_osd_data_missing_cycle_id(self, test_client):
         """Test release_osd_data with missing cycle_id."""
 
         data = {}
-        result = client_post(f"{BASE_API_URL}/osd_release", params=data).json()
+        result = test_client.post(f"{BASE_API_URL}/osd_release", params=data).json()
         assert result["result_data"] == "Missing field(s): query.cycle_id"
 
     @patch("ska_ost_osd.osd.routers.api.manage_version_release")

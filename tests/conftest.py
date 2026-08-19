@@ -1,6 +1,5 @@
 import json
 import os
-from functools import partial
 from importlib.metadata import version
 
 import pytest
@@ -79,14 +78,6 @@ def empty_client(empty_tmdata):
     app = create_app()
     app.dependency_overrides[get_tmdata_car_main] = lambda: empty_tmdata
     return TestClient(app)
-
-
-@pytest.fixture(scope="session")
-def client_post():
-    app = create_app()
-    client = TestClient(app)
-
-    return partial(client.post, headers={"accept": "application/json"})
 
 
 @pytest.fixture(scope="session")
