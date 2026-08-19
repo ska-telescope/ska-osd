@@ -10,7 +10,7 @@ from tests.conftest import BASE_API_URL
 
 def test_invalid_osd_tmdata_source(
     invalid_osd_tmdata_source_input,
-    client_get,
+    test_client,
     osd_versions,
 ):
     """This test case checks the functionality of OSD API It will validate all
@@ -49,7 +49,7 @@ def test_invalid_osd_tmdata_source(
         "array_assembly": array_assembly,
     }
 
-    response = client_get(
+    response = test_client.get(
         f"{BASE_API_URL}/osd",
         params=remove_none_params(params),
     ).json()
@@ -61,7 +61,7 @@ def test_invalid_osd_tmdata_source(
         assert response["result_data"] == expected["result_data"]
 
 
-def test_osd_endpoint(client_get):
+def test_osd_endpoint(test_client):
     """This function tests that a request to the OSD endpoint for a specific
     OSD returns expected data for that OSD.
 
@@ -73,7 +73,7 @@ def test_osd_endpoint(client_get):
     tests_tmdata_dir = Path(__file__).resolve().parents[3] / "tmdata"
 
     with patch("ska_ost_osd.osd.osd.BASE_FOLDER_NAME", str(tests_tmdata_dir)):
-        response = client_get(
+        response = test_client.get(
             f"{BASE_API_URL}/osd",
             params={
                 "source": "file",
@@ -86,14 +86,14 @@ def test_osd_endpoint(client_get):
     assert "AA0.5" in response["result_data"]["capabilities"]["mid"].keys()
 
 
-def test_osd_sub_bands_endpoint(client_get):
+def test_osd_sub_bands_endpoint(test_client):
     """This function checks that the sub_bands are defined for band 5b.
 
     :param mid_osd_data (dict): The expected data for the OSD.
     :raises AssertionError: If the response does not contain the
         expected OSD data or returns an error status code.
     """
-    response = client_get(
+    response = test_client.get(
         f"{BASE_API_URL}/osd",
         params={
             "source": "file",
@@ -111,7 +111,7 @@ def test_osd_sub_bands_endpoint(client_get):
     assert len(b5_info["sub_bands"]) == 3
 
 
-def test_invalid_osd_tmdata_source_capabilities(client_get):
+def test_invalid_osd_tmdata_source_capabilities(test_client):
     """This function tests that a request with an invalid capability returns
     the expected error response.
 
@@ -119,7 +119,7 @@ def test_invalid_osd_tmdata_source_capabilities(client_get):
         expected error message.
     """
 
-    response = client_get(
+    response = test_client.get(
         f"{BASE_API_URL}/osd",
         params={
             "cycle_id": 1,
@@ -136,10 +136,10 @@ def test_invalid_osd_tmdata_source_capabilities(client_get):
     assert response["result_data"] == expected
 
 
-def test_osd_source(client_get):
+def test_osd_source(test_client):
     """This function tests that a request with an OSD source as car ."""
 
-    response = client_get(
+    response = test_client.get(
         f"{BASE_API_URL}/osd", params={"cycle_id": 1, "source": "car"}
     )
     error_msg = {
@@ -155,7 +155,7 @@ def test_osd_source(client_get):
 
 def test_mid_low_response(
     mid_low_response_input,
-    client_get,
+    test_client,
 ):
     """This function tests that the response from the REST API contains the
     expected body contents when retrieving OSD metadata.
@@ -180,7 +180,7 @@ def test_mid_low_response(
         "array_assembly": array_assembly,
     }
 
-    response = client_get(
+    response = test_client.get(
         f"{BASE_API_URL}/osd",
         params=remove_none_params(params),
     ).json()
@@ -210,7 +210,7 @@ def test_invalid_cycle_id(
     cycle_id,
     source,
     capabilities,
-    client_get,
+    test_client,
 ):
     """This function tests that the response from the REST API contains the
     expected body contents when retrieving OSD metadata.
@@ -224,7 +224,7 @@ def test_invalid_cycle_id(
         "capabilities": capabilities,
     }
 
-    response = client_get(
+    response = test_client.get(
         f"{BASE_API_URL}/osd",
         params=params,
     ).json()

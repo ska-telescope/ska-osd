@@ -68,11 +68,10 @@ def create_entity_object():
 
 
 @pytest.fixture(scope="session")
-def client_get():
+def test_client(tests_tmdata):
     app = create_app()
-    client = TestClient(app)
-
-    return partial(client.get, headers={"accept": "application/json"})
+    app.dependency_overrides[get_tmdata_car_main] = lambda: tests_tmdata
+    return TestClient(app)
 
 
 @pytest.fixture(scope="session")
