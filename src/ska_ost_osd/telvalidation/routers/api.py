@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from fastapi import Body
+from fastapi import Depends
 from jsonschema import ValidationError
 from ska_telmodel_client import TMData
 
@@ -11,12 +11,11 @@ from ska_ost_osd.telvalidation.common.constant import (
     SEMANTIC_VALIDATION_DISABLED_MSG,
     SEMANTIC_VALIDATION_VALUE,
     SEMANTICALLY_VALID_JSON_MSG,
-    SWAGGER_SEMANTIC_VALIDATION_JSON_FILE_PATH,
 )
-from ska_ost_osd.telvalidation.common.utils import read_json
 from ska_ost_osd.telvalidation.models.semantic_schema_validator import (
     SemanticValidationModel,
 )
+from ska_ost_osd.telvalidation.routers.dependencies import get_semantic_validation_context
 from ska_ost_osd.telvalidation.semantic_validator import (
     VALIDATION_STRICTNESS,
     semantic_validate,
@@ -36,8 +35,8 @@ from ska_ost_osd.telvalidation.semantic_validator import (
     response_model=ApiResponse,
 )
 def semantically_validate_json(
-    semantic_model: SemanticValidationModel = Body(
-        example=read_json(SWAGGER_SEMANTIC_VALIDATION_JSON_FILE_PATH)
+    semantic_context: tuple[SemanticValidationModel, TMData] = Depends(
+        get_semantic_validation_context
     ),
 ):
     """Validate the input JSON semantically.
@@ -59,10 +58,9 @@ def semantically_validate_json(
 
     error_details = []
 
-    sources = [semantic_model.sources]
+    semantic_model, tm_data = semantic_context
 
     try:
-        tm_data = TMData(sources, update=True)
         semantic_validate(
             observing_command_input=semantic_model.observing_command_input,
             tm_data=tm_data,

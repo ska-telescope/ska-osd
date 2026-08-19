@@ -350,7 +350,7 @@ def check_cycle_id(
 
 
 def osd_tmdata_source(
-    tmdata: TMData = None,
+    tmdata: TMData,
     cycle_id: int = None,
     osd_version: str = None,
     source: str = "car",

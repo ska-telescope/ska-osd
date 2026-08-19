@@ -12,6 +12,9 @@ from ska_ost_osd.osd.routers.dependencies import (
     get_tmdata_car_main,
     get_tmdata_gitlab_main,
 )
+from ska_ost_osd.telvalidation.routers.dependencies import (
+    get_tmdata_default_semantic_source,
+)
 from tests.unit.ska_ost_osd.common.constant import (
     INVALID_MID_CONFIGURE_JSON,
     LOW_ASSIGN_JSON,
@@ -48,8 +51,6 @@ def patch_tmdata_source(monkeypatch):
     """Patch osd_tmdata_source for all tests so that they use local tmdata"""
 
     def patched_osd_tmdata_source(*args, **kwargs):
-        if "tmdata" not in kwargs:
-            kwargs["tmdata"] = TMData(TESTS_TMDATA_SOURCE)
         _, source_error_msg_list = osd_tmdata_source(*args, **kwargs)
         return TESTS_TMDATA_SOURCE, source_error_msg_list
 
@@ -72,6 +73,7 @@ def test_client(tests_tmdata):
     app = create_app()
     app.dependency_overrides[get_tmdata_car_main] = lambda: tests_tmdata
     app.dependency_overrides[get_tmdata_gitlab_main] = lambda: tests_tmdata
+    app.dependency_overrides[get_tmdata_default_semantic_source] = lambda: tests_tmdata
     return TestClient(app)
 
 
@@ -80,6 +82,7 @@ def empty_client(empty_tmdata):
     app = create_app()
     app.dependency_overrides[get_tmdata_car_main] = lambda: empty_tmdata
     app.dependency_overrides[get_tmdata_gitlab_main] = lambda: empty_tmdata
+    app.dependency_overrides[get_tmdata_default_semantic_source] = lambda: empty_tmdata
     return TestClient(app)
 
 
