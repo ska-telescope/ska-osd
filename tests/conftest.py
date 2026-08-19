@@ -8,7 +8,10 @@ from ska_telmodel_client import TMData
 
 from ska_ost_osd.app import create_app
 from ska_ost_osd.osd.osd import osd_tmdata_source
-from ska_ost_osd.osd.routers.dependencies import get_tmdata_car_main
+from ska_ost_osd.osd.routers.dependencies import (
+    get_tmdata_car_main,
+    get_tmdata_gitlab_main,
+)
 from tests.unit.ska_ost_osd.common.constant import (
     INVALID_MID_CONFIGURE_JSON,
     LOW_ASSIGN_JSON,
@@ -45,15 +48,13 @@ def patch_tmdata_source(monkeypatch):
     """Patch osd_tmdata_source for all tests so that they use local tmdata"""
 
     def patched_osd_tmdata_source(*args, **kwargs):
+        if "tmdata" not in kwargs:
+            kwargs["tmdata"] = TMData(TESTS_TMDATA_SOURCE)
         _, source_error_msg_list = osd_tmdata_source(*args, **kwargs)
         return TESTS_TMDATA_SOURCE, source_error_msg_list
 
     monkeypatch.setattr(
         "ska_ost_osd.osd.osd.osd_tmdata_source",
-        patched_osd_tmdata_source,
-    )
-    monkeypatch.setattr(
-        "ska_ost_osd.telvalidation.models.semantic_schema_validator.osd_tmdata_source",
         patched_osd_tmdata_source,
     )
 
@@ -70,6 +71,7 @@ def create_entity_object():
 def test_client(tests_tmdata):
     app = create_app()
     app.dependency_overrides[get_tmdata_car_main] = lambda: tests_tmdata
+    app.dependency_overrides[get_tmdata_gitlab_main] = lambda: tests_tmdata
     return TestClient(app)
 
 
@@ -77,6 +79,7 @@ def test_client(tests_tmdata):
 def empty_client(empty_tmdata):
     app = create_app()
     app.dependency_overrides[get_tmdata_car_main] = lambda: empty_tmdata
+    app.dependency_overrides[get_tmdata_gitlab_main] = lambda: empty_tmdata
     return TestClient(app)
 
 
@@ -99,24 +102,25 @@ def empty_tmdata(tmp_path_factory):
 
 
 @pytest.fixture(scope="session")
-def validate_car_class():
+def validate_car_class(tests_tmdata):
     """This function is used as a fixture for osd_tmdata_source object with
     osd_version as '1.11.0'.
 
     :returns: osd_tmdata_source object
     """
-    tmdata_source, _ = osd_tmdata_source(osd_version="1.11.0")
+    tmdata_source, _ = osd_tmdata_source(tmdata=tests_tmdata, osd_version="1.11.0")
     return tmdata_source
 
 
 @pytest.fixture(scope="session")
-def validate_gitlab_class():
+def validate_gitlab_class(tests_tmdata):
     """This function is used as a fixture for osd_tmdata_source object with
     parameters.
 
     :returns: osd_tmdata_source object
     """
     tmdata_source, _ = osd_tmdata_source(
+        tmdata=tests_tmdata,
         cycle_id=1,
         gitlab_branch="nak-776-osd-implementation-file-versioning",
         source="gitlab",

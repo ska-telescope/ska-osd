@@ -77,67 +77,74 @@ def test_set_source_gitlab_method(validate_gitlab_class):
     )
 
 
-def test_validate_gitlab_with_both_invalid_param():
+def test_validate_gitlab_with_both_invalid_param(tests_tmdata):  # pylint: disable=W0621
     """This test case checks if the output of the osd_tmdata_source when no
     parameter is given and latest version is returned or not."""
 
-    ost_osd_version = get_osd_latest_version()
+    ost_osd_version = get_osd_latest_version(tests_tmdata)
 
     msg = f"car:ost/ska-ost-osd?{ost_osd_version}#tmdata"
-    tm_data_src, _ = osd_tmdata_source()
+    tm_data_src, _ = osd_tmdata_source(tmdata=tests_tmdata)
 
     assert tm_data_src == (msg,)
 
 
-def test_check_osd_version_method():
+def test_check_osd_version_method(tests_tmdata):
     """This test case checks if the output of the osd_tmdata_source when
     osd_version parameter is given it should return the correct URL."""
-    tm_data_src, _ = osd_tmdata_source(osd_version="1.0.0")
+    tm_data_src, _ = osd_tmdata_source(tmdata=tests_tmdata, osd_version="1.0.0")
     assert tm_data_src == ("car:ost/ska-ost-osd?1.0.0#tmdata",)
 
 
-def test_check_cycle_id_and_osd_version_method():
+def test_check_cycle_id_and_osd_version_method(tests_tmdata):
     """This test case checks if the output of the osd_tmdata_source when
     cycle_id and osd_version parameter is given it should return the correct
     URL."""
-    tm_data_src, _ = osd_tmdata_source(cycle_id=1, osd_version="1.11.0")
+    tm_data_src, _ = osd_tmdata_source(
+        tmdata=tests_tmdata, cycle_id=1, osd_version="1.11.0"
+    )
     assert tm_data_src == ("car:ost/ska-ost-osd?1.11.0#tmdata",)
 
 
-def test_check_cycle_id_2_and_osd_version_method():
+def test_check_cycle_id_2_and_osd_version_method(tests_tmdata):
     """This test case checks if the output of the osd_tmdata_source when
     cycle_id and osd_version parameter is given it should return the correct
     URL."""
-    tm_data_src, _ = osd_tmdata_source(cycle_id=2, osd_version="1.0.0")
+    tm_data_src, _ = osd_tmdata_source(
+        tmdata=tests_tmdata, cycle_id=2, osd_version="1.0.0"
+    )
     assert tm_data_src == ("car:ost/ska-ost-osd?1.0.0#tmdata",)
 
 
-def test_check_cycle_id_with_source_method():
+def test_check_cycle_id_with_source_method(tests_tmdata):
     """This test case checks if the output of the osd_tmdata_source when
     cycle_id, osd_version and source parameter is given it should return the
     correct URL."""
-    tm_data_src, _ = osd_tmdata_source(cycle_id=2, osd_version="1.0.0", source="file")
+    tm_data_src, _ = osd_tmdata_source(
+        tmdata=tests_tmdata, cycle_id=2, osd_version="1.0.0", source="file"
+    )
     assert tm_data_src == ("file://tmdata",)
 
 
-def test_check_master_branch_method():
+def test_check_master_branch_method(tests_tmdata):
     """This test case checks if the output of the osd_tmdata_source when
     cycle_id, gitlab_branch and source parameter is given it should return the
     correct URL."""
     tm_data_src, _ = osd_tmdata_source(
-        cycle_id=2, gitlab_branch="master", source="gitlab"
+        tmdata=tests_tmdata, cycle_id=2, gitlab_branch="master", source="gitlab"
     )
     assert tm_data_src == (
         "gitlab://gitlab.com/ska-telescope/ost/ska-ost-osd?master#tmdata",
     )
 
 
-def test_invalid_osd_tmdata_source():
+def test_invalid_osd_tmdata_source(tests_tmdata):
     """This test case checks if the output of the osd_tmdata_source when
     cycle_id, gitlab_branch and source parameter and osd_version is given
     incorrect it should return the appropriate error messages."""
 
     _, error_msgs = osd_tmdata_source(
+        tmdata=tests_tmdata,
         cycle_id=100000,
         osd_version="1.1.0",
         gitlab_branch="main",

@@ -277,13 +277,12 @@ def get_available_cycles(tmdata: TMData) -> list[int]:
     ]
 
 
-def get_osd_latest_version() -> str:
+def get_osd_latest_version(tmdata_version: TMData) -> str:
     """Read the latest_release.txt file and retrieve the latest OSD version.
 
+    :param tmdata_version: TMData, TMData object for gitlab main version files.
     :return: str, the latest OSD release version.
     """
-    gitlab_source = list(osd_tmdata_source(source="gitlab", gitlab_branch="main")[0])
-    tmdata_version = TMData(gitlab_source, update=True)
     osd_version = (
         tmdata_version[RELEASE_FILE_PATH_LATEST].get().decode("utf-8").replace('"', "")
     )
@@ -292,6 +291,7 @@ def get_osd_latest_version() -> str:
 
 
 def check_cycle_id(
+    tmdata: TMData,
     cycle_id: int = None,
     osd_version: str = None,
     gitlab_branch: str = None,
@@ -304,6 +304,7 @@ def check_cycle_id(
     :param cycle_id: cycle id integer value.
     :param osd_version: osd version i.e. 1.9.0
     :param gitlab_branch: branch name like master, dev etc.
+    :param tmdata: TMData object used for latest version lookup.
     :param versions_dict: version dict containing version data
     :return: osd_version in string format i.e 1.9.0 or raises
         OSDDataException
@@ -319,8 +320,8 @@ def check_cycle_id(
         osd_version = gitlab_branch
 
     if cycle_id is None and osd_version is None and gitlab_branch is None:
-        osd_version = (
-            get_osd_latest_version()
+        osd_version = get_osd_latest_version(
+            tmdata
         )  # get latest version from latest_release.txt file
 
     if versions_dict is None:
@@ -349,6 +350,7 @@ def check_cycle_id(
 
 
 def osd_tmdata_source(
+    tmdata: TMData = None,
     cycle_id: int = None,
     osd_version: str = None,
     source: str = "car",
@@ -357,6 +359,7 @@ def osd_tmdata_source(
 ) -> str:
     """This function checks and returns source_uri for TMData class.
 
+    :param tmdata: TMData object used for latest version lookup.
     :param cycle_id: cycle id integer value.
     :param osd_version: osd version i.e. 1.9.0 or branch name like
         master, dev etc.
@@ -378,7 +381,7 @@ def osd_tmdata_source(
         source_error_msg_list.append(SOURCE_ERROR_MESSAGE.format(source))
 
     osd_version, cycle_error_msg_list = check_cycle_id(
-        cycle_id, osd_version, gitlab_branch, versions_dict
+        tmdata, cycle_id, osd_version, gitlab_branch, versions_dict
     )
 
     source_error_msg_list.extend(cycle_error_msg_list)
@@ -457,6 +460,7 @@ def get_osd_using_tmdata(
 
 
 def build_tmdata_for_osd_query(
+    tmdata: TMData,
     cycle_id: Optional[int] = None,
     osd_version: Optional[str] = None,
     source: Optional[str] = None,
@@ -466,6 +470,7 @@ def build_tmdata_for_osd_query(
 ) -> TMData:
     """Build TMData for an OSD query from request parameters.
 
+    :param tmdata: TMData, TMData object for gitlab main version files.
     :param cycle_id: int, optional cycle ID.
     :param osd_version: str, optional OSD version.
     :param source: str, optional source.
@@ -488,10 +493,9 @@ def build_tmdata_for_osd_query(
     except OSDModelError as error:
         errors.extend(error.args[0])
 
-    gitlab_source = list(osd_tmdata_source(source="gitlab", gitlab_branch="main")[0])
-    tmdata_version = TMData(gitlab_source, update=True)
-    versions_dict = tmdata_version[VERSION_FILE_PATH].get_dict()
+    versions_dict = tmdata[VERSION_FILE_PATH].get_dict()
     _, cycle_errors = check_cycle_id(
+        tmdata=tmdata,
         cycle_id=cycle_id,
         osd_version=osd_version,
         gitlab_branch=gitlab_branch,
@@ -506,6 +510,7 @@ def build_tmdata_for_osd_query(
         source=source,
         gitlab_branch=gitlab_branch,
         versions_dict=versions_dict,
+        tmdata=tmdata,
     )
 
     if error:

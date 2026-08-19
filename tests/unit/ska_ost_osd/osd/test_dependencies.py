@@ -3,12 +3,12 @@ from unittest.mock import Mock
 from ska_ost_osd.osd.models.models import OSDQueryParams
 from ska_ost_osd.osd.routers.dependencies import (
     get_osd_query_context,
-    get_tmdata_for_osd_query,
+    get_tmdata_gitlab_main,
 )
 from tests import conftest as test_conftest
 
 
-def test_get_tmdata_for_osd_query_maps_cycle_1_to_first_tag(monkeypatch, tests_tmdata):
+def test_get_osd_query_context_maps_cycle_1_to_first_tag(monkeypatch, tests_tmdata):
     """Cycle 1 should resolve to the first version in version mapping."""
     monkeypatch.setattr(
         "ska_ost_osd.osd.osd.osd_tmdata_source",
@@ -18,18 +18,17 @@ def test_get_tmdata_for_osd_query_maps_cycle_1_to_first_tag(monkeypatch, tests_t
     monkeypatch.setattr("ska_ost_osd.osd.osd.TMData", tmdata_constructor)
 
     osd_model = OSDQueryParams(cycle_id=1, source="car")
-    tm_data = get_tmdata_for_osd_query(osd_model)
+    model, tm_data = get_osd_query_context(osd_model, tests_tmdata)
 
+    assert model == osd_model
     assert tm_data is tests_tmdata
-    assert tmdata_constructor.call_count == 2
-    assert tmdata_constructor.call_args_list[1].kwargs["source_uris"] == (
+    assert tmdata_constructor.call_count == 1
+    assert tmdata_constructor.call_args.kwargs["source_uris"] == (
         "car:ost/ska-ost-osd?4.2.1#tmdata",
     )
 
 
-def test_get_tmdata_for_osd_query_maps_cycle_10000_to_first_tag(
-    monkeypatch, tests_tmdata
-):
+def test_get_osd_query_context_maps_cycle_10000_to_first_tag(monkeypatch, tests_tmdata):
     """Cycle 10000 should resolve to the first version in version mapping."""
     monkeypatch.setattr(
         "ska_ost_osd.osd.osd.osd_tmdata_source",
@@ -39,24 +38,26 @@ def test_get_tmdata_for_osd_query_maps_cycle_10000_to_first_tag(
     monkeypatch.setattr("ska_ost_osd.osd.osd.TMData", tmdata_constructor)
 
     osd_model = OSDQueryParams(cycle_id=10000, source="car")
-    tm_data = get_tmdata_for_osd_query(osd_model)
+    model, tm_data = get_osd_query_context(osd_model, tests_tmdata)
 
+    assert model == osd_model
     assert tm_data is tests_tmdata
-    assert tmdata_constructor.call_count == 2
-    assert tmdata_constructor.call_args_list[1].kwargs["source_uris"] == (
+    assert tmdata_constructor.call_count == 1
+    assert tmdata_constructor.call_args.kwargs["source_uris"] == (
         "car:ost/ska-ost-osd?5.1.0#tmdata",
     )
 
 
-def test_get_osd_query_context_returns_model_and_tmdata(monkeypatch, tests_tmdata):
-    """Context dependency should return the validated model and TMData."""
+def test_get_tmdata_gitlab_main_uses_gitlab_main_source(monkeypatch, tests_tmdata):
+    """GitLab main dependency should construct TMData with expected source."""
+    tmdata_constructor = Mock(return_value=tests_tmdata)
     monkeypatch.setattr(
-        "ska_ost_osd.osd.routers.dependencies.get_tmdata_for_osd_query",
-        lambda osd_model: tests_tmdata,
+        "ska_ost_osd.osd.routers.dependencies.TMData",
+        tmdata_constructor,
     )
-    osd_model = OSDQueryParams(cycle_id=1, source="car", capabilities="mid")
+    tm_data = get_tmdata_gitlab_main()
 
-    model, tm_data = get_osd_query_context(osd_model)
-
-    assert model == osd_model
     assert tm_data is tests_tmdata
+    assert tmdata_constructor.call_args.args[0] == [
+        "gitlab://gitlab.com/ska-telescope/ost/ska-ost-osd?main#tmdata"
+    ]
