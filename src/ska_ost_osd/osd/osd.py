@@ -424,15 +424,47 @@ def get_osd_data(
 
 
 def get_osd_using_tmdata(
+    tm_data: TMData,
+    capabilities: Optional[str] = None,
+    array_assembly: Optional[str] = None,
+    cycle_id: Optional[int] = None,
+    process_templates: bool = False,
+) -> Dict:
+    """Retrieve OSD data using an already constructed TMData object.
+
+    :param tm_data: TMData, pre-resolved TMData source for OSD retrieval.
+    :param capabilities: str, optional capabilities.
+    :param array_assembly: str, optional array assembly.
+    :param cycle_id: int, optional cycle ID.
+    :param process_templates: bool, whether to process template mappings.
+    :return: Dict[Dict[str, Any]], OSD data.
+    :raises ValueError: If any validation or processing errors occur.
+    """
+    errors = []
+
+    osd_data, osd_errors = get_osd_data(
+        capabilities=[capabilities] if capabilities else None,
+        tmdata=tm_data,
+        array_assembly=array_assembly,
+        cycle_id=cycle_id,
+        process_templates=process_templates,
+    )
+    errors.extend(osd_errors)
+    if errors:
+        raise ValueError(errors)
+
+    return osd_data
+
+
+def build_tmdata_for_osd_query(
     cycle_id: Optional[int] = None,
     osd_version: Optional[str] = None,
     source: Optional[str] = None,
     gitlab_branch: Optional[str] = None,
     capabilities: Optional[str] = None,
     array_assembly: Optional[str] = None,
-    process_templates: bool = False,
-) -> Dict:
-    """Retrieve OSD data using TMData.
+) -> TMData:
+    """Build TMData for an OSD query from request parameters.
 
     :param cycle_id: int, optional cycle ID.
     :param osd_version: str, optional OSD version.
@@ -440,8 +472,7 @@ def get_osd_using_tmdata(
     :param gitlab_branch: str, optional GitLab branch.
     :param capabilities: str, optional capabilities.
     :param array_assembly: str, optional array assembly.
-    :param process_templates: bool, whether to process template mappings.
-    :return: Dict[Dict[str, Any]], OSD data.
+    :return: TMData, TMData object resolved from query parameters.
     :raises ValueError: If any validation or processing errors occur.
     """
     errors = []
@@ -483,20 +514,7 @@ def get_osd_using_tmdata(
     if errors:
         raise ValueError(errors)
 
-    tm_data = TMData(source_uris=tm_data_source)
-
-    osd_data, osd_errors = get_osd_data(
-        capabilities=[capabilities] if capabilities else None,
-        tmdata=tm_data,
-        array_assembly=array_assembly,
-        cycle_id=cycle_id,
-        process_templates=process_templates,
-    )
-    errors.extend(osd_errors)
-    if errors:
-        raise ValueError(errors)
-
-    return osd_data
+    return TMData(source_uris=tm_data_source)
 
 
 def update_osd_file(

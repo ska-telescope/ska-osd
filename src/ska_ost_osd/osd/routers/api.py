@@ -39,7 +39,10 @@ from ska_ost_osd.osd.osd import (
     get_osd_using_tmdata,
     update_osd_file,
 )
-from ska_ost_osd.osd.routers.dependencies import get_tmdata_car_main
+from ska_ost_osd.osd.routers.dependencies import (
+    get_osd_query_context,
+    get_tmdata_car_main,
+)
 from ska_ost_osd.osd.version_mapping.version_manager import manage_version_release
 
 # this variable is added for restricting tmdata publish from local/dev environment.
@@ -61,7 +64,9 @@ osd_router = APIRouter(prefix="")
     responses=get_responses(ApiResponse),
     response_model=ApiResponse,
 )
-def get_osd(osd_model: OSDQueryParams = Depends()) -> Dict:
+def get_osd(
+    osd_context: tuple[OSDQueryParams, TMData] = Depends(get_osd_query_context),
+) -> Dict:
     """This function takes query parameters and OSD data source objects to
     generate a response containing matching OSD data.
 
@@ -69,10 +74,15 @@ def get_osd(osd_model: OSDQueryParams = Depends()) -> Dict:
         required fields.
     :returns dict: A dictionary with OSD data satisfying the query.
     """
+    osd_model, tm_data = osd_context
     try:
-        model_data = osd_model.model_dump()
-        model_data["process_templates"] = True
-        osd_data = get_osd_using_tmdata(**model_data)
+        osd_data = get_osd_using_tmdata(
+            tm_data=tm_data,
+            capabilities=osd_model.capabilities,
+            array_assembly=osd_model.array_assembly,
+            cycle_id=osd_model.cycle_id,
+            process_templates=True,
+        )
     except (OSDModelError, ValueError) as error:
         raise error
     return convert_to_response_object(osd_data, result_code=HTTPStatus.OK)
