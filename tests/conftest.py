@@ -82,14 +82,6 @@ def empty_client(empty_tmdata):
 
 
 @pytest.fixture(scope="session")
-def client_put():
-    app = create_app()
-    client = TestClient(app)
-
-    return partial(client.put)
-
-
-@pytest.fixture(scope="session")
 def client_post():
     app = create_app()
     client = TestClient(app)
