@@ -9,6 +9,7 @@ from ska_telmodel_client import TMData
 
 from ska_ost_osd.app import create_app
 from ska_ost_osd.osd.osd import osd_tmdata_source
+from ska_ost_osd.osd.routers.dependencies import get_tmdata_car_main
 from tests.unit.ska_ost_osd.common.constant import (
     INVALID_MID_CONFIGURE_JSON,
     LOW_ASSIGN_JSON,
@@ -75,6 +76,13 @@ def client_get():
 
 
 @pytest.fixture(scope="session")
+def empty_client(empty_tmdata):
+    app = create_app()
+    app.dependency_overrides[get_tmdata_car_main] = lambda: empty_tmdata
+    return TestClient(app)
+
+
+@pytest.fixture(scope="session")
 def client_put():
     app = create_app()
     client = TestClient(app)
@@ -99,6 +107,13 @@ def tmdata_source():
 @pytest.fixture(scope="session")
 def tests_tmdata():
     return TMData(TESTS_TMDATA_SOURCE)
+
+
+@pytest.fixture(scope="session")
+def empty_tmdata(tmp_path_factory):
+    """Fixture for an empty TMData instance."""
+    empty_dir = tmp_path_factory.mktemp("empty_tmdata")
+    return TMData([f"file://{empty_dir}"])
 
 
 @pytest.fixture(scope="session")

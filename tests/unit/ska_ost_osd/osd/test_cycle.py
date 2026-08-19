@@ -33,14 +33,11 @@ class TestCycleAPI:
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == expected_json
 
-    @mock.patch("ska_ost_osd.osd.osd.TMData")
-    def test_cycle_endpoint_file_not_found(self, mock_tmdata, client_get):
+    def test_cycle_endpoint_file_not_found(self, empty_client):
         """Test that GET /cycle returns 500 or appropriate error when TMData
         raises an exception."""
 
-        mock_tmdata.side_effect = FileNotFoundError("file not found")
-
-        response = client_get(f"{BASE_API_URL}/cycle")
+        response = empty_client.get(f"{BASE_API_URL}/cycle")
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
         assert response.json()["result_status"] == "failed"
