@@ -211,10 +211,12 @@ def test_fetch_capabilities_from_osd_based_on_client_based_osd_data(mock1):
         ),
     ],
 )
-def test_semantic_validate_api(test_client, request, json_body_to_validate, response):
+def test_semantic_validate_api(
+    tests_tmdata_source, test_client, request, json_body_to_validate, response
+):
     """Test semantic validation API with valid and invalid JSON."""
     json_body = request.getfixturevalue(json_body_to_validate)
-    json_body["sources"] = "file://tmdata"
+    json_body["sources"] = tests_tmdata_source
     expected_response = request.getfixturevalue(response)
 
     res = test_client.post(f"{BASE_API_URL}/semantic_validation", json=json_body).json()
@@ -239,11 +241,11 @@ def test_semantic_validate_api(test_client, request, json_body_to_validate, resp
     ],
 )
 def test_disable_semantic_validate_api(
-    test_client, request, json_body_to_validate, response
+    tests_tmdata_source, test_client, request, json_body_to_validate, response
 ):
     """Test semantic validation API when VALIDATION_STRICTNESS is set to 1."""
     json_body = request.getfixturevalue(json_body_to_validate)
-    json_body["sources"] = "file://tmdata"
+    json_body["sources"] = tests_tmdata_source
     expected_response = request.getfixturevalue(response)
 
     res = test_client.post(f"{BASE_API_URL}/semantic_validation", json=json_body).json()
@@ -304,11 +306,16 @@ def test_semantic_validate_api_not_passing_required_keys(
     ],
 )
 def test_not_passing_optional_keys(
-    request, test_client, json_body_to_validate, response, key_to_delete
+    request,
+    tests_tmdata_source,
+    test_client,
+    json_body_to_validate,
+    response,
+    key_to_delete,
 ):
     """Test semantic validation API response by not passing optional keys."""
     json_body = request.getfixturevalue(json_body_to_validate).copy()
-    json_body["sources"] = "file://tmdata"
+    json_body["sources"] = tests_tmdata_source
     del json_body[key_to_delete]
     expected_response = request.getfixturevalue(response)
     res = test_client.post(f"{BASE_API_URL}/semantic_validation", json=json_body).json()
@@ -328,13 +335,14 @@ def test_wrong_values_and_no_observing_command_input(
 
 
 def test_passing_only_required_keys(
+    tests_tmdata_source,
     test_client,
     valid_only_observing_command_input_in_request_body,
     valid_semantic_validation_response,
 ):
     """Test semantic validation API response with only required keys."""
     json_body = valid_only_observing_command_input_in_request_body
-    json_body["sources"] = "file://tmdata"
+    json_body["sources"] = tests_tmdata_source
     expected_response = valid_semantic_validation_response
     res = test_client.post(f"{BASE_API_URL}/semantic_validation", json=json_body).json()
     assert res == expected_response

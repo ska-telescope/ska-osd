@@ -42,9 +42,6 @@ from tests.unit.ska_ost_osd.utils import read_json
 OSD_MAJOR_VERSION = version("ska-ost-osd").split(".")[0]
 BASE_API_URL = f"/ska-ost-osd/osd/api/v{OSD_MAJOR_VERSION}"
 
-# Local tmdata snapshot with version-mapping and latest-release files
-TESTS_TMDATA_SOURCE = [f"file://{os.path.join(os.path.dirname(__file__), 'tmdata')}"]
-
 
 @pytest.fixture(scope="session")
 def create_entity_object():
@@ -52,6 +49,24 @@ def create_entity_object():
         return read_json(filepath)
 
     return _create_entity_object
+
+
+@pytest.fixture(scope="session")
+def tests_tmdata_source():
+    """TMData source URL fixture."""
+    return f"file://{os.path.join(os.path.dirname(__file__), 'tmdata')}"
+
+
+@pytest.fixture(scope="session")
+def tests_tmdata(tests_tmdata_source):
+    return TMData(source_uris=[tests_tmdata_source])
+
+
+@pytest.fixture(scope="session")
+def empty_tmdata(tmp_path_factory):
+    """Fixture for an empty TMData instance."""
+    empty_dir = tmp_path_factory.mktemp("empty_tmdata")
+    return TMData([f"file://{empty_dir}"])
 
 
 @pytest.fixture(scope="session")
@@ -82,24 +97,6 @@ def empty_client(empty_tmdata):
     app.dependency_overrides[get_tmdata_for_osd_query] = lambda: empty_tmdata
     app.dependency_overrides[get_tmdata_default_semantic_source] = lambda: empty_tmdata
     return TestClient(app)
-
-
-@pytest.fixture(scope="session")
-def tmdata_source():
-    """TMData source URL fixture."""
-    return TESTS_TMDATA_SOURCE[0]
-
-
-@pytest.fixture(scope="session")
-def tests_tmdata():
-    return TMData(TESTS_TMDATA_SOURCE)
-
-
-@pytest.fixture(scope="session")
-def empty_tmdata(tmp_path_factory):
-    """Fixture for an empty TMData instance."""
-    empty_dir = tmp_path_factory.mktemp("empty_tmdata")
-    return TMData([f"file://{empty_dir}"])
 
 
 @pytest.fixture(scope="session")
@@ -363,13 +360,13 @@ def invalid_osd_tmdata_source_input(request):
 
 @pytest.fixture(scope="session")
 def valid_semantic_validation_body(
-    tmdata_source, mid_osd_data, valid_observing_command_input
+    tests_tmdata_source, mid_osd_data, valid_observing_command_input
 ):
     return {
         "observing_command_input": valid_observing_command_input,
         "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
         "array_assembly": "AA0.5",
-        "sources": tmdata_source,
+        "sources": tests_tmdata_source,
         "raise_semantic": True,
         "osd_data": mid_osd_data,
     }
@@ -377,13 +374,13 @@ def valid_semantic_validation_body(
 
 @pytest.fixture(scope="session")
 def valid_semantic_validation_body_aa1(
-    tmdata_source, mid_osd_data_aa1, valid_observing_command_input_aa1
+    tests_tmdata_source, mid_osd_data_aa1, valid_observing_command_input_aa1
 ):
     return {
         "observing_command_input": valid_observing_command_input_aa1,
         "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
         "array_assembly": "AA1",
-        "sources": tmdata_source,
+        "sources": tests_tmdata_source,
         "raise_semantic": True,
         "osd_data": mid_osd_data_aa1,
     }
@@ -391,13 +388,13 @@ def valid_semantic_validation_body_aa1(
 
 @pytest.fixture(scope="session")
 def valid_semantic_validation_body_aa2(
-    tmdata_source, mid_osd_data_aa2, valid_observing_command_input_aa2
+    tests_tmdata_source, mid_osd_data_aa2, valid_observing_command_input_aa2
 ):
     return {
         "observing_command_input": valid_observing_command_input_aa2,
         "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
         "array_assembly": "AA2",
-        "sources": tmdata_source,
+        "sources": tests_tmdata_source,
         "raise_semantic": True,
         "osd_data": mid_osd_data_aa2,
     }
@@ -423,13 +420,13 @@ def semantic_validation_disable_response():
 
 @pytest.fixture(scope="session")
 def invalid_semantic_validation_body(
-    tmdata_source, mid_osd_data, invalid_observing_command_input
+    tests_tmdata_source, mid_osd_data, invalid_observing_command_input
 ):
     return {
         "observing_command_input": invalid_observing_command_input,
         "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
         "array_assembly": "AA0.5",
-        "sources": tmdata_source,
+        "sources": tests_tmdata_source,
         "raise_semantic": True,
         "osd_data": mid_osd_data,
     }
@@ -437,13 +434,13 @@ def invalid_semantic_validation_body(
 
 @pytest.fixture(scope="session")
 def invalid_semantic_validation_body_aa1(
-    tmdata_source, mid_osd_data_aa1, invalid_observing_command_input_aa1
+    tests_tmdata_source, mid_osd_data_aa1, invalid_observing_command_input_aa1
 ):
     return {
         "observing_command_input": invalid_observing_command_input_aa1,
         "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
         "array_assembly": "AA1",
-        "sources": tmdata_source,
+        "sources": tests_tmdata_source,
         "raise_semantic": True,
         "osd_data": mid_osd_data_aa1,
     }
@@ -451,13 +448,13 @@ def invalid_semantic_validation_body_aa1(
 
 @pytest.fixture(scope="session")
 def invalid_semantic_validation_body_aa2(
-    tmdata_source, mid_osd_data_aa2, invalid_observing_command_input_aa2
+    tests_tmdata_source, mid_osd_data_aa2, invalid_observing_command_input_aa2
 ):
     return {
         "observing_command_input": invalid_observing_command_input_aa2,
         "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
         "array_assembly": "AA2",
-        "sources": tmdata_source,
+        "sources": tests_tmdata_source,
         "raise_semantic": True,
         "osd_data": mid_osd_data_aa2,
     }
