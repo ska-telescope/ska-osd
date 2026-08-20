@@ -7,25 +7,19 @@ from ska_telmodel_client import TMData
 from ska_ost_osd.common.utils import update_file
 from ska_ost_osd.osd.common.osd_validation_messages import (
     ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE,
-    AVAILABLE_SOURCE_ERROR_MESSAGE,
     CAPABILITY_DOESNOT_EXIST_ERROR_MESSAGE,
     CYCLE_ERROR_MESSAGE,
     CYCLE_ID_ERROR_MESSAGE,
     OSD_VERSION_ERROR_MESSAGE,
-    SOURCE_ERROR_MESSAGE,
 )
 from ska_ost_osd.osd.template_mapping.template_mapping import process_template_mappings
 
 from .common.constant import (
     ARRAY_ASSEMBLY_PATTERN,
-    BASE_FOLDER_NAME,
-    BASE_URL,
-    CAR_URL,
     LOW_CAPABILITIES_JSON_PATH,
     MID_CAPABILITIES_JSON_PATH,
     OBSERVATORY_POLICIES_JSON_PATH,
     RELEASE_FILE_PATH_LATEST,
-    SOURCES,
     VERSION_FILE_PATH,
     osd_file_mapping,
     osd_response_template,
@@ -345,54 +339,6 @@ def check_cycle_id(
             )
 
     return osd_version, cycle_error_msg_list
-
-
-def osd_tmdata_source(
-    tmdata: TMData,
-    cycle_id: int = None,
-    osd_version: str = None,
-    source: str = "car",
-    gitlab_branch: str = None,
-    versions_dict: Dict = None,
-) -> str:
-    """This function checks and returns source_uri for TMData class.
-
-    :param tmdata: TMData object used for latest version lookup.
-    :param cycle_id: cycle id integer value.
-    :param osd_version: osd version i.e. 1.9.0 or branch name like
-        master, dev etc.
-    :param source: where to get OSD Data from car or file
-    :param gitlab_branch: branch name like master, dev etc.
-    :param versions_dict: version dict containing version data
-    :return: source_uris as a string or raises exception
-    """
-    source_error_msg_list = []
-    if source not in SOURCES:
-        source_msg = ", ".join(SOURCES)
-        source_error_msg_list.append(AVAILABLE_SOURCE_ERROR_MESSAGE.format(source_msg))
-
-    if (
-        gitlab_branch
-        and isinstance(gitlab_branch, str)
-        and (source == "car" or source == "file")
-    ):
-        source_error_msg_list.append(SOURCE_ERROR_MESSAGE.format(source))
-
-    osd_version, cycle_error_msg_list = check_cycle_id(
-        tmdata, cycle_id, osd_version, gitlab_branch, versions_dict
-    )
-
-    source_error_msg_list.extend(cycle_error_msg_list)
-
-    source_url = (f"{source}:{BASE_URL}{CAR_URL}{osd_version}#{BASE_FOLDER_NAME}",)
-
-    if source == "file":
-        source_url = (f"file://{BASE_FOLDER_NAME}",)
-
-    if source == "car":
-        source_url = (f"{source}:{CAR_URL}{osd_version}#{BASE_FOLDER_NAME}",)
-
-    return source_url, source_error_msg_list
 
 
 def get_osd_data(

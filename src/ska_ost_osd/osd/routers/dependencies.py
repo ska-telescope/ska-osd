@@ -10,11 +10,16 @@ from ska_ost_osd.osd.common.constant import (
     BASE_FOLDER_NAME,
     BASE_URL,
     CAR_URL,
+    SOURCES,
     VERSION_FILE_PATH,
 )
 from ska_ost_osd.osd.common.error_handling import OSDModelError
+from ska_ost_osd.osd.common.osd_validation_messages import (
+    AVAILABLE_SOURCE_ERROR_MESSAGE,
+    SOURCE_ERROR_MESSAGE,
+)
 from ska_ost_osd.osd.models.models import OSDModel, OSDQueryParams
-from ska_ost_osd.osd.osd import osd_tmdata_source
+from ska_ost_osd.osd.osd import check_cycle_id
 
 
 def get_tmdata_car_main():
@@ -54,19 +59,36 @@ def get_tmdata_for_osd_query(
         errors.extend(error.args[0])
 
     versions_dict = tmdata[VERSION_FILE_PATH].get_dict()
-    source_uris, source_errors = osd_tmdata_source(
+    source = osd_model.source
+
+    if source not in SOURCES:
+        source_msg = ", ".join(SOURCES)
+        errors.append(AVAILABLE_SOURCE_ERROR_MESSAGE.format(source_msg))
+
+    if (
+        osd_model.gitlab_branch
+        and isinstance(osd_model.gitlab_branch, str)
+        and source in ("car", "file")
+    ):
+        errors.append(SOURCE_ERROR_MESSAGE.format(source))
+
+    osd_version, cycle_errors = check_cycle_id(
+        tmdata=tmdata,
         cycle_id=osd_model.cycle_id,
         osd_version=osd_model.osd_version,
-        source=osd_model.source,
         gitlab_branch=osd_model.gitlab_branch,
         versions_dict=versions_dict,
-        tmdata=tmdata,
     )
-
-    if source_errors:
-        errors.extend(source_errors)
+    if cycle_errors:
+        errors.extend(cycle_errors)
 
     if errors:
         raise ValueError(errors)
+
+    source_uris = (f"{source}:{BASE_URL}{CAR_URL}{osd_version}#{BASE_FOLDER_NAME}",)
+    if source == "file":
+        source_uris = (f"{source}://{BASE_FOLDER_NAME}",)
+    if source == "car":
+        source_uris = (f"{source}:{CAR_URL}{osd_version}#{BASE_FOLDER_NAME}",)
 
     return TMData(source_uris=source_uris)

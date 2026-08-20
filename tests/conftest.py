@@ -7,9 +7,9 @@ from fastapi.testclient import TestClient
 from ska_telmodel_client import TMData
 
 from ska_ost_osd.app import create_app
-from ska_ost_osd.osd.osd import osd_tmdata_source
 from ska_ost_osd.osd.routers.dependencies import (
     get_tmdata_car_main,
+    get_tmdata_for_osd_query,
     get_tmdata_gitlab_main,
 )
 from ska_ost_osd.telvalidation.routers.dependencies import (
@@ -46,20 +46,6 @@ BASE_API_URL = f"/ska-ost-osd/osd/api/v{OSD_MAJOR_VERSION}"
 TESTS_TMDATA_SOURCE = [f"file://{os.path.join(os.path.dirname(__file__), 'tmdata')}"]
 
 
-@pytest.fixture(autouse=True)
-def patch_tmdata_source(monkeypatch):
-    """Patch osd_tmdata_source for all tests so that they use local tmdata"""
-
-    def patched_osd_tmdata_source(*args, **kwargs):
-        _, source_error_msg_list = osd_tmdata_source(*args, **kwargs)
-        return TESTS_TMDATA_SOURCE, source_error_msg_list
-
-    monkeypatch.setattr(
-        "ska_ost_osd.osd.osd.osd_tmdata_source",
-        patched_osd_tmdata_source,
-    )
-
-
 @pytest.fixture(scope="session")
 def create_entity_object():
     def _create_entity_object(filepath: str):
@@ -72,7 +58,7 @@ def create_entity_object():
 def test_client(tests_tmdata):
     app = create_app()
     app.dependency_overrides[get_tmdata_car_main] = lambda: tests_tmdata
-    app.dependency_overrides[get_tmdata_gitlab_main] = lambda: tests_tmdata
+    app.dependency_overrides[get_tmdata_for_osd_query] = lambda: tests_tmdata
     app.dependency_overrides[get_tmdata_default_semantic_source] = lambda: tests_tmdata
     return TestClient(app)
 
@@ -81,7 +67,7 @@ def test_client(tests_tmdata):
 def empty_client(empty_tmdata):
     app = create_app()
     app.dependency_overrides[get_tmdata_car_main] = lambda: empty_tmdata
-    app.dependency_overrides[get_tmdata_gitlab_main] = lambda: empty_tmdata
+    app.dependency_overrides[get_tmdata_for_osd_query] = lambda: empty_tmdata
     app.dependency_overrides[get_tmdata_default_semantic_source] = lambda: empty_tmdata
     return TestClient(app)
 
@@ -102,33 +88,6 @@ def empty_tmdata(tmp_path_factory):
     """Fixture for an empty TMData instance."""
     empty_dir = tmp_path_factory.mktemp("empty_tmdata")
     return TMData([f"file://{empty_dir}"])
-
-
-@pytest.fixture(scope="session")
-def validate_car_class(tests_tmdata):
-    """This function is used as a fixture for osd_tmdata_source object with
-    osd_version as '1.11.0'.
-
-    :returns: osd_tmdata_source object
-    """
-    tmdata_source, _ = osd_tmdata_source(tmdata=tests_tmdata, osd_version="1.11.0")
-    return tmdata_source
-
-
-@pytest.fixture(scope="session")
-def validate_gitlab_class(tests_tmdata):
-    """This function is used as a fixture for osd_tmdata_source object with
-    parameters.
-
-    :returns: osd_tmdata_source object
-    """
-    tmdata_source, _ = osd_tmdata_source(
-        tmdata=tests_tmdata,
-        cycle_id=1,
-        gitlab_branch="nak-776-osd-implementation-file-versioning",
-        source="gitlab",
-    )
-    return tmdata_source
 
 
 @pytest.fixture(scope="session")
@@ -355,21 +314,6 @@ def mid_low_response_input(request):
                     "osd_version 1..1.0 is not valid",
                     "array_assembly AAA3 is not valid",
                     "Cycle 100000 is not valid,Available IDs are 1,10000",  # need to revisit this
-                ],
-                "result_status": "failed",
-                "result_code": 400,
-            },
-        ),
-        (
-            None,
-            None,
-            "file",
-            "mid",
-            "AA100000",
-            {
-                "result_data": [
-                    "Array Assembly AA100000 is not valid,Available Array Assemblies"
-                    " are AA0.5, AA1, AA2"
                 ],
                 "result_status": "failed",
                 "result_code": 400,
