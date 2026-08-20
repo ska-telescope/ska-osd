@@ -5,7 +5,6 @@ from typing import Any, Dict, Optional
 from ska_telmodel_client import TMData
 
 from ska_ost_osd.common.utils import update_file
-from ska_ost_osd.osd.common.error_handling import OSDModelError
 from ska_ost_osd.osd.common.osd_validation_messages import (
     ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE,
     AVAILABLE_SOURCE_ERROR_MESSAGE,
@@ -15,7 +14,6 @@ from ska_ost_osd.osd.common.osd_validation_messages import (
     OSD_VERSION_ERROR_MESSAGE,
     SOURCE_ERROR_MESSAGE,
 )
-from ska_ost_osd.osd.models.models import OSDModel
 from ska_ost_osd.osd.template_mapping.template_mapping import process_template_mappings
 
 from .common.constant import (
@@ -457,69 +455,6 @@ def get_osd_using_tmdata(
         raise ValueError(errors)
 
     return osd_data
-
-
-def build_tmdata_for_osd_query(
-    tmdata: TMData,
-    cycle_id: Optional[int] = None,
-    osd_version: Optional[str] = None,
-    source: Optional[str] = None,
-    gitlab_branch: Optional[str] = None,
-    capabilities: Optional[str] = None,
-    array_assembly: Optional[str] = None,
-) -> TMData:
-    """Build TMData for an OSD query from request parameters.
-
-    :param tmdata: TMData, TMData object for gitlab main version files.
-    :param cycle_id: int, optional cycle ID.
-    :param osd_version: str, optional OSD version.
-    :param source: str, optional source.
-    :param gitlab_branch: str, optional GitLab branch.
-    :param capabilities: str, optional capabilities.
-    :param array_assembly: str, optional array assembly.
-    :return: TMData, TMData object resolved from query parameters.
-    :raises ValueError: If any validation or processing errors occur.
-    """
-    errors = []
-
-    try:
-        OSDModel(
-            source=source,
-            cycle_id=cycle_id,
-            osd_version=osd_version,
-            capabilities=capabilities,
-            array_assembly=array_assembly,
-        )
-    except OSDModelError as error:
-        errors.extend(error.args[0])
-
-    versions_dict = tmdata[VERSION_FILE_PATH].get_dict()
-    _, cycle_errors = check_cycle_id(
-        tmdata=tmdata,
-        cycle_id=cycle_id,
-        osd_version=osd_version,
-        gitlab_branch=gitlab_branch,
-        versions_dict=versions_dict,
-    )
-    if cycle_errors:
-        errors.extend(cycle_errors)
-        raise ValueError(errors)
-    tm_data_source, error = osd_tmdata_source(
-        cycle_id=cycle_id,
-        osd_version=osd_version,
-        source=source,
-        gitlab_branch=gitlab_branch,
-        versions_dict=versions_dict,
-        tmdata=tmdata,
-    )
-
-    if error:
-        errors.extend(error)
-
-    if errors:
-        raise ValueError(errors)
-
-    return TMData(source_uris=tm_data_source)
 
 
 def update_osd_file(
