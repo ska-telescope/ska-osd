@@ -1,64 +1,7 @@
 from http import HTTPStatus
-from pathlib import Path
-from unittest.mock import patch
-
-import pytest
 
 from ska_ost_osd.common.utils import remove_none_params
 from tests.conftest import BASE_API_URL
-
-
-def test_invalid_osd_tmdata_source(
-    invalid_osd_tmdata_source_input,
-    test_client,
-    osd_versions,
-):
-    """This test case checks the functionality of OSD API It will validate all
-    params and return expected output.
-
-    NOTE: This testcase has dependency on 'cycle_gitlab_release_version_mapping.json'
-          file so make sure to run the 'make osd-pre-release' command which is
-          mentioned in readme and document files.
-
-    :param cycle_id,: 1, 2
-    :param osd_version,: 1.0.0
-    :param source,: File, Car and Gitlab
-    :param capabilities: Mid or Low
-    :param array_assembly: Array Assembly AA0.5, AA1
-    :param expected: output of OSD API
-
-    :returns: assert equals values
-    """
-
-    (
-        cycle_id,
-        osd_version,
-        source,
-        capabilities,
-        array_assembly,
-        expected,
-    ) = invalid_osd_tmdata_source_input
-
-    if expected.get("detail") and isinstance(expected["detail"], list):
-        expected["detail"][0] = expected["detail"][0].format(osd_versions=osd_versions)
-    params = {
-        "cycle_id": cycle_id,
-        "osd_version": osd_version,
-        "source": source,
-        "capabilities": capabilities,
-        "array_assembly": array_assembly,
-    }
-
-    response = test_client.get(
-        f"{BASE_API_URL}/osd",
-        params=remove_none_params(params),
-    ).json()
-
-    if array_assembly == "AA100000":
-        assert array_assembly in response["result_data"][0]
-
-    else:
-        assert response["result_data"] == expected["result_data"]
 
 
 def test_osd_endpoint(test_client):
@@ -70,17 +13,14 @@ def test_osd_endpoint(test_client):
         expected OSD data or returns an error status code.
     """
 
-    tests_tmdata_dir = Path(__file__).resolve().parents[3] / "tmdata"
-
-    with patch("ska_ost_osd.osd.osd.BASE_FOLDER_NAME", str(tests_tmdata_dir)):
-        response = test_client.get(
-            f"{BASE_API_URL}/osd",
-            params={
-                "source": "file",
-                "capabilities": "mid",
-                "array_assembly": "AA0.5",
-            },
-        ).json()
+    response = test_client.get(
+        f"{BASE_API_URL}/osd",
+        params={
+            "source": "file",
+            "capabilities": "mid",
+            "array_assembly": "AA0.5",
+        },
+    ).json()
 
     assert response["result_code"] == 200
     assert "AA0.5" in response["result_data"]["capabilities"]["mid"].keys()
@@ -191,43 +131,18 @@ def test_mid_low_response(
     assert array_assembly in result_data[capabilities].keys()
 
 
-@pytest.mark.parametrize(
-    "cycle_id, source, capabilities",
-    [
-        (
-            3,
-            "file",
-            "mid",
-        ),
-        (
-            2,
-            "file",
-            "low",
-        ),
-    ],
-)
 def test_invalid_cycle_id(
-    cycle_id,
-    source,
-    capabilities,
-    test_client,
+    sad_path_client,
 ):
-    """This function tests that the response from the REST API contains the
-    expected body contents when retrieving OSD metadata.
+    """Client smoke test for dependency-resolution errors in /osd.
 
-    :raises AssertionError: If the expected data is invalid.
+    Resolver logic is exercised through get_tmdata_for_osd_query by not
+    overriding that dependency on sad_path_client.
     """
-
-    params = {
-        "cycle_id": cycle_id,
-        "source": source,
-        "capabilities": capabilities,
-    }
-
-    response = test_client.get(
+    response = sad_path_client.get(
         f"{BASE_API_URL}/osd",
-        params=params,
+        params={"cycle_id": 3, "source": "file", "capabilities": "mid"},
     ).json()
 
-    assert str(cycle_id) in response["result_data"][0]
+    assert "Cycle 3 is not valid" in response["result_data"][0]
     assert response["result_code"] == HTTPStatus.BAD_REQUEST

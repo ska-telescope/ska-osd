@@ -56,6 +56,7 @@ def create_entity_object():
 
 @pytest.fixture(scope="session")
 def test_client(tests_tmdata):
+    """Test client using tests_tmdata for all requests"""
     app = create_app()
     app.dependency_overrides[get_tmdata_car_main] = lambda: tests_tmdata
     app.dependency_overrides[get_tmdata_for_osd_query] = lambda: tests_tmdata
@@ -64,7 +65,18 @@ def test_client(tests_tmdata):
 
 
 @pytest.fixture(scope="session")
+def sad_path_client(tests_tmdata):
+    """Test client for error-handling in get_tmdata_for_osd_query."""
+    app = create_app()
+    app.dependency_overrides[get_tmdata_car_main] = lambda: tests_tmdata
+    app.dependency_overrides[get_tmdata_gitlab_main] = lambda: tests_tmdata
+    app.dependency_overrides[get_tmdata_default_semantic_source] = lambda: tests_tmdata
+    return TestClient(app)
+
+
+@pytest.fixture(scope="session")
 def empty_client(empty_tmdata):
+    """Test client using TMData with no files"""
     app = create_app()
     app.dependency_overrides[get_tmdata_car_main] = lambda: empty_tmdata
     app.dependency_overrides[get_tmdata_for_osd_query] = lambda: empty_tmdata
