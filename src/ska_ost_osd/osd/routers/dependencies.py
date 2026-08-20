@@ -33,15 +33,8 @@ def get_tmdata_gitlab_main():
     )
 
 
-def get_osd_query_model(
-    osd_model: OSDQueryParams = Depends(),
-) -> OSDQueryParams:
-    """Provide validated OSD query model."""
-    return osd_model
-
-
 def get_tmdata_for_osd_query(
-    osd_model: OSDQueryParams = Depends(get_osd_query_model),
+    osd_model: OSDQueryParams = Depends(),
     tmdata: TMData = Depends(get_tmdata_gitlab_main),
 ) -> TMData:
     """Resolve TMData for /osd from the query model."""

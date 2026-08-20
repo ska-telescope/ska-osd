@@ -40,7 +40,6 @@ from ska_ost_osd.osd.osd import (
     update_osd_file,
 )
 from ska_ost_osd.osd.routers.dependencies import (
-    get_osd_query_model,
     get_tmdata_car_main,
     get_tmdata_for_osd_query,
 )
@@ -66,7 +65,7 @@ osd_router = APIRouter(prefix="")
     response_model=ApiResponse,
 )
 def get_osd(
-    osd_model: OSDQueryParams = Depends(get_osd_query_model),
+    osd_model: OSDQueryParams = Depends(),
     tm_data: TMData = Depends(get_tmdata_for_osd_query),
 ) -> Dict:
     """This function takes query parameters and OSD data source objects to
