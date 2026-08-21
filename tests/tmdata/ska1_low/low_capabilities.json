@@ -21,9 +21,9 @@
     "AA0.5": {
       "number_stations": 4,
       "number_station_ids": [
-        345, 
-        350, 
-        352, 
+        345,
+        350,
+        352,
         431
       ],
       "number_substations": 0,

@@ -41,12 +41,12 @@
                             "freq_max": [
                                 {
                                     "rule": "min_frequency_hz <= freq_max <= max_frequency_hz",
-                                    "error": "Invalid input for freq_max"                                
+                                    "error": "Invalid input for freq_max"
                                 },
                                 {
                                     "rule": "freq_min < freq_max",
                                     "error": "freq_min should be less than freq_max",
-                                    "dependency_key": ["freq_min"]                    
+                                    "dependency_key": ["freq_min"]
                                 }
                             ]
                         }
@@ -100,7 +100,7 @@
                     }
                 ]
             }
-            
+
         }
     },
     "AA1": {
@@ -252,7 +252,7 @@
                     }
                 },
                 "common": {
-                    
+
                 }
             }
         }
@@ -406,7 +406,7 @@
                     }
                 },
                 "common": {
-                    
+
                 }
             }
         }

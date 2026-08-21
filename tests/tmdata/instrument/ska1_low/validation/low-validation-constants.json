@@ -111,7 +111,7 @@
                                 "rule": "-90.0 <= c2 <= 90.0",
                                 "error": "c2 must be between -90.0 and 90.0"
                             }
-                        ]  
+                        ]
                     }
                 }
             },
@@ -163,7 +163,7 @@
                                     "error": "Invalid input for function_mode! Currently allowed pst"
                                 }
                             ]
-                        }   
+                        }
                     }
                 },
                 "pst": {
@@ -288,7 +288,7 @@
                                 "rule": "-90.0 <= c2 <= 90.0",
                                 "error": "c2 must be between -90.0 and 90.0"
                             }
-                        ]  
+                        ]
                     }
                 }
             },
@@ -340,7 +340,7 @@
                                     "error": "Invalid input for function_mode! Currently allowed pst"
                                 }
                             ]
-                        }   
+                        }
                     }
                 },
                 "pst": {
@@ -466,7 +466,7 @@
                                 "rule": "-90.0 <= c2 <= 90.0",
                                 "error": "c2 must be between -90.0 and 90.0"
                             }
-                        ]  
+                        ]
                     }
                 }
             },
@@ -518,7 +518,7 @@
                                     "error": "Invalid input for function_mode! Currently allowed pst"
                                 }
                             ]
-                        }   
+                        }
                     }
                 },
                 "pst": {
