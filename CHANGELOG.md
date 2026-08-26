@@ -5,6 +5,10 @@ Change Log
 All notable changes to this project will be documented in this file.
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
+Unreleased
+**********
+* Use FastAPI dependency injection to handle TMData clients
+
 6.0.9
 **********
 * Update version_mapping (missing from 6.0.8)
