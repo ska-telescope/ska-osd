@@ -1,4 +1,3 @@
-import json
 import os
 from importlib.metadata import version
 
@@ -97,37 +96,6 @@ def empty_client(empty_tmdata):
     app.dependency_overrides[get_tmdata_for_osd_query] = lambda: empty_tmdata
     app.dependency_overrides[get_tmdata_default_semantic_source] = lambda: empty_tmdata
     return TestClient(app)
-
-
-@pytest.fixture(scope="session")
-def osd_versions():
-    """This fixture reads a JSON file containing cycle-to-version mappings,
-    extracts all unique versions across all cycles, and returns them as a
-    sorted list.
-
-    :returns list: A sorted list of unique OSD versions extracted from
-        the JSON file.
-    """
-
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    parent_dir = os.path.dirname(current_dir)
-    json_path = os.path.join(
-        parent_dir,
-        "src",
-        "ska_ost_osd",
-        "osd",
-        "version_mapping",
-        "cycle_gitlab_release_version_mapping.json",
-    )
-
-    with open(json_path, "r", encoding="utf-8") as file:
-        data = json.load(file)
-
-    all_versions = set()
-    for cycle_versions in data.values():
-        all_versions.update(cycle_versions)
-
-    return sorted(list(all_versions))
 
 
 @pytest.fixture(scope="session")
