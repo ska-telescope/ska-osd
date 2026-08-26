@@ -34,7 +34,6 @@ def test_get_osd_data(
 
     :param capabilities: Mid or Low
     :param array_assembly: Array Assembly AA0.5, AA1
-    :param tmdata: tmdata object
     :param expected: output of get_osd_data function
     :param tests_tmdata: tmdata fixture
     :returns: assert equals values

@@ -255,6 +255,7 @@ class OSD:
 def get_available_cycles(tmdata: TMData) -> list[int]:
     """Fetch available cycle numbers from TMData version mapping.
 
+    :param tmdata: TMData, TMData client to access version mapping.
     :return: list[int], list of available cycle numbers.
     """
     try:
