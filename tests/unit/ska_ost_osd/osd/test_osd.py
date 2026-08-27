@@ -3,174 +3,62 @@ from unittest.mock import patch
 import pytest
 
 from ska_ost_osd.osd.common.error_handling import OSDModelError
-from ska_ost_osd.osd.common.utils import get_osd_latest_version
 from ska_ost_osd.osd.models.models import OSDModel, ValidationOnCapabilities
-from ska_ost_osd.osd.osd import get_osd_data, osd_tmdata_source, update_osd_file
-from tests.conftest import tm_data_osd
-from tests.unit.ska_ost_osd.common.constant import (
-    DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER,
-    OSD_RESPONSE_WITH_CAPABILITIES_ARRAY_ASSEMBLY_PARAMETER,
-    OSD_RESPONSE_WITH_ONLY_CAPABILITIES_PARAMETER,
-)
+from ska_ost_osd.osd.osd import get_osd_data, update_osd_file
 
 
 @pytest.mark.parametrize(
-    "capabilities, array_assembly, tmdata, file_path",
+    "capabilities, array_assembly, expected_keys",
     [
-        (None, None, tm_data_osd, DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER),
+        (None, None, ["mid", "low"]),
         (
             ["mid"],
             None,
-            tm_data_osd,
-            OSD_RESPONSE_WITH_ONLY_CAPABILITIES_PARAMETER,
+            ["mid"],
         ),
         (
             ["mid"],
             "AA0.5",
-            tm_data_osd,
-            OSD_RESPONSE_WITH_CAPABILITIES_ARRAY_ASSEMBLY_PARAMETER,
+            ["mid"],
         ),
     ],
 )
 def test_get_osd_data(
     capabilities,
     array_assembly,
-    tmdata,  # pylint: disable=W0613
-    file_path,
-    create_entity_object,
-    tm_data_osd,  # pylint: disable=W0621
+    expected_keys,
+    tests_tmdata,
 ):
     """This test case checks the functionality of get_osd_data it converts the
     python dict into list keys and checks for equality with expected output.
 
     :param capabilities: Mid or Low
     :param array_assembly: Array Assembly AA0.5, AA1
-    :param tmdata: tmdata object
     :param expected: output of get_osd_data function
-    :param tm_data_osd: tmdata fixture
+    :param tests_tmdata: tmdata fixture
     :returns: assert equals values
     """
 
     result, _ = get_osd_data(
-        capabilities, array_assembly, tmdata=tm_data_osd, process_templates=False
+        capabilities, array_assembly, tmdata=tests_tmdata, process_templates=False
     )
-    result_keys = result["capabilities"].keys()
-    expected = create_entity_object(file_path)
-    expected_keys = expected["capabilities"].keys()
+    result_keys = list(result["capabilities"].keys())
 
     assert result_keys == expected_keys
 
 
-def test_set_source_car_method(validate_car_class):
-    """This test case checks if the output of the osd_tmdata_source function is
-    as expected or not.
-
-    :param osd_tmdata_source: validate_car_class fixture.
-    """
-
-    assert validate_car_class == ("car:ost/ska-ost-osd?1.11.0#tmdata",)
-
-
-def test_set_source_gitlab_method(validate_gitlab_class):
-    """This test case checks if the output of the osd_tmdata_source function is
-    as expected or not.
-
-    :param osd_tmdata_source: validate_gitlab_class fixture.
-    """
-
-    msg = "nak-776-osd-implementation-file-versioning#tmdata"
-
-    assert validate_gitlab_class == (
-        f"gitlab://gitlab.com/ska-telescope/ost/ska-ost-osd?{msg}",
-    )
-
-
-def test_validate_gitlab_with_both_invalid_param():
-    """This test case checks if the output of the osd_tmdata_source when no
-    parameter is given and latest version is returned or not."""
-
-    ost_osd_version = get_osd_latest_version()
-
-    msg = f"car:ost/ska-ost-osd?{ost_osd_version}#tmdata"
-    tm_data_src, _ = osd_tmdata_source()
-
-    assert tm_data_src == (msg,)
-
-
-def test_check_osd_version_method():
-    """This test case checks if the output of the osd_tmdata_source when
-    osd_version parameter is given it should return the correct URL."""
-    tm_data_src, _ = osd_tmdata_source(osd_version="1.0.0")
-    assert tm_data_src == ("car:ost/ska-ost-osd?1.0.0#tmdata",)
-
-
-def test_check_cycle_id_and_osd_version_method():
-    """This test case checks if the output of the osd_tmdata_source when
-    cycle_id and osd_version parameter is given it should return the correct
-    URL."""
-    tm_data_src, _ = osd_tmdata_source(cycle_id=1, osd_version="1.11.0")
-    assert tm_data_src == ("car:ost/ska-ost-osd?1.11.0#tmdata",)
-
-
-def test_check_cycle_id_2_and_osd_version_method():
-    """This test case checks if the output of the osd_tmdata_source when
-    cycle_id and osd_version parameter is given it should return the correct
-    URL."""
-    tm_data_src, _ = osd_tmdata_source(cycle_id=2, osd_version="1.0.0")
-    assert tm_data_src == ("car:ost/ska-ost-osd?1.0.0#tmdata",)
-
-
-def test_check_cycle_id_with_source_method():
-    """This test case checks if the output of the osd_tmdata_source when
-    cycle_id, osd_version and source parameter is given it should return the
-    correct URL."""
-    tm_data_src, _ = osd_tmdata_source(cycle_id=2, osd_version="1.0.0", source="file")
-    assert tm_data_src == ("file://tmdata",)
-
-
-def test_check_master_branch_method():
-    """This test case checks if the output of the osd_tmdata_source when
-    cycle_id, gitlab_branch and source parameter is given it should return the
-    correct URL."""
-    tm_data_src, _ = osd_tmdata_source(
-        cycle_id=2, gitlab_branch="master", source="gitlab"
-    )
-    assert tm_data_src == (
-        "gitlab://gitlab.com/ska-telescope/ost/ska-ost-osd?master#tmdata",
-    )
-
-
-def test_invalid_osd_tmdata_source():
-    """This test case checks if the output of the osd_tmdata_source when
-    cycle_id, gitlab_branch and source parameter and osd_version is given
-    incorrect it should return the appropriate error messages."""
-
-    _, error_msgs = osd_tmdata_source(
-        cycle_id=100000,
-        osd_version="1.1.0",
-        gitlab_branch="main",
-        source="github",
-        versions_dict={"cycle_1": ["1.0.0"]},
-    )
-    assert error_msgs == [
-        "Source is not valid available are file, car, gitlab",
-        "Only one parameter is needed either osd_version or gitlab_branch",
-        "Cycle 100000 is not valid,Available IDs are 1",
-    ]
-
-
-def test_invalid_get_osd_data_capability(tm_data_osd):  # pylint: disable=W0621
+def test_invalid_get_osd_data_capability(tests_tmdata):
     """This test case checks if the output of the get_osd_data when
     capabilities is given incorrect with correct array_assembly it should
     return the appropriate error messages.
 
-    :param tm_data_osd: tm_data_osd
+    :param tests_tmdata: tests_tmdata
     """
 
     _, error_msgs = get_osd_data(
         capabilities=["midd"],
         array_assembly="AA1",
-        tmdata=tm_data_osd,
+        tmdata=tests_tmdata,
         process_templates=False,
     )
     assert error_msgs == [
@@ -179,19 +67,19 @@ def test_invalid_get_osd_data_capability(tm_data_osd):  # pylint: disable=W0621
     ]
 
 
-def test_invalid_get_osd_data_array_assembly(tm_data_osd):  # pylint: disable=W0621
+def test_invalid_get_osd_data_array_assembly(tests_tmdata):
     """This test case checks if the output of the get_osd_data when
     array_assembly is given incorrect with correct capabilities it should
     return the appropriate error messages.
 
-    :param tm_data_osd: tm_data_osd
+    :param tests_tmdata: tests_tmdata
     """
     aa_value = "AA100000"
 
     _, error_msgs = get_osd_data(
         capabilities=["mid"],
         array_assembly=aa_value,
-        tmdata=tm_data_osd,
+        tmdata=tests_tmdata,
         process_templates=False,
     )
     msg = ",".join(error_msgs[0].split(",")[1:])
@@ -343,13 +231,13 @@ def test_update_osd_file_observatory_policy_update(
     assert mock_update_file.call_count == 1
 
 
-def test_get_osd_data_with_process_templates(tm_data_osd):  # pylint: disable=W0621
+def test_get_osd_data_with_process_templates(tests_tmdata):
     """Test that process_templates parameter is properly passed through."""
     # Test with process_templates=False (default)
     result_false, _ = get_osd_data(
         capabilities=["mid"],
         array_assembly="AA0.5",
-        tmdata=tm_data_osd,
+        tmdata=tests_tmdata,
         process_templates=False,
     )
 
@@ -357,7 +245,7 @@ def test_get_osd_data_with_process_templates(tm_data_osd):  # pylint: disable=W0
     result_true, _ = get_osd_data(
         capabilities=["mid"],
         array_assembly="AA0.5",
-        tmdata=tm_data_osd,
+        tmdata=tests_tmdata,
         process_templates=True,
     )
 
@@ -369,9 +257,7 @@ def test_get_osd_data_with_process_templates(tm_data_osd):  # pylint: disable=W0
 
 
 @patch("ska_ost_osd.osd.osd.process_template_mappings")
-def test_get_osd_data_template_processing_called(
-    mock_process_templates, tm_data_osd
-):  # pylint: disable=W0621
+def test_get_osd_data_template_processing_called(mock_process_templates, tests_tmdata):
     """Test that process_template_mappings is called when process_templates=True."""
 
     # Mock the template processing function to return modified data
@@ -390,7 +276,7 @@ def test_get_osd_data_template_processing_called(
     result, _ = get_osd_data(
         capabilities=["mid"],
         array_assembly="AA0.5",
-        tmdata=tm_data_osd,
+        tmdata=tests_tmdata,
         process_templates=True,
     )
 

@@ -1,65 +1,45 @@
-import json
 import os
-import pathlib
-import tempfile
-from functools import partial
 from importlib.metadata import version
-from unittest.mock import patch
 
 import pytest
 from fastapi.testclient import TestClient
 from ska_telmodel_client import TMData
 
 from ska_ost_osd.app import create_app
-from ska_ost_osd.osd.osd import osd_tmdata_source
-from ska_ost_osd.telvalidation.common.constant import CAR_TELMODEL_SOURCE
+from ska_ost_osd.osd.routers.dependencies import (
+    get_tmdata_car_main,
+    get_tmdata_for_osd_query,
+    get_tmdata_gitlab_main,
+)
+from ska_ost_osd.telvalidation.routers.dependencies import (
+    get_tmdata_default_semantic_source,
+)
 from tests.unit.ska_ost_osd.common.constant import (
-    DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER,
     INVALID_MID_CONFIGURE_JSON,
     LOW_ASSIGN_JSON,
-    LOW_CAPABILITIES_MOCK_DATA,
     LOW_CONFIGURE_JSON,
     LOW_SBD_JSON,
-    LOW_SBD_VALIDATION_MOCK_DATA,
     MID_ASSIGN_JSON,
     MID_ASSIGN_JSON_AA1,
     MID_ASSIGN_JSON_AA2,
-    MID_CAPABILITIES_MOCK_DATA,
     MID_OSD_DATA_JSON,
     MID_OSD_DATA_JSON_AA1,
     MID_OSD_DATA_JSON_AA2,
     MID_SBD_JSON,
-    MID_SBD_VALIDATION_MOCK_DATA,
     VALID_MID_CONFIGURE_JSON,
-    VALIDATION_MOCK_DATA,
-    local_source,
     low_configure_expected_result_for_invalid_data,
     low_expected_result_for_invalid_data,
     low_sbd_expected_result_for_invalid_data,
     mid_configure_expected_result_for_invalid_data,
     mid_expected_result_for_invalid_data,
     mid_sbd_expected_result_for_invalid_data,
-    sources,
 )
-from tests.unit.ska_ost_osd.utils import create_mock_json_files, read_json
+from tests.unit.ska_ost_osd.utils import read_json
 
 # flake8: noqa E501
 # pylint: disable=W0621
 OSD_MAJOR_VERSION = version("ska-ost-osd").split(".")[0]
 BASE_API_URL = f"/ska-ost-osd/osd/api/v{OSD_MAJOR_VERSION}"
-
-# Local tmdata snapshot with version-mapping and latest-release files
-TESTS_TMDATA_SOURCE = [f"file://{os.path.join(os.path.dirname(__file__), 'tmdata')}"]
-
-
-@pytest.fixture(autouse=True)
-def patch_gitlab_source():
-    """Patch ``GITLAB_SOURCE`` for all tests so that they use local version-mapping
-    and latest-release files instead of the remote GitLab backend."""
-    with patch("ska_ost_osd.osd.osd.GITLAB_SOURCE", TESTS_TMDATA_SOURCE), patch(
-        "ska_ost_osd.osd.common.utils.GITLAB_SOURCE", TESTS_TMDATA_SOURCE
-    ):
-        yield
 
 
 @pytest.fixture(scope="session")
@@ -71,161 +51,80 @@ def create_entity_object():
 
 
 @pytest.fixture(scope="session")
-def client_get():
-    app = create_app()
-    client = TestClient(app)
-
-    return partial(client.get, headers={"accept": "application/json"})
-
-
-@pytest.fixture(scope="session")
-def client_put():
-    app = create_app()
-    client = TestClient(app)
-
-    return partial(client.put)
-
-
-@pytest.fixture(scope="session")
-def client_post():
-    app = create_app()
-    client = TestClient(app)
-
-    return partial(client.post, headers={"accept": "application/json"})
-
-
-@pytest.fixture(scope="session")
-def git_tm_data():
-    return TMData(sources)
-
-
-# re-defined TMData for local file source
-@pytest.fixture(scope="session")
-def tm_data():
-    return TMData(local_source)
-
-
-@pytest.fixture(scope="session")
-def tmdata_source():
+def tests_tmdata_source():
     """TMData source URL fixture."""
-    return CAR_TELMODEL_SOURCE
+    return f"file://{os.path.join(os.path.dirname(__file__), 'tmdata')}"
 
 
 @pytest.fixture(scope="session")
-def tm_data_osd(create_entity_object):
-    with tempfile.TemporaryDirectory("tmdata") as dirname:
-        mid_parent = pathlib.Path(dirname, "ska1_mid")
-        mid_parent.mkdir(parents=True)
-        create_mock_json_files(
-            mid_parent / "mid_capabilities.json",
-            create_entity_object(MID_CAPABILITIES_MOCK_DATA),
-        )
-
-        low_parent = pathlib.Path(dirname, "ska1_low")
-        low_parent.mkdir(parents=True)
-        create_mock_json_files(
-            low_parent / "low_capabilities.json",
-            create_entity_object(LOW_CAPABILITIES_MOCK_DATA),
-        )
-
-        create_mock_json_files(
-            f"{dirname}/observatory_policies.json",
-            create_entity_object(DEFAULT_OSD_RESPONSE_WITH_NO_PARAMETER).get(
-                "observatory_policy"
-            ),
-        )
-
-        mid_validation_parent = pathlib.Path(
-            dirname, "instrument", "ska1_mid", "validation"
-        )
-        mid_validation_parent.mkdir(parents=True)
-        create_mock_json_files(
-            mid_validation_parent / "mid-validation-constants.json",
-            create_entity_object(VALIDATION_MOCK_DATA).get("mid_validation"),
-        )
-
-        low_validation_parent = pathlib.Path(
-            dirname, "instrument", "ska1_low", "validation"
-        )
-        low_validation_parent.mkdir(parents=True)
-        create_mock_json_files(
-            low_validation_parent / "low-validation-constants.json",
-            create_entity_object(VALIDATION_MOCK_DATA).get("low_validation"),
-        )
-
-        mid_sbd_validation_parent = pathlib.Path(
-            dirname, "instrument", "scheduling-block", "validation"
-        )
-        mid_sbd_validation_parent.mkdir(parents=True)
-        create_mock_json_files(
-            mid_sbd_validation_parent / "mid_sbd-validation-constants.json",
-            create_entity_object(MID_SBD_VALIDATION_MOCK_DATA),
-        )
-
-        create_mock_json_files(
-            mid_sbd_validation_parent / "low_sbd-validation-constants.json",
-            create_entity_object(LOW_SBD_VALIDATION_MOCK_DATA),
-        )
-
-        print(f"Dirname: {dirname} {mid_parent} {os.listdir(dirname)}")
-        yield TMData([f"file://{dirname}"])
+def tests_tmdata(tests_tmdata_source):
+    return TMData(source_uris=[tests_tmdata_source])
 
 
 @pytest.fixture(scope="session")
-def validate_car_class():
-    """This function is used as a fixture for osd_tmdata_source object with
-    osd_version as '1.11.0'.
-
-    :returns: osd_tmdata_source object
-    """
-    tmdata_source, _ = osd_tmdata_source(osd_version="1.11.0")
-    return tmdata_source
+def empty_tmdata(tmp_path_factory):
+    """Fixture for an empty TMData instance."""
+    empty_dir = tmp_path_factory.mktemp("empty_tmdata")
+    return TMData([f"file://{empty_dir}"])
 
 
 @pytest.fixture(scope="session")
-def validate_gitlab_class():
-    """This function is used as a fixture for osd_tmdata_source object with
-    parameters.
-
-    :returns: osd_tmdata_source object
-    """
-    tmdata_source, _ = osd_tmdata_source(
-        cycle_id=1,
-        gitlab_branch="nak-776-osd-implementation-file-versioning",
-        source="gitlab",
-    )
-    return tmdata_source
+def test_client(tests_tmdata):
+    """Test client using tests_tmdata for all requests"""
+    app = create_app()
+    app.dependency_overrides[get_tmdata_car_main] = lambda: tests_tmdata
+    app.dependency_overrides[get_tmdata_for_osd_query] = lambda: tests_tmdata
+    app.dependency_overrides[get_tmdata_default_semantic_source] = lambda: tests_tmdata
+    return TestClient(app)
 
 
 @pytest.fixture(scope="session")
-def osd_versions():
-    """This fixture reads a JSON file containing cycle-to-version mappings,
-    extracts all unique versions across all cycles, and returns them as a
-    sorted list.
+def sad_path_client(tests_tmdata):
+    """Test client for error-handling in get_tmdata_for_osd_query."""
+    app = create_app()
+    app.dependency_overrides[get_tmdata_car_main] = lambda: tests_tmdata
+    app.dependency_overrides[get_tmdata_gitlab_main] = lambda: tests_tmdata
+    app.dependency_overrides[get_tmdata_default_semantic_source] = lambda: tests_tmdata
+    return TestClient(app)
 
-    :returns list: A sorted list of unique OSD versions extracted from
-        the JSON file.
-    """
 
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    parent_dir = os.path.dirname(current_dir)
-    json_path = os.path.join(
-        parent_dir,
-        "src",
-        "ska_ost_osd",
-        "osd",
-        "version_mapping",
-        "cycle_gitlab_release_version_mapping.json",
-    )
+@pytest.fixture(scope="session")
+def empty_client(empty_tmdata):
+    """Test client using TMData with no files"""
+    app = create_app()
+    app.dependency_overrides[get_tmdata_car_main] = lambda: empty_tmdata
+    app.dependency_overrides[get_tmdata_for_osd_query] = lambda: empty_tmdata
+    app.dependency_overrides[get_tmdata_default_semantic_source] = lambda: empty_tmdata
+    return TestClient(app)
 
-    with open(json_path, "r", encoding="utf-8") as file:
-        data = json.load(file)
 
-    all_versions = set()
-    for cycle_versions in data.values():
-        all_versions.update(cycle_versions)
+@pytest.fixture
+def failing_tmdata(tests_tmdata_source, monkeypatch):
+    """TMData fixture that fails on item access to simulate CAR backend errors."""
+    tmdata = TMData(source_uris=[tests_tmdata_source])
 
-    return sorted(list(all_versions))
+    def raise_car_backend_error(_, __):
+        raise ValueError(
+            "car://gitlab.com/ska-telescope/ost/ska-ost-osd?1.0.0#tmdata "
+            "not found in SKA CAR - make sure to add tmdata CI!"
+        )
+
+    monkeypatch.setattr(TMData, "__getitem__", raise_car_backend_error)
+    return tmdata
+
+
+@pytest.fixture
+def car_source_failure_client(failing_tmdata):
+    """Client fixture where /osd receives TMData that fails during read."""
+    app = create_app()
+
+    def get_failing_tmdata_for_osd_query():
+        return failing_tmdata
+
+    app.dependency_overrides[
+        get_tmdata_for_osd_query
+    ] = get_failing_tmdata_for_osd_query
+    return TestClient(app)
 
 
 @pytest.fixture(scope="session")
@@ -253,26 +152,6 @@ def mid_osd_data_aa2():
     :returns dict: MID_OSD_DATA_JSON file data
     """
     return MID_OSD_DATA_JSON_AA2
-
-
-@pytest.fixture(scope="session")
-def mock_mid_data(create_entity_object):
-    """This function is used as a fixture for mid json data.
-
-    :returns: mid json data
-    """
-
-    return create_entity_object(MID_CAPABILITIES_MOCK_DATA)
-
-
-@pytest.fixture(scope="session")
-def mock_low_data(create_entity_object):
-    """This function is used as a fixture for low json data.
-
-    :returns: low json data
-    """
-
-    return create_entity_object(LOW_CAPABILITIES_MOCK_DATA)
 
 
 @pytest.fixture(scope="session")
@@ -447,21 +326,6 @@ def mid_low_response_input(request):
             },
         ),
         (
-            None,
-            None,
-            "file",
-            "mid",
-            "AA100000",
-            {
-                "result_data": [
-                    "Array Assembly AA100000 is not valid,Available Array Assemblies"
-                    " are AA0.5, AA1, AA2"
-                ],
-                "result_status": "failed",
-                "result_code": 400,
-            },
-        ),
-        (
             1,
             None,
             None,
@@ -493,13 +357,13 @@ def invalid_osd_tmdata_source_input(request):
 
 @pytest.fixture(scope="session")
 def valid_semantic_validation_body(
-    tmdata_source, mid_osd_data, valid_observing_command_input
+    tests_tmdata_source, mid_osd_data, valid_observing_command_input
 ):
     return {
         "observing_command_input": valid_observing_command_input,
         "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
         "array_assembly": "AA0.5",
-        "sources": tmdata_source,
+        "sources": tests_tmdata_source,
         "raise_semantic": True,
         "osd_data": mid_osd_data,
     }
@@ -507,13 +371,13 @@ def valid_semantic_validation_body(
 
 @pytest.fixture(scope="session")
 def valid_semantic_validation_body_aa1(
-    tmdata_source, mid_osd_data_aa1, valid_observing_command_input_aa1
+    tests_tmdata_source, mid_osd_data_aa1, valid_observing_command_input_aa1
 ):
     return {
         "observing_command_input": valid_observing_command_input_aa1,
         "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
         "array_assembly": "AA1",
-        "sources": tmdata_source,
+        "sources": tests_tmdata_source,
         "raise_semantic": True,
         "osd_data": mid_osd_data_aa1,
     }
@@ -521,13 +385,13 @@ def valid_semantic_validation_body_aa1(
 
 @pytest.fixture(scope="session")
 def valid_semantic_validation_body_aa2(
-    tmdata_source, mid_osd_data_aa2, valid_observing_command_input_aa2
+    tests_tmdata_source, mid_osd_data_aa2, valid_observing_command_input_aa2
 ):
     return {
         "observing_command_input": valid_observing_command_input_aa2,
         "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
         "array_assembly": "AA2",
-        "sources": tmdata_source,
+        "sources": tests_tmdata_source,
         "raise_semantic": True,
         "osd_data": mid_osd_data_aa2,
     }
@@ -553,13 +417,13 @@ def semantic_validation_disable_response():
 
 @pytest.fixture(scope="session")
 def invalid_semantic_validation_body(
-    tmdata_source, mid_osd_data, invalid_observing_command_input
+    tests_tmdata_source, mid_osd_data, invalid_observing_command_input
 ):
     return {
         "observing_command_input": invalid_observing_command_input,
         "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
         "array_assembly": "AA0.5",
-        "sources": tmdata_source,
+        "sources": tests_tmdata_source,
         "raise_semantic": True,
         "osd_data": mid_osd_data,
     }
@@ -567,13 +431,13 @@ def invalid_semantic_validation_body(
 
 @pytest.fixture(scope="session")
 def invalid_semantic_validation_body_aa1(
-    tmdata_source, mid_osd_data_aa1, invalid_observing_command_input_aa1
+    tests_tmdata_source, mid_osd_data_aa1, invalid_observing_command_input_aa1
 ):
     return {
         "observing_command_input": invalid_observing_command_input_aa1,
         "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
         "array_assembly": "AA1",
-        "sources": tmdata_source,
+        "sources": tests_tmdata_source,
         "raise_semantic": True,
         "osd_data": mid_osd_data_aa1,
     }
@@ -581,13 +445,13 @@ def invalid_semantic_validation_body_aa1(
 
 @pytest.fixture(scope="session")
 def invalid_semantic_validation_body_aa2(
-    tmdata_source, mid_osd_data_aa2, invalid_observing_command_input_aa2
+    tests_tmdata_source, mid_osd_data_aa2, invalid_observing_command_input_aa2
 ):
     return {
         "observing_command_input": invalid_observing_command_input_aa2,
         "interface": "https://schema.skao.int/ska-tmc-assignresources/2.1",
         "array_assembly": "AA2",
-        "sources": tmdata_source,
+        "sources": tests_tmdata_source,
         "raise_semantic": True,
         "osd_data": mid_osd_data_aa2,
     }

@@ -1,0 +1,126 @@
+{
+    "interface": "https://schema.skao.int/ska-telmodel-layout/1.1",
+    "telescope": "ska1_low",
+    "receptors": [
+        {
+            "interface": "https://schema.skao.int/ska-telmodel-layout-receptor/1.1",
+            "diameter": 38.0,
+            "location": {
+                "interface": "https://schema.skao.int/ska-telmodel-layout-location/1.0",
+                "geocentric": {
+                    "interface": "https://schema.skao.int/ska-telmodel-layout-geocentric/1.0",
+                    "coordinate_frame": "ITRF",
+                    "x": -2565044.433249,
+                    "y": 5085763.694774,
+                    "z": -2861062.439952
+                },
+                "geodetic": {
+                    "interface": "https://schema.skao.int/ska-telmodel-layout-geodetic/1.0",
+                    "coordinate_frame": "WGS84",
+                    "lat": -26.824722084,
+                    "lon": 116.76444824,
+                    "h": 365.0
+                }
+            },
+            "fixed_delays": [
+                {
+                    "interface": "https://schema.skao.int/ska-telmodel-layout-receptor-fixed-delay/0.0",
+                    "fixed_delay_id": "FIX_H",
+                    "polarisation": 0,
+                    "units": "m",
+                    "delay": 0.0
+                },
+                {
+                    "interface": "https://schema.skao.int/ska-telmodel-layout-receptor-fixed-delay/0.0",
+                    "fixed_delay_id": "FIX_V",
+                    "polarisation": 0,
+                    "units": "m",
+                    "delay": 0.0
+                }
+            ],
+            "niao": 0.0,
+            "station_id": 0,
+            "station_label": "AC"
+        },
+        {
+            "interface": "https://schema.skao.int/ska-telmodel-layout-receptor/1.1",
+            "diameter": 38.0,
+            "location": {
+                "interface": "https://schema.skao.int/ska-telmodel-layout-location/1.0",
+                "geocentric": {
+                    "interface": "https://schema.skao.int/ska-telmodel-layout-geocentric/1.0",
+                    "coordinate_frame": "ITRF",
+                    "x": -2565124.7717066384,
+                    "y": 5085647.529621617,
+                    "z": -2861207.079154239
+                },
+                "geodetic": {
+                    "interface": "https://schema.skao.int/ska-telmodel-layout-geodetic/1.0",
+                    "coordinate_frame": "WGS84",
+                    "lat": -26.826162,
+                    "lon": 116.765696,
+                    "h": 370.0
+                }
+            },
+            "fixed_delays": [
+                {
+                    "interface": "https://schema.skao.int/ska-telmodel-layout-receptor-fixed-delay/0.0",
+                    "fixed_delay_id": "FIX_H",
+                    "polarisation": 0,
+                    "units": "m",
+                    "delay": 0.0
+                },
+                {
+                    "interface": "https://schema.skao.int/ska-telmodel-layout-receptor-fixed-delay/0.0",
+                    "fixed_delay_id": "FIX_V",
+                    "polarisation": 0,
+                    "units": "m",
+                    "delay": 0.0
+                }
+            ],
+            "niao": 0.0,
+            "station_id": 1,
+            "station_label": "C1"
+        },
+        {
+            "interface": "https://schema.skao.int/ska-telmodel-layout-receptor/1.1",
+            "diameter": 38.0,
+            "location": {
+                "interface": "https://schema.skao.int/ska-telmodel-layout-location/1.0",
+                "geocentric": {
+                    "interface": "https://schema.skao.int/ska-telmodel-layout-geocentric/1.0",
+                    "coordinate_frame": "ITRF",
+                    "x": -2564996.841508992,
+                    "y": 5085851.958070379,
+                    "z": -2860957.8376849536
+                },
+                "geodetic": {
+                    "interface": "https://schema.skao.int/ska-telmodel-layout-geodetic/1.0",
+                    "coordinate_frame": "WGS84",
+                    "lat": -26.823646,
+                    "lon": 116.763621,
+                    "h": 369.0
+                }
+            },
+            "fixed_delays": [
+                {
+                    "interface": "https://schema.skao.int/ska-telmodel-layout-receptor-fixed-delay/0.0",
+                    "fixed_delay_id": "FIX_H",
+                    "polarisation": 0,
+                    "units": "m",
+                    "delay": 0.0
+                },
+                {
+                    "interface": "https://schema.skao.int/ska-telmodel-layout-receptor-fixed-delay/0.0",
+                    "fixed_delay_id": "FIX_V",
+                    "polarisation": 0,
+                    "units": "m",
+                    "delay": 0.0
+                }
+            ],
+            "niao": 0.0,
+            "station_id": 2,
+            "station_label": "C2"
+        }
+    ]
+}

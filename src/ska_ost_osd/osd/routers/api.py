@@ -11,6 +11,7 @@ from typing import Dict, Optional
 
 from fastapi import APIRouter, Body, Depends
 from pydantic import ValidationError
+from ska_telmodel_client import TMData
 
 from ska_ost_osd.common.models import ApiResponse
 from ska_ost_osd.common.utils import convert_to_response_object, get_responses
@@ -38,6 +39,10 @@ from ska_ost_osd.osd.osd import (
     get_osd_using_tmdata,
     update_osd_file,
 )
+from ska_ost_osd.osd.routers.dependencies import (
+    get_tmdata_car_main,
+    get_tmdata_for_osd_query,
+)
 from ska_ost_osd.osd.version_mapping.version_manager import manage_version_release
 
 # this variable is added for restricting tmdata publish from local/dev environment.
@@ -59,7 +64,10 @@ osd_router = APIRouter(prefix="")
     responses=get_responses(ApiResponse),
     response_model=ApiResponse,
 )
-def get_osd(osd_model: OSDQueryParams = Depends()) -> Dict:
+def get_osd(
+    osd_model: OSDQueryParams = Depends(),
+    tm_data: TMData = Depends(get_tmdata_for_osd_query),
+) -> Dict:
     """This function takes query parameters and OSD data source objects to
     generate a response containing matching OSD data.
 
@@ -68,9 +76,13 @@ def get_osd(osd_model: OSDQueryParams = Depends()) -> Dict:
     :returns dict: A dictionary with OSD data satisfying the query.
     """
     try:
-        model_data = osd_model.model_dump()
-        model_data["process_templates"] = True
-        osd_data = get_osd_using_tmdata(**model_data)
+        osd_data = get_osd_using_tmdata(
+            tm_data=tm_data,
+            capabilities=osd_model.capabilities,
+            array_assembly=osd_model.array_assembly,
+            cycle_id=osd_model.cycle_id,
+            process_templates=True,
+        )
     except (OSDModelError, ValueError) as error:
         raise error
     return convert_to_response_object(osd_data, result_code=HTTPStatus.OK)
@@ -187,13 +199,15 @@ def release_osd_data(
     responses=get_responses(ApiResponse[CycleModel]),
     response_model=ApiResponse,
 )
-def get_cycle_list() -> ApiResponse[CycleModel]:
+def get_cycle_list(
+    tmdata: TMData = Depends(get_tmdata_car_main),
+) -> ApiResponse[CycleModel]:
     """Get the list of all available proposal cycles.
 
     :return: ApiResponse[CycleModel], response model containing the list
         of cycle numbers.
     """
-    cycle_numbers = get_available_cycles()
+    cycle_numbers = get_available_cycles(tmdata)
     cycles = {"cycles": sorted(cycle_numbers)}
     return convert_to_response_object(cycles, result_code=HTTPStatus.OK)
 

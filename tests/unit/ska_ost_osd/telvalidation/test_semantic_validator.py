@@ -1,10 +1,8 @@
-import unittest
 from datetime import datetime
 from unittest.mock import patch
 
 import pytest
 from fastapi import status
-from ska_telmodel_client import TMData
 
 from ska_ost_osd.telvalidation.common.error_handling import (
     SchemanticValidationKeyError,
@@ -25,7 +23,6 @@ from tests.unit.ska_ost_osd.common.constant import (
     INPUT_COMMAND_CONFIG,
     INVALID_MID_VALIDATE_CONSTANT,
     capabilities,
-    sources,
 )
 
 
@@ -33,7 +30,7 @@ from tests.unit.ska_ost_osd.common.constant import (
 def test_semantic_validate_para(
     mock_fetch_capabilities,
     semantic_validation_param_input,
-    tm_data_osd,
+    tests_tmdata,
     create_entity_object,
 ):
     """Parameterized test case to verify semantic validation for different
@@ -69,15 +66,15 @@ def test_semantic_validate_para(
             " interface='...' explicitly."
         ),
     ):
-        semantic_validate(config, tm_data_osd)
+        semantic_validate(config, tm_data=tests_tmdata)
 
     config["interface"] = interface
 
     if not is_exception:
-        assert semantic_validate(config, tm_data=tm_data_osd), expected_result
+        assert semantic_validate(config, tm_data=tests_tmdata), expected_result
     else:
         try:
-            semantic_validate(config, tm_data=tm_data_osd)
+            semantic_validate(config, tm_data=tests_tmdata)
         except SchematicValidationError as error:
             assert error.message == expected_result
 
@@ -102,46 +99,31 @@ def test_validate_schemantic_json_input_keys(mock6):
         )
 
 
-class TestTargetVisibility(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.tm_data = TMData(sources)
-
-    def test_target_is_visible_mid(self):
+class TestTargetVisibility:
+    def test_target_is_visible_mid(self, tests_tmdata):
         ra_str = "21:08:47.92"
         dec_str = "-88:57:22.9"
         telescope = "mid"
         observing_time = datetime(2023, 5, 8, 20, 30)
-
-        expected_output = True
-
-        self.assertEqual(
-            validate_target_is_visible(
-                ra_str,
-                dec_str,
-                telescope,
-                "target_mid",
-                tm_data=self.tm_data,
-                observing_time=observing_time,
-            ),
-            expected_output,
+        assert validate_target_is_visible(
+            ra_str,
+            dec_str,
+            telescope,
+            "target_mid",
+            tm_data=tests_tmdata,
+            observing_time=observing_time,
         )
 
-    def test_target_is_visible_low(self):
+    def test_target_is_visible_low(self, tests_tmdata):
         ra = "21:08:47.92"
         dec = "-88:57:22.9"
         telescope = "low"
         observing_time = datetime(2023, 5, 8, 20, 30)
-
-        expected_output = True
-        self.assertEqual(
-            validate_target_is_visible(
-                ra, dec, telescope, "target_low", self.tm_data, observing_time
-            ),
-            expected_output,
+        assert validate_target_is_visible(
+            ra, dec, telescope, "target_low", tests_tmdata, observing_time
         )
 
-    def test_target_is_visible_unknown_name(self):
+    def test_target_is_visible_unknown_name(self, tests_tmdata):
         ra = "21:08:47.92"
         dec = "-88:57:22.9"
         telescope = "asd"
@@ -152,11 +134,11 @@ class TestTargetVisibility(unittest.TestCase):
             match="Invalid telescope name",
         ):
             validate_target_is_visible(
-                ra, dec, telescope, "asd", self.tm_data, observing_time
+                ra, dec, telescope, "asd", tests_tmdata, observing_time
             )
 
     @patch("ska_ost_osd.telvalidation.oet_tmc_validators.ra_dec_to_az_el")
-    def test_temp_list_length_less_than_3(self, mock_ra_dec_to_az_el):
+    def test_temp_list_length_less_than_3(self, mock_ra_dec_to_az_el, tests_tmdata):
         # Mock ra_dec_to_az_el to return temp_list with length < 3
         mock_ra_dec_to_az_el.return_value = [180, 60]
 
@@ -168,25 +150,19 @@ class TestTargetVisibility(unittest.TestCase):
             "Telescope: low target observing during 2023-05-08T12:30:00 is not visible"
         )
 
-        with self.assertRaises(SchematicValidationError) as context:
+        with pytest.raises(SchematicValidationError) as context:
             validate_target_is_visible(
-                ra, dec, telescope, "target_low", self.tm_data, observing_time
+                ra, dec, telescope, "target_low", tests_tmdata, observing_time
             )
 
-        # Assert that the exception was raised
-        self.assertIsInstance(context.exception, SchematicValidationError)
-        # Assert that the error message matches the expected result
-        self.assertEqual(str(context.exception), expected_result)
+        assert str(context.value) == expected_result
 
-    def test_target_is_visible_low_with_utc(self):
+    def test_target_is_visible_low_with_utc(self, tests_tmdata):
         ra = "21:08:47.92"
         dec = "-88:57:22.9"
         telescope = "low"
-
-        expected_output = True
-        self.assertEqual(
-            validate_target_is_visible(ra, dec, telescope, "target_low", self.tm_data),
-            expected_output,
+        assert validate_target_is_visible(
+            ra, dec, telescope, "target_low", tests_tmdata
         )
 
 
@@ -235,13 +211,15 @@ def test_fetch_capabilities_from_osd_based_on_client_based_osd_data(mock1):
         ),
     ],
 )
-def test_semantic_validate_api(client_post, request, json_body_to_validate, response):
+def test_semantic_validate_api(
+    tests_tmdata_source, test_client, request, json_body_to_validate, response
+):
     """Test semantic validation API with valid and invalid JSON."""
     json_body = request.getfixturevalue(json_body_to_validate)
-    json_body["sources"] = "file://tmdata"
+    json_body["sources"] = tests_tmdata_source
     expected_response = request.getfixturevalue(response)
 
-    res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body).json()
+    res = test_client.post(f"{BASE_API_URL}/semantic_validation", json=json_body).json()
     assert res == expected_response
 
 
@@ -263,27 +241,27 @@ def test_semantic_validate_api(client_post, request, json_body_to_validate, resp
     ],
 )
 def test_disable_semantic_validate_api(
-    client_post, request, json_body_to_validate, response
+    tests_tmdata_source, test_client, request, json_body_to_validate, response
 ):
     """Test semantic validation API when VALIDATION_STRICTNESS is set to 1."""
     json_body = request.getfixturevalue(json_body_to_validate)
-    json_body["sources"] = "file://tmdata"
+    json_body["sources"] = tests_tmdata_source
     expected_response = request.getfixturevalue(response)
 
-    res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body).json()
+    res = test_client.post(f"{BASE_API_URL}/semantic_validation", json=json_body).json()
 
     assert res == expected_response
 
 
 def test_semantic_validate_api_not_passing_required_keys(
-    client_post,
+    test_client,
     valid_semantic_validation_body,
 ):
     """Test semantic validation API response with missing input
     observing_command_input key."""
     json_body = valid_semantic_validation_body.copy()
     del json_body["observing_command_input"]
-    res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body).json()
+    res = test_client.post(f"{BASE_API_URL}/semantic_validation", json=json_body).json()
     assert "Missing field(s): body.observing_command_input" in res["result_data"]
 
 
@@ -328,44 +306,50 @@ def test_semantic_validate_api_not_passing_required_keys(
     ],
 )
 def test_not_passing_optional_keys(
-    request, client_post, json_body_to_validate, response, key_to_delete
+    request,
+    tests_tmdata_source,
+    test_client,
+    json_body_to_validate,
+    response,
+    key_to_delete,
 ):
     """Test semantic validation API response by not passing optional keys."""
     json_body = request.getfixturevalue(json_body_to_validate).copy()
-    json_body["sources"] = "file://tmdata"
+    json_body["sources"] = tests_tmdata_source
     del json_body[key_to_delete]
     expected_response = request.getfixturevalue(response)
-    res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body).json()
+    res = test_client.post(f"{BASE_API_URL}/semantic_validation", json=json_body).json()
     assert res["result_data"] == expected_response["result_data"]
 
 
 def test_wrong_values_and_no_observing_command_input(
     wrong_semantic_validation_parameter_value_response,
     wrong_semantic_validation_parameter_body,
-    client_post,
+    test_client,
 ):
     """Test semantic validation API response with wrong values."""
     json_body = wrong_semantic_validation_parameter_body
     expected_response = wrong_semantic_validation_parameter_value_response
-    res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body).json()
+    res = test_client.post(f"{BASE_API_URL}/semantic_validation", json=json_body).json()
     assert res["result_data"] == expected_response["result_data"]
 
 
 def test_passing_only_required_keys(
-    client_post,
+    tests_tmdata_source,
+    test_client,
     valid_only_observing_command_input_in_request_body,
     valid_semantic_validation_response,
 ):
     """Test semantic validation API response with only required keys."""
     json_body = valid_only_observing_command_input_in_request_body
-    json_body["sources"] = "file://tmdata"
+    json_body["sources"] = tests_tmdata_source
     expected_response = valid_semantic_validation_response
-    res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body).json()
+    res = test_client.post(f"{BASE_API_URL}/semantic_validation", json=json_body).json()
     assert res == expected_response
 
 
 def test_semantic_validate_invalid_array_assembly(
-    semantic_validation_invalid_array_assembly, client_post
+    semantic_validation_invalid_array_assembly, test_client
 ):
     """Test semantic validation API response with invalid array assembly."""
     json_body = semantic_validation_invalid_array_assembly
@@ -373,6 +357,6 @@ def test_semantic_validate_invalid_array_assembly(
         "body.array_assembly: String should match pattern"
         " '^AA(\\d+|\\d+\\.\\d+)|^Low|^Mid', invalid payload: AAA121"
     )
-    res = client_post(f"{BASE_API_URL}/semantic_validation", json=json_body).json()
+    res = test_client.post(f"{BASE_API_URL}/semantic_validation", json=json_body).json()
     assert res["result_data"] == expected_response
     assert res["result_code"] == status.HTTP_422_UNPROCESSABLE_ENTITY

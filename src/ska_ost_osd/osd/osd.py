@@ -5,30 +5,21 @@ from typing import Any, Dict, Optional
 from ska_telmodel_client import TMData
 
 from ska_ost_osd.common.utils import update_file
-from ska_ost_osd.osd.common.error_handling import OSDModelError
 from ska_ost_osd.osd.common.osd_validation_messages import (
     ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE,
-    AVAILABLE_SOURCE_ERROR_MESSAGE,
     CAPABILITY_DOESNOT_EXIST_ERROR_MESSAGE,
     CYCLE_ERROR_MESSAGE,
     CYCLE_ID_ERROR_MESSAGE,
     OSD_VERSION_ERROR_MESSAGE,
-    SOURCE_ERROR_MESSAGE,
 )
-from ska_ost_osd.osd.common.utils import get_osd_latest_version
-from ska_ost_osd.osd.models.models import OSDModel
 from ska_ost_osd.osd.template_mapping.template_mapping import process_template_mappings
 
 from .common.constant import (
     ARRAY_ASSEMBLY_PATTERN,
-    BASE_FOLDER_NAME,
-    BASE_URL,
-    CAR_URL,
-    GITLAB_SOURCE,
     LOW_CAPABILITIES_JSON_PATH,
     MID_CAPABILITIES_JSON_PATH,
     OBSERVATORY_POLICIES_JSON_PATH,
-    SOURCES,
+    RELEASE_FILE_PATH_LATEST,
     VERSION_FILE_PATH,
     osd_file_mapping,
     osd_response_template,
@@ -261,13 +252,16 @@ class OSD:
             return ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE.format(value, msg)
 
 
-def get_available_cycles() -> list[int]:
+def get_available_cycles(tmdata: TMData) -> list[int]:
     """Fetch available cycle numbers from TMData version mapping.
 
+    :param tmdata: TMData, TMData client to access version mapping.
     :return: list[int], list of available cycle numbers.
     """
-    tmdata = TMData([f"car:{CAR_URL}main#{BASE_FOLDER_NAME}"], update=True)
-    versions_dict = tmdata[VERSION_FILE_PATH].get_dict()
+    try:
+        versions_dict = tmdata[VERSION_FILE_PATH].get_dict()
+    except KeyError as err:
+        raise FileNotFoundError(f"file not found: {VERSION_FILE_PATH}") from err
 
     return [
         int(key.split("_")[1])
@@ -276,7 +270,21 @@ def get_available_cycles() -> list[int]:
     ]
 
 
+def get_osd_latest_version(tmdata_version: TMData) -> str:
+    """Read the latest_release.txt file and retrieve the latest OSD version.
+
+    :param tmdata_version: TMData, TMData object for gitlab main version files.
+    :return: str, the latest OSD release version.
+    """
+    osd_version = (
+        tmdata_version[RELEASE_FILE_PATH_LATEST].get().decode("utf-8").replace('"', "")
+    )
+
+    return osd_version
+
+
 def check_cycle_id(
+    tmdata: TMData,
     cycle_id: int = None,
     osd_version: str = None,
     gitlab_branch: str = None,
@@ -289,6 +297,7 @@ def check_cycle_id(
     :param cycle_id: cycle id integer value.
     :param osd_version: osd version i.e. 1.9.0
     :param gitlab_branch: branch name like master, dev etc.
+    :param tmdata: TMData object used for latest version lookup.
     :param versions_dict: version dict containing version data
     :return: osd_version in string format i.e 1.9.0 or raises
         OSDDataException
@@ -304,8 +313,8 @@ def check_cycle_id(
         osd_version = gitlab_branch
 
     if cycle_id is None and osd_version is None and gitlab_branch is None:
-        osd_version = (
-            get_osd_latest_version()
+        osd_version = get_osd_latest_version(
+            tmdata
         )  # get latest version from latest_release.txt file
 
     if versions_dict is None:
@@ -331,52 +340,6 @@ def check_cycle_id(
             )
 
     return osd_version, cycle_error_msg_list
-
-
-def osd_tmdata_source(
-    cycle_id: int = None,
-    osd_version: str = None,
-    source: str = "car",
-    gitlab_branch: str = None,
-    versions_dict: Dict = None,
-) -> str:
-    """This function checks and returns source_uri for TMData class.
-
-    :param cycle_id: cycle id integer value.
-    :param osd_version: osd version i.e. 1.9.0 or branch name like
-        master, dev etc.
-    :param source: where to get OSD Data from car or file
-    :param gitlab_branch: branch name like master, dev etc.
-    :param versions_dict: version dict containing version data
-    :return: source_uris as a string or raises exception
-    """
-    source_error_msg_list = []
-    if source not in SOURCES:
-        source_msg = ", ".join(SOURCES)
-        source_error_msg_list.append(AVAILABLE_SOURCE_ERROR_MESSAGE.format(source_msg))
-
-    if (
-        gitlab_branch
-        and isinstance(gitlab_branch, str)
-        and (source == "car" or source == "file")
-    ):
-        source_error_msg_list.append(SOURCE_ERROR_MESSAGE.format(source))
-
-    osd_version, cycle_error_msg_list = check_cycle_id(
-        cycle_id, osd_version, gitlab_branch, versions_dict
-    )
-
-    source_error_msg_list.extend(cycle_error_msg_list)
-
-    source_url = (f"{source}:{BASE_URL}{CAR_URL}{osd_version}#{BASE_FOLDER_NAME}",)
-
-    if source == "file":
-        source_url = (f"file://{BASE_FOLDER_NAME}",)
-
-    if source == "car":
-        source_url = (f"{source}:{CAR_URL}{osd_version}#{BASE_FOLDER_NAME}",)
-
-    return source_url, source_error_msg_list
 
 
 def get_osd_data(
@@ -409,65 +372,23 @@ def get_osd_data(
 
 
 def get_osd_using_tmdata(
-    cycle_id: Optional[int] = None,
-    osd_version: Optional[str] = None,
-    source: Optional[str] = None,
-    gitlab_branch: Optional[str] = None,
+    tm_data: TMData,
     capabilities: Optional[str] = None,
     array_assembly: Optional[str] = None,
+    cycle_id: Optional[int] = None,
     process_templates: bool = False,
 ) -> Dict:
-    """Retrieve OSD data using TMData.
+    """Retrieve OSD data using an already constructed TMData object.
 
-    :param cycle_id: int, optional cycle ID.
-    :param osd_version: str, optional OSD version.
-    :param source: str, optional source.
-    :param gitlab_branch: str, optional GitLab branch.
+    :param tm_data: TMData, pre-resolved TMData source for OSD retrieval.
     :param capabilities: str, optional capabilities.
     :param array_assembly: str, optional array assembly.
+    :param cycle_id: int, optional cycle ID.
     :param process_templates: bool, whether to process template mappings.
     :return: Dict[Dict[str, Any]], OSD data.
     :raises ValueError: If any validation or processing errors occur.
     """
     errors = []
-
-    try:
-        OSDModel(
-            source=source,
-            cycle_id=cycle_id,
-            osd_version=osd_version,
-            capabilities=capabilities,
-            array_assembly=array_assembly,
-        )
-    except OSDModelError as error:
-        errors.extend(error.args[0])
-
-    tmdata_version = TMData(GITLAB_SOURCE, update=True)
-    versions_dict = tmdata_version[VERSION_FILE_PATH].get_dict()
-    _, cycle_errors = check_cycle_id(
-        cycle_id=cycle_id,
-        osd_version=osd_version,
-        gitlab_branch=gitlab_branch,
-        versions_dict=versions_dict,
-    )
-    if cycle_errors:
-        errors.extend(cycle_errors)
-        raise ValueError(errors)
-    tm_data_source, error = osd_tmdata_source(
-        cycle_id=cycle_id,
-        osd_version=osd_version,
-        source=source,
-        gitlab_branch=gitlab_branch,
-        versions_dict=versions_dict,
-    )
-
-    if error:
-        errors.extend(error)
-
-    if errors:
-        raise ValueError(errors)
-
-    tm_data = TMData(source_uris=tm_data_source)
 
     osd_data, osd_errors = get_osd_data(
         capabilities=[capabilities] if capabilities else None,

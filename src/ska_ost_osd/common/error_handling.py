@@ -1,5 +1,4 @@
 import logging
-from typing import Any, Dict
 
 from fastapi import Request, status
 from fastapi.exceptions import RequestValidationError, ResponseValidationError
@@ -54,7 +53,7 @@ def get_http_status_from_map(exc: Exception) -> int:
 
 class ValidationErrorFormatter:
     @staticmethod
-    def format(exc: RequestValidationError) -> Dict[str, Any]:
+    def format(exc: RequestValidationError) -> str:
         """Format a FastAPI RequestValidationError into a structured error
         message.
 
@@ -73,11 +72,12 @@ class ValidationErrorFormatter:
 
         :param exc: RequestValidationError, the exception raised during
             request validation.
-        :return: Dict[str, Any], a dictionary containing the formatted error message.
+        :return: str, formatted error message.
         """
-        missing_fields = []
+        missing_fields = set()
         parsing_errors = []
         payload_str = ""
+        input_value = None
 
         for err in exc.errors():
             err_type = err.get("type")
@@ -85,21 +85,26 @@ class ValidationErrorFormatter:
             msg = err.get("msg", "Invalid input")
             input_value = err.get("input", "")
 
-            if err_type == "missing":
-                missing_fields.append(loc)
-            elif err_type == "int_parsing":
-                parsing_errors.append(f"{loc}: {msg}, provided value: {input_value}")
-            else:
-                parsing_errors.append(f"{loc}: {msg}")
+            match err_type:
+                case "missing":
+                    missing_fields.add(loc)
+                case "int_parsing":
+                    parsing_errors.append(
+                        f"{loc}: {msg}, provided value: {input_value}"
+                    )
+                case _:
+                    parsing_errors.append(f"{loc}: {msg}")
 
             if input_value and not payload_str:
                 payload_str = str(input_value)
 
         parts = []
         if missing_fields:
-            parts.append(f"Missing field(s): {', '.join(missing_fields)}")
+            parts.append(f"Missing field(s): {', '.join(sorted(missing_fields))}")
         if parsing_errors:
-            parts.extend(parsing_errors)
+            # FastAPI dependencies can duplicate errors;
+            # deduplicate while preserving order
+            parts.extend(dict.fromkeys(parsing_errors))
 
         error_message = ". ".join(parts)
         if payload_str and not isinstance(input_value, dict):
