@@ -98,6 +98,35 @@ def empty_client(empty_tmdata):
     return TestClient(app)
 
 
+@pytest.fixture
+def failing_tmdata(tests_tmdata_source, monkeypatch):
+    """TMData fixture that fails on item access to simulate CAR backend errors."""
+    tmdata = TMData(source_uris=[tests_tmdata_source])
+
+    def raise_car_backend_error(_, __):
+        raise ValueError(
+            "car://gitlab.com/ska-telescope/ost/ska-ost-osd?1.0.0#tmdata "
+            "not found in SKA CAR - make sure to add tmdata CI!"
+        )
+
+    monkeypatch.setattr(TMData, "__getitem__", raise_car_backend_error)
+    return tmdata
+
+
+@pytest.fixture
+def car_source_failure_client(failing_tmdata):
+    """Client fixture where /osd receives TMData that fails during read."""
+    app = create_app()
+
+    def get_failing_tmdata_for_osd_query():
+        return failing_tmdata
+
+    app.dependency_overrides[
+        get_tmdata_for_osd_query
+    ] = get_failing_tmdata_for_osd_query
+    return TestClient(app)
+
+
 @pytest.fixture(scope="session")
 def mid_osd_data():
     """This fixture returns data in MID_OSD_DATA_JSON file.

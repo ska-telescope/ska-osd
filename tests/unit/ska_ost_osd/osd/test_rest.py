@@ -1,10 +1,6 @@
 from http import HTTPStatus
 
-from fastapi.testclient import TestClient
-
-from ska_ost_osd.app import create_app
 from ska_ost_osd.common.utils import remove_none_params
-from ska_ost_osd.osd.routers.dependencies import get_tmdata_for_osd_query
 from tests.conftest import BASE_API_URL
 
 
@@ -80,7 +76,7 @@ def test_invalid_osd_tmdata_source_capabilities(test_client):
     assert response["result_data"] == expected
 
 
-def test_osd_source_reports_backend_resolution_error():
+def test_osd_source_reports_backend_resolution_error(car_source_failure_client):
     """OSD endpoint should surface CAR TMData read errors.
 
     get_tmdata_for_osd_query should still resolve successfully; the
@@ -88,19 +84,7 @@ def test_osd_source_reports_backend_resolution_error():
     Uses dependency override so the test is deterministic and does not
     connect to CAR.
     """
-    app = create_app()
-
-    class FailingTMData:
-        def __getitem__(self, _):
-            raise ValueError(
-                "car://gitlab.com/ska-telescope/ost/ska-ost-osd?1.0.0#tmdata "
-                "not found in SKA CAR - make sure to add tmdata CI!"
-            )
-
-    app.dependency_overrides[get_tmdata_for_osd_query] = lambda: FailingTMData()
-    client = TestClient(app)
-
-    response = client.get(
+    response = car_source_failure_client.get(
         f"{BASE_API_URL}/osd", params={"cycle_id": 1, "source": "car"}
     )
     body = response.json()
