@@ -5,6 +5,7 @@ default:
 
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
+  POETRY_CONFIG_VIRTUALENVS_CREATE: "true"
   DOCS_RTD_PROJECT_SLUG: ska-telescope-ska-ost-osd
 
 # The YAML file defines a set of jobs with constraints stating when they should be run.
@@ -84,10 +85,6 @@ osd-tmdata-publish:
   when: manual
   script:
     - make osddata-do-publish
-
-docs-build:
-  variables:
-    POETRY_CONFIG_VIRTUALENVS_CREATE: "true"
 
 include:
   # Python
