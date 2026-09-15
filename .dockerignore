@@ -7,6 +7,7 @@ __pycache__
 build
 dist
 .cache
+.venv
 
 # Unit test / coverage reports
 htmlcov
