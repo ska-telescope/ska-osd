@@ -85,6 +85,10 @@ osd-tmdata-publish:
   script:
     - make osddata-do-publish
 
+docs-build:
+  variables:
+    POETRY_CONFIG_VIRTUALENVS_CREATE: "true"
+
 include:
   # Python
   - project: "ska-telescope/templates-repository"
