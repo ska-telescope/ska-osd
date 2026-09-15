@@ -1,5 +1,5 @@
 import re
-from enum import Enum
+from enum import StrEnum
 from typing import Any, Dict, List, Literal, Optional, TypeVar
 
 from pydantic import BaseModel, Field, model_validator
@@ -141,11 +141,10 @@ class ValidationOnCapabilities(BaseModel):
         return values
 
 
-class ReleaseType(str, Enum):
+class ReleaseType(StrEnum):
     """Enumeration of possible release types for OSD.
 
     This enum is used to distinguish between major and minor releases.
-    It inherits from ``str`` to allow string comparisons and serialization.
 
     :cvar minor: Represents a minor release.
     :cvar major: Represents a major release.
