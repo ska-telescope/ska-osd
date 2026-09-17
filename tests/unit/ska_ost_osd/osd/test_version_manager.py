@@ -34,9 +34,9 @@ class TestVersionManager:
 
         result = increment_version(current_version, release_type)
 
-        assert (
-            result == expected_version
-        ), f"Expected {expected_version}, but got {result}"
+        assert result == expected_version, (
+            f"Expected {expected_version}, but got {result}"
+        )
 
     def test_increment_minor_version(self):
         """Test incrementing the minor version number."""
@@ -46,9 +46,9 @@ class TestVersionManager:
 
         result = increment_version(current_version, release_type)
 
-        assert (
-            result == expected_version
-        ), f"Expected {expected_version}, but got {result}"
+        assert result == expected_version, (
+            f"Expected {expected_version}, but got {result}"
+        )
 
     def test_increment_patch_version(self):
         """Test incrementing patch version when release_type is None and patch
@@ -66,9 +66,9 @@ class TestVersionManager:
 
         result = increment_version(current_version, release_type)
 
-        assert (
-            result == expected_version
-        ), f"Expected {expected_version}, but got {result}"
+        assert result == expected_version, (
+            f"Expected {expected_version}, but got {result}"
+        )
 
     def test_increment_version_3(self):
         """Test increment_version when patch and minor exceed 9, resulting in a
@@ -82,9 +82,9 @@ class TestVersionManager:
         current_version = "1.2.9"
         expected_version = "1.3.0"
         result = increment_version(current_version)
-        assert (
-            result == expected_version
-        ), f"Expected {expected_version}, but got {result}"
+        assert result == expected_version, (
+            f"Expected {expected_version}, but got {result}"
+        )
 
     def test_increment_version_5(self):
         """Test incrementing patch version when release_type is None and patch

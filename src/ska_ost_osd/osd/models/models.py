@@ -172,7 +172,7 @@ class OSDRelease(BaseModel):
         release = OSDRelease(
             message="Updated observation constraints for mid telescope",
             version="4.1.0",
-            cycle_id="4"
+            cycle_id="4",
         )
     """
 

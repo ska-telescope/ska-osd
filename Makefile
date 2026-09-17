@@ -25,15 +25,14 @@ PYTHONPATH = /src
 -include .make/base.mk
 -include .make/oci.mk
 -include .make/k8s.mk
--include .make/python.mk
+-include .make/python-uv.mk
 -include .make/tmdata.mk
 # Set sphinx documentation build to fail on warnings (as it is configured
 # in .readthedocs.yaml as well)
 DOCS_SPHINXOPTS ?= -W --keep-going
 
-python-lint: PYTHON_RUNNER = poetry run
-python-test: PYTHON_RUNNER = poetry run
-DOCS_PYTHON_RUNNER = poetry run python3
+PYTHON_RUNNER = uv run
+DOCS_PYTHON_RUNNER = uv run python3
 
 IMAGE_TO_TEST = $(CAR_OCI_REGISTRY_HOST)/$(strip $(OCI_IMAGE)):$(VERSION)
 K8S_CHART = ska-ost-osd-umbrella
@@ -59,20 +58,11 @@ ifneq ($(ENV_CHECK),)
 K8S_CHART_PARAMS += --set ska-ost-osd.vaultStaticSecret.enabled=false
 endif
 
-# unset defaults so settings in pyproject.toml take effect
-PYTHON_SWITCHES_FOR_BLACK =
-PYTHON_SWITCHES_FOR_ISORT =
-PYTHON_SWITCHES_FOR_PYLINT =
-
-# Restore Black's preferred line length which otherwise would be overridden by
-# System Team makefiles' 79 character default
-PYTHON_LINE_LENGTH = 88
-
 # Set python-test make target to run unit tests and not the component tests
 PYTHON_TEST_FILE = tests/unit/
 
 openapi:
-	python -c "from docs.openapi.export_openapi import export_openapi; export_openapi()"
+	$(PYTHON_RUNNER) python -c "from docs.openapi.export_openapi import export_openapi; export_openapi()"
 
 # include your own private variables for custom deployment configuration
 -include PrivateRules.mak

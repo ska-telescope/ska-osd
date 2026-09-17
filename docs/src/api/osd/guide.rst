@@ -939,14 +939,16 @@ This section explains how to integrate and use the **ska-ost-osd** package in yo
 Installation
 ------------
 
-Add the following entry under the `[tool.poetry.dependencies]` section in your `pyproject.toml`:
+Add the following entry under the ``[project]`` ``dependencies`` list in your ``pyproject.toml``:
 
 .. code-block:: toml
 
-    [tool.poetry.dependencies]
-    ska-ost-osd = "^<majorversion>"
+    [project]
+    dependencies = [
+        "ska-ost-osd>=<majorversion>,<<nextmajorversion>",
+    ]
 
-This will ensure that Poetry installs the specified version (or a compatible one) of the `ska-ost-osd` package.
+This will ensure that a compatible version of the ``ska-ost-osd`` package is installed.
 
 Usage
 -----

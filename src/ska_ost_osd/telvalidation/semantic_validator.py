@@ -211,9 +211,9 @@ def build_basic_capabilities_lookup(
                     for item in value:
                         for key in item:
                             if key.endswith("_id"):
-                                capabilities_lookup.setdefault(key, {})[
-                                    item[key]
-                                ] = item
+                                capabilities_lookup.setdefault(key, {})[item[key]] = (
+                                    item
+                                )
                 else:
                     collect(value)
         elif isinstance(node, list):
@@ -238,23 +238,23 @@ def fetch_matched_capabilities_from_basic_capabilities(
 
     :example:
         >>> capabilities = {
-        ...     'allowed_channel_count_range_max': [58982],
-        ...     'allowed_channel_count_range_min': [1],
-        ...     'allowed_channel_width_values': [13440],
-        ...     'available_bandwidth_hz': 800000000,
-        ...     'available_receivers': ['Band_1', 'Band_2'],
-        ...     'cbf_modes': ['correlation', 'pst'],
-        ...     'max_baseline_km': 1.5,
-        ...     'number_dish_ids': ['SKA001', 'SKA036', 'SKA063', 'SKA100'],
-        ...     'number_fsps': 4,
-        ...     'number_meerkat_dishes': 0,
-        ...     'number_meerkatplus_dishes': 0,
-        ...     'number_pss_beams': 0,
-        ...     'number_pst_beams': 1,
-        ...     'number_ska_dishes': 4,
-        ...     'number_zoom_channels': 0,
-        ...     'number_zoom_windows': 0,
-        ...     'ps_beam_bandwidth_hz': 400000000
+        ...     "allowed_channel_count_range_max": [58982],
+        ...     "allowed_channel_count_range_min": [1],
+        ...     "allowed_channel_width_values": [13440],
+        ...     "available_bandwidth_hz": 800000000,
+        ...     "available_receivers": ["Band_1", "Band_2"],
+        ...     "cbf_modes": ["correlation", "pst"],
+        ...     "max_baseline_km": 1.5,
+        ...     "number_dish_ids": ["SKA001", "SKA036", "SKA063", "SKA100"],
+        ...     "number_fsps": 4,
+        ...     "number_meerkat_dishes": 0,
+        ...     "number_meerkatplus_dishes": 0,
+        ...     "number_pss_beams": 0,
+        ...     "number_pst_beams": 1,
+        ...     "number_ska_dishes": 4,
+        ...     "number_zoom_channels": 0,
+        ...     "number_zoom_windows": 0,
+        ...     "ps_beam_bandwidth_hz": 400000000,
         ... }
         >>> basic_capabilities = {
         ...     'rx_id': {
@@ -351,7 +351,9 @@ def validate_command_input(
     validation_data = semantic_validate_data[array_assembly].get(
         "assign_resource"
         if ASSIGN_RESOURCE in interface
-        else "configure" if CONFIGURE in interface else "sbd"
+        else "configure"
+        if CONFIGURE in interface
+        else "sbd"
     )
 
     msg_list = validate_json(

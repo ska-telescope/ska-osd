@@ -20,11 +20,11 @@ git submodule update --init --recursive
 
 ### Build and test
 
-Install dependencies with Poetry and activate the virtual environment
+Install dependencies with uv and activate the virtual environment
 
 ```
-poetry install
-eval $(poetry env activate)
+uv sync --all-groups
+source .venv/bin/activate
 ```
 
 To build a new Docker image for the OSD, run
@@ -38,6 +38,12 @@ Execute the test suite and lint the project with:
 ```
 make python-test
 make python-lint
+```
+
+Reformat the code and apply lint autofixes with:
+
+```
+make python-format
 ```
 
 To run a helm chart unit tests to verify helm chart configuration:
