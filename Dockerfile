@@ -1,6 +1,6 @@
 # ---------- Build Stage ----------
-ARG BUILD_IMAGE="artefact.skao.int/ska-build-python:0.3.1"
-ARG RUNTIME_BASE_IMAGE="artefact.skao.int/ska-python:0.2.3"
+ARG BUILD_IMAGE="artefact.skao.int/ska-build-python-ubuntu26:1.0.1"
+ARG RUNTIME_BASE_IMAGE="artefact.skao.int/ska-python-ubuntu26:1.0.1"
 
 FROM ${BUILD_IMAGE} AS buildenv
 

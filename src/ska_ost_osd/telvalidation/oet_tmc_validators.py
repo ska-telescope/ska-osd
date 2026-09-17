@@ -17,7 +17,7 @@ from typing import Any, Union
 
 import astropy.units as u
 from astropy.time import Time
-from simpleeval import EvalWithCompoundTypes
+from simpleeval import EvalWithCompoundTypes, ModuleWrapper
 
 from .common.constant import MID_VALIDATION_CONSTANT_JSON_FILE_PATH
 from .common.error_handling import (
@@ -250,7 +250,7 @@ def evaluate_rule(
     eval_new_data = []
     simple_eval = EvalWithCompoundTypes()
     simple_eval.functions["len"] = len
-    simple_eval.functions["re"] = re
+    simple_eval.functions["re"] = ModuleWrapper(re)
 
     if len(osd_base_constraint) > 1:
         # if found multiple constraints values from OSD

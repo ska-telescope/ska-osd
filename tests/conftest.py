@@ -121,9 +121,9 @@ def car_source_failure_client(failing_tmdata):
     def get_failing_tmdata_for_osd_query():
         return failing_tmdata
 
-    app.dependency_overrides[
-        get_tmdata_for_osd_query
-    ] = get_failing_tmdata_for_osd_query
+    app.dependency_overrides[get_tmdata_for_osd_query] = (
+        get_failing_tmdata_for_osd_query
+    )
     return TestClient(app)
 
 

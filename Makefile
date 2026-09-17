@@ -31,6 +31,10 @@ PYTHONPATH = /src
 # in .readthedocs.yaml as well)
 DOCS_SPHINXOPTS ?= -W --keep-going
 
+python-lint: PYTHON_RUNNER = poetry run
+python-test: PYTHON_RUNNER = poetry run
+DOCS_PYTHON_RUNNER = poetry run python3
+
 IMAGE_TO_TEST = $(CAR_OCI_REGISTRY_HOST)/$(strip $(OCI_IMAGE)):$(VERSION)
 K8S_CHART = ska-ost-osd-umbrella
 
