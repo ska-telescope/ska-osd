@@ -7,11 +7,13 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 Unreleased
 **********
+* [BREAKING] Change Mid's SPFRx sync_pps default from false to unset
 * Migrated build and developer tooling from Poetry to uv, and from
   black/isort/flake8/pylint to ruff.
 * Minimum supported Python version is now 3.11, testing on Python 3.14.
 * Upgraded astropy to 8.x, which ships stable-ABI wheels for Python 3.11 to 3.14.
 * Use FastAPI dependency injection to handle TMData clients
+* [BUGFIX] Fix number_zoom_windows for AA2_SV to be 1 instead of 16
 
 6.0.9
 **********

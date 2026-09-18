@@ -129,7 +129,7 @@
         "vis",
         "pst"
       ],
-      "number_zoom_windows": 16,
+      "number_zoom_windows": 1,
       "number_zoom_channels": 4000,
       "number_pss_beams": 0,
       "number_pst_beams": 1,

@@ -29,7 +29,7 @@
         },
         "csp_configuration": {
             "spfrx": {
-                "sync_pps": false,
+                "sync_pps": "unset",
                 "saturation_threshold": 0.2
             }
         }
