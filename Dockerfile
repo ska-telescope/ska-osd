@@ -4,26 +4,21 @@ ARG RUNTIME_BASE_IMAGE="artefact.skao.int/ska-python-ubuntu26:1.0.1"
 
 FROM ${BUILD_IMAGE} AS buildenv
 
-# Set up Poetry environment
-ENV POETRY_NO_INTERACTION=1 \
-    POETRY_VIRTUALENVS_IN_PROJECT=1 \
-    POETRY_VIRTUALENVS_CREATE=1\
-    POETRY_CACHE_DIR=/tmp/poetry_cache
-
 ENV APP_DIR="/app"
 
 WORKDIR ${APP_DIR}
 
-# Copy dependency files early for better caching
-COPY pyproject.toml poetry.lock ./
-RUN touch README.md
+# Resolve dependencies first so this layer caches independently of application code
+COPY pyproject.toml uv.lock ./
 
-# Install no-root here so we get a docker layer cached with dependencies
-# but not app code, to rebuild quickly.
-RUN poetry install --without dev --no-root && rm -rf ${POETRY_CACHE_DIR}
+RUN uv sync --frozen --no-dev --no-install-project
 
-# Copy application code to expected location
-RUN mkdir -p ${APP_DIR}/src
+# Install the project itself so importlib.metadata can resolve its version at runtime
+COPY README.md LICENSE ./
+COPY src ./src
+
+RUN uv sync --frozen --no-dev
+
 COPY tmdata ${APP_DIR}/src/tmdata
 
 # The runtime image, used to just run the code provided its virtual environment
@@ -50,11 +45,6 @@ COPY --chown=${APP_USER}:${APP_USER} --from=buildenv ${APP_DIR}/src/tmdata ${APP
 
 # Copy the full application code
 COPY --chown=${APP_USER}:${APP_USER} . ./
-
-# Install the current application in editable mode into the virtual environment.
-# - Ensures app code is linked into the environment.
-# - Assumes dependencies were already installed in the build stage.
-RUN python -m pip --require-virtualenv install --no-deps -e .
 
 USER ${APP_USER}
 

@@ -185,9 +185,7 @@ class TestGitlabHelper:
             mock_git_backend_instance.commit_transaction.assert_not_called()
 
     @patch("ska_ost_osd.osd.common.gitlab_helper.setup_gitlab_access")
-    def test_push_to_gitlab_with_modified_files(
-        self, mock_gitlab
-    ):  # pylint: disable=W0613
+    def test_push_to_gitlab_with_modified_files(self, mock_gitlab):  # pylint: disable=W0613
         """Test push_to_gitlab when there are modified files to push."""
         # Mock the GitBackend class
         with patch(

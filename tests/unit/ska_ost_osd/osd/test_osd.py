@@ -203,9 +203,7 @@ def test_update_osd_file_non_existent_telescope(
     assert "SKA-Low" not in result
 
 
-def test_update_osd_file_observatory_policy_update(
-    sample_existing_data, mocker
-):  # pylint: disable=W0621
+def test_update_osd_file_observatory_policy_update(sample_existing_data, mocker):  # pylint: disable=W0621
     """Test update_osd_file with observatory policy updates."""
     mock_update_file = mocker.patch("ska_ost_osd.osd.osd.update_file")
 

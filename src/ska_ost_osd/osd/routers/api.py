@@ -48,7 +48,7 @@ from ska_ost_osd.osd.version_mapping.version_manager import manage_version_relea
 # this variable is added for restricting tmdata publish from local/dev environment.
 # usage: 0 means disable tmdata publish to artefact.
 # 1 means allow to publish
-PUSH_TO_GITLAB = int(environ.get("PUSH_TO_GITLAB", 0))
+PUSH_TO_GITLAB = int(environ.get("PUSH_TO_GITLAB", "0"))
 osd_router = APIRouter(prefix="")
 
 

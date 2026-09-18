@@ -5,7 +5,7 @@ default:
 
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
-  POETRY_CONFIG_VIRTUALENVS_CREATE: "true"
+  UV_VERSION: "0.12.15"
   DOCS_RTD_PROJECT_SLUG: ska-telescope-ska-ost-osd
 
 # The YAML file defines a set of jobs with constraints stating when they should be run.
@@ -89,7 +89,7 @@ osd-tmdata-publish:
 include:
   # Python
   - project: "ska-telescope/templates-repository"
-    file: "gitlab-ci/includes/python.gitlab-ci.yml"
+    file: "gitlab-ci/includes/python-uv.gitlab-ci.yml"
   # OCI
   - project: "ska-telescope/templates-repository"
     file: "gitlab-ci/includes/oci-image.gitlab-ci.yml"

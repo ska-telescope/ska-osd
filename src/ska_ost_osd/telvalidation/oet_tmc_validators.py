@@ -12,6 +12,7 @@ capabilities. e.g: in rule file below is rule and error messages.
 
 import logging
 import re
+from collections import deque
 from datetime import datetime
 from typing import Any, Union
 
@@ -31,9 +32,6 @@ from .coordinates_conversion import (
 )
 
 logging.getLogger("telvalidation")
-
-
-from collections import deque
 
 
 def get_value_based_on_provided_path(nested_data: Union[dict, list], path: list) -> Any:

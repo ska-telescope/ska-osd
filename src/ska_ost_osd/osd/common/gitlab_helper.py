@@ -138,10 +138,10 @@ def push_to_gitlab(
             for src_path, target_path in modified_files:
                 current_dir = Path(__file__).resolve().parent
                 project_root = current_dir.parent.parent.parent
-                src_path = project_root / src_path
-                if src_path.name == "mid_capabilities.json":
-                    src_path = Path("tmdata/ska1_mid/mid_capabilities.json")
-                git_repo.add_data(src_path, target_path)
+                resolved_path = project_root / src_path
+                if resolved_path.name == "mid_capabilities.json":
+                    resolved_path = Path("tmdata/ska1_mid/mid_capabilities.json")
+                git_repo.add_data(resolved_path, target_path)
 
             # Commit and push
             git_repo.commit(commit_msg)
