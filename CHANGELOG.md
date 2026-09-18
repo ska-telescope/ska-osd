@@ -7,6 +7,9 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 Unreleased
 **********
+
+7.0.0
+**********
 * [BREAKING] Change Mid's SPFRx sync_pps default from false to unset
 * Migrated build and developer tooling from Poetry to uv, and from
   black/isort/flake8/pylint to ruff.

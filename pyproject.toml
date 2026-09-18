@@ -1,6 +1,6 @@
 [project]
 name = "ska-ost-osd"
-version = "6.0.9"
+version = "7.0.0"
 description = "Simplest form OSD consists of configuration files that are required by OSO tools."
 authors = [{ name = "Team Nakshatra" }]
 license = "BSD-3-Clause"
