@@ -1,10 +1,10 @@
 {
-  "cycle_number": 1,
-  "cycle_id": "TEST_SKAO_2027_Low_AA2_SV",
+  "cycle_number": 2,
+  "cycle_id": "TEST_SKAO_2027_Low_AA2_Proposal",
   "type": "Proposal",
-  "cycle_description": "TEST Low AA2 Science Verification",
+  "cycle_description": "TEST Low AA2 Proposal",
   "cycle_information": {
-    "cycle_id": "TEST_SKAO_2027_1",
+    "cycle_id": "TEST_SKAO_2027_2",
     "proposal_open": "2026-03-27T12:00:00.000Z",
     "proposal_close": "2027-04-01T15:00:00.000Z"
   },
@@ -15,6 +15,6 @@
     "max_data_products": 1
   },
   "telescope_capabilities": {
-    "Low": "AA2_SV"
+    "Low": "AA2"
   }
 }
