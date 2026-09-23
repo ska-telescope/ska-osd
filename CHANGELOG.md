@@ -7,6 +7,7 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 Unreleased
 **********
+* Added proposal cycle data to the release-cycle version mapping.
 
 7.0.0
 **********
