@@ -14,7 +14,7 @@ class TestCycleAPI:
         response = test_client.get(f"{BASE_API_URL}/cycle")
 
         expected_json = {
-            "result_data": {"cycles": [1, 10000]},
+            "result_data": {"cycles": [1, 2]},
             "result_status": "success",
             "result_code": 200,
         }
