@@ -2,6 +2,7 @@ from unittest.mock import patch
 
 import pytest
 
+from ska_ost_osd.osd.common.constant import osd_file_mapping
 from ska_ost_osd.osd.common.error_handling import OSDModelError
 from ska_ost_osd.osd.models.models import OSDModel, ValidationOnCapabilities
 from ska_ost_osd.osd.osd import get_osd_data, update_osd_file
@@ -45,6 +46,21 @@ def test_get_osd_data(
     result_keys = list(result["capabilities"].keys())
 
     assert result_keys == expected_keys
+
+
+def test_get_osd_data_without_cycle_returns_complete_catalogue(tests_tmdata):
+    """A request without a cycle returns all available capability data."""
+    result, error_msgs = get_osd_data(tmdata=tests_tmdata)
+
+    assert error_msgs == []
+    assert "observatory_policy" not in result
+    assert list(result["capabilities"]) == ["mid", "low"]
+
+    for capability in ("mid", "low"):
+        source_data = tests_tmdata[osd_file_mapping[capability]].get_dict()
+        assert set(result["capabilities"][capability]) == set(source_data) - {
+            "telescope"
+        }
 
 
 def test_invalid_get_osd_data_capability(tests_tmdata):

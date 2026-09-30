@@ -14,6 +14,7 @@ from ska_ost_osd.osd.template_mapping.template_mapping import process_template_m
 
 from .common.constant import (
     ARRAY_ASSEMBLY_PATTERN,
+    CAPABILITIES,
     LOW_CAPABILITIES_JSON_PATH,
     MID_CAPABILITIES_JSON_PATH,
     OBSERVATORY_POLICIES_JSON_PATH,
@@ -80,9 +81,8 @@ class OSD:
         self,
         capabilities: list = None,
         array_assembly: str = None,
-    ) -> dict[dict[str, Any]]:
-        """Check if capabilities or array assembly exist, retrieve them from
-        observatory policies, populate the dictionary, and return it.
+    ) -> dict[str, Any]:
+        """Select telescope capabilities and array assemblies for the request.
 
         :param capabilities: list, capabilities such as "mid" or "low".
         :param array_assembly: str, for "mid" can be one of "AA0.5",
@@ -201,27 +201,36 @@ class OSD:
         capabilities_and_array_assembly = None
         chk_capabilities = self.check_capabilities(self.capabilities)
 
-        policies = self.tmdata[osd_file_mapping["observatory_policies"]].get_dict()
-        cycle_error_msg = check_cycle_id(self.cycle_id, policies)
-
-        if chk_capabilities or cycle_error_msg:
-            if chk_capabilities:
-                osd_err_msg_list.append(chk_capabilities)
-            if cycle_error_msg:
-                osd_err_msg_list.append(cycle_error_msg)
+        if chk_capabilities:
+            osd_err_msg_list.append(chk_capabilities)
         else:
-            if self.cycle_id is not None:
+            if self.cycle_id is None:
+                self.osd_data["observatory_policy"] = {
+                    "telescope_capabilities": {
+                        capability.capitalize(): None for capability in CAPABILITIES
+                    }
+                }
+            else:
+                policies = self.tmdata[
+                    osd_file_mapping["observatory_policies"]
+                ].get_dict()
+                cycle_error_msg = check_cycle_id(self.cycle_id, policies)
+                if cycle_error_msg:
+                    osd_err_msg_list.append(cycle_error_msg)
+                    return capabilities_and_array_assembly, osd_err_msg_list
+
                 self.osd_data["observatory_policy"] = policies[f"cycle_{self.cycle_id}"]
             telescope_capabilities_dict = self.get_telescope_observatory_policies(
                 self.capabilities, self.array_assembly
             )
-            osd_data = self.osd_data
+            if self.cycle_id is None:
+                del self.osd_data["observatory_policy"]
 
             (
                 capabilities_and_array_assembly,
                 err_msg,
             ) = self.__get_capabilities_and_array_assembly(
-                self.tmdata, telescope_capabilities_dict, osd_data
+                self.tmdata, telescope_capabilities_dict, self.osd_data
             )
             if err_msg:
                 osd_err_msg_list.extend(err_msg)
@@ -286,9 +295,15 @@ def check_cycle_id(
     :param policies: Contents of observatory_polcies.json
     :return: str, error message if cycle_id is invalid, else None.
     """
-    cycle_numbers = map(lambda x: int(x.split("_")[1]), policies.keys())
+    cycle_numbers = [
+        int(key.removeprefix("cycle_"))
+        for key in policies
+        if key.startswith("cycle_") and key.removeprefix("cycle_").isdigit()
+    ]
     if cycle_id is not None and cycle_id not in cycle_numbers:
-        return CYCLE_ID_ERROR_MESSAGE.format(cycle_id, cycle_numbers)
+        return CYCLE_ID_ERROR_MESSAGE.format(
+            cycle_id, ",".join(str(cycle_number) for cycle_number in cycle_numbers)
+        )
 
 
 def get_osd_data(
