@@ -61,8 +61,6 @@ General Structure
     │   │   └── cycle_gitlab_release_version_mapping.json
     │   ├── version_manager.py
     │   └── osd.py
-    ├── scripts
-    │   └── release.sh
     └── telvalidation
         ├── common
         ├── models
@@ -79,11 +77,6 @@ General Structure
 
     * OSD supports backward compatibility for all existing released versions. If someone wants to retrieve older version then
       they just need to point out that specific version in ``osd_version``.
-
-.. note::
-
-    Created a bash script ``release.sh`` in ``scripts`` folder.
-
 
 If user wants to access this framework from CDM, Jupyter Notebook or any other client below is the example.
 If there is any error then the end user will get the appropriate error message.
@@ -915,19 +908,7 @@ Manual tmdata Release Steps
 
     make bump-patch-release
 
-4. Run below command for OSD release
-
-Created a target called ``osd-pre-release`` in Makefile which will run when ska_ost_osd is released.
-also added a ``release.sh`` file inside ``ska_ost_osd`` ``scripts`` folder which has two functions ``GetCycleId`` and ``UpdateAndAddValue``
-
-``GetCycleId`` function gets ``cycle_number`` from ``observatory_policies.json`` file and triggers next function ``UpdateAndAddValue``
-which updates or add cycle_id values in version mapping json file.
-
-.. code:: bash
-
-    make osd-pre-release
-
-5. Set the Release
+4. Set the Release
 
 * `For remaining release steps click here <https://developer.skao.int/en/latest/tutorial/release-management/automate-release-process.html>`_
 
