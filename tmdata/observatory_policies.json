@@ -10,11 +10,12 @@
   },
   "cycle_policies": {
     "normal_max_hours": 100.0,
-    "max_targets": 1,
-    "max_observation_setups": 1,
-    "max_data_products": 1
+    "max_targets": 3,
+    "max_observation_setups": 2,
+    "max_data_products": 2
   },
   "telescope_capabilities": {
-    "Low": "AA2"
+    "Low": "AA2",
+    "Mid": "AA2"
   }
 }
