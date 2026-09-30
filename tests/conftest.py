@@ -8,7 +8,6 @@ from ska_telmodel_client import TMData
 from ska_ost_osd.app import create_app
 from ska_ost_osd.osd.routers.dependencies import (
     get_tmdata_car_main,
-    get_tmdata_for_osd_query,
     get_tmdata_gitlab_main,
 )
 from ska_ost_osd.telvalidation.routers.dependencies import (
@@ -73,17 +72,6 @@ def test_client(tests_tmdata):
     """Test client using tests_tmdata for all requests"""
     app = create_app()
     app.dependency_overrides[get_tmdata_car_main] = lambda: tests_tmdata
-    app.dependency_overrides[get_tmdata_for_osd_query] = lambda: tests_tmdata
-    app.dependency_overrides[get_tmdata_default_semantic_source] = lambda: tests_tmdata
-    return TestClient(app)
-
-
-@pytest.fixture(scope="session")
-def sad_path_client(tests_tmdata):
-    """Test client for error-handling in get_tmdata_for_osd_query."""
-    app = create_app()
-    app.dependency_overrides[get_tmdata_car_main] = lambda: tests_tmdata
-    app.dependency_overrides[get_tmdata_gitlab_main] = lambda: tests_tmdata
     app.dependency_overrides[get_tmdata_default_semantic_source] = lambda: tests_tmdata
     return TestClient(app)
 
@@ -93,7 +81,6 @@ def empty_client(empty_tmdata):
     """Test client using TMData with no files"""
     app = create_app()
     app.dependency_overrides[get_tmdata_car_main] = lambda: empty_tmdata
-    app.dependency_overrides[get_tmdata_for_osd_query] = lambda: empty_tmdata
     app.dependency_overrides[get_tmdata_default_semantic_source] = lambda: empty_tmdata
     return TestClient(app)
 
@@ -121,9 +108,7 @@ def car_source_failure_client(failing_tmdata):
     def get_failing_tmdata_for_osd_query():
         return failing_tmdata
 
-    app.dependency_overrides[get_tmdata_for_osd_query] = (
-        get_failing_tmdata_for_osd_query
-    )
+    app.dependency_overrides[get_tmdata_car_main] = get_failing_tmdata_for_osd_query
     return TestClient(app)
 
 

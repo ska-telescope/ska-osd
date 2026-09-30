@@ -79,8 +79,6 @@ def test_invalid_osd_tmdata_source_capabilities(test_client):
 def test_osd_source_reports_backend_resolution_error(car_source_failure_client):
     """OSD endpoint should surface CAR TMData read errors.
 
-    get_tmdata_for_osd_query should still resolve successfully; the
-    returned TMData object fails when OSD retrieval reads from it.
     Uses dependency override so the test is deterministic and does not
     connect to CAR.
     """
@@ -134,14 +132,14 @@ def test_mid_low_response(
 
 
 def test_invalid_cycle_id(
-    sad_path_client,
+    test_client,
 ):
-    """Client smoke test for dependency-resolution errors in /osd.
+    """Test that an invalid cycle_id returns the expected error response.
 
-    Resolver logic is exercised through get_tmdata_for_osd_query by not
-    overriding that dependency on sad_path_client.
+    :raises AssertionError: If the respone is not as expected.
     """
-    response = sad_path_client.get(
+
+    response = test_client.get(
         f"{BASE_API_URL}/osd",
         params={"cycle_id": 3, "source": "file", "capabilities": "mid"},
     ).json()
