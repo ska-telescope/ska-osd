@@ -19,8 +19,8 @@ from .common.constant import (
     LOW_CAPABILITIES_JSON_PATH,
     MID_CAPABILITIES_JSON_PATH,
     OBSERVATORY_POLICIES_JSON_PATH,
+    POLICIES_CONSTANT_JSON_FILE_PATH,
     RELEASE_FILE_PATH_LATEST,
-    VERSION_FILE_PATH,
     osd_file_mapping,
     osd_response_template,
 )
@@ -259,13 +259,15 @@ def get_available_cycles(tmdata: TMData) -> list[int]:
     :return: list[int], list of available cycle numbers.
     """
     try:
-        versions_dict = tmdata[VERSION_FILE_PATH].get_dict()
+        policies = tmdata[POLICIES_CONSTANT_JSON_FILE_PATH].get_dict()
     except KeyError as err:
-        raise FileNotFoundError(f"file not found: {VERSION_FILE_PATH}") from err
+        raise FileNotFoundError(
+            f"file not found: {POLICIES_CONSTANT_JSON_FILE_PATH}"
+        ) from err
 
     return [
         int(key.split("_")[1])
-        for key in versions_dict.keys()
+        for key in policies.keys()
         if key.startswith("cycle_") and "_" in key
     ]
 
