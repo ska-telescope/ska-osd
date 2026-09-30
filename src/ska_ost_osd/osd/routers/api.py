@@ -138,6 +138,7 @@ def update_osd_data(
     description="Release OSD data with automatic version increment based on cycle ID",
     responses=get_responses(ApiResponse[OSDRelease]),
     response_model=ApiResponse[OSDRelease],
+    deprecated=True,
 )
 def release_osd_data(
     cycle_id: int, release_type: Optional[ReleaseType] = None

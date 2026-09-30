@@ -846,6 +846,11 @@ Error Handling
 TMData Release Process using API.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. warning::
+
+   The ``POST /osd_release`` endpoint is deprecated. It remains available for
+   backward compatibility while the TMData release workflow is redesigned.
+
 TMData releases are now handled separately from the main ska-ost-osd codebase through an automated process:
 
 1. **Automatic Release via API**: Use the ``POST /osd_release`` endpoint to trigger automated TMData releases
