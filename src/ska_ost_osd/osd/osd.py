@@ -8,9 +8,7 @@ from ska_ost_osd.common.utils import update_file
 from ska_ost_osd.osd.common.osd_validation_messages import (
     ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE,
     CAPABILITY_DOESNOT_EXIST_ERROR_MESSAGE,
-    CYCLE_ERROR_MESSAGE,
     CYCLE_ID_ERROR_MESSAGE,
-    OSD_VERSION_ERROR_MESSAGE,
 )
 from ska_ost_osd.osd.template_mapping.template_mapping import process_template_mappings
 
@@ -89,15 +87,8 @@ class OSD:
         :param capabilities: list, capabilities such as "mid" or "low".
         :param array_assembly: str, for "mid" can be one of "AA0.5",
             "AA2", or "AA1".
-        :return: dict, dictionary of OSD data and dictionary of
-            capabilities and array assembly.
+        :return: dict, dictionary of capabilities and array assembly.
         """
-        self.osd_data["observatory_policy"] = self.get_data(
-            self.tmdata,
-            capability=osd_file_mapping["observatory_policies"],
-            array_assembly=array_assembly,
-        )
-
         telescope_capabilities = self.osd_data["observatory_policy"].get(
             "telescope_capabilities", {}
         )
@@ -113,7 +104,7 @@ class OSD:
                     cap: telescope_capabilities.get(cap, {}) for cap in capabilities
                 }
 
-        return self.osd_data, capabilities_dict
+        return capabilities_dict
 
     def __get_capabilities_and_array_assembly(
         self, tmdata, telescope_capabilities_dict: dict, osd_data: dict
@@ -188,9 +179,6 @@ class OSD:
             except (KeyError, AttributeError):
                 return {}
 
-        if "observatory_policies" in capability:
-            return tmdata[capability].get_dict()
-
         else:
             return (
                 tmdata[capability].get_dict()[array_assembly]
@@ -213,18 +201,21 @@ class OSD:
         capabilities_and_array_assembly = None
         chk_capabilities = self.check_capabilities(self.capabilities)
 
-        if chk_capabilities:
-            osd_err_msg_list.append(chk_capabilities)
+        policies = self.tmdata[osd_file_mapping["observatory_policies"]].get_dict()
+        cycle_error_msg = check_cycle_id(self.cycle_id, policies)
+
+        if chk_capabilities or cycle_error_msg:
+            if chk_capabilities:
+                osd_err_msg_list.append(chk_capabilities)
+            if cycle_error_msg:
+                osd_err_msg_list.append(cycle_error_msg)
         else:
-            (
-                osd_data,
-                telescope_capabilities_dict,
-            ) = self.get_telescope_observatory_policies(
+            if self.cycle_id is not None:
+                self.osd_data["observatory_policy"] = policies[f"cycle_{self.cycle_id}"]
+            telescope_capabilities_dict = self.get_telescope_observatory_policies(
                 self.capabilities, self.array_assembly
             )
-
-            if not self.cycle_id:
-                del osd_data["observatory_policy"]
+            osd_data = self.osd_data
 
             (
                 capabilities_and_array_assembly,
@@ -286,62 +277,18 @@ def get_osd_latest_version(tmdata_version: TMData) -> str:
 
 
 def check_cycle_id(
-    tmdata: TMData,
     cycle_id: int = None,
-    osd_version: str = None,
-    gitlab_branch: str = None,
-    versions_dict: Dict = None,
-) -> str:
-    """This function checks if a given cycle exists or not also raises
-    OSDDataException if gitlab_branch and osd_version both is given. raises
-    OSDDataException for Cycle ID exists or not. and returns osd_version.
+    policies: Dict = None,
+) -> str | None:
+    """This function return an error message if the given cycle is invalid.
 
     :param cycle_id: cycle id integer value.
-    :param osd_version: osd version i.e. 1.9.0
-    :param gitlab_branch: branch name like master, dev etc.
-    :param tmdata: TMData object used for latest version lookup.
-    :param versions_dict: version dict containing version data
-    :return: osd_version in string format i.e 1.9.0 or raises
-        OSDDataException
+    :param policies: Contents of observatory_polcies.json
+    :return: str, error message if cycle_id is invalid, else None.
     """
-    cycle_error_msg_list = []
-
-    if gitlab_branch is not None and osd_version is not None:
-        cycle_error_msg_list.append(
-            CYCLE_ERROR_MESSAGE,
-        )
-
-    if gitlab_branch is not None:
-        osd_version = gitlab_branch
-
-    if cycle_id is None and osd_version is None and gitlab_branch is None:
-        osd_version = get_osd_latest_version(
-            tmdata
-        )  # get latest version from latest_release.txt file
-
-    if versions_dict is None:
-        versions_dict = {}
-
-    cycle_ids = [int(key.split("_")[-1]) for key in versions_dict]
-    cycle_id_exists = [cycle_id if cycle_id in cycle_ids else None][0]
-    string_ids = ",".join([str(i) for i in cycle_ids])
-    if cycle_id is not None and cycle_id_exists is None:
-        cycle_error_msg_list.append(
-            CYCLE_ID_ERROR_MESSAGE.format(cycle_id, string_ids),
-        )
-
-    elif cycle_id is not None and osd_version is None:
-        osd_version = versions_dict[f"cycle_{cycle_id}"][0]
-
-    elif cycle_id is not None and cycle_id_exists and osd_version is not None:
-        if osd_version not in versions_dict[f"cycle_{cycle_id}"]:
-            cycle_error_msg_list.append(
-                OSD_VERSION_ERROR_MESSAGE.format(
-                    osd_version, versions_dict[f"cycle_{cycle_id}"]
-                )
-            )
-
-    return osd_version, cycle_error_msg_list
+    cycle_numbers = map(lambda x: int(x.split("_")[1]), policies.keys())
+    if cycle_id is not None and cycle_id not in cycle_numbers:
+        return CYCLE_ID_ERROR_MESSAGE.format(cycle_id, cycle_numbers)
 
 
 def get_osd_data(
