@@ -1077,11 +1077,7 @@ Subarray templates are automatically processed when retrieving OSD data:
         "result_code": 200
     }
 
-tmdata publish job
--------------------
+TMData publishing
+-----------------
 
 `tmdata-publish` (from gitlab) is needed when user need to test on main using OSD UI, in this no tag is pushed to gitlab or CAR.
-
-`osd-tmdata-publish` (from CAR) is needed when user need to fetch data using OSD UI / API. in this tag is published automatically using OSD UI.
-
-For now please run either of job manually as per need.

@@ -114,15 +114,6 @@ An explanation of validation strictness levels and configuring OSD semantic vali
 
 # Publish tmdata
 
-`tmdata-publish` (from gitlab) is needed when user need to test on main using OSD UI, in this no tag is pushed to gitlab or CAR.
-
-`osd-tmdata-publish` (from CAR) is needed when user need to fetch data using OSD UI / API. in this tag is published automatically using OSD UI.
-
-For now please run either of job manually as per need.
-
-Please run `osd-tmdata-publish` job manually after merging / releasing into main.
-this is a required step, without this new tmdata will not be reflected on CAR.
-
 Now OSD is handling releases separately for tmdata and ska-ost-osd codebase.
 User can now update tmdata with the help of [ OSD UI editor](https://k8s.stfc.skao.int/ska-oso-integration/osd) and publish it separately on artefact repository with enabling `push_to_gitlab` environment variable to "1".
 
