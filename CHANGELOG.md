@@ -7,6 +7,11 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 Unreleased
 **********
+* [BREAKING] Define multiple cycles through a single TelModel backend in ``tmdata/cycles``
+* [BREAKING] Users pass a TMData client to public API functions instead of OSD creating one from ``tmdata/version_mapping``
+* [DEPRECATED] Deprecate the `/osd_release` endpoint
+* `/osd` requests without a cycle now return the complete capability catalogue
+* Removed ``osd-pre-release``, ``osd-tmdata-publish`` and ``release.sh``
 * Added proposal cycle data to the release-cycle version mapping.
 
 7.0.0
