@@ -7,6 +7,7 @@ from ska_telmodel_client import TMData
 from ska_ost_osd.common.utils import update_file
 from ska_ost_osd.osd.common.osd_validation_messages import (
     ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE,
+    ARRAY_ASSEMBLY_REQUIRES_CAPABILITY_ERROR_MESSAGE,
     CAPABILITY_DOESNOT_BELONG_TO_CYCLE_ERROR_MESSAGE,
     CAPABILITY_DOESNOT_EXIST_ERROR_MESSAGE,
     CYCLE_ID_ARRAY_ASSEMBLY_ERROR_MESSAGE,
@@ -225,6 +226,8 @@ class OSD:
             osd_err_msg_list.append(chk_capabilities)
         elif self.cycle_id is not None and self.array_assembly:
             osd_err_msg_list.append(CYCLE_ID_ARRAY_ASSEMBLY_ERROR_MESSAGE)
+        elif self.array_assembly and not self.capabilities:
+            osd_err_msg_list.append(ARRAY_ASSEMBLY_REQUIRES_CAPABILITY_ERROR_MESSAGE)
         else:
             if self.cycle_id is None:
                 self.osd_data["observatory_policy"] = {
