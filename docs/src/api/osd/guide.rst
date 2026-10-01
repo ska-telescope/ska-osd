@@ -27,22 +27,25 @@ Folder Structure
 .. code-block:: bash
 
     tmdata
-    │──── observatory_policies.json
-    │   ├── ska1_low
-    │   │   └── low_capabilities.json
-    │   └── ska1_mid
-    │       └── mid_capabilities.json
+    ├── cycles
+    │   ├── cycle_1.json
+    │   └── cycle_<id>.json
+    ├── ska1_low
+    │   └── low_capabilities.json
+    └── ska1_mid
+        └── mid_capabilities.json
 
 
 * `mid_capabilities.json <https://confluence.skatelescope.org/pages/viewpage.action?spaceKey=SWSI&title=Observatory+Static+Data>`_
 
 * `low_capabilities.json <https://confluence.skatelescope.org/pages/viewpage.action?spaceKey=SWSI&title=Observatory+Static+Data>`_
 
-* `observatory_policies.json <https://confluence.skatelescope.org/pages/viewpage.action?spaceKey=SWSI&title=Observatory+Static+Data>`_
-
 .. note::
 
-    ``observatory_policies.json`` is at root, because its common for both Mid and Low.
+    Each observing cycle is stored in its own
+    ``cycles/cycle_<id>.json`` file. The legacy ``observatory_policies.json``
+    file remains at the root on main for backward compatibility with the old
+    legacy version mapper.
 
 General Structure
 ~~~~~~~~~~~~~~~~~~~
@@ -124,8 +127,8 @@ API json response template
 ======================    ============================================================================================================
 Keys                      Description
 ======================    ============================================================================================================
-observatory_policy        file content of ``observatory_policies.json`` file
-telescope_capabilities    value of ``telescope_capabilities`` in file ``observatory_policies.json``
+observatory_policy        file content of the selected ``cycles/cycle_<id>.json`` file
+telescope_capabilities    value of ``telescope_capabilities`` in the selected cycle file
 capabilities              key value pair of mid and low
 Mid                       file content of ``mid_capabilities.json`` with ``basic_capabilities`` and ``Array Assembly`` AA0.5, AA1 etc
 Low                       file content of ``low_capabilities.json`` with ``basic_capabilities`` and ``Array Assembly`` AA0.5, AA1 etc
@@ -391,9 +394,9 @@ GET /osd
     1. If no parameters are provided to the API then it should return error message for required
     ``cycle_id`` or ``capabilities``.
 
-    2. Calling API with only one parameter cycle_id and no other parameter. First it will check if the
-       cycle id is valid or not, and will fetch latest version stored in the
-       ``cycle_gitlab_release_version_mapping.json`` file.
+    2. Calling the API with only ``cycle_id`` checks that the corresponding
+       ``cycles/cycle_<id>.json`` file exists, then uses that file's
+       ``telescope_capabilities`` to select the OSD data.
 
     3. If source is not provided in the API call, the default is set to car. API will
        fetch data from car. other option is file and gitlab.
@@ -477,7 +480,8 @@ GET /cycle
 
 5. Scenarios
 
-    1. When this api gets called the api returns all available ``cycle_id``.
+    1. When this API is called, it returns the available ``cycle_id`` values
+       from the ``cycles/cycle_<id>.json`` filenames.
 
 
 POST /osd_release
