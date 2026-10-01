@@ -8,6 +8,7 @@ from ska_ost_osd.common.utils import update_file
 from ska_ost_osd.osd.common.osd_validation_messages import (
     ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE,
     CAPABILITY_DOESNOT_EXIST_ERROR_MESSAGE,
+    CYCLE_ID_ARRAY_ASSEMBLY_ERROR_MESSAGE,
     CYCLE_ID_ERROR_MESSAGE,
 )
 from ska_ost_osd.osd.template_mapping.template_mapping import process_template_mappings
@@ -18,7 +19,7 @@ from .common.constant import (
     LOW_CAPABILITIES_JSON_PATH,
     MID_CAPABILITIES_JSON_PATH,
     OBSERVATORY_POLICIES_JSON_PATH,
-    POLICIES_CONSTANT_JSON_FILE_PATH,
+    OBSERVING_CYCLES_TMDATA_DIR,
     RELEASE_FILE_PATH_LATEST,
     osd_file_mapping,
     osd_response_template,
@@ -203,6 +204,8 @@ class OSD:
 
         if chk_capabilities:
             osd_err_msg_list.append(chk_capabilities)
+        elif self.cycle_id is not None and self.array_assembly:
+            osd_err_msg_list.append(CYCLE_ID_ARRAY_ASSEMBLY_ERROR_MESSAGE)
         else:
             if self.cycle_id is None:
                 self.osd_data["observatory_policy"] = {
@@ -211,15 +214,14 @@ class OSD:
                     }
                 }
             else:
-                policies = self.tmdata[
-                    osd_file_mapping["observatory_policies"]
-                ].get_dict()
-                cycle_error_msg = check_cycle_id(self.cycle_id, policies)
+                cycle_error_msg = check_cycle_id(self.cycle_id, self.tmdata)
                 if cycle_error_msg:
                     osd_err_msg_list.append(cycle_error_msg)
                     return capabilities_and_array_assembly, osd_err_msg_list
 
-                self.osd_data["observatory_policy"] = policies[f"cycle_{self.cycle_id}"]
+                self.osd_data["observatory_policy"] = self.tmdata[
+                    f"{OBSERVING_CYCLES_TMDATA_DIR}/cycle_{self.cycle_id}.json"
+                ].get_dict()
             telescope_capabilities_dict = self.get_telescope_observatory_policies(
                 self.capabilities, self.array_assembly
             )
@@ -253,23 +255,24 @@ class OSD:
 
 
 def get_available_cycles(tmdata: TMData) -> list[int]:
-    """Fetch available cycle numbers from TMData version mapping.
+    """List available cycle IDs from observing-cycle file names.
 
-    :param tmdata: TMData, TMData client to access version mapping.
+    :param tmdata: TMData client providing the observing cycle directory.
     :return: list[int], list of available cycle numbers.
     """
-    try:
-        policies = tmdata[POLICIES_CONSTANT_JSON_FILE_PATH].get_dict()
-    except KeyError as err:
-        raise FileNotFoundError(
-            f"file not found: {POLICIES_CONSTANT_JSON_FILE_PATH}"
-        ) from err
+    if not any(k.startswith(OBSERVING_CYCLES_TMDATA_DIR) for k in tmdata):
+        raise FileNotFoundError(f"file not found: {OBSERVING_CYCLES_TMDATA_DIR}")
 
-    return [
-        int(key.split("_")[1])
-        for key in policies.keys()
-        if key.startswith("cycle_") and "_" in key
-    ]
+    cycles_tmdata = tmdata[OBSERVING_CYCLES_TMDATA_DIR]
+    cycles = map(
+        lambda key: int(str(key).removesuffix(".json").removeprefix("cycle_")),
+        filter(
+            lambda key: key.startswith("cycle_") and key.endswith(".json"),
+            cycles_tmdata,
+        ),
+    )
+
+    return list(cycles)
 
 
 def get_osd_latest_version(tmdata_version: TMData) -> str:
@@ -287,20 +290,31 @@ def get_osd_latest_version(tmdata_version: TMData) -> str:
 
 def check_cycle_id(
     cycle_id: int = None,
-    policies: Dict = None,
+    tmdata: TMData = None,
 ) -> str | None:
-    """This function return an error message if the given cycle is invalid.
+    """Return an error message when a cycle has no observing-cycle file.
 
     :param cycle_id: cycle id integer value.
-    :param policies: Contents of observatory_polcies.json
+    :param tmdata: TMData client providing the observing cycle directory.
     :return: str, error message if cycle_id is invalid, else None.
     """
-    cycle_numbers = [
-        int(key.removeprefix("cycle_"))
-        for key in policies
-        if key.startswith("cycle_") and key.removeprefix("cycle_").isdigit()
-    ]
-    if cycle_id is not None and cycle_id not in cycle_numbers:
+    if not any(k.startswith(OBSERVING_CYCLES_TMDATA_DIR) for k in tmdata):
+        raise FileNotFoundError(f"file not found: {OBSERVING_CYCLES_TMDATA_DIR}")
+
+    if cycle_id is None:
+        return None
+
+    cycle_filename = f"cycle_{cycle_id}.json"
+    cycles_tmdata = tmdata[OBSERVING_CYCLES_TMDATA_DIR]
+    cycle_numbers = map(
+        lambda key: str(key).removesuffix(".json").removeprefix("cycle_"),
+        filter(
+            lambda key: key.startswith("cycle_") and key.endswith(".json"),
+            cycles_tmdata,
+        ),
+    )
+
+    if cycle_filename not in cycles_tmdata:
         return CYCLE_ID_ERROR_MESSAGE.format(
             cycle_id, ",".join(str(cycle_number) for cycle_number in cycle_numbers)
         )
