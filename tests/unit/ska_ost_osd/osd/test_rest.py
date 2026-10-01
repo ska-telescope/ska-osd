@@ -35,6 +35,22 @@ def test_cycle_osd_uses_selected_cycle_file(test_client):
     assert set(body["result_data"]["capabilities"]) == {"mid", "low"}
 
 
+def test_cycle_capability_uses_cycle_selected_array_assembly(test_client):
+    """A valid cycle capability request uses the assembly from its policy."""
+    response = test_client.get(
+        f"{BASE_API_URL}/osd",
+        params={"cycle_id": 2, "capabilities": "mid"},
+    )
+    body = response.json()
+
+    assert response.status_code == HTTPStatus.OK
+    assert list(body["result_data"]["capabilities"]) == ["mid"]
+    assert set(body["result_data"]["capabilities"]["mid"]) == {
+        "basic_capabilities",
+        "AA2",
+    }
+
+
 def test_catalogue_filter_does_not_include_observatory_policy(test_client):
     """A non-cycle filter selects catalogue data without a cycle policy."""
     response = test_client.get(
