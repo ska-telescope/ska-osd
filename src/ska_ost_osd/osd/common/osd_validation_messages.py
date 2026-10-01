@@ -9,6 +9,9 @@ CAPABILITY_DOESNOT_BELONG_TO_CYCLE_ERROR_MESSAGE = (
 ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE = (
     "Array Assembly {} is not valid,Available Array Assemblies are {}"
 )
+ARRAY_ASSEMBLY_REQUIRES_CAPABILITY_ERROR_MESSAGE = (
+    "Array Assembly requires a capability"
+)
 OSD_VERSION_ERROR_MESSAGE = "OSD Version {} is not valid,Available OSD Versions are {}"
 GITLAB_BRANCH_ERROR_MESSAGE = "gitlab_branch and osd_version cannot be used together"
 SOURCE_ERROR_MESSAGE = "Source {} is not valid"

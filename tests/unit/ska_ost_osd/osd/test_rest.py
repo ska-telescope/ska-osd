@@ -80,6 +80,18 @@ def test_catalogue_filter_does_not_include_observatory_policy(test_client):
     assert "AA0.5" in body["result_data"]["capabilities"]["mid"]
 
 
+def test_array_assembly_requires_capability(test_client):
+    """An array assembly cannot be selected without a capability."""
+    response = test_client.get(
+        f"{BASE_API_URL}/osd",
+        params={"array_assembly": "AA0.5"},
+    )
+    body = response.json()
+
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert body["result_data"] == ["Array Assembly requires a capability"]
+
+
 def test_cycle_id_and_array_assembly_are_incompatible(test_client):
     """A cycle policy, rather than an explicit array filter, selects assemblies."""
     response = test_client.get(
