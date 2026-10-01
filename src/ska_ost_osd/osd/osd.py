@@ -28,7 +28,7 @@ from .common.constant import (
 
 class OSD:
     """Initialize OSD-related variables and methods, including
-    get_telescope_observatory_policies, get_data, and get_osd_data."""
+    get_telescope_capabilities, get_data, and get_osd_data."""
 
     def __init__(
         self,
@@ -78,12 +78,12 @@ class OSD:
                 return CAPABILITY_DOESNOT_EXIST_ERROR_MESSAGE.format(cap_list[0], msg)
         return None
 
-    def get_telescope_observatory_policies(
+    def get_telescope_capabilities(
         self,
         capabilities: list = None,
         array_assembly: str = None,
     ) -> dict[str, Any]:
-        """Select telescope capabilities and array assemblies for the request.
+        """Select telescope capabilities from the current observing cycle.
 
         :param capabilities: list, capabilities such as "mid" or "low".
         :param array_assembly: str, for "mid" can be one of "AA0.5",
@@ -188,7 +188,7 @@ class OSD:
             )
 
     def get_osd_data(self) -> dict[dict[str, Any]]:
-        """Call get_telescope_observatory_policies and
+        """Call get_telescope_capabilities and
         get_capabilities_and_array_assembly, then return the populated osd_data
         dictionary.
 
@@ -222,7 +222,7 @@ class OSD:
                 self.osd_data["observatory_policy"] = self.tmdata[
                     f"{OBSERVING_CYCLES_TMDATA_DIR}/cycle_{self.cycle_id}.json"
                 ].get_dict()
-            telescope_capabilities_dict = self.get_telescope_observatory_policies(
+            telescope_capabilities_dict = self.get_telescope_capabilities(
                 self.capabilities, self.array_assembly
             )
             if self.cycle_id is None:
