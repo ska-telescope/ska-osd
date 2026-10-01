@@ -1,4 +1,5 @@
 import copy
+import logging
 import re
 from typing import Any, Dict, Optional
 
@@ -7,6 +8,7 @@ from ska_telmodel_client import TMData
 from ska_ost_osd.common.utils import update_file
 from ska_ost_osd.osd.common.osd_validation_messages import (
     ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE,
+    ARRAY_ASSEMBLY_DOESNOT_MATCH_CYCLE_CAPABILITY_ERROR_MESSAGE,
     ARRAY_ASSEMBLY_REQUIRES_CAPABILITY_ERROR_MESSAGE,
     CAPABILITY_DOESNOT_BELONG_TO_CYCLE_ERROR_MESSAGE,
     CAPABILITY_DOESNOT_EXIST_ERROR_MESSAGE,
@@ -26,6 +28,8 @@ from .common.constant import (
     osd_file_mapping,
     osd_response_template,
 )
+
+LOGGER = logging.getLogger(__name__)
 
 
 class OSD:
@@ -100,7 +104,7 @@ class OSD:
             capabilities_dict = telescope_capabilities
         else:
             capabilities = [cap.capitalize() for cap in capabilities]
-            if array_assembly:
+            if array_assembly and self.cycle_id is None:
                 capabilities_dict = {cap: array_assembly for cap in capabilities}
             else:
                 capabilities_dict = {
@@ -125,6 +129,33 @@ class OSD:
                 return CAPABILITY_DOESNOT_BELONG_TO_CYCLE_ERROR_MESSAGE.format(
                     capability, self.cycle_id, available_capabilities
                 )
+        return None
+
+    def check_cycle_array_assembly(self) -> str | None:
+        """Validate an explicit array assembly against the selected cycle."""
+        if not self.array_assembly:
+            return None
+
+        telescope_capabilities = self.osd_data["observatory_policy"].get(
+            "telescope_capabilities", {}
+        )
+        for capability in self.capabilities:
+            cycle_array_assembly = telescope_capabilities[capability.capitalize()]
+            if self.array_assembly != cycle_array_assembly:
+                return (
+                    ARRAY_ASSEMBLY_DOESNOT_MATCH_CYCLE_CAPABILITY_ERROR_MESSAGE.format(
+                        self.array_assembly,
+                        capability,
+                        self.cycle_id,
+                        cycle_array_assembly,
+                    )
+                )
+            LOGGER.warning(
+                "Ignoring redundant array assembly %s for capability %s in cycle %s",
+                self.array_assembly,
+                capability,
+                self.cycle_id,
+            )
         return None
 
     def __get_capabilities_and_array_assembly(
@@ -224,7 +255,9 @@ class OSD:
 
         if chk_capabilities:
             osd_err_msg_list.append(chk_capabilities)
-        elif self.cycle_id is not None and self.array_assembly:
+        elif (
+            self.cycle_id is not None and self.array_assembly and not self.capabilities
+        ):
             osd_err_msg_list.append(CYCLE_ID_ARRAY_ASSEMBLY_ERROR_MESSAGE)
         elif self.array_assembly and not self.capabilities:
             osd_err_msg_list.append(ARRAY_ASSEMBLY_REQUIRES_CAPABILITY_ERROR_MESSAGE)
@@ -247,6 +280,10 @@ class OSD:
                 cycle_capability_error = self.check_cycle_capabilities()
                 if cycle_capability_error:
                     osd_err_msg_list.append(cycle_capability_error)
+                    return capabilities_and_array_assembly, osd_err_msg_list
+                cycle_array_assembly_error = self.check_cycle_array_assembly()
+                if cycle_array_assembly_error:
+                    osd_err_msg_list.append(cycle_array_assembly_error)
                     return capabilities_and_array_assembly, osd_err_msg_list
             telescope_capabilities_dict = self.get_telescope_capabilities(
                 self.capabilities, self.array_assembly
