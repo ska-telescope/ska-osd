@@ -4,6 +4,67 @@ from ska_ost_osd.common.utils import remove_none_params
 from tests.conftest import BASE_API_URL
 
 
+def test_osd_legacy_query_parameters_are_noops(test_client):
+    """Legacy source and version parameters do not alter OSD selection."""
+    baseline = test_client.get(
+        f"{BASE_API_URL}/osd", params={"cycle_id": 2}
+    )
+    legacy_parameters = test_client.get(
+        f"{BASE_API_URL}/osd",
+        params={
+            "cycle_id": 2,
+            "source": "gitlab",
+            "osd_version": "999.999.999",
+            "gitlab_branch": "legacy-client-branch",
+        },
+    )
+
+    assert baseline.status_code == HTTPStatus.OK
+    assert legacy_parameters.status_code == HTTPStatus.OK
+    assert legacy_parameters.json()["result_data"] == baseline.json()["result_data"]
+
+
+def test_cycle_osd_uses_selected_cycle_file(test_client):
+    """A cycle-specific request includes its selected cycle-file policy."""
+    response = test_client.get(f"{BASE_API_URL}/osd", params={"cycle_id": 2})
+    body = response.json()
+
+    assert response.status_code == HTTPStatus.OK
+    assert body["result_data"]["observatory_policy"]["cycle_number"] == 2
+    assert body["result_data"]["observatory_policy"]["cycle_id"] == (
+        "TEST_SKAO_2027_Low_AA2_Proposal"
+    )
+    assert set(body["result_data"]["capabilities"]) == {"mid", "low"}
+
+
+def test_catalogue_filter_does_not_include_observatory_policy(test_client):
+    """A non-cycle filter selects catalogue data without a cycle policy."""
+    response = test_client.get(
+        f"{BASE_API_URL}/osd",
+        params={"capabilities": "mid", "array_assembly": "AA0.5"},
+    )
+    body = response.json()
+
+    assert response.status_code == HTTPStatus.OK
+    assert "observatory_policy" not in body["result_data"]
+    assert list(body["result_data"]["capabilities"]) == ["mid"]
+    assert "AA0.5" in body["result_data"]["capabilities"]["mid"]
+
+
+def test_cycle_id_and_array_assembly_are_incompatible(test_client):
+    """A cycle policy, rather than an explicit array filter, selects assemblies."""
+    response = test_client.get(
+        f"{BASE_API_URL}/osd",
+        params={"cycle_id": 2, "array_assembly": "AA0.5"},
+    )
+    body = response.json()
+
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert "Cycle_id and Array_assembly cannot be used together" in str(
+        body["result_data"]
+    )
+
+
 def test_osd_endpoint(test_client):
     """This function tests that a request to the OSD endpoint for a specific
     OSD returns expected data for that OSD.
