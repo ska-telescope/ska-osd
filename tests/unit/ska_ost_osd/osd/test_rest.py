@@ -6,9 +6,7 @@ from tests.conftest import BASE_API_URL
 
 def test_osd_legacy_query_parameters_are_noops(test_client):
     """Legacy source and version parameters do not alter OSD selection."""
-    baseline = test_client.get(
-        f"{BASE_API_URL}/osd", params={"cycle_id": 2}
-    )
+    baseline = test_client.get(f"{BASE_API_URL}/osd", params={"cycle_id": 2})
     legacy_parameters = test_client.get(
         f"{BASE_API_URL}/osd",
         params={
@@ -63,6 +61,20 @@ def test_cycle_id_and_array_assembly_are_incompatible(test_client):
     assert "Cycle_id and Array_assembly cannot be used together" in str(
         body["result_data"]
     )
+
+
+def test_cycle_rejects_capability_not_in_policy(test_client):
+    """An explicit capability must be available in the selected cycle."""
+    response = test_client.get(
+        f"{BASE_API_URL}/osd",
+        params={"cycle_id": 1, "capabilities": "mid"},
+    )
+    body = response.json()
+
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert body["result_data"] == [
+        "Capability mid is not available for cycle 1,Available Capabilities are low"
+    ]
 
 
 def test_osd_endpoint(test_client):

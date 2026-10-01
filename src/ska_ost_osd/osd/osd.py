@@ -7,6 +7,7 @@ from ska_telmodel_client import TMData
 from ska_ost_osd.common.utils import update_file
 from ska_ost_osd.osd.common.osd_validation_messages import (
     ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE,
+    CAPABILITY_DOESNOT_BELONG_TO_CYCLE_ERROR_MESSAGE,
     CAPABILITY_DOESNOT_EXIST_ERROR_MESSAGE,
     CYCLE_ID_ARRAY_ASSEMBLY_ERROR_MESSAGE,
     CYCLE_ID_ERROR_MESSAGE,
@@ -106,6 +107,24 @@ class OSD:
                 }
 
         return capabilities_dict
+
+    def check_cycle_capabilities(self) -> str | None:
+        """Return an error for capabilities absent from the selected cycle."""
+        if not self.capabilities:
+            return None
+
+        telescope_capabilities = self.osd_data["observatory_policy"].get(
+            "telescope_capabilities", {}
+        )
+        available_capabilities = ", ".join(
+            capability.lower() for capability in telescope_capabilities
+        )
+        for capability in self.capabilities:
+            if capability.capitalize() not in telescope_capabilities:
+                return CAPABILITY_DOESNOT_BELONG_TO_CYCLE_ERROR_MESSAGE.format(
+                    capability, self.cycle_id, available_capabilities
+                )
+        return None
 
     def __get_capabilities_and_array_assembly(
         self, tmdata, telescope_capabilities_dict: dict, osd_data: dict
@@ -222,6 +241,10 @@ class OSD:
                 self.osd_data["observatory_policy"] = self.tmdata[
                     f"{OBSERVING_CYCLES_TMDATA_DIR}/cycle_{self.cycle_id}.json"
                 ].get_dict()
+                cycle_capability_error = self.check_cycle_capabilities()
+                if cycle_capability_error:
+                    osd_err_msg_list.append(cycle_capability_error)
+                    return capabilities_and_array_assembly, osd_err_msg_list
             telescope_capabilities_dict = self.get_telescope_capabilities(
                 self.capabilities, self.array_assembly
             )

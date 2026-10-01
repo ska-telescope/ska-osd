@@ -3,6 +3,9 @@ CYCLE_ID_ERROR_MESSAGE = "Cycle {} is not valid,Available IDs are {}"
 CAPABILITY_DOESNOT_EXIST_ERROR_MESSAGE = (
     "Capability {} is not valid,Available Capabilities are {}"
 )
+CAPABILITY_DOESNOT_BELONG_TO_CYCLE_ERROR_MESSAGE = (
+    "Capability {} is not available for cycle {},Available Capabilities are {}"
+)
 ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE = (
     "Array Assembly {} is not valid,Available Array Assemblies are {}"
 )
