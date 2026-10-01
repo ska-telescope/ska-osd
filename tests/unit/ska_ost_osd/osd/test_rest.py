@@ -79,6 +79,20 @@ def test_cycle_id_and_array_assembly_are_incompatible(test_client):
     )
 
 
+def test_cycle_capability_and_array_assembly_are_incompatible(test_client):
+    """A cycle capability policy already selects its array assembly."""
+    response = test_client.get(
+        f"{BASE_API_URL}/osd",
+        params={"cycle_id": 2, "capabilities": "mid", "array_assembly": "AA2"},
+    )
+    body = response.json()
+
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert "Cycle_id and Array_assembly cannot be used together" in str(
+        body["result_data"]
+    )
+
+
 def test_cycle_rejects_capability_not_in_policy(test_client):
     """An explicit capability must be available in the selected cycle."""
     response = test_client.get(
