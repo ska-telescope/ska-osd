@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 from ska_ost_osd.common.utils import remove_none_params
+from ska_ost_osd.osd.common.constant import osd_file_mapping
 from tests.conftest import BASE_API_URL
 
 
@@ -48,6 +49,20 @@ def test_cycle_capability_uses_cycle_selected_array_assembly(test_client):
     assert set(body["result_data"]["capabilities"]["mid"]) == {
         "basic_capabilities",
         "AA2",
+    }
+
+
+def test_capability_only_returns_complete_catalogue(test_client, tests_tmdata):
+    """A capability-only request returns all of that capability's assemblies."""
+    response = test_client.get(f"{BASE_API_URL}/osd", params={"capabilities": "mid"})
+    body = response.json()
+    source_data = tests_tmdata[osd_file_mapping["mid"]].get_dict()
+
+    assert response.status_code == HTTPStatus.OK
+    assert "observatory_policy" not in body["result_data"]
+    assert set(body["result_data"]["capabilities"]) == {"mid"}
+    assert set(body["result_data"]["capabilities"]["mid"]) == set(source_data) - {
+        "telescope"
     }
 
 
