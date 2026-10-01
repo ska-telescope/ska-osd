@@ -1,3 +1,4 @@
+import logging
 from http import HTTPStatus
 
 from ska_ost_osd.common.utils import remove_none_params
@@ -106,18 +107,36 @@ def test_cycle_id_and_array_assembly_are_incompatible(test_client):
     )
 
 
-def test_cycle_capability_and_array_assembly_are_incompatible(test_client):
-    """A cycle capability policy already selects its array assembly."""
+def test_cycle_capability_matching_array_assembly_is_redundant(test_client, caplog):
+    """A matching explicit assembly does not override the cycle policy."""
+    with caplog.at_level(logging.WARNING):
+        response = test_client.get(
+            f"{BASE_API_URL}/osd",
+            params={"cycle_id": 2, "capabilities": "mid", "array_assembly": "AA2"},
+        )
+    body = response.json()
+
+    assert response.status_code == HTTPStatus.OK
+    assert list(body["result_data"]["capabilities"]) == ["mid"]
+    assert "AA2" in body["result_data"]["capabilities"]["mid"]
+    assert (
+        "Ignoring redundant array assembly AA2 for capability mid in cycle 2"
+        in caplog.messages
+    )
+
+
+def test_cycle_capability_array_assembly_must_match_policy(test_client):
+    """An explicit cycle assembly must match the capability policy."""
     response = test_client.get(
         f"{BASE_API_URL}/osd",
-        params={"cycle_id": 2, "capabilities": "mid", "array_assembly": "AA2"},
+        params={"cycle_id": 2, "capabilities": "mid", "array_assembly": "AA0.5"},
     )
     body = response.json()
 
     assert response.status_code == HTTPStatus.BAD_REQUEST
-    assert "Cycle_id and Array_assembly cannot be used together" in str(
-        body["result_data"]
-    )
+    assert body["result_data"] == [
+        "Array Assembly AA0.5 does not match capability mid in cycle 2; expected AA2"
+    ]
 
 
 def test_cycle_rejects_capability_not_in_policy(test_client):
