@@ -20,6 +20,7 @@ from ska_ost_osd.osd.common.constant import (
     MID_CAPABILITIES_JSON_PATH,
     RELEASE_VERSION_MAPPING,
     SWAGGER_MID_OSD_DATA_JSON_FILE_PATH,
+    Telescope,
     osd_file_mapping,
 )
 from ska_ost_osd.osd.common.error_handling import CapabilityError, OSDModelError
@@ -77,7 +78,9 @@ def get_osd(
     try:
         osd_data = get_osd_using_tmdata(
             tm_data=tm_data,
-            capabilities=osd_model.capabilities,
+            telescope=(
+                Telescope(osd_model.capabilities) if osd_model.capabilities else None
+            ),
             array_assembly=osd_model.array_assembly,
             cycle_id=osd_model.cycle_id,
             process_templates=True,

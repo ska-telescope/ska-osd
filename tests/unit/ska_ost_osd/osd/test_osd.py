@@ -9,30 +9,30 @@ from ska_ost_osd.osd.osd import get_osd_data, update_osd_file
 
 
 @pytest.mark.parametrize(
-    "capabilities, array_assembly, expected_telescopes",
+    "telescope, array_assembly, expected_telescopes",
     [
         (None, None, {"mid", "low"}),
         (
-            ["mid"],
+            "mid",
             None,
             {"mid"},
         ),
         (
-            ["mid"],
+            "mid",
             "AA0.5",
             {"mid"},
         ),
     ],
 )
 def test_get_osd_data(
-    capabilities,
+    telescope,
     array_assembly,
     expected_telescopes,
     tests_tmdata,
 ):
     """Check that get_osd_data returns the expected telescope entries.
 
-    :param capabilities: Mid or Low
+    :param telescope: Mid or Low
     :param array_assembly: Array Assembly AA0.5, AA1
     :param expected_telescopes: telescope entries in the OSD response
     :param tests_tmdata: tmdata fixture
@@ -40,7 +40,7 @@ def test_get_osd_data(
     """
 
     result, _ = get_osd_data(
-        capabilities, array_assembly, tmdata=tests_tmdata, process_templates=False
+        telescope, array_assembly, tmdata=tests_tmdata, process_templates=False
     )
     assert set(result["capabilities"]) == expected_telescopes
 
@@ -69,7 +69,7 @@ def test_invalid_get_osd_data_capability(tests_tmdata):
     """
 
     _, error_msgs = get_osd_data(
-        capabilities=["midd"],
+        telescope="midd",
         array_assembly="AA1",
         tmdata=tests_tmdata,
         process_templates=False,
@@ -90,7 +90,7 @@ def test_invalid_get_osd_data_array_assembly(tests_tmdata):
     aa_value = "AA100000"
 
     _, error_msgs = get_osd_data(
-        capabilities=["mid"],
+        telescope="mid",
         array_assembly=aa_value,
         tmdata=tests_tmdata,
         process_templates=False,
@@ -246,7 +246,7 @@ def test_get_osd_data_with_process_templates(tests_tmdata):
     """Test that process_templates parameter is properly passed through."""
     # Test with process_templates=False (default)
     result_false, _ = get_osd_data(
-        capabilities=["mid"],
+        telescope="mid",
         array_assembly="AA0.5",
         tmdata=tests_tmdata,
         process_templates=False,
@@ -254,7 +254,7 @@ def test_get_osd_data_with_process_templates(tests_tmdata):
 
     # Test with process_templates=True
     result_true, _ = get_osd_data(
-        capabilities=["mid"],
+        telescope="mid",
         array_assembly="AA0.5",
         tmdata=tests_tmdata,
         process_templates=True,
@@ -285,7 +285,7 @@ def test_get_osd_data_template_processing_called(mock_process_templates, tests_t
 
     # Test with process_templates=True
     result, _ = get_osd_data(
-        capabilities=["mid"],
+        telescope="mid",
         array_assembly="AA0.5",
         tmdata=tests_tmdata,
         process_templates=True,
