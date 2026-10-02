@@ -59,12 +59,13 @@ class OSD:
         self.process_templates = process_templates
 
     def capability_files(self) -> dict[str, str]:
-        """Return capability names and TMData paths discovered from TMData."""
-        return {
-            entry.rsplit("/", maxsplit=1)[-1].removesuffix("_capabilities.json"): entry
-            for entry in self.tmdata
-            if entry.endswith("_capabilities.json")
-        }
+        """Return TMData capability paths keyed by their telescope fields."""
+        capability_files = {}
+        for entry in self.tmdata:
+            if entry.endswith("_capabilities.json"):
+                telescope = self.tmdata[entry].get_dict()["telescope"]
+                capability_files[telescope.lower()] = entry
+        return capability_files
 
     def cycle_files(self):
         """Return the TMData cycle directory or raise when it is absent."""
