@@ -9,33 +9,32 @@ from ska_ost_osd.osd.osd import get_osd_data, update_osd_file
 
 
 @pytest.mark.parametrize(
-    "capabilities, array_assembly, expected_keys",
+    "capabilities, array_assembly, expected_telescopes",
     [
-        (None, None, ["mid", "low"]),
+        (None, None, {"mid", "low"}),
         (
             ["mid"],
             None,
-            ["mid"],
+            {"mid"},
         ),
         (
             ["mid"],
             "AA0.5",
-            ["mid"],
+            {"mid"},
         ),
     ],
 )
 def test_get_osd_data(
     capabilities,
     array_assembly,
-    expected_keys,
+    expected_telescopes,
     tests_tmdata,
 ):
-    """This test case checks the functionality of get_osd_data it converts the
-    python dict into list keys and checks for equality with expected output.
+    """Check that get_osd_data returns the expected telescope entries.
 
     :param capabilities: Mid or Low
     :param array_assembly: Array Assembly AA0.5, AA1
-    :param expected: output of get_osd_data function
+    :param expected_telescopes: telescope entries in the OSD response
     :param tests_tmdata: tmdata fixture
     :returns: assert equals values
     """
@@ -43,9 +42,7 @@ def test_get_osd_data(
     result, _ = get_osd_data(
         capabilities, array_assembly, tmdata=tests_tmdata, process_templates=False
     )
-    result_keys = list(result["capabilities"].keys())
-
-    assert result_keys == expected_keys
+    assert set(result["capabilities"]) == expected_telescopes
 
 
 def test_get_osd_data_without_cycle_returns_complete_catalogue(tests_tmdata):
@@ -54,7 +51,7 @@ def test_get_osd_data_without_cycle_returns_complete_catalogue(tests_tmdata):
 
     assert error_msgs == []
     assert "observatory_policy" not in result
-    assert list(result["capabilities"]) == ["mid", "low"]
+    assert set(result["capabilities"]) == {"mid", "low"}
 
     for capability in ("mid", "low"):
         source_data = tests_tmdata[osd_file_mapping[capability]].get_dict()

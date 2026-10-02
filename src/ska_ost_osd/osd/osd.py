@@ -133,9 +133,7 @@ class OSD:
             # Catalogue mode: select each requested telescope and optionally one
             # named capability set. No capability-set filter is expanded to all
             # named sets later in build_osd_data().
-            telescope_names = self.requested_telescopes or sorted(
-                self.capability_files(), reverse=True
-            )
+            telescope_names = self.requested_telescopes or self.capability_files()
             return {
                 telescope.lower(): self.requested_capability_set
                 for telescope in telescope_names
