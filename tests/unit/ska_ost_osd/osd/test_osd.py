@@ -80,6 +80,25 @@ def test_invalid_get_osd_data_capability(tests_tmdata):
     ]
 
 
+def test_get_osd_data_invalid_capability_only(tests_tmdata):
+    """This test case checks that the output of the get_osd_data when
+    an invalid telescope is provided without an array assembly returns
+    the appropriate error messages.
+
+    :param tests_tmdata: tests_tmdata
+    """
+    _, error_msgs = get_osd_data(
+        telescope="invalid",
+        array_assembly=None,
+        tmdata=tests_tmdata,
+        process_templates=False,
+    )
+    assert error_msgs == [
+        "Capability invalid is not valid,Available Capabilities are low, mid,"
+        " observatory_policies"
+    ]
+
+
 def test_invalid_get_osd_data_array_assembly(tests_tmdata):
     """This test case checks if the output of the get_osd_data when
     array_assembly is given incorrect with correct capabilities it should
