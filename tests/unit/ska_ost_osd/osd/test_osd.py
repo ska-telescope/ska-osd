@@ -75,8 +75,8 @@ def test_invalid_get_osd_data_capability(tests_tmdata):
         process_templates=False,
     )
     assert error_msgs == [
-        "Capability midd is not valid,Available Capabilities are low, mid,"
-        " observatory_policies"
+        "Capability midd is invalid. Valid capabilities are low, mid,"
+        " observatory_policies."
     ]
 
 
@@ -94,8 +94,8 @@ def test_get_osd_data_invalid_capability_only(tests_tmdata):
         process_templates=False,
     )
     assert error_msgs == [
-        "Capability invalid is not valid,Available Capabilities are low, mid,"
-        " observatory_policies"
+        "Capability invalid is invalid. Valid capabilities are low, mid,"
+        " observatory_policies."
     ]
 
 
@@ -114,9 +114,12 @@ def test_invalid_get_osd_data_array_assembly(tests_tmdata):
         tmdata=tests_tmdata,
         process_templates=False,
     )
-    msg = ",".join(error_msgs[0].split(",")[1:])
 
-    assert error_msgs[0] == f"Array Assembly {aa_value} is not valid,{msg}"
+    assert len(error_msgs) == 1
+    assert (
+        error_msgs[0]
+        == f"Array assembly {aa_value} is invalid. Valid array assemblies are constraints, AA0.5, AA1, AA2, Mid_ITF."
+    )
 
 
 @pytest.fixture

@@ -90,7 +90,7 @@ def test_array_assembly_requires_capability(test_client):
     body = response.json()
 
     assert response.status_code == HTTPStatus.BAD_REQUEST
-    assert body["result_data"] == ["Array Assembly requires a capability"]
+    assert body["result_data"] == ["Array assembly requires a capability."]
 
 
 def test_cycle_id_and_array_assembly_are_incompatible(test_client):
@@ -135,7 +135,7 @@ def test_cycle_capability_array_assembly_must_match_policy(test_client):
 
     assert response.status_code == HTTPStatus.BAD_REQUEST
     assert body["result_data"] == [
-        "Array Assembly AA0.5 does not match capability mid in cycle 2; expected AA2"
+        "Array assembly AA0.5 does not match capability mid in cycle 2. Expected AA2."
     ]
 
 
@@ -149,7 +149,7 @@ def test_cycle_rejects_capability_not_in_policy(test_client):
 
     assert response.status_code == HTTPStatus.BAD_REQUEST
     assert body["result_data"] == [
-        "Capability mid is not available for cycle 1,Available Capabilities are low"
+        "Capability mid is invalid for cycle 1. Valid capabilities are low."
     ]
 
 
@@ -293,5 +293,5 @@ def test_invalid_cycle_id(
         params={"cycle_id": 3, "source": "file", "capabilities": "mid"},
     ).json()
 
-    assert "Cycle 3 is not valid" in response["result_data"][0]
+    assert "Cycle 3 is invalid" in response["result_data"][0]
     assert response["result_code"] == HTTPStatus.BAD_REQUEST
