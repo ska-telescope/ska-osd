@@ -204,11 +204,14 @@ class OSD:
         self, capability_set: str, telescope_capability_data: dict[str, Any]
     ) -> str | None:
         """Return an error when a named capability set is absent from a telescope."""
-        if capability_set not in telescope_capability_data:
+        if (
+            capability_set == "constraints"
+            or capability_set not in telescope_capability_data
+        ):
             available = ", ".join(
                 key
                 for key in telescope_capability_data
-                if key not in ("telescope", "basic_capabilities")
+                if key not in ("telescope", "basic_capabilities", "constraints")
             )
             return ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE.format(
                 capability_set, available
@@ -239,7 +242,7 @@ class OSD:
                     {
                         key: value
                         for key, value in telescope_capability_data.items()
-                        if key not in ("telescope", "basic_capabilities")
+                        if key not in ("telescope", "basic_capabilities", "constraints")
                     }
                 )
             else:

@@ -63,7 +63,8 @@ def test_capability_only_returns_complete_catalogue(test_client, tests_tmdata):
     assert "observatory_policy" not in body["result_data"]
     assert set(body["result_data"]["capabilities"]) == {"mid"}
     assert set(body["result_data"]["capabilities"]["mid"]) == set(source_data) - {
-        "telescope"
+        "telescope",
+        "constraints",
     }
 
 

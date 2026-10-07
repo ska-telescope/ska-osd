@@ -56,7 +56,8 @@ def test_get_osd_data_without_cycle_returns_complete_catalogue(tests_tmdata):
     for capability in ("mid", "low"):
         source_data = tests_tmdata[osd_file_mapping[capability]].get_dict()
         assert set(result["capabilities"][capability]) == set(source_data) - {
-            "telescope"
+            "telescope",
+            "constraints",
         }
 
 
@@ -118,8 +119,29 @@ def test_invalid_get_osd_data_array_assembly(tests_tmdata):
     assert len(error_msgs) == 1
     assert (
         error_msgs[0]
-        == f"Array assembly {aa_value} is invalid. Valid array assemblies are constraints, AA0.5, AA1, AA2, Mid_ITF."
+        == f"Array assembly {aa_value} is invalid. Valid array assemblies are AA0.5, AA1, AA2, Mid_ITF."
     )
+
+
+def test_get_osd_data_array_assembly_constraints_is_invalid(tests_tmdata):
+    """ "constraints" is a key of the capabilities document, not a named
+    array assembly, so requesting it as one should be rejected rather than
+    returned as if it were a valid capability set.
+
+    :param tests_tmdata: tests_tmdata
+    """
+    osd_data, error_msgs = get_osd_data(
+        telescope="mid",
+        array_assembly="constraints",
+        tmdata=tests_tmdata,
+        process_templates=False,
+    )
+
+    assert osd_data is None
+    assert error_msgs == [
+        "Array assembly constraints is invalid. Valid array assemblies are"
+        " AA0.5, AA1, AA2, Mid_ITF."
+    ]
 
 
 @pytest.fixture
