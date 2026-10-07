@@ -19,7 +19,6 @@
       "min_coarse_channel": 64,
       "max_coarse_channel": 447,
       "coarse_channel_width_hz": 781.25e3,
-      "coarse_channel_width": 781.25e3,
       "number_continuum_channels_per_coarse_channel": 144,
       "number_zoom_channels_per_coarse_channel": 432,
       "number_pst_channels_per_coarse_channel": 216,
@@ -34,7 +33,6 @@
         431
       ],
       "number_substations": 0,
-      "number_beams": 1,
       "number_subarray_beams": 1,
       "max_baseline_km": 3.0,
       "available_bandwidth_hz": 75000000.0,
@@ -55,7 +53,6 @@
     "AA1": {
       "number_stations": 16,
       "number_substations": 512,
-      "number_beams": 8,
       "number_subarray_beams": 8,
       "max_baseline_km": 6.0,
       "available_bandwidth_hz": 75000000.0,
@@ -77,7 +74,6 @@
     "AA2": {
       "number_stations": 68,
       "number_substations": 720,
-      "number_beams": 8,
       "number_subarray_beams": 8,
       "max_baseline_km": 40.0,
       "available_bandwidth_hz": 150000000.0,
@@ -100,7 +96,6 @@
     "Low_ITF": {
       "number_stations": 16,
       "number_substations": 512,
-      "number_beams": 8,
       "number_subarray_beams": 8,
       "max_baseline_km": 6.0,
       "available_bandwidth_hz": 75000000.0,
@@ -121,7 +116,6 @@
     "AA2_SV": {
       "number_stations": 68,
       "number_substations": 0,
-      "number_beams": 1,
       "number_subarray_beams": 1,
       "max_baseline_km": 40.0,
       "available_bandwidth_hz": 150000000.0,
