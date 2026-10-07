@@ -313,19 +313,6 @@ def get_osd_latest_version(tmdata_version: TMData) -> str:
     return osd_version
 
 
-def check_cycle_id(
-    cycle_id: int = None,
-    tmdata: TMData = None,
-) -> str | None:
-    """Return an error message when a cycle has no observing-cycle file."""
-    return OSD(
-        telescope=None,
-        array_assembly=None,
-        tmdata=tmdata,
-        cycle_id=cycle_id,
-    ).check_cycle_id()
-
-
 def get_osd_data(
     telescope: Telescope | None = None,
     array_assembly: str = None,

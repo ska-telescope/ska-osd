@@ -20,12 +20,6 @@ osd_file_mapping = {
     "subarray_templates": SUBARRAY_TEMPLATES_PATH,
 }
 
-osd_response_template = {
-    "observatory_policy": {"cycle_number": 1, "telescope_capabilities": []},
-    "capabilities": {},
-}
-
-
 BASE_URL = "//gitlab.com/ska-telescope/"
 CAR_URL = "ost/ska-ost-osd?"
 BASE_FOLDER_NAME = "tmdata"
