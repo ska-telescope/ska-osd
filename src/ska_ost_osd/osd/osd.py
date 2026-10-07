@@ -210,7 +210,7 @@ class OSD:
     ) -> str | None:
         """Return an error when a named capability set is absent from a telescope."""
         if (
-            capability_set == "constraints"
+            capability_set in ("constraints", "basic_capabilities")
             or capability_set not in telescope_capability_data
         ):
             available = ", ".join(

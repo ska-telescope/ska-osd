@@ -123,23 +123,30 @@ def test_invalid_get_osd_data_array_assembly(tests_tmdata):
     )
 
 
-def test_get_osd_data_array_assembly_constraints_is_invalid(tests_tmdata):
-    """ "constraints" is a key of the capabilities document, not a named
-    array assembly, so requesting it as one should be rejected rather than
-    returned as if it were a valid capability set.
+@pytest.mark.parametrize(
+    "invalid_array_assembly", ["constraints", "basic_capabilities"]
+)
+def test_get_osd_data_array_assembly_rejects_non_array_assembly_keys(
+    invalid_array_assembly, tests_tmdata
+):
+    """ "constraints" and "basic_capabilities" are keys of the capabilities
+    document, not named array assemblies, so requesting either as one
+    should be rejected rather than returned as if it were a valid
+    capability set.
 
+    :param invalid_array_assembly: the non-array-assembly key under test
     :param tests_tmdata: tests_tmdata
     """
     osd_data, error_msgs = get_osd_data(
         telescope="mid",
-        array_assembly="constraints",
+        array_assembly=invalid_array_assembly,
         tmdata=tests_tmdata,
         process_templates=False,
     )
 
     assert osd_data is None
     assert error_msgs == [
-        "Array assembly constraints is invalid. Valid array assemblies are"
+        f"Array assembly {invalid_array_assembly} is invalid. Valid array assemblies are"
         " AA0.5, AA1, AA2, Mid_ITF."
     ]
 
