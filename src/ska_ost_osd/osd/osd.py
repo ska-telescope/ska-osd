@@ -1,6 +1,7 @@
 import copy
 import logging
 import re
+from functools import cached_property
 from typing import Any, Dict, Optional
 
 from ska_telmodel_client import TMData
@@ -57,14 +58,15 @@ class OSD:
         self.tmdata = tmdata
         self.process_templates = process_templates
 
-    def capability_files(self) -> dict[str, str]:
+    @cached_property
+    def capability_filepaths(self) -> dict[str, str]:
         """Return telescope-keyed TMData capability document paths."""
-        capability_files = {}
+        capability_filepaths = {}
         for entry in self.tmdata:
             if entry.endswith("_capabilities.json"):
                 telescope = self.tmdata[entry].get_dict()["telescope"]
-                capability_files[telescope.lower()] = entry
-        return capability_files
+                capability_filepaths[telescope.lower()] = entry
+        return capability_filepaths
 
     def cycle_files(self):
         """Return the TMData cycle directory or raise when it is absent."""
@@ -95,10 +97,10 @@ class OSD:
 
     def validate_query(self) -> str | None:
         """Validate the query before reading TMData files."""
-        capability_files = self.capability_files()
+        capability_filepaths = self.capability_filepaths
         if self.requested_telescope:
             # A queried telescope must have a corresponding capability document.
-            if self.requested_telescope.lower() not in capability_files:
+            if self.requested_telescope.lower() not in capability_filepaths:
                 available = ", ".join(list(osd_file_mapping.keys())[:3])
                 return CAPABILITY_DOESNOT_EXIST_ERROR_MESSAGE.format(
                     self.requested_telescope, available
@@ -139,7 +141,7 @@ class OSD:
                 }, None
             return {
                 telescope.lower(): self.requested_capability_set
-                for telescope in self.capability_files()
+                for telescope in self.capability_filepaths
             }, None
 
         # Cycle mode: each telescope maps to one prescribed capability set.
@@ -188,7 +190,7 @@ class OSD:
     def get_telescope_capability_data(self, telescope: str) -> dict[str, Any]:
         """Load one telescope capability document and optional template mappings."""
         telescope_capability_data = self.tmdata[
-            self.capability_files()[telescope]
+            self.capability_filepaths[telescope]
         ].get_dict()
         if not self.process_templates:
             return telescope_capability_data
@@ -201,7 +203,7 @@ class OSD:
             template_data = {}
         return process_template_mappings(
             telescope_capability_data,
-            self.capability_files()[telescope],
+            self.capability_filepaths[telescope],
             template_data,
         )
 
