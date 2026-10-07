@@ -193,7 +193,12 @@ class OSD:
         if not self.process_templates:
             return telescope_capability_data
 
-        template_data = self.tmdata[osd_file_mapping["subarray_templates"]].get_dict()
+        try:
+            template_data = self.tmdata[
+                osd_file_mapping["subarray_templates"]
+            ].get_dict()
+        except (KeyError, AttributeError):
+            template_data = {}
         return process_template_mappings(
             telescope_capability_data,
             self.capability_files()[telescope],

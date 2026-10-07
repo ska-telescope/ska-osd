@@ -144,6 +144,31 @@ def test_get_osd_data_array_assembly_constraints_is_invalid(tests_tmdata):
     ]
 
 
+def test_get_osd_data_missing_subarray_templates_falls_back_to_empty(
+    tests_tmdata, monkeypatch
+):
+    """When process_templates is requested but the TMData source has no
+    subarray_templates file, get_osd_data should fall back to treating the
+    template data as empty rather than raising.
+
+    :param tests_tmdata: tests_tmdata
+    :param monkeypatch: pytest monkeypatch fixture
+    """
+    monkeypatch.setitem(
+        osd_file_mapping, "subarray_templates", "missing/templates.json"
+    )
+
+    osd_data, error_msgs = get_osd_data(
+        telescope="mid",
+        array_assembly="AA0.5",
+        tmdata=tests_tmdata,
+        process_templates=True,
+    )
+
+    assert error_msgs == []
+    assert "AA0.5" in osd_data["capabilities"]["mid"]
+
+
 @pytest.fixture
 def sample_existing_data():
     return {
