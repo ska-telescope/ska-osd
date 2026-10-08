@@ -76,10 +76,18 @@ General Structure
 
 .. note::
 
-    * Created a separate JSON file for mapping ``cycle_id`` to version number ``cycle_gitlab_release_version_mapping.json`` inside ``version_mapping`` folder.
+    * ``GET /osd`` and ``GET /cycle`` resolve a requested ``cycle_id`` by
+      reading ``cycles/cycle_<id>.json`` directly from the ``TMData`` source
+      used for the request. ``osd_version``, ``source`` and ``gitlab_branch``
+      have no effect on the data returned.
 
-    * OSD supports backward compatibility for all existing released versions. If someone wants to retrieve older version then
-      they just need to point out that specific version in ``osd_version``.
+    * ``cycle_gitlab_release_version_mapping.json`` was the earlier mechanism
+      for resolving a ``cycle_id`` (or an explicit ``osd_version`` /
+      ``gitlab_branch``) to a specific ``tmdata`` GitLab release.
+      ``POST /osd_release`` is deprecated but still available; the Makefile
+      automation that used to drive it (the ``osd-pre-release`` and
+      ``osddata-do-publish`` targets) has been removed entirely. The mapping
+      file itself is kept only for backward compatibility.
 
 If user wants to access this framework from CDM, Jupyter Notebook or any other client below is the example.
 If there is any error then the end user will get the appropriate error message.
