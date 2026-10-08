@@ -1,7 +1,10 @@
 """Created file to maintain OSD Model constants."""
 
+from enum import Enum
+
 MID_CONSTANT_JSON_FILE_PATH = "ska1_mid/mid_capabilities.json"
 LOW_CONSTANT_JSON_FILE_PATH = "ska1_low/low_capabilities.json"
+OBSERVING_CYCLES_TMDATA_DIR = "cycles"
 POLICIES_CONSTANT_JSON_FILE_PATH = "observatory_policies.json"
 RELEASE_FILE = "tmdata/version_mapping/latest_release.txt"
 RELEASE_FILE_PATH_LATEST = "version_mapping/latest_release.txt"
@@ -17,18 +20,25 @@ osd_file_mapping = {
     "subarray_templates": SUBARRAY_TEMPLATES_PATH,
 }
 
-osd_response_template = {
-    "observatory_policy": {"cycle_number": 1, "telescope_capabilities": []},
-    "capabilities": {},
-}
-
-
 BASE_URL = "//gitlab.com/ska-telescope/"
 CAR_URL = "ost/ska-ost-osd?"
 BASE_FOLDER_NAME = "tmdata"
 
 SOURCES = ("file", "car", "gitlab")
 CAPABILITIES = ("mid", "low")
+
+
+class Telescope(str, Enum):
+    """Supported telescope names."""
+
+    LOW = "low"
+    MID = "mid"
+
+    def __str__(self) -> str:
+        """Return the telescope name used in TMData and API responses."""
+        return self.value
+
+
 OSD_VERSION_PATTERN = r"^\d+\.\d+\.\d+"
 ARRAY_ASSEMBLY_PATTERN = r"^AA(\d+|\d+\.\d+)|^Low|^Mid"
 QUERY_FIELDS = [

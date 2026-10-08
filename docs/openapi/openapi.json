@@ -335,6 +335,7 @@
         "summary": "Release new osd version to Gitlab",
         "description": "Release OSD data with automatic version increment based on cycle ID",
         "operationId": "release_osd_data_ska_ost_osd_osd_api_v5_osd_release_post",
+        "deprecated": true,
         "parameters": [
           {
             "name": "cycle_id",

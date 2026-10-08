@@ -27,22 +27,25 @@ Folder Structure
 .. code-block:: bash
 
     tmdata
-    │──── observatory_policies.json
-    │   ├── ska1_low
-    │   │   └── low_capabilities.json
-    │   └── ska1_mid
-    │       └── mid_capabilities.json
+    ├── cycles
+    │   ├── cycle_1.json
+    │   └── cycle_<id>.json
+    ├── ska1_low
+    │   └── low_capabilities.json
+    └── ska1_mid
+        └── mid_capabilities.json
 
 
 * `mid_capabilities.json <https://confluence.skatelescope.org/pages/viewpage.action?spaceKey=SWSI&title=Observatory+Static+Data>`_
 
 * `low_capabilities.json <https://confluence.skatelescope.org/pages/viewpage.action?spaceKey=SWSI&title=Observatory+Static+Data>`_
 
-* `observatory_policies.json <https://confluence.skatelescope.org/pages/viewpage.action?spaceKey=SWSI&title=Observatory+Static+Data>`_
-
 .. note::
 
-    ``observatory_policies.json`` is at root, because its common for both Mid and Low.
+    Each observing cycle is stored in its own
+    ``cycles/cycle_<id>.json`` file. The legacy ``observatory_policies.json``
+    file remains at the root on main for backward compatibility with the old
+    legacy version mapper.
 
 General Structure
 ~~~~~~~~~~~~~~~~~~~
@@ -61,8 +64,6 @@ General Structure
     │   │   └── cycle_gitlab_release_version_mapping.json
     │   ├── version_manager.py
     │   └── osd.py
-    ├── scripts
-    │   └── release.sh
     └── telvalidation
         ├── common
         ├── models
@@ -75,15 +76,18 @@ General Structure
 
 .. note::
 
-    * Created a separate JSON file for mapping ``cycle_id`` to version number ``cycle_gitlab_release_version_mapping.json`` inside ``version_mapping`` folder.
+    * ``GET /osd`` and ``GET /cycle`` resolve a requested ``cycle_id`` by
+      reading ``cycles/cycle_<id>.json`` directly from the ``TMData`` source
+      used for the request. ``osd_version``, ``source`` and ``gitlab_branch``
+      have no effect on the data returned.
 
-    * OSD supports backward compatibility for all existing released versions. If someone wants to retrieve older version then
-      they just need to point out that specific version in ``osd_version``.
-
-.. note::
-
-    Created a bash script ``release.sh`` in ``scripts`` folder.
-
+    * ``cycle_gitlab_release_version_mapping.json`` was the earlier mechanism
+      for resolving a ``cycle_id`` (or an explicit ``osd_version`` /
+      ``gitlab_branch``) to a specific ``tmdata`` GitLab release.
+      ``POST /osd_release`` is deprecated but still available; the Makefile
+      automation that used to drive it (the ``osd-pre-release`` and
+      ``osddata-do-publish`` targets) has been removed entirely. The mapping
+      file itself is kept only for backward compatibility.
 
 If user wants to access this framework from CDM, Jupyter Notebook or any other client below is the example.
 If there is any error then the end user will get the appropriate error message.
@@ -131,8 +135,8 @@ API json response template
 ======================    ============================================================================================================
 Keys                      Description
 ======================    ============================================================================================================
-observatory_policy        file content of ``observatory_policies.json`` file
-telescope_capabilities    value of ``telescope_capabilities`` in file ``observatory_policies.json``
+observatory_policy        file content of the selected ``cycles/cycle_<id>.json`` file
+telescope_capabilities    value of ``telescope_capabilities`` in the selected cycle file
 capabilities              key value pair of mid and low
 Mid                       file content of ``mid_capabilities.json`` with ``basic_capabilities`` and ``Array Assembly`` AA0.5, AA1 etc
 Low                       file content of ``low_capabilities.json`` with ``basic_capabilities`` and ``Array Assembly`` AA0.5, AA1 etc
@@ -395,12 +399,13 @@ GET /osd
 
 5. Scenarios
 
-    1. If no parameters are provided to the API then it should return error message for required
-    ``cycle_id`` or ``capabilities``.
+    1. If no parameters are provided, the API returns the complete OSD catalogue: every
+       telescope's ``basic_capabilities`` together with all of its named array assemblies.
+       No ``observatory_policy`` is included, since no ``cycle_id`` was selected.
 
-    2. Calling API with only one parameter cycle_id and no other parameter. First it will check if the
-       cycle id is valid or not, and will fetch latest version stored in the
-       ``cycle_gitlab_release_version_mapping.json`` file.
+    2. Calling the API with only ``cycle_id`` checks that the corresponding
+       ``cycles/cycle_<id>.json`` file exists, then uses that file's
+       ``telescope_capabilities`` to select the OSD data.
 
     3. If source is not provided in the API call, the default is set to car. API will
        fetch data from car. other option is file and gitlab.
@@ -484,7 +489,8 @@ GET /cycle
 
 5. Scenarios
 
-    1. When this api gets called the api returns all available ``cycle_id``.
+    1. When this API is called, it returns the available ``cycle_id`` values
+       from the ``cycles/cycle_<id>.json`` filenames.
 
 
 POST /osd_release
@@ -846,6 +852,11 @@ Error Handling
 TMData Release Process using API.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. warning::
+
+   The ``POST /osd_release`` endpoint is deprecated. It remains available for
+   backward compatibility while the TMData release workflow is redesigned.
+
 TMData releases are now handled separately from the main ska-ost-osd codebase through an automated process:
 
 1. **Automatic Release via API**: Use the ``POST /osd_release`` endpoint to trigger automated TMData releases
@@ -910,19 +921,7 @@ Manual tmdata Release Steps
 
     make bump-patch-release
 
-4. Run below command for OSD release
-
-Created a target called ``osd-pre-release`` in Makefile which will run when ska_ost_osd is released.
-also added a ``release.sh`` file inside ``ska_ost_osd`` ``scripts`` folder which has two functions ``GetCycleId`` and ``UpdateAndAddValue``
-
-``GetCycleId`` function gets ``cycle_number`` from ``observatory_policies.json`` file and triggers next function ``UpdateAndAddValue``
-which updates or add cycle_id values in version mapping json file.
-
-.. code:: bash
-
-    make osd-pre-release
-
-5. Set the Release
+4. Set the Release
 
 * `For remaining release steps click here <https://developer.skao.int/en/latest/tutorial/release-management/automate-release-process.html>`_
 
@@ -1091,11 +1090,7 @@ Subarray templates are automatically processed when retrieving OSD data:
         "result_code": 200
     }
 
-tmdata publish job
--------------------
+TMData publishing
+-----------------
 
 `tmdata-publish` (from gitlab) is needed when user need to test on main using OSD UI, in this no tag is pushed to gitlab or CAR.
-
-`osd-tmdata-publish` (from CAR) is needed when user need to fetch data using OSD UI / API. in this tag is published automatically using OSD UI.
-
-For now please run either of job manually as per need.

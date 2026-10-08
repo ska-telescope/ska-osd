@@ -1,5 +1,7 @@
 import copy
+import logging
 import re
+from functools import cached_property
 from typing import Any, Dict, Optional
 
 from ska_telmodel_client import TMData
@@ -7,10 +9,12 @@ from ska_telmodel_client import TMData
 from ska_ost_osd.common.utils import update_file
 from ska_ost_osd.osd.common.osd_validation_messages import (
     ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE,
+    ARRAY_ASSEMBLY_DOESNOT_MATCH_CYCLE_CAPABILITY_ERROR_MESSAGE,
+    ARRAY_ASSEMBLY_REQUIRES_CAPABILITY_ERROR_MESSAGE,
+    CAPABILITY_DOESNOT_BELONG_TO_CYCLE_ERROR_MESSAGE,
     CAPABILITY_DOESNOT_EXIST_ERROR_MESSAGE,
-    CYCLE_ERROR_MESSAGE,
+    CYCLE_ID_ARRAY_ASSEMBLY_ERROR_MESSAGE,
     CYCLE_ID_ERROR_MESSAGE,
-    OSD_VERSION_ERROR_MESSAGE,
 )
 from ska_ost_osd.osd.template_mapping.template_mapping import process_template_mappings
 
@@ -19,20 +23,21 @@ from .common.constant import (
     LOW_CAPABILITIES_JSON_PATH,
     MID_CAPABILITIES_JSON_PATH,
     OBSERVATORY_POLICIES_JSON_PATH,
+    OBSERVING_CYCLES_TMDATA_DIR,
     RELEASE_FILE_PATH_LATEST,
-    VERSION_FILE_PATH,
+    Telescope,
     osd_file_mapping,
-    osd_response_template,
 )
+
+LOGGER = logging.getLogger(__name__)
 
 
 class OSD:
-    """Initialize OSD-related variables and methods, including
-    get_telescope_observatory_policies, get_data, and get_osd_data."""
+    """Build OSD responses from telescope capability documents and cycle definitions."""
 
     def __init__(
         self,
-        capabilities: list,
+        telescope: Telescope | None,
         array_assembly: str,
         tmdata: TMData,
         cycle_id: int,
@@ -40,234 +45,259 @@ class OSD:
     ) -> None:
         """Initialize the OSD class.
 
-        :param capabilities: list, capabilities of the telescope ("mid"
-            or "low").
-        :param array_assembly: str, for "mid" can be one of "AA0.5",
-            "AA2", or "AA1".
+        :param telescope: requested telescope name (``"mid"`` or ``"low"``).
+        :param array_assembly: requested capability-set name, such as ``"AA2"`` or ``"AA2_SV"``.
         :param tmdata: TMData, TMData class object.
         :param cycle_id: int, cycle identifier.
         :param process_templates: bool, whether to process template mappings.
         :return: None
         """
         self.cycle_id = cycle_id
-        self.osd_data = copy.deepcopy(osd_response_template)
-        self.capabilities = capabilities
-        self.array_assembly = array_assembly
+        self.requested_telescope = telescope
+        self.requested_capability_set = array_assembly
         self.tmdata = tmdata
-        self.keys_list = {}
         self.process_templates = process_templates
 
-    def check_capabilities(self, capabilities: list = None) -> str | None:
-        """Check if the given capabilities exist, and raise an exception if
-        not.
+    @cached_property
+    def capability_filepaths(self) -> dict[str, str]:
+        """Return telescope-keyed TMData capability document paths."""
+        capability_filepaths = {}
+        for entry in self.tmdata:
+            if entry.endswith("_capabilities.json"):
+                telescope = self.tmdata[entry].get_dict()["telescope"]
+                capability_filepaths[telescope.lower()] = entry
+        return capability_filepaths
 
-        :param capabilities: list, capabilities such as "mid", "low", or
-            "basic_capability".
-        :return: None.
-        :raises OSDDataException: If any provided capability does not
-            exist.
-        """
+    def cycle_files(self):
+        """Return the TMData cycle directory or raise when it is absent."""
+        if not any(k.startswith(OBSERVING_CYCLES_TMDATA_DIR) for k in self.tmdata):
+            raise FileNotFoundError(f"file not found: {OBSERVING_CYCLES_TMDATA_DIR}")
+        return self.tmdata[OBSERVING_CYCLES_TMDATA_DIR]
 
-        capabilities_list = list(osd_file_mapping.keys())[:3]
+    def get_available_cycles(self) -> list[int]:
+        """List available cycle IDs from observing-cycle file names."""
+        return [
+            int(str(key).removesuffix(".json").removeprefix("cycle_"))
+            for key in self.cycle_files()
+            if key.startswith("cycle_") and key.endswith(".json")
+        ]
 
-        if capabilities:
-            cap_list = [i for i in capabilities if i.lower() not in capabilities_list]
+    def check_cycle_id(self) -> str | None:
+        """Return an error message when the selected cycle file is absent."""
+        if self.cycle_id is None:
+            return None
 
-            if isinstance(capabilities, list) and cap_list:
-                msg = ", ".join(capabilities_list)
-                return CAPABILITY_DOESNOT_EXIST_ERROR_MESSAGE.format(cap_list[0], msg)
+        cycle_filename = f"cycle_{self.cycle_id}.json"
+        if cycle_filename not in self.cycle_files():
+            cycle_numbers = ",".join(
+                str(cycle) for cycle in self.get_available_cycles()
+            )
+            return CYCLE_ID_ERROR_MESSAGE.format(self.cycle_id, cycle_numbers)
         return None
 
-    def get_telescope_observatory_policies(
+    def validate_query(self) -> str | None:
+        """Validate the query before reading TMData files."""
+        capability_filepaths = self.capability_filepaths
+        if self.requested_telescope:
+            # A queried telescope must have a corresponding capability document.
+            if self.requested_telescope.lower() not in capability_filepaths:
+                available = ", ".join(list(osd_file_mapping.keys())[:3])
+                return CAPABILITY_DOESNOT_EXIST_ERROR_MESSAGE.format(
+                    self.requested_telescope, available
+                )
+
+        # A named capability set can only be queried with a telescope.
+        if self.requested_capability_set and not self.requested_telescope:
+            if self.cycle_id is not None:
+                return CYCLE_ID_ARRAY_ASSEMBLY_ERROR_MESSAGE
+            return ARRAY_ASSEMBLY_REQUIRES_CAPABILITY_ERROR_MESSAGE
+        return None
+
+    def get_cycle_definition(self) -> tuple[dict[str, Any] | None, str | None]:
+        """Load the selected cycle definition after validating its file name."""
+        cycle_error = self.check_cycle_id()
+        if cycle_error:
+            return None, cycle_error
+        if self.cycle_id is None:
+            return None, None
+        return (
+            self.tmdata[
+                f"{OBSERVING_CYCLES_TMDATA_DIR}/cycle_{self.cycle_id}.json"
+            ].get_dict(),
+            None,
+        )
+
+    def select_telescope_capability_sets(
+        self, cycle_definition: dict[str, Any] | None
+    ) -> tuple[dict[str, str | None] | None, str | None]:
+        """Select a named capability set for each included telescope."""
+        if cycle_definition is None:
+            # Catalogue mode: select each requested telescope and optionally one
+            # named capability set. No capability-set filter is expanded to all
+            # named sets later in build_osd_data().
+            if self.requested_telescope:
+                return {
+                    self.requested_telescope.lower(): self.requested_capability_set
+                }, None
+            return {
+                telescope.lower(): self.requested_capability_set
+                for telescope in self.capability_filepaths
+            }, None
+
+        # Cycle mode: each telescope maps to one prescribed capability set.
+        cycle_telescope_capability_sets = cycle_definition["telescope_capabilities"]
+        if self.requested_telescope is None:
+            return {
+                telescope.lower(): capability_set
+                for telescope, capability_set in cycle_telescope_capability_sets.items()
+            }, None
+
+        telescope_key = self.requested_telescope.capitalize()
+        # A requested telescope must be specified in the requested cycle.
+        if telescope_key not in cycle_telescope_capability_sets:
+            available = ", ".join(
+                available_telescope.lower()
+                for available_telescope in cycle_telescope_capability_sets
+            )
+            return None, CAPABILITY_DOESNOT_BELONG_TO_CYCLE_ERROR_MESSAGE.format(
+                self.requested_telescope, self.cycle_id, available
+            )
+
+        cycle_capability_set = cycle_telescope_capability_sets[telescope_key]
+        if self.requested_capability_set:
+            # A cycle already specifies a capability set for each telescope.
+            # Requesting a capability set is valid only when it matches the cycle.
+            if self.requested_capability_set != cycle_capability_set:
+                return (
+                    None,
+                    ARRAY_ASSEMBLY_DOESNOT_MATCH_CYCLE_CAPABILITY_ERROR_MESSAGE.format(
+                        self.requested_capability_set,
+                        self.requested_telescope,
+                        self.cycle_id,
+                        cycle_capability_set,
+                    ),
+                )
+            LOGGER.warning(
+                "Ignoring redundant array assembly %s for capability %s in cycle %s",
+                self.requested_capability_set,
+                self.requested_telescope,
+                self.cycle_id,
+            )
+
+        # Join the telescope to the capability set specified in the cycle.
+        return {self.requested_telescope.lower(): cycle_capability_set}, None
+
+    def get_telescope_capability_data(self, telescope: str) -> dict[str, Any]:
+        """Load one telescope capability document and optional template mappings."""
+        telescope_capability_data = self.tmdata[
+            self.capability_filepaths[telescope]
+        ].get_dict()
+        if not self.process_templates:
+            return telescope_capability_data
+
+        try:
+            template_data = self.tmdata[
+                osd_file_mapping["subarray_templates"]
+            ].get_dict()
+        except (KeyError, AttributeError):
+            template_data = {}
+        return process_template_mappings(
+            telescope_capability_data,
+            self.capability_filepaths[telescope],
+            template_data,
+        )
+
+    def check_capability_set(
+        self, capability_set: str, telescope_capability_data: dict[str, Any]
+    ) -> str | None:
+        """Return an error when a named capability set is absent from a telescope."""
+        if (
+            capability_set in ("constraints", "basic_capabilities")
+            or capability_set not in telescope_capability_data
+        ):
+            available = ", ".join(
+                key
+                for key in telescope_capability_data
+                if key not in ("telescope", "basic_capabilities", "constraints")
+            )
+            return ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE.format(
+                capability_set, available
+            )
+        return None
+
+    def build_osd_data(
         self,
-        capabilities: list = None,
-        array_assembly: str = None,
-    ) -> dict[dict[str, Any]]:
-        """Check if capabilities or array assembly exist, retrieve them from
-        observatory policies, populate the dictionary, and return it.
+        selected_telescope_capability_sets: dict[str, str | None],
+        cycle_definition: dict[str, Any] | None,
+    ) -> tuple[dict[str, Any] | None, list[str]]:
+        """Materialize the selected telescope capability sets."""
+        result_data = {"capabilities": {}}
+        errors = []
 
-        :param capabilities: list, capabilities such as "mid" or "low".
-        :param array_assembly: str, for "mid" can be one of "AA0.5",
-            "AA2", or "AA1".
-        :return: dict, dictionary of OSD data and dictionary of
-            capabilities and array assembly.
-        """
-        self.osd_data["observatory_policy"] = self.get_data(
-            self.tmdata,
-            capability=osd_file_mapping["observatory_policies"],
-            array_assembly=array_assembly,
-        )
+        for (
+            telescope,
+            capability_set,
+        ) in selected_telescope_capability_sets.items():
+            telescope_capability_data = self.get_telescope_capability_data(telescope)
+            selected_data = {
+                "basic_capabilities": telescope_capability_data["basic_capabilities"]
+            }
 
-        telescope_capabilities = self.osd_data["observatory_policy"].get(
-            "telescope_capabilities", {}
-        )
-
-        if not capabilities and not array_assembly:
-            capabilities_dict = telescope_capabilities
-        else:
-            capabilities = [cap.capitalize() for cap in capabilities]
-            if array_assembly:
-                capabilities_dict = {cap: array_assembly for cap in capabilities}
-            else:
-                capabilities_dict = {
-                    cap: telescope_capabilities.get(cap, {}) for cap in capabilities
-                }
-
-        return self.osd_data, capabilities_dict
-
-    def __get_capabilities_and_array_assembly(
-        self, tmdata, telescope_capabilities_dict: dict, osd_data: dict
-    ) -> dict[dict[str, Any]]:
-        """Return the osd_data dictionary with values populated as per
-        osd_file_mapping.
-
-        :param tmdata: TMData class object.
-        :param telescope_capabilities_dict: dict, capabilities like
-            "mid" or "low".
-        :param osd_data: dict, dictionary with predefined keys and
-            values as mentioned in constant.py osd_file_mapping
-            dictionary / JSON response.
-        :return: dict, osd_data dictionary with values populated.
-            :raises OSDDataException, KeyError: If keys are missing or
-            invalid.
-        """
-        cap_err_msg_list = []
-        for key, value in telescope_capabilities_dict.items():
-            data = self.get_data(tmdata, capability=osd_file_mapping[key.lower()])
-
-            if self.process_templates:
-                template_data = self.get_data(
-                    tmdata, templates=osd_file_mapping["subarray_templates"]
+            if capability_set is None:
+                # An unfiltered catalogue response contains all named capability sets.
+                selected_data.update(
+                    {
+                        key: value
+                        for key, value in telescope_capability_data.items()
+                        if key not in ("telescope", "basic_capabilities", "constraints")
+                    }
                 )
-                data = process_template_mappings(
-                    data, osd_file_mapping[key.lower()], template_data
-                )
-            self.keys_list = list(data.keys())
-            err_msg = None
-            if self.array_assembly:
-                err_msg = self.check_array_assembly(value, self.keys_list)
-
-            if err_msg:
-                cap_err_msg_list.append(err_msg)
             else:
-                osd_data["capabilities"][key.lower()] = {}
-                osd_data["capabilities"][key.lower()]["basic_capabilities"] = data[
-                    "basic_capabilities"
+                capability_set_error = self.check_capability_set(
+                    capability_set, telescope_capability_data
+                )
+                if capability_set_error:
+                    errors.append(capability_set_error)
+                    continue
+                selected_data[capability_set] = telescope_capability_data[
+                    capability_set
                 ]
-                if not self.array_assembly and not self.cycle_id:
-                    for array_assembly_id in self.keys_list:
-                        if array_assembly_id not in ["telescope", "basic_capabilities"]:
-                            osd_data["capabilities"][key.lower()][array_assembly_id] = (
-                                data[array_assembly_id]
-                            )
-                else:
-                    osd_data["capabilities"][key.lower()][value] = data[value]
 
-        return osd_data, cap_err_msg_list
+            result_data["capabilities"][telescope] = selected_data
 
-    def get_data(
-        self,
-        tmdata: TMData,
-        capability: str = None,
-        array_assembly: str = None,
-        templates: str = None,
-    ) -> dict[dict[str, Any]]:
-        """Retrieve data from the tmdata object based on capability and array
-        assembly.
+        if errors:
+            return None, errors
+        if cycle_definition is not None:
+            result_data = {"observatory_policy": cycle_definition, **result_data}
+        return result_data, []
 
-        :param tmdata: TMData class object.
-        :param capability: str, capability such as "mid" or "low".
-        :param array_assembly: str, for "mid" can be one of "AA0.5",
-            "AA2", or "AA1".
-        :param templates: str, template file path for loading template data.
-        :return: dict, JSON object from tmdata.
-        """
-        if templates:
-            try:
-                return tmdata[templates].get_dict()
-            except (KeyError, AttributeError):
-                return {}
+    def get_osd_data(self) -> tuple[dict[str, Any] | None, list[str]]:
+        """Return OSD data selected by the query's cycle and telescope filters."""
+        query_error = self.validate_query()
+        if query_error:
+            return None, [query_error]
 
-        if "observatory_policies" in capability:
-            return tmdata[capability].get_dict()
+        cycle_definition, cycle_error = self.get_cycle_definition()
+        if cycle_error:
+            return None, [cycle_error]
 
-        else:
-            return (
-                tmdata[capability].get_dict()[array_assembly]
-                if array_assembly
-                else tmdata[capability].get_dict()
-            )
+        selected_telescope_capability_sets, selection_error = (
+            self.select_telescope_capability_sets(cycle_definition)
+        )
+        if selection_error:
+            return None, [selection_error]
 
-    def get_osd_data(self) -> dict[dict[str, Any]]:
-        """Call get_telescope_observatory_policies and
-        get_capabilities_and_array_assembly, then return the populated osd_data
-        dictionary.
-
-        :return: dict, osd_data dictionary with values populated.
-        :raises OSDDataException: If any capability check or data
-            retrieval fails.
-        """
-
-        osd_err_msg_list = []
-
-        capabilities_and_array_assembly = None
-        chk_capabilities = self.check_capabilities(self.capabilities)
-
-        if chk_capabilities:
-            osd_err_msg_list.append(chk_capabilities)
-        else:
-            (
-                osd_data,
-                telescope_capabilities_dict,
-            ) = self.get_telescope_observatory_policies(
-                self.capabilities, self.array_assembly
-            )
-
-            if not self.cycle_id:
-                del osd_data["observatory_policy"]
-
-            (
-                capabilities_and_array_assembly,
-                err_msg,
-            ) = self.__get_capabilities_and_array_assembly(
-                self.tmdata, telescope_capabilities_dict, osd_data
-            )
-            if err_msg:
-                osd_err_msg_list.extend(err_msg)
-
-        return capabilities_and_array_assembly, osd_err_msg_list
-
-    def check_array_assembly(self, value: str, key_list: dict) -> None:
-        """Check whether an array_assembly value like "AA0.5" or "AA1" exists
-        in key_list, and raise OSDDataException if not.
-
-        :param value: str, the array_assembly value to check.
-        :param key_list: dict, dictionary keys to validate against.
-        :return: None or raises OSDDataException.
-        """
-        if value not in key_list:
-            msg = ", ".join(
-                key for key in key_list if re.match(ARRAY_ASSEMBLY_PATTERN, key)
-            )
-            return ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE.format(value, msg)
+        return self.build_osd_data(selected_telescope_capability_sets, cycle_definition)
 
 
 def get_available_cycles(tmdata: TMData) -> list[int]:
-    """Fetch available cycle numbers from TMData version mapping.
-
-    :param tmdata: TMData, TMData client to access version mapping.
-    :return: list[int], list of available cycle numbers.
-    """
-    try:
-        versions_dict = tmdata[VERSION_FILE_PATH].get_dict()
-    except KeyError as err:
-        raise FileNotFoundError(f"file not found: {VERSION_FILE_PATH}") from err
-
-    return [
-        int(key.split("_")[1])
-        for key in versions_dict.keys()
-        if key.startswith("cycle_") and "_" in key
-    ]
+    """List available cycle IDs from observing-cycle file names."""
+    return OSD(
+        telescope=None,
+        array_assembly=None,
+        tmdata=tmdata,
+        cycle_id=None,
+    ).get_available_cycles()
 
 
 def get_osd_latest_version(tmdata_version: TMData) -> str:
@@ -283,85 +313,24 @@ def get_osd_latest_version(tmdata_version: TMData) -> str:
     return osd_version
 
 
-def check_cycle_id(
-    tmdata: TMData,
-    cycle_id: int = None,
-    osd_version: str = None,
-    gitlab_branch: str = None,
-    versions_dict: Dict = None,
-) -> str:
-    """This function checks if a given cycle exists or not also raises
-    OSDDataException if gitlab_branch and osd_version both is given. raises
-    OSDDataException for Cycle ID exists or not. and returns osd_version.
-
-    :param cycle_id: cycle id integer value.
-    :param osd_version: osd version i.e. 1.9.0
-    :param gitlab_branch: branch name like master, dev etc.
-    :param tmdata: TMData object used for latest version lookup.
-    :param versions_dict: version dict containing version data
-    :return: osd_version in string format i.e 1.9.0 or raises
-        OSDDataException
-    """
-    cycle_error_msg_list = []
-
-    if gitlab_branch is not None and osd_version is not None:
-        cycle_error_msg_list.append(
-            CYCLE_ERROR_MESSAGE,
-        )
-
-    if gitlab_branch is not None:
-        osd_version = gitlab_branch
-
-    if cycle_id is None and osd_version is None and gitlab_branch is None:
-        osd_version = get_osd_latest_version(
-            tmdata
-        )  # get latest version from latest_release.txt file
-
-    if versions_dict is None:
-        versions_dict = {}
-
-    cycle_ids = [int(key.split("_")[-1]) for key in versions_dict]
-    cycle_id_exists = [cycle_id if cycle_id in cycle_ids else None][0]
-    string_ids = ",".join([str(i) for i in cycle_ids])
-    if cycle_id is not None and cycle_id_exists is None:
-        cycle_error_msg_list.append(
-            CYCLE_ID_ERROR_MESSAGE.format(cycle_id, string_ids),
-        )
-
-    elif cycle_id is not None and osd_version is None:
-        osd_version = versions_dict[f"cycle_{cycle_id}"][0]
-
-    elif cycle_id is not None and cycle_id_exists and osd_version is not None:
-        if osd_version not in versions_dict[f"cycle_{cycle_id}"]:
-            cycle_error_msg_list.append(
-                OSD_VERSION_ERROR_MESSAGE.format(
-                    osd_version, versions_dict[f"cycle_{cycle_id}"]
-                )
-            )
-
-    return osd_version, cycle_error_msg_list
-
-
 def get_osd_data(
-    capabilities: list = None,
+    telescope: Telescope | None = None,
     array_assembly: str = None,
     tmdata: TMData = None,
     cycle_id: int = None,
     process_templates: bool = False,
-) -> dict[dict[str, Any]]:
-    """This function creates OSD class object and returns osd_data dictionary
-    as json object.
+) -> tuple[dict[str, Any] | None, list[str]]:
+    """Build OSD data for telescope and named-capability-set query filters.
 
-    :param capabilities: mid or low
-    :param array_assembly: in mid there are AA0.5, AA2 and AA1 you can
-        give any one
-    :param tmdata: TMData class object.
-    :param cycle_id: cycle id
-    :param process_templates: bool, whether to process template mappings
-    :return: json object
+    :param telescope: optional telescope name.
+    :param array_assembly: optional name of a capability set.
+    :param tmdata: TMData object containing the OSD documents.
+    :param cycle_id: optional observing-cycle ID.
+    :param process_templates: whether to process template mappings.
+    :return: OSD data and any validation errors.
     """
     osd_data, data_error_msg_list = OSD(
-        capabilities=capabilities,
+        telescope=telescope,
         array_assembly=array_assembly,
         tmdata=tmdata,
         cycle_id=cycle_id,
@@ -373,7 +342,7 @@ def get_osd_data(
 
 def get_osd_using_tmdata(
     tm_data: TMData,
-    capabilities: Optional[str] = None,
+    telescope: Telescope | None = None,
     array_assembly: Optional[str] = None,
     cycle_id: Optional[int] = None,
     process_templates: bool = False,
@@ -381,8 +350,8 @@ def get_osd_using_tmdata(
     """Retrieve OSD data using an already constructed TMData object.
 
     :param tm_data: TMData, pre-resolved TMData source for OSD retrieval.
-    :param capabilities: str, optional capabilities.
-    :param array_assembly: str, optional array assembly.
+    :param telescope: optional telescope name.
+    :param array_assembly: optional name of a capability set.
     :param cycle_id: int, optional cycle ID.
     :param process_templates: bool, whether to process template mappings.
     :return: Dict[Dict[str, Any]], OSD data.
@@ -391,7 +360,7 @@ def get_osd_using_tmdata(
     errors = []
 
     osd_data, osd_errors = get_osd_data(
-        capabilities=[capabilities] if capabilities else None,
+        telescope=telescope,
         tmdata=tm_data,
         array_assembly=array_assembly,
         cycle_id=cycle_id,

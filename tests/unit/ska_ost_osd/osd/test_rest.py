@@ -1,7 +1,157 @@
+import logging
 from http import HTTPStatus
 
 from ska_ost_osd.common.utils import remove_none_params
+from ska_ost_osd.osd.common.constant import osd_file_mapping
 from tests.conftest import BASE_API_URL
+
+
+def test_osd_legacy_query_parameters_are_noops(test_client):
+    """Legacy source and version parameters do not alter OSD selection."""
+    baseline = test_client.get(f"{BASE_API_URL}/osd", params={"cycle_id": 2})
+    legacy_parameters = test_client.get(
+        f"{BASE_API_URL}/osd",
+        params={
+            "cycle_id": 2,
+            "source": "gitlab",
+            "osd_version": "999.999.999",
+            "gitlab_branch": "legacy-client-branch",
+        },
+    )
+
+    assert baseline.status_code == HTTPStatus.OK
+    assert legacy_parameters.status_code == HTTPStatus.OK
+    assert legacy_parameters.json()["result_data"] == baseline.json()["result_data"]
+
+
+def test_cycle_osd_uses_selected_cycle_file(test_client):
+    """A cycle-specific request includes its selected cycle-file policy."""
+    response = test_client.get(f"{BASE_API_URL}/osd", params={"cycle_id": 2})
+    body = response.json()
+
+    assert response.status_code == HTTPStatus.OK
+    assert body["result_data"]["observatory_policy"]["cycle_number"] == 2
+    assert body["result_data"]["observatory_policy"]["cycle_id"] == (
+        "TEST_SKAO_2027_Low_AA2_Proposal"
+    )
+    assert set(body["result_data"]["capabilities"]) == {"mid", "low"}
+
+
+def test_cycle_capability_uses_cycle_selected_array_assembly(test_client):
+    """A valid cycle capability request uses the assembly from its policy."""
+    response = test_client.get(
+        f"{BASE_API_URL}/osd",
+        params={"cycle_id": 2, "capabilities": "mid"},
+    )
+    body = response.json()
+
+    assert response.status_code == HTTPStatus.OK
+    assert list(body["result_data"]["capabilities"]) == ["mid"]
+    assert set(body["result_data"]["capabilities"]["mid"]) == {
+        "basic_capabilities",
+        "AA2",
+    }
+
+
+def test_capability_only_returns_complete_catalogue(test_client, tests_tmdata):
+    """A capability-only request returns all of that capability's assemblies."""
+    response = test_client.get(f"{BASE_API_URL}/osd", params={"capabilities": "mid"})
+    body = response.json()
+    source_data = tests_tmdata[osd_file_mapping["mid"]].get_dict()
+
+    assert response.status_code == HTTPStatus.OK
+    assert "observatory_policy" not in body["result_data"]
+    assert set(body["result_data"]["capabilities"]) == {"mid"}
+    assert set(body["result_data"]["capabilities"]["mid"]) == set(source_data) - {
+        "telescope",
+        "constraints",
+    }
+
+
+def test_catalogue_filter_does_not_include_observatory_policy(test_client):
+    """A non-cycle filter selects catalogue data without a cycle policy."""
+    response = test_client.get(
+        f"{BASE_API_URL}/osd",
+        params={"capabilities": "mid", "array_assembly": "AA0.5"},
+    )
+    body = response.json()
+
+    assert response.status_code == HTTPStatus.OK
+    assert "observatory_policy" not in body["result_data"]
+    assert list(body["result_data"]["capabilities"]) == ["mid"]
+    assert "AA0.5" in body["result_data"]["capabilities"]["mid"]
+
+
+def test_array_assembly_requires_capability(test_client):
+    """An array assembly cannot be selected without a capability."""
+    response = test_client.get(
+        f"{BASE_API_URL}/osd",
+        params={"array_assembly": "AA0.5"},
+    )
+    body = response.json()
+
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert body["result_data"] == ["Array assembly requires a capability."]
+
+
+def test_cycle_id_and_array_assembly_are_incompatible(test_client):
+    """A cycle policy, rather than an explicit array filter, selects assemblies."""
+    response = test_client.get(
+        f"{BASE_API_URL}/osd",
+        params={"cycle_id": 2, "array_assembly": "AA0.5"},
+    )
+    body = response.json()
+
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert "Cycle_id and Array_assembly cannot be used together" in str(
+        body["result_data"]
+    )
+
+
+def test_cycle_capability_matching_array_assembly_is_redundant(test_client, caplog):
+    """A matching explicit assembly does not override the cycle policy."""
+    with caplog.at_level(logging.WARNING):
+        response = test_client.get(
+            f"{BASE_API_URL}/osd",
+            params={"cycle_id": 2, "capabilities": "mid", "array_assembly": "AA2"},
+        )
+    body = response.json()
+
+    assert response.status_code == HTTPStatus.OK
+    assert list(body["result_data"]["capabilities"]) == ["mid"]
+    assert "AA2" in body["result_data"]["capabilities"]["mid"]
+    assert (
+        "Ignoring redundant array assembly AA2 for capability mid in cycle 2"
+        in caplog.messages
+    )
+
+
+def test_cycle_capability_array_assembly_must_match_policy(test_client):
+    """An explicit cycle assembly must match the capability policy."""
+    response = test_client.get(
+        f"{BASE_API_URL}/osd",
+        params={"cycle_id": 2, "capabilities": "mid", "array_assembly": "AA0.5"},
+    )
+    body = response.json()
+
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert body["result_data"] == [
+        "Array assembly AA0.5 does not match capability mid in cycle 2. Expected AA2."
+    ]
+
+
+def test_cycle_rejects_capability_not_in_policy(test_client):
+    """An explicit capability must be available in the selected cycle."""
+    response = test_client.get(
+        f"{BASE_API_URL}/osd",
+        params={"cycle_id": 1, "capabilities": "mid"},
+    )
+    body = response.json()
+
+    assert response.status_code == HTTPStatus.BAD_REQUEST
+    assert body["result_data"] == [
+        "Capability mid is invalid for cycle 1. Valid capabilities are low."
+    ]
 
 
 def test_osd_endpoint(test_client):
@@ -79,8 +229,6 @@ def test_invalid_osd_tmdata_source_capabilities(test_client):
 def test_osd_source_reports_backend_resolution_error(car_source_failure_client):
     """OSD endpoint should surface CAR TMData read errors.
 
-    get_tmdata_for_osd_query should still resolve successfully; the
-    returned TMData object fails when OSD retrieval reads from it.
     Uses dependency override so the test is deterministic and does not
     connect to CAR.
     """
@@ -134,17 +282,17 @@ def test_mid_low_response(
 
 
 def test_invalid_cycle_id(
-    sad_path_client,
+    test_client,
 ):
-    """Client smoke test for dependency-resolution errors in /osd.
+    """Test that an invalid cycle_id returns the expected error response.
 
-    Resolver logic is exercised through get_tmdata_for_osd_query by not
-    overriding that dependency on sad_path_client.
+    :raises AssertionError: If the respone is not as expected.
     """
-    response = sad_path_client.get(
+
+    response = test_client.get(
         f"{BASE_API_URL}/osd",
         params={"cycle_id": 3, "source": "file", "capabilities": "mid"},
     ).json()
 
-    assert "Cycle 3 is not valid" in response["result_data"][0]
+    assert "Cycle 3 is invalid" in response["result_data"][0]
     assert response["result_code"] == HTTPStatus.BAD_REQUEST

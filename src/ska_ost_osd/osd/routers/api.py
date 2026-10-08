@@ -20,6 +20,7 @@ from ska_ost_osd.osd.common.constant import (
     MID_CAPABILITIES_JSON_PATH,
     RELEASE_VERSION_MAPPING,
     SWAGGER_MID_OSD_DATA_JSON_FILE_PATH,
+    Telescope,
     osd_file_mapping,
 )
 from ska_ost_osd.osd.common.error_handling import CapabilityError, OSDModelError
@@ -41,7 +42,6 @@ from ska_ost_osd.osd.osd import (
 )
 from ska_ost_osd.osd.routers.dependencies import (
     get_tmdata_car_main,
-    get_tmdata_for_osd_query,
 )
 from ska_ost_osd.osd.version_mapping.version_manager import manage_version_release
 
@@ -66,7 +66,7 @@ osd_router = APIRouter(prefix="")
 )
 def get_osd(
     osd_model: OSDQueryParams = Depends(),
-    tm_data: TMData = Depends(get_tmdata_for_osd_query),
+    tm_data: TMData = Depends(get_tmdata_car_main),
 ) -> Dict:
     """This function takes query parameters and OSD data source objects to
     generate a response containing matching OSD data.
@@ -78,7 +78,9 @@ def get_osd(
     try:
         osd_data = get_osd_using_tmdata(
             tm_data=tm_data,
-            capabilities=osd_model.capabilities,
+            telescope=(
+                Telescope(osd_model.capabilities) if osd_model.capabilities else None
+            ),
             array_assembly=osd_model.array_assembly,
             cycle_id=osd_model.cycle_id,
             process_templates=True,
@@ -139,6 +141,7 @@ def update_osd_data(
     description="Release OSD data with automatic version increment based on cycle ID",
     responses=get_responses(ApiResponse[OSDRelease]),
     response_model=ApiResponse[OSDRelease],
+    deprecated=True,
 )
 def release_osd_data(
     cycle_id: int, release_type: Optional[ReleaseType] = None

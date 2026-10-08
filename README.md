@@ -72,18 +72,6 @@ To uninstall the chart, run
 make k8s-uninstall-chart
 ```
 
-### Release a new version
-
-This is a very crucial part for OSD, without this some functionality may break and exceptions and errors will be raised.
-
-Failing to run this command before releasing a new version may cause test cases to fail. This command ensures all necessary pre-release checks and configurations are properly set up.
-
-Run Below command from Command line.
-
-```
-make osd-pre-release
-```
-
 ### Post-Release OpenAPI Specification Updates
 
 To ensure the openapi.json file reflects the latest API structure and version, run the following command from the command line:
@@ -125,15 +113,6 @@ An explanation of validation strictness levels and configuring OSD semantic vali
 [ska-ost-osd Documentation](https://developer.skao.int/projects/ska-ost-osd/en/latest/api/semantic-validation/guide.html#configuring-semantic-validation).
 
 # Publish tmdata
-
-`tmdata-publish` (from gitlab) is needed when user need to test on main using OSD UI, in this no tag is pushed to gitlab or CAR.
-
-`osd-tmdata-publish` (from CAR) is needed when user need to fetch data using OSD UI / API. in this tag is published automatically using OSD UI.
-
-For now please run either of job manually as per need.
-
-Please run `osd-tmdata-publish` job manually after merging / releasing into main.
-this is a required step, without this new tmdata will not be reflected on CAR.
 
 Now OSD is handling releases separately for tmdata and ska-ost-osd codebase.
 User can now update tmdata with the help of [ OSD UI editor](https://k8s.stfc.skao.int/ska-oso-integration/osd) and publish it separately on artefact repository with enabling `push_to_gitlab` environment variable to "1".

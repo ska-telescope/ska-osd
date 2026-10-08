@@ -2,49 +2,63 @@ from unittest.mock import patch
 
 import pytest
 
+from ska_ost_osd.osd.common.constant import osd_file_mapping
 from ska_ost_osd.osd.common.error_handling import OSDModelError
 from ska_ost_osd.osd.models.models import OSDModel, ValidationOnCapabilities
 from ska_ost_osd.osd.osd import get_osd_data, update_osd_file
 
 
 @pytest.mark.parametrize(
-    "capabilities, array_assembly, expected_keys",
+    "telescope, array_assembly, expected_telescopes",
     [
-        (None, None, ["mid", "low"]),
+        (None, None, {"mid", "low"}),
         (
-            ["mid"],
+            "mid",
             None,
-            ["mid"],
+            {"mid"},
         ),
         (
-            ["mid"],
+            "mid",
             "AA0.5",
-            ["mid"],
+            {"mid"},
         ),
     ],
 )
 def test_get_osd_data(
-    capabilities,
+    telescope,
     array_assembly,
-    expected_keys,
+    expected_telescopes,
     tests_tmdata,
 ):
-    """This test case checks the functionality of get_osd_data it converts the
-    python dict into list keys and checks for equality with expected output.
+    """Check that get_osd_data returns the expected telescope entries.
 
-    :param capabilities: Mid or Low
+    :param telescope: Mid or Low
     :param array_assembly: Array Assembly AA0.5, AA1
-    :param expected: output of get_osd_data function
+    :param expected_telescopes: telescope entries in the OSD response
     :param tests_tmdata: tmdata fixture
     :returns: assert equals values
     """
 
     result, _ = get_osd_data(
-        capabilities, array_assembly, tmdata=tests_tmdata, process_templates=False
+        telescope, array_assembly, tmdata=tests_tmdata, process_templates=False
     )
-    result_keys = list(result["capabilities"].keys())
+    assert set(result["capabilities"]) == expected_telescopes
 
-    assert result_keys == expected_keys
+
+def test_get_osd_data_without_cycle_returns_complete_catalogue(tests_tmdata):
+    """A request without a cycle returns all available capability data."""
+    result, error_msgs = get_osd_data(tmdata=tests_tmdata)
+
+    assert error_msgs == []
+    assert "observatory_policy" not in result
+    assert set(result["capabilities"]) == {"mid", "low"}
+
+    for capability in ("mid", "low"):
+        source_data = tests_tmdata[osd_file_mapping[capability]].get_dict()
+        assert set(result["capabilities"][capability]) == set(source_data) - {
+            "telescope",
+            "constraints",
+        }
 
 
 def test_invalid_get_osd_data_capability(tests_tmdata):
@@ -56,14 +70,33 @@ def test_invalid_get_osd_data_capability(tests_tmdata):
     """
 
     _, error_msgs = get_osd_data(
-        capabilities=["midd"],
+        telescope="midd",
         array_assembly="AA1",
         tmdata=tests_tmdata,
         process_templates=False,
     )
     assert error_msgs == [
-        "Capability midd is not valid,Available Capabilities are low, mid,"
-        " observatory_policies"
+        "Capability midd is invalid. Valid capabilities are low, mid,"
+        " observatory_policies."
+    ]
+
+
+def test_get_osd_data_invalid_capability_only(tests_tmdata):
+    """This test case checks that the output of the get_osd_data when
+    an invalid telescope is provided without an array assembly returns
+    the appropriate error messages.
+
+    :param tests_tmdata: tests_tmdata
+    """
+    _, error_msgs = get_osd_data(
+        telescope="invalid",
+        array_assembly=None,
+        tmdata=tests_tmdata,
+        process_templates=False,
+    )
+    assert error_msgs == [
+        "Capability invalid is invalid. Valid capabilities are low, mid,"
+        " observatory_policies."
     ]
 
 
@@ -77,14 +110,70 @@ def test_invalid_get_osd_data_array_assembly(tests_tmdata):
     aa_value = "AA100000"
 
     _, error_msgs = get_osd_data(
-        capabilities=["mid"],
+        telescope="mid",
         array_assembly=aa_value,
         tmdata=tests_tmdata,
         process_templates=False,
     )
-    msg = ",".join(error_msgs[0].split(",")[1:])
 
-    assert error_msgs[0] == f"Array Assembly {aa_value} is not valid,{msg}"
+    assert len(error_msgs) == 1
+    assert (
+        error_msgs[0]
+        == f"Array assembly {aa_value} is invalid. Valid array assemblies are AA0.5, AA1, AA2, Mid_ITF."
+    )
+
+
+@pytest.mark.parametrize(
+    "invalid_array_assembly", ["constraints", "basic_capabilities"]
+)
+def test_get_osd_data_array_assembly_rejects_non_array_assembly_keys(
+    invalid_array_assembly, tests_tmdata
+):
+    """ "constraints" and "basic_capabilities" are keys of the capabilities
+    document, not named array assemblies, so requesting either as one
+    should be rejected rather than returned as if it were a valid
+    capability set.
+
+    :param invalid_array_assembly: the non-array-assembly key under test
+    :param tests_tmdata: tests_tmdata
+    """
+    osd_data, error_msgs = get_osd_data(
+        telescope="mid",
+        array_assembly=invalid_array_assembly,
+        tmdata=tests_tmdata,
+        process_templates=False,
+    )
+
+    assert osd_data is None
+    assert error_msgs == [
+        f"Array assembly {invalid_array_assembly} is invalid. Valid array assemblies are"
+        " AA0.5, AA1, AA2, Mid_ITF."
+    ]
+
+
+def test_get_osd_data_missing_subarray_templates_falls_back_to_empty(
+    tests_tmdata, monkeypatch
+):
+    """When process_templates is requested but the TMData source has no
+    subarray_templates file, get_osd_data should fall back to treating the
+    template data as empty rather than raising.
+
+    :param tests_tmdata: tests_tmdata
+    :param monkeypatch: pytest monkeypatch fixture
+    """
+    monkeypatch.setitem(
+        osd_file_mapping, "subarray_templates", "missing/templates.json"
+    )
+
+    osd_data, error_msgs = get_osd_data(
+        telescope="mid",
+        array_assembly="AA0.5",
+        tmdata=tests_tmdata,
+        process_templates=True,
+    )
+
+    assert error_msgs == []
+    assert "AA0.5" in osd_data["capabilities"]["mid"]
 
 
 @pytest.fixture
@@ -233,7 +322,7 @@ def test_get_osd_data_with_process_templates(tests_tmdata):
     """Test that process_templates parameter is properly passed through."""
     # Test with process_templates=False (default)
     result_false, _ = get_osd_data(
-        capabilities=["mid"],
+        telescope="mid",
         array_assembly="AA0.5",
         tmdata=tests_tmdata,
         process_templates=False,
@@ -241,7 +330,7 @@ def test_get_osd_data_with_process_templates(tests_tmdata):
 
     # Test with process_templates=True
     result_true, _ = get_osd_data(
-        capabilities=["mid"],
+        telescope="mid",
         array_assembly="AA0.5",
         tmdata=tests_tmdata,
         process_templates=True,
@@ -272,7 +361,7 @@ def test_get_osd_data_template_processing_called(mock_process_templates, tests_t
 
     # Test with process_templates=True
     result, _ = get_osd_data(
-        capabilities=["mid"],
+        telescope="mid",
         array_assembly="AA0.5",
         tmdata=tests_tmdata,
         process_templates=True,

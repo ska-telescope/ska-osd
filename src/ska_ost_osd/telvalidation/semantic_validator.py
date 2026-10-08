@@ -90,7 +90,7 @@ def fetch_capabilities_from_osd(
         fetched_osd_data = osd_data
     else:
         fetched_osd_data, _ = get_osd_data(
-            capabilities=[telescope],
+            telescope=telescope,
             array_assembly=array_assembly,
             tmdata=tm_data,
         )

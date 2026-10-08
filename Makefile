@@ -82,13 +82,3 @@ dev-up: K8S_CHART_PARAMS = \
 dev-up: k8s-namespace k8s-install-chart k8s-wait ## bring up developer deployment
 
 dev-down: k8s-uninstall-chart k8s-delete-namespace  ## tear down developer deployment
-
-osd-pre-release:
-
-	@./src/ska_ost_osd/scripts/release.sh $(VERSION)
-
-CI_MERGE_REQUEST_SOURCE_BRANCH_NAME := $(shell cat tmdata/version_mapping/latest_release.txt)
-
-osddata-do-publish:
-	@echo "tmdata-publish: package to publish: $(TMDATA_PKG) version: $(VERSION) in: $(TMDATA_OUT_DIR)"
-	@. $(TMDATA_SUPPORT); publishTMData "$(TMDATA_SRC_DIR)" "$(TMDATA_OUT_DIR)" `git rev-parse HEAD` "${CI_COMMIT_TAG}" "${CI_COMMIT_BRANCH}" "${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}"
