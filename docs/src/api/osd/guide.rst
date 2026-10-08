@@ -391,8 +391,9 @@ GET /osd
 
 5. Scenarios
 
-    1. If no parameters are provided to the API then it should return error message for required
-    ``cycle_id`` or ``capabilities``.
+    1. If no parameters are provided, the API returns the complete OSD catalogue: every
+       telescope's ``basic_capabilities`` together with all of its named array assemblies.
+       No ``observatory_policy`` is included, since no ``cycle_id`` was selected.
 
     2. Calling the API with only ``cycle_id`` checks that the corresponding
        ``cycles/cycle_<id>.json`` file exists, then uses that file's
