@@ -120,6 +120,8 @@ class CSPSPFRx(OSDBaseModel):
     @field_validator("sync_pps", mode="before")
     @classmethod
     def from_boolean(cls, value: Any) -> Any:
+        # ToDo: remove once we're confident the TMData files associated with v6
+        #  are not used in a production environment
         """Releases up to 6.0.9 used a boolean rather than the three-way
         mode; true and false mean on and off."""
         if isinstance(value, bool):

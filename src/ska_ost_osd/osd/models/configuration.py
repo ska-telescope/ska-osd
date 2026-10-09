@@ -50,6 +50,8 @@ def _merge_constraints(
     The defaults file's avoidance angles with the capabilities file's
     elevation limits.
     """
+    # ToDo: remove once we're out of the contract phase of moving the
+    # osd defaults to defaults.json
     merged = {
         **capabilities.constraints.model_dump(),
         **defaults.constraints.model_dump(),
