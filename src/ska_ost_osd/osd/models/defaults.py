@@ -32,7 +32,7 @@ class TelescopeDefaults(OSDBaseModel):
     narrow ``telescope`` to their own value.
     """
 
-    telescope: str
+    telescope: Literal["ska-mid", "ska-low"]
     constraints: AvoidanceConstraints
 
 
