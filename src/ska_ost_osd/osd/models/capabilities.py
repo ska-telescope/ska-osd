@@ -58,6 +58,14 @@ class TelescopeCapabilitiesBase(OSDBaseModel):
     @model_validator(mode="before")
     @classmethod
     def collect_subarrays(cls, data: Any) -> Any:
+        """
+        In the tmdata file each array assembly is a top-level key;
+        gather the keys matching ``ARRAY_ASSEMBLY_PATTERN`` into
+        ``subarrays``, using the key as the subarray name.
+
+        The pattern separates the array assemblies from the file's other
+        top-level keys.
+        """
         if not isinstance(data, dict) or "subarrays" in data:
             return data
         data = dict(data)
