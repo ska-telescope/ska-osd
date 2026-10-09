@@ -1,5 +1,5 @@
 from enum import StrEnum
-from typing import Annotated, Any, List, Literal, Optional, Union
+from typing import Annotated, Any, Literal, Self
 
 from pydantic import (
     AliasChoices,
@@ -62,10 +62,10 @@ class PseudoRandomNoiseDiode(OSDBaseModel):
 
 
 NoiseDiode = Annotated[
-    Union[PeriodicNoiseDiode, PseudoRandomNoiseDiode], Field(discriminator="mode")
+    PeriodicNoiseDiode | PseudoRandomNoiseDiode, Field(discriminator="mode")
 ]
 
-Attenuation = Annotated[Optional[float], Field(default=None, ge=0.0, le=31.75)]
+Attenuation = Annotated[float | None, Field(default=None, ge=0.0, le=31.75)]
 
 
 class TargetSPFRx(OSDBaseModel):
@@ -73,7 +73,7 @@ class TargetSPFRx(OSDBaseModel):
     attenuation_1_y: Attenuation
     attenuation_2_x: Attenuation
     attenuation_2_y: Attenuation
-    noise_diode_options: List[NoiseDiode]
+    noise_diode_options: list[NoiseDiode]
     default_noise_diode_mode: DefaultNoiseDiodeMode
 
     @model_validator(mode="before")
@@ -93,7 +93,7 @@ class TargetSPFRx(OSDBaseModel):
         return data
 
     @model_validator(mode="after")
-    def check_default_mode_has_option(self):
+    def check_default_mode_has_option(self) -> Self:
         if self.default_noise_diode_mode == DefaultNoiseDiodeMode.OFF:
             return self
         modes = {option.mode for option in self.noise_diode_options}

@@ -1,7 +1,7 @@
 """Pydantic models for tmdata/subarray_templates/subarray_template_library.json."""
 
 from enum import StrEnum
-from typing import Any, List
+from typing import Any, Self
 
 from pydantic import Field, field_validator, model_validator
 
@@ -20,7 +20,7 @@ class SubarrayTemplate(OSDBaseModel):
 
     name: str = Field(examples=["MID_FULL_AA2"])
     subarray_type: SubarrayType
-    custom_stations: List[str] = Field(examples=[["SKA001", "SKA013"]])
+    custom_stations: list[str] = Field(examples=[["SKA001", "SKA013"]])
     description: str
 
     @field_validator("custom_stations", mode="before")
@@ -32,7 +32,7 @@ class SubarrayTemplate(OSDBaseModel):
         return value
 
     @model_validator(mode="after")
-    def check_custom_stations(self):
+    def check_custom_stations(self) -> Self:
         if self.subarray_type == SubarrayType.CUSTOM and not self.custom_stations:
             raise ValueError(f"{self.name}: a custom template lists no custom_stations")
         if self.subarray_type != SubarrayType.CUSTOM and self.custom_stations:
@@ -43,7 +43,7 @@ class SubarrayTemplate(OSDBaseModel):
 class SubarrayTemplateLibrary(OSDBaseModel):
     """Top-level model for subarray_template_library.json."""
 
-    templates: List[SubarrayTemplate]
+    templates: list[SubarrayTemplate]
 
     @model_validator(mode="before")
     @classmethod

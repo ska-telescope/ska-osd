@@ -1,4 +1,4 @@
-from typing import List
+from typing import Self
 
 from pydantic import ConfigDict
 from ska_telmodel_client import TMData
@@ -58,15 +58,13 @@ def _merge_constraints(
 
 
 class MidConfiguration(ConfigurationModel):
-    frequency_band: List[MidFrequencyBand]
+    frequency_band: list[MidFrequencyBand]
     constraints: Constraints
-    subarrays: List[MidSubarray]
+    subarrays: list[MidSubarray]
     spfrx_defaults: SPFRxParameters
 
     @classmethod
-    def combine(
-        cls, capabilities: MidCapabilities, defaults: MidDefaults
-    ) -> "MidConfiguration":
+    def combine(cls, capabilities: MidCapabilities, defaults: MidDefaults) -> Self:
         return cls(
             frequency_band=capabilities.frequency_band,
             constraints=_merge_constraints(capabilities, defaults),
@@ -79,12 +77,10 @@ class LowConfiguration(ConfigurationModel):
     frequency_band: LowFrequencyBand
     constraints: Constraints
     quality_attribute_metrics: LowQualityAttributeMetrics
-    subarrays: List[LowSubarray]
+    subarrays: list[LowSubarray]
 
     @classmethod
-    def combine(
-        cls, capabilities: LowCapabilities, defaults: LowDefaults
-    ) -> "LowConfiguration":
+    def combine(cls, capabilities: LowCapabilities, defaults: LowDefaults) -> Self:
         return cls(
             frequency_band=capabilities.frequency_band,
             constraints=_merge_constraints(capabilities, defaults),
@@ -96,10 +92,10 @@ class LowConfiguration(ConfigurationModel):
 class Configuration(ConfigurationModel):
     ska_mid: MidConfiguration
     ska_low: LowConfiguration
-    observatory_policies: List[ObservatoryPolicy]
+    observatory_policies: list[ObservatoryPolicy]
 
     @classmethod
-    def from_tmdata(cls, tmdata: TMData) -> "Configuration":
+    def from_tmdata(cls, tmdata: TMData) -> Self:
         """Read and combine the capabilities, defaults and cycle files."""
 
         def read(path: str) -> dict:

@@ -1,6 +1,6 @@
 import re
 from enum import StrEnum
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Any, Literal, Self
 
 from pydantic import AliasChoices, AliasPath, Field, model_validator
 
@@ -13,7 +13,7 @@ class ElevationConstraints(OSDBaseModel):
     max_elevation_deg: float = Field(ge=0, le=90, examples=[90.0])
 
     @model_validator(mode="after")
-    def check_elevation_range(self):
+    def check_elevation_range(self) -> Self:
         if self.min_elevation_deg > self.max_elevation_deg:
             raise ValueError("min_elevation_deg must not exceed max_elevation_deg")
         return self
@@ -24,7 +24,7 @@ class FrequencyBand(OSDBaseModel):
     min_frequency_hz: float = Field(gt=0)
 
     @model_validator(mode="after")
-    def check_frequency_range(self):
+    def check_frequency_range(self) -> Self:
         if self.min_frequency_hz > self.max_frequency_hz:
             raise ValueError("min_frequency_hz must not exceed max_frequency_hz")
         return self
@@ -32,7 +32,7 @@ class FrequencyBand(OSDBaseModel):
 
 class Subarray(OSDBaseModel):
     name: str = Field(examples=["AA0.5"])
-    receptors: List[Union[str, int]] = Field(
+    receptors: list[str | int] = Field(
         validation_alias=AliasChoices(
             "receptors", "number_dish_ids", "number_station_ids"
         ),
@@ -49,7 +49,7 @@ class Subarray(OSDBaseModel):
     # Name patterns in tmdata, e.g. ["*_AA2"]; when the OSD processes
     # templates, the matching templates keyed by name. The *_ITF assemblies
     # have none.
-    subarray_templates: Optional[Union[List[str], Dict[str, Any]]] = None
+    subarray_templates: list[str] | dict[str, Any] | None = None
 
 
 class TelescopeCapabilitiesBase(OSDBaseModel):
@@ -85,24 +85,24 @@ class MidFrequencyBand(FrequencyBand):
     """One receiver band. tmdata: ``basic_capabilities.receiver_information[]``."""
 
     rx_id: str = Field(examples=["Band_1"])
-    band5b_subbands: Optional[List[Band5bSubband]] = Field(
+    band5b_subbands: list[Band5bSubband] | None = Field(
         default=None,
         validation_alias=AliasChoices("band5b_subbands", "sub_bands"),
     )
 
 
 class MidSubarray(Subarray):
-    allowed_channel_width_values_hz: List[int]
-    allowed_channel_count_range_min: List[int]
-    allowed_channel_count_range_max: List[int]
-    available_receivers: List[str] = Field(examples=[["Band_1", "Band_2"]])
-    cbf_modes: List[MidCBFMode]
+    allowed_channel_width_values_hz: list[int]
+    allowed_channel_count_range_min: list[int]
+    allowed_channel_count_range_max: list[int]
+    available_receivers: list[str] = Field(examples=[["Band_1", "Band_2"]])
+    cbf_modes: list[MidCBFMode]
     number_ska_dishes: int = Field(ge=0)
     number_meerkat_dishes: int = Field(ge=0)
     number_meerkatplus_dishes: int = Field(ge=0)
 
     @model_validator(mode="after")
-    def check_dish_count(self):
+    def check_dish_count(self) -> Self:
         # receptors lists SKA dish IDs only; MeerKAT dishes are counted separately
         if self.number_ska_dishes != len(self.receptors):
             raise ValueError(
@@ -114,15 +114,15 @@ class MidSubarray(Subarray):
 
 class MidCapabilities(TelescopeCapabilitiesBase):
     telescope: Literal["Mid"] = "Mid"
-    frequency_band: List[MidFrequencyBand] = Field(
+    frequency_band: list[MidFrequencyBand] = Field(
         validation_alias=AliasChoices(
             "frequency_band", AliasPath("basic_capabilities", "receiver_information")
         )
     )
-    subarrays: List[MidSubarray]
+    subarrays: list[MidSubarray]
 
     @model_validator(mode="after")
-    def check_available_receivers(self):
+    def check_available_receivers(self) -> Self:
         rx_ids = {band.rx_id for band in self.frequency_band}
         for subarray in self.subarrays:
             unknown = set(subarray.available_receivers) - rx_ids
@@ -154,12 +154,12 @@ class LowSubarray(Subarray):
     number_substations: int = Field(ge=0)
     number_subarray_beams: int = Field(ge=0)
     number_stations: int = Field(ge=0)
-    cbf_modes: List[LowCBFMode]
+    cbf_modes: list[LowCBFMode]
     number_vlbi_beams: int = Field(ge=0)
-    allowed_zoom_factors: List[int]
+    allowed_zoom_factors: list[int]
 
     @model_validator(mode="after")
-    def check_station_count(self):
+    def check_station_count(self) -> Self:
         if self.number_stations != len(self.receptors):
             raise ValueError(
                 f"{self.name}: number_stations ({self.number_stations}) does not "
@@ -173,4 +173,4 @@ class LowCapabilities(TelescopeCapabilitiesBase):
     frequency_band: LowFrequencyBand = Field(
         validation_alias=AliasChoices("frequency_band", "basic_capabilities")
     )
-    subarrays: List[LowSubarray]
+    subarrays: list[LowSubarray]
