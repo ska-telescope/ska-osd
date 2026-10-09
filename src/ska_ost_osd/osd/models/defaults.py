@@ -84,13 +84,17 @@ class TargetSPFRx(OSDBaseModel):
         ``noise_diode_options`` and ``default_noise_diode_mode``."""
         if not isinstance(data, dict) or "noise_diode" not in data:
             return data
-        data = dict(data)
-        noise_diode = dict(data.pop("noise_diode"))
-        data["default_noise_diode_mode"] = noise_diode.pop("mode")
-        data["noise_diode_options"] = [
-            {"mode": mode, **option} for mode, option in noise_diode.items()
-        ]
-        return data
+        data = data.copy()
+        noise_diode = data.pop("noise_diode")
+        return {
+            **data,
+            "default_noise_diode_mode": noise_diode["mode"],
+            "noise_diode_options": [
+                {"mode": mode, **option}
+                for mode, option in noise_diode.items()
+                if mode != "mode"
+            ],
+        }
 
     @model_validator(mode="after")
     def check_default_mode_has_option(self) -> Self:
@@ -112,8 +116,6 @@ class SyncPPS(StrEnum):
 
 
 class CSPSPFRx(OSDBaseModel):
-    """tmdata: ``defaults.csp_configuration.spfrx``."""
-
     sync_pps: SyncPPS
     saturation_threshold: float = Field(examples=[0.2])
 
@@ -130,8 +132,6 @@ class CSPSPFRx(OSDBaseModel):
 
 
 class SPFRxParameters(OSDBaseModel):
-    """tmdata: ``defaults``."""
-
     target_spfrx: TargetSPFRx = Field(
         validation_alias=AliasChoices(
             "target_spfrx", AliasPath("target", "dish_spfrx_params")

@@ -68,7 +68,7 @@ class TelescopeCapabilitiesBase(OSDBaseModel):
         """
         if not isinstance(data, dict) or "subarrays" in data:
             return data
-        data = dict(data)
+        data = data.copy()
         data["subarrays"] = [
             {"name": key, **data.pop(key)}
             for key in list(data)
