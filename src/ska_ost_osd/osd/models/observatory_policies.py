@@ -1,7 +1,3 @@
-"""Pydantic models for tmdata/observatory_policies.json: the policy of the
-proposal cycle that a release serves.
-"""
-
 from datetime import datetime
 from typing import Optional
 

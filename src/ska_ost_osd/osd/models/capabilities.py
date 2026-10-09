@@ -1,14 +1,3 @@
-"""Pydantic models for the capabilities tmdata files:
-tmdata/ska1_mid/mid_capabilities.json and tmdata/ska1_low/low_capabilities.json.
-
-``MidCapabilities`` and ``LowCapabilities`` model the files themselves; the
-models inside them follow ska-oso-services' names (``MidFrequencyBand``,
-``LowSubarray``...). Where a tmdata key differs, it is accepted as an alias
-when validating, so the tmdata JSON can be read as-is. Fields with no
-oso-services equivalent keep their tmdata name. configuration.py combines
-these with the defaults into the configuration ska-oso-services serves.
-"""
-
 import re
 from enum import StrEnum
 from typing import Any, Dict, List, Literal, Optional, Union
@@ -18,12 +7,8 @@ from pydantic import AliasChoices, AliasPath, Field, model_validator
 from ska_ost_osd.osd.common.constant import ARRAY_ASSEMBLY_PATTERN
 from ska_ost_osd.osd.models.defaults import OSDBaseModel
 
-# Shared by Mid and Low
-
 
 class ElevationConstraints(OSDBaseModel):
-    """tmdata: ``constraints``."""
-
     min_elevation_deg: float = Field(ge=0, le=90, examples=[45.0])
     max_elevation_deg: float = Field(ge=0, le=90, examples=[90.0])
 
@@ -46,8 +31,6 @@ class FrequencyBand(OSDBaseModel):
 
 
 class Subarray(OSDBaseModel):
-    """One array assembly. tmdata: the top-level ``"AA0.5"``, ``"AA2"``... keys."""
-
     name: str = Field(examples=["AA0.5"])
     receptors: List[Union[str, int]] = Field(
         validation_alias=AliasChoices(
@@ -58,7 +41,6 @@ class Subarray(OSDBaseModel):
     available_bandwidth_hz: float = Field(gt=0)
     number_pst_beams: int = Field(ge=0)
     number_fsps: int = Field(ge=0)
-    # these have not been added to oso-services yet
     max_baseline_km: float = Field(gt=0)
     number_zoom_windows: int = Field(ge=0)
     number_zoom_channels: int = Field(ge=0)
@@ -71,17 +53,11 @@ class Subarray(OSDBaseModel):
 
 
 class TelescopeCapabilitiesBase(OSDBaseModel):
-    """Base for the top-level Mid and Low capabilities models. Subclasses
-    declare ``subarrays`` with their own subarray type."""
-
     constraints: ElevationConstraints
 
     @model_validator(mode="before")
     @classmethod
     def collect_subarrays(cls, data: Any) -> Any:
-        """In tmdata each array assembly is a top-level key; gather every
-        key matching ``ARRAY_ASSEMBLY_PATTERN`` into ``subarrays``, using
-        the key as the subarray name."""
         if not isinstance(data, dict) or "subarrays" in data:
             return data
         data = dict(data)
@@ -91,10 +67,6 @@ class TelescopeCapabilitiesBase(OSDBaseModel):
             if re.match(ARRAY_ASSEMBLY_PATTERN, key)
         ]
         return data
-
-
-# Mid: tmdata/ska1_mid/mid_capabilities.json
-
 
 class MidCBFMode(StrEnum):
     CORRELATION = "correlation"
@@ -120,7 +92,6 @@ class MidFrequencyBand(FrequencyBand):
 
 class MidSubarray(Subarray):
     allowed_channel_width_values_hz: List[int]
-    # tmdata only - no oso-services equivalent yet
     allowed_channel_count_range_min: List[int]
     allowed_channel_count_range_max: List[int]
     available_receivers: List[str] = Field(examples=[["Band_1", "Band_2"]])
@@ -141,8 +112,6 @@ class MidSubarray(Subarray):
 
 
 class MidCapabilities(TelescopeCapabilitiesBase):
-    """Top-level model for mid_capabilities.json."""
-
     telescope: Literal["Mid"] = "Mid"
     frequency_band: List[MidFrequencyBand] = Field(
         validation_alias=AliasChoices(
@@ -171,8 +140,6 @@ class LowCBFMode(StrEnum):
 
 
 class LowFrequencyBand(FrequencyBand):
-    """tmdata: ``basic_capabilities``."""
-
     min_coarse_channel: int = Field(ge=0, examples=[64])
     max_coarse_channel: int = Field(ge=0, examples=[447])
     coarse_channel_width_hz: float = Field(gt=0, examples=[781.25e3])
@@ -201,8 +168,6 @@ class LowSubarray(Subarray):
 
 
 class LowCapabilities(TelescopeCapabilitiesBase):
-    """Top-level model for low_capabilities.json."""
-
     telescope: Literal["Low"] = "Low"
     frequency_band: LowFrequencyBand = Field(
         validation_alias=AliasChoices("frequency_band", "basic_capabilities")

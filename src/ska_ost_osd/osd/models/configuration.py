@@ -31,8 +31,7 @@ class ConfigurationModel(OSDBaseModel):
 
 
 class Constraints(ElevationConstraints, AvoidanceConstraints):
-    """The defaults file's avoidance angles with the capabilities file's
-    elevation limits."""
+    """The constraints are spread across the two tmdata files - combining them"""
 
 
 def _merge_constraints(
