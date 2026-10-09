@@ -25,6 +25,8 @@ Unreleased
   (``cycles/cycle_*.json``) and ``SubarrayTemplateLibrary``, plus
   ``MidConfiguration``, ``LowConfiguration`` and ``Configuration``, which combine
   the capabilities and defaults files into the configuration ska-oso-services serves
+* ``ObservatoryPolicy`` reads ``proposal_open`` and ``proposal_close`` as
+  timezone-aware datetimes, a date without a timezone is rejected.
 * Added a test that validates the real tmdata files against these models
 
 7.0.0

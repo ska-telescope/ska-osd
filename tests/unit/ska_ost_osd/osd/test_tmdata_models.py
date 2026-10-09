@@ -9,6 +9,7 @@ configuration, and validating what the OSD serves.
 """
 
 import json
+from datetime import datetime
 from pathlib import Path
 
 import pytest
@@ -298,12 +299,21 @@ class TestObservatoryPolicy:
         )
         ObservatoryPolicy.model_validate(osd_data["observatory_policy"])
 
-    def test_proposal_dates_are_served_as_written(self):
-        """Parsing the dates would change their format, so they keep the
-        exact text of the file."""
+    def test_proposal_dates_are_served_as_the_same_time(self):
+        """The dates are parsed, so ``.000Z`` is served as ``Z``, but the
+        time is unchanged."""
         data = load(OBSERVATORY_POLICIES)
         policy = ObservatoryPolicy.model_validate(data).model_dump(mode="json")
-        assert policy["cycle_information"] == data["cycle_information"]
+        for key in ("proposal_open", "proposal_close"):
+            assert datetime.fromisoformat(
+                policy["cycle_information"][key]
+            ) == datetime.fromisoformat(data["cycle_information"][key])
+
+    def test_proposal_dates_need_a_timezone(self):
+        data = load(OBSERVATORY_POLICIES)
+        data["cycle_information"]["proposal_open"] = "2026-03-27T12:00:00"
+        with pytest.raises(ValidationError, match="timezone"):
+            ObservatoryPolicy.model_validate(data)
 
     def test_telescope_offering_nothing_is_null(self):
         """The PHT UI checks for null, so a telescope missing from the file

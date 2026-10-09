@@ -1,21 +1,18 @@
-from datetime import datetime
 from typing import Self
 
-from pydantic import Field, model_validator
+from pydantic import AwareDatetime, Field, model_validator
 
 from ska_ost_osd.osd.models.defaults import OSDBaseModel
 
 
 class CycleInformation(OSDBaseModel):
     cycle_id: str = Field(examples=["SKAO_2027_1"])
-    proposal_open: str = Field(examples=["2026-03-27T12:00:00.000Z"])
-    proposal_close: str = Field(examples=["2027-04-01T15:00:00.000Z"])
+    proposal_open: AwareDatetime = Field(examples=["2026-03-27T12:00:00.000Z"])
+    proposal_close: AwareDatetime = Field(examples=["2027-04-01T15:00:00.000Z"])
 
     @model_validator(mode="after")
     def check_proposal_window(self) -> Self:
-        opens = datetime.fromisoformat(self.proposal_open)
-        closes = datetime.fromisoformat(self.proposal_close)
-        if opens >= closes:
+        if self.proposal_open >= self.proposal_close:
             raise ValueError("proposal_open must be before proposal_close")
         return self
 
