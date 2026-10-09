@@ -14,6 +14,7 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
+from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import LowCapabilities, MidCapabilities
 from ska_ost_osd.osd.models.configuration import (
     Configuration,
@@ -31,7 +32,7 @@ MID_CAPABILITIES = "ska1_mid/mid_capabilities.json"
 LOW_CAPABILITIES = "ska1_low/low_capabilities.json"
 MID_DEFAULTS = "ska1_mid/mid_defaults.json"
 LOW_DEFAULTS = "ska1_low/low_defaults.json"
-OBSERVATORY_POLICIES = "observatory_policies.json"
+OBSERVATORY_POLICIES = "cycles/cycle_1.json"
 SUBARRAY_TEMPLATES = "subarray_templates/subarray_template_library.json"
 
 AVOIDANCE_ANGLES = (
@@ -64,17 +65,25 @@ class TestOsdOutput:
     """What the OSD serves from the tmdata validates against the models."""
 
     @pytest.mark.parametrize(
-        "model, telescope", [(MidCapabilities, "mid"), (LowCapabilities, "low")]
+        "model, telescope, path",
+        [
+            (MidCapabilities, Telescope.MID, MID_CAPABILITIES),
+            (LowCapabilities, Telescope.LOW, LOW_CAPABILITIES),
+        ],
     )
-    def test_template_processed_output_validates(self, model, telescope, tests_tmdata):
+    def test_template_processed_output_validates(
+        self, model, telescope, path, tests_tmdata
+    ):
         """The OSD's output with subarray templates resolved, as
-        ska-oso-services fetches it, validates too."""
+        ska-oso-services fetches it, validates once the constraints, which
+        the OSD no longer returns, are added from the capabilities file."""
         osd_data = get_osd_using_tmdata(
-            tests_tmdata,
-            capabilities=telescope,
-            process_templates=True,
+            tests_tmdata, telescope=telescope, process_templates=True
         )
-        model.model_validate(osd_data["capabilities"][telescope])
+        served = osd_data["capabilities"][telescope.value]
+        assert "constraints" not in served
+
+        model.model_validate({**served, "constraints": load(path)["constraints"]})
 
 
 class TestBreakingChanges:

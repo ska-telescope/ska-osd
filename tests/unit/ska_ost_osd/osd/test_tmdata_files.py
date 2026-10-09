@@ -30,6 +30,10 @@ TMDATA = Path(__file__).parents[4] / "tmdata"
             SubarrayTemplateLibrary,
             "subarray_templates/subarray_template_library.json",
         ),
+    ]
+    + [
+        (ObservatoryPolicy, f"cycles/{cycle.name}")
+        for cycle in sorted((TMDATA / "cycles").glob("cycle_*.json"))
     ],
 )
 def test_tmdata_file_serialises(model, path):
