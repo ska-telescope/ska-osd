@@ -47,20 +47,6 @@ def load(path: str) -> dict:
         return json.load(json_file)
 
 
-def mock_configuration() -> Configuration:
-    return Configuration(
-        ska_mid=MidConfiguration.combine(
-            MidCapabilities.model_validate(load(MID_CAPABILITIES)),
-            MidDefaults.model_validate(load(MID_DEFAULTS)),
-        ),
-        ska_low=LowConfiguration.combine(
-            LowCapabilities.model_validate(load(LOW_CAPABILITIES)),
-            LowDefaults.model_validate(load(LOW_DEFAULTS)),
-        ),
-        observatory_policy=ObservatoryPolicy.model_validate(load(OBSERVATORY_POLICIES)),
-    )
-
-
 class TestOsdOutput:
     """What the OSD serves from the tmdata validates against the models."""
 
@@ -389,11 +375,37 @@ class TestSubarrayTemplates:
 class TestConfiguration:
     """The combined configuration ska-oso-services serves."""
 
-    def test_odt_keys_come_first_and_unchanged(self):
+    def test_from_tmdata_combines_capabilities_and_defaults(self, tests_tmdata):
+        """Each telescope's configuration combines its capabilities and
+        defaults files."""
+        configuration = Configuration.from_tmdata(tests_tmdata)
+
+        assert configuration.ska_mid == MidConfiguration.combine(
+            MidCapabilities.model_validate(load(MID_CAPABILITIES)),
+            MidDefaults.model_validate(load(MID_DEFAULTS)),
+        )
+        assert configuration.ska_low == LowConfiguration.combine(
+            LowCapabilities.model_validate(load(LOW_CAPABILITIES)),
+            LowDefaults.model_validate(load(LOW_DEFAULTS)),
+        )
+
+    def test_from_tmdata_reads_every_cycle(self, tests_tmdata):
+        """The configuration holds the policy of every cycle in the tmdata,
+        in cycle order."""
+        cycle_files = (TESTS_TMDATA / "cycles").glob("cycle_*.json")
+        cycles = sorted(int(path.stem.removeprefix("cycle_")) for path in cycle_files)
+
+        configuration = Configuration.from_tmdata(tests_tmdata)
+
+        assert [p.cycle_number for p in configuration.observatory_policies] == cycles
+
+    def test_odt_keys_come_first_and_unchanged(self, tests_tmdata):
         """/odt/configuration serves ska_mid and ska_low; the observatory
-        policy is only added after them."""
-        served = mock_configuration().model_dump(mode="json", by_alias=True)
-        assert list(served) == ["ska_mid", "ska_low", "observatory_policy"]
+        policies are only added after them."""
+        served = Configuration.from_tmdata(tests_tmdata).model_dump(
+            mode="json", by_alias=True
+        )
+        assert list(served) == ["ska_mid", "ska_low", "observatory_policies"]
 
     def test_all_constraints_served_without_angles_in_capabilities(self):
         """With the angles gone from the capabilities file, the configuration
@@ -448,8 +460,8 @@ class TestConfiguration:
             == capabilities.constraints.min_elevation_deg
         )
 
-    def test_serialised_configuration_validates(self):
+    def test_serialised_configuration_validates(self, tests_tmdata):
         """What ska-oso-services serves can be read back by the same
         models."""
-        configuration = mock_configuration()
+        configuration = Configuration.from_tmdata(tests_tmdata)
         assert Configuration.model_validate(configuration.model_dump()) == configuration

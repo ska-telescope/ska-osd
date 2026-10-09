@@ -4,6 +4,8 @@ from enum import Enum
 
 MID_CONSTANT_JSON_FILE_PATH = "ska1_mid/mid_capabilities.json"
 LOW_CONSTANT_JSON_FILE_PATH = "ska1_low/low_capabilities.json"
+MID_DEFAULTS_JSON_FILE_PATH = "ska1_mid/mid_defaults.json"
+LOW_DEFAULTS_JSON_FILE_PATH = "ska1_low/low_defaults.json"
 OBSERVING_CYCLES_TMDATA_DIR = "cycles"
 POLICIES_CONSTANT_JSON_FILE_PATH = "observatory_policies.json"
 RELEASE_FILE = "tmdata/version_mapping/latest_release.txt"
