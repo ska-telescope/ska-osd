@@ -13,6 +13,7 @@ import pytest
 from ska_ost_osd.osd.models.capabilities import LowCapabilities, MidCapabilities
 from ska_ost_osd.osd.models.defaults import LowDefaults, MidDefaults
 from ska_ost_osd.osd.models.observatory_policies import ObservatoryPolicy
+from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplateLibrary
 
 TMDATA = Path(__file__).parents[4] / "tmdata"
 
@@ -25,6 +26,10 @@ TMDATA = Path(__file__).parents[4] / "tmdata"
         (MidDefaults, "ska1_mid/mid_defaults.json"),
         (LowDefaults, "ska1_low/low_defaults.json"),
         (ObservatoryPolicy, "observatory_policies.json"),
+        (
+            SubarrayTemplateLibrary,
+            "subarray_templates/subarray_template_library.json",
+        ),
     ],
 )
 def test_tmdata_file_serialises(model, path):

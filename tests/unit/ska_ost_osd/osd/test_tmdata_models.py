@@ -1,5 +1,5 @@
-"""Unit tests for the capabilities, defaults, observatory policy and
-configuration models.
+"""Unit tests for the capabilities, defaults, observatory policy, subarray
+template and configuration models.
 
 These use the test copy of the tmdata in tests/tmdata, so changing the real
 tmdata doesn't need them updating; test_tmdata_files.py checks the real
@@ -22,6 +22,7 @@ from ska_ost_osd.osd.models.configuration import (
 )
 from ska_ost_osd.osd.models.defaults import LowDefaults, MidDefaults
 from ska_ost_osd.osd.models.observatory_policies import ObservatoryPolicy
+from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplateLibrary
 from ska_ost_osd.osd.osd import get_osd_using_tmdata
 
 TESTS_TMDATA = Path(__file__).parents[3] / "tmdata"
@@ -31,6 +32,7 @@ LOW_CAPABILITIES = "ska1_low/low_capabilities.json"
 MID_DEFAULTS = "ska1_mid/mid_defaults.json"
 LOW_DEFAULTS = "ska1_low/low_defaults.json"
 OBSERVATORY_POLICIES = "observatory_policies.json"
+SUBARRAY_TEMPLATES = "subarray_templates/subarray_template_library.json"
 
 AVOIDANCE_ANGLES = (
     "sun_avoidance_angle_deg",
@@ -109,6 +111,11 @@ class TestBreakingChanges:
                 OBSERVATORY_POLICIES,
                 lambda data: data.update(cycle=data.pop("cycle_number")),
             ),
+            (
+                SubarrayTemplateLibrary,
+                SUBARRAY_TEMPLATES,
+                lambda data: next(iter(data.values())).update(subarray_type="AA9"),
+            ),
         ],
         ids=[
             "field removed",
@@ -116,6 +123,7 @@ class TestBreakingChanges:
             "section removed",
             "type changed",
             "policy key renamed",
+            "unknown template type",
         ],
     )
     def test_breaking_change_fails_validation(self, model, path, break_file):
@@ -326,6 +334,47 @@ class TestObservatoryPolicy:
         )
         with pytest.raises(ValidationError, match="proposal_open must be before"):
             ObservatoryPolicy.model_validate(data)
+
+
+class TestSubarrayTemplates:
+    """The subarray template models' own logic."""
+
+    def test_templates_are_named_by_key(self):
+        """Each top-level key becomes a template, named after the key."""
+        data = load(SUBARRAY_TEMPLATES)
+
+        library = SubarrayTemplateLibrary.model_validate(data)
+
+        assert [template.name for template in library.templates] == list(data)
+
+    def test_custom_stations_are_split(self):
+        """tmdata's comma-separated stations become a list."""
+        data = load(SUBARRAY_TEMPLATES)
+        name = next(n for n, t in data.items() if t["subarray_type"] == "custom")
+
+        library = SubarrayTemplateLibrary.model_validate(data)
+
+        template = next(t for t in library.templates if t.name == name)
+        assert template.custom_stations == data[name]["custom_stations"].split(",")
+
+    @pytest.mark.parametrize(
+        "custom, stations, message",
+        [
+            (True, "", "lists no custom_stations"),
+            (False, "SKA001", "only custom templates list custom_stations"),
+        ],
+        ids=["custom without stations", "stations on a non-custom template"],
+    )
+    def test_only_custom_templates_list_stations(self, custom, stations, message):
+        """Custom templates, and only those, list their stations."""
+        data = load(SUBARRAY_TEMPLATES)
+        name = next(
+            n for n, t in data.items() if (t["subarray_type"] == "custom") == custom
+        )
+        data[name]["custom_stations"] = stations
+
+        with pytest.raises(ValidationError, match=message):
+            SubarrayTemplateLibrary.model_validate(data)
 
 
 class TestConfiguration:
