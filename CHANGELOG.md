@@ -9,10 +9,23 @@ Unreleased
 **********
 * [BREAKING] Define multiple cycles through a single TelModel backend in ``tmdata/cycles``
 * [BREAKING] Users pass a TMData client to public API functions instead of OSD creating one from ``tmdata/version_mapping``
+* [BREAKING] Removed ``number_beams`` from the SKA-Low array assemblies in
+  ``low_capabilities.json``; use ``number_subarray_beams``
+* [BREAKING] Removed the duplicate ``coarse_channel_width`` from
+  ``low_capabilities.json``; use ``coarse_channel_width_hz``
+* [BREAKING] Removed the sun, moon and Jupiter avoidance angles from the capabilities
+  files; they are defined in ``mid_defaults.json`` and ``low_defaults.json``
+* Removed the unused semantic validation constants from ``tmdata/instrument``
 * [DEPRECATED] Deprecate the `/osd_release` endpoint
 * `/osd` requests without a cycle now return the complete capability catalogue
 * Removed ``osd-pre-release``, ``osd-tmdata-publish`` and ``release.sh``
 * Added proposal cycle data to the release-cycle version mapping.
+* Added Pydantic models for the tmdata files: ``MidCapabilities`` and
+  ``LowCapabilities``, ``MidDefaults`` and ``LowDefaults``, ``ObservatoryPolicy``
+  (``cycles/cycle_*.json``) and ``SubarrayTemplateLibrary``, plus
+  ``MidConfiguration``, ``LowConfiguration`` and ``Configuration``, which combine
+  the capabilities and defaults files into the configuration ska-oso-services serves
+* Added a test that validates the real tmdata files against these models
 
 7.0.0
 **********
