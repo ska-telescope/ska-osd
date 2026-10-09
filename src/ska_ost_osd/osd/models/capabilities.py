@@ -68,6 +68,7 @@ class TelescopeCapabilitiesBase(OSDBaseModel):
         ]
         return data
 
+
 class MidCBFMode(StrEnum):
     CORRELATION = "correlation"
     PST = "pst"
