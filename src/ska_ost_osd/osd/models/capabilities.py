@@ -5,6 +5,10 @@ from typing import Annotated, Any, Literal, Self
 from pydantic import AliasChoices, Field, model_validator
 
 from ska_ost_osd.osd.common.constant import ARRAY_ASSEMBLY_PATTERN, Telescope
+from ska_ost_osd.osd.exceptions import (
+    Band5bSubbandNotFoundError,
+    FrequencyBandNotFoundError,
+)
 from ska_ost_osd.osd.models.defaults import OSDBaseModel
 
 
@@ -100,6 +104,22 @@ class MidFrequencyBand(FrequencyBand):
         validation_alias=AliasChoices("band5b_subbands", "sub_bands"),
     )
 
+    def get_band5b_subband(self, sub_band: int) -> Band5bSubband:
+        """Look up one of this band's Band 5b sub-bands by number.
+
+        :param sub_band: the sub-band number, e.g. ``2``.
+        :return: the sub-band.
+        :raises Band5bSubbandNotFoundError: If this band has no sub-band
+            with that number, including when it has no sub-bands at all.
+        """
+        subbands = self.band5b_subbands or []
+        for subband in subbands:
+            if subband.sub_band == sub_band:
+                return subband
+        raise Band5bSubbandNotFoundError(
+            self.rx_id, sub_band, [subband.sub_band for subband in subbands]
+        )
+
 
 class MidBasicCapabilities(OSDBaseModel):
     """Mid's receiver bands. tmdata: ``basic_capabilities``."""
@@ -107,6 +127,20 @@ class MidBasicCapabilities(OSDBaseModel):
     frequency_bands: list[MidFrequencyBand] = Field(
         validation_alias=AliasChoices("frequency_bands", "receiver_information")
     )
+
+    def get_frequency_band(self, rx_id: str) -> MidFrequencyBand:
+        """Look up one receiver band by its ID.
+
+        :param rx_id: the band ID, e.g. ``"Band_2"``.
+        :return: the band.
+        :raises FrequencyBandNotFoundError: If there is no band with that ID.
+        """
+        for band in self.frequency_bands:
+            if band.rx_id == rx_id:
+                return band
+        raise FrequencyBandNotFoundError(
+            rx_id, [band.rx_id for band in self.frequency_bands]
+        )
 
 
 class MidCapabilitySet(CapabilitySetBase):

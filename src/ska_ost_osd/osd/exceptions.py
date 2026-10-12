@@ -2,8 +2,10 @@
 
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.common.osd_validation_messages import (
+    BAND5B_SUBBAND_DOESNOT_EXIST_ERROR_MESSAGE,
     CAPABILITY_SET_DOESNOT_EXIST_ERROR_MESSAGE,
     CYCLE_ID_ERROR_MESSAGE,
+    FREQUENCY_BAND_DOESNOT_EXIST_ERROR_MESSAGE,
 )
 from ska_ost_osd.osd.models.observatory_policies import CycleID
 
@@ -44,5 +46,43 @@ class CapabilitySetNotFoundError(OSDQueryError, LookupError):
         super().__init__(
             CAPABILITY_SET_DOESNOT_EXIST_ERROR_MESSAGE.format(
                 name, telescope, ", ".join(available_names)
+            )
+        )
+
+
+class FrequencyBandNotFoundError(OSDQueryError, LookupError):
+    """Mid has no receiver band with the requested ID.
+
+    :param rx_id: the band ID requested, e.g. ``"Band_2"``.
+    :param available_rx_ids: the IDs of Mid's bands.
+    """
+
+    def __init__(self, rx_id: str, available_rx_ids: list[str]):
+        self.rx_id = rx_id
+        self.available_rx_ids = available_rx_ids
+        super().__init__(
+            FREQUENCY_BAND_DOESNOT_EXIST_ERROR_MESSAGE.format(
+                rx_id, ", ".join(available_rx_ids)
+            )
+        )
+
+
+class Band5bSubbandNotFoundError(OSDQueryError, LookupError):
+    """The band has no Band 5b sub-band with the requested number.
+
+    :param rx_id: the band searched.
+    :param sub_band: the sub-band number requested.
+    :param available_sub_bands: the band's sub-band numbers.
+    """
+
+    def __init__(self, rx_id: str, sub_band: int, available_sub_bands: list[int]):
+        self.rx_id = rx_id
+        self.sub_band = sub_band
+        self.available_sub_bands = available_sub_bands
+        super().__init__(
+            BAND5B_SUBBAND_DOESNOT_EXIST_ERROR_MESSAGE.format(
+                sub_band,
+                rx_id,
+                ", ".join(str(n) for n in available_sub_bands) or "none",
             )
         )

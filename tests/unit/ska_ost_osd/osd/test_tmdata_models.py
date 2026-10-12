@@ -16,12 +16,19 @@ import pytest
 from pydantic import TypeAdapter, ValidationError
 
 from ska_ost_osd.osd.common.constant import Telescope
+from ska_ost_osd.osd.exceptions import (
+    Band5bSubbandNotFoundError,
+    FrequencyBandNotFoundError,
+    OSDQueryError,
+)
 from ska_ost_osd.osd.models.capabilities import (
+    Band5bSubband,
     CapabilitySet,
     LowCapabilitiesFile,
     LowCapabilitySet,
     MidCapabilitiesFile,
     MidCapabilitySet,
+    MidFrequencyBand,
 )
 from ska_ost_osd.osd.models.configuration import (
     Configuration,
@@ -32,6 +39,7 @@ from ska_ost_osd.osd.models.defaults import LowDefaultsFile, MidDefaultsFile
 from ska_ost_osd.osd.models.observatory_policies import ObservatoryPolicy
 from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplateLibrary
 from ska_ost_osd.osd.osd import get_osd_using_tmdata
+from tests.unit.ska_ost_osd.osd.expected import MID_BASIC_CAPABILITIES
 
 TESTS_TMDATA = Path(__file__).parents[3] / "tmdata"
 
@@ -276,6 +284,80 @@ class TestCapabilities:
         break_file(data)
         with pytest.raises(ValidationError, match=message):
             model.model_validate(data)
+
+
+class TestMidBasicCapabilities:
+    """Looking up Mid's receiver bands and Band 5b's sub-bands by key."""
+
+    def test_get_frequency_band(self):
+        assert MID_BASIC_CAPABILITIES.get_frequency_band("Band_2") == (
+            MidFrequencyBand(
+                rx_id="Band_2",
+                min_frequency_hz=950_000_000,
+                max_frequency_hz=1_760_000_000,
+            )
+        )
+
+    def test_get_frequency_band_raises_for_unknown_rx_id(self):
+        with pytest.raises(
+            FrequencyBandNotFoundError,
+            match=(
+                r"Frequency band Band_9 is invalid\. Valid frequency bands are "
+                r"Band_1, Band_2, Band_3, Band_4, Band_5a, Band_5b\."
+            ),
+        ) as excinfo:
+            MID_BASIC_CAPABILITIES.get_frequency_band("Band_9")
+
+        assert excinfo.value.rx_id == "Band_9"
+        assert excinfo.value.available_rx_ids == [
+            "Band_1", "Band_2", "Band_3", "Band_4", "Band_5a", "Band_5b",
+        ]  # fmt: skip
+
+    def test_get_band5b_subband(self):
+        band = MID_BASIC_CAPABILITIES.get_frequency_band("Band_5b")
+
+        assert band.get_band5b_subband(2) == Band5bSubband(
+            sub_band=2,
+            min_frequency_hz=12_810_000_000,
+            max_frequency_hz=13_510_000_000,
+            lo_frequency_hz=13_860_000_000,
+            sideband="low",
+        )
+
+    def test_get_band5b_subband_raises_for_unknown_sub_band(self):
+        band = MID_BASIC_CAPABILITIES.get_frequency_band("Band_5b")
+
+        with pytest.raises(
+            Band5bSubbandNotFoundError,
+            match=(
+                r"Sub-band 4 is invalid for Band_5b\. Valid sub-bands are 1, 2, 3\."
+            ),
+        ) as excinfo:
+            band.get_band5b_subband(4)
+
+        assert excinfo.value.rx_id == "Band_5b"
+        assert excinfo.value.sub_band == 4
+        assert excinfo.value.available_sub_bands == [1, 2, 3]
+
+    def test_get_band5b_subband_raises_for_band_without_sub_bands(self):
+        band = MID_BASIC_CAPABILITIES.get_frequency_band("Band_1")
+
+        with pytest.raises(
+            Band5bSubbandNotFoundError,
+            match=r"Sub-band 1 is invalid for Band_1\. Valid sub-bands are none\.",
+        ):
+            band.get_band5b_subband(1)
+
+    @pytest.mark.parametrize(
+        "error",
+        [
+            FrequencyBandNotFoundError("Band_9", ["Band_1"]),
+            Band5bSubbandNotFoundError("Band_5b", 4, [1, 2, 3]),
+        ],
+    )
+    def test_errors_are_query_and_lookup_errors(self, error):
+        assert isinstance(error, OSDQueryError)
+        assert isinstance(error, LookupError)
 
 
 class TestDefaults:
