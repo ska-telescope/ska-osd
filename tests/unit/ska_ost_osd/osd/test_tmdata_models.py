@@ -222,19 +222,6 @@ class TestCapabilities:
         LowCapabilities.model_validate(data)
 
     @pytest.mark.parametrize(
-        "model, path",
-        [(MidCapabilities, MID_CAPABILITIES), (LowCapabilities, LOW_CAPABILITIES)],
-    )
-    def test_avoidance_angles_not_needed(self, model, path):
-        """The avoidance angles now live only in the defaults files, so the
-        capabilities files validate without them."""
-        data = load(path)
-        for angle in AVOIDANCE_ANGLES:
-            data["constraints"].pop(angle, None)
-
-        model.model_validate(data)
-
-    @pytest.mark.parametrize(
         "model, path, break_file, message",
         [
             (
@@ -473,12 +460,11 @@ class TestConfiguration:
         )
         assert list(served) == ["ska_mid", "ska_low", "observatory_policies"]
 
-    def test_all_constraints_served_without_angles_in_capabilities(self):
-        """With the angles gone from the capabilities file, the configuration
-        still serves all five constraints, the angles from the defaults."""
+    def test_constraints_combine_both_files(self):
+        """The configuration serves all five constraints: the elevation
+        limits from the capabilities file and the avoidance angles from the
+        defaults file."""
         capabilities = load(MID_CAPABILITIES)
-        for angle in AVOIDANCE_ANGLES:
-            capabilities["constraints"].pop(angle, None)
         defaults = load(MID_DEFAULTS)
 
         configuration = MidConfiguration.combine(
@@ -508,23 +494,6 @@ class TestConfiguration:
         )
         assert configuration.frequency_band == capabilities.basic_capabilities
         assert configuration.subarrays == capabilities.subarrays
-
-    def test_defaults_avoidance_angles_take_priority(self):
-        """The defaults file is the home of the avoidance angles; the
-        capabilities file only repeats them for backward compatibility."""
-        capabilities = MidCapabilities.model_validate(load(MID_CAPABILITIES))
-        defaults = load(MID_DEFAULTS)
-        defaults["constraints"]["sun_avoidance_angle_deg"] = 45.0
-
-        configuration = MidConfiguration.combine(
-            capabilities, MidDefaults.model_validate(defaults)
-        )
-
-        assert configuration.constraints.sun_avoidance_angle_deg == 45.0
-        assert (
-            configuration.constraints.min_elevation_deg
-            == capabilities.constraints.min_elevation_deg
-        )
 
     def test_serialised_configuration_validates(self, tests_tmdata):
         """What ska-oso-services serves can be read back by the same

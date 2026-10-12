@@ -40,23 +40,19 @@ class ConfigurationModel(OSDBaseModel):
 
 
 class Constraints(ElevationConstraints, AvoidanceConstraints):
-    """The constraints are spread across the two tmdata files - combining them"""
+    """A telescope's observing constraints, which tmdata stores in two
+    files."""
 
     @classmethod
     def combine(
         cls, capabilities: TelescopeCapabilitiesBase, defaults: TelescopeDefaults
     ) -> Self:
-        """
-        The defaults file's avoidance angles with the capabilities file's
-        elevation limits.
-        """
-        # ToDo: remove once we're out of the contract phase of moving the
-        # osd defaults to defaults.json
-        merged = {
+        """The elevation limits from the capabilities file with the sun,
+        moon and Jupiter avoidance angles from the defaults file."""
+        return cls(
             **capabilities.constraints.model_dump(),
             **defaults.constraints.model_dump(),
-        }
-        return cls(**merged)
+        )
 
 
 class MidConfiguration(ConfigurationModel):
