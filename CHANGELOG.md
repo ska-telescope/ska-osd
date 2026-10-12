@@ -20,14 +20,17 @@ Unreleased
 * `/osd` requests without a cycle now return the complete capability catalogue
 * Removed ``osd-pre-release``, ``osd-tmdata-publish`` and ``release.sh``
 * Added proposal cycle data to the release-cycle version mapping.
-* Added Pydantic models for the tmdata files: ``MidCapabilities`` and
-  ``LowCapabilities``, ``MidDefaults`` and ``LowDefaults``, ``ObservatoryPolicy``
-  (``cycles/cycle_*.json``) and ``SubarrayTemplateLibrary``, plus
-  ``MidConfiguration``, ``LowConfiguration`` and ``Configuration``, which combine
-  the capabilities and defaults files into the configuration ska-oso-services serves
-* ``ObservatoryPolicy`` reads ``proposal_open`` and ``proposal_close`` as
-  timezone-aware datetimes, a date without a timezone is rejected.
+* Added Pydantic storage models for the tmdata files: ``MidCapabilitiesFile`` and
+  ``LowCapabilitiesFile``, ``MidDefaultsFile`` and ``LowDefaultsFile``, ``CycleFile``
+  (``cycles/cycle_*.json``) and ``SubarrayTemplateLibraryFile``
+* ``Cycle`` reads ``proposal_open`` and ``proposal_close`` as timezone-aware
+  datetimes, a date without a timezone is rejected.
 * Added a test that validates the real tmdata files against these models
+* Added ``ska_ost_osd.osd.queries``: functions that read cycles, capability sets,
+  basic capabilities, constraints, defaults and subarray templates from a TMData
+  client and return them as Pydantic models
+* Added ``ska_ost_osd.osd.views``: the configuration ska-oso-services serves to the
+  ODT and the cycle data it serves to the PHT, built from those queries
 
 7.0.0
 **********
