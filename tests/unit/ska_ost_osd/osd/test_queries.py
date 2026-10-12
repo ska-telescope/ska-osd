@@ -1,58 +1,22 @@
 """Unit tests for the query functions, using the test copy of the
 tmdata in tests/tmdata."""
 
-from datetime import datetime, timezone
-
 import pytest
 
+from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.exceptions import CycleNotFoundError, OSDQueryError
-from ska_ost_osd.osd.models.observatory_policies import (
-    CycleID,
-    CycleInformation,
-    CyclePolicies,
-    ObservatoryPolicy,
-    TelescopeCapabilities,
+from ska_ost_osd.osd.models.observatory_policies import CycleID
+from ska_ost_osd.osd.queries import (
+    get_cycle,
+    get_cycle_ids,
+    get_cycles,
+    get_telescope_capabilities,
 )
-from ska_ost_osd.osd.queries import get_cycle, get_cycle_ids, get_cycles
-
-# tests/tmdata/cycles/cycle_1.json
-CYCLE_1 = ObservatoryPolicy(
-    cycle_number=CycleID(1),
-    cycle_id="TEST_SKAO_2027_Low_AA2_SV",
-    type="Science Verification",
-    cycle_description="TEST Low AA2 Science Verification",
-    cycle_information=CycleInformation(
-        cycle_id="TEST_SKAO_2027_1",
-        proposal_open=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
-        proposal_close=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
-    ),
-    cycle_policies=CyclePolicies(
-        normal_max_hours=100.0,
-        max_targets=1,
-        max_observation_setups=1,
-        max_data_products=1,
-    ),
-    telescope_capabilities=TelescopeCapabilities(ska_mid=None, ska_low="AA2_SV"),
-)
-
-# tests/tmdata/cycles/cycle_2.json
-CYCLE_2 = ObservatoryPolicy(
-    cycle_number=CycleID(2),
-    cycle_id="TEST_SKAO_2027_Low_AA2_Proposal",
-    type="Proposal",
-    cycle_description="TEST Low AA2 Proposal",
-    cycle_information=CycleInformation(
-        cycle_id="TEST_SKAO_2027_2",
-        proposal_open=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
-        proposal_close=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
-    ),
-    cycle_policies=CyclePolicies(
-        normal_max_hours=100.0,
-        max_targets=3,
-        max_observation_setups=2,
-        max_data_products=2,
-    ),
-    telescope_capabilities=TelescopeCapabilities(ska_mid="AA2", ska_low="AA2"),
+from tests.unit.ska_ost_osd.osd.expected import (
+    CYCLE_1,
+    CYCLE_2,
+    LOW_CAPABILITIES,
+    MID_CAPABILITIES,
 )
 
 
@@ -93,6 +57,26 @@ class TestGetCycles:
     def test_raises_when_cycles_directory_missing(self, empty_tmdata):
         with pytest.raises(FileNotFoundError, match="file not found: cycles"):
             get_cycles(empty_tmdata)
+
+
+class TestGetTelescopeCapabilities:
+    @pytest.mark.parametrize(
+        "telescope, expected",
+        [(Telescope.MID, MID_CAPABILITIES), (Telescope.LOW, LOW_CAPABILITIES)],
+    )
+    def test_returns_capabilities(self, tests_tmdata, telescope, expected):
+        assert get_telescope_capabilities(tests_tmdata, telescope) == expected
+
+    @pytest.mark.parametrize(
+        "telescope, path",
+        [
+            (Telescope.MID, "ska1_mid/mid_capabilities.json"),
+            (Telescope.LOW, "ska1_low/low_capabilities.json"),
+        ],
+    )
+    def test_raises_when_file_missing(self, empty_tmdata, telescope, path):
+        with pytest.raises(FileNotFoundError, match=f"file not found: {path}"):
+            get_telescope_capabilities(empty_tmdata, telescope)
 
 
 class TestExceptions:

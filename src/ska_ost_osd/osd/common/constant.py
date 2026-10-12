@@ -41,6 +41,12 @@ class Telescope(str, Enum):
         return self.value
 
 
+CAPABILITIES_JSON_FILE_PATHS = {
+    Telescope.MID: MID_CONSTANT_JSON_FILE_PATH,
+    Telescope.LOW: LOW_CONSTANT_JSON_FILE_PATH,
+}
+
+
 OSD_VERSION_PATTERN = r"^\d+\.\d+\.\d+"
 ARRAY_ASSEMBLY_PATTERN = r"^AA(\d+|\d+\.\d+)|^Low|^Mid"
 QUERY_FIELDS = [

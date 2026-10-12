@@ -4,11 +4,23 @@ Each function takes the TMData to read from, so the caller chooses the
 source and version and handles any caching.
 """
 
+from typing import Literal, overload
+
 from ska_telmodel_client import TMData
 
-from ska_ost_osd.osd.common.constant import OBSERVING_CYCLES_TMDATA_DIR
+from ska_ost_osd.osd.common.constant import (
+    CAPABILITIES_JSON_FILE_PATHS,
+    OBSERVING_CYCLES_TMDATA_DIR,
+    Telescope,
+)
 from ska_ost_osd.osd.exceptions import CycleNotFoundError
+from ska_ost_osd.osd.models.capabilities import LowCapabilities, MidCapabilities
 from ska_ost_osd.osd.models.observatory_policies import CycleID, ObservatoryPolicy
+
+_CAPABILITIES_MODELS = {
+    Telescope.MID: MidCapabilities,
+    Telescope.LOW: LowCapabilities,
+}
 
 
 def get_cycle_ids(tmdata: TMData) -> list[CycleID]:
@@ -53,7 +65,44 @@ def get_cycles(tmdata: TMData) -> list[ObservatoryPolicy]:
     return [_read_cycle(tmdata, cycle_id) for cycle_id in get_cycle_ids(tmdata)]
 
 
+@overload
+def get_telescope_capabilities(
+    tmdata: TMData, telescope: Literal[Telescope.MID]
+) -> MidCapabilities: ...
+
+
+@overload
+def get_telescope_capabilities(
+    tmdata: TMData, telescope: Literal[Telescope.LOW]
+) -> LowCapabilities: ...
+
+
+def get_telescope_capabilities(
+    tmdata: TMData, telescope: Telescope
+) -> MidCapabilities | LowCapabilities:
+    """Read one telescope's capabilities file: its elevation constraints,
+    frequency bands and capability sets.
+
+    :param tmdata: TMData to read from.
+    :param telescope: the telescope.
+    :return: the telescope's capabilities.
+    :raises FileNotFoundError: If the tmdata has no capabilities file for
+        the telescope.
+    """
+    return _CAPABILITIES_MODELS[telescope].model_validate(
+        _read(tmdata, CAPABILITIES_JSON_FILE_PATHS[telescope])
+    )
+
+
 def _read_cycle(tmdata: TMData, cycle_id: CycleID) -> ObservatoryPolicy:
     return ObservatoryPolicy.model_validate(
-        tmdata[f"{OBSERVING_CYCLES_TMDATA_DIR}/cycle_{cycle_id}.json"].get_dict()
+        _read(tmdata, f"{OBSERVING_CYCLES_TMDATA_DIR}/cycle_{cycle_id}.json")
     )
+
+
+def _read(tmdata: TMData, path: str) -> dict:
+    """Read one tmdata file. Every query reads tmdata through here."""
+    try:
+        return tmdata[path].get_dict()
+    except KeyError as error:
+        raise FileNotFoundError(f"file not found: {path}") from error
