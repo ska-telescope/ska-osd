@@ -32,7 +32,7 @@ def test_cycle_osd_uses_selected_cycle_file(test_client):
     assert response.status_code == HTTPStatus.OK
     assert body["result_data"]["observatory_policy"]["cycle_number"] == 2
     assert body["result_data"]["observatory_policy"]["cycle_id"] == (
-        "TEST_SKAO_2027_AA1_Proposal"
+        "TEST_SKAO_2027_AA2_Proposal"
     )
     assert set(body["result_data"]["capabilities"]) == {"mid", "low"}
 
@@ -49,7 +49,7 @@ def test_cycle_capability_uses_cycle_selected_array_assembly(test_client):
     assert list(body["result_data"]["capabilities"]) == ["mid"]
     assert set(body["result_data"]["capabilities"]["mid"]) == {
         "basic_capabilities",
-        "AA1",
+        "AA2",
     }
 
 
@@ -72,21 +72,21 @@ def test_catalogue_filter_does_not_include_observatory_policy(test_client):
     """A non-cycle filter selects catalogue data without a cycle policy."""
     response = test_client.get(
         f"{BASE_API_URL}/osd",
-        params={"capabilities": "mid", "array_assembly": "AA0.5"},
+        params={"capabilities": "mid", "array_assembly": "AA1"},
     )
     body = response.json()
 
     assert response.status_code == HTTPStatus.OK
     assert "observatory_policy" not in body["result_data"]
     assert list(body["result_data"]["capabilities"]) == ["mid"]
-    assert "AA0.5" in body["result_data"]["capabilities"]["mid"]
+    assert "AA1" in body["result_data"]["capabilities"]["mid"]
 
 
 def test_array_assembly_requires_capability(test_client):
     """An array assembly cannot be selected without a capability."""
     response = test_client.get(
         f"{BASE_API_URL}/osd",
-        params={"array_assembly": "AA0.5"},
+        params={"array_assembly": "AA1"},
     )
     body = response.json()
 
@@ -98,7 +98,7 @@ def test_cycle_id_and_array_assembly_are_incompatible(test_client):
     """A cycle policy, rather than an explicit array filter, selects assemblies."""
     response = test_client.get(
         f"{BASE_API_URL}/osd",
-        params={"cycle_id": 2, "array_assembly": "AA0.5"},
+        params={"cycle_id": 2, "array_assembly": "AA1"},
     )
     body = response.json()
 
@@ -113,15 +113,15 @@ def test_cycle_capability_matching_array_assembly_is_redundant(test_client, capl
     with caplog.at_level(logging.WARNING):
         response = test_client.get(
             f"{BASE_API_URL}/osd",
-            params={"cycle_id": 2, "capabilities": "mid", "array_assembly": "AA1"},
+            params={"cycle_id": 2, "capabilities": "mid", "array_assembly": "AA2"},
         )
     body = response.json()
 
     assert response.status_code == HTTPStatus.OK
     assert list(body["result_data"]["capabilities"]) == ["mid"]
-    assert "AA1" in body["result_data"]["capabilities"]["mid"]
+    assert "AA2" in body["result_data"]["capabilities"]["mid"]
     assert (
-        "Ignoring redundant array assembly AA1 for capability mid in cycle 2"
+        "Ignoring redundant array assembly AA2 for capability mid in cycle 2"
         in caplog.messages
     )
 
@@ -130,13 +130,13 @@ def test_cycle_capability_array_assembly_must_match_policy(test_client):
     """An explicit cycle assembly must match the capability policy."""
     response = test_client.get(
         f"{BASE_API_URL}/osd",
-        params={"cycle_id": 2, "capabilities": "mid", "array_assembly": "AA0.5"},
+        params={"cycle_id": 2, "capabilities": "mid", "array_assembly": "AA1"},
     )
     body = response.json()
 
     assert response.status_code == HTTPStatus.BAD_REQUEST
     assert body["result_data"] == [
-        "Array assembly AA0.5 does not match capability mid in cycle 2. Expected AA1."
+        "Array assembly AA1 does not match capability mid in cycle 2. Expected AA2."
     ]
 
 
@@ -168,12 +168,12 @@ def test_osd_endpoint(test_client):
         params={
             "source": "file",
             "capabilities": "mid",
-            "array_assembly": "AA0.5",
+            "array_assembly": "AA1",
         },
     ).json()
 
     assert response["result_code"] == 200
-    assert "AA0.5" in response["result_data"]["capabilities"]["mid"].keys()
+    assert "AA1" in response["result_data"]["capabilities"]["mid"].keys()
 
 
 def test_osd_sub_bands_endpoint(test_client):
@@ -188,7 +188,7 @@ def test_osd_sub_bands_endpoint(test_client):
         params={
             "source": "file",
             "capabilities": "mid",
-            "array_assembly": "AA0.5",
+            "array_assembly": "AA1",
         },
     )
     assert response.status_code == 200

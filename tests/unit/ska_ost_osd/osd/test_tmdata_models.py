@@ -97,7 +97,7 @@ class TestBreakingChanges:
             (
                 MidCapabilitiesFile,
                 MID_CAPABILITIES,
-                lambda data: data["AA1"].pop("number_fsps"),
+                lambda data: data["AA2"].pop("number_fsps"),
             ),
             (
                 LowCapabilitiesFile,
@@ -154,10 +154,10 @@ class TestCapabilities:
         ignored. A capability set need not list subarray templates."""
         data = load(LOW_CAPABILITIES)
         names = {s.name for s in LowCapabilitiesFile.model_validate(data).subarrays}
-        data["AA3"] = data["AA1"]
+        data["AA3"] = data["AA2"]
         data["Low_ITF"] = {
             key: value
-            for key, value in data["AA1"].items()
+            for key, value in data["AA2"].items()
             if key != "subarray_templates"
         }
         data["version"] = "1.0"
@@ -166,7 +166,7 @@ class TestCapabilities:
 
         subarrays = {subarray.name: subarray for subarray in capabilities.subarrays}
         assert set(subarrays) == names | {"AA3", "Low_ITF"}
-        assert subarrays["AA0.5"].receptors == data["AA0.5"]["number_station_ids"]
+        assert subarrays["AA1"].receptors == data["AA1"]["number_station_ids"]
         assert subarrays["Low_ITF"].subarray_templates is None
 
     @pytest.mark.parametrize(
@@ -205,11 +205,9 @@ class TestCapabilities:
         assert capability_set == expected
 
     def test_capability_set_rejects_another_telescope(self):
-        data = load(LOW_CAPABILITIES)["AA0.5"]
+        data = load(LOW_CAPABILITIES)["AA1"]
         with pytest.raises(ValidationError, match="telescope"):
-            LowCapabilitySet.model_validate(
-                {"name": "AA0.5", **data, "telescope": "mid"}
-            )
+            LowCapabilitySet.model_validate({"name": "AA1", **data, "telescope": "mid"})
 
     @pytest.mark.parametrize(
         "model, path",
@@ -254,19 +252,19 @@ class TestCapabilities:
             (
                 MidCapabilitiesFile,
                 MID_CAPABILITIES,
-                lambda data: data["AA1"]["number_dish_ids"].pop(),
+                lambda data: data["AA2"]["number_dish_ids"].pop(),
                 "number_ska_dishes",
             ),
             (
                 MidCapabilitiesFile,
                 MID_CAPABILITIES,
-                lambda data: data["AA1"]["available_receivers"].append("Band_9"),
+                lambda data: data["AA2"]["available_receivers"].append("Band_9"),
                 "available_receivers",
             ),
             (
                 LowCapabilitiesFile,
                 LOW_CAPABILITIES,
-                lambda data: data["AA1"]["number_station_ids"].pop(),
+                lambda data: data["AA2"]["number_station_ids"].pop(),
                 "number_stations",
             ),
         ],

@@ -45,9 +45,9 @@ from ska_ost_osd.osd.models.observatory_policies import (
 # tests/tmdata/cycles/cycle_1.json
 CYCLE_1 = ObservatoryPolicy(
     cycle_number=CycleID(1),
-    cycle_id="TEST_SKAO_2027_Low_AA0.5_SV",
+    cycle_id="TEST_SKAO_2027_Low_AA1_SV",
     type="Science Verification",
-    cycle_description="TEST Low AA0.5 Science Verification",
+    cycle_description="TEST Low AA1 Science Verification",
     cycle_information=CycleInformation(
         cycle_id="TEST_SKAO_2027_1",
         proposal_open=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
@@ -59,15 +59,15 @@ CYCLE_1 = ObservatoryPolicy(
         max_observation_setups=1,
         max_data_products=1,
     ),
-    telescope_capabilities=TelescopeCapabilities(ska_mid=None, ska_low="AA0.5"),
+    telescope_capabilities=TelescopeCapabilities(ska_mid=None, ska_low="AA1"),
 )
 
 # tests/tmdata/cycles/cycle_2.json
 CYCLE_2 = ObservatoryPolicy(
     cycle_number=CycleID(2),
-    cycle_id="TEST_SKAO_2027_AA1_Proposal",
+    cycle_id="TEST_SKAO_2027_AA2_Proposal",
     type="Proposal",
-    cycle_description="TEST AA1 Proposal",
+    cycle_description="TEST AA2 Proposal",
     cycle_information=CycleInformation(
         cycle_id="TEST_SKAO_2027_2",
         proposal_open=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
@@ -79,13 +79,13 @@ CYCLE_2 = ObservatoryPolicy(
         max_observation_setups=2,
         max_data_products=2,
     ),
-    telescope_capabilities=TelescopeCapabilities(ska_mid="AA1", ska_low="AA1"),
+    telescope_capabilities=TelescopeCapabilities(ska_mid="AA2", ska_low="AA2"),
 )
 
 # tests/tmdata/ska1_mid/mid_capabilities.json
-MID_AA05 = MidCapabilitySet(
-    name="AA0.5",
-    receptors=["SKA001", "SKA036", "SKA077", "SKA100"],
+MID_AA1 = MidCapabilitySet(
+    name="AA1",
+    receptors=["SKA001", "SKA002", "SKA003", "SKA004"],
     available_bandwidth_hz=800_000_000,
     number_pst_beams=1,
     number_fsps=4,
@@ -94,7 +94,7 @@ MID_AA05 = MidCapabilitySet(
     number_zoom_channels=0,
     number_pss_beams=0,
     ps_beam_bandwidth_hz=400_000_000,
-    subarray_templates=["*_AA0.5"],
+    subarray_templates=["*_AA1"],
     allowed_channel_width_values_hz=[13440],
     allowed_channel_count_range_min=[1],
     allowed_channel_count_range_max=[58982],
@@ -105,17 +105,17 @@ MID_AA05 = MidCapabilitySet(
     number_meerkatplus_dishes=0,
 )
 
-MID_AA1 = MidCapabilitySet(
-    name="AA1",
+MID_AA2 = MidCapabilitySet(
+    name="AA2",
     receptors=[
-        "SKA036",
-        "SKA040",
-        "SKA045",
-        "SKA046",
-        "SKA048",
-        "SKA077",
-        "SKA081",
-        "SKA101",
+        "SKA001",
+        "SKA002",
+        "SKA003",
+        "SKA004",
+        "SKA005",
+        "SKA006",
+        "SKA007",
+        "SKA008",
     ],  # fmt: skip
     available_bandwidth_hz=800_000_000,
     number_pst_beams=1,
@@ -125,7 +125,7 @@ MID_AA1 = MidCapabilitySet(
     number_zoom_channels=0,
     number_pss_beams=0,
     ps_beam_bandwidth_hz=400_000_000,
-    subarray_templates=["*_AA1"],
+    subarray_templates=["*_AA2"],
     allowed_channel_width_values_hz=[13440],
     allowed_channel_count_range_min=[1],
     allowed_channel_count_range_max=[58982],
@@ -193,13 +193,13 @@ MID_BASIC_CAPABILITIES = MidBasicCapabilities(
 MID_CAPABILITIES_FILE = MidCapabilitiesFile(
     constraints=ElevationConstraints(min_elevation_deg=15.0, max_elevation_deg=90.0),
     basic_capabilities=MID_BASIC_CAPABILITIES,
-    subarrays=[MID_AA05, MID_AA1],
+    subarrays=[MID_AA1, MID_AA2],
 )
 
 # tests/tmdata/ska1_low/low_capabilities.json
-LOW_AA05 = LowCapabilitySet(
-    name="AA0.5",
-    receptors=[345, 350, 352, 431],
+LOW_AA1 = LowCapabilitySet(
+    name="AA1",
+    receptors=[345, 346, 347, 348],
     number_stations=4,
     number_substations=0,
     number_subarray_beams=1,
@@ -213,31 +213,14 @@ LOW_AA05 = LowCapabilitySet(
     number_vlbi_beams=0,
     ps_beam_bandwidth_hz=75_000_000.0,
     number_fsps=6,
-    subarray_templates=["*_AA0.5"],
+    subarray_templates=["*_AA1"],
     allowed_zoom_factors=[0],
 )
 
-LOW_AA1 = LowCapabilitySet(
-    name="AA1",
-    receptors=[
-        345,
-        346,
-        347,
-        348,
-        349,
-        350,
-        351,
-        352,
-        353,
-        354,
-        429,
-        430,
-        431,
-        432,
-        433,
-        434,
-    ],  # fmt: skip
-    number_stations=16,
+LOW_AA2 = LowCapabilitySet(
+    name="AA2",
+    receptors=[345, 346, 347, 348, 349, 350, 351, 352],
+    number_stations=8,
     number_substations=512,
     number_subarray_beams=8,
     max_baseline_km=6.0,
@@ -250,7 +233,7 @@ LOW_AA1 = LowCapabilitySet(
     number_vlbi_beams=0,
     ps_beam_bandwidth_hz=75_000_000.0,
     number_fsps=6,
-    subarray_templates=["*_AA1"],
+    subarray_templates=["*_AA2"],
     allowed_zoom_factors=[1, 2, 4, 8],
 )
 
@@ -269,7 +252,7 @@ LOW_BASIC_CAPABILITIES = LowBasicCapabilities(
 LOW_CAPABILITIES_FILE = LowCapabilitiesFile(
     constraints=ElevationConstraints(min_elevation_deg=45.0, max_elevation_deg=90.0),
     basic_capabilities=LOW_BASIC_CAPABILITIES,
-    subarrays=[LOW_AA05, LOW_AA1],
+    subarrays=[LOW_AA1, LOW_AA2],
 )
 
 # The defaults in tests/tmdata/ska1_mid/mid_defaults.json

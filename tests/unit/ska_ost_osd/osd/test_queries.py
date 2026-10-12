@@ -25,15 +25,15 @@ from ska_ost_osd.osd.queries import (
 from tests.unit.ska_ost_osd.osd.expected import (
     CYCLE_1,
     CYCLE_2,
-    LOW_AA05,
     LOW_AA1,
+    LOW_AA2,
     LOW_BASIC_CAPABILITIES,
     LOW_CAPABILITIES_FILE,
     LOW_CONSTRAINTS,
     LOW_DEFAULTS,
     LOW_DEFAULTS_FILE,
-    MID_AA05,
     MID_AA1,
+    MID_AA2,
     MID_BASIC_CAPABILITIES,
     MID_CAPABILITIES_FILE,
     MID_CONSTRAINTS,
@@ -176,8 +176,8 @@ class TestGetCapabilitySets:
     @pytest.mark.parametrize(
         "telescope, expected",
         [
-            (Telescope.MID, [MID_AA05, MID_AA1]),
-            (Telescope.LOW, [LOW_AA05, LOW_AA1]),
+            (Telescope.MID, [MID_AA1, MID_AA2]),
+            (Telescope.LOW, [LOW_AA1, LOW_AA2]),
         ],
     )
     def test_returns_capability_sets_in_file_order(
@@ -196,10 +196,10 @@ class TestGetCapabilitySet:
     @pytest.mark.parametrize(
         "telescope, name, expected",
         [
-            (Telescope.MID, "AA0.5", MID_AA05),
             (Telescope.MID, "AA1", MID_AA1),
-            (Telescope.LOW, "AA0.5", LOW_AA05),
+            (Telescope.MID, "AA2", MID_AA2),
             (Telescope.LOW, "AA1", LOW_AA1),
+            (Telescope.LOW, "AA2", LOW_AA2),
         ],
     )
     def test_returns_capability_set(self, tests_tmdata, telescope, name, expected):
@@ -209,21 +209,21 @@ class TestGetCapabilitySet:
         with pytest.raises(
             CapabilitySetNotFoundError,
             match=(
-                r"Capability set AA2 is invalid for telescope mid\. "
-                r"Valid capability sets are AA0\.5, AA1\."
+                r"Capability set AA3 is invalid for telescope mid\. "
+                r"Valid capability sets are AA1, AA2\."
             ),
         ) as excinfo:
-            get_capability_set(tests_tmdata, Telescope.MID, "AA2")
+            get_capability_set(tests_tmdata, Telescope.MID, "AA3")
 
         assert excinfo.value.telescope == Telescope.MID
-        assert excinfo.value.name == "AA2"
-        assert excinfo.value.available_names == ["AA0.5", "AA1"]
+        assert excinfo.value.name == "AA3"
+        assert excinfo.value.available_names == ["AA1", "AA2"]
 
     def test_raises_when_file_missing(self, empty_tmdata):
         with pytest.raises(
             FileNotFoundError, match="file not found: ska1_low/low_capabilities.json"
         ):
-            get_capability_set(empty_tmdata, Telescope.LOW, "AA0.5")
+            get_capability_set(empty_tmdata, Telescope.LOW, "AA1")
 
 
 class TestExceptions:
@@ -234,7 +234,7 @@ class TestExceptions:
         assert isinstance(error, LookupError)
 
     def test_capability_set_not_found_is_a_query_error_and_lookup_error(self):
-        error = CapabilitySetNotFoundError(Telescope.LOW, "AA2", ["AA0.5", "AA1"])
+        error = CapabilitySetNotFoundError(Telescope.LOW, "AA3", ["AA1", "AA2"])
 
         assert isinstance(error, OSDQueryError)
         assert isinstance(error, LookupError)

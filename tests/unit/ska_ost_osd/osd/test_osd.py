@@ -19,7 +19,7 @@ from ska_ost_osd.osd.osd import get_osd_data, update_osd_file
         ),
         (
             "mid",
-            "AA0.5",
+            "AA1",
             {"mid"},
         ),
     ],
@@ -33,7 +33,7 @@ def test_get_osd_data(
     """Check that get_osd_data returns the expected telescope entries.
 
     :param telescope: Mid or Low
-    :param array_assembly: Array Assembly AA0.5, AA1
+    :param array_assembly: Array Assembly AA1, AA2
     :param expected_telescopes: telescope entries in the OSD response
     :param tests_tmdata: tmdata fixture
     :returns: assert equals values
@@ -119,7 +119,7 @@ def test_invalid_get_osd_data_array_assembly(tests_tmdata):
     assert len(error_msgs) == 1
     assert (
         error_msgs[0]
-        == f"Array assembly {aa_value} is invalid. Valid array assemblies are AA0.5, AA1."
+        == f"Array assembly {aa_value} is invalid. Valid array assemblies are AA1, AA2."
     )
 
 
@@ -147,7 +147,7 @@ def test_get_osd_data_array_assembly_rejects_non_array_assembly_keys(
     assert osd_data is None
     assert error_msgs == [
         f"Array assembly {invalid_array_assembly} is invalid. Valid array assemblies are"
-        " AA0.5, AA1."
+        " AA1, AA2."
     ]
 
 
@@ -167,13 +167,13 @@ def test_get_osd_data_missing_subarray_templates_falls_back_to_empty(
 
     osd_data, error_msgs = get_osd_data(
         telescope="mid",
-        array_assembly="AA0.5",
+        array_assembly="AA1",
         tmdata=tests_tmdata,
         process_templates=True,
     )
 
     assert error_msgs == []
-    assert "AA0.5" in osd_data["capabilities"]["mid"]
+    assert "AA1" in osd_data["capabilities"]["mid"]
 
 
 @pytest.fixture
@@ -323,7 +323,7 @@ def test_get_osd_data_with_process_templates(tests_tmdata):
     # Test with process_templates=False (default)
     result_false, _ = get_osd_data(
         telescope="mid",
-        array_assembly="AA0.5",
+        array_assembly="AA1",
         tmdata=tests_tmdata,
         process_templates=False,
     )
@@ -331,7 +331,7 @@ def test_get_osd_data_with_process_templates(tests_tmdata):
     # Test with process_templates=True
     result_true, _ = get_osd_data(
         telescope="mid",
-        array_assembly="AA0.5",
+        array_assembly="AA1",
         tmdata=tests_tmdata,
         process_templates=True,
     )
@@ -351,8 +351,8 @@ def test_get_osd_data_template_processing_called(mock_process_templates, tests_t
     def mock_template_processing(data, _capability, _template_data):
         # Add mock subarray_templates to the data
         modified_data = data.copy()
-        if "AA0.5" in modified_data:
-            modified_data["AA0.5"]["subarray_templates"] = {
+        if "AA1" in modified_data:
+            modified_data["AA1"]["subarray_templates"] = {
                 "mid_template_1": {"config": "test"}
             }
         return modified_data
@@ -362,7 +362,7 @@ def test_get_osd_data_template_processing_called(mock_process_templates, tests_t
     # Test with process_templates=True
     result, _ = get_osd_data(
         telescope="mid",
-        array_assembly="AA0.5",
+        array_assembly="AA1",
         tmdata=tests_tmdata,
         process_templates=True,
     )
@@ -373,10 +373,10 @@ def test_get_osd_data_template_processing_called(mock_process_templates, tests_t
     # Verify the result contains the mocked template data
     assert "capabilities" in result
     assert "mid" in result["capabilities"]
-    assert "AA0.5" in result["capabilities"]["mid"]
-    assert "subarray_templates" in result["capabilities"]["mid"]["AA0.5"]
+    assert "AA1" in result["capabilities"]["mid"]
+    assert "subarray_templates" in result["capabilities"]["mid"]["AA1"]
     assert (
-        "mid_template_1" in result["capabilities"]["mid"]["AA0.5"]["subarray_templates"]
+        "mid_template_1" in result["capabilities"]["mid"]["AA1"]["subarray_templates"]
     )
 
 

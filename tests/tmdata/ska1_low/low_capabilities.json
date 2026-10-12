@@ -15,13 +15,13 @@
       "number_pst_channels_per_coarse_channel": 216,
       "number_pss_channels_per_coarse_channel": 54
     },
-    "AA0.5": {
+    "AA1": {
       "number_stations": 4,
       "number_station_ids": [
         345,
-        350,
-        352,
-        431
+        346,
+        347,
+        348
       ],
       "number_substations": 0,
       "number_beams": 1,
@@ -39,11 +39,11 @@
       "number_vlbi_beams": 0,
       "ps_beam_bandwidth_hz": 75000000.0,
       "number_fsps": 6,
-      "subarray_templates": ["*_AA0.5"],
+      "subarray_templates": ["*_AA1"],
       "allowed_zoom_factors": [0]
     },
-    "AA1": {
-      "number_stations": 16,
+    "AA2": {
+      "number_stations": 8,
       "number_substations": 512,
       "number_beams": 8,
       "number_subarray_beams": 8,
@@ -60,8 +60,8 @@
       "number_vlbi_beams": 0,
       "ps_beam_bandwidth_hz": 75000000.0,
       "number_fsps": 6,
-      "number_station_ids": [345, 346, 347, 348, 349, 350, 351, 352, 353, 354, 429, 430, 431, 432, 433, 434],
+      "number_station_ids": [345, 346, 347, 348, 349, 350, 351, 352],
       "allowed_zoom_factors": [1, 2, 4, 8],
-      "subarray_templates": ["*_AA1"]
+      "subarray_templates": ["*_AA2"]
     }
 }
