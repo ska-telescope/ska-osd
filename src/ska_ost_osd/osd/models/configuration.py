@@ -12,9 +12,9 @@ from ska_ost_osd.osd.common.constant import (
 )
 from ska_ost_osd.osd.models.capabilities import (
     ElevationConstraints,
+    LowBasicCapabilities,
     LowCapabilities,
     LowCapabilitySet,
-    LowFrequencyBand,
     MidCapabilities,
     MidCapabilitySet,
     MidFrequencyBand,
@@ -68,7 +68,7 @@ class MidConfiguration(ConfigurationModel):
     @classmethod
     def combine(cls, capabilities: MidCapabilities, defaults: MidDefaults) -> Self:
         return cls(
-            frequency_band=capabilities.frequency_band,
+            frequency_band=capabilities.basic_capabilities.frequency_bands,
             constraints=_merge_constraints(capabilities, defaults),
             subarrays=capabilities.subarrays,
             spfrx_defaults=defaults.spfrx_defaults,
@@ -76,7 +76,7 @@ class MidConfiguration(ConfigurationModel):
 
 
 class LowConfiguration(ConfigurationModel):
-    frequency_band: LowFrequencyBand
+    frequency_band: LowBasicCapabilities
     constraints: Constraints
     quality_attribute_metrics: LowQualityAttributeMetrics
     subarrays: list[LowCapabilitySet]
@@ -84,7 +84,7 @@ class LowConfiguration(ConfigurationModel):
     @classmethod
     def combine(cls, capabilities: LowCapabilities, defaults: LowDefaults) -> Self:
         return cls(
-            frequency_band=capabilities.frequency_band,
+            frequency_band=capabilities.basic_capabilities,
             constraints=_merge_constraints(capabilities, defaults),
             quality_attribute_metrics=defaults.quality_attribute_metrics,
             subarrays=capabilities.subarrays,

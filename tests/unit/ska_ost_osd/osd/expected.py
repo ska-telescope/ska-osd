@@ -7,10 +7,11 @@ from datetime import datetime, timezone
 from ska_ost_osd.osd.models.capabilities import (
     Band5bSubband,
     ElevationConstraints,
+    LowBasicCapabilities,
     LowCapabilities,
     LowCapabilitySet,
     LowCBFMode,
-    LowFrequencyBand,
+    MidBasicCapabilities,
     MidCapabilities,
     MidCapabilitySet,
     MidCBFMode,
@@ -132,9 +133,8 @@ MID_AA1 = MidCapabilitySet(
     number_meerkatplus_dishes=0,
 )
 
-MID_CAPABILITIES = MidCapabilities(
-    constraints=ElevationConstraints(min_elevation_deg=15.0, max_elevation_deg=90.0),
-    frequency_band=[
+MID_BASIC_CAPABILITIES = MidBasicCapabilities(
+    frequency_bands=[
         MidFrequencyBand(
             rx_id="Band_1", min_frequency_hz=350_000_000, max_frequency_hz=1_050_000_000
         ),
@@ -185,6 +185,11 @@ MID_CAPABILITIES = MidCapabilities(
             ],
         ),
     ],
+)
+
+MID_CAPABILITIES = MidCapabilities(
+    constraints=ElevationConstraints(min_elevation_deg=15.0, max_elevation_deg=90.0),
+    basic_capabilities=MID_BASIC_CAPABILITIES,
     subarrays=[MID_AA05, MID_AA1],
 )
 
@@ -246,19 +251,21 @@ LOW_AA1 = LowCapabilitySet(
     allowed_zoom_factors=[1, 2, 4, 8],
 )
 
+LOW_BASIC_CAPABILITIES = LowBasicCapabilities(
+    min_frequency_hz=50_000_000.0,
+    max_frequency_hz=350_000_000.0,
+    min_coarse_channel=64,
+    max_coarse_channel=447,
+    coarse_channel_width_hz=781_250.0,
+    number_continuum_channels_per_coarse_channel=144,
+    number_zoom_channels_per_coarse_channel=432,
+    number_pst_channels_per_coarse_channel=216,
+    number_pss_channels_per_coarse_channel=54,
+)
+
 LOW_CAPABILITIES = LowCapabilities(
     constraints=ElevationConstraints(min_elevation_deg=45.0, max_elevation_deg=90.0),
-    frequency_band=LowFrequencyBand(
-        min_frequency_hz=50_000_000.0,
-        max_frequency_hz=350_000_000.0,
-        min_coarse_channel=64,
-        max_coarse_channel=447,
-        coarse_channel_width_hz=781_250.0,
-        number_continuum_channels_per_coarse_channel=144,
-        number_zoom_channels_per_coarse_channel=432,
-        number_pst_channels_per_coarse_channel=216,
-        number_pss_channels_per_coarse_channel=54,
-    ),
+    basic_capabilities=LOW_BASIC_CAPABILITIES,
     subarrays=[LOW_AA05, LOW_AA1],
 )
 

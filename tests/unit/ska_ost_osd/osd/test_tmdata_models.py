@@ -506,7 +506,7 @@ class TestConfiguration:
         assert (
             configuration.quality_attribute_metrics.cbf.processors_ready_percent == 50
         )
-        assert configuration.frequency_band == capabilities.frequency_band
+        assert configuration.frequency_band == capabilities.basic_capabilities
         assert configuration.subarrays == capabilities.subarrays
 
     def test_defaults_avoidance_angles_take_priority(self):

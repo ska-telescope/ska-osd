@@ -17,8 +17,10 @@ from ska_ost_osd.osd.common.constant import (
 from ska_ost_osd.osd.exceptions import CapabilitySetNotFoundError, CycleNotFoundError
 from ska_ost_osd.osd.models.capabilities import (
     CapabilitySet,
+    LowBasicCapabilities,
     LowCapabilities,
     LowCapabilitySet,
+    MidBasicCapabilities,
     MidCapabilities,
     MidCapabilitySet,
 )
@@ -134,6 +136,33 @@ def get_telescope_defaults(
     return _DEFAULTS_MODELS[telescope].model_validate(
         _read(tmdata, DEFAULTS_JSON_FILE_PATHS[telescope])
     )
+
+
+@overload
+def get_basic_capabilities(
+    tmdata: TMData, telescope: Literal[Telescope.MID]
+) -> MidBasicCapabilities: ...
+
+
+@overload
+def get_basic_capabilities(
+    tmdata: TMData, telescope: Literal[Telescope.LOW]
+) -> LowBasicCapabilities: ...
+
+
+def get_basic_capabilities(
+    tmdata: TMData, telescope: Telescope
+) -> MidBasicCapabilities | LowBasicCapabilities:
+    """Read one telescope's basic capabilities: Mid's receiver bands, or
+    Low's frequency band and how it is divided into channels.
+
+    :param tmdata: TMData to read from.
+    :param telescope: the telescope.
+    :return: the telescope's basic capabilities.
+    :raises FileNotFoundError: If the tmdata has no capabilities file for
+        the telescope.
+    """
+    return get_telescope_capabilities(tmdata, telescope).basic_capabilities
 
 
 @overload

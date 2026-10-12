@@ -2,7 +2,7 @@ import re
 from enum import StrEnum
 from typing import Annotated, Any, Literal, Self
 
-from pydantic import AliasChoices, AliasPath, Field, model_validator
+from pydantic import AliasChoices, Field, model_validator
 
 from ska_ost_osd.osd.common.constant import ARRAY_ASSEMBLY_PATTERN, Telescope
 from ska_ost_osd.osd.models.defaults import OSDBaseModel
@@ -99,6 +99,14 @@ class MidFrequencyBand(FrequencyBand):
     )
 
 
+class MidBasicCapabilities(OSDBaseModel):
+    """Mid's receiver bands. tmdata: ``basic_capabilities``."""
+
+    frequency_bands: list[MidFrequencyBand] = Field(
+        validation_alias=AliasChoices("frequency_bands", "receiver_information")
+    )
+
+
 class MidCapabilitySet(CapabilitySetBase):
     telescope: Literal[Telescope.MID] = Telescope.MID
     allowed_channel_width_values_hz: list[int]
@@ -123,22 +131,18 @@ class MidCapabilitySet(CapabilitySetBase):
 
 class MidCapabilities(TelescopeCapabilitiesBase):
     telescope: Literal["Mid"] = "Mid"
-    frequency_band: list[MidFrequencyBand] = Field(
-        validation_alias=AliasChoices(
-            "frequency_band", AliasPath("basic_capabilities", "receiver_information")
-        )
-    )
+    basic_capabilities: MidBasicCapabilities
     subarrays: list[MidCapabilitySet]
 
     @model_validator(mode="after")
     def check_available_receivers(self) -> Self:
-        rx_ids = {band.rx_id for band in self.frequency_band}
+        rx_ids = {band.rx_id for band in self.basic_capabilities.frequency_bands}
         for subarray in self.subarrays:
             unknown = set(subarray.available_receivers) - rx_ids
             if unknown:
                 raise ValueError(
                     f"{subarray.name}: available_receivers {sorted(unknown)} "
-                    "not found in frequency_band"
+                    "not found in frequency_bands"
                 )
         return self
 
@@ -149,7 +153,10 @@ class LowCBFMode(StrEnum):
     PSS = "pss"
 
 
-class LowFrequencyBand(FrequencyBand):
+class LowBasicCapabilities(FrequencyBand):
+    """Low's frequency band and how it is divided into channels.
+    tmdata: ``basic_capabilities``."""
+
     min_coarse_channel: int = Field(ge=0, examples=[64])
     max_coarse_channel: int = Field(ge=0, examples=[447])
     coarse_channel_width_hz: float = Field(gt=0, examples=[781.25e3])
@@ -187,7 +194,5 @@ CapabilitySet = Annotated[
 
 class LowCapabilities(TelescopeCapabilitiesBase):
     telescope: Literal["Low"] = "Low"
-    frequency_band: LowFrequencyBand = Field(
-        validation_alias=AliasChoices("frequency_band", "basic_capabilities")
-    )
+    basic_capabilities: LowBasicCapabilities
     subarrays: list[LowCapabilitySet]
