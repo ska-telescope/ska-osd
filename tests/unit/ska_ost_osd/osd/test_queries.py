@@ -14,6 +14,7 @@ from ska_ost_osd.osd.queries import (
     get_basic_capabilities,
     get_capability_set,
     get_capability_sets,
+    get_constraints,
     get_cycle,
     get_cycle_ids,
     get_cycles,
@@ -27,11 +28,13 @@ from tests.unit.ska_ost_osd.osd.expected import (
     LOW_AA1,
     LOW_BASIC_CAPABILITIES,
     LOW_CAPABILITIES,
+    LOW_CONSTRAINTS,
     LOW_DEFAULTS,
     MID_AA05,
     MID_AA1,
     MID_BASIC_CAPABILITIES,
     MID_CAPABILITIES,
+    MID_CONSTRAINTS,
     MID_DEFAULTS,
 )
 
@@ -131,6 +134,21 @@ class TestGetBasicCapabilities:
             FileNotFoundError, match="file not found: ska1_low/low_capabilities.json"
         ):
             get_basic_capabilities(empty_tmdata, Telescope.LOW)
+
+
+class TestGetConstraints:
+    @pytest.mark.parametrize(
+        "telescope, expected",
+        [(Telescope.MID, MID_CONSTRAINTS), (Telescope.LOW, LOW_CONSTRAINTS)],
+    )
+    def test_returns_constraints(self, tests_tmdata, telescope, expected):
+        assert get_constraints(tests_tmdata, telescope) == expected
+
+    def test_raises_when_files_missing(self, empty_tmdata):
+        with pytest.raises(
+            FileNotFoundError, match="file not found: ska1_mid/mid_capabilities.json"
+        ):
+            get_constraints(empty_tmdata, Telescope.MID)
 
 
 class TestGetCapabilitySets:

@@ -42,21 +42,21 @@ class ConfigurationModel(OSDBaseModel):
 class Constraints(ElevationConstraints, AvoidanceConstraints):
     """The constraints are spread across the two tmdata files - combining them"""
 
-
-def _merge_constraints(
-    capabilities: TelescopeCapabilitiesBase, defaults: TelescopeDefaults
-) -> Constraints:
-    """
-    The defaults file's avoidance angles with the capabilities file's
-    elevation limits.
-    """
-    # ToDo: remove once we're out of the contract phase of moving the
-    # osd defaults to defaults.json
-    merged = {
-        **capabilities.constraints.model_dump(),
-        **defaults.constraints.model_dump(),
-    }
-    return Constraints(**merged)
+    @classmethod
+    def combine(
+        cls, capabilities: TelescopeCapabilitiesBase, defaults: TelescopeDefaults
+    ) -> Self:
+        """
+        The defaults file's avoidance angles with the capabilities file's
+        elevation limits.
+        """
+        # ToDo: remove once we're out of the contract phase of moving the
+        # osd defaults to defaults.json
+        merged = {
+            **capabilities.constraints.model_dump(),
+            **defaults.constraints.model_dump(),
+        }
+        return cls(**merged)
 
 
 class MidConfiguration(ConfigurationModel):
@@ -69,7 +69,7 @@ class MidConfiguration(ConfigurationModel):
     def combine(cls, capabilities: MidCapabilities, defaults: MidDefaults) -> Self:
         return cls(
             frequency_band=capabilities.basic_capabilities.frequency_bands,
-            constraints=_merge_constraints(capabilities, defaults),
+            constraints=Constraints.combine(capabilities, defaults),
             subarrays=capabilities.subarrays,
             spfrx_defaults=defaults.spfrx_defaults,
         )
@@ -85,7 +85,7 @@ class LowConfiguration(ConfigurationModel):
     def combine(cls, capabilities: LowCapabilities, defaults: LowDefaults) -> Self:
         return cls(
             frequency_band=capabilities.basic_capabilities,
-            constraints=_merge_constraints(capabilities, defaults),
+            constraints=Constraints.combine(capabilities, defaults),
             quality_attribute_metrics=defaults.quality_attribute_metrics,
             subarrays=capabilities.subarrays,
         )

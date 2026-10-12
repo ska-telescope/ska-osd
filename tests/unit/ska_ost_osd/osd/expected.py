@@ -17,6 +17,7 @@ from ska_ost_osd.osd.models.capabilities import (
     MidCBFMode,
     MidFrequencyBand,
 )
+from ska_ost_osd.osd.models.configuration import Constraints
 from ska_ost_osd.osd.models.defaults import (
     AvoidanceConstraints,
     CSPSPFRx,
@@ -304,4 +305,24 @@ LOW_DEFAULTS = LowDefaults(
     quality_attribute_metrics=LowQualityAttributeMetrics(
         cbf=LowCBFMetrics(processors_ready_percent=100, alveo_configured_percent=100)
     ),
+)
+
+# Elevation limits from tests/tmdata/ska1_mid/mid_capabilities.json and
+# avoidance angles from mid_defaults.json
+MID_CONSTRAINTS = Constraints(
+    min_elevation_deg=15.0,
+    max_elevation_deg=90.0,
+    sun_avoidance_angle_deg=30.0,
+    moon_avoidance_angle_deg=10.0,
+    jupiter_avoidance_angle_deg=10.0,
+)
+
+# Elevation limits from tests/tmdata/ska1_low/low_capabilities.json and
+# avoidance angles from low_defaults.json
+LOW_CONSTRAINTS = Constraints(
+    min_elevation_deg=45.0,
+    max_elevation_deg=90.0,
+    sun_avoidance_angle_deg=30.0,
+    moon_avoidance_angle_deg=10.0,
+    jupiter_avoidance_angle_deg=10.0,
 )
