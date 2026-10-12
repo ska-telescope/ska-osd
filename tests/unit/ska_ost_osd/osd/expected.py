@@ -8,11 +8,11 @@ from ska_ost_osd.osd.models.capabilities import (
     Band5bSubband,
     ElevationConstraints,
     LowBasicCapabilities,
-    LowCapabilities,
+    LowCapabilitiesFile,
     LowCapabilitySet,
     LowCBFMode,
     MidBasicCapabilities,
-    MidCapabilities,
+    MidCapabilitiesFile,
     MidCapabilitySet,
     MidCBFMode,
     MidFrequencyBand,
@@ -23,9 +23,9 @@ from ska_ost_osd.osd.models.defaults import (
     CSPSPFRx,
     DefaultNoiseDiodeMode,
     LowCBFMetrics,
-    LowDefaults,
+    LowDefaultsFile,
     LowQualityAttributeMetrics,
-    MidDefaults,
+    MidDefaultsFile,
     PeriodicNoiseDiode,
     PseudoRandomNoiseDiode,
     SPFRxParameters,
@@ -188,7 +188,7 @@ MID_BASIC_CAPABILITIES = MidBasicCapabilities(
     ],
 )
 
-MID_CAPABILITIES = MidCapabilities(
+MID_CAPABILITIES_FILE = MidCapabilitiesFile(
     constraints=ElevationConstraints(min_elevation_deg=15.0, max_elevation_deg=90.0),
     basic_capabilities=MID_BASIC_CAPABILITIES,
     subarrays=[MID_AA05, MID_AA1],
@@ -264,14 +264,14 @@ LOW_BASIC_CAPABILITIES = LowBasicCapabilities(
     number_pss_channels_per_coarse_channel=54,
 )
 
-LOW_CAPABILITIES = LowCapabilities(
+LOW_CAPABILITIES_FILE = LowCapabilitiesFile(
     constraints=ElevationConstraints(min_elevation_deg=45.0, max_elevation_deg=90.0),
     basic_capabilities=LOW_BASIC_CAPABILITIES,
     subarrays=[LOW_AA05, LOW_AA1],
 )
 
 # tests/tmdata/ska1_mid/mid_defaults.json
-MID_DEFAULTS = MidDefaults(
+MID_DEFAULTS_FILE = MidDefaultsFile(
     constraints=AvoidanceConstraints(
         sun_avoidance_angle_deg=30.0,
         moon_avoidance_angle_deg=10.0,
@@ -296,7 +296,7 @@ MID_DEFAULTS = MidDefaults(
 )
 
 # tests/tmdata/ska1_low/low_defaults.json
-LOW_DEFAULTS = LowDefaults(
+LOW_DEFAULTS_FILE = LowDefaultsFile(
     constraints=AvoidanceConstraints(
         sun_avoidance_angle_deg=30.0,
         moon_avoidance_angle_deg=10.0,

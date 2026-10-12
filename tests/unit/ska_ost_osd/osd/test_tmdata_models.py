@@ -18,9 +18,9 @@ from pydantic import TypeAdapter, ValidationError
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
     CapabilitySet,
-    LowCapabilities,
+    LowCapabilitiesFile,
     LowCapabilitySet,
-    MidCapabilities,
+    MidCapabilitiesFile,
     MidCapabilitySet,
 )
 from ska_ost_osd.osd.models.configuration import (
@@ -28,7 +28,7 @@ from ska_ost_osd.osd.models.configuration import (
     LowConfiguration,
     MidConfiguration,
 )
-from ska_ost_osd.osd.models.defaults import LowDefaults, MidDefaults
+from ska_ost_osd.osd.models.defaults import LowDefaultsFile, MidDefaultsFile
 from ska_ost_osd.osd.models.observatory_policies import ObservatoryPolicy
 from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplateLibrary
 from ska_ost_osd.osd.osd import get_osd_using_tmdata
@@ -60,8 +60,8 @@ class TestOsdOutput:
     @pytest.mark.parametrize(
         "model, telescope, path",
         [
-            (MidCapabilities, Telescope.MID, MID_CAPABILITIES),
-            (LowCapabilities, Telescope.LOW, LOW_CAPABILITIES),
+            (MidCapabilitiesFile, Telescope.MID, MID_CAPABILITIES),
+            (LowCapabilitiesFile, Telescope.LOW, LOW_CAPABILITIES),
         ],
     )
     def test_template_processed_output_validates(
@@ -87,22 +87,22 @@ class TestBreakingChanges:
         "model, path, break_file",
         [
             (
-                MidCapabilities,
+                MidCapabilitiesFile,
                 MID_CAPABILITIES,
                 lambda data: data["AA1"].pop("number_fsps"),
             ),
             (
-                LowCapabilities,
+                LowCapabilitiesFile,
                 LOW_CAPABILITIES,
                 lambda data: data.update(frequency=data.pop("basic_capabilities")),
             ),
             (
-                MidDefaults,
+                MidDefaultsFile,
                 MID_DEFAULTS,
                 lambda data: data["defaults"].pop("csp_configuration"),
             ),
             (
-                LowDefaults,
+                LowDefaultsFile,
                 LOW_DEFAULTS,
                 lambda data: data["quality_attribute_metrics"]["cbf"].update(
                     processors_ready_percent="all"
@@ -145,7 +145,7 @@ class TestCapabilities:
         capability set, so a new one is picked up and other keys are
         ignored. A capability set need not list subarray templates."""
         data = load(LOW_CAPABILITIES)
-        names = {s.name for s in LowCapabilities.model_validate(data).subarrays}
+        names = {s.name for s in LowCapabilitiesFile.model_validate(data).subarrays}
         data["AA3"] = data["AA1"]
         data["Low_ITF"] = {
             key: value
@@ -154,7 +154,7 @@ class TestCapabilities:
         }
         data["version"] = "1.0"
 
-        capabilities = LowCapabilities.model_validate(data)
+        capabilities = LowCapabilitiesFile.model_validate(data)
 
         subarrays = {subarray.name: subarray for subarray in capabilities.subarrays}
         assert set(subarrays) == names | {"AA3", "Low_ITF"}
@@ -164,8 +164,8 @@ class TestCapabilities:
     @pytest.mark.parametrize(
         "model, path, telescope",
         [
-            (MidCapabilities, MID_CAPABILITIES, Telescope.MID),
-            (LowCapabilities, LOW_CAPABILITIES, Telescope.LOW),
+            (MidCapabilitiesFile, MID_CAPABILITIES, Telescope.MID),
+            (LowCapabilitiesFile, LOW_CAPABILITIES, Telescope.LOW),
         ],
     )
     def test_capability_sets_know_their_telescope(self, model, path, telescope):
@@ -177,8 +177,8 @@ class TestCapabilities:
     @pytest.mark.parametrize(
         "model, path, capability_set_model",
         [
-            (MidCapabilities, MID_CAPABILITIES, MidCapabilitySet),
-            (LowCapabilities, LOW_CAPABILITIES, LowCapabilitySet),
+            (MidCapabilitiesFile, MID_CAPABILITIES, MidCapabilitySet),
+            (LowCapabilitiesFile, LOW_CAPABILITIES, LowCapabilitySet),
         ],
     )
     @pytest.mark.parametrize("mode", ["python", "json"])
@@ -205,7 +205,10 @@ class TestCapabilities:
 
     @pytest.mark.parametrize(
         "model, path",
-        [(MidCapabilities, MID_CAPABILITIES), (LowCapabilities, LOW_CAPABILITIES)],
+        [
+            (MidCapabilitiesFile, MID_CAPABILITIES),
+            (LowCapabilitiesFile, LOW_CAPABILITIES),
+        ],
     )
     def test_serialised_capabilities_validate(self, model, path):
         """The models' own output, with the subarrays already collected, can
@@ -219,13 +222,13 @@ class TestCapabilities:
         data = load(LOW_CAPABILITIES)
         data.pop("quality_attribute_metrics", None)
 
-        LowCapabilities.model_validate(data)
+        LowCapabilitiesFile.model_validate(data)
 
     @pytest.mark.parametrize(
         "model, path, break_file, message",
         [
             (
-                MidCapabilities,
+                MidCapabilitiesFile,
                 MID_CAPABILITIES,
                 lambda data: data["constraints"].update(
                     min_elevation_deg=90.0, max_elevation_deg=10.0
@@ -233,7 +236,7 @@ class TestCapabilities:
                 "min_elevation_deg must not exceed max_elevation_deg",
             ),
             (
-                MidCapabilities,
+                MidCapabilitiesFile,
                 MID_CAPABILITIES,
                 lambda data: data["basic_capabilities"]["receiver_information"][
                     0
@@ -241,19 +244,19 @@ class TestCapabilities:
                 "min_frequency_hz must not exceed max_frequency_hz",
             ),
             (
-                MidCapabilities,
+                MidCapabilitiesFile,
                 MID_CAPABILITIES,
                 lambda data: data["AA1"]["number_dish_ids"].pop(),
                 "number_ska_dishes",
             ),
             (
-                MidCapabilities,
+                MidCapabilitiesFile,
                 MID_CAPABILITIES,
                 lambda data: data["AA1"]["available_receivers"].append("Band_9"),
                 "available_receivers",
             ),
             (
-                LowCapabilities,
+                LowCapabilitiesFile,
                 LOW_CAPABILITIES,
                 lambda data: data["AA1"]["number_station_ids"].pop(),
                 "number_stations",
@@ -284,7 +287,7 @@ class TestDefaults:
         data = load(MID_DEFAULTS)
         noise_diode = data["defaults"]["target"]["dish_spfrx_params"]["noise_diode"]
 
-        target_spfrx = MidDefaults.model_validate(data).spfrx_defaults.target_spfrx
+        target_spfrx = MidDefaultsFile.model_validate(data).spfrx_defaults.target_spfrx
 
         options = {option.mode: option for option in target_spfrx.noise_diode_options}
         assert target_spfrx.default_noise_diode_mode == noise_diode["mode"]
@@ -299,7 +302,7 @@ class TestDefaults:
         noise_diode.pop("periodic")
 
         with pytest.raises(ValidationError, match="no matching entry"):
-            MidDefaults.model_validate(data)
+            MidDefaultsFile.model_validate(data)
 
     @pytest.mark.parametrize("old, new", [(False, "off"), (True, "on")])
     def test_boolean_sync_pps_is_read(self, old, new):
@@ -307,7 +310,7 @@ class TestDefaults:
         data = load(MID_DEFAULTS)
         data["defaults"]["csp_configuration"]["spfrx"]["sync_pps"] = old
 
-        defaults = MidDefaults.model_validate(data)
+        defaults = MidDefaultsFile.model_validate(data)
 
         assert defaults.spfrx_defaults.csp_spfrx.sync_pps == new
 
@@ -318,10 +321,11 @@ class TestDefaults:
         noise_diode["mode"] = "off"
         noise_diode.pop("periodic")
 
-        MidDefaults.model_validate(data)
+        MidDefaultsFile.model_validate(data)
 
     @pytest.mark.parametrize(
-        "model, path", [(MidDefaults, MID_DEFAULTS), (LowDefaults, LOW_DEFAULTS)]
+        "model, path",
+        [(MidDefaultsFile, MID_DEFAULTS), (LowDefaultsFile, LOW_DEFAULTS)],
     )
     def test_serialised_defaults_validate(self, model, path):
         """The models' own output, with the noise diode options already
@@ -434,12 +438,12 @@ class TestConfiguration:
         configuration = Configuration.from_tmdata(tests_tmdata)
 
         assert configuration.ska_mid == MidConfiguration.combine(
-            MidCapabilities.model_validate(load(MID_CAPABILITIES)),
-            MidDefaults.model_validate(load(MID_DEFAULTS)),
+            MidCapabilitiesFile.model_validate(load(MID_CAPABILITIES)),
+            MidDefaultsFile.model_validate(load(MID_DEFAULTS)),
         )
         assert configuration.ska_low == LowConfiguration.combine(
-            LowCapabilities.model_validate(load(LOW_CAPABILITIES)),
-            LowDefaults.model_validate(load(LOW_DEFAULTS)),
+            LowCapabilitiesFile.model_validate(load(LOW_CAPABILITIES)),
+            LowDefaultsFile.model_validate(load(LOW_DEFAULTS)),
         )
 
     def test_from_tmdata_reads_every_cycle(self, tests_tmdata):
@@ -468,8 +472,8 @@ class TestConfiguration:
         defaults = load(MID_DEFAULTS)
 
         configuration = MidConfiguration.combine(
-            MidCapabilities.model_validate(capabilities),
-            MidDefaults.model_validate(defaults),
+            MidCapabilitiesFile.model_validate(capabilities),
+            MidDefaultsFile.model_validate(defaults),
         )
 
         assert configuration.constraints.model_dump() == {
@@ -481,12 +485,12 @@ class TestConfiguration:
     def test_quality_attribute_metrics_come_from_defaults(self):
         """The defaults file is the home of Low's quality attribute metrics;
         the copy in the capabilities file is ignored."""
-        capabilities = LowCapabilities.model_validate(load(LOW_CAPABILITIES))
+        capabilities = LowCapabilitiesFile.model_validate(load(LOW_CAPABILITIES))
         defaults = load(LOW_DEFAULTS)
         defaults["quality_attribute_metrics"]["cbf"]["processors_ready_percent"] = 50.0
 
         configuration = LowConfiguration.combine(
-            capabilities, LowDefaults.model_validate(defaults)
+            capabilities, LowDefaultsFile.model_validate(defaults)
         )
 
         assert (

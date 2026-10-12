@@ -52,7 +52,9 @@ class CapabilitySetBase(OSDBaseModel):
     subarray_templates: list[str] | dict[str, Any] | None = None
 
 
-class TelescopeCapabilitiesBase(OSDBaseModel):
+class TelescopeCapabilitiesFileBase(OSDBaseModel):
+    """Base for the Mid and Low capabilities file models."""
+
     constraints: ElevationConstraints
 
     @model_validator(mode="before")
@@ -129,7 +131,9 @@ class MidCapabilitySet(CapabilitySetBase):
         return self
 
 
-class MidCapabilities(TelescopeCapabilitiesBase):
+class MidCapabilitiesFile(TelescopeCapabilitiesFileBase):
+    """Top-level model for mid_capabilities.json."""
+
     telescope: Literal["Mid"] = "Mid"
     basic_capabilities: MidBasicCapabilities
     subarrays: list[MidCapabilitySet]
@@ -192,7 +196,9 @@ CapabilitySet = Annotated[
 ]
 
 
-class LowCapabilities(TelescopeCapabilitiesBase):
+class LowCapabilitiesFile(TelescopeCapabilitiesFileBase):
+    """Top-level model for low_capabilities.json."""
+
     telescope: Literal["Low"] = "Low"
     basic_capabilities: LowBasicCapabilities
     subarrays: list[LowCapabilitySet]

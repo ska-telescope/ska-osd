@@ -18,24 +18,24 @@ from ska_ost_osd.osd.exceptions import CapabilitySetNotFoundError, CycleNotFound
 from ska_ost_osd.osd.models.capabilities import (
     CapabilitySet,
     LowBasicCapabilities,
-    LowCapabilities,
+    LowCapabilitiesFile,
     LowCapabilitySet,
     MidBasicCapabilities,
-    MidCapabilities,
+    MidCapabilitiesFile,
     MidCapabilitySet,
 )
 from ska_ost_osd.osd.models.configuration import Constraints
-from ska_ost_osd.osd.models.defaults import LowDefaults, MidDefaults
+from ska_ost_osd.osd.models.defaults import LowDefaultsFile, MidDefaultsFile
 from ska_ost_osd.osd.models.observatory_policies import CycleID, ObservatoryPolicy
 
 _CAPABILITIES_MODELS = {
-    Telescope.MID: MidCapabilities,
-    Telescope.LOW: LowCapabilities,
+    Telescope.MID: MidCapabilitiesFile,
+    Telescope.LOW: LowCapabilitiesFile,
 }
 
 _DEFAULTS_MODELS = {
-    Telescope.MID: MidDefaults,
-    Telescope.LOW: LowDefaults,
+    Telescope.MID: MidDefaultsFile,
+    Telescope.LOW: LowDefaultsFile,
 }
 
 
@@ -84,18 +84,18 @@ def get_cycles(tmdata: TMData) -> list[ObservatoryPolicy]:
 @overload
 def get_telescope_capabilities(
     tmdata: TMData, telescope: Literal[Telescope.MID]
-) -> MidCapabilities: ...
+) -> MidCapabilitiesFile: ...
 
 
 @overload
 def get_telescope_capabilities(
     tmdata: TMData, telescope: Literal[Telescope.LOW]
-) -> LowCapabilities: ...
+) -> LowCapabilitiesFile: ...
 
 
 def get_telescope_capabilities(
     tmdata: TMData, telescope: Telescope
-) -> MidCapabilities | LowCapabilities:
+) -> MidCapabilitiesFile | LowCapabilitiesFile:
     """Read one telescope's capabilities file: its elevation constraints,
     frequency bands and capability sets.
 
@@ -113,18 +113,18 @@ def get_telescope_capabilities(
 @overload
 def get_telescope_defaults(
     tmdata: TMData, telescope: Literal[Telescope.MID]
-) -> MidDefaults: ...
+) -> MidDefaultsFile: ...
 
 
 @overload
 def get_telescope_defaults(
     tmdata: TMData, telescope: Literal[Telescope.LOW]
-) -> LowDefaults: ...
+) -> LowDefaultsFile: ...
 
 
 def get_telescope_defaults(
     tmdata: TMData, telescope: Telescope
-) -> MidDefaults | LowDefaults:
+) -> MidDefaultsFile | LowDefaultsFile:
     """Read one telescope's defaults file: its avoidance constraints and,
     for Mid, the SPFRx defaults or, for Low, the quality attribute metrics.
 

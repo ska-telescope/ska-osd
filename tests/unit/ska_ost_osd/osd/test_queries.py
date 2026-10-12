@@ -27,15 +27,15 @@ from tests.unit.ska_ost_osd.osd.expected import (
     LOW_AA05,
     LOW_AA1,
     LOW_BASIC_CAPABILITIES,
-    LOW_CAPABILITIES,
+    LOW_CAPABILITIES_FILE,
     LOW_CONSTRAINTS,
-    LOW_DEFAULTS,
+    LOW_DEFAULTS_FILE,
     MID_AA05,
     MID_AA1,
     MID_BASIC_CAPABILITIES,
-    MID_CAPABILITIES,
+    MID_CAPABILITIES_FILE,
     MID_CONSTRAINTS,
-    MID_DEFAULTS,
+    MID_DEFAULTS_FILE,
 )
 
 
@@ -81,7 +81,10 @@ class TestGetCycles:
 class TestGetTelescopeCapabilities:
     @pytest.mark.parametrize(
         "telescope, expected",
-        [(Telescope.MID, MID_CAPABILITIES), (Telescope.LOW, LOW_CAPABILITIES)],
+        [
+            (Telescope.MID, MID_CAPABILITIES_FILE),
+            (Telescope.LOW, LOW_CAPABILITIES_FILE),
+        ],
     )
     def test_returns_capabilities(self, tests_tmdata, telescope, expected):
         assert get_telescope_capabilities(tests_tmdata, telescope) == expected
@@ -101,7 +104,7 @@ class TestGetTelescopeCapabilities:
 class TestGetTelescopeDefaults:
     @pytest.mark.parametrize(
         "telescope, expected",
-        [(Telescope.MID, MID_DEFAULTS), (Telescope.LOW, LOW_DEFAULTS)],
+        [(Telescope.MID, MID_DEFAULTS_FILE), (Telescope.LOW, LOW_DEFAULTS_FILE)],
     )
     def test_returns_defaults(self, tests_tmdata, telescope, expected):
         assert get_telescope_defaults(tests_tmdata, telescope) == expected

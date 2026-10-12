@@ -26,10 +26,10 @@ class AvoidanceConstraints(OSDBaseModel):
     jupiter_avoidance_angle_deg: float = Field(examples=[10.0])
 
 
-class TelescopeDefaults(OSDBaseModel):
+class TelescopeDefaultsFileBase(OSDBaseModel):
     """
-    Base for the top-level Mid and Low defaults models. Subclasses
-    narrow ``telescope`` to their own value.
+    Base for the Mid and Low defaults file models. Subclasses narrow
+    ``telescope`` to their own value.
     """
 
     telescope: Literal["ska-mid", "ska-low"]
@@ -144,7 +144,7 @@ class SPFRxParameters(OSDBaseModel):
     )
 
 
-class MidDefaults(TelescopeDefaults):
+class MidDefaultsFile(TelescopeDefaultsFileBase):
     """Top-level model for mid_defaults.json."""
 
     telescope: Literal["Mid"] = "Mid"
@@ -162,7 +162,7 @@ class LowQualityAttributeMetrics(OSDBaseModel):
     cbf: LowCBFMetrics
 
 
-class LowDefaults(TelescopeDefaults):
+class LowDefaultsFile(TelescopeDefaultsFileBase):
     """Top-level model for low_defaults.json."""
 
     telescope: Literal["Low"] = "Low"

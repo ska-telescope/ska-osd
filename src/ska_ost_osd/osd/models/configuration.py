@@ -13,21 +13,21 @@ from ska_ost_osd.osd.common.constant import (
 from ska_ost_osd.osd.models.capabilities import (
     ElevationConstraints,
     LowBasicCapabilities,
-    LowCapabilities,
+    LowCapabilitiesFile,
     LowCapabilitySet,
-    MidCapabilities,
+    MidCapabilitiesFile,
     MidCapabilitySet,
     MidFrequencyBand,
-    TelescopeCapabilitiesBase,
+    TelescopeCapabilitiesFileBase,
 )
 from ska_ost_osd.osd.models.defaults import (
     AvoidanceConstraints,
-    LowDefaults,
+    LowDefaultsFile,
     LowQualityAttributeMetrics,
-    MidDefaults,
+    MidDefaultsFile,
     OSDBaseModel,
     SPFRxParameters,
-    TelescopeDefaults,
+    TelescopeDefaultsFileBase,
 )
 from ska_ost_osd.osd.models.observatory_policies import ObservatoryPolicy
 from ska_ost_osd.osd.osd import get_available_cycles
@@ -45,7 +45,9 @@ class Constraints(ElevationConstraints, AvoidanceConstraints):
 
     @classmethod
     def combine(
-        cls, capabilities: TelescopeCapabilitiesBase, defaults: TelescopeDefaults
+        cls,
+        capabilities: TelescopeCapabilitiesFileBase,
+        defaults: TelescopeDefaultsFileBase,
     ) -> Self:
         """The elevation limits from the capabilities file with the sun,
         moon and Jupiter avoidance angles from the defaults file."""
@@ -62,7 +64,9 @@ class MidConfiguration(ConfigurationModel):
     spfrx_defaults: SPFRxParameters
 
     @classmethod
-    def combine(cls, capabilities: MidCapabilities, defaults: MidDefaults) -> Self:
+    def combine(
+        cls, capabilities: MidCapabilitiesFile, defaults: MidDefaultsFile
+    ) -> Self:
         return cls(
             frequency_band=capabilities.basic_capabilities.frequency_bands,
             constraints=Constraints.combine(capabilities, defaults),
@@ -78,7 +82,9 @@ class LowConfiguration(ConfigurationModel):
     subarrays: list[LowCapabilitySet]
 
     @classmethod
-    def combine(cls, capabilities: LowCapabilities, defaults: LowDefaults) -> Self:
+    def combine(
+        cls, capabilities: LowCapabilitiesFile, defaults: LowDefaultsFile
+    ) -> Self:
         return cls(
             frequency_band=capabilities.basic_capabilities,
             constraints=Constraints.combine(capabilities, defaults),
@@ -101,12 +107,12 @@ class Configuration(ConfigurationModel):
 
         return cls(
             ska_mid=MidConfiguration.combine(
-                MidCapabilities.model_validate(read(MID_CONSTANT_JSON_FILE_PATH)),
-                MidDefaults.model_validate(read(MID_DEFAULTS_JSON_FILE_PATH)),
+                MidCapabilitiesFile.model_validate(read(MID_CONSTANT_JSON_FILE_PATH)),
+                MidDefaultsFile.model_validate(read(MID_DEFAULTS_JSON_FILE_PATH)),
             ),
             ska_low=LowConfiguration.combine(
-                LowCapabilities.model_validate(read(LOW_CONSTANT_JSON_FILE_PATH)),
-                LowDefaults.model_validate(read(LOW_DEFAULTS_JSON_FILE_PATH)),
+                LowCapabilitiesFile.model_validate(read(LOW_CONSTANT_JSON_FILE_PATH)),
+                LowDefaultsFile.model_validate(read(LOW_DEFAULTS_JSON_FILE_PATH)),
             ),
             observatory_policies=[
                 ObservatoryPolicy.model_validate(

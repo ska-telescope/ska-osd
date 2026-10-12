@@ -10,8 +10,8 @@ from pathlib import Path
 
 import pytest
 
-from ska_ost_osd.osd.models.capabilities import LowCapabilities, MidCapabilities
-from ska_ost_osd.osd.models.defaults import LowDefaults, MidDefaults
+from ska_ost_osd.osd.models.capabilities import LowCapabilitiesFile, MidCapabilitiesFile
+from ska_ost_osd.osd.models.defaults import LowDefaultsFile, MidDefaultsFile
 from ska_ost_osd.osd.models.observatory_policies import ObservatoryPolicy
 from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplateLibrary
 
@@ -21,10 +21,10 @@ TMDATA = Path(__file__).parents[4] / "tmdata"
 @pytest.mark.parametrize(
     "model, path",
     [
-        (MidCapabilities, "ska1_mid/mid_capabilities.json"),
-        (LowCapabilities, "ska1_low/low_capabilities.json"),
-        (MidDefaults, "ska1_mid/mid_defaults.json"),
-        (LowDefaults, "ska1_low/low_defaults.json"),
+        (MidCapabilitiesFile, "ska1_mid/mid_capabilities.json"),
+        (LowCapabilitiesFile, "ska1_low/low_capabilities.json"),
+        (MidDefaultsFile, "ska1_mid/mid_defaults.json"),
+        (LowDefaultsFile, "ska1_low/low_defaults.json"),
         (ObservatoryPolicy, "observatory_policies.json"),
         (
             SubarrayTemplateLibrary,
