@@ -18,6 +18,7 @@ from ska_ost_osd.osd.queries import (
     get_cycle,
     get_cycle_ids,
     get_cycles,
+    get_defaults,
     get_telescope_capabilities,
     get_telescope_defaults,
 )
@@ -29,12 +30,14 @@ from tests.unit.ska_ost_osd.osd.expected import (
     LOW_BASIC_CAPABILITIES,
     LOW_CAPABILITIES_FILE,
     LOW_CONSTRAINTS,
+    LOW_DEFAULTS,
     LOW_DEFAULTS_FILE,
     MID_AA05,
     MID_AA1,
     MID_BASIC_CAPABILITIES,
     MID_CAPABILITIES_FILE,
     MID_CONSTRAINTS,
+    MID_DEFAULTS,
     MID_DEFAULTS_FILE,
 )
 
@@ -119,6 +122,21 @@ class TestGetTelescopeDefaults:
     def test_raises_when_file_missing(self, empty_tmdata, telescope, path):
         with pytest.raises(FileNotFoundError, match=f"file not found: {path}"):
             get_telescope_defaults(empty_tmdata, telescope)
+
+
+class TestGetDefaults:
+    @pytest.mark.parametrize(
+        "telescope, expected",
+        [(Telescope.MID, MID_DEFAULTS), (Telescope.LOW, LOW_DEFAULTS)],
+    )
+    def test_returns_defaults(self, tests_tmdata, telescope, expected):
+        assert get_defaults(tests_tmdata, telescope) == expected
+
+    def test_raises_when_file_missing(self, empty_tmdata):
+        with pytest.raises(
+            FileNotFoundError, match="file not found: ska1_mid/mid_defaults.json"
+        ):
+            get_defaults(empty_tmdata, Telescope.MID)
 
 
 class TestGetBasicCapabilities:

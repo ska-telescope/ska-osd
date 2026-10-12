@@ -144,6 +144,12 @@ class SPFRxParameters(OSDBaseModel):
     )
 
 
+class MidDefaults(OSDBaseModel):
+    """Mid's defaults: the SPFRx settings."""
+
+    spfrx_defaults: SPFRxParameters
+
+
 class MidDefaultsFile(TelescopeDefaultsFileBase):
     """Top-level model for mid_defaults.json."""
 
@@ -160,6 +166,12 @@ class LowCBFMetrics(OSDBaseModel):
 
 class LowQualityAttributeMetrics(OSDBaseModel):
     cbf: LowCBFMetrics
+
+
+class LowDefaults(OSDBaseModel):
+    """Low's defaults: the quality attribute metrics."""
+
+    quality_attribute_metrics: LowQualityAttributeMetrics
 
 
 class LowDefaultsFile(TelescopeDefaultsFileBase):

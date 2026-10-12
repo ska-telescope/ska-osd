@@ -25,17 +25,27 @@ from ska_ost_osd.osd.models.capabilities import (
     MidCapabilitySet,
 )
 from ska_ost_osd.osd.models.configuration import Constraints
-from ska_ost_osd.osd.models.defaults import LowDefaultsFile, MidDefaultsFile
+from ska_ost_osd.osd.models.defaults import (
+    LowDefaults,
+    LowDefaultsFile,
+    MidDefaults,
+    MidDefaultsFile,
+)
 from ska_ost_osd.osd.models.observatory_policies import CycleID, ObservatoryPolicy
 
-_CAPABILITIES_MODELS = {
+_CAPABILITIES_FILE_MODELS = {
     Telescope.MID: MidCapabilitiesFile,
     Telescope.LOW: LowCapabilitiesFile,
 }
 
-_DEFAULTS_MODELS = {
+_DEFAULTS_FILE_MODELS = {
     Telescope.MID: MidDefaultsFile,
     Telescope.LOW: LowDefaultsFile,
+}
+
+_DEFAULTS_MODELS = {
+    Telescope.MID: MidDefaults,
+    Telescope.LOW: LowDefaults,
 }
 
 
@@ -105,7 +115,7 @@ def get_telescope_capabilities(
     :raises FileNotFoundError: If the tmdata has no capabilities file for
         the telescope.
     """
-    return _CAPABILITIES_MODELS[telescope].model_validate(
+    return _CAPABILITIES_FILE_MODELS[telescope].model_validate(
         _read(tmdata, CAPABILITIES_JSON_FILE_PATHS[telescope])
     )
 
@@ -134,8 +144,32 @@ def get_telescope_defaults(
     :raises FileNotFoundError: If the tmdata has no defaults file for the
         telescope.
     """
-    return _DEFAULTS_MODELS[telescope].model_validate(
+    return _DEFAULTS_FILE_MODELS[telescope].model_validate(
         _read(tmdata, DEFAULTS_JSON_FILE_PATHS[telescope])
+    )
+
+
+@overload
+def get_defaults(tmdata: TMData, telescope: Literal[Telescope.MID]) -> MidDefaults: ...
+
+
+@overload
+def get_defaults(tmdata: TMData, telescope: Literal[Telescope.LOW]) -> LowDefaults: ...
+
+
+def get_defaults(tmdata: TMData, telescope: Telescope) -> MidDefaults | LowDefaults:
+    """Read one telescope's defaults: Mid's SPFRx settings, or Low's quality
+    attribute metrics. The avoidance angles in the same file are part of the
+    constraints, so are not included.
+
+    :param tmdata: TMData to read from.
+    :param telescope: the telescope.
+    :return: the telescope's defaults.
+    :raises FileNotFoundError: If the tmdata has no defaults file for the
+        telescope.
+    """
+    return _DEFAULTS_MODELS[telescope].model_validate(
+        get_telescope_defaults(tmdata, telescope), from_attributes=True
     )
 
 

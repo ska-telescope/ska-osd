@@ -23,8 +23,10 @@ from ska_ost_osd.osd.models.defaults import (
     CSPSPFRx,
     DefaultNoiseDiodeMode,
     LowCBFMetrics,
+    LowDefaults,
     LowDefaultsFile,
     LowQualityAttributeMetrics,
+    MidDefaults,
     MidDefaultsFile,
     PeriodicNoiseDiode,
     PseudoRandomNoiseDiode,
@@ -270,13 +272,8 @@ LOW_CAPABILITIES_FILE = LowCapabilitiesFile(
     subarrays=[LOW_AA05, LOW_AA1],
 )
 
-# tests/tmdata/ska1_mid/mid_defaults.json
-MID_DEFAULTS_FILE = MidDefaultsFile(
-    constraints=AvoidanceConstraints(
-        sun_avoidance_angle_deg=30.0,
-        moon_avoidance_angle_deg=10.0,
-        jupiter_avoidance_angle_deg=10.0,
-    ),
+# The defaults in tests/tmdata/ska1_mid/mid_defaults.json
+MID_DEFAULTS = MidDefaults(
     spfrx_defaults=SPFRxParameters(
         target_spfrx=TargetSPFRx(
             attenuation_1_x=10.0,
@@ -295,16 +292,31 @@ MID_DEFAULTS_FILE = MidDefaultsFile(
     ),
 )
 
-# tests/tmdata/ska1_low/low_defaults.json
+# The whole of tests/tmdata/ska1_mid/mid_defaults.json
+MID_DEFAULTS_FILE = MidDefaultsFile(
+    constraints=AvoidanceConstraints(
+        sun_avoidance_angle_deg=30.0,
+        moon_avoidance_angle_deg=10.0,
+        jupiter_avoidance_angle_deg=10.0,
+    ),
+    spfrx_defaults=MID_DEFAULTS.spfrx_defaults,
+)
+
+# The defaults in tests/tmdata/ska1_low/low_defaults.json
+LOW_DEFAULTS = LowDefaults(
+    quality_attribute_metrics=LowQualityAttributeMetrics(
+        cbf=LowCBFMetrics(processors_ready_percent=100, alveo_configured_percent=100)
+    ),
+)
+
+# The whole of tests/tmdata/ska1_low/low_defaults.json
 LOW_DEFAULTS_FILE = LowDefaultsFile(
     constraints=AvoidanceConstraints(
         sun_avoidance_angle_deg=30.0,
         moon_avoidance_angle_deg=10.0,
         jupiter_avoidance_angle_deg=10.0,
     ),
-    quality_attribute_metrics=LowQualityAttributeMetrics(
-        cbf=LowCBFMetrics(processors_ready_percent=100, alveo_configured_percent=100)
-    ),
+    quality_attribute_metrics=LOW_DEFAULTS.quality_attribute_metrics,
 )
 
 # Elevation limits from tests/tmdata/ska1_mid/mid_capabilities.json and
