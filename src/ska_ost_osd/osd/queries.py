@@ -4,6 +4,7 @@ Each function takes the TMData to read from, so the caller chooses the
 source and version and handles any caching.
 """
 
+from fnmatch import fnmatchcase
 from typing import Literal, overload
 
 from ska_telmodel_client import TMData
@@ -33,7 +34,10 @@ from ska_ost_osd.osd.models.defaults import (
     MidDefaultsFile,
 )
 from ska_ost_osd.osd.models.observatory_policies import CycleID, ObservatoryPolicy
-from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplateLibraryFile
+from ska_ost_osd.osd.models.subarray_templates import (
+    SubarrayTemplate,
+    SubarrayTemplateLibraryFile,
+)
 
 _CAPABILITIES_FILE_MODELS = {
     Telescope.MID: MidCapabilitiesFile,
@@ -290,6 +294,35 @@ def get_subarray_template_library(tmdata: TMData) -> SubarrayTemplateLibraryFile
     return SubarrayTemplateLibraryFile.model_validate(
         _read(tmdata, SUBARRAY_TEMPLATES_PATH)
     )
+
+
+def get_capability_set_templates(
+    tmdata: TMData, telescope: Telescope, name: str
+) -> list[SubarrayTemplate]:
+    """Read the subarray templates a capability set offers.
+
+    A template belongs to the capability set when its name matches one of
+    the set's ``subarray_templates`` patterns (e.g. ``"*_AA2"``) and starts
+    with the set's telescope (e.g. ``"MID_"``). A pattern alone is not
+    enough: ``"*_AA2"`` matches both telescopes' AA2 templates.
+
+    :param tmdata: TMData to read from.
+    :param telescope: the telescope the capability set belongs to.
+    :param name: the name of the capability set, e.g. ``"AA2"``.
+    :return: the matching templates, in the order the library lists them.
+    :raises CapabilitySetNotFoundError: If the telescope has no capability
+        set with that name.
+    :raises FileNotFoundError: If the tmdata has no capabilities file for
+        the telescope, or no template library file.
+    """
+    patterns = get_capability_set(tmdata, telescope, name).subarray_templates or []
+    prefix = f"{telescope.value.upper()}_"
+    return [
+        template
+        for template in get_subarray_template_library(tmdata).templates
+        if template.name.startswith(prefix)
+        and any(fnmatchcase(template.name, pattern) for pattern in patterns)
+    ]
 
 
 def _read_cycle(tmdata: TMData, cycle_id: CycleID) -> ObservatoryPolicy:

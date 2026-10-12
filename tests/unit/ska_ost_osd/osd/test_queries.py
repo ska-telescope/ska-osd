@@ -13,6 +13,7 @@ from ska_ost_osd.osd.models.observatory_policies import CycleID
 from ska_ost_osd.osd.queries import (
     get_basic_capabilities,
     get_capability_set,
+    get_capability_set_templates,
     get_capability_sets,
     get_constraints,
     get_cycle,
@@ -33,6 +34,9 @@ from tests.unit.ska_ost_osd.osd.expected import (
     LOW_CONSTRAINTS,
     LOW_DEFAULTS,
     LOW_DEFAULTS_FILE,
+    LOW_FULL_AA2_TEMPLATE,
+    LOW_TEST_AA1_TEMPLATE,
+    LOW_TEST_AA2_TEMPLATE,
     MID_AA1,
     MID_AA2,
     MID_BASIC_CAPABILITIES,
@@ -40,6 +44,7 @@ from tests.unit.ska_ost_osd.osd.expected import (
     MID_CONSTRAINTS,
     MID_DEFAULTS,
     MID_DEFAULTS_FILE,
+    MID_FULL_AA2_TEMPLATE,
     SUBARRAY_TEMPLATE_LIBRARY_FILE,
 )
 
@@ -241,6 +246,34 @@ class TestGetSubarrayTemplateLibrary:
             match="file not found: subarray_templates/subarray_template_library.json",
         ):
             get_subarray_template_library(empty_tmdata)
+
+
+class TestGetCapabilitySetTemplates:
+    @pytest.mark.parametrize(
+        "telescope, name, expected",
+        [
+            (Telescope.MID, "AA1", []),
+            (Telescope.MID, "AA2", [MID_FULL_AA2_TEMPLATE]),
+            (Telescope.LOW, "AA1", [LOW_TEST_AA1_TEMPLATE]),
+            (Telescope.LOW, "AA2", [LOW_FULL_AA2_TEMPLATE, LOW_TEST_AA2_TEMPLATE]),
+        ],
+        ids=[
+            "no template",
+            "full template only",
+            "subset template only",
+            "full and subset templates",
+        ],
+    )
+    def test_returns_capability_set_templates(
+        self, tests_tmdata, telescope, name, expected
+    ):
+        """The pattern *_AA2 matches templates of both telescopes; only the
+        capability set's own telescope's templates are returned."""
+        assert get_capability_set_templates(tests_tmdata, telescope, name) == expected
+
+    def test_raises_for_unknown_capability_set(self, tests_tmdata):
+        with pytest.raises(CapabilitySetNotFoundError):
+            get_capability_set_templates(tests_tmdata, Telescope.MID, "AA3")
 
 
 class TestExceptions:
