@@ -1,10 +1,19 @@
-from typing import Self
+from typing import Any, Self
 
-from pydantic import ConfigDict
+from pydantic import (
+    ConfigDict,
+    SerializerFunctionWrapHandler,
+    model_serializer,
+    model_validator,
+)
 
 from ska_ost_osd.osd.models.capabilities import (
+    CapabilitySet,
     ElevationConstraints,
     LowBasicCapabilities,
+    LowCapabilitySet,
+    MidBasicCapabilities,
+    MidCapabilitySet,
     MidFrequencyBand,
     TelescopeCapabilitiesFileBase,
 )
@@ -14,6 +23,7 @@ from ska_ost_osd.osd.models.defaults import (
     SPFRxParameters,
     TelescopeDefaultsFileBase,
 )
+from ska_ost_osd.osd.models.observatory_policies import ObservatoryPolicy
 
 
 class ConfigurationModel(OSDBaseModel):
@@ -92,3 +102,63 @@ class Configuration(ConfigurationModel):
 
     ska_mid: MidConfiguration
     ska_low: LowConfiguration
+
+
+# The view models below are what ska-oso-services serves to the PHT from
+# GET /prsls/osd/cycles and GET /prsls/osd/{cycle}: each cycle with the
+# capability set each telescope offers and that telescope's basic
+# capabilities. Served with aliases, the field names are the ones the PHT UI
+# reads.
+
+
+class CycleCapabilitiesBase(ConfigurationModel):
+    """One telescope's capabilities in a cycle. Served with the capability
+    set keyed by its name, e.g. ``"AA2": {...}``, beside
+    ``basic_capabilities``."""
+
+    capability_set: CapabilitySet
+
+    @model_validator(mode="before")
+    @classmethod
+    def collect_capability_set(cls, data: Any) -> Any:
+        """Read the served form back: the one key that isn't
+        ``basic_capabilities`` is the capability set."""
+        if not isinstance(data, dict) or "capability_set" in data:
+            return data
+        data = data.copy()
+        names = [key for key in data if key != "basic_capabilities"]
+        if len(names) == 1:
+            data["capability_set"] = data.pop(names[0])
+        return data
+
+    @model_serializer(mode="wrap")
+    def key_capability_set_by_name(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, Any]:
+        data = handler(self)
+        data[self.capability_set.name] = data.pop("capability_set")
+        return data
+
+
+class MidCycleCapabilities(CycleCapabilitiesBase):
+    basic_capabilities: MidBasicCapabilities
+    capability_set: MidCapabilitySet
+
+
+class LowCycleCapabilities(CycleCapabilitiesBase):
+    basic_capabilities: LowBasicCapabilities
+    capability_set: LowCapabilitySet
+
+
+class CycleCapabilities(ConfigurationModel):
+    """The telescopes a cycle offers; ``None`` for one it does not."""
+
+    mid: MidCycleCapabilities | None = None
+    low: LowCycleCapabilities | None = None
+
+
+class CycleConfiguration(ConfigurationModel):
+    """One cycle joined with what it offers."""
+
+    observatory_policy: ObservatoryPolicy
+    capabilities: CycleCapabilities

@@ -22,10 +22,14 @@ from ska_ost_osd.osd.models.configuration import (
     ConfigurationLowCBFMetrics,
     ConfigurationLowQualityAttributeMetrics,
     Constraints,
+    CycleCapabilities,
+    CycleConfiguration,
     LowConfiguration,
     LowConfigurationCapabilitySet,
+    LowCycleCapabilities,
     MidConfiguration,
     MidConfigurationCapabilitySet,
+    MidCycleCapabilities,
 )
 from ska_ost_osd.osd.models.defaults import (
     AvoidanceConstraints,
@@ -441,5 +445,29 @@ CONFIGURATION = Configuration(
                 number_subarray_beams=8,
             ),
         ],
+    ),
+)
+
+# The PHT cycle views of tests/tmdata: each cycle with the capability set
+# each telescope offers and that telescope's basic capabilities
+CYCLE_1_CONFIGURATION = CycleConfiguration(
+    observatory_policy=CYCLE_1,
+    capabilities=CycleCapabilities(
+        mid=None,
+        low=LowCycleCapabilities(
+            basic_capabilities=LOW_BASIC_CAPABILITIES, capability_set=LOW_AA1
+        ),
+    ),
+)
+
+CYCLE_2_CONFIGURATION = CycleConfiguration(
+    observatory_policy=CYCLE_2,
+    capabilities=CycleCapabilities(
+        mid=MidCycleCapabilities(
+            basic_capabilities=MID_BASIC_CAPABILITIES, capability_set=MID_AA2
+        ),
+        low=LowCycleCapabilities(
+            basic_capabilities=LOW_BASIC_CAPABILITIES, capability_set=LOW_AA2
+        ),
     ),
 )

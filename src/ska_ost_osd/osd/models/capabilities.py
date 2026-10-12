@@ -124,8 +124,10 @@ class MidFrequencyBand(FrequencyBand):
 class MidBasicCapabilities(OSDBaseModel):
     """Mid's receiver bands. tmdata: ``basic_capabilities``."""
 
+    # Served as receiver_information, the tmdata name, which the PHT UI reads
     frequency_bands: list[MidFrequencyBand] = Field(
-        validation_alias=AliasChoices("frequency_bands", "receiver_information")
+        validation_alias=AliasChoices("frequency_bands", "receiver_information"),
+        serialization_alias="receiver_information",
     )
 
     def get_frequency_band(self, rx_id: str) -> MidFrequencyBand:
