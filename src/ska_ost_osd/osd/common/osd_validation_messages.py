@@ -1,4 +1,7 @@
 CYCLE_ID_ERROR_MESSAGE = "Cycle {} is invalid. Valid IDs are {}."
+CAPABILITY_SET_DOESNOT_EXIST_ERROR_MESSAGE = (
+    "Capability set {} is invalid for telescope {}. Valid capability sets are {}."
+)
 CAPABILITY_DOESNOT_EXIST_ERROR_MESSAGE = (
     "Capability {} is invalid. Valid capabilities are {}."
 )

@@ -13,8 +13,14 @@ from ska_ost_osd.osd.common.constant import (
     OBSERVING_CYCLES_TMDATA_DIR,
     Telescope,
 )
-from ska_ost_osd.osd.exceptions import CycleNotFoundError
-from ska_ost_osd.osd.models.capabilities import LowCapabilities, MidCapabilities
+from ska_ost_osd.osd.exceptions import CapabilitySetNotFoundError, CycleNotFoundError
+from ska_ost_osd.osd.models.capabilities import (
+    CapabilitySet,
+    LowCapabilities,
+    LowCapabilitySet,
+    MidCapabilities,
+    MidCapabilitySet,
+)
 from ska_ost_osd.osd.models.observatory_policies import CycleID, ObservatoryPolicy
 
 _CAPABILITIES_MODELS = {
@@ -91,6 +97,41 @@ def get_telescope_capabilities(
     """
     return _CAPABILITIES_MODELS[telescope].model_validate(
         _read(tmdata, CAPABILITIES_JSON_FILE_PATHS[telescope])
+    )
+
+
+@overload
+def get_capability_set(
+    tmdata: TMData, telescope: Literal[Telescope.MID], name: str
+) -> MidCapabilitySet: ...
+
+
+@overload
+def get_capability_set(
+    tmdata: TMData, telescope: Literal[Telescope.LOW], name: str
+) -> LowCapabilitySet: ...
+
+
+def get_capability_set(
+    tmdata: TMData, telescope: Telescope, name: str
+) -> CapabilitySet:
+    """Read one capability set, identified by its telescope and name.
+
+    :param tmdata: TMData to read from.
+    :param telescope: the telescope the capability set belongs to.
+    :param name: the name of the capability set, e.g. ``"AA0.5"``.
+    :return: the capability set.
+    :raises CapabilitySetNotFoundError: If the telescope has no capability
+        set with that name.
+    :raises FileNotFoundError: If the tmdata has no capabilities file for
+        the telescope.
+    """
+    capability_sets = get_telescope_capabilities(tmdata, telescope).subarrays
+    for capability_set in capability_sets:
+        if capability_set.name == name:
+            return capability_set
+    raise CapabilitySetNotFoundError(
+        telescope, name, [capability_set.name for capability_set in capability_sets]
     )
 
 

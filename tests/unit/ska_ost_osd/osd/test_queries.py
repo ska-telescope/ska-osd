@@ -4,9 +4,14 @@ tmdata in tests/tmdata."""
 import pytest
 
 from ska_ost_osd.osd.common.constant import Telescope
-from ska_ost_osd.osd.exceptions import CycleNotFoundError, OSDQueryError
+from ska_ost_osd.osd.exceptions import (
+    CapabilitySetNotFoundError,
+    CycleNotFoundError,
+    OSDQueryError,
+)
 from ska_ost_osd.osd.models.observatory_policies import CycleID
 from ska_ost_osd.osd.queries import (
+    get_capability_set,
     get_cycle,
     get_cycle_ids,
     get_cycles,
@@ -15,7 +20,11 @@ from ska_ost_osd.osd.queries import (
 from tests.unit.ska_ost_osd.osd.expected import (
     CYCLE_1,
     CYCLE_2,
+    LOW_AA05,
+    LOW_AA1,
     LOW_CAPABILITIES,
+    MID_AA05,
+    MID_AA1,
     MID_CAPABILITIES,
 )
 
@@ -79,9 +88,49 @@ class TestGetTelescopeCapabilities:
             get_telescope_capabilities(empty_tmdata, telescope)
 
 
+class TestGetCapabilitySet:
+    @pytest.mark.parametrize(
+        "telescope, name, expected",
+        [
+            (Telescope.MID, "AA0.5", MID_AA05),
+            (Telescope.MID, "AA1", MID_AA1),
+            (Telescope.LOW, "AA0.5", LOW_AA05),
+            (Telescope.LOW, "AA1", LOW_AA1),
+        ],
+    )
+    def test_returns_capability_set(self, tests_tmdata, telescope, name, expected):
+        assert get_capability_set(tests_tmdata, telescope, name) == expected
+
+    def test_raises_for_unknown_name(self, tests_tmdata):
+        with pytest.raises(
+            CapabilitySetNotFoundError,
+            match=(
+                r"Capability set AA2 is invalid for telescope mid\. "
+                r"Valid capability sets are AA0\.5, AA1\."
+            ),
+        ) as excinfo:
+            get_capability_set(tests_tmdata, Telescope.MID, "AA2")
+
+        assert excinfo.value.telescope == Telescope.MID
+        assert excinfo.value.name == "AA2"
+        assert excinfo.value.available_names == ["AA0.5", "AA1"]
+
+    def test_raises_when_file_missing(self, empty_tmdata):
+        with pytest.raises(
+            FileNotFoundError, match="file not found: ska1_low/low_capabilities.json"
+        ):
+            get_capability_set(empty_tmdata, Telescope.LOW, "AA0.5")
+
+
 class TestExceptions:
     def test_cycle_not_found_is_a_query_error_and_lookup_error(self):
         error = CycleNotFoundError(CycleID(3), [CycleID(1), CycleID(2)])
+
+        assert isinstance(error, OSDQueryError)
+        assert isinstance(error, LookupError)
+
+    def test_capability_set_not_found_is_a_query_error_and_lookup_error(self):
+        error = CapabilitySetNotFoundError(Telescope.LOW, "AA2", ["AA0.5", "AA1"])
 
         assert isinstance(error, OSDQueryError)
         assert isinstance(error, LookupError)
