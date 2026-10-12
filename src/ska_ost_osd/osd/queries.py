@@ -137,6 +137,31 @@ def get_telescope_defaults(
 
 
 @overload
+def get_capability_sets(
+    tmdata: TMData, telescope: Literal[Telescope.MID]
+) -> list[MidCapabilitySet]: ...
+
+
+@overload
+def get_capability_sets(
+    tmdata: TMData, telescope: Literal[Telescope.LOW]
+) -> list[LowCapabilitySet]: ...
+
+
+def get_capability_sets(tmdata: TMData, telescope: Telescope) -> list[CapabilitySet]:
+    """Read all of one telescope's capability sets, in the order the tmdata
+    lists them.
+
+    :param tmdata: TMData to read from.
+    :param telescope: the telescope.
+    :return: the telescope's capability sets.
+    :raises FileNotFoundError: If the tmdata has no capabilities file for
+        the telescope.
+    """
+    return get_telescope_capabilities(tmdata, telescope).subarrays
+
+
+@overload
 def get_capability_set(
     tmdata: TMData, telescope: Literal[Telescope.MID], name: str
 ) -> MidCapabilitySet: ...
@@ -162,7 +187,7 @@ def get_capability_set(
     :raises FileNotFoundError: If the tmdata has no capabilities file for
         the telescope.
     """
-    capability_sets = get_telescope_capabilities(tmdata, telescope).subarrays
+    capability_sets = get_capability_sets(tmdata, telescope)
     for capability_set in capability_sets:
         if capability_set.name == name:
             return capability_set

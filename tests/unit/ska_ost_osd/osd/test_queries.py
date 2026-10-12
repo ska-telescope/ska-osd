@@ -12,6 +12,7 @@ from ska_ost_osd.osd.exceptions import (
 from ska_ost_osd.osd.models.observatory_policies import CycleID
 from ska_ost_osd.osd.queries import (
     get_capability_set,
+    get_capability_sets,
     get_cycle,
     get_cycle_ids,
     get_cycles,
@@ -109,6 +110,26 @@ class TestGetTelescopeDefaults:
     def test_raises_when_file_missing(self, empty_tmdata, telescope, path):
         with pytest.raises(FileNotFoundError, match=f"file not found: {path}"):
             get_telescope_defaults(empty_tmdata, telescope)
+
+
+class TestGetCapabilitySets:
+    @pytest.mark.parametrize(
+        "telescope, expected",
+        [
+            (Telescope.MID, [MID_AA05, MID_AA1]),
+            (Telescope.LOW, [LOW_AA05, LOW_AA1]),
+        ],
+    )
+    def test_returns_capability_sets_in_file_order(
+        self, tests_tmdata, telescope, expected
+    ):
+        assert get_capability_sets(tests_tmdata, telescope) == expected
+
+    def test_raises_when_file_missing(self, empty_tmdata):
+        with pytest.raises(
+            FileNotFoundError, match="file not found: ska1_mid/mid_capabilities.json"
+        ):
+            get_capability_sets(empty_tmdata, Telescope.MID)
 
 
 class TestGetCapabilitySet:
