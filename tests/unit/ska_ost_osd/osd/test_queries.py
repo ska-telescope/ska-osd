@@ -3,6 +3,7 @@ tmdata in tests/tmdata."""
 
 import pytest
 
+from ska_ost_osd.osd import queries
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.exceptions import (
     CapabilitySetNotFoundError,
@@ -17,6 +18,7 @@ from ska_ost_osd.osd.queries import (
     get_capability_sets,
     get_constraints,
     get_cycle,
+    get_cycle_capability_sets,
     get_cycle_ids,
     get_cycles,
     get_defaults,
@@ -274,6 +276,40 @@ class TestGetCapabilitySetTemplates:
     def test_raises_for_unknown_capability_set(self, tests_tmdata):
         with pytest.raises(CapabilitySetNotFoundError):
             get_capability_set_templates(tests_tmdata, Telescope.MID, "AA3")
+
+
+class TestGetCycleCapabilitySets:
+    @pytest.mark.parametrize(
+        "cycle_id, expected",
+        [
+            (CycleID(1), {Telescope.LOW: LOW_AA1}),
+            (CycleID(2), {Telescope.MID: MID_AA2, Telescope.LOW: LOW_AA2}),
+        ],
+        ids=["low only", "mid and low"],
+    )
+    def test_returns_capability_sets_offered(self, tests_tmdata, cycle_id, expected):
+        assert get_cycle_capability_sets(tests_tmdata, cycle_id) == expected
+
+    def test_raises_for_unknown_cycle(self, tests_tmdata):
+        with pytest.raises(CycleNotFoundError):
+            get_cycle_capability_sets(tests_tmdata, CycleID(3))
+
+    def test_raises_when_cycle_names_unknown_capability_set(
+        self, tests_tmdata, monkeypatch
+    ):
+        """The cycle refers to a capability set by name; a name with no
+        capability set is an error rather than being skipped."""
+        cycle = CYCLE_1.model_copy(
+            update={
+                "telescope_capabilities": CYCLE_1.telescope_capabilities.model_copy(
+                    update={"ska_low": "AA3"}
+                )
+            }
+        )
+        monkeypatch.setattr(queries, "get_cycle", lambda *_: cycle)
+
+        with pytest.raises(CapabilitySetNotFoundError, match="Capability set AA3"):
+            get_cycle_capability_sets(tests_tmdata, CycleID(1))
 
 
 class TestExceptions:
