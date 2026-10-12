@@ -13,6 +13,7 @@ Welcome to ska-ost-osd's documentation!
    :caption: Usage
 
    api/osd/guide
+   api/osd/queries
    api/semantic-validation/guide
    api/semantic-validation/validation-rules-update
 
