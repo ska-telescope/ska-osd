@@ -17,7 +17,16 @@ from ska_ost_osd.osd.models.capabilities import (
     MidCBFMode,
     MidFrequencyBand,
 )
-from ska_ost_osd.osd.models.configuration import Constraints
+from ska_ost_osd.osd.models.configuration import (
+    Configuration,
+    ConfigurationLowCBFMetrics,
+    ConfigurationLowQualityAttributeMetrics,
+    Constraints,
+    LowConfiguration,
+    LowConfigurationCapabilitySet,
+    MidConfiguration,
+    MidConfigurationCapabilitySet,
+)
 from ska_ost_osd.osd.models.defaults import (
     AvoidanceConstraints,
     CSPSPFRx,
@@ -369,4 +378,68 @@ SUBARRAY_TEMPLATE_LIBRARY_FILE = SubarrayTemplateLibraryFile(
         LOW_FULL_AA2_TEMPLATE,
         LOW_TEST_AA2_TEMPLATE,
     ]
+)
+
+# The ODT configuration view of tests/tmdata: what ska-oso-services serves
+# from GET /configuration
+CONFIGURATION = Configuration(
+    ska_mid=MidConfiguration(
+        frequency_band=MID_BASIC_CAPABILITIES.frequency_bands,
+        constraints=MID_CONSTRAINTS,
+        subarrays=[
+            MidConfigurationCapabilitySet(
+                name="AA1",
+                receptors=["SKA001", "SKA002", "SKA003", "SKA004"],
+                available_bandwidth_hz=800_000_000.0,
+                number_pst_beams=1,
+                number_fsps=4,
+                allowed_channel_width_values_hz=[13440],
+            ),
+            MidConfigurationCapabilitySet(
+                name="AA2",
+                receptors=[
+                    "SKA001",
+                    "SKA002",
+                    "SKA003",
+                    "SKA004",
+                    "SKA005",
+                    "SKA006",
+                    "SKA007",
+                    "SKA008",
+                ],  # fmt: skip
+                available_bandwidth_hz=800_000_000.0,
+                number_pst_beams=1,
+                number_fsps=8,
+                allowed_channel_width_values_hz=[13440],
+            ),
+        ],
+        spfrx_defaults=MID_DEFAULTS.spfrx_defaults,
+    ),
+    ska_low=LowConfiguration(
+        frequency_band=LOW_BASIC_CAPABILITIES,
+        constraints=LOW_CONSTRAINTS,
+        quality_attribute_metrics=ConfigurationLowQualityAttributeMetrics(
+            cbf=ConfigurationLowCBFMetrics(processors_ready_percent=100.0)
+        ),
+        subarrays=[
+            LowConfigurationCapabilitySet(
+                name="AA1",
+                receptors=[345, 346, 347, 348],
+                available_bandwidth_hz=75_000_000.0,
+                number_pst_beams=1,
+                number_fsps=6,
+                number_substations=0,
+                number_subarray_beams=1,
+            ),
+            LowConfigurationCapabilitySet(
+                name="AA2",
+                receptors=[345, 346, 347, 348, 349, 350, 351, 352],
+                available_bandwidth_hz=75_000_000.0,
+                number_pst_beams=1,
+                number_fsps=6,
+                number_substations=512,
+                number_subarray_beams=8,
+            ),
+        ],
+    ),
 )

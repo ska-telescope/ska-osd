@@ -30,11 +30,7 @@ from ska_ost_osd.osd.models.capabilities import (
     MidCapabilitySet,
     MidFrequencyBand,
 )
-from ska_ost_osd.osd.models.configuration import (
-    Configuration,
-    LowConfiguration,
-    MidConfiguration,
-)
+from ska_ost_osd.osd.models.configuration import Constraints
 from ska_ost_osd.osd.models.defaults import LowDefaultsFile, MidDefaultsFile
 from ska_ost_osd.osd.models.observatory_policies import ObservatoryPolicy
 from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplateLibraryFile
@@ -509,78 +505,22 @@ class TestSubarrayTemplates:
             SubarrayTemplateLibraryFile.model_validate(data)
 
 
-class TestConfiguration:
-    """The combined configuration ska-oso-services serves."""
-
-    def test_from_tmdata_combines_capabilities_and_defaults(self, tests_tmdata):
-        """Each telescope's configuration combines its capabilities and
-        defaults files."""
-        configuration = Configuration.from_tmdata(tests_tmdata)
-
-        assert configuration.ska_mid == MidConfiguration.combine(
-            MidCapabilitiesFile.model_validate(load(MID_CAPABILITIES)),
-            MidDefaultsFile.model_validate(load(MID_DEFAULTS)),
-        )
-        assert configuration.ska_low == LowConfiguration.combine(
-            LowCapabilitiesFile.model_validate(load(LOW_CAPABILITIES)),
-            LowDefaultsFile.model_validate(load(LOW_DEFAULTS)),
-        )
-
-    def test_from_tmdata_reads_every_cycle(self, tests_tmdata):
-        """The configuration holds the policy of every cycle in the tmdata,
-        in cycle order."""
-        cycle_files = (TESTS_TMDATA / "cycles").glob("cycle_*.json")
-        cycles = sorted(int(path.stem.removeprefix("cycle_")) for path in cycle_files)
-
-        configuration = Configuration.from_tmdata(tests_tmdata)
-
-        assert [p.cycle_number for p in configuration.observatory_policies] == cycles
-
-    def test_odt_keys_come_first_and_unchanged(self, tests_tmdata):
-        """/odt/configuration serves ska_mid and ska_low; the observatory
-        policies are only added after them."""
-        served = Configuration.from_tmdata(tests_tmdata).model_dump(
-            mode="json", by_alias=True
-        )
-        assert list(served) == ["ska_mid", "ska_low", "observatory_policies"]
+class TestConstraints:
+    """Combining the constraints the two tmdata files each hold half of."""
 
     def test_constraints_combine_both_files(self):
-        """The configuration serves all five constraints: the elevation
-        limits from the capabilities file and the avoidance angles from the
-        defaults file."""
+        """All five constraints: the elevation limits from the capabilities
+        file and the avoidance angles from the defaults file."""
         capabilities = load(MID_CAPABILITIES)
         defaults = load(MID_DEFAULTS)
 
-        configuration = MidConfiguration.combine(
+        constraints = Constraints.combine(
             MidCapabilitiesFile.model_validate(capabilities),
             MidDefaultsFile.model_validate(defaults),
         )
 
-        assert configuration.constraints.model_dump() == {
+        assert constraints.model_dump() == {
             **{angle: defaults["constraints"][angle] for angle in AVOIDANCE_ANGLES},
             "min_elevation_deg": capabilities["constraints"]["min_elevation_deg"],
             "max_elevation_deg": capabilities["constraints"]["max_elevation_deg"],
         }
-
-    def test_quality_attribute_metrics_come_from_defaults(self):
-        """The defaults file is the home of Low's quality attribute metrics;
-        the copy in the capabilities file is ignored."""
-        capabilities = LowCapabilitiesFile.model_validate(load(LOW_CAPABILITIES))
-        defaults = load(LOW_DEFAULTS)
-        defaults["quality_attribute_metrics"]["cbf"]["processors_ready_percent"] = 50.0
-
-        configuration = LowConfiguration.combine(
-            capabilities, LowDefaultsFile.model_validate(defaults)
-        )
-
-        assert (
-            configuration.quality_attribute_metrics.cbf.processors_ready_percent == 50
-        )
-        assert configuration.frequency_band == capabilities.basic_capabilities
-        assert configuration.subarrays == capabilities.subarrays
-
-    def test_serialised_configuration_validates(self, tests_tmdata):
-        """What ska-oso-services serves can be read back by the same
-        models."""
-        configuration = Configuration.from_tmdata(tests_tmdata)
-        assert Configuration.model_validate(configuration.model_dump()) == configuration

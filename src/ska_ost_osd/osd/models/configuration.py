@@ -1,36 +1,19 @@
 from typing import Self
 
 from pydantic import ConfigDict
-from ska_telmodel_client import TMData
 
-from ska_ost_osd.osd.common.constant import (
-    LOW_CONSTANT_JSON_FILE_PATH,
-    LOW_DEFAULTS_JSON_FILE_PATH,
-    MID_CONSTANT_JSON_FILE_PATH,
-    MID_DEFAULTS_JSON_FILE_PATH,
-    OBSERVING_CYCLES_TMDATA_DIR,
-)
 from ska_ost_osd.osd.models.capabilities import (
     ElevationConstraints,
     LowBasicCapabilities,
-    LowCapabilitiesFile,
-    LowCapabilitySet,
-    MidCapabilitiesFile,
-    MidCapabilitySet,
     MidFrequencyBand,
     TelescopeCapabilitiesFileBase,
 )
 from ska_ost_osd.osd.models.defaults import (
     AvoidanceConstraints,
-    LowDefaultsFile,
-    LowQualityAttributeMetrics,
-    MidDefaultsFile,
     OSDBaseModel,
     SPFRxParameters,
     TelescopeDefaultsFileBase,
 )
-from ska_ost_osd.osd.models.observatory_policies import ObservatoryPolicy
-from ska_ost_osd.osd.osd import get_available_cycles
 
 
 class ConfigurationModel(OSDBaseModel):
@@ -57,67 +40,55 @@ class Constraints(ElevationConstraints, AvoidanceConstraints):
         )
 
 
+# The view models below are what ska-oso-services serves to the ODT from
+# GET /configuration: the reader models narrowed to the fields it serves.
+
+
+class ConfigurationCapabilitySetBase(ConfigurationModel):
+    """The fields of a capability set the configuration serves for both
+    telescopes."""
+
+    name: str
+    receptors: list[str | int]
+    available_bandwidth_hz: float
+    number_pst_beams: int
+    number_fsps: int
+
+
+class MidConfigurationCapabilitySet(ConfigurationCapabilitySetBase):
+    allowed_channel_width_values_hz: list[int]
+
+
+class LowConfigurationCapabilitySet(ConfigurationCapabilitySetBase):
+    number_substations: int
+    number_subarray_beams: int
+
+
+class ConfigurationLowCBFMetrics(ConfigurationModel):
+    processors_ready_percent: float
+
+
+class ConfigurationLowQualityAttributeMetrics(ConfigurationModel):
+    cbf: ConfigurationLowCBFMetrics
+
+
 class MidConfiguration(ConfigurationModel):
     frequency_band: list[MidFrequencyBand]
     constraints: Constraints
-    subarrays: list[MidCapabilitySet]
+    subarrays: list[MidConfigurationCapabilitySet]
     spfrx_defaults: SPFRxParameters
-
-    @classmethod
-    def combine(
-        cls, capabilities: MidCapabilitiesFile, defaults: MidDefaultsFile
-    ) -> Self:
-        return cls(
-            frequency_band=capabilities.basic_capabilities.frequency_bands,
-            constraints=Constraints.combine(capabilities, defaults),
-            subarrays=capabilities.subarrays,
-            spfrx_defaults=defaults.spfrx_defaults,
-        )
 
 
 class LowConfiguration(ConfigurationModel):
     frequency_band: LowBasicCapabilities
     constraints: Constraints
-    quality_attribute_metrics: LowQualityAttributeMetrics
-    subarrays: list[LowCapabilitySet]
-
-    @classmethod
-    def combine(
-        cls, capabilities: LowCapabilitiesFile, defaults: LowDefaultsFile
-    ) -> Self:
-        return cls(
-            frequency_band=capabilities.basic_capabilities,
-            constraints=Constraints.combine(capabilities, defaults),
-            quality_attribute_metrics=defaults.quality_attribute_metrics,
-            subarrays=capabilities.subarrays,
-        )
+    quality_attribute_metrics: ConfigurationLowQualityAttributeMetrics
+    subarrays: list[LowConfigurationCapabilitySet]
 
 
 class Configuration(ConfigurationModel):
+    """The ODT configuration: both telescopes' bands, constraints, defaults
+    and capability sets."""
+
     ska_mid: MidConfiguration
     ska_low: LowConfiguration
-    observatory_policies: list[ObservatoryPolicy]
-
-    @classmethod
-    def from_tmdata(cls, tmdata: TMData) -> Self:
-        """Read and combine the capabilities, defaults and cycle files."""
-
-        def read(path: str) -> dict:
-            return tmdata[path].get_dict()
-
-        return cls(
-            ska_mid=MidConfiguration.combine(
-                MidCapabilitiesFile.model_validate(read(MID_CONSTANT_JSON_FILE_PATH)),
-                MidDefaultsFile.model_validate(read(MID_DEFAULTS_JSON_FILE_PATH)),
-            ),
-            ska_low=LowConfiguration.combine(
-                LowCapabilitiesFile.model_validate(read(LOW_CONSTANT_JSON_FILE_PATH)),
-                LowDefaultsFile.model_validate(read(LOW_DEFAULTS_JSON_FILE_PATH)),
-            ),
-            observatory_policies=[
-                ObservatoryPolicy.model_validate(
-                    read(f"{OBSERVING_CYCLES_TMDATA_DIR}/cycle_{cycle}.json")
-                )
-                for cycle in sorted(get_available_cycles(tmdata))
-            ],
-        )
