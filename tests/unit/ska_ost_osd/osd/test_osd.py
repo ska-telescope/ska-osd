@@ -119,7 +119,7 @@ def test_invalid_get_osd_data_array_assembly(tests_tmdata):
     assert len(error_msgs) == 1
     assert (
         error_msgs[0]
-        == f"Array assembly {aa_value} is invalid. Valid array assemblies are AA0.5, AA1, AA2, Mid_ITF."
+        == f"Array assembly {aa_value} is invalid. Valid array assemblies are AA0.5, AA1."
     )
 
 
@@ -147,7 +147,7 @@ def test_get_osd_data_array_assembly_rejects_non_array_assembly_keys(
     assert osd_data is None
     assert error_msgs == [
         f"Array assembly {invalid_array_assembly} is invalid. Valid array assemblies are"
-        " AA0.5, AA1, AA2, Mid_ITF."
+        " AA0.5, AA1."
     ]
 
 

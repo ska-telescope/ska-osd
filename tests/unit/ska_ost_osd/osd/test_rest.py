@@ -32,7 +32,7 @@ def test_cycle_osd_uses_selected_cycle_file(test_client):
     assert response.status_code == HTTPStatus.OK
     assert body["result_data"]["observatory_policy"]["cycle_number"] == 2
     assert body["result_data"]["observatory_policy"]["cycle_id"] == (
-        "TEST_SKAO_2027_Low_AA2_Proposal"
+        "TEST_SKAO_2027_AA1_Proposal"
     )
     assert set(body["result_data"]["capabilities"]) == {"mid", "low"}
 
@@ -49,7 +49,7 @@ def test_cycle_capability_uses_cycle_selected_array_assembly(test_client):
     assert list(body["result_data"]["capabilities"]) == ["mid"]
     assert set(body["result_data"]["capabilities"]["mid"]) == {
         "basic_capabilities",
-        "AA2",
+        "AA1",
     }
 
 
@@ -113,15 +113,15 @@ def test_cycle_capability_matching_array_assembly_is_redundant(test_client, capl
     with caplog.at_level(logging.WARNING):
         response = test_client.get(
             f"{BASE_API_URL}/osd",
-            params={"cycle_id": 2, "capabilities": "mid", "array_assembly": "AA2"},
+            params={"cycle_id": 2, "capabilities": "mid", "array_assembly": "AA1"},
         )
     body = response.json()
 
     assert response.status_code == HTTPStatus.OK
     assert list(body["result_data"]["capabilities"]) == ["mid"]
-    assert "AA2" in body["result_data"]["capabilities"]["mid"]
+    assert "AA1" in body["result_data"]["capabilities"]["mid"]
     assert (
-        "Ignoring redundant array assembly AA2 for capability mid in cycle 2"
+        "Ignoring redundant array assembly AA1 for capability mid in cycle 2"
         in caplog.messages
     )
 
@@ -136,7 +136,7 @@ def test_cycle_capability_array_assembly_must_match_policy(test_client):
 
     assert response.status_code == HTTPStatus.BAD_REQUEST
     assert body["result_data"] == [
-        "Array assembly AA0.5 does not match capability mid in cycle 2. Expected AA2."
+        "Array assembly AA0.5 does not match capability mid in cycle 2. Expected AA1."
     ]
 
 

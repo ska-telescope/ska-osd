@@ -140,18 +140,26 @@ class TestCapabilities:
     """The capabilities models' own logic."""
 
     def test_array_assemblies_are_found_by_name(self):
-        """Every top-level key matching the array assembly pattern becomes a
-        subarray, so a new assembly is picked up and other keys are ignored."""
+        """Every top-level key matching the array assembly pattern, whether
+        an AA name or a telescope-prefixed one such as Low_ITF, becomes a
+        capability set, so a new one is picked up and other keys are
+        ignored. A capability set need not list subarray templates."""
         data = load(LOW_CAPABILITIES)
         names = {s.name for s in LowCapabilities.model_validate(data).subarrays}
-        data["AA3"] = data["AA2"]
+        data["AA3"] = data["AA1"]
+        data["Low_ITF"] = {
+            key: value
+            for key, value in data["AA1"].items()
+            if key != "subarray_templates"
+        }
         data["version"] = "1.0"
 
         capabilities = LowCapabilities.model_validate(data)
 
         subarrays = {subarray.name: subarray for subarray in capabilities.subarrays}
-        assert set(subarrays) == names | {"AA3"}
+        assert set(subarrays) == names | {"AA3", "Low_ITF"}
         assert subarrays["AA0.5"].receptors == data["AA0.5"]["number_station_ids"]
+        assert subarrays["Low_ITF"].subarray_templates is None
 
     @pytest.mark.parametrize(
         "model, path, telescope",
@@ -254,7 +262,7 @@ class TestCapabilities:
             (
                 MidCapabilities,
                 MID_CAPABILITIES,
-                lambda data: data["AA2"]["available_receivers"].append("Band_9"),
+                lambda data: data["AA1"]["available_receivers"].append("Band_9"),
                 "available_receivers",
             ),
             (
