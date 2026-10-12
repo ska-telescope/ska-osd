@@ -7,7 +7,8 @@ source and version and handles any caching.
 from ska_telmodel_client import TMData
 
 from ska_ost_osd.osd.common.constant import OBSERVING_CYCLES_TMDATA_DIR
-from ska_ost_osd.osd.models.observatory_policies import CycleID
+from ska_ost_osd.osd.exceptions import CycleNotFoundError
+from ska_ost_osd.osd.models.observatory_policies import CycleID, ObservatoryPolicy
 
 
 def get_cycle_ids(tmdata: TMData) -> list[CycleID]:
@@ -23,4 +24,22 @@ def get_cycle_ids(tmdata: TMData) -> list[CycleID]:
         CycleID(int(key.removeprefix("cycle_").removesuffix(".json")))
         for key in tmdata[OBSERVING_CYCLES_TMDATA_DIR]
         if key.startswith("cycle_") and key.endswith(".json")
+    )
+
+
+def get_cycle(tmdata: TMData, cycle_id: CycleID) -> ObservatoryPolicy:
+    """Read one cycle, from ``cycles/cycle_<N>.json``: its metadata,
+    policies and the capability set each telescope offers.
+
+    :param tmdata: TMData to read from.
+    :param cycle_id: the ID of the cycle.
+    :return: the cycle.
+    :raises CycleNotFoundError: If there is no cycle with that ID.
+    :raises FileNotFoundError: If the tmdata has no cycles directory.
+    """
+    cycle_ids = get_cycle_ids(tmdata)
+    if cycle_id not in cycle_ids:
+        raise CycleNotFoundError(cycle_id, cycle_ids)
+    return ObservatoryPolicy.model_validate(
+        tmdata[f"{OBSERVING_CYCLES_TMDATA_DIR}/cycle_{cycle_id}.json"].get_dict()
     )
