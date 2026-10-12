@@ -5,7 +5,7 @@ import pytest
 
 from ska_ost_osd.osd.exceptions import CycleNotFoundError, OSDQueryError
 from ska_ost_osd.osd.models.observatory_policies import CycleID, ObservatoryPolicy
-from ska_ost_osd.osd.queries import get_cycle, get_cycle_ids
+from ska_ost_osd.osd.queries import get_cycle, get_cycle_ids, get_cycles
 
 
 class TestGetCycleIds:
@@ -46,6 +46,24 @@ class TestGetCycle:
     def test_raises_when_cycles_directory_missing(self, empty_tmdata):
         with pytest.raises(FileNotFoundError, match="file not found: cycles"):
             get_cycle(empty_tmdata, CycleID(1))
+
+
+class TestGetCycles:
+    def test_returns_every_cycle_in_id_order(self, tests_tmdata):
+        cycles = get_cycles(tests_tmdata)
+
+        assert all(isinstance(cycle, ObservatoryPolicy) for cycle in cycles)
+        assert [cycle.cycle_number for cycle in cycles] == [CycleID(1), CycleID(2)]
+
+    def test_matches_get_cycle(self, tests_tmdata):
+        assert get_cycles(tests_tmdata) == [
+            get_cycle(tests_tmdata, cycle_id)
+            for cycle_id in get_cycle_ids(tests_tmdata)
+        ]
+
+    def test_raises_when_cycles_directory_missing(self, empty_tmdata):
+        with pytest.raises(FileNotFoundError, match="file not found: cycles"):
+            get_cycles(empty_tmdata)
 
 
 class TestExceptions:

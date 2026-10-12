@@ -40,6 +40,20 @@ def get_cycle(tmdata: TMData, cycle_id: CycleID) -> ObservatoryPolicy:
     cycle_ids = get_cycle_ids(tmdata)
     if cycle_id not in cycle_ids:
         raise CycleNotFoundError(cycle_id, cycle_ids)
+    return _read_cycle(tmdata, cycle_id)
+
+
+def get_cycles(tmdata: TMData) -> list[ObservatoryPolicy]:
+    """Read every cycle, in ascending order of ID.
+
+    :param tmdata: TMData to read from.
+    :return: the cycles.
+    :raises FileNotFoundError: If the tmdata has no cycles directory.
+    """
+    return [_read_cycle(tmdata, cycle_id) for cycle_id in get_cycle_ids(tmdata)]
+
+
+def _read_cycle(tmdata: TMData, cycle_id: CycleID) -> ObservatoryPolicy:
     return ObservatoryPolicy.model_validate(
         tmdata[f"{OBSERVING_CYCLES_TMDATA_DIR}/cycle_{cycle_id}.json"].get_dict()
     )
