@@ -1,10 +1,10 @@
 import re
 from enum import StrEnum
-from typing import Any, Literal, Self
+from typing import Annotated, Any, Literal, Self
 
 from pydantic import AliasChoices, AliasPath, Field, model_validator
 
-from ska_ost_osd.osd.common.constant import ARRAY_ASSEMBLY_PATTERN
+from ska_ost_osd.osd.common.constant import ARRAY_ASSEMBLY_PATTERN, Telescope
 from ska_ost_osd.osd.models.defaults import OSDBaseModel
 
 
@@ -30,7 +30,7 @@ class FrequencyBand(OSDBaseModel):
         return self
 
 
-class Subarray(OSDBaseModel):
+class CapabilitySetBase(OSDBaseModel):
     name: str = Field(examples=["AA0.5"])
     receptors: list[str | int] = Field(
         validation_alias=AliasChoices(
@@ -99,7 +99,8 @@ class MidFrequencyBand(FrequencyBand):
     )
 
 
-class MidSubarray(Subarray):
+class MidCapabilitySet(CapabilitySetBase):
+    telescope: Literal[Telescope.MID] = Telescope.MID
     allowed_channel_width_values_hz: list[int]
     allowed_channel_count_range_min: list[int]
     allowed_channel_count_range_max: list[int]
@@ -127,7 +128,7 @@ class MidCapabilities(TelescopeCapabilitiesBase):
             "frequency_band", AliasPath("basic_capabilities", "receiver_information")
         )
     )
-    subarrays: list[MidSubarray]
+    subarrays: list[MidCapabilitySet]
 
     @model_validator(mode="after")
     def check_available_receivers(self) -> Self:
@@ -158,7 +159,8 @@ class LowFrequencyBand(FrequencyBand):
     number_pss_channels_per_coarse_channel: int = Field(ge=0, examples=[54])
 
 
-class LowSubarray(Subarray):
+class LowCapabilitySet(CapabilitySetBase):
+    telescope: Literal[Telescope.LOW] = Telescope.LOW
     number_substations: int = Field(ge=0)
     number_subarray_beams: int = Field(ge=0)
     number_stations: int = Field(ge=0)
@@ -176,9 +178,16 @@ class LowSubarray(Subarray):
         return self
 
 
+# A capability set is one array assembly of either telescope; the
+# telescope field picks the model when one is read back.
+CapabilitySet = Annotated[
+    MidCapabilitySet | LowCapabilitySet, Field(discriminator="telescope")
+]
+
+
 class LowCapabilities(TelescopeCapabilitiesBase):
     telescope: Literal["Low"] = "Low"
     frequency_band: LowFrequencyBand = Field(
         validation_alias=AliasChoices("frequency_band", "basic_capabilities")
     )
-    subarrays: list[LowSubarray]
+    subarrays: list[LowCapabilitySet]

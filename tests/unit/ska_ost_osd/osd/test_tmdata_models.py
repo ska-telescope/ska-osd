@@ -13,10 +13,16 @@ from datetime import datetime
 from pathlib import Path
 
 import pytest
-from pydantic import ValidationError
+from pydantic import TypeAdapter, ValidationError
 
 from ska_ost_osd.osd.common.constant import Telescope
-from ska_ost_osd.osd.models.capabilities import LowCapabilities, MidCapabilities
+from ska_ost_osd.osd.models.capabilities import (
+    CapabilitySet,
+    LowCapabilities,
+    LowCapabilitySet,
+    MidCapabilities,
+    MidCapabilitySet,
+)
 from ska_ost_osd.osd.models.configuration import (
     Configuration,
     LowConfiguration,
@@ -146,6 +152,48 @@ class TestCapabilities:
         subarrays = {subarray.name: subarray for subarray in capabilities.subarrays}
         assert set(subarrays) == names | {"AA3"}
         assert subarrays["AA0.5"].receptors == data["AA0.5"]["number_station_ids"]
+
+    @pytest.mark.parametrize(
+        "model, path, telescope",
+        [
+            (MidCapabilities, MID_CAPABILITIES, Telescope.MID),
+            (LowCapabilities, LOW_CAPABILITIES, Telescope.LOW),
+        ],
+    )
+    def test_capability_sets_know_their_telescope(self, model, path, telescope):
+        """tmdata doesn't repeat the telescope on each array assembly; the
+        capability set models fill it in."""
+        capabilities = model.model_validate(load(path))
+        assert {cs.telescope for cs in capabilities.subarrays} == {telescope}
+
+    @pytest.mark.parametrize(
+        "model, path, capability_set_model",
+        [
+            (MidCapabilities, MID_CAPABILITIES, MidCapabilitySet),
+            (LowCapabilities, LOW_CAPABILITIES, LowCapabilitySet),
+        ],
+    )
+    @pytest.mark.parametrize("mode", ["python", "json"])
+    def test_capability_set_is_chosen_by_telescope(
+        self, model, path, capability_set_model, mode
+    ):
+        """A serialised capability set reads back as the right capability
+        set model, chosen by its telescope."""
+        expected = model.model_validate(load(path)).subarrays[0]
+
+        capability_set = TypeAdapter(CapabilitySet).validate_python(
+            expected.model_dump(mode=mode)
+        )
+
+        assert type(capability_set) is capability_set_model
+        assert capability_set == expected
+
+    def test_capability_set_rejects_another_telescope(self):
+        data = load(LOW_CAPABILITIES)["AA0.5"]
+        with pytest.raises(ValidationError, match="telescope"):
+            LowCapabilitySet.model_validate(
+                {"name": "AA0.5", **data, "telescope": "mid"}
+            )
 
     @pytest.mark.parametrize(
         "model, path",
