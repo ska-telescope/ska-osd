@@ -10,6 +10,7 @@ from ska_telmodel_client import TMData
 
 from ska_ost_osd.osd.common.constant import (
     CAPABILITIES_JSON_FILE_PATHS,
+    DEFAULTS_JSON_FILE_PATHS,
     OBSERVING_CYCLES_TMDATA_DIR,
     Telescope,
 )
@@ -21,11 +22,17 @@ from ska_ost_osd.osd.models.capabilities import (
     MidCapabilities,
     MidCapabilitySet,
 )
+from ska_ost_osd.osd.models.defaults import LowDefaults, MidDefaults
 from ska_ost_osd.osd.models.observatory_policies import CycleID, ObservatoryPolicy
 
 _CAPABILITIES_MODELS = {
     Telescope.MID: MidCapabilities,
     Telescope.LOW: LowCapabilities,
+}
+
+_DEFAULTS_MODELS = {
+    Telescope.MID: MidDefaults,
+    Telescope.LOW: LowDefaults,
 }
 
 
@@ -97,6 +104,35 @@ def get_telescope_capabilities(
     """
     return _CAPABILITIES_MODELS[telescope].model_validate(
         _read(tmdata, CAPABILITIES_JSON_FILE_PATHS[telescope])
+    )
+
+
+@overload
+def get_telescope_defaults(
+    tmdata: TMData, telescope: Literal[Telescope.MID]
+) -> MidDefaults: ...
+
+
+@overload
+def get_telescope_defaults(
+    tmdata: TMData, telescope: Literal[Telescope.LOW]
+) -> LowDefaults: ...
+
+
+def get_telescope_defaults(
+    tmdata: TMData, telescope: Telescope
+) -> MidDefaults | LowDefaults:
+    """Read one telescope's defaults file: its avoidance constraints and,
+    for Mid, the SPFRx defaults or, for Low, the quality attribute metrics.
+
+    :param tmdata: TMData to read from.
+    :param telescope: the telescope.
+    :return: the telescope's defaults.
+    :raises FileNotFoundError: If the tmdata has no defaults file for the
+        telescope.
+    """
+    return _DEFAULTS_MODELS[telescope].model_validate(
+        _read(tmdata, DEFAULTS_JSON_FILE_PATHS[telescope])
     )
 
 

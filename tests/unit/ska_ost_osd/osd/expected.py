@@ -16,6 +16,20 @@ from ska_ost_osd.osd.models.capabilities import (
     MidCBFMode,
     MidFrequencyBand,
 )
+from ska_ost_osd.osd.models.defaults import (
+    AvoidanceConstraints,
+    CSPSPFRx,
+    DefaultNoiseDiodeMode,
+    LowCBFMetrics,
+    LowDefaults,
+    LowQualityAttributeMetrics,
+    MidDefaults,
+    PeriodicNoiseDiode,
+    PseudoRandomNoiseDiode,
+    SPFRxParameters,
+    SyncPPS,
+    TargetSPFRx,
+)
 from ska_ost_osd.osd.models.observatory_policies import (
     CycleID,
     CycleInformation,
@@ -246,4 +260,41 @@ LOW_CAPABILITIES = LowCapabilities(
         number_pss_channels_per_coarse_channel=54,
     ),
     subarrays=[LOW_AA05, LOW_AA1],
+)
+
+# tests/tmdata/ska1_mid/mid_defaults.json
+MID_DEFAULTS = MidDefaults(
+    constraints=AvoidanceConstraints(
+        sun_avoidance_angle_deg=30.0,
+        moon_avoidance_angle_deg=10.0,
+        jupiter_avoidance_angle_deg=10.0,
+    ),
+    spfrx_defaults=SPFRxParameters(
+        target_spfrx=TargetSPFRx(
+            attenuation_1_x=10.0,
+            attenuation_1_y=10.0,
+            attenuation_2_x=10.0,
+            attenuation_2_y=10.0,
+            noise_diode_options=[
+                PeriodicNoiseDiode(
+                    period_ms=1000.0, duty_cycle_ms=500.0, phase_shift_ms=0.0
+                ),
+                PseudoRandomNoiseDiode(binary_polynomial=0, seed=0, dwell_ms=0.0),
+            ],
+            default_noise_diode_mode=DefaultNoiseDiodeMode.OFF,
+        ),
+        csp_spfrx=CSPSPFRx(sync_pps=SyncPPS.UNSET, saturation_threshold=0.2),
+    ),
+)
+
+# tests/tmdata/ska1_low/low_defaults.json
+LOW_DEFAULTS = LowDefaults(
+    constraints=AvoidanceConstraints(
+        sun_avoidance_angle_deg=30.0,
+        moon_avoidance_angle_deg=10.0,
+        jupiter_avoidance_angle_deg=10.0,
+    ),
+    quality_attribute_metrics=LowQualityAttributeMetrics(
+        cbf=LowCBFMetrics(processors_ready_percent=100, alveo_configured_percent=100)
+    ),
 )
