@@ -10,7 +10,7 @@ from ska_ost_osd.osd.exceptions import (
     CycleNotFoundError,
     OSDQueryError,
 )
-from ska_ost_osd.osd.models.observatory_policies import CycleID
+from ska_ost_osd.osd.models.cycles import Cycle, CycleID
 from ska_ost_osd.osd.queries import (
     get_basic_capabilities,
     get_capability_set,
@@ -66,6 +66,12 @@ class TestGetCycle:
     )
     def test_returns_cycle(self, tests_tmdata, cycle_id, expected):
         assert get_cycle(tests_tmdata, cycle_id) == expected
+
+    def test_returns_reader_model(self, tests_tmdata):
+        """The query returns the reader model, not the storage model it is
+        read through."""
+        assert type(get_cycle(tests_tmdata, CycleID(1))) is Cycle
+        assert {type(cycle) for cycle in get_cycles(tests_tmdata)} == {Cycle}
 
     def test_raises_for_unknown_cycle(self, tests_tmdata):
         with pytest.raises(

@@ -31,8 +31,8 @@ from ska_ost_osd.osd.models.capabilities import (
     MidFrequencyBand,
 )
 from ska_ost_osd.osd.models.configuration import Constraints
+from ska_ost_osd.osd.models.cycles import CycleFile
 from ska_ost_osd.osd.models.defaults import LowDefaultsFile, MidDefaultsFile
-from ska_ost_osd.osd.models.observatory_policies import ObservatoryPolicy
 from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplateLibraryFile
 from ska_ost_osd.osd.osd import get_osd_using_tmdata
 from tests.unit.ska_ost_osd.osd.expected import MID_BASIC_CAPABILITIES
@@ -43,7 +43,7 @@ MID_CAPABILITIES = "ska1_mid/mid_capabilities.json"
 LOW_CAPABILITIES = "ska1_low/low_capabilities.json"
 MID_DEFAULTS = "ska1_mid/mid_defaults.json"
 LOW_DEFAULTS = "ska1_low/low_defaults.json"
-OBSERVATORY_POLICIES = "cycles/cycle_1.json"
+CYCLE = "cycles/cycle_1.json"
 SUBARRAY_TEMPLATES = "subarray_templates/subarray_template_library.json"
 
 AVOIDANCE_ANGLES = (
@@ -113,8 +113,8 @@ class TestBreakingChanges:
                 ),
             ),
             (
-                ObservatoryPolicy,
-                OBSERVATORY_POLICIES,
+                CycleFile,
+                CYCLE,
                 lambda data: data.update(cycle=data.pop("cycle_number")),
             ),
             (
@@ -410,58 +410,58 @@ class TestDefaults:
         assert model.model_validate(defaults.model_dump()) == defaults
 
 
-class TestObservatoryPolicy:
-    """The observatory policy model's own logic."""
+class TestCycleFile:
+    """The cycle file model's own logic."""
 
     def test_cycle_response_policy_validates(self, tests_tmdata):
         """The policy in the OSD's response for the cycle, as the PHT
         endpoints fetch it, validates."""
-        cycle = load(OBSERVATORY_POLICIES)["cycle_number"]
+        cycle = load(CYCLE)["cycle_number"]
         osd_data = get_osd_using_tmdata(
             tests_tmdata, cycle_id=cycle, process_templates=True
         )
-        ObservatoryPolicy.model_validate(osd_data["observatory_policy"])
+        CycleFile.model_validate(osd_data["observatory_policy"])
 
     def test_proposal_dates_are_served_as_the_same_time(self):
         """The dates are parsed, so ``.000Z`` is served as ``Z``, but the
         time is unchanged."""
-        data = load(OBSERVATORY_POLICIES)
-        policy = ObservatoryPolicy.model_validate(data).model_dump(mode="json")
+        data = load(CYCLE)
+        policy = CycleFile.model_validate(data).model_dump(mode="json")
         for key in ("proposal_open", "proposal_close"):
             assert datetime.fromisoformat(
                 policy["cycle_information"][key]
             ) == datetime.fromisoformat(data["cycle_information"][key])
 
     def test_proposal_dates_need_a_timezone(self):
-        data = load(OBSERVATORY_POLICIES)
+        data = load(CYCLE)
         data["cycle_information"]["proposal_open"] = "2026-03-27T12:00:00"
         with pytest.raises(ValidationError, match="timezone"):
-            ObservatoryPolicy.model_validate(data)
+            CycleFile.model_validate(data)
 
     def test_telescope_offering_nothing_is_null(self):
         """The PHT UI checks for null, so a telescope missing from the file
         is served as null rather than left out, under the file's keys."""
-        data = load(OBSERVATORY_POLICIES)
+        data = load(CYCLE)
         data["telescope_capabilities"] = {"Low": "AA2_SV"}
 
-        policy = ObservatoryPolicy.model_validate(data)
+        policy = CycleFile.model_validate(data)
 
         assert policy.telescope_capabilities.ska_mid is None
         assert policy.telescope_capabilities.ska_low == "AA2_SV"
         served = policy.model_dump(mode="json", by_alias=True)
         assert served["telescope_capabilities"] == {"Mid": None, "Low": "AA2_SV"}
-        assert ObservatoryPolicy.model_validate(policy.model_dump()) == policy
+        assert CycleFile.model_validate(policy.model_dump()) == policy
 
     def test_proposals_must_open_before_they_close(self):
         """A proposal window that closes before it opens is rejected."""
-        data = load(OBSERVATORY_POLICIES)
+        data = load(CYCLE)
         information = data["cycle_information"]
         information["proposal_open"], information["proposal_close"] = (
             information["proposal_close"],
             information["proposal_open"],
         )
         with pytest.raises(ValidationError, match="proposal_open must be before"):
-            ObservatoryPolicy.model_validate(data)
+            CycleFile.model_validate(data)
 
 
 class TestSubarrayTemplates:

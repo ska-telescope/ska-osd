@@ -5,7 +5,7 @@ import pytest
 
 from ska_ost_osd.osd.exceptions import CycleNotFoundError
 from ska_ost_osd.osd.models.configuration import Configuration, CycleConfiguration
-from ska_ost_osd.osd.models.observatory_policies import CycleID
+from ska_ost_osd.osd.models.cycles import CycleID
 from ska_ost_osd.osd.views import (
     get_configuration,
     get_cycle_configuration,

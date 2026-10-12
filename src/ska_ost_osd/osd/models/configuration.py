@@ -17,13 +17,13 @@ from ska_ost_osd.osd.models.capabilities import (
     MidFrequencyBand,
     TelescopeCapabilitiesFileBase,
 )
+from ska_ost_osd.osd.models.cycles import Cycle
 from ska_ost_osd.osd.models.defaults import (
     AvoidanceConstraints,
     OSDBaseModel,
     SPFRxParameters,
     TelescopeDefaultsFileBase,
 )
-from ska_ost_osd.osd.models.observatory_policies import ObservatoryPolicy
 
 
 class ConfigurationModel(OSDBaseModel):
@@ -160,5 +160,5 @@ class CycleCapabilities(ConfigurationModel):
 class CycleConfiguration(ConfigurationModel):
     """One cycle joined with what it offers."""
 
-    observatory_policy: ObservatoryPolicy
+    observatory_policy: Cycle
     capabilities: CycleCapabilities

@@ -34,8 +34,22 @@ class TelescopeCapabilities(OSDBaseModel):
     ska_low: str | None = Field(default=None, alias="Low", examples=["AA2_SV"])
 
 
-class ObservatoryPolicy(OSDBaseModel):
-    """Top-level model for observatory_policies.json."""
+class Cycle(OSDBaseModel):
+    """One cycle: its metadata, proposal dates, policies and the capability
+    set each telescope offers."""
+
+    cycle_number: CycleID = Field(ge=1, examples=[1])
+    cycle_id: str | None = None
+    type: str | None = Field(default=None, examples=["Science Verification"])
+    cycle_description: str
+    cycle_information: CycleInformation
+    cycle_policies: CyclePolicies
+    telescope_capabilities: TelescopeCapabilities
+
+
+class CycleFile(OSDBaseModel):
+    """Top-level model for cycles/cycle_<N>.json, and for the legacy
+    observatory_policies.json."""
 
     cycle_number: CycleID = Field(ge=1, examples=[1])
     cycle_id: str | None = None

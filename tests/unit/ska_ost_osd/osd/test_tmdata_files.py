@@ -11,8 +11,8 @@ from pathlib import Path
 import pytest
 
 from ska_ost_osd.osd.models.capabilities import LowCapabilitiesFile, MidCapabilitiesFile
+from ska_ost_osd.osd.models.cycles import CycleFile
 from ska_ost_osd.osd.models.defaults import LowDefaultsFile, MidDefaultsFile
-from ska_ost_osd.osd.models.observatory_policies import ObservatoryPolicy
 from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplateLibraryFile
 
 TMDATA = Path(__file__).parents[4] / "tmdata"
@@ -25,14 +25,14 @@ TMDATA = Path(__file__).parents[4] / "tmdata"
         (LowCapabilitiesFile, "ska1_low/low_capabilities.json"),
         (MidDefaultsFile, "ska1_mid/mid_defaults.json"),
         (LowDefaultsFile, "ska1_low/low_defaults.json"),
-        (ObservatoryPolicy, "observatory_policies.json"),
+        (CycleFile, "observatory_policies.json"),
         (
             SubarrayTemplateLibraryFile,
             "subarray_templates/subarray_template_library.json",
         ),
     ]
     + [
-        (ObservatoryPolicy, f"cycles/{cycle.name}")
+        (CycleFile, f"cycles/{cycle.name}")
         for cycle in sorted((TMDATA / "cycles").glob("cycle_*.json"))
     ],
 )

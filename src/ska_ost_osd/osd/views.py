@@ -19,7 +19,7 @@ from ska_ost_osd.osd.models.configuration import (
     MidConfigurationCapabilitySet,
     MidCycleCapabilities,
 )
-from ska_ost_osd.osd.models.observatory_policies import CycleID
+from ska_ost_osd.osd.models.cycles import CycleID
 from ska_ost_osd.osd.queries import (
     get_basic_capabilities,
     get_capability_sets,

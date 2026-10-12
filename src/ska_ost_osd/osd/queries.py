@@ -27,13 +27,13 @@ from ska_ost_osd.osd.models.capabilities import (
     MidCapabilitySet,
 )
 from ska_ost_osd.osd.models.configuration import Constraints
+from ska_ost_osd.osd.models.cycles import Cycle, CycleFile, CycleID
 from ska_ost_osd.osd.models.defaults import (
     LowDefaults,
     LowDefaultsFile,
     MidDefaults,
     MidDefaultsFile,
 )
-from ska_ost_osd.osd.models.observatory_policies import CycleID, ObservatoryPolicy
 from ska_ost_osd.osd.models.subarray_templates import (
     SubarrayTemplate,
     SubarrayTemplateLibraryFile,
@@ -77,7 +77,7 @@ def get_cycle_ids(tmdata: TMData) -> list[CycleID]:
     )
 
 
-def get_cycle(tmdata: TMData, cycle_id: CycleID) -> ObservatoryPolicy:
+def get_cycle(tmdata: TMData, cycle_id: CycleID) -> Cycle:
     """Read one cycle, from ``cycles/cycle_<N>.json``: its metadata,
     policies and the capability set each telescope offers.
 
@@ -93,7 +93,7 @@ def get_cycle(tmdata: TMData, cycle_id: CycleID) -> ObservatoryPolicy:
     return _read_cycle(tmdata, cycle_id)
 
 
-def get_cycles(tmdata: TMData) -> list[ObservatoryPolicy]:
+def get_cycles(tmdata: TMData) -> list[Cycle]:
     """Read every cycle, in ascending order of ID.
 
     :param tmdata: TMData to read from.
@@ -354,10 +354,11 @@ def get_cycle_capability_sets(
     }
 
 
-def _read_cycle(tmdata: TMData, cycle_id: CycleID) -> ObservatoryPolicy:
-    return ObservatoryPolicy.model_validate(
+def _read_cycle(tmdata: TMData, cycle_id: CycleID) -> Cycle:
+    cycle_file = CycleFile.model_validate(
         _read(tmdata, f"{OBSERVING_CYCLES_TMDATA_DIR}/cycle_{cycle_id}.json")
     )
+    return Cycle.model_validate(cycle_file, from_attributes=True)
 
 
 def _read(tmdata: TMData, path: str) -> dict:

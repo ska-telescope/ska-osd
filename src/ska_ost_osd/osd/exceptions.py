@@ -7,7 +7,7 @@ from ska_ost_osd.osd.common.osd_validation_messages import (
     CYCLE_ID_ERROR_MESSAGE,
     FREQUENCY_BAND_DOESNOT_EXIST_ERROR_MESSAGE,
 )
-from ska_ost_osd.osd.models.observatory_policies import CycleID
+from ska_ost_osd.osd.models.cycles import CycleID
 
 
 class OSDQueryError(Exception):

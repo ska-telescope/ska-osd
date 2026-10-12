@@ -31,6 +31,13 @@ from ska_ost_osd.osd.models.configuration import (
     MidConfigurationCapabilitySet,
     MidCycleCapabilities,
 )
+from ska_ost_osd.osd.models.cycles import (
+    Cycle,
+    CycleID,
+    CycleInformation,
+    CyclePolicies,
+    TelescopeCapabilities,
+)
 from ska_ost_osd.osd.models.defaults import (
     AvoidanceConstraints,
     CSPSPFRx,
@@ -47,13 +54,6 @@ from ska_ost_osd.osd.models.defaults import (
     SyncPPS,
     TargetSPFRx,
 )
-from ska_ost_osd.osd.models.observatory_policies import (
-    CycleID,
-    CycleInformation,
-    CyclePolicies,
-    ObservatoryPolicy,
-    TelescopeCapabilities,
-)
 from ska_ost_osd.osd.models.subarray_templates import (
     SubarrayTemplate,
     SubarrayTemplateLibraryFile,
@@ -61,7 +61,7 @@ from ska_ost_osd.osd.models.subarray_templates import (
 )
 
 # tests/tmdata/cycles/cycle_1.json
-CYCLE_1 = ObservatoryPolicy(
+CYCLE_1 = Cycle(
     cycle_number=CycleID(1),
     cycle_id="TEST_SKAO_2027_Low_AA1_SV",
     type="Science Verification",
@@ -81,7 +81,7 @@ CYCLE_1 = ObservatoryPolicy(
 )
 
 # tests/tmdata/cycles/cycle_2.json
-CYCLE_2 = ObservatoryPolicy(
+CYCLE_2 = Cycle(
     cycle_number=CycleID(2),
     cycle_id="TEST_SKAO_2027_AA2_Proposal",
     type="Proposal",
