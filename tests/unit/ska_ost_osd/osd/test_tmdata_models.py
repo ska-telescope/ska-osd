@@ -37,7 +37,7 @@ from ska_ost_osd.osd.models.configuration import (
 )
 from ska_ost_osd.osd.models.defaults import LowDefaultsFile, MidDefaultsFile
 from ska_ost_osd.osd.models.observatory_policies import ObservatoryPolicy
-from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplateLibrary
+from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplateLibraryFile
 from ska_ost_osd.osd.osd import get_osd_using_tmdata
 from tests.unit.ska_ost_osd.osd.expected import MID_BASIC_CAPABILITIES
 
@@ -122,7 +122,7 @@ class TestBreakingChanges:
                 lambda data: data.update(cycle=data.pop("cycle_number")),
             ),
             (
-                SubarrayTemplateLibrary,
+                SubarrayTemplateLibraryFile,
                 SUBARRAY_TEMPLATES,
                 lambda data: next(iter(data.values())).update(subarray_type="AA9"),
             ),
@@ -475,7 +475,7 @@ class TestSubarrayTemplates:
         """Each top-level key becomes a template, named after the key."""
         data = load(SUBARRAY_TEMPLATES)
 
-        library = SubarrayTemplateLibrary.model_validate(data)
+        library = SubarrayTemplateLibraryFile.model_validate(data)
 
         assert [template.name for template in library.templates] == list(data)
 
@@ -484,7 +484,7 @@ class TestSubarrayTemplates:
         data = load(SUBARRAY_TEMPLATES)
         name = next(n for n, t in data.items() if t["subarray_type"] == "custom")
 
-        library = SubarrayTemplateLibrary.model_validate(data)
+        library = SubarrayTemplateLibraryFile.model_validate(data)
 
         template = next(t for t in library.templates if t.name == name)
         assert template.custom_stations == data[name]["custom_stations"].split(",")
@@ -506,7 +506,7 @@ class TestSubarrayTemplates:
         data[name]["custom_stations"] = stations
 
         with pytest.raises(ValidationError, match=message):
-            SubarrayTemplateLibrary.model_validate(data)
+            SubarrayTemplateLibraryFile.model_validate(data)
 
 
 class TestConfiguration:

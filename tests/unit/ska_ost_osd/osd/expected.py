@@ -41,6 +41,11 @@ from ska_ost_osd.osd.models.observatory_policies import (
     ObservatoryPolicy,
     TelescopeCapabilities,
 )
+from ska_ost_osd.osd.models.subarray_templates import (
+    SubarrayTemplate,
+    SubarrayTemplateLibraryFile,
+    SubarrayType,
+)
 
 # tests/tmdata/cycles/cycle_1.json
 CYCLE_1 = ObservatoryPolicy(
@@ -320,4 +325,48 @@ LOW_CONSTRAINTS = Constraints(
     sun_avoidance_angle_deg=30.0,
     moon_avoidance_angle_deg=10.0,
     jupiter_avoidance_angle_deg=10.0,
+)
+
+# tests/tmdata/subarray_templates/subarray_template_library.json
+MID_FULL_AA2_TEMPLATE = SubarrayTemplate(
+    name="MID_FULL_AA2",
+    subarray_type=SubarrayType.CUSTOM,
+    custom_stations=[
+        "SKA001",
+        "SKA002",
+        "SKA003",
+        "SKA004",
+        "SKA005",
+        "SKA006",
+        "SKA007",
+        "SKA008",
+    ],  # fmt: skip
+    description="TEST full Mid AA2 array.",
+)
+LOW_TEST_AA1_TEMPLATE = SubarrayTemplate(
+    name="LOW_TEST_AA1",
+    subarray_type=SubarrayType.CUSTOM,
+    custom_stations=["S8-1", "S8-2"],
+    description="TEST Low AA1 subset of stations.",
+)
+LOW_FULL_AA2_TEMPLATE = SubarrayTemplate(
+    name="LOW_FULL_AA2",
+    subarray_type=SubarrayType.AA2,
+    custom_stations=[],
+    description="TEST full Low AA2 array.",
+)
+LOW_TEST_AA2_TEMPLATE = SubarrayTemplate(
+    name="LOW_TEST_AA2",
+    subarray_type=SubarrayType.CUSTOM,
+    custom_stations=["S8-1", "S8-2", "S8-3", "S8-4"],
+    description="TEST Low AA2 subset of stations.",
+)
+
+SUBARRAY_TEMPLATE_LIBRARY_FILE = SubarrayTemplateLibraryFile(
+    templates=[
+        MID_FULL_AA2_TEMPLATE,
+        LOW_TEST_AA1_TEMPLATE,
+        LOW_FULL_AA2_TEMPLATE,
+        LOW_TEST_AA2_TEMPLATE,
+    ]
 )

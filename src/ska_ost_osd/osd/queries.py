@@ -12,6 +12,7 @@ from ska_ost_osd.osd.common.constant import (
     CAPABILITIES_JSON_FILE_PATHS,
     DEFAULTS_JSON_FILE_PATHS,
     OBSERVING_CYCLES_TMDATA_DIR,
+    SUBARRAY_TEMPLATES_PATH,
     Telescope,
 )
 from ska_ost_osd.osd.exceptions import CapabilitySetNotFoundError, CycleNotFoundError
@@ -32,6 +33,7 @@ from ska_ost_osd.osd.models.defaults import (
     MidDefaultsFile,
 )
 from ska_ost_osd.osd.models.observatory_policies import CycleID, ObservatoryPolicy
+from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplateLibraryFile
 
 _CAPABILITIES_FILE_MODELS = {
     Telescope.MID: MidCapabilitiesFile,
@@ -274,6 +276,19 @@ def get_capability_set(
             return capability_set
     raise CapabilitySetNotFoundError(
         telescope, name, [capability_set.name for capability_set in capability_sets]
+    )
+
+
+def get_subarray_template_library(tmdata: TMData) -> SubarrayTemplateLibraryFile:
+    """Read the subarray template library file: every template, for both
+    telescopes.
+
+    :param tmdata: TMData to read from.
+    :return: the template library.
+    :raises FileNotFoundError: If the tmdata has no template library file.
+    """
+    return SubarrayTemplateLibraryFile.model_validate(
+        _read(tmdata, SUBARRAY_TEMPLATES_PATH)
     )
 
 

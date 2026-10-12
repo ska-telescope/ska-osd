@@ -40,7 +40,7 @@ class SubarrayTemplate(OSDBaseModel):
         return self
 
 
-class SubarrayTemplateLibrary(OSDBaseModel):
+class SubarrayTemplateLibraryFile(OSDBaseModel):
     """Top-level model for subarray_template_library.json."""
 
     templates: list[SubarrayTemplate]

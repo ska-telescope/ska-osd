@@ -19,6 +19,7 @@ from ska_ost_osd.osd.queries import (
     get_cycle_ids,
     get_cycles,
     get_defaults,
+    get_subarray_template_library,
     get_telescope_capabilities,
     get_telescope_defaults,
 )
@@ -39,6 +40,7 @@ from tests.unit.ska_ost_osd.osd.expected import (
     MID_CONSTRAINTS,
     MID_DEFAULTS,
     MID_DEFAULTS_FILE,
+    SUBARRAY_TEMPLATE_LIBRARY_FILE,
 )
 
 
@@ -224,6 +226,21 @@ class TestGetCapabilitySet:
             FileNotFoundError, match="file not found: ska1_low/low_capabilities.json"
         ):
             get_capability_set(empty_tmdata, Telescope.LOW, "AA1")
+
+
+class TestGetSubarrayTemplateLibrary:
+    def test_returns_library_file(self, tests_tmdata):
+        assert (
+            get_subarray_template_library(tests_tmdata)
+            == SUBARRAY_TEMPLATE_LIBRARY_FILE
+        )
+
+    def test_raises_when_file_missing(self, empty_tmdata):
+        with pytest.raises(
+            FileNotFoundError,
+            match="file not found: subarray_templates/subarray_template_library.json",
+        ):
+            get_subarray_template_library(empty_tmdata)
 
 
 class TestExceptions:
