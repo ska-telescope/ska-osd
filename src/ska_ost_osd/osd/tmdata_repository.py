@@ -49,7 +49,7 @@ class TMDataRepository:
     def get_defaults(self, telescope: Literal[Telescope.LOW]) -> LowDefaults: ...
 
     def get_defaults(self, telescope: Telescope) -> MidDefaults | LowDefaults:
-        raise NotImplementedError
+        return queries.get_defaults(self._tmdata, telescope)
 
     @overload
     def get_basic_capabilities(
