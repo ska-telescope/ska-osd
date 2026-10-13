@@ -1,5 +1,5 @@
 """The models expected from the test copy of the tmdata in tests/tmdata,
-written out field by field so the queries are checked against the files
+written out field by field so the repository is checked against the files
 rather than against each other."""
 
 from datetime import datetime, timezone

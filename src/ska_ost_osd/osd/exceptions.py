@@ -1,4 +1,5 @@
-"""Exceptions raised by the query functions in ``ska_ost_osd.osd.queries``."""
+"""Exceptions raised by the OSD repository and the reader models when a key
+has no data."""
 
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.common.osd_validation_messages import (

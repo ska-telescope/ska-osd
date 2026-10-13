@@ -1,5 +1,6 @@
 """The OSD repository backed by the tmdata, read through a TMData client."""
 
+from fnmatch import fnmatchcase
 from typing import Literal, overload
 
 from ska_telmodel_client import TMData
@@ -22,6 +23,12 @@ from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplate
 _DEFAULTS_MODELS = {
     Telescope.MID: MidDefaults,
     Telescope.LOW: LowDefaults,
+}
+
+# The fields of a cycle's telescope_capabilities, by telescope
+_CYCLE_TELESCOPE_FIELDS = {
+    Telescope.MID: "ska_mid",
+    Telescope.LOW: "ska_low",
 }
 
 
@@ -128,12 +135,32 @@ class TMDataRepository:
     def get_subarray_templates(
         self, telescope: Telescope, capability_set: str
     ) -> list[SubarrayTemplate]:
-        return queries.get_subarray_templates(self._tmdata, telescope, capability_set)
+        """A template belongs to the capability set when its name matches one
+        of the set's ``subarray_templates`` patterns (e.g. ``"*_AA2"``) and
+        starts with the set's telescope (e.g. ``"MID_"``). A pattern alone is
+        not enough: ``"*_AA2"`` matches both telescopes' AA2 templates."""
+        patterns = (
+            self.get_capability_set(telescope, capability_set).subarray_templates or []
+        )
+        prefix = f"{telescope.value.upper()}_"
+        return [
+            template
+            for template in queries.get_subarray_template_library(
+                self._tmdata
+            ).templates
+            if template.name.startswith(prefix)
+            and any(fnmatchcase(template.name, pattern) for pattern in patterns)
+        ]
 
     def get_cycle_capability_sets(
         self, cycle_id: CycleID
     ) -> dict[Telescope, CapabilitySet]:
-        return queries.get_cycle_capability_sets(self._tmdata, cycle_id)
+        offered = self.get_cycle(cycle_id).telescope_capabilities
+        return {
+            telescope: self.get_capability_set(telescope, name)
+            for telescope, field in _CYCLE_TELESCOPE_FIELDS.items()
+            if (name := getattr(offered, field)) is not None
+        }
 
     # Storage to reader models
 
