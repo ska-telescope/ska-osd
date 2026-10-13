@@ -77,20 +77,22 @@ class TestGetCycleConfiguration:
         [(CycleID(1), CYCLE_1_CONFIGURATION), (CycleID(2), CYCLE_2_CONFIGURATION)],
         ids=["low only", "mid and low"],
     )
-    def test_returns_cycle_configuration(self, tests_tmdata, cycle_id, expected):
-        assert get_cycle_configuration(tests_tmdata, cycle_id) == expected
+    def test_returns_cycle_configuration(
+        self, test_tmdata_repository, cycle_id, expected
+    ):
+        assert get_cycle_configuration(test_tmdata_repository, cycle_id) == expected
 
-    def test_raises_for_unknown_cycle(self, tests_tmdata):
+    def test_raises_for_unknown_cycle(self, test_tmdata_repository):
         with pytest.raises(CycleNotFoundError):
-            get_cycle_configuration(tests_tmdata, CycleID(3))
+            get_cycle_configuration(test_tmdata_repository, CycleID(3))
 
-    def test_serves_the_pht_cycle_fields(self, tests_tmdata):
+    def test_serves_the_pht_cycle_fields(self, test_tmdata_repository):
         """The JSON, with aliases as ska-oso-services serves it, has the
         names the PHT UI reads: telescope_capabilities Mid/Low, Mid's
         basic_capabilities.receiver_information, and under each telescope
         only basic_capabilities and the offered capability set, keyed by
         its name."""
-        served = get_cycle_configuration(tests_tmdata, CycleID(2)).model_dump(
+        served = get_cycle_configuration(test_tmdata_repository, CycleID(2)).model_dump(
             mode="json", by_alias=True
         )
 
@@ -105,26 +107,28 @@ class TestGetCycleConfiguration:
         assert mid["AA2"]["name"] == "AA2"
         assert list(served["capabilities"]["low"]) == ["basic_capabilities", "AA2"]
 
-    def test_telescope_not_offered_is_null(self, tests_tmdata):
-        served = get_cycle_configuration(tests_tmdata, CycleID(1)).model_dump(
+    def test_telescope_not_offered_is_null(self, test_tmdata_repository):
+        served = get_cycle_configuration(test_tmdata_repository, CycleID(1)).model_dump(
             mode="json", by_alias=True
         )
         assert served["capabilities"]["mid"] is None
 
     @pytest.mark.parametrize("cycle_id", [CycleID(1), CycleID(2)])
-    def test_served_cycle_configuration_validates(self, tests_tmdata, cycle_id):
-        configuration = get_cycle_configuration(tests_tmdata, cycle_id)
+    def test_served_cycle_configuration_validates(
+        self, test_tmdata_repository, cycle_id
+    ):
+        configuration = get_cycle_configuration(test_tmdata_repository, cycle_id)
         served = configuration.model_dump(mode="json", by_alias=True)
         assert CycleConfiguration.model_validate(served) == configuration
 
 
 class TestGetCycleConfigurations:
-    def test_returns_every_cycle_in_id_order(self, tests_tmdata):
-        assert get_cycle_configurations(tests_tmdata) == [
+    def test_returns_every_cycle_in_id_order(self, test_tmdata_repository):
+        assert get_cycle_configurations(test_tmdata_repository) == [
             CYCLE_1_CONFIGURATION,
             CYCLE_2_CONFIGURATION,
         ]
 
-    def test_raises_when_cycles_directory_missing(self, empty_tmdata):
+    def test_raises_when_cycles_directory_missing(self, empty_tmdata_repository):
         with pytest.raises(FileNotFoundError):
-            get_cycle_configurations(empty_tmdata)
+            get_cycle_configurations(empty_tmdata_repository)

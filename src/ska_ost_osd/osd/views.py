@@ -1,10 +1,8 @@
-"""Views: the query results recast into the shapes their consumers use.
+"""Views: the repository's data recast into the shapes its consumers use.
 
-Views build only on the functions in ``ska_ost_osd.osd.queries`` and never
-read the tmdata themselves.
+Views build only on the methods of ``OSDRepository``, so they work with any
+repository; errors from reading the data come from the repository.
 """
-
-from ska_telmodel_client import TMData
 
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.configuration import (
@@ -20,12 +18,6 @@ from ska_ost_osd.osd.models.configuration import (
     MidCycleCapabilities,
 )
 from ska_ost_osd.osd.models.cycles import CycleID
-from ska_ost_osd.osd.queries import (
-    get_basic_capabilities,
-    get_cycle,
-    get_cycle_capability_sets,
-    get_cycle_ids,
-)
 from ska_ost_osd.osd.repository import OSDRepository
 
 
@@ -36,8 +28,6 @@ def get_configuration(repository: OSDRepository) -> Configuration:
     :param repository: the OSD repository to read from.
     :return: both telescopes' bands, constraints, defaults and capability
         sets.
-    :raises FileNotFoundError: If the tmdata has no capabilities or defaults
-        file for a telescope.
     """
     return Configuration(
         ska_mid=MidConfiguration(
@@ -70,33 +60,34 @@ def get_configuration(repository: OSDRepository) -> Configuration:
     )
 
 
-def get_cycle_configuration(tmdata: TMData, cycle_id: CycleID) -> CycleConfiguration:
+def get_cycle_configuration(
+    repository: OSDRepository, cycle_id: CycleID
+) -> CycleConfiguration:
     """Build one cycle's view for the PHT: what ska-oso-services serves from
     GET /prsls/osd/{cycle}.
 
-    :param tmdata: TMData to read from.
+    :param repository: the OSD repository to read from.
     :param cycle_id: the ID of the cycle.
     :return: the cycle with, for each telescope it offers, the offered
         capability set and that telescope's basic capabilities.
     :raises CycleNotFoundError: If there is no cycle with that ID.
     :raises CapabilitySetNotFoundError: If the cycle names a capability set
         that does not exist.
-    :raises FileNotFoundError: If a tmdata file is missing.
     """
-    capability_sets = get_cycle_capability_sets(tmdata, cycle_id)
+    capability_sets = repository.get_cycle_capability_sets(cycle_id)
     mid = capability_sets.get(Telescope.MID)
     low = capability_sets.get(Telescope.LOW)
     return CycleConfiguration(
-        observatory_policy=get_cycle(tmdata, cycle_id),
+        observatory_policy=repository.get_cycle(cycle_id),
         capabilities=CycleCapabilities(
             mid=MidCycleCapabilities(
-                basic_capabilities=get_basic_capabilities(tmdata, Telescope.MID),
+                basic_capabilities=repository.get_basic_capabilities(Telescope.MID),
                 capability_set=mid,
             )
             if mid
             else None,
             low=LowCycleCapabilities(
-                basic_capabilities=get_basic_capabilities(tmdata, Telescope.LOW),
+                basic_capabilities=repository.get_basic_capabilities(Telescope.LOW),
                 capability_set=low,
             )
             if low
@@ -105,16 +96,16 @@ def get_cycle_configuration(tmdata: TMData, cycle_id: CycleID) -> CycleConfigura
     )
 
 
-def get_cycle_configurations(tmdata: TMData) -> list[CycleConfiguration]:
+def get_cycle_configurations(repository: OSDRepository) -> list[CycleConfiguration]:
     """Build every cycle's view for the PHT, in ascending order of ID: what
     ska-oso-services serves from GET /prsls/osd/cycles.
 
-    :param tmdata: TMData to read from.
+    :param repository: the OSD repository to read from.
     :return: the cycle views.
     :raises CapabilitySetNotFoundError: If a cycle names a capability set
         that does not exist.
-    :raises FileNotFoundError: If a tmdata file is missing.
     """
     return [
-        get_cycle_configuration(tmdata, cycle_id) for cycle_id in get_cycle_ids(tmdata)
+        get_cycle_configuration(repository, cycle_id)
+        for cycle_id in repository.get_cycle_ids()
     ]
