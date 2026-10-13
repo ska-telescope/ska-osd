@@ -35,6 +35,7 @@ from ska_ost_osd.osd.models.capabilities import (
     MidCapabilitySet,
     MidFrequencyBand,
 )
+from ska_ost_osd.osd.models.constraints import Constraints
 from ska_ost_osd.osd.osd import get_osd_using_tmdata
 from tests.unit.ska_ost_osd.osd.expected import MID_BASIC_CAPABILITIES
 
@@ -487,3 +488,42 @@ class TestSubarrayTemplates:
 
         with pytest.raises(ValidationError, match=message):
             SubarrayTemplateLibraryFile.model_validate(data)
+
+
+class TestConstraints:
+    """Constraints validates its own fields, independently of the storage
+    models it is built from."""
+
+    VALID = {
+        "min_elevation_deg": 15.0,
+        "max_elevation_deg": 90.0,
+        "sun_avoidance_angle_deg": 45.0,
+        "moon_avoidance_angle_deg": 5.0,
+        "jupiter_avoidance_angle_deg": 5.0,
+    }
+
+    def test_accepts_valid_constraints(self):
+        assert Constraints(**self.VALID).model_dump() == self.VALID
+
+    @pytest.mark.parametrize(
+        "update, message",
+        [
+            (
+                {"min_elevation_deg": 90.0, "max_elevation_deg": 10.0},
+                "min_elevation_deg must not exceed max_elevation_deg",
+            ),
+            ({"min_elevation_deg": -1.0}, "greater than or equal to 0"),
+            ({"max_elevation_deg": 91.0}, "less than or equal to 90"),
+        ],
+        ids=["elevation range", "below horizon", "above zenith"],
+    )
+    def test_rejects_invalid_elevations(self, update, message):
+        with pytest.raises(ValidationError, match=message):
+            Constraints(**{**self.VALID, **update})
+
+    @pytest.mark.parametrize("field", list(VALID))
+    def test_requires_every_field(self, field):
+        data = {key: value for key, value in self.VALID.items() if key != field}
+
+        with pytest.raises(ValidationError, match=field):
+            Constraints(**data)
