@@ -45,16 +45,3 @@ class Cycle(OSDBaseModel):
     cycle_information: CycleInformation
     cycle_policies: CyclePolicies
     telescope_capabilities: TelescopeCapabilities
-
-
-class CycleFile(OSDBaseModel):
-    """Top-level model for cycles/cycle_<N>.json, and for the legacy
-    observatory_policies.json."""
-
-    cycle_number: CycleID = Field(ge=1, examples=[1])
-    cycle_id: str | None = None
-    type: str | None = Field(default=None, examples=["Science Verification"])
-    cycle_description: str
-    cycle_information: CycleInformation
-    cycle_policies: CyclePolicies
-    telescope_capabilities: TelescopeCapabilities

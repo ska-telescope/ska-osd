@@ -1,10 +1,9 @@
-import re
 from enum import StrEnum
 from typing import Annotated, Any, Literal, Self
 
 from pydantic import AliasChoices, Field, model_validator
 
-from ska_ost_osd.osd.common.constant import ARRAY_ASSEMBLY_PATTERN, Telescope
+from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.exceptions import (
     Band5bSubbandNotFoundError,
     FrequencyBandNotFoundError,
@@ -54,33 +53,6 @@ class CapabilitySetBase(OSDBaseModel):
     # templates, the matching templates keyed by name. The *_ITF assemblies
     # have none.
     subarray_templates: list[str] | dict[str, Any] | None = None
-
-
-class TelescopeCapabilitiesFileBase(OSDBaseModel):
-    """Base for the Mid and Low capabilities file models."""
-
-    constraints: ElevationConstraints
-
-    @model_validator(mode="before")
-    @classmethod
-    def collect_subarrays(cls, data: Any) -> Any:
-        """
-        In the tmdata file each array assembly is a top-level key;
-        gather the keys matching ``ARRAY_ASSEMBLY_PATTERN`` into
-        ``subarrays``, using the key as the subarray name.
-
-        The pattern separates the array assemblies from the file's other
-        top-level keys.
-        """
-        if not isinstance(data, dict) or "subarrays" in data:
-            return data
-        data = data.copy()
-        data["subarrays"] = [
-            {"name": key, **data.pop(key)}
-            for key in list(data)
-            if re.match(ARRAY_ASSEMBLY_PATTERN, key)
-        ]
-        return data
 
 
 class MidCBFMode(StrEnum):
@@ -167,26 +139,6 @@ class MidCapabilitySet(CapabilitySetBase):
         return self
 
 
-class MidCapabilitiesFile(TelescopeCapabilitiesFileBase):
-    """Top-level model for mid_capabilities.json."""
-
-    telescope: Literal["Mid"] = "Mid"
-    basic_capabilities: MidBasicCapabilities
-    subarrays: list[MidCapabilitySet]
-
-    @model_validator(mode="after")
-    def check_available_receivers(self) -> Self:
-        rx_ids = {band.rx_id for band in self.basic_capabilities.frequency_bands}
-        for subarray in self.subarrays:
-            unknown = set(subarray.available_receivers) - rx_ids
-            if unknown:
-                raise ValueError(
-                    f"{subarray.name}: available_receivers {sorted(unknown)} "
-                    "not found in frequency_bands"
-                )
-        return self
-
-
 class LowCBFMode(StrEnum):
     VIS = "vis"
     PST = "pst"
@@ -230,11 +182,3 @@ class LowCapabilitySet(CapabilitySetBase):
 CapabilitySet = Annotated[
     MidCapabilitySet | LowCapabilitySet, Field(discriminator="telescope")
 ]
-
-
-class LowCapabilitiesFile(TelescopeCapabilitiesFileBase):
-    """Top-level model for low_capabilities.json."""
-
-    telescope: Literal["Low"] = "Low"
-    basic_capabilities: LowBasicCapabilities
-    subarrays: list[LowCapabilitySet]

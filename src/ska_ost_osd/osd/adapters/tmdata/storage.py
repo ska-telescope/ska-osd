@@ -10,6 +10,14 @@ from typing import Literal, overload
 
 from ska_telmodel_client import TMData
 
+from ska_ost_osd.osd.adapters.tmdata.models import (
+    CycleFile,
+    LowCapabilitiesFile,
+    LowDefaultsFile,
+    MidCapabilitiesFile,
+    MidDefaultsFile,
+    SubarrayTemplateLibraryFile,
+)
 from ska_ost_osd.osd.common.constant import (
     CAPABILITIES_JSON_FILE_PATHS,
     DEFAULTS_JSON_FILE_PATHS,
@@ -17,18 +25,7 @@ from ska_ost_osd.osd.common.constant import (
     SUBARRAY_TEMPLATES_PATH,
     Telescope,
 )
-from ska_ost_osd.osd.models.capabilities import (
-    LowCapabilitiesFile,
-    MidCapabilitiesFile,
-)
-from ska_ost_osd.osd.models.cycles import CycleFile, CycleID
-from ska_ost_osd.osd.models.defaults import (
-    LowDefaultsFile,
-    MidDefaultsFile,
-)
-from ska_ost_osd.osd.models.subarray_templates import (
-    SubarrayTemplateLibraryFile,
-)
+from ska_ost_osd.osd.models.cycles import CycleID
 
 _CAPABILITIES_FILE_MODELS = {
     Telescope.MID: MidCapabilitiesFile,

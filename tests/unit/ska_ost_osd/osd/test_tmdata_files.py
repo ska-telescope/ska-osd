@@ -10,10 +10,14 @@ from pathlib import Path
 
 import pytest
 
-from ska_ost_osd.osd.models.capabilities import LowCapabilitiesFile, MidCapabilitiesFile
-from ska_ost_osd.osd.models.cycles import CycleFile
-from ska_ost_osd.osd.models.defaults import LowDefaultsFile, MidDefaultsFile
-from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplateLibraryFile
+from ska_ost_osd.osd.adapters.tmdata.models import (
+    CycleFile,
+    LowCapabilitiesFile,
+    LowDefaultsFile,
+    MidCapabilitiesFile,
+    MidDefaultsFile,
+    SubarrayTemplateLibraryFile,
+)
 
 TMDATA = Path(__file__).parents[4] / "tmdata"
 

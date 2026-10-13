@@ -15,6 +15,14 @@ from pathlib import Path
 import pytest
 from pydantic import TypeAdapter, ValidationError
 
+from ska_ost_osd.osd.adapters.tmdata.models import (
+    CycleFile,
+    LowCapabilitiesFile,
+    LowDefaultsFile,
+    MidCapabilitiesFile,
+    MidDefaultsFile,
+    SubarrayTemplateLibraryFile,
+)
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.exceptions import (
     Band5bSubbandNotFoundError,
@@ -23,15 +31,10 @@ from ska_ost_osd.osd.exceptions import (
 from ska_ost_osd.osd.models.capabilities import (
     Band5bSubband,
     CapabilitySet,
-    LowCapabilitiesFile,
     LowCapabilitySet,
-    MidCapabilitiesFile,
     MidCapabilitySet,
     MidFrequencyBand,
 )
-from ska_ost_osd.osd.models.cycles import CycleFile
-from ska_ost_osd.osd.models.defaults import LowDefaultsFile, MidDefaultsFile
-from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplateLibraryFile
 from ska_ost_osd.osd.osd import get_osd_using_tmdata
 from tests.unit.ska_ost_osd.osd.expected import MID_BASIC_CAPABILITIES
 

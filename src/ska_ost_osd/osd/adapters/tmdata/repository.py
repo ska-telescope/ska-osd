@@ -6,6 +6,7 @@ from typing import Literal, overload
 from ska_telmodel_client import TMData
 
 from ska_ost_osd.osd.adapters.tmdata import storage
+from ska_ost_osd.osd.adapters.tmdata.models import CycleFile
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.exceptions import CapabilitySetNotFoundError, CycleNotFoundError
 from ska_ost_osd.osd.models.capabilities import (
@@ -16,7 +17,7 @@ from ska_ost_osd.osd.models.capabilities import (
     MidCapabilitySet,
 )
 from ska_ost_osd.osd.models.constraints import Constraints
-from ska_ost_osd.osd.models.cycles import Cycle, CycleFile, CycleID
+from ska_ost_osd.osd.models.cycles import Cycle, CycleID
 from ska_ost_osd.osd.models.defaults import LowDefaults, MidDefaults
 from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplate
 

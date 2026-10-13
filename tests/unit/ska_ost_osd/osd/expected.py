@@ -4,15 +4,21 @@ rather than against each other."""
 
 from datetime import datetime, timezone
 
+from ska_ost_osd.osd.adapters.tmdata.models import (
+    CycleFile,
+    LowCapabilitiesFile,
+    LowDefaultsFile,
+    MidCapabilitiesFile,
+    MidDefaultsFile,
+    SubarrayTemplateLibraryFile,
+)
 from ska_ost_osd.osd.models.capabilities import (
     Band5bSubband,
     ElevationConstraints,
     LowBasicCapabilities,
-    LowCapabilitiesFile,
     LowCapabilitySet,
     LowCBFMode,
     MidBasicCapabilities,
-    MidCapabilitiesFile,
     MidCapabilitySet,
     MidCBFMode,
     MidFrequencyBand,
@@ -20,7 +26,6 @@ from ska_ost_osd.osd.models.capabilities import (
 from ska_ost_osd.osd.models.constraints import Constraints
 from ska_ost_osd.osd.models.cycles import (
     Cycle,
-    CycleFile,
     CycleID,
     CycleInformation,
     CyclePolicies,
@@ -32,21 +37,15 @@ from ska_ost_osd.osd.models.defaults import (
     DefaultNoiseDiodeMode,
     LowCBFMetrics,
     LowDefaults,
-    LowDefaultsFile,
     LowQualityAttributeMetrics,
     MidDefaults,
-    MidDefaultsFile,
     PeriodicNoiseDiode,
     PseudoRandomNoiseDiode,
     SPFRxParameters,
     SyncPPS,
     TargetSPFRx,
 )
-from ska_ost_osd.osd.models.subarray_templates import (
-    SubarrayTemplate,
-    SubarrayTemplateLibraryFile,
-    SubarrayType,
-)
+from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplate, SubarrayType
 from ska_ost_osd.osd.views.odt import (
     Configuration,
     ConfigurationLowCBFMetrics,

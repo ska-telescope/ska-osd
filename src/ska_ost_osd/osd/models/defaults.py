@@ -26,16 +26,6 @@ class AvoidanceConstraints(OSDBaseModel):
     jupiter_avoidance_angle_deg: float = Field(examples=[10.0])
 
 
-class TelescopeDefaultsFileBase(OSDBaseModel):
-    """
-    Base for the Mid and Low defaults file models. Subclasses narrow
-    ``telescope`` to their own value.
-    """
-
-    telescope: Literal["ska-mid", "ska-low"]
-    constraints: AvoidanceConstraints
-
-
 class NoiseDiodeMode(StrEnum):
     PERIODIC = "periodic"
     PSEUDO_RANDOM = "pseudo_random"
@@ -150,15 +140,6 @@ class MidDefaults(OSDBaseModel):
     spfrx_defaults: SPFRxParameters
 
 
-class MidDefaultsFile(TelescopeDefaultsFileBase):
-    """Top-level model for mid_defaults.json."""
-
-    telescope: Literal["Mid"] = "Mid"
-    spfrx_defaults: SPFRxParameters = Field(
-        validation_alias=AliasChoices("spfrx_defaults", "defaults")
-    )
-
-
 class LowCBFMetrics(OSDBaseModel):
     processors_ready_percent: float = Field(ge=0, le=100)
     alveo_configured_percent: float = Field(ge=0, le=100)
@@ -171,11 +152,4 @@ class LowQualityAttributeMetrics(OSDBaseModel):
 class LowDefaults(OSDBaseModel):
     """Low's defaults: the quality attribute metrics."""
 
-    quality_attribute_metrics: LowQualityAttributeMetrics
-
-
-class LowDefaultsFile(TelescopeDefaultsFileBase):
-    """Top-level model for low_defaults.json."""
-
-    telescope: Literal["Low"] = "Low"
     quality_attribute_metrics: LowQualityAttributeMetrics
