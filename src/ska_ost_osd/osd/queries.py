@@ -90,17 +90,7 @@ def get_cycle(tmdata: TMData, cycle_id: CycleID) -> Cycle:
     cycle_ids = get_cycle_ids(tmdata)
     if cycle_id not in cycle_ids:
         raise CycleNotFoundError(cycle_id, cycle_ids)
-    return _read_cycle(tmdata, cycle_id)
-
-
-def get_cycles(tmdata: TMData) -> list[Cycle]:
-    """Read every cycle, in ascending order of ID.
-
-    :param tmdata: TMData to read from.
-    :return: the cycles.
-    :raises FileNotFoundError: If the tmdata has no cycles directory.
-    """
-    return [_read_cycle(tmdata, cycle_id) for cycle_id in get_cycle_ids(tmdata)]
+    return Cycle.model_validate(get_cycle_file(tmdata, cycle_id), from_attributes=True)
 
 
 def get_cycle_file(tmdata: TMData, cycle_id: CycleID) -> CycleFile:
@@ -367,10 +357,6 @@ def get_cycle_capability_sets(
         for telescope, field in _CYCLE_TELESCOPE_FIELDS.items()
         if (name := getattr(offered, field)) is not None
     }
-
-
-def _read_cycle(tmdata: TMData, cycle_id: CycleID) -> Cycle:
-    return Cycle.model_validate(get_cycle_file(tmdata, cycle_id), from_attributes=True)
 
 
 def _read(tmdata: TMData, path: str) -> dict:

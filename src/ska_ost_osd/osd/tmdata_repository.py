@@ -6,6 +6,7 @@ from ska_telmodel_client import TMData
 
 from ska_ost_osd.osd import queries
 from ska_ost_osd.osd.common.constant import Telescope
+from ska_ost_osd.osd.exceptions import CycleNotFoundError
 from ska_ost_osd.osd.models.capabilities import (
     CapabilitySet,
     LowBasicCapabilities,
@@ -14,7 +15,7 @@ from ska_ost_osd.osd.models.capabilities import (
     MidCapabilitySet,
 )
 from ska_ost_osd.osd.models.configuration import Constraints
-from ska_ost_osd.osd.models.cycles import Cycle, CycleID
+from ska_ost_osd.osd.models.cycles import Cycle, CycleFile, CycleID
 from ska_ost_osd.osd.models.defaults import LowDefaults, MidDefaults
 from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplate
 
@@ -35,10 +36,16 @@ class TMDataRepository:
         return queries.get_cycle_ids(self._tmdata)
 
     def get_cycle(self, cycle_id: CycleID) -> Cycle:
-        return queries.get_cycle(self._tmdata, cycle_id)
+        cycle_ids = self.get_cycle_ids()
+        if cycle_id not in cycle_ids:
+            raise CycleNotFoundError(cycle_id, cycle_ids)
+        return self._to_cycle(queries.get_cycle_file(self._tmdata, cycle_id))
 
     def get_cycles(self) -> list[Cycle]:
-        return queries.get_cycles(self._tmdata)
+        return [
+            self._to_cycle(queries.get_cycle_file(self._tmdata, cycle_id))
+            for cycle_id in self.get_cycle_ids()
+        ]
 
     # Per telescope
 
@@ -108,3 +115,9 @@ class TMDataRepository:
         self, cycle_id: CycleID
     ) -> dict[Telescope, CapabilitySet]:
         return queries.get_cycle_capability_sets(self._tmdata, cycle_id)
+
+    # Storage to reader models
+
+    @staticmethod
+    def _to_cycle(cycle_file: CycleFile) -> Cycle:
+        return Cycle.model_validate(cycle_file, from_attributes=True)
