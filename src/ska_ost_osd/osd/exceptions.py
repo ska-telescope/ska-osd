@@ -27,7 +27,7 @@ class CycleNotFoundError(OSDQueryError, LookupError):
         self.available_cycle_ids = available_cycle_ids
         super().__init__(
             CYCLE_ID_ERROR_MESSAGE.format(
-                cycle_id, ",".join(str(cycle) for cycle in available_cycle_ids)
+                cycle_id, ", ".join(str(cycle) for cycle in available_cycle_ids)
             )
         )
 

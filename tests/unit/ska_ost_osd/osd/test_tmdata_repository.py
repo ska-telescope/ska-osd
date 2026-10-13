@@ -58,7 +58,7 @@ class TestGetCycle:
 
     def test_raises_for_unknown_cycle(self, test_tmdata_repository):
         with pytest.raises(
-            CycleNotFoundError, match=r"Cycle 3 is invalid\. Valid IDs are 1,2\."
+            CycleNotFoundError, match=r"Cycle 3 is invalid\. Valid IDs are 1, 2\."
         ) as excinfo:
             test_tmdata_repository.get_cycle(CycleID(3))
 
