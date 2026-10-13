@@ -3,9 +3,15 @@ tests/tmdata."""
 
 import pytest
 
+from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.exceptions import CycleNotFoundError
 from ska_ost_osd.osd.models.cycles import Cycle, CycleID
-from tests.unit.ska_ost_osd.osd.expected import CYCLE_1, CYCLE_2
+from tests.unit.ska_ost_osd.osd.expected import (
+    CYCLE_1,
+    CYCLE_2,
+    LOW_BASIC_CAPABILITIES,
+    MID_BASIC_CAPABILITIES,
+)
 
 
 class TestGetCycleIds:
@@ -51,3 +57,23 @@ class TestGetCycles:
     def test_raises_when_cycles_directory_missing(self, empty_tmdata_repository):
         with pytest.raises(FileNotFoundError, match="file not found: cycles"):
             empty_tmdata_repository.get_cycles()
+
+
+class TestGetBasicCapabilities:
+    @pytest.mark.parametrize(
+        "telescope, expected",
+        [
+            (Telescope.MID, MID_BASIC_CAPABILITIES),
+            (Telescope.LOW, LOW_BASIC_CAPABILITIES),
+        ],
+    )
+    def test_returns_basic_capabilities(
+        self, test_tmdata_repository, telescope, expected
+    ):
+        assert test_tmdata_repository.get_basic_capabilities(telescope) == expected
+
+    def test_raises_when_file_missing(self, empty_tmdata_repository):
+        with pytest.raises(
+            FileNotFoundError, match="file not found: ska1_low/low_capabilities.json"
+        ):
+            empty_tmdata_repository.get_basic_capabilities(Telescope.LOW)

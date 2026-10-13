@@ -64,7 +64,7 @@ class TMDataRepository:
     def get_basic_capabilities(
         self, telescope: Telescope
     ) -> MidBasicCapabilities | LowBasicCapabilities:
-        raise NotImplementedError
+        return queries.get_basic_capabilities(self._tmdata, telescope)
 
     def get_constraints(self, telescope: Telescope) -> Constraints:
         raise NotImplementedError
