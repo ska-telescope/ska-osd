@@ -82,7 +82,7 @@ class TMDataRepository:
     ) -> list[LowCapabilitySet]: ...
 
     def get_capability_sets(self, telescope: Telescope) -> list[CapabilitySet]:
-        raise NotImplementedError
+        return queries.get_capability_sets(self._tmdata, telescope)
 
     @overload
     def get_capability_set(
@@ -95,7 +95,7 @@ class TMDataRepository:
     ) -> LowCapabilitySet: ...
 
     def get_capability_set(self, telescope: Telescope, name: str) -> CapabilitySet:
-        raise NotImplementedError
+        return queries.get_capability_set(self._tmdata, telescope, name)
 
     # Joins
 

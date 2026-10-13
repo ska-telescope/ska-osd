@@ -4,14 +4,18 @@ tests/tmdata."""
 import pytest
 
 from ska_ost_osd.osd.common.constant import Telescope
-from ska_ost_osd.osd.exceptions import CycleNotFoundError
+from ska_ost_osd.osd.exceptions import CapabilitySetNotFoundError, CycleNotFoundError
 from ska_ost_osd.osd.models.cycles import Cycle, CycleID
 from tests.unit.ska_ost_osd.osd.expected import (
     CYCLE_1,
     CYCLE_2,
+    LOW_AA1,
+    LOW_AA2,
     LOW_BASIC_CAPABILITIES,
     LOW_CONSTRAINTS,
     LOW_DEFAULTS,
+    MID_AA1,
+    MID_AA2,
     MID_BASIC_CAPABILITIES,
     MID_CONSTRAINTS,
     MID_DEFAULTS,
@@ -111,3 +115,59 @@ class TestGetDefaults:
             FileNotFoundError, match="file not found: ska1_mid/mid_defaults.json"
         ):
             empty_tmdata_repository.get_defaults(Telescope.MID)
+
+
+class TestGetCapabilitySets:
+    @pytest.mark.parametrize(
+        "telescope, expected",
+        [
+            (Telescope.MID, [MID_AA1, MID_AA2]),
+            (Telescope.LOW, [LOW_AA1, LOW_AA2]),
+        ],
+    )
+    def test_returns_capability_sets_in_file_order(
+        self, test_tmdata_repository, telescope, expected
+    ):
+        assert test_tmdata_repository.get_capability_sets(telescope) == expected
+
+    def test_raises_when_file_missing(self, empty_tmdata_repository):
+        with pytest.raises(
+            FileNotFoundError, match="file not found: ska1_mid/mid_capabilities.json"
+        ):
+            empty_tmdata_repository.get_capability_sets(Telescope.MID)
+
+
+class TestGetCapabilitySet:
+    @pytest.mark.parametrize(
+        "telescope, name, expected",
+        [
+            (Telescope.MID, "AA1", MID_AA1),
+            (Telescope.MID, "AA2", MID_AA2),
+            (Telescope.LOW, "AA1", LOW_AA1),
+            (Telescope.LOW, "AA2", LOW_AA2),
+        ],
+    )
+    def test_returns_capability_set(
+        self, test_tmdata_repository, telescope, name, expected
+    ):
+        assert test_tmdata_repository.get_capability_set(telescope, name) == expected
+
+    def test_raises_for_unknown_name(self, test_tmdata_repository):
+        with pytest.raises(
+            CapabilitySetNotFoundError,
+            match=(
+                r"Capability set AA3 is invalid for telescope mid\. "
+                r"Valid capability sets are AA1, AA2\."
+            ),
+        ) as excinfo:
+            test_tmdata_repository.get_capability_set(Telescope.MID, "AA3")
+
+        assert excinfo.value.telescope == Telescope.MID
+        assert excinfo.value.name == "AA3"
+        assert excinfo.value.available_names == ["AA1", "AA2"]
+
+    def test_raises_when_file_missing(self, empty_tmdata_repository):
+        with pytest.raises(
+            FileNotFoundError, match="file not found: ska1_low/low_capabilities.json"
+        ):
+            empty_tmdata_repository.get_capability_set(Telescope.LOW, "AA1")
