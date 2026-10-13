@@ -114,7 +114,9 @@ class TMDataRepository:
         self, telescope: Literal[Telescope.LOW]
     ) -> list[LowCapabilitySet]: ...
 
-    def get_capability_sets(self, telescope: Telescope) -> list[CapabilitySet]:
+    def get_capability_sets(
+        self, telescope: Telescope
+    ) -> list[MidCapabilitySet] | list[LowCapabilitySet]:
         return storage.get_telescope_capabilities(self._tmdata, telescope).subarrays
 
     @overload

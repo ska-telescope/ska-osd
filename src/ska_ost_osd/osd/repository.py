@@ -91,7 +91,9 @@ class OSDRepository(Protocol):
         self, telescope: Literal[Telescope.LOW]
     ) -> list[LowCapabilitySet]: ...
 
-    def get_capability_sets(self, telescope: Telescope) -> list[CapabilitySet]:
+    def get_capability_sets(
+        self, telescope: Telescope
+    ) -> list[MidCapabilitySet] | list[LowCapabilitySet]:
         """All of a telescope's capability sets."""
         ...
 
