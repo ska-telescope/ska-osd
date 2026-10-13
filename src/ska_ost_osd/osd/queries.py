@@ -103,6 +103,19 @@ def get_cycles(tmdata: TMData) -> list[Cycle]:
     return [_read_cycle(tmdata, cycle_id) for cycle_id in get_cycle_ids(tmdata)]
 
 
+def get_cycle_file(tmdata: TMData, cycle_id: CycleID) -> CycleFile:
+    """Read one cycle's file, ``cycles/cycle_<N>.json``.
+
+    :param tmdata: TMData to read from.
+    :param cycle_id: the ID of the cycle.
+    :return: the cycle file, as stored.
+    :raises FileNotFoundError: If the file is missing.
+    """
+    return CycleFile.model_validate(
+        _read(tmdata, f"{OBSERVING_CYCLES_TMDATA_DIR}/cycle_{cycle_id}.json")
+    )
+
+
 @overload
 def get_telescope_capabilities(
     tmdata: TMData, telescope: Literal[Telescope.MID]
@@ -357,10 +370,7 @@ def get_cycle_capability_sets(
 
 
 def _read_cycle(tmdata: TMData, cycle_id: CycleID) -> Cycle:
-    cycle_file = CycleFile.model_validate(
-        _read(tmdata, f"{OBSERVING_CYCLES_TMDATA_DIR}/cycle_{cycle_id}.json")
-    )
-    return Cycle.model_validate(cycle_file, from_attributes=True)
+    return Cycle.model_validate(get_cycle_file(tmdata, cycle_id), from_attributes=True)
 
 
 def _read(tmdata: TMData, path: str) -> dict:

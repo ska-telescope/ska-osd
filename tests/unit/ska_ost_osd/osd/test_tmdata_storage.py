@@ -4,18 +4,37 @@ its storage model, using the test copy of the tmdata in tests/tmdata."""
 import pytest
 
 from ska_ost_osd.osd.common.constant import Telescope
+from ska_ost_osd.osd.models.cycles import CycleID
 from ska_ost_osd.osd.queries import (
+    get_cycle_file,
     get_subarray_template_library,
     get_telescope_capabilities,
     get_telescope_defaults,
 )
 from tests.unit.ska_ost_osd.osd.expected import (
+    CYCLE_1_FILE,
+    CYCLE_2_FILE,
     LOW_CAPABILITIES_FILE,
     LOW_DEFAULTS_FILE,
     MID_CAPABILITIES_FILE,
     MID_DEFAULTS_FILE,
     SUBARRAY_TEMPLATE_LIBRARY_FILE,
 )
+
+
+class TestGetCycleFile:
+    @pytest.mark.parametrize(
+        "cycle_id, expected",
+        [(CycleID(1), CYCLE_1_FILE), (CycleID(2), CYCLE_2_FILE)],
+    )
+    def test_returns_cycle_file(self, tests_tmdata, cycle_id, expected):
+        assert get_cycle_file(tests_tmdata, cycle_id) == expected
+
+    def test_raises_when_file_missing(self, empty_tmdata):
+        with pytest.raises(
+            FileNotFoundError, match="file not found: cycles/cycle_1.json"
+        ):
+            get_cycle_file(empty_tmdata, CycleID(1))
 
 
 class TestGetTelescopeCapabilities:

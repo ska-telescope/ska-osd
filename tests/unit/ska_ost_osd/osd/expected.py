@@ -33,6 +33,7 @@ from ska_ost_osd.osd.models.configuration import (
 )
 from ska_ost_osd.osd.models.cycles import (
     Cycle,
+    CycleFile,
     CycleID,
     CycleInformation,
     CyclePolicies,
@@ -82,6 +83,46 @@ CYCLE_1 = Cycle(
 
 # tests/tmdata/cycles/cycle_2.json
 CYCLE_2 = Cycle(
+    cycle_number=CycleID(2),
+    cycle_id="TEST_SKAO_2027_AA2_Proposal",
+    type="Proposal",
+    cycle_description="TEST AA2 Proposal",
+    cycle_information=CycleInformation(
+        cycle_id="TEST_SKAO_2027_2",
+        proposal_open=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
+        proposal_close=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
+    ),
+    cycle_policies=CyclePolicies(
+        normal_max_hours=100.0,
+        max_targets=3,
+        max_observation_setups=2,
+        max_data_products=2,
+    ),
+    telescope_capabilities=TelescopeCapabilities(ska_mid="AA2", ska_low="AA2"),
+)
+
+# tests/tmdata/cycles/cycle_1.json, as stored
+CYCLE_1_FILE = CycleFile(
+    cycle_number=CycleID(1),
+    cycle_id="TEST_SKAO_2027_Low_AA1_SV",
+    type="Science Verification",
+    cycle_description="TEST Low AA1 Science Verification",
+    cycle_information=CycleInformation(
+        cycle_id="TEST_SKAO_2027_1",
+        proposal_open=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
+        proposal_close=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
+    ),
+    cycle_policies=CyclePolicies(
+        normal_max_hours=100.0,
+        max_targets=1,
+        max_observation_setups=1,
+        max_data_products=1,
+    ),
+    telescope_capabilities=TelescopeCapabilities(ska_mid=None, ska_low="AA1"),
+)
+
+# tests/tmdata/cycles/cycle_2.json, as stored
+CYCLE_2_FILE = CycleFile(
     cycle_number=CycleID(2),
     cycle_id="TEST_SKAO_2027_AA2_Proposal",
     type="Proposal",
