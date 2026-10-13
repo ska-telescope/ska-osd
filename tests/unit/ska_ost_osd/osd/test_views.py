@@ -27,14 +27,14 @@ CAPABILITY_SET_KEYS = [
 
 
 class TestGetConfiguration:
-    def test_returns_configuration(self, tests_tmdata):
-        assert get_configuration(tests_tmdata) == CONFIGURATION
+    def test_returns_configuration(self, test_tmdata_repository):
+        assert get_configuration(test_tmdata_repository) == CONFIGURATION
 
-    def test_serves_the_odt_configuration_fields(self, tests_tmdata):
+    def test_serves_the_odt_configuration_fields(self, test_tmdata_repository):
         """The JSON matches what ska-oso-services serves from GET
         /configuration, with allowed_channel_width_values_hz on the Mid
         capability sets, which ska-oso-services means to serve but drops."""
-        served = get_configuration(tests_tmdata).model_dump(mode="json")
+        served = get_configuration(test_tmdata_repository).model_dump(mode="json")
 
         assert list(served) == ["ska_mid", "ska_low"]
         assert list(served["ska_mid"]) == [
@@ -62,13 +62,13 @@ class TestGetConfiguration:
             "cbf": {"processors_ready_percent": 100.0}
         }
 
-    def test_serialised_configuration_validates(self, tests_tmdata):
-        configuration = get_configuration(tests_tmdata)
+    def test_serialised_configuration_validates(self, test_tmdata_repository):
+        configuration = get_configuration(test_tmdata_repository)
         assert Configuration.model_validate(configuration.model_dump()) == configuration
 
-    def test_raises_when_files_missing(self, empty_tmdata):
+    def test_raises_when_files_missing(self, empty_tmdata_repository):
         with pytest.raises(FileNotFoundError):
-            get_configuration(empty_tmdata)
+            get_configuration(empty_tmdata_repository)
 
 
 class TestGetCycleConfiguration:

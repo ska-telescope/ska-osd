@@ -22,20 +22,18 @@ from ska_ost_osd.osd.models.configuration import (
 from ska_ost_osd.osd.models.cycles import CycleID
 from ska_ost_osd.osd.queries import (
     get_basic_capabilities,
-    get_capability_sets,
-    get_constraints,
     get_cycle,
     get_cycle_capability_sets,
     get_cycle_ids,
-    get_defaults,
 )
+from ska_ost_osd.osd.repository import OSDRepository
 
 
-def get_configuration(tmdata: TMData) -> Configuration:
+def get_configuration(repository: OSDRepository) -> Configuration:
     """Build the ODT configuration: what ska-oso-services serves from GET
     /configuration.
 
-    :param tmdata: TMData to read from.
+    :param repository: the OSD repository to read from.
     :return: both telescopes' bands, constraints, defaults and capability
         sets.
     :raises FileNotFoundError: If the tmdata has no capabilities or defaults
@@ -43,30 +41,30 @@ def get_configuration(tmdata: TMData) -> Configuration:
     """
     return Configuration(
         ska_mid=MidConfiguration(
-            frequency_band=get_basic_capabilities(
-                tmdata, Telescope.MID
+            frequency_band=repository.get_basic_capabilities(
+                Telescope.MID
             ).frequency_bands,
-            constraints=get_constraints(tmdata, Telescope.MID),
+            constraints=repository.get_constraints(Telescope.MID),
             subarrays=[
                 MidConfigurationCapabilitySet.model_validate(
                     capability_set, from_attributes=True
                 )
-                for capability_set in get_capability_sets(tmdata, Telescope.MID)
+                for capability_set in repository.get_capability_sets(Telescope.MID)
             ],
-            spfrx_defaults=get_defaults(tmdata, Telescope.MID).spfrx_defaults,
+            spfrx_defaults=repository.get_defaults(Telescope.MID).spfrx_defaults,
         ),
         ska_low=LowConfiguration(
-            frequency_band=get_basic_capabilities(tmdata, Telescope.LOW),
-            constraints=get_constraints(tmdata, Telescope.LOW),
+            frequency_band=repository.get_basic_capabilities(Telescope.LOW),
+            constraints=repository.get_constraints(Telescope.LOW),
             quality_attribute_metrics=ConfigurationLowQualityAttributeMetrics.model_validate(
-                get_defaults(tmdata, Telescope.LOW).quality_attribute_metrics,
+                repository.get_defaults(Telescope.LOW).quality_attribute_metrics,
                 from_attributes=True,
             ),
             subarrays=[
                 LowConfigurationCapabilitySet.model_validate(
                     capability_set, from_attributes=True
                 )
-                for capability_set in get_capability_sets(tmdata, Telescope.LOW)
+                for capability_set in repository.get_capability_sets(Telescope.LOW)
             ],
         ),
     )
