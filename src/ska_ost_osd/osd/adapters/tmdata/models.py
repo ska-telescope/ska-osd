@@ -105,12 +105,8 @@ class AvoidanceConstraints(OSDBaseModel):
 
 
 class TelescopeDefaultsFileBase(OSDBaseModel):
-    """
-    Base for the Mid and Low defaults file models. Subclasses narrow
-    ``telescope`` to their own value.
-    """
+    """Base for the Mid and Low defaults file models."""
 
-    telescope: Literal["ska-mid", "ska-low"]
     constraints: AvoidanceConstraints
 
 
