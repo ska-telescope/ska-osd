@@ -15,7 +15,7 @@ from ska_ost_osd.osd.models.capabilities import (
     MidBasicCapabilities,
     MidCapabilitySet,
 )
-from ska_ost_osd.osd.models.configuration import Constraints
+from ska_ost_osd.osd.models.constraints import Constraints
 from ska_ost_osd.osd.models.cycles import Cycle, CycleFile, CycleID
 from ska_ost_osd.osd.models.defaults import LowDefaults, MidDefaults
 from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplate

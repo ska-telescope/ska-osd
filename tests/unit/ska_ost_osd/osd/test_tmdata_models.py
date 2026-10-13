@@ -29,7 +29,7 @@ from ska_ost_osd.osd.models.capabilities import (
     MidCapabilitySet,
     MidFrequencyBand,
 )
-from ska_ost_osd.osd.models.configuration import Constraints
+from ska_ost_osd.osd.models.constraints import Constraints
 from ska_ost_osd.osd.models.cycles import CycleFile
 from ska_ost_osd.osd.models.defaults import LowDefaultsFile, MidDefaultsFile
 from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplateLibraryFile

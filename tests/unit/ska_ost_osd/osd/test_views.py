@@ -4,10 +4,10 @@ tests/tmdata."""
 import pytest
 
 from ska_ost_osd.osd.exceptions import CycleNotFoundError
-from ska_ost_osd.osd.models.configuration import Configuration, CycleConfiguration
 from ska_ost_osd.osd.models.cycles import CycleID
-from ska_ost_osd.osd.views import (
-    get_configuration,
+from ska_ost_osd.osd.views.odt import Configuration, get_configuration
+from ska_ost_osd.osd.views.pht import (
+    CycleConfiguration,
     get_cycle_configuration,
     get_cycle_configurations,
 )

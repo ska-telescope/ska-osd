@@ -17,20 +17,7 @@ from ska_ost_osd.osd.models.capabilities import (
     MidCBFMode,
     MidFrequencyBand,
 )
-from ska_ost_osd.osd.models.configuration import (
-    Configuration,
-    ConfigurationLowCBFMetrics,
-    ConfigurationLowQualityAttributeMetrics,
-    Constraints,
-    CycleCapabilities,
-    CycleConfiguration,
-    LowConfiguration,
-    LowConfigurationCapabilitySet,
-    LowCycleCapabilities,
-    MidConfiguration,
-    MidConfigurationCapabilitySet,
-    MidCycleCapabilities,
-)
+from ska_ost_osd.osd.models.constraints import Constraints
 from ska_ost_osd.osd.models.cycles import (
     Cycle,
     CycleFile,
@@ -59,6 +46,21 @@ from ska_ost_osd.osd.models.subarray_templates import (
     SubarrayTemplate,
     SubarrayTemplateLibraryFile,
     SubarrayType,
+)
+from ska_ost_osd.osd.views.odt import (
+    Configuration,
+    ConfigurationLowCBFMetrics,
+    ConfigurationLowQualityAttributeMetrics,
+    LowConfiguration,
+    LowConfigurationCapabilitySet,
+    MidConfiguration,
+    MidConfigurationCapabilitySet,
+)
+from ska_ost_osd.osd.views.pht import (
+    CycleCapabilities,
+    CycleConfiguration,
+    LowCycleCapabilities,
+    MidCycleCapabilities,
 )
 
 # tests/tmdata/cycles/cycle_1.json
