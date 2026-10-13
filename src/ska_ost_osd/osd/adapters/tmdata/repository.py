@@ -91,9 +91,14 @@ class TMDataRepository:
         ).basic_capabilities
 
     def get_constraints(self, telescope: Telescope) -> Constraints:
-        return Constraints.combine(
-            storage.get_telescope_capabilities(self._tmdata, telescope),
-            storage.get_telescope_defaults(self._tmdata, telescope),
+        """tmdata stores the constraints in two files: the elevation limits
+        in the capabilities file, and the sun, moon and Jupiter avoidance
+        angles in the defaults file."""
+        capabilities = storage.get_telescope_capabilities(self._tmdata, telescope)
+        defaults = storage.get_telescope_defaults(self._tmdata, telescope)
+        return Constraints(
+            **capabilities.constraints.model_dump(),
+            **defaults.constraints.model_dump(),
         )
 
     # Capability sets

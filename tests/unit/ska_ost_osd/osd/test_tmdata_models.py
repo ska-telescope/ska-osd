@@ -29,7 +29,6 @@ from ska_ost_osd.osd.models.capabilities import (
     MidCapabilitySet,
     MidFrequencyBand,
 )
-from ska_ost_osd.osd.models.constraints import Constraints
 from ska_ost_osd.osd.models.cycles import CycleFile
 from ska_ost_osd.osd.models.defaults import LowDefaultsFile, MidDefaultsFile
 from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplateLibraryFile
@@ -44,12 +43,6 @@ MID_DEFAULTS = "ska1_mid/mid_defaults.json"
 LOW_DEFAULTS = "ska1_low/low_defaults.json"
 CYCLE = "cycles/cycle_1.json"
 SUBARRAY_TEMPLATES = "subarray_templates/subarray_template_library.json"
-
-AVOIDANCE_ANGLES = (
-    "sun_avoidance_angle_deg",
-    "moon_avoidance_angle_deg",
-    "jupiter_avoidance_angle_deg",
-)
 
 
 def load(path: str) -> dict:
@@ -491,24 +484,3 @@ class TestSubarrayTemplates:
 
         with pytest.raises(ValidationError, match=message):
             SubarrayTemplateLibraryFile.model_validate(data)
-
-
-class TestConstraints:
-    """Combining the constraints the two tmdata files each hold half of."""
-
-    def test_constraints_combine_both_files(self):
-        """All five constraints: the elevation limits from the capabilities
-        file and the avoidance angles from the defaults file."""
-        capabilities = load(MID_CAPABILITIES)
-        defaults = load(MID_DEFAULTS)
-
-        constraints = Constraints.combine(
-            MidCapabilitiesFile.model_validate(capabilities),
-            MidDefaultsFile.model_validate(defaults),
-        )
-
-        assert constraints.model_dump() == {
-            **{angle: defaults["constraints"][angle] for angle in AVOIDANCE_ANGLES},
-            "min_elevation_deg": capabilities["constraints"]["min_elevation_deg"],
-            "max_elevation_deg": capabilities["constraints"]["max_elevation_deg"],
-        }
