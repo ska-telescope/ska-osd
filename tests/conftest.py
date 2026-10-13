@@ -1,3 +1,4 @@
+import json
 import os
 from importlib.metadata import version
 
@@ -78,6 +79,22 @@ def test_tmdata_repository(tests_tmdata):
 def empty_tmdata_repository(empty_tmdata):
     """The OSD repository over TMData with no files."""
     return TMDataRepository(empty_tmdata)
+
+
+@pytest.fixture
+def tmdata_repository_with(tests_tmdata_source, tmp_path):
+    """Build an OSD repository over the test copy of the tmdata, with some
+    files replaced: pass a dict of each file's tmdata path to its contents.
+    The replacements are written to a temporary source listed after the
+    test tmdata, so they take precedence."""
+
+    def _tmdata_repository_with(files: dict[str, dict]) -> TMDataRepository:
+        for path, content in files.items():
+            (tmp_path / path).parent.mkdir(parents=True, exist_ok=True)
+            (tmp_path / path).write_text(json.dumps(content))
+        return TMDataRepository(TMData([tests_tmdata_source, f"file://{tmp_path}"]))
+
+    return _tmdata_repository_with
 
 
 @pytest.fixture(scope="session")
