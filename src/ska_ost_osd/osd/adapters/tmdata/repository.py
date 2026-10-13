@@ -5,7 +5,7 @@ from typing import Literal, overload
 
 from ska_telmodel_client import TMData
 
-from ska_ost_osd.osd import queries
+from ska_ost_osd.osd.adapters.tmdata import storage
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.exceptions import CapabilitySetNotFoundError, CycleNotFoundError
 from ska_ost_osd.osd.models.capabilities import (
@@ -45,17 +45,17 @@ class TMDataRepository:
     # Cycles
 
     def get_cycle_ids(self) -> list[CycleID]:
-        return queries.get_cycle_ids(self._tmdata)
+        return storage.get_cycle_ids(self._tmdata)
 
     def get_cycle(self, cycle_id: CycleID) -> Cycle:
         cycle_ids = self.get_cycle_ids()
         if cycle_id not in cycle_ids:
             raise CycleNotFoundError(cycle_id, cycle_ids)
-        return self._to_cycle(queries.get_cycle_file(self._tmdata, cycle_id))
+        return self._to_cycle(storage.get_cycle_file(self._tmdata, cycle_id))
 
     def get_cycles(self) -> list[Cycle]:
         return [
-            self._to_cycle(queries.get_cycle_file(self._tmdata, cycle_id))
+            self._to_cycle(storage.get_cycle_file(self._tmdata, cycle_id))
             for cycle_id in self.get_cycle_ids()
         ]
 
@@ -69,7 +69,7 @@ class TMDataRepository:
 
     def get_defaults(self, telescope: Telescope) -> MidDefaults | LowDefaults:
         return _DEFAULTS_MODELS[telescope].model_validate(
-            queries.get_telescope_defaults(self._tmdata, telescope),
+            storage.get_telescope_defaults(self._tmdata, telescope),
             from_attributes=True,
         )
 
@@ -86,14 +86,14 @@ class TMDataRepository:
     def get_basic_capabilities(
         self, telescope: Telescope
     ) -> MidBasicCapabilities | LowBasicCapabilities:
-        return queries.get_telescope_capabilities(
+        return storage.get_telescope_capabilities(
             self._tmdata, telescope
         ).basic_capabilities
 
     def get_constraints(self, telescope: Telescope) -> Constraints:
         return Constraints.combine(
-            queries.get_telescope_capabilities(self._tmdata, telescope),
-            queries.get_telescope_defaults(self._tmdata, telescope),
+            storage.get_telescope_capabilities(self._tmdata, telescope),
+            storage.get_telescope_defaults(self._tmdata, telescope),
         )
 
     # Capability sets
@@ -109,7 +109,7 @@ class TMDataRepository:
     ) -> list[LowCapabilitySet]: ...
 
     def get_capability_sets(self, telescope: Telescope) -> list[CapabilitySet]:
-        return queries.get_telescope_capabilities(self._tmdata, telescope).subarrays
+        return storage.get_telescope_capabilities(self._tmdata, telescope).subarrays
 
     @overload
     def get_capability_set(
@@ -145,7 +145,7 @@ class TMDataRepository:
         prefix = f"{telescope.value.upper()}_"
         return [
             template
-            for template in queries.get_subarray_template_library(
+            for template in storage.get_subarray_template_library(
                 self._tmdata
             ).templates
             if template.name.startswith(prefix)

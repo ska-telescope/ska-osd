@@ -15,6 +15,7 @@ from ska_telmodel_client import TMData
 
 from ska_ost_osd.common.models import ApiResponse
 from ska_ost_osd.common.utils import convert_to_response_object, get_responses
+from ska_ost_osd.osd.adapters.tmdata.storage import get_cycle_ids
 from ska_ost_osd.osd.common.constant import (
     CYCLE_TO_VERSION_MAPPING,
     MID_CAPABILITIES_JSON_PATH,
@@ -39,7 +40,6 @@ from ska_ost_osd.osd.osd import (
     get_osd_using_tmdata,
     update_osd_file,
 )
-from ska_ost_osd.osd.queries import get_cycle_ids
 from ska_ost_osd.osd.routers.dependencies import (
     get_tmdata_car_main,
 )

@@ -3,14 +3,14 @@ its storage model, using the test copy of the tmdata in tests/tmdata."""
 
 import pytest
 
-from ska_ost_osd.osd.common.constant import Telescope
-from ska_ost_osd.osd.models.cycles import CycleID
-from ska_ost_osd.osd.queries import (
+from ska_ost_osd.osd.adapters.tmdata.storage import (
     get_cycle_file,
     get_subarray_template_library,
     get_telescope_capabilities,
     get_telescope_defaults,
 )
+from ska_ost_osd.osd.common.constant import Telescope
+from ska_ost_osd.osd.models.cycles import CycleID
 from tests.unit.ska_ost_osd.osd.expected import (
     CYCLE_1_FILE,
     CYCLE_2_FILE,

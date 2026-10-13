@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 from ska_telmodel_client import TMData
 
 from ska_ost_osd.app import create_app
-from ska_ost_osd.osd.tmdata_repository import TMDataRepository
+from ska_ost_osd.osd.adapters.tmdata import TMDataRepository
 from ska_ost_osd.osd.routers.dependencies import (
     get_tmdata_car_main,
     get_tmdata_gitlab_main,
