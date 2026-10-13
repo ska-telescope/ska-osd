@@ -100,26 +100,87 @@ Joins
 Views
 ~~~~~~
 
+The views in ``ska_ost_osd.osd.views`` build the responses ska-oso-services serves
+to its UIs. Each takes an ``OSDRepository``, so it works with any repository, and
+returns a Pydantic model that ska-oso-services can use directly as the FastAPI
+response model of the endpoint.
+
 .. list-table::
    :header-rows: 1
 
-   * - Function
+   * - View
      - Returns
+     - Served by ska-oso-services
+     - Used by
    * - ``get_configuration(repository)``
-     - ``Configuration``: both telescopes' bands, constraints, defaults and
-       capability sets, as ska-oso-services serves them to the ODT from
-       ``GET /configuration``
-   * - ``get_cycle_configurations(repository)`` /
-       ``get_cycle_configuration(repository, cycle_id)``
-     - ``CycleConfiguration``: a cycle with, for each telescope it offers, the
-       offered capability set and that telescope's basic capabilities, as
-       ska-oso-services serves them to the PHT from ``GET /prsls/osd/cycles`` and
-       ``GET /prsls/osd/{cycle}``
+     - ``Configuration``
+     - ``GET /configuration``
+     - ODT UI
+   * - ``get_cycle_configuration(repository, cycle_id)``
+     - ``CycleConfiguration``
+     - ``GET /prsls/osd/{cycle}``
+     - PHT UI
+   * - ``get_cycle_configurations(repository)``
+     - ``list[CycleConfiguration]``, in ascending order of cycle ID
+     - ``GET /prsls/osd/cycles``
+     - PHT UI
 
-Serialise the cycle views with aliases, as FastAPI does by default, for the field
-names the PHT reads (``telescope_capabilities`` as ``Mid`` and ``Low``, Mid's
-receiver bands as ``receiver_information``, and each capability set keyed by its
-name):
+
+ODT configuration
+^^^^^^^^^^^^^^^^^^
+
+``get_configuration(repository)`` returns everything the ODT needs about both
+telescopes, independent of any cycle:
+
+.. code-block:: text
+
+    ska_mid
+        frequency_band          the receiver bands, Band 5b with its sub-bands
+        constraints             elevation limits and avoidance angles
+        subarrays               each capability set: name, receptors,
+                                available_bandwidth_hz, number_pst_beams,
+                                number_fsps, allowed_channel_width_values_hz
+        spfrx_defaults          target_spfrx and csp_spfrx
+    ska_low
+        frequency_band          the band and its channels
+        constraints             elevation limits and avoidance angles
+        quality_attribute_metrics
+        subarrays               each capability set: name, receptors,
+                                available_bandwidth_hz, number_pst_beams,
+                                number_fsps, number_substations,
+                                number_subarray_beams
+
+The capability sets are narrowed to the fields the ODT uses; use
+``repository.get_capability_set`` for all of a capability set's fields. The JSON
+matches what ska-oso-services serves today, with one addition:
+``allowed_channel_width_values_hz`` on the Mid capability sets, which
+ska-oso-services means to serve but currently drops.
+
+
+PHT cycle data
+^^^^^^^^^^^^^^^
+
+``get_cycle_configuration(repository, cycle_id)`` returns one cycle with what it
+offers; ``get_cycle_configurations(repository)`` returns every cycle:
+
+.. code-block:: text
+
+    observatory_policy          the cycle: cycle_number, cycle_id, type,
+                                cycle_description, cycle_information (proposal
+                                dates), cycle_policies, telescope_capabilities
+    capabilities
+        mid                     null if the cycle doesn't offer Mid
+            basic_capabilities  receiver_information: the receiver bands
+            "AA2"               the offered capability set, keyed by its name
+        low                     null if the cycle doesn't offer Low
+            basic_capabilities  the band and its channels
+            "AA2"               the offered capability set, keyed by its name
+
+The PHT UI reads the field names of the response it already uses, so serialise
+these views with aliases, as FastAPI does by default: ``telescope_capabilities``
+as ``Mid`` and ``Low``, and Mid's receiver bands as ``receiver_information``. The
+PHT UI finds the capability set as the first key under ``mid`` or ``low`` that
+isn't ``basic_capabilities``.
 
 .. code-block:: python
 
