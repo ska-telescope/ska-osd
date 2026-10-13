@@ -3,6 +3,7 @@ tests/tmdata."""
 
 import pytest
 
+from ska_ost_osd.osd import queries
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.exceptions import CapabilitySetNotFoundError, CycleNotFoundError
 from ska_ost_osd.osd.models.cycles import Cycle, CycleID
@@ -206,3 +207,42 @@ class TestGetSubarrayTemplates:
     def test_raises_for_unknown_capability_set(self, test_tmdata_repository):
         with pytest.raises(CapabilitySetNotFoundError):
             test_tmdata_repository.get_subarray_templates(Telescope.MID, "AA3")
+
+
+class TestGetCycleCapabilitySets:
+    @pytest.mark.parametrize(
+        "cycle_id, expected",
+        [
+            (CycleID(1), {Telescope.LOW: LOW_AA1}),
+            (CycleID(2), {Telescope.MID: MID_AA2, Telescope.LOW: LOW_AA2}),
+        ],
+        ids=["low only", "mid and low"],
+    )
+    def test_returns_capability_sets_offered(
+        self, test_tmdata_repository, cycle_id, expected
+    ):
+        assert test_tmdata_repository.get_cycle_capability_sets(cycle_id) == expected
+
+    def test_raises_for_unknown_cycle(self, test_tmdata_repository):
+        with pytest.raises(CycleNotFoundError):
+            test_tmdata_repository.get_cycle_capability_sets(CycleID(3))
+
+    def test_raises_when_cycle_names_unknown_capability_set(
+        self, test_tmdata_repository, monkeypatch
+    ):
+        """The cycle refers to a capability set by name; a name with no
+        capability set is an error rather than being skipped."""
+        cycle = CYCLE_1.model_copy(
+            update={
+                "telescope_capabilities": CYCLE_1.telescope_capabilities.model_copy(
+                    update={"ska_low": "AA3"}
+                )
+            }
+        )
+        # ToDo: this patches the query function the repository wraps, so it
+        # depends on the implementation; replace it with a repository over
+        # test data that has the broken cycle (see the plan)
+        monkeypatch.setattr(queries, "get_cycle", lambda *_: cycle)
+
+        with pytest.raises(CapabilitySetNotFoundError, match="Capability set AA3"):
+            test_tmdata_repository.get_cycle_capability_sets(CycleID(1))

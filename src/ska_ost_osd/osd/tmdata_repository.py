@@ -107,4 +107,4 @@ class TMDataRepository:
     def get_cycle_capability_sets(
         self, cycle_id: CycleID
     ) -> dict[Telescope, CapabilitySet]:
-        raise NotImplementedError
+        return queries.get_cycle_capability_sets(self._tmdata, cycle_id)
