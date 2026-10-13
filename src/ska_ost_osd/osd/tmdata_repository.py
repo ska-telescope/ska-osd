@@ -4,6 +4,7 @@ from typing import Literal, overload
 
 from ska_telmodel_client import TMData
 
+from ska_ost_osd.osd import queries
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
     CapabilitySet,
@@ -31,13 +32,13 @@ class TMDataRepository:
     # Cycles
 
     def get_cycle_ids(self) -> list[CycleID]:
-        raise NotImplementedError
+        return queries.get_cycle_ids(self._tmdata)
 
     def get_cycle(self, cycle_id: CycleID) -> Cycle:
-        raise NotImplementedError
+        return queries.get_cycle(self._tmdata, cycle_id)
 
     def get_cycles(self) -> list[Cycle]:
-        raise NotImplementedError
+        return queries.get_cycles(self._tmdata)
 
     # Per telescope
 
