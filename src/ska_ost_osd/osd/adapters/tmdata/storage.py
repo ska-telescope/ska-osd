@@ -139,7 +139,7 @@ def get_subarray_template_library(tmdata: TMData) -> SubarrayTemplateLibraryFile
 
 
 def _read(tmdata: TMData, path: str) -> dict:
-    """Read one tmdata file. Every query reads tmdata through here."""
+    """Read one tmdata file. Every storage reader reads tmdata through here."""
     try:
         return tmdata[path].get_dict()
     except KeyError as error:

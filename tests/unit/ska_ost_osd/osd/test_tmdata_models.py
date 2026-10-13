@@ -1,11 +1,10 @@
-"""Unit tests for the capabilities, defaults, observatory policy, subarray
-template and configuration models.
+"""Unit tests for the capabilities, defaults, cycle, subarray template and
+constraints models: the storage models and the reader models.
 
 These use the test copy of the tmdata in tests/tmdata, so changing the real
 tmdata doesn't need them updating; test_tmdata_files.py checks the real
 files. They cover the models' own logic: the checks across fields, reshaping
-the tmdata layout, combining the capabilities and defaults into the
-configuration, and validating what the OSD serves.
+the tmdata layout, and validating what the legacy OSD API serves.
 """
 
 import json

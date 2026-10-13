@@ -1,4 +1,5 @@
-"""Pydantic models for tmdata/subarray_templates/subarray_template_library.json."""
+"""The subarray template reader model. The storage model for the template
+library file is in ``ska_ost_osd.osd.adapters.tmdata.models``."""
 
 from enum import StrEnum
 from typing import Any, Self
