@@ -108,9 +108,15 @@ class TestGetCycleConfiguration:
         assert list(served["capabilities"]["low"]) == ["basic_capabilities", "AA2"]
 
     def test_telescope_not_offered_is_null(self, test_tmdata_repository):
+        """The PHT UI checks for null, so a telescope the cycle doesn't offer
+        is served as null rather than left out."""
         served = get_cycle_configuration(test_tmdata_repository, CycleID(1)).model_dump(
             mode="json", by_alias=True
         )
+        assert served["observatory_policy"]["telescope_capabilities"] == {
+            "Mid": None,
+            "Low": "AA1",
+        }
         assert served["capabilities"]["mid"] is None
 
     @pytest.mark.parametrize("cycle_id", [CycleID(1), CycleID(2)])

@@ -423,9 +423,9 @@ class TestCycleFile:
         with pytest.raises(ValidationError, match="timezone"):
             CycleFile.model_validate(data)
 
-    def test_telescope_offering_nothing_is_null(self):
-        """The PHT UI checks for null, so a telescope missing from the file
-        is served as null rather than left out, under the file's keys."""
+    def test_telescope_offering_nothing_is_none(self):
+        """A telescope missing from the file's telescope_capabilities is read
+        as None. (The PHT view serves it as null: see test_views.py.)"""
         data = load(CYCLE)
         data["telescope_capabilities"] = {"Low": "AA2_SV"}
 
@@ -433,9 +433,6 @@ class TestCycleFile:
 
         assert policy.telescope_capabilities.ska_mid is None
         assert policy.telescope_capabilities.ska_low == "AA2_SV"
-        served = policy.model_dump(mode="json", by_alias=True)
-        assert served["telescope_capabilities"] == {"Mid": None, "Low": "AA2_SV"}
-        assert CycleFile.model_validate(policy.model_dump()) == policy
 
     def test_proposals_must_open_before_they_close(self):
         """A proposal window that closes before it opens is rejected."""

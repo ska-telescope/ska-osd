@@ -58,8 +58,11 @@ from ska_ost_osd.osd.views.odt import (
 from ska_ost_osd.osd.views.pht import (
     CycleCapabilities,
     CycleConfiguration,
+    CycleTelescopeCapabilities,
     LowCycleCapabilities,
+    MidCycleBasicCapabilities,
     MidCycleCapabilities,
+    ObservatoryPolicy,
 )
 
 # tests/tmdata/cycles/cycle_1.json
@@ -493,7 +496,15 @@ CONFIGURATION = Configuration(
 # The PHT cycle views of tests/tmdata: each cycle with the capability set
 # each telescope offers and that telescope's basic capabilities
 CYCLE_1_CONFIGURATION = CycleConfiguration(
-    observatory_policy=CYCLE_1,
+    observatory_policy=ObservatoryPolicy(
+        cycle_number=CycleID(1),
+        cycle_id="TEST_SKAO_2027_Low_AA1_SV",
+        type="Science Verification",
+        cycle_description="TEST Low AA1 Science Verification",
+        cycle_information=CYCLE_1.cycle_information,
+        cycle_policies=CYCLE_1.cycle_policies,
+        telescope_capabilities=CycleTelescopeCapabilities(ska_mid=None, ska_low="AA1"),
+    ),
     capabilities=CycleCapabilities(
         mid=None,
         low=LowCycleCapabilities(
@@ -503,10 +514,21 @@ CYCLE_1_CONFIGURATION = CycleConfiguration(
 )
 
 CYCLE_2_CONFIGURATION = CycleConfiguration(
-    observatory_policy=CYCLE_2,
+    observatory_policy=ObservatoryPolicy(
+        cycle_number=CycleID(2),
+        cycle_id="TEST_SKAO_2027_AA2_Proposal",
+        type="Proposal",
+        cycle_description="TEST AA2 Proposal",
+        cycle_information=CYCLE_2.cycle_information,
+        cycle_policies=CYCLE_2.cycle_policies,
+        telescope_capabilities=CycleTelescopeCapabilities(ska_mid="AA2", ska_low="AA2"),
+    ),
     capabilities=CycleCapabilities(
         mid=MidCycleCapabilities(
-            basic_capabilities=MID_BASIC_CAPABILITIES, capability_set=MID_AA2
+            basic_capabilities=MidCycleBasicCapabilities(
+                frequency_bands=MID_BASIC_CAPABILITIES.frequency_bands
+            ),
+            capability_set=MID_AA2,
         ),
         low=LowCycleCapabilities(
             basic_capabilities=LOW_BASIC_CAPABILITIES, capability_set=LOW_AA2

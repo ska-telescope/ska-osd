@@ -49,6 +49,13 @@ class TestGetCycle:
         assert type(test_tmdata_repository.get_cycle(CycleID(1))) is Cycle
         assert {type(cycle) for cycle in test_tmdata_repository.get_cycles()} == {Cycle}
 
+    def test_serialises_with_reader_field_names(self, test_tmdata_repository):
+        """The PHT's names for the offered telescopes (Mid, Low) belong to
+        the PHT view, not to the reader model."""
+        served = test_tmdata_repository.get_cycle(CycleID(1)).model_dump(by_alias=True)
+
+        assert served["telescope_capabilities"] == {"ska_mid": None, "ska_low": "AA1"}
+
     def test_raises_for_unknown_cycle(self, test_tmdata_repository):
         with pytest.raises(
             CycleNotFoundError, match=r"Cycle 3 is invalid\. Valid IDs are 1,2\."
@@ -84,6 +91,15 @@ class TestGetBasicCapabilities:
         self, test_tmdata_repository, telescope, expected
     ):
         assert test_tmdata_repository.get_basic_capabilities(telescope) == expected
+
+    def test_serialises_with_reader_field_names(self, test_tmdata_repository):
+        """The PHT's name for Mid's receiver bands (receiver_information)
+        belongs to the PHT view, not to the reader model."""
+        served = test_tmdata_repository.get_basic_capabilities(
+            Telescope.MID
+        ).model_dump(by_alias=True)
+
+        assert list(served) == ["frequency_bands"]
 
     def test_raises_when_file_missing(self, empty_tmdata_repository):
         with pytest.raises(

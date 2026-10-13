@@ -6,6 +6,7 @@ with aliases, the field names are the ones the PHT UI reads."""
 from typing import Any
 
 from pydantic import (
+    Field,
     SerializerFunctionWrapHandler,
     model_serializer,
     model_validator,
@@ -16,12 +17,39 @@ from ska_ost_osd.osd.models.capabilities import (
     CapabilitySet,
     LowBasicCapabilities,
     LowCapabilitySet,
-    MidBasicCapabilities,
     MidCapabilitySet,
+    MidFrequencyBand,
 )
-from ska_ost_osd.osd.models.cycles import Cycle, CycleID
+from ska_ost_osd.osd.models.cycles import CycleID, CycleInformation, CyclePolicies
 from ska_ost_osd.osd.repository import OSDRepository
 from ska_ost_osd.osd.views.base import ConfigurationModel
+
+
+class CycleTelescopeCapabilities(ConfigurationModel):
+    """The capability set each telescope offers in the cycle, or ``None``.
+    Served as ``Mid`` and ``Low``, the names the PHT UI reads."""
+
+    ska_mid: str | None = Field(alias="Mid")
+    ska_low: str | None = Field(alias="Low")
+
+
+class ObservatoryPolicy(ConfigurationModel):
+    """The cycle, as the PHT UI reads it."""
+
+    cycle_number: CycleID
+    cycle_id: str | None
+    type: str | None
+    cycle_description: str
+    cycle_information: CycleInformation
+    cycle_policies: CyclePolicies
+    telescope_capabilities: CycleTelescopeCapabilities
+
+
+class MidCycleBasicCapabilities(ConfigurationModel):
+    """Mid's receiver bands, served as ``receiver_information``, the name the
+    PHT UI reads."""
+
+    frequency_bands: list[MidFrequencyBand] = Field(alias="receiver_information")
 
 
 class CycleCapabilitiesBase(ConfigurationModel):
@@ -54,7 +82,7 @@ class CycleCapabilitiesBase(ConfigurationModel):
 
 
 class MidCycleCapabilities(CycleCapabilitiesBase):
-    basic_capabilities: MidBasicCapabilities
+    basic_capabilities: MidCycleBasicCapabilities
     capability_set: MidCapabilitySet
 
 
@@ -73,7 +101,7 @@ class CycleCapabilities(ConfigurationModel):
 class CycleConfiguration(ConfigurationModel):
     """One cycle joined with what it offers."""
 
-    observatory_policy: Cycle
+    observatory_policy: ObservatoryPolicy
     capabilities: CycleCapabilities
 
 
@@ -95,10 +123,15 @@ def get_cycle_configuration(
     mid = capability_sets.get(Telescope.MID)
     low = capability_sets.get(Telescope.LOW)
     return CycleConfiguration(
-        observatory_policy=repository.get_cycle(cycle_id),
+        observatory_policy=ObservatoryPolicy.model_validate(
+            repository.get_cycle(cycle_id), from_attributes=True
+        ),
         capabilities=CycleCapabilities(
             mid=MidCycleCapabilities(
-                basic_capabilities=repository.get_basic_capabilities(Telescope.MID),
+                basic_capabilities=MidCycleBasicCapabilities.model_validate(
+                    repository.get_basic_capabilities(Telescope.MID),
+                    from_attributes=True,
+                ),
                 capability_set=mid,
             )
             if mid
