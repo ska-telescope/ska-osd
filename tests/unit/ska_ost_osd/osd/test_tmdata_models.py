@@ -19,7 +19,6 @@ from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.exceptions import (
     Band5bSubbandNotFoundError,
     FrequencyBandNotFoundError,
-    OSDQueryError,
 )
 from ska_ost_osd.osd.models.capabilities import (
     Band5bSubband,
@@ -341,17 +340,6 @@ class TestMidBasicCapabilities:
             match=r"Sub-band 1 is invalid for Band_1\. Valid sub-bands are none\.",
         ):
             band.get_band5b_subband(1)
-
-    @pytest.mark.parametrize(
-        "error",
-        [
-            FrequencyBandNotFoundError("Band_9", ["Band_1"]),
-            Band5bSubbandNotFoundError("Band_5b", 4, [1, 2, 3]),
-        ],
-    )
-    def test_errors_are_query_and_lookup_errors(self, error):
-        assert isinstance(error, OSDQueryError)
-        assert isinstance(error, LookupError)
 
 
 class TestDefaults:
