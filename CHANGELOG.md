@@ -26,11 +26,12 @@ Unreleased
 * ``Cycle`` reads ``proposal_open`` and ``proposal_close`` as timezone-aware
   datetimes, a date without a timezone is rejected.
 * Added a test that validates the real tmdata files against these models
-* Added ``ska_ost_osd.osd.queries``: functions that read cycles, capability sets,
-  basic capabilities, constraints, defaults and subarray templates from a TMData
-  client and return them as Pydantic models
+* Added ``OSDRepository`` (``ska_ost_osd.osd.repository``), the interface for
+  reading cycles, capability sets, basic capabilities, constraints, defaults and
+  subarray templates as Pydantic models, and ``TMDataRepository``
+  (``ska_ost_osd.osd.tmdata_repository``), which implements it over a TMData client
 * Added ``ska_ost_osd.osd.views``: the configuration ska-oso-services serves to the
-  ODT and the cycle data it serves to the PHT, built from those queries
+  ODT and the cycle data it serves to the PHT, built from an ``OSDRepository``
 
 7.0.0
 **********
