@@ -24,7 +24,6 @@
         348
       ],
       "number_substations": 0,
-      "number_beams": 1,
       "number_subarray_beams": 1,
       "max_baseline_km": 3.0,
       "available_bandwidth_hz": 75000000.0,
@@ -45,7 +44,6 @@
     "AA2": {
       "number_stations": 8,
       "number_substations": 512,
-      "number_beams": 8,
       "number_subarray_beams": 8,
       "max_baseline_km": 6.0,
       "available_bandwidth_hz": 75000000.0,
