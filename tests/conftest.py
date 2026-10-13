@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 from ska_telmodel_client import TMData
 
 from ska_ost_osd.app import create_app
+from ska_ost_osd.osd.tmdata_repository import TMDataRepository
 from ska_ost_osd.osd.routers.dependencies import (
     get_tmdata_car_main,
     get_tmdata_gitlab_main,
@@ -65,6 +66,18 @@ def empty_tmdata(tmp_path_factory):
     """Fixture for an empty TMData instance."""
     empty_dir = tmp_path_factory.mktemp("empty_tmdata")
     return TMData([f"file://{empty_dir}"])
+
+
+@pytest.fixture(scope="session")
+def test_tmdata_repository(tests_tmdata):
+    """The OSD repository over the test copy of the tmdata."""
+    return TMDataRepository(tests_tmdata)
+
+
+@pytest.fixture(scope="session")
+def empty_tmdata_repository(empty_tmdata):
+    """The OSD repository over TMData with no files."""
+    return TMDataRepository(empty_tmdata)
 
 
 @pytest.fixture(scope="session")
