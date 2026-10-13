@@ -33,7 +33,9 @@ Unreleased
   (``ska_ost_osd.osd.adapters.tmdata``), which implements it over a TMData client
 * Added ``ska_ost_osd.osd.views``: the configuration ska-oso-services serves to the
   ODT (``views.odt``) and the cycle data it serves to the PHT (``views.pht``), built
-  from an ``OSDRepository``
+  from an ``OSDRepository``. The views serialise with the names their consumers
+  read by default, without ``by_alias=True``
+* Raised the minimum pydantic version to 2.11, for ``serialize_by_alias``
 
 7.0.0
 **********

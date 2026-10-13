@@ -180,17 +180,17 @@ offers; ``get_cycle_configurations(repository)`` returns every cycle:
             basic_capabilities  the band and its channels
             "AA2"               the offered capability set, keyed by its name
 
-The PHT UI reads the field names of the response it already uses, so serialise
-these views with aliases, as FastAPI does by default: ``telescope_capabilities``
-as ``Mid`` and ``Low``, and Mid's receiver bands as ``receiver_information``. The
-PHT UI finds the capability set as the first key under ``mid`` or ``low`` that
-isn't ``basic_capabilities``.
+The PHT UI reads the field names of the response it already uses, and the views
+serialise with those names by default, without ``by_alias=True``:
+``telescope_capabilities`` as ``Mid`` and ``Low``, and Mid's receiver bands as
+``receiver_information``. The PHT UI finds the capability set as the first key
+under ``mid`` or ``low`` that isn't ``basic_capabilities``.
 
 .. code-block:: python
 
     from ska_ost_osd.osd.views.pht import get_cycle_configuration
 
-    get_cycle_configuration(repository, 1).model_dump(mode="json", by_alias=True)
+    get_cycle_configuration(repository, 1).model_dump(mode="json")
 
 
 Errors
