@@ -6,7 +6,7 @@ from ska_telmodel_client import TMData
 
 from ska_ost_osd.osd import queries
 from ska_ost_osd.osd.common.constant import Telescope
-from ska_ost_osd.osd.exceptions import CycleNotFoundError
+from ska_ost_osd.osd.exceptions import CapabilitySetNotFoundError, CycleNotFoundError
 from ska_ost_osd.osd.models.capabilities import (
     CapabilitySet,
     LowBasicCapabilities,
@@ -115,7 +115,13 @@ class TMDataRepository:
     ) -> LowCapabilitySet: ...
 
     def get_capability_set(self, telescope: Telescope, name: str) -> CapabilitySet:
-        return queries.get_capability_set(self._tmdata, telescope, name)
+        capability_sets = self.get_capability_sets(telescope)
+        for capability_set in capability_sets:
+            if capability_set.name == name:
+                return capability_set
+        raise CapabilitySetNotFoundError(
+            telescope, name, [capability_set.name for capability_set in capability_sets]
+        )
 
     # Joins
 
