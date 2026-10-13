@@ -3,7 +3,7 @@ tests/tmdata."""
 
 import pytest
 
-from ska_ost_osd.osd.exceptions import CycleNotFoundError
+from ska_ost_osd.osd.exceptions import CapabilitySetNotFoundError, CycleNotFoundError
 from ska_ost_osd.osd.models.cycles import CycleID
 from ska_ost_osd.osd.views.odt import Configuration, get_configuration
 from ska_ost_osd.osd.views.pht import (
@@ -14,6 +14,7 @@ from ska_ost_osd.osd.views.pht import (
 from tests.unit.ska_ost_osd.osd.expected import (
     CONFIGURATION,
     CYCLE_1_CONFIGURATION,
+    CYCLE_1_FILE,
     CYCLE_2_CONFIGURATION,
 )
 
@@ -85,6 +86,21 @@ class TestGetCycleConfiguration:
     def test_raises_for_unknown_cycle(self, test_tmdata_repository):
         with pytest.raises(CycleNotFoundError):
             get_cycle_configuration(test_tmdata_repository, CycleID(3))
+
+    def test_raises_when_cycle_names_unknown_capability_set(
+        self, tmdata_repository_with
+    ):
+        repository = tmdata_repository_with(
+            {
+                "cycles/cycle_1.json": {
+                    **CYCLE_1_FILE.model_dump(mode="json", by_alias=True),
+                    "telescope_capabilities": {"Low": "AA3"},
+                }
+            }
+        )
+
+        with pytest.raises(CapabilitySetNotFoundError, match="Capability set AA3"):
+            get_cycle_configuration(repository, CycleID(1))
 
     def test_serves_the_pht_cycle_fields(self, test_tmdata_repository):
         """The JSON, with aliases as ska-oso-services serves it, has the

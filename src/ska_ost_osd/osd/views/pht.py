@@ -122,12 +122,11 @@ def get_cycle_configuration(
     :raises CapabilitySetNotFoundError: If the cycle names a capability set
         that does not exist.
     """
-    capability_sets = repository.get_cycle_capability_sets(cycle_id)
-    mid = capability_sets.get(Telescope.MID)
-    low = capability_sets.get(Telescope.LOW)
+    cycle = repository.get_cycle(cycle_id)
+    offered = cycle.telescope_capabilities
     return CycleConfiguration(
         observatory_policy=ObservatoryPolicy.model_validate(
-            repository.get_cycle(cycle_id), from_attributes=True
+            cycle, from_attributes=True
         ),
         capabilities=CycleCapabilities(
             mid=MidCycleCapabilities(
@@ -135,15 +134,19 @@ def get_cycle_configuration(
                     repository.get_basic_capabilities(Telescope.MID),
                     from_attributes=True,
                 ),
-                capability_set=mid,
+                capability_set=repository.get_capability_set(
+                    Telescope.MID, offered.ska_mid
+                ),
             )
-            if mid
+            if offered.ska_mid is not None
             else None,
             low=LowCycleCapabilities(
                 basic_capabilities=repository.get_basic_capabilities(Telescope.LOW),
-                capability_set=low,
+                capability_set=repository.get_capability_set(
+                    Telescope.LOW, offered.ska_low
+                ),
             )
-            if low
+            if offered.ska_low is not None
             else None,
         ),
     )
