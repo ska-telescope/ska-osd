@@ -19,6 +19,11 @@ from ska_ost_osd.osd.models.cycles import Cycle, CycleFile, CycleID
 from ska_ost_osd.osd.models.defaults import LowDefaults, MidDefaults
 from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplate
 
+_DEFAULTS_MODELS = {
+    Telescope.MID: MidDefaults,
+    Telescope.LOW: LowDefaults,
+}
+
 
 class TMDataRepository:
     """Implements ``OSDRepository`` by reading the tmdata through a TMData
@@ -56,7 +61,10 @@ class TMDataRepository:
     def get_defaults(self, telescope: Literal[Telescope.LOW]) -> LowDefaults: ...
 
     def get_defaults(self, telescope: Telescope) -> MidDefaults | LowDefaults:
-        return queries.get_defaults(self._tmdata, telescope)
+        return _DEFAULTS_MODELS[telescope].model_validate(
+            queries.get_telescope_defaults(self._tmdata, telescope),
+            from_attributes=True,
+        )
 
     @overload
     def get_basic_capabilities(
@@ -71,7 +79,9 @@ class TMDataRepository:
     def get_basic_capabilities(
         self, telescope: Telescope
     ) -> MidBasicCapabilities | LowBasicCapabilities:
-        return queries.get_basic_capabilities(self._tmdata, telescope)
+        return queries.get_telescope_capabilities(
+            self._tmdata, telescope
+        ).basic_capabilities
 
     def get_constraints(self, telescope: Telescope) -> Constraints:
         return queries.get_constraints(self._tmdata, telescope)
@@ -89,7 +99,7 @@ class TMDataRepository:
     ) -> list[LowCapabilitySet]: ...
 
     def get_capability_sets(self, telescope: Telescope) -> list[CapabilitySet]:
-        return queries.get_capability_sets(self._tmdata, telescope)
+        return queries.get_telescope_capabilities(self._tmdata, telescope).subarrays
 
     @overload
     def get_capability_set(

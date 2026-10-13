@@ -19,19 +19,15 @@ from ska_ost_osd.osd.common.constant import (
 from ska_ost_osd.osd.exceptions import CapabilitySetNotFoundError, CycleNotFoundError
 from ska_ost_osd.osd.models.capabilities import (
     CapabilitySet,
-    LowBasicCapabilities,
     LowCapabilitiesFile,
     LowCapabilitySet,
-    MidBasicCapabilities,
     MidCapabilitiesFile,
     MidCapabilitySet,
 )
 from ska_ost_osd.osd.models.configuration import Constraints
 from ska_ost_osd.osd.models.cycles import Cycle, CycleFile, CycleID
 from ska_ost_osd.osd.models.defaults import (
-    LowDefaults,
     LowDefaultsFile,
-    MidDefaults,
     MidDefaultsFile,
 )
 from ska_ost_osd.osd.models.subarray_templates import (
@@ -53,11 +49,6 @@ _DEFAULTS_FILE_MODELS = {
 _CYCLE_TELESCOPE_FIELDS = {
     Telescope.MID: "ska_mid",
     Telescope.LOW: "ska_low",
-}
-
-_DEFAULTS_MODELS = {
-    Telescope.MID: MidDefaults,
-    Telescope.LOW: LowDefaults,
 }
 
 
@@ -162,57 +153,6 @@ def get_telescope_defaults(
     return _DEFAULTS_FILE_MODELS[telescope].model_validate(
         _read(tmdata, DEFAULTS_JSON_FILE_PATHS[telescope])
     )
-
-
-@overload
-def get_defaults(tmdata: TMData, telescope: Literal[Telescope.MID]) -> MidDefaults: ...
-
-
-@overload
-def get_defaults(tmdata: TMData, telescope: Literal[Telescope.LOW]) -> LowDefaults: ...
-
-
-def get_defaults(tmdata: TMData, telescope: Telescope) -> MidDefaults | LowDefaults:
-    """Read one telescope's defaults: Mid's SPFRx settings, or Low's quality
-    attribute metrics. The avoidance angles in the same file are part of the
-    constraints, so are not included.
-
-    :param tmdata: TMData to read from.
-    :param telescope: the telescope.
-    :return: the telescope's defaults.
-    :raises FileNotFoundError: If the tmdata has no defaults file for the
-        telescope.
-    """
-    return _DEFAULTS_MODELS[telescope].model_validate(
-        get_telescope_defaults(tmdata, telescope), from_attributes=True
-    )
-
-
-@overload
-def get_basic_capabilities(
-    tmdata: TMData, telescope: Literal[Telescope.MID]
-) -> MidBasicCapabilities: ...
-
-
-@overload
-def get_basic_capabilities(
-    tmdata: TMData, telescope: Literal[Telescope.LOW]
-) -> LowBasicCapabilities: ...
-
-
-def get_basic_capabilities(
-    tmdata: TMData, telescope: Telescope
-) -> MidBasicCapabilities | LowBasicCapabilities:
-    """Read one telescope's basic capabilities: Mid's receiver bands, or
-    Low's frequency band and how it is divided into channels.
-
-    :param tmdata: TMData to read from.
-    :param telescope: the telescope.
-    :return: the telescope's basic capabilities.
-    :raises FileNotFoundError: If the tmdata has no capabilities file for
-        the telescope.
-    """
-    return get_telescope_capabilities(tmdata, telescope).basic_capabilities
 
 
 def get_constraints(tmdata: TMData, telescope: Telescope) -> Constraints:
