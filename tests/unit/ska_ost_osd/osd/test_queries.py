@@ -14,7 +14,6 @@ from ska_ost_osd.osd.models.cycles import Cycle, CycleID
 from ska_ost_osd.osd.queries import (
     get_basic_capabilities,
     get_capability_set,
-    get_capability_set_templates,
     get_capability_sets,
     get_constraints,
     get_cycle,
@@ -23,6 +22,7 @@ from ska_ost_osd.osd.queries import (
     get_cycles,
     get_defaults,
     get_subarray_template_library,
+    get_subarray_templates,
     get_telescope_capabilities,
     get_telescope_defaults,
 )
@@ -256,9 +256,9 @@ class TestGetSubarrayTemplateLibrary:
             get_subarray_template_library(empty_tmdata)
 
 
-class TestGetCapabilitySetTemplates:
+class TestGetSubarrayTemplates:
     @pytest.mark.parametrize(
-        "telescope, name, expected",
+        "telescope, capability_set, expected",
         [
             (Telescope.MID, "AA1", []),
             (Telescope.MID, "AA2", [MID_FULL_AA2_TEMPLATE]),
@@ -272,16 +272,18 @@ class TestGetCapabilitySetTemplates:
             "full and subset templates",
         ],
     )
-    def test_returns_capability_set_templates(
-        self, tests_tmdata, telescope, name, expected
+    def test_returns_subarray_templates(
+        self, tests_tmdata, telescope, capability_set, expected
     ):
         """The pattern *_AA2 matches templates of both telescopes; only the
         capability set's own telescope's templates are returned."""
-        assert get_capability_set_templates(tests_tmdata, telescope, name) == expected
+        assert (
+            get_subarray_templates(tests_tmdata, telescope, capability_set) == expected
+        )
 
     def test_raises_for_unknown_capability_set(self, tests_tmdata):
         with pytest.raises(CapabilitySetNotFoundError):
-            get_capability_set_templates(tests_tmdata, Telescope.MID, "AA3")
+            get_subarray_templates(tests_tmdata, Telescope.MID, "AA3")
 
 
 class TestGetCycleCapabilitySets:

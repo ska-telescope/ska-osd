@@ -99,8 +99,8 @@ class TMDataRepository:
 
     # Joins
 
-    def get_capability_set_templates(
-        self, telescope: Telescope, name: str
+    def get_subarray_templates(
+        self, telescope: Telescope, capability_set: str
     ) -> list[SubarrayTemplate]:
         raise NotImplementedError
 

@@ -302,8 +302,8 @@ def get_subarray_template_library(tmdata: TMData) -> SubarrayTemplateLibraryFile
     )
 
 
-def get_capability_set_templates(
-    tmdata: TMData, telescope: Telescope, name: str
+def get_subarray_templates(
+    tmdata: TMData, telescope: Telescope, capability_set: str
 ) -> list[SubarrayTemplate]:
     """Read the subarray templates a capability set offers.
 
@@ -314,14 +314,16 @@ def get_capability_set_templates(
 
     :param tmdata: TMData to read from.
     :param telescope: the telescope the capability set belongs to.
-    :param name: the name of the capability set, e.g. ``"AA2"``.
+    :param capability_set: the name of the capability set, e.g. ``"AA2"``.
     :return: the matching templates, in the order the library lists them.
     :raises CapabilitySetNotFoundError: If the telescope has no capability
         set with that name.
     :raises FileNotFoundError: If the tmdata has no capabilities file for
         the telescope, or no template library file.
     """
-    patterns = get_capability_set(tmdata, telescope, name).subarray_templates or []
+    patterns = (
+        get_capability_set(tmdata, telescope, capability_set).subarray_templates or []
+    )
     prefix = f"{telescope.value.upper()}_"
     return [
         template

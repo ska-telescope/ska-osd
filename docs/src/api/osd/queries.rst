@@ -95,7 +95,7 @@ Joins
    * - ``get_cycle_capability_sets(tmdata, cycle_id)``
      - the capability set the cycle offers for each telescope, as a ``dict`` keyed
        by ``Telescope``; a telescope the cycle does not offer is left out
-   * - ``get_capability_set_templates(tmdata, telescope, name)``
+   * - ``get_subarray_templates(tmdata, telescope, capability_set)``
      - the ``SubarrayTemplate`` objects of a capability set: those whose name
        matches one of its ``subarray_templates`` patterns and starts with the
        telescope, e.g. ``MID_``
