@@ -11,17 +11,6 @@ from ska_ost_osd.osd.exceptions import (
 from ska_ost_osd.osd.models.defaults import OSDBaseModel
 
 
-class ElevationConstraints(OSDBaseModel):
-    min_elevation_deg: float = Field(ge=0, le=90, examples=[45.0])
-    max_elevation_deg: float = Field(ge=0, le=90, examples=[90.0])
-
-    @model_validator(mode="after")
-    def check_elevation_range(self) -> Self:
-        if self.min_elevation_deg > self.max_elevation_deg:
-            raise ValueError("min_elevation_deg must not exceed max_elevation_deg")
-        return self
-
-
 class FrequencyBand(OSDBaseModel):
     max_frequency_hz: float = Field(gt=0)
     min_frequency_hz: float = Field(gt=0)

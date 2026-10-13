@@ -5,7 +5,9 @@ rather than against each other."""
 from datetime import datetime, timezone
 
 from ska_ost_osd.osd.adapters.tmdata.models import (
+    AvoidanceConstraints,
     CycleFile,
+    ElevationConstraints,
     LowCapabilitiesFile,
     LowDefaultsFile,
     MidCapabilitiesFile,
@@ -14,7 +16,6 @@ from ska_ost_osd.osd.adapters.tmdata.models import (
 )
 from ska_ost_osd.osd.models.capabilities import (
     Band5bSubband,
-    ElevationConstraints,
     LowBasicCapabilities,
     LowCapabilitySet,
     LowCBFMode,
@@ -32,7 +33,6 @@ from ska_ost_osd.osd.models.cycles import (
     TelescopeCapabilities,
 )
 from ska_ost_osd.osd.models.defaults import (
-    AvoidanceConstraints,
     CSPSPFRx,
     DefaultNoiseDiodeMode,
     LowCBFMetrics,

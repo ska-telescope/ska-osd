@@ -16,16 +16,6 @@ class OSDBaseModel(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
-class AvoidanceConstraints(OSDBaseModel):
-    """
-    Sun, moon and Jupiter avoidance angles.
-    """
-
-    sun_avoidance_angle_deg: float = Field(examples=[30.0])
-    moon_avoidance_angle_deg: float = Field(examples=[10.0])
-    jupiter_avoidance_angle_deg: float = Field(examples=[10.0])
-
-
 class NoiseDiodeMode(StrEnum):
     PERIODIC = "periodic"
     PSEUDO_RANDOM = "pseudo_random"
