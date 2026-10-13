@@ -15,15 +15,18 @@ Overview
   subarray templates, and the links between them. A method named in the plural
   returns all of something; one named in the singular looks one item up by its key
   and raises an error if there is none.
-* ``TMDataRepository`` (``ska_ost_osd.osd.tmdata_repository``) implements it by
+* ``TMDataRepository`` (``ska_ost_osd.osd.adapters.tmdata``) implements it by
   reading the tmdata through a TMData client.
-* **Views** in ``ska_ost_osd.osd.views`` take any ``OSDRepository`` and combine its
-  data into the shapes ska-oso-services serves: the ODT configuration and the PHT
-  cycle data.
+* **Views** take any ``OSDRepository`` and combine its data into the shapes
+  ska-oso-services serves, one module per consumer: the ODT configuration in
+  ``ska_ost_osd.osd.views.odt`` and the PHT cycle data in
+  ``ska_ost_osd.osd.views.pht``.
 
 The repository returns *reader models*, the data as callers use it. The
 ``TMDataRepository`` reads each tmdata file through a *storage model*, named with a
 ``File`` suffix (e.g. ``MidCapabilitiesFile``), which validates the file as a whole.
+The storage models are part of the TMData adapter
+(``ska_ost_osd.osd.adapters.tmdata.models``), not of the API.
 
 Create the TMData client, which chooses the source and version, and a repository
 over it once; cache the results if needed:
@@ -32,7 +35,7 @@ over it once; cache the results if needed:
 
     from ska_telmodel_client import TMData
 
-    from ska_ost_osd.osd.tmdata_repository import TMDataRepository
+    from ska_ost_osd.osd.adapters.tmdata import TMDataRepository
 
     repository = TMDataRepository(TMData(["car:ost/ska-ost-osd?main"], update=True))
 
@@ -101,7 +104,8 @@ Views
 ~~~~~~
 
 The views in ``ska_ost_osd.osd.views`` build the responses ska-oso-services serves
-to its UIs. Each takes an ``OSDRepository``, so it works with any repository, and
+to its UIs. Each consumer's views and response models are in its own module:
+``views.odt`` for the ODT and ``views.pht`` for the PHT. Each takes an ``OSDRepository``, so it works with any repository, and
 returns a Pydantic model that ska-oso-services can use directly as the FastAPI
 response model of the endpoint.
 
@@ -112,15 +116,15 @@ response model of the endpoint.
      - Returns
      - Served by ska-oso-services
      - Used by
-   * - ``get_configuration(repository)``
+   * - ``odt.get_configuration(repository)``
      - ``Configuration``
      - ``GET /configuration``
      - ODT UI
-   * - ``get_cycle_configuration(repository, cycle_id)``
+   * - ``pht.get_cycle_configuration(repository, cycle_id)``
      - ``CycleConfiguration``
      - ``GET /prsls/osd/{cycle}``
      - PHT UI
-   * - ``get_cycle_configurations(repository)``
+   * - ``pht.get_cycle_configurations(repository)``
      - ``list[CycleConfiguration]``, in ascending order of cycle ID
      - ``GET /prsls/osd/cycles``
      - PHT UI
@@ -184,7 +188,7 @@ isn't ``basic_capabilities``.
 
 .. code-block:: python
 
-    from ska_ost_osd.osd.views import get_cycle_configuration
+    from ska_ost_osd.osd.views.pht import get_cycle_configuration
 
     get_cycle_configuration(repository, 1).model_dump(mode="json", by_alias=True)
 
