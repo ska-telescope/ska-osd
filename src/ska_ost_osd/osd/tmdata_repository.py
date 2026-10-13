@@ -102,7 +102,7 @@ class TMDataRepository:
     def get_subarray_templates(
         self, telescope: Telescope, capability_set: str
     ) -> list[SubarrayTemplate]:
-        raise NotImplementedError
+        return queries.get_subarray_templates(self._tmdata, telescope, capability_set)
 
     def get_cycle_capability_sets(
         self, cycle_id: CycleID

@@ -14,11 +14,15 @@ from tests.unit.ska_ost_osd.osd.expected import (
     LOW_BASIC_CAPABILITIES,
     LOW_CONSTRAINTS,
     LOW_DEFAULTS,
+    LOW_FULL_AA2_TEMPLATE,
+    LOW_TEST_AA1_TEMPLATE,
+    LOW_TEST_AA2_TEMPLATE,
     MID_AA1,
     MID_AA2,
     MID_BASIC_CAPABILITIES,
     MID_CONSTRAINTS,
     MID_DEFAULTS,
+    MID_FULL_AA2_TEMPLATE,
 )
 
 
@@ -171,3 +175,34 @@ class TestGetCapabilitySet:
             FileNotFoundError, match="file not found: ska1_low/low_capabilities.json"
         ):
             empty_tmdata_repository.get_capability_set(Telescope.LOW, "AA1")
+
+
+class TestGetSubarrayTemplates:
+    @pytest.mark.parametrize(
+        "telescope, capability_set, expected",
+        [
+            (Telescope.MID, "AA1", []),
+            (Telescope.MID, "AA2", [MID_FULL_AA2_TEMPLATE]),
+            (Telescope.LOW, "AA1", [LOW_TEST_AA1_TEMPLATE]),
+            (Telescope.LOW, "AA2", [LOW_FULL_AA2_TEMPLATE, LOW_TEST_AA2_TEMPLATE]),
+        ],
+        ids=[
+            "no template",
+            "full template only",
+            "subset template only",
+            "full and subset templates",
+        ],
+    )
+    def test_returns_subarray_templates(
+        self, test_tmdata_repository, telescope, capability_set, expected
+    ):
+        """The pattern *_AA2 matches templates of both telescopes; only the
+        capability set's own telescope's templates are returned."""
+        assert (
+            test_tmdata_repository.get_subarray_templates(telescope, capability_set)
+            == expected
+        )
+
+    def test_raises_for_unknown_capability_set(self, test_tmdata_repository):
+        with pytest.raises(CapabilitySetNotFoundError):
+            test_tmdata_repository.get_subarray_templates(Telescope.MID, "AA3")
