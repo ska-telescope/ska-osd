@@ -24,7 +24,6 @@ from ska_ost_osd.osd.models.capabilities import (
     MidCapabilitiesFile,
     MidCapabilitySet,
 )
-from ska_ost_osd.osd.models.configuration import Constraints
 from ska_ost_osd.osd.models.cycles import Cycle, CycleFile, CycleID
 from ska_ost_osd.osd.models.defaults import (
     LowDefaultsFile,
@@ -152,23 +151,6 @@ def get_telescope_defaults(
     """
     return _DEFAULTS_FILE_MODELS[telescope].model_validate(
         _read(tmdata, DEFAULTS_JSON_FILE_PATHS[telescope])
-    )
-
-
-def get_constraints(tmdata: TMData, telescope: Telescope) -> Constraints:
-    """Read one telescope's observing constraints: the elevation limits from
-    its capabilities file and the sun, moon and Jupiter avoidance angles
-    from its defaults file.
-
-    :param tmdata: TMData to read from.
-    :param telescope: the telescope.
-    :return: the telescope's constraints.
-    :raises FileNotFoundError: If the tmdata has no capabilities or no
-        defaults file for the telescope.
-    """
-    return Constraints.combine(
-        get_telescope_capabilities(tmdata, telescope),
-        get_telescope_defaults(tmdata, telescope),
     )
 
 

@@ -84,7 +84,10 @@ class TMDataRepository:
         ).basic_capabilities
 
     def get_constraints(self, telescope: Telescope) -> Constraints:
-        return queries.get_constraints(self._tmdata, telescope)
+        return Constraints.combine(
+            queries.get_telescope_capabilities(self._tmdata, telescope),
+            queries.get_telescope_defaults(self._tmdata, telescope),
+        )
 
     # Capability sets
 
