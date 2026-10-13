@@ -29,8 +29,8 @@ class CycleTelescopeCapabilities(ConfigurationModel):
     """The capability set each telescope offers in the cycle, or ``None``.
     Served as ``Mid`` and ``Low``, the names the PHT UI reads."""
 
-    ska_mid: str | None = Field(alias="Mid")
-    ska_low: str | None = Field(alias="Low")
+    ska_mid: str | None = Field(validation_alias="Mid", serialization_alias="Mid")
+    ska_low: str | None = Field(validation_alias="Low", serialization_alias="Low")
 
 
 class ObservatoryPolicy(ConfigurationModel):
@@ -49,7 +49,10 @@ class MidCycleBasicCapabilities(ConfigurationModel):
     """Mid's receiver bands, served as ``receiver_information``, the name the
     PHT UI reads."""
 
-    frequency_bands: list[MidFrequencyBand] = Field(alias="receiver_information")
+    frequency_bands: list[MidFrequencyBand] = Field(
+        validation_alias="receiver_information",
+        serialization_alias="receiver_information",
+    )
 
 
 class CycleCapabilitiesBase(ConfigurationModel):
