@@ -48,7 +48,7 @@ def get_cycle_ids(tmdata: TMData) -> list[CycleID]:
     if not any(key.startswith(OBSERVING_CYCLES_TMDATA_DIR) for key in tmdata):
         raise FileNotFoundError(f"file not found: {OBSERVING_CYCLES_TMDATA_DIR}")
     return sorted(
-        CycleID(int(key.removeprefix("cycle_").removesuffix(".json")))
+        CycleID(key.removeprefix("cycle_").removesuffix(".json"))
         for key in tmdata[OBSERVING_CYCLES_TMDATA_DIR]
         if key.startswith("cycle_") and key.endswith(".json")
     )
