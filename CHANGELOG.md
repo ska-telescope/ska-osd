@@ -36,6 +36,8 @@ Unreleased
   from an ``OSDRepository``. The views serialise with the names their consumers
   read by default, without ``by_alias=True``
 * Raised the minimum pydantic version to 2.11, for ``serialize_by_alias``
+* Bump the build and runtime base images to ``ska-build-python-ubuntu26:1.1.2`` and
+  ``ska-python-ubuntu26:1.1.2`` to pick up the OpenSSL DTLS retransmission fix
 
 7.0.0
 **********
