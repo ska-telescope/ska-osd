@@ -1,4 +1,5 @@
-"""Pydantic models for tmdata/subarray_templates/subarray_template_library.json."""
+"""The subarray template reader model. The storage model for the template
+library file is in ``ska_ost_osd.osd.adapters.tmdata.models``."""
 
 from enum import StrEnum
 from typing import Any, Self
@@ -38,20 +39,3 @@ class SubarrayTemplate(OSDBaseModel):
         if self.subarray_type != SubarrayType.CUSTOM and self.custom_stations:
             raise ValueError(f"{self.name}: only custom templates list custom_stations")
         return self
-
-
-class SubarrayTemplateLibrary(OSDBaseModel):
-    """Top-level model for subarray_template_library.json."""
-
-    templates: list[SubarrayTemplate]
-
-    @model_validator(mode="before")
-    @classmethod
-    def collect_templates(cls, data: Any) -> Any:
-        """In tmdata each template is a top-level key; gather them into
-        ``templates``, using the key as the template name."""
-        if not isinstance(data, dict) or "templates" in data:
-            return data
-        return {
-            "templates": [{"name": name, **template} for name, template in data.items()]
-        }

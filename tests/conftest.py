@@ -1,3 +1,4 @@
+import json
 import os
 from importlib.metadata import version
 
@@ -6,6 +7,7 @@ from fastapi.testclient import TestClient
 from ska_telmodel_client import TMData
 
 from ska_ost_osd.app import create_app
+from ska_ost_osd.osd.adapters.tmdata import TMDataRepository
 from ska_ost_osd.osd.routers.dependencies import (
     get_tmdata_car_main,
     get_tmdata_gitlab_main,
@@ -65,6 +67,34 @@ def empty_tmdata(tmp_path_factory):
     """Fixture for an empty TMData instance."""
     empty_dir = tmp_path_factory.mktemp("empty_tmdata")
     return TMData([f"file://{empty_dir}"])
+
+
+@pytest.fixture(scope="session")
+def test_tmdata_repository(tests_tmdata):
+    """The OSD repository over the test copy of the tmdata."""
+    return TMDataRepository(tests_tmdata)
+
+
+@pytest.fixture(scope="session")
+def empty_tmdata_repository(empty_tmdata):
+    """The OSD repository over TMData with no files."""
+    return TMDataRepository(empty_tmdata)
+
+
+@pytest.fixture
+def tmdata_repository_with(tests_tmdata_source, tmp_path):
+    """Build an OSD repository over the test copy of the tmdata, with some
+    files replaced: pass a dict of each file's tmdata path to its contents.
+    The replacements are written to a temporary source listed after the
+    test tmdata, so they take precedence."""
+
+    def _tmdata_repository_with(files: dict[str, dict]) -> TMDataRepository:
+        for path, content in files.items():
+            (tmp_path / path).parent.mkdir(parents=True, exist_ok=True)
+            (tmp_path / path).write_text(json.dumps(content))
+        return TMDataRepository(TMData([tests_tmdata_source, f"file://{tmp_path}"]))
+
+    return _tmdata_repository_with
 
 
 @pytest.fixture(scope="session")
@@ -178,7 +208,7 @@ def invalid_observing_command_input_aa2(create_entity_object):
             "car",
             None,
             "mid",
-            "AA0.5",
+            "AA1",
         ),
         (
             None,
@@ -186,7 +216,7 @@ def invalid_observing_command_input_aa2(create_entity_object):
             "car",
             None,
             "low",
-            "AA0.5",
+            "AA1",
         ),
         (
             None,
@@ -194,31 +224,7 @@ def invalid_observing_command_input_aa2(create_entity_object):
             "car",
             None,
             "mid",
-            "AA0.5",
-        ),
-        (
-            None,
-            None,
-            "car",
-            None,
-            "low",
-            "AA0.5",
-        ),
-        (
-            None,
-            None,
-            "file",
-            None,
-            "mid",
-            "AA0.5",
-        ),
-        (
-            None,
-            None,
-            "file",
-            None,
-            "low",
-            "AA0.5",
+            "AA1",
         ),
         (
             None,
@@ -274,7 +280,7 @@ def invalid_observing_command_input_aa2(create_entity_object):
             "gitlab",
             "main",
             "mid",
-            "AA0.5",
+            "AA1",
         ),
         (
             None,
@@ -282,7 +288,7 @@ def invalid_observing_command_input_aa2(create_entity_object):
             "gitlab",
             "main",
             "low",
-            "AA0.5",
+            "AA1",
         ),
     ],
 )

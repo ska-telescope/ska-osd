@@ -1,22 +1,14 @@
-import re
 from enum import StrEnum
-from typing import Any, Literal, Self
+from typing import Annotated, Any, Literal, Self
 
-from pydantic import AliasChoices, AliasPath, Field, model_validator
+from pydantic import AliasChoices, Field, model_validator
 
-from ska_ost_osd.osd.common.constant import ARRAY_ASSEMBLY_PATTERN
+from ska_ost_osd.osd.common.constant import Telescope
+from ska_ost_osd.osd.exceptions import (
+    Band5bSubbandNotFoundError,
+    FrequencyBandNotFoundError,
+)
 from ska_ost_osd.osd.models.defaults import OSDBaseModel
-
-
-class ElevationConstraints(OSDBaseModel):
-    min_elevation_deg: float = Field(ge=0, le=90, examples=[45.0])
-    max_elevation_deg: float = Field(ge=0, le=90, examples=[90.0])
-
-    @model_validator(mode="after")
-    def check_elevation_range(self) -> Self:
-        if self.min_elevation_deg > self.max_elevation_deg:
-            raise ValueError("min_elevation_deg must not exceed max_elevation_deg")
-        return self
 
 
 class FrequencyBand(OSDBaseModel):
@@ -30,7 +22,7 @@ class FrequencyBand(OSDBaseModel):
         return self
 
 
-class Subarray(OSDBaseModel):
+class CapabilitySetBase(OSDBaseModel):
     name: str = Field(examples=["AA0.5"])
     receptors: list[str | int] = Field(
         validation_alias=AliasChoices(
@@ -50,31 +42,6 @@ class Subarray(OSDBaseModel):
     # templates, the matching templates keyed by name. The *_ITF assemblies
     # have none.
     subarray_templates: list[str] | dict[str, Any] | None = None
-
-
-class TelescopeCapabilitiesBase(OSDBaseModel):
-    constraints: ElevationConstraints
-
-    @model_validator(mode="before")
-    @classmethod
-    def collect_subarrays(cls, data: Any) -> Any:
-        """
-        In the tmdata file each array assembly is a top-level key;
-        gather the keys matching ``ARRAY_ASSEMBLY_PATTERN`` into
-        ``subarrays``, using the key as the subarray name.
-
-        The pattern separates the array assemblies from the file's other
-        top-level keys.
-        """
-        if not isinstance(data, dict) or "subarrays" in data:
-            return data
-        data = data.copy()
-        data["subarrays"] = [
-            {"name": key, **data.pop(key)}
-            for key in list(data)
-            if re.match(ARRAY_ASSEMBLY_PATTERN, key)
-        ]
-        return data
 
 
 class MidCBFMode(StrEnum):
@@ -98,8 +65,47 @@ class MidFrequencyBand(FrequencyBand):
         validation_alias=AliasChoices("band5b_subbands", "sub_bands"),
     )
 
+    def get_band5b_subband(self, sub_band: int) -> Band5bSubband:
+        """Look up one of this band's Band 5b sub-bands by number.
 
-class MidSubarray(Subarray):
+        :param sub_band: the sub-band number, e.g. ``2``.
+        :return: the sub-band.
+        :raises Band5bSubbandNotFoundError: If this band has no sub-band
+            with that number, including when it has no sub-bands at all.
+        """
+        subbands = self.band5b_subbands or []
+        for subband in subbands:
+            if subband.sub_band == sub_band:
+                return subband
+        raise Band5bSubbandNotFoundError(
+            self.rx_id, sub_band, [subband.sub_band for subband in subbands]
+        )
+
+
+class MidBasicCapabilities(OSDBaseModel):
+    """Mid's receiver bands. tmdata: ``basic_capabilities``."""
+
+    frequency_bands: list[MidFrequencyBand] = Field(
+        validation_alias=AliasChoices("frequency_bands", "receiver_information"),
+    )
+
+    def get_frequency_band(self, rx_id: str) -> MidFrequencyBand:
+        """Look up one receiver band by its ID.
+
+        :param rx_id: the band ID, e.g. ``"Band_2"``.
+        :return: the band.
+        :raises FrequencyBandNotFoundError: If there is no band with that ID.
+        """
+        for band in self.frequency_bands:
+            if band.rx_id == rx_id:
+                return band
+        raise FrequencyBandNotFoundError(
+            rx_id, [band.rx_id for band in self.frequency_bands]
+        )
+
+
+class MidCapabilitySet(CapabilitySetBase):
+    telescope: Literal[Telescope.MID] = Telescope.MID
     allowed_channel_width_values_hz: list[int]
     allowed_channel_count_range_min: list[int]
     allowed_channel_count_range_max: list[int]
@@ -120,35 +126,16 @@ class MidSubarray(Subarray):
         return self
 
 
-class MidCapabilities(TelescopeCapabilitiesBase):
-    telescope: Literal["Mid"] = "Mid"
-    frequency_band: list[MidFrequencyBand] = Field(
-        validation_alias=AliasChoices(
-            "frequency_band", AliasPath("basic_capabilities", "receiver_information")
-        )
-    )
-    subarrays: list[MidSubarray]
-
-    @model_validator(mode="after")
-    def check_available_receivers(self) -> Self:
-        rx_ids = {band.rx_id for band in self.frequency_band}
-        for subarray in self.subarrays:
-            unknown = set(subarray.available_receivers) - rx_ids
-            if unknown:
-                raise ValueError(
-                    f"{subarray.name}: available_receivers {sorted(unknown)} "
-                    "not found in frequency_band"
-                )
-        return self
-
-
 class LowCBFMode(StrEnum):
     VIS = "vis"
     PST = "pst"
     PSS = "pss"
 
 
-class LowFrequencyBand(FrequencyBand):
+class LowBasicCapabilities(FrequencyBand):
+    """Low's frequency band and how it is divided into channels.
+    tmdata: ``basic_capabilities``."""
+
     min_coarse_channel: int = Field(ge=0, examples=[64])
     max_coarse_channel: int = Field(ge=0, examples=[447])
     coarse_channel_width_hz: float = Field(gt=0, examples=[781.25e3])
@@ -158,7 +145,8 @@ class LowFrequencyBand(FrequencyBand):
     number_pss_channels_per_coarse_channel: int = Field(ge=0, examples=[54])
 
 
-class LowSubarray(Subarray):
+class LowCapabilitySet(CapabilitySetBase):
+    telescope: Literal[Telescope.LOW] = Telescope.LOW
     number_substations: int = Field(ge=0)
     number_subarray_beams: int = Field(ge=0)
     number_stations: int = Field(ge=0)
@@ -176,9 +164,8 @@ class LowSubarray(Subarray):
         return self
 
 
-class LowCapabilities(TelescopeCapabilitiesBase):
-    telescope: Literal["Low"] = "Low"
-    frequency_band: LowFrequencyBand = Field(
-        validation_alias=AliasChoices("frequency_band", "basic_capabilities")
-    )
-    subarrays: list[LowSubarray]
+# A capability set is one array assembly of either telescope; the
+# telescope field picks the model when one is read back.
+CapabilitySet = Annotated[
+    MidCapabilitySet | LowCapabilitySet, Field(discriminator="telescope")
+]

@@ -1,4 +1,13 @@
 CYCLE_ID_ERROR_MESSAGE = "Cycle {} is invalid. Valid IDs are {}."
+CAPABILITY_SET_DOESNOT_EXIST_ERROR_MESSAGE = (
+    "Capability set {} is invalid for telescope {}. Valid capability sets are {}."
+)
+FREQUENCY_BAND_DOESNOT_EXIST_ERROR_MESSAGE = (
+    "Frequency band {} is invalid. Valid frequency bands are {}."
+)
+BAND5B_SUBBAND_DOESNOT_EXIST_ERROR_MESSAGE = (
+    "Sub-band {} is invalid for {}. Valid sub-bands are {}."
+)
 CAPABILITY_DOESNOT_EXIST_ERROR_MESSAGE = (
     "Capability {} is invalid. Valid capabilities are {}."
 )

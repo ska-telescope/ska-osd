@@ -1,11 +1,10 @@
-"""Unit tests for the capabilities, defaults, observatory policy, subarray
-template and configuration models.
+"""Unit tests for the capabilities, defaults, cycle, subarray template and
+constraints models: the storage models and the reader models.
 
 These use the test copy of the tmdata in tests/tmdata, so changing the real
 tmdata doesn't need them updating; test_tmdata_files.py checks the real
 files. They cover the models' own logic: the checks across fields, reshaping
-the tmdata layout, combining the capabilities and defaults into the
-configuration, and validating what the OSD serves.
+the tmdata layout, and validating what the legacy OSD API serves.
 """
 
 import json
@@ -13,19 +12,31 @@ from datetime import datetime
 from pathlib import Path
 
 import pytest
-from pydantic import ValidationError
+from pydantic import TypeAdapter, ValidationError
 
-from ska_ost_osd.osd.common.constant import Telescope
-from ska_ost_osd.osd.models.capabilities import LowCapabilities, MidCapabilities
-from ska_ost_osd.osd.models.configuration import (
-    Configuration,
-    LowConfiguration,
-    MidConfiguration,
+from ska_ost_osd.osd.adapters.tmdata.models import (
+    CycleFile,
+    LowCapabilitiesFile,
+    LowDefaultsFile,
+    MidCapabilitiesFile,
+    MidDefaultsFile,
+    SubarrayTemplateLibraryFile,
 )
-from ska_ost_osd.osd.models.defaults import LowDefaults, MidDefaults
-from ska_ost_osd.osd.models.observatory_policies import ObservatoryPolicy
-from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplateLibrary
+from ska_ost_osd.osd.common.constant import Telescope
+from ska_ost_osd.osd.exceptions import (
+    Band5bSubbandNotFoundError,
+    FrequencyBandNotFoundError,
+)
+from ska_ost_osd.osd.models.capabilities import (
+    Band5bSubband,
+    CapabilitySet,
+    LowCapabilitySet,
+    MidCapabilitySet,
+    MidFrequencyBand,
+)
+from ska_ost_osd.osd.models.constraints import Constraints
 from ska_ost_osd.osd.osd import get_osd_using_tmdata
+from tests.unit.ska_ost_osd.osd.expected import MID_BASIC_CAPABILITIES
 
 TESTS_TMDATA = Path(__file__).parents[3] / "tmdata"
 
@@ -33,14 +44,8 @@ MID_CAPABILITIES = "ska1_mid/mid_capabilities.json"
 LOW_CAPABILITIES = "ska1_low/low_capabilities.json"
 MID_DEFAULTS = "ska1_mid/mid_defaults.json"
 LOW_DEFAULTS = "ska1_low/low_defaults.json"
-OBSERVATORY_POLICIES = "cycles/cycle_1.json"
+CYCLE = "cycles/cycle_1.json"
 SUBARRAY_TEMPLATES = "subarray_templates/subarray_template_library.json"
-
-AVOIDANCE_ANGLES = (
-    "sun_avoidance_angle_deg",
-    "moon_avoidance_angle_deg",
-    "jupiter_avoidance_angle_deg",
-)
 
 
 def load(path: str) -> dict:
@@ -54,8 +59,8 @@ class TestOsdOutput:
     @pytest.mark.parametrize(
         "model, telescope, path",
         [
-            (MidCapabilities, Telescope.MID, MID_CAPABILITIES),
-            (LowCapabilities, Telescope.LOW, LOW_CAPABILITIES),
+            (MidCapabilitiesFile, Telescope.MID, MID_CAPABILITIES),
+            (LowCapabilitiesFile, Telescope.LOW, LOW_CAPABILITIES),
         ],
     )
     def test_template_processed_output_validates(
@@ -81,34 +86,34 @@ class TestBreakingChanges:
         "model, path, break_file",
         [
             (
-                MidCapabilities,
+                MidCapabilitiesFile,
                 MID_CAPABILITIES,
-                lambda data: data["AA1"].pop("number_fsps"),
+                lambda data: data["AA2"].pop("number_fsps"),
             ),
             (
-                LowCapabilities,
+                LowCapabilitiesFile,
                 LOW_CAPABILITIES,
                 lambda data: data.update(frequency=data.pop("basic_capabilities")),
             ),
             (
-                MidDefaults,
+                MidDefaultsFile,
                 MID_DEFAULTS,
                 lambda data: data["defaults"].pop("csp_configuration"),
             ),
             (
-                LowDefaults,
+                LowDefaultsFile,
                 LOW_DEFAULTS,
                 lambda data: data["quality_attribute_metrics"]["cbf"].update(
                     processors_ready_percent="all"
                 ),
             ),
             (
-                ObservatoryPolicy,
-                OBSERVATORY_POLICIES,
+                CycleFile,
+                CYCLE,
                 lambda data: data.update(cycle=data.pop("cycle_number")),
             ),
             (
-                SubarrayTemplateLibrary,
+                SubarrayTemplateLibraryFile,
                 SUBARRAY_TEMPLATES,
                 lambda data: next(iter(data.values())).update(subarray_type="AA9"),
             ),
@@ -134,22 +139,73 @@ class TestCapabilities:
     """The capabilities models' own logic."""
 
     def test_array_assemblies_are_found_by_name(self):
-        """Every top-level key matching the array assembly pattern becomes a
-        subarray, so a new assembly is picked up and other keys are ignored."""
+        """Every top-level key matching the array assembly pattern, whether
+        an AA name or a telescope-prefixed one such as Low_ITF, becomes a
+        capability set, so a new one is picked up and other keys are
+        ignored. A capability set need not list subarray templates."""
         data = load(LOW_CAPABILITIES)
-        names = {s.name for s in LowCapabilities.model_validate(data).subarrays}
+        names = {s.name for s in LowCapabilitiesFile.model_validate(data).subarrays}
         data["AA3"] = data["AA2"]
+        data["Low_ITF"] = {
+            key: value
+            for key, value in data["AA2"].items()
+            if key != "subarray_templates"
+        }
         data["version"] = "1.0"
 
-        capabilities = LowCapabilities.model_validate(data)
+        capabilities = LowCapabilitiesFile.model_validate(data)
 
         subarrays = {subarray.name: subarray for subarray in capabilities.subarrays}
-        assert set(subarrays) == names | {"AA3"}
-        assert subarrays["AA0.5"].receptors == data["AA0.5"]["number_station_ids"]
+        assert set(subarrays) == names | {"AA3", "Low_ITF"}
+        assert subarrays["AA1"].receptors == data["AA1"]["number_station_ids"]
+        assert subarrays["Low_ITF"].subarray_templates is None
+
+    @pytest.mark.parametrize(
+        "model, path, telescope",
+        [
+            (MidCapabilitiesFile, MID_CAPABILITIES, Telescope.MID),
+            (LowCapabilitiesFile, LOW_CAPABILITIES, Telescope.LOW),
+        ],
+    )
+    def test_capability_sets_know_their_telescope(self, model, path, telescope):
+        """tmdata doesn't repeat the telescope on each array assembly; the
+        capability set models fill it in."""
+        capabilities = model.model_validate(load(path))
+        assert {cs.telescope for cs in capabilities.subarrays} == {telescope}
+
+    @pytest.mark.parametrize(
+        "model, path, capability_set_model",
+        [
+            (MidCapabilitiesFile, MID_CAPABILITIES, MidCapabilitySet),
+            (LowCapabilitiesFile, LOW_CAPABILITIES, LowCapabilitySet),
+        ],
+    )
+    @pytest.mark.parametrize("mode", ["python", "json"])
+    def test_capability_set_is_chosen_by_telescope(
+        self, model, path, capability_set_model, mode
+    ):
+        """A serialised capability set reads back as the right capability
+        set model, chosen by its telescope."""
+        expected = model.model_validate(load(path)).subarrays[0]
+
+        capability_set = TypeAdapter(CapabilitySet).validate_python(
+            expected.model_dump(mode=mode)
+        )
+
+        assert type(capability_set) is capability_set_model
+        assert capability_set == expected
+
+    def test_capability_set_rejects_another_telescope(self):
+        data = load(LOW_CAPABILITIES)["AA1"]
+        with pytest.raises(ValidationError, match="telescope"):
+            LowCapabilitySet.model_validate({"name": "AA1", **data, "telescope": "mid"})
 
     @pytest.mark.parametrize(
         "model, path",
-        [(MidCapabilities, MID_CAPABILITIES), (LowCapabilities, LOW_CAPABILITIES)],
+        [
+            (MidCapabilitiesFile, MID_CAPABILITIES),
+            (LowCapabilitiesFile, LOW_CAPABILITIES),
+        ],
     )
     def test_serialised_capabilities_validate(self, model, path):
         """The models' own output, with the subarrays already collected, can
@@ -163,26 +219,13 @@ class TestCapabilities:
         data = load(LOW_CAPABILITIES)
         data.pop("quality_attribute_metrics", None)
 
-        LowCapabilities.model_validate(data)
-
-    @pytest.mark.parametrize(
-        "model, path",
-        [(MidCapabilities, MID_CAPABILITIES), (LowCapabilities, LOW_CAPABILITIES)],
-    )
-    def test_avoidance_angles_not_needed(self, model, path):
-        """The avoidance angles now live only in the defaults files, so the
-        capabilities files validate without them."""
-        data = load(path)
-        for angle in AVOIDANCE_ANGLES:
-            data["constraints"].pop(angle, None)
-
-        model.model_validate(data)
+        LowCapabilitiesFile.model_validate(data)
 
     @pytest.mark.parametrize(
         "model, path, break_file, message",
         [
             (
-                MidCapabilities,
+                MidCapabilitiesFile,
                 MID_CAPABILITIES,
                 lambda data: data["constraints"].update(
                     min_elevation_deg=90.0, max_elevation_deg=10.0
@@ -190,7 +233,7 @@ class TestCapabilities:
                 "min_elevation_deg must not exceed max_elevation_deg",
             ),
             (
-                MidCapabilities,
+                MidCapabilitiesFile,
                 MID_CAPABILITIES,
                 lambda data: data["basic_capabilities"]["receiver_information"][
                     0
@@ -198,21 +241,21 @@ class TestCapabilities:
                 "min_frequency_hz must not exceed max_frequency_hz",
             ),
             (
-                MidCapabilities,
+                MidCapabilitiesFile,
                 MID_CAPABILITIES,
-                lambda data: data["AA1"]["number_dish_ids"].pop(),
+                lambda data: data["AA2"]["number_dish_ids"].pop(),
                 "number_ska_dishes",
             ),
             (
-                MidCapabilities,
+                MidCapabilitiesFile,
                 MID_CAPABILITIES,
                 lambda data: data["AA2"]["available_receivers"].append("Band_9"),
                 "available_receivers",
             ),
             (
-                LowCapabilities,
+                LowCapabilitiesFile,
                 LOW_CAPABILITIES,
-                lambda data: data["AA1"]["number_station_ids"].pop(),
+                lambda data: data["AA2"]["number_station_ids"].pop(),
                 "number_stations",
             ),
         ],
@@ -232,6 +275,69 @@ class TestCapabilities:
             model.model_validate(data)
 
 
+class TestMidBasicCapabilities:
+    """Looking up Mid's receiver bands and Band 5b's sub-bands by key."""
+
+    def test_get_frequency_band(self):
+        assert MID_BASIC_CAPABILITIES.get_frequency_band("Band_2") == (
+            MidFrequencyBand(
+                rx_id="Band_2",
+                min_frequency_hz=950_000_000,
+                max_frequency_hz=1_760_000_000,
+            )
+        )
+
+    def test_get_frequency_band_raises_for_unknown_rx_id(self):
+        with pytest.raises(
+            FrequencyBandNotFoundError,
+            match=(
+                r"Frequency band Band_9 is invalid\. Valid frequency bands are "
+                r"Band_1, Band_2, Band_3, Band_4, Band_5a, Band_5b\."
+            ),
+        ) as excinfo:
+            MID_BASIC_CAPABILITIES.get_frequency_band("Band_9")
+
+        assert excinfo.value.rx_id == "Band_9"
+        assert excinfo.value.available_rx_ids == [
+            "Band_1", "Band_2", "Band_3", "Band_4", "Band_5a", "Band_5b",
+        ]  # fmt: skip
+
+    def test_get_band5b_subband(self):
+        band = MID_BASIC_CAPABILITIES.get_frequency_band("Band_5b")
+
+        assert band.get_band5b_subband(2) == Band5bSubband(
+            sub_band=2,
+            min_frequency_hz=12_810_000_000,
+            max_frequency_hz=13_510_000_000,
+            lo_frequency_hz=13_860_000_000,
+            sideband="low",
+        )
+
+    def test_get_band5b_subband_raises_for_unknown_sub_band(self):
+        band = MID_BASIC_CAPABILITIES.get_frequency_band("Band_5b")
+
+        with pytest.raises(
+            Band5bSubbandNotFoundError,
+            match=(
+                r"Sub-band 4 is invalid for Band_5b\. Valid sub-bands are 1, 2, 3\."
+            ),
+        ) as excinfo:
+            band.get_band5b_subband(4)
+
+        assert excinfo.value.rx_id == "Band_5b"
+        assert excinfo.value.sub_band == 4
+        assert excinfo.value.available_sub_bands == [1, 2, 3]
+
+    def test_get_band5b_subband_raises_for_band_without_sub_bands(self):
+        band = MID_BASIC_CAPABILITIES.get_frequency_band("Band_1")
+
+        with pytest.raises(
+            Band5bSubbandNotFoundError,
+            match=r"Sub-band 1 is invalid for Band_1\. Valid sub-bands are none\.",
+        ):
+            band.get_band5b_subband(1)
+
+
 class TestDefaults:
     """The defaults models' own logic."""
 
@@ -241,7 +347,7 @@ class TestDefaults:
         data = load(MID_DEFAULTS)
         noise_diode = data["defaults"]["target"]["dish_spfrx_params"]["noise_diode"]
 
-        target_spfrx = MidDefaults.model_validate(data).spfrx_defaults.target_spfrx
+        target_spfrx = MidDefaultsFile.model_validate(data).spfrx_defaults.target_spfrx
 
         options = {option.mode: option for option in target_spfrx.noise_diode_options}
         assert target_spfrx.default_noise_diode_mode == noise_diode["mode"]
@@ -256,7 +362,7 @@ class TestDefaults:
         noise_diode.pop("periodic")
 
         with pytest.raises(ValidationError, match="no matching entry"):
-            MidDefaults.model_validate(data)
+            MidDefaultsFile.model_validate(data)
 
     @pytest.mark.parametrize("old, new", [(False, "off"), (True, "on")])
     def test_boolean_sync_pps_is_read(self, old, new):
@@ -264,7 +370,7 @@ class TestDefaults:
         data = load(MID_DEFAULTS)
         data["defaults"]["csp_configuration"]["spfrx"]["sync_pps"] = old
 
-        defaults = MidDefaults.model_validate(data)
+        defaults = MidDefaultsFile.model_validate(data)
 
         assert defaults.spfrx_defaults.csp_spfrx.sync_pps == new
 
@@ -275,10 +381,11 @@ class TestDefaults:
         noise_diode["mode"] = "off"
         noise_diode.pop("periodic")
 
-        MidDefaults.model_validate(data)
+        MidDefaultsFile.model_validate(data)
 
     @pytest.mark.parametrize(
-        "model, path", [(MidDefaults, MID_DEFAULTS), (LowDefaults, LOW_DEFAULTS)]
+        "model, path",
+        [(MidDefaultsFile, MID_DEFAULTS), (LowDefaultsFile, LOW_DEFAULTS)],
     )
     def test_serialised_defaults_validate(self, model, path):
         """The models' own output, with the noise diode options already
@@ -287,58 +394,55 @@ class TestDefaults:
         assert model.model_validate(defaults.model_dump()) == defaults
 
 
-class TestObservatoryPolicy:
-    """The observatory policy model's own logic."""
+class TestCycleFile:
+    """The cycle file model's own logic."""
 
     def test_cycle_response_policy_validates(self, tests_tmdata):
         """The policy in the OSD's response for the cycle, as the PHT
         endpoints fetch it, validates."""
-        cycle = load(OBSERVATORY_POLICIES)["cycle_number"]
+        cycle = load(CYCLE)["cycle_number"]
         osd_data = get_osd_using_tmdata(
             tests_tmdata, cycle_id=cycle, process_templates=True
         )
-        ObservatoryPolicy.model_validate(osd_data["observatory_policy"])
+        CycleFile.model_validate(osd_data["observatory_policy"])
 
     def test_proposal_dates_are_served_as_the_same_time(self):
         """The dates are parsed, so ``.000Z`` is served as ``Z``, but the
         time is unchanged."""
-        data = load(OBSERVATORY_POLICIES)
-        policy = ObservatoryPolicy.model_validate(data).model_dump(mode="json")
+        data = load(CYCLE)
+        policy = CycleFile.model_validate(data).model_dump(mode="json")
         for key in ("proposal_open", "proposal_close"):
             assert datetime.fromisoformat(
                 policy["cycle_information"][key]
             ) == datetime.fromisoformat(data["cycle_information"][key])
 
     def test_proposal_dates_need_a_timezone(self):
-        data = load(OBSERVATORY_POLICIES)
+        data = load(CYCLE)
         data["cycle_information"]["proposal_open"] = "2026-03-27T12:00:00"
         with pytest.raises(ValidationError, match="timezone"):
-            ObservatoryPolicy.model_validate(data)
+            CycleFile.model_validate(data)
 
-    def test_telescope_offering_nothing_is_null(self):
-        """The PHT UI checks for null, so a telescope missing from the file
-        is served as null rather than left out, under the file's keys."""
-        data = load(OBSERVATORY_POLICIES)
+    def test_telescope_offering_nothing_is_none(self):
+        """A telescope missing from the file's telescope_capabilities is read
+        as None. (The PHT view serves it as null: see test_views.py.)"""
+        data = load(CYCLE)
         data["telescope_capabilities"] = {"Low": "AA2_SV"}
 
-        policy = ObservatoryPolicy.model_validate(data)
+        policy = CycleFile.model_validate(data)
 
         assert policy.telescope_capabilities.ska_mid is None
         assert policy.telescope_capabilities.ska_low == "AA2_SV"
-        served = policy.model_dump(mode="json", by_alias=True)
-        assert served["telescope_capabilities"] == {"Mid": None, "Low": "AA2_SV"}
-        assert ObservatoryPolicy.model_validate(policy.model_dump()) == policy
 
     def test_proposals_must_open_before_they_close(self):
         """A proposal window that closes before it opens is rejected."""
-        data = load(OBSERVATORY_POLICIES)
+        data = load(CYCLE)
         information = data["cycle_information"]
         information["proposal_open"], information["proposal_close"] = (
             information["proposal_close"],
             information["proposal_open"],
         )
         with pytest.raises(ValidationError, match="proposal_open must be before"):
-            ObservatoryPolicy.model_validate(data)
+            CycleFile.model_validate(data)
 
 
 class TestSubarrayTemplates:
@@ -348,7 +452,7 @@ class TestSubarrayTemplates:
         """Each top-level key becomes a template, named after the key."""
         data = load(SUBARRAY_TEMPLATES)
 
-        library = SubarrayTemplateLibrary.model_validate(data)
+        library = SubarrayTemplateLibraryFile.model_validate(data)
 
         assert [template.name for template in library.templates] == list(data)
 
@@ -357,7 +461,7 @@ class TestSubarrayTemplates:
         data = load(SUBARRAY_TEMPLATES)
         name = next(n for n, t in data.items() if t["subarray_type"] == "custom")
 
-        library = SubarrayTemplateLibrary.model_validate(data)
+        library = SubarrayTemplateLibraryFile.model_validate(data)
 
         template = next(t for t in library.templates if t.name == name)
         assert template.custom_stations == data[name]["custom_stations"].split(",")
@@ -379,99 +483,43 @@ class TestSubarrayTemplates:
         data[name]["custom_stations"] = stations
 
         with pytest.raises(ValidationError, match=message):
-            SubarrayTemplateLibrary.model_validate(data)
+            SubarrayTemplateLibraryFile.model_validate(data)
 
 
-class TestConfiguration:
-    """The combined configuration ska-oso-services serves."""
+class TestConstraints:
+    """Constraints validates its own fields, independently of the storage
+    models it is built from."""
 
-    def test_from_tmdata_combines_capabilities_and_defaults(self, tests_tmdata):
-        """Each telescope's configuration combines its capabilities and
-        defaults files."""
-        configuration = Configuration.from_tmdata(tests_tmdata)
+    VALID = {
+        "min_elevation_deg": 15.0,
+        "max_elevation_deg": 90.0,
+        "sun_avoidance_angle_deg": 45.0,
+        "moon_avoidance_angle_deg": 5.0,
+        "jupiter_avoidance_angle_deg": 5.0,
+    }
 
-        assert configuration.ska_mid == MidConfiguration.combine(
-            MidCapabilities.model_validate(load(MID_CAPABILITIES)),
-            MidDefaults.model_validate(load(MID_DEFAULTS)),
-        )
-        assert configuration.ska_low == LowConfiguration.combine(
-            LowCapabilities.model_validate(load(LOW_CAPABILITIES)),
-            LowDefaults.model_validate(load(LOW_DEFAULTS)),
-        )
+    def test_accepts_valid_constraints(self):
+        assert Constraints(**self.VALID).model_dump() == self.VALID
 
-    def test_from_tmdata_reads_every_cycle(self, tests_tmdata):
-        """The configuration holds the policy of every cycle in the tmdata,
-        in cycle order."""
-        cycle_files = (TESTS_TMDATA / "cycles").glob("cycle_*.json")
-        cycles = sorted(int(path.stem.removeprefix("cycle_")) for path in cycle_files)
+    @pytest.mark.parametrize(
+        "update, message",
+        [
+            (
+                {"min_elevation_deg": 90.0, "max_elevation_deg": 10.0},
+                "min_elevation_deg must not exceed max_elevation_deg",
+            ),
+            ({"min_elevation_deg": -1.0}, "greater than or equal to 0"),
+            ({"max_elevation_deg": 91.0}, "less than or equal to 90"),
+        ],
+        ids=["elevation range", "below horizon", "above zenith"],
+    )
+    def test_rejects_invalid_elevations(self, update, message):
+        with pytest.raises(ValidationError, match=message):
+            Constraints(**{**self.VALID, **update})
 
-        configuration = Configuration.from_tmdata(tests_tmdata)
+    @pytest.mark.parametrize("field", list(VALID))
+    def test_requires_every_field(self, field):
+        data = {key: value for key, value in self.VALID.items() if key != field}
 
-        assert [p.cycle_number for p in configuration.observatory_policies] == cycles
-
-    def test_odt_keys_come_first_and_unchanged(self, tests_tmdata):
-        """/odt/configuration serves ska_mid and ska_low; the observatory
-        policies are only added after them."""
-        served = Configuration.from_tmdata(tests_tmdata).model_dump(
-            mode="json", by_alias=True
-        )
-        assert list(served) == ["ska_mid", "ska_low", "observatory_policies"]
-
-    def test_all_constraints_served_without_angles_in_capabilities(self):
-        """With the angles gone from the capabilities file, the configuration
-        still serves all five constraints, the angles from the defaults."""
-        capabilities = load(MID_CAPABILITIES)
-        for angle in AVOIDANCE_ANGLES:
-            capabilities["constraints"].pop(angle, None)
-        defaults = load(MID_DEFAULTS)
-
-        configuration = MidConfiguration.combine(
-            MidCapabilities.model_validate(capabilities),
-            MidDefaults.model_validate(defaults),
-        )
-
-        assert configuration.constraints.model_dump() == {
-            **{angle: defaults["constraints"][angle] for angle in AVOIDANCE_ANGLES},
-            "min_elevation_deg": capabilities["constraints"]["min_elevation_deg"],
-            "max_elevation_deg": capabilities["constraints"]["max_elevation_deg"],
-        }
-
-    def test_quality_attribute_metrics_come_from_defaults(self):
-        """The defaults file is the home of Low's quality attribute metrics;
-        the copy in the capabilities file is ignored."""
-        capabilities = LowCapabilities.model_validate(load(LOW_CAPABILITIES))
-        defaults = load(LOW_DEFAULTS)
-        defaults["quality_attribute_metrics"]["cbf"]["processors_ready_percent"] = 50.0
-
-        configuration = LowConfiguration.combine(
-            capabilities, LowDefaults.model_validate(defaults)
-        )
-
-        assert (
-            configuration.quality_attribute_metrics.cbf.processors_ready_percent == 50
-        )
-        assert configuration.frequency_band == capabilities.frequency_band
-        assert configuration.subarrays == capabilities.subarrays
-
-    def test_defaults_avoidance_angles_take_priority(self):
-        """The defaults file is the home of the avoidance angles; the
-        capabilities file only repeats them for backward compatibility."""
-        capabilities = MidCapabilities.model_validate(load(MID_CAPABILITIES))
-        defaults = load(MID_DEFAULTS)
-        defaults["constraints"]["sun_avoidance_angle_deg"] = 45.0
-
-        configuration = MidConfiguration.combine(
-            capabilities, MidDefaults.model_validate(defaults)
-        )
-
-        assert configuration.constraints.sun_avoidance_angle_deg == 45.0
-        assert (
-            configuration.constraints.min_elevation_deg
-            == capabilities.constraints.min_elevation_deg
-        )
-
-    def test_serialised_configuration_validates(self, tests_tmdata):
-        """What ska-oso-services serves can be read back by the same
-        models."""
-        configuration = Configuration.from_tmdata(tests_tmdata)
-        assert Configuration.model_validate(configuration.model_dump()) == configuration
+        with pytest.raises(ValidationError, match=field):
+            Constraints(**data)

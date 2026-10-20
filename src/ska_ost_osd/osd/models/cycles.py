@@ -1,8 +1,11 @@
-from typing import Self
+from typing import Annotated, Self
 
 from pydantic import AwareDatetime, Field, model_validator
 
 from ska_ost_osd.osd.models.defaults import OSDBaseModel
+
+# The key that identifies a cycle: currently the number N in cycles/cycle_<N>.json
+CycleID = Annotated[int, Field(gt=0, examples=[1])]
 
 
 class CycleInformation(OSDBaseModel):
@@ -27,14 +30,18 @@ class CyclePolicies(OSDBaseModel):
 class TelescopeCapabilities(OSDBaseModel):
     """The array assembly each telescope offers in the cycle, or ``None``."""
 
-    ska_mid: str | None = Field(default=None, alias="Mid", examples=["AA2"])
-    ska_low: str | None = Field(default=None, alias="Low", examples=["AA2_SV"])
+    # Read from the tmdata keys Mid and Low
+    ska_mid: str | None = Field(default=None, validation_alias="Mid", examples=["AA2"])
+    ska_low: str | None = Field(
+        default=None, validation_alias="Low", examples=["AA2_SV"]
+    )
 
 
-class ObservatoryPolicy(OSDBaseModel):
-    """Top-level model for observatory_policies.json."""
+class Cycle(OSDBaseModel):
+    """One cycle: its metadata, proposal dates, policies and the capability
+    set each telescope offers."""
 
-    cycle_number: int = Field(ge=1, examples=[1])
+    cycle_number: CycleID
     cycle_id: str | None = None
     type: str | None = Field(default=None, examples=["Science Verification"])
     cycle_description: str

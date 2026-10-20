@@ -15,6 +15,7 @@ from ska_telmodel_client import TMData
 
 from ska_ost_osd.common.models import ApiResponse
 from ska_ost_osd.common.utils import convert_to_response_object, get_responses
+from ska_ost_osd.osd.adapters.tmdata.storage import get_cycle_ids
 from ska_ost_osd.osd.common.constant import (
     CYCLE_TO_VERSION_MAPPING,
     MID_CAPABILITIES_JSON_PATH,
@@ -36,7 +37,6 @@ from ska_ost_osd.osd.models.models import (
 )
 from ska_ost_osd.osd.osd import (
     add_new_data_storage,
-    get_available_cycles,
     get_osd_using_tmdata,
     update_osd_file,
 )
@@ -210,8 +210,7 @@ def get_cycle_list(
     :return: ApiResponse[CycleModel], response model containing the list
         of cycle numbers.
     """
-    cycle_numbers = get_available_cycles(tmdata)
-    cycles = {"cycles": sorted(cycle_numbers)}
+    cycles = {"cycles": get_cycle_ids(tmdata)}
     return convert_to_response_object(cycles, result_code=HTTPStatus.OK)
 
 

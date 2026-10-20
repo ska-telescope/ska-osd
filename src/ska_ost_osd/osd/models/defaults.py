@@ -16,26 +16,6 @@ class OSDBaseModel(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
 
-class AvoidanceConstraints(OSDBaseModel):
-    """
-    Sun, moon and Jupiter avoidance angles.
-    """
-
-    sun_avoidance_angle_deg: float = Field(examples=[30.0])
-    moon_avoidance_angle_deg: float = Field(examples=[10.0])
-    jupiter_avoidance_angle_deg: float = Field(examples=[10.0])
-
-
-class TelescopeDefaults(OSDBaseModel):
-    """
-    Base for the top-level Mid and Low defaults models. Subclasses
-    narrow ``telescope`` to their own value.
-    """
-
-    telescope: Literal["ska-mid", "ska-low"]
-    constraints: AvoidanceConstraints
-
-
 class NoiseDiodeMode(StrEnum):
     PERIODIC = "periodic"
     PSEUDO_RANDOM = "pseudo_random"
@@ -144,13 +124,10 @@ class SPFRxParameters(OSDBaseModel):
     )
 
 
-class MidDefaults(TelescopeDefaults):
-    """Top-level model for mid_defaults.json."""
+class MidDefaults(OSDBaseModel):
+    """Mid's defaults: the SPFRx settings."""
 
-    telescope: Literal["Mid"] = "Mid"
-    spfrx_defaults: SPFRxParameters = Field(
-        validation_alias=AliasChoices("spfrx_defaults", "defaults")
-    )
+    spfrx_defaults: SPFRxParameters
 
 
 class LowCBFMetrics(OSDBaseModel):
@@ -162,8 +139,7 @@ class LowQualityAttributeMetrics(OSDBaseModel):
     cbf: LowCBFMetrics
 
 
-class LowDefaults(TelescopeDefaults):
-    """Top-level model for low_defaults.json."""
+class LowDefaults(OSDBaseModel):
+    """Low's defaults: the quality attribute metrics."""
 
-    telescope: Literal["Low"] = "Low"
     quality_attribute_metrics: LowQualityAttributeMetrics
