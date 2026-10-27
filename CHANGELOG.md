@@ -7,6 +7,18 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 Unreleased
 **********
+* [BREAKING] Removed the REST API: the FastAPI app, its Helm charts and OCI image, and
+  the ``/osd``, ``/cycle``, ``/osd_release`` and ``/semantic_validation`` endpoints.
+  The OSD is now a Python library only
+* [BREAKING] Removed semantic validation, ``ska_ost_osd.telvalidation``
+* [BREAKING] Removed the code behind the ``PUT /osd`` and ``/osd_release`` endpoints:
+  ``update_osd_file`` and ``add_new_data_storage`` in ``ska_ost_osd.osd.osd``,
+  ``ska_ost_osd.osd.version_mapping``, ``ska_ost_osd.osd.common.gitlab_helper``,
+  ``ska_ost_osd.osd.common.utils``, ``ska_ost_osd.osd.models.models`` and
+  ``CapabilityError``
+* [BREAKING] Removed ``ska_ost_osd.common``, including the FastAPI
+  ``generic_exception_handler``
+* Removed the ``fastapi``, ``astropy`` and ``simpleeval`` dependencies
 * [BREAKING] Define multiple cycles through a single TelModel backend in ``tmdata/cycles``
 * [BREAKING] Users pass a TMData client to public API functions instead of OSD creating one from ``tmdata/version_mapping``
 * [BREAKING] Removed ``number_beams`` from the SKA-Low array assemblies in
@@ -16,8 +28,8 @@ Unreleased
 * [BREAKING] Removed the sun, moon and Jupiter avoidance angles from the capabilities
   files; they are defined in ``mid_defaults.json`` and ``low_defaults.json``
 * Removed the unused semantic validation constants from ``tmdata/instrument``
-* [DEPRECATED] Deprecate the `/osd_release` endpoint
-* `/osd` requests without a cycle now return the complete capability catalogue
+* ``get_osd_using_tmdata`` queries without a cycle now return the complete capability
+  catalogue
 * Removed ``osd-pre-release``, ``osd-tmdata-publish`` and ``release.sh``
 * Added proposal cycle data to the release-cycle version mapping.
 * Added Pydantic storage models for the tmdata files: ``MidCapabilitiesFile`` and

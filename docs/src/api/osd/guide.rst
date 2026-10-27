@@ -47,78 +47,38 @@ Folder Structure
     file remains at the root on main for backward compatibility with the old
     legacy version mapper.
 
-General Structure
-~~~~~~~~~~~~~~~~~~~
+Querying the OSD
+~~~~~~~~~~~~~~~~~
 
-.. code-block:: bash
+``get_osd_using_tmdata`` (``ska_ost_osd.osd.osd``) returns the OSD data as a
+dictionary, selected by cycle, telescope and array assembly. New code should use
+the repository described in :doc:`python_api`, which returns the same data as
+Pydantic models.
 
-    ├── common
-    │   ├── __init__.py
-    │   ├── models.py
-    │   └── utils.py
-    ├── osd
-    │   ├── common
-    │   ├── models
-    │   ├── routers
-    │   ├── version_mapping
-    │   │   └── cycle_gitlab_release_version_mapping.json
-    │   ├── version_manager.py
-    │   └── osd.py
-    └── telvalidation
-        ├── common
-        ├── models
-        ├── routers
-        ├── __init__.py
-        ├── coordinates_conversion.py
-        ├── oet_tmc_validators.py
-        └── semantic_validator.py
-
-
-.. note::
-
-    * ``GET /osd`` and ``GET /cycle`` resolve a requested ``cycle_id`` by
-      reading ``cycles/cycle_<id>.json`` directly from the ``TMData`` source
-      used for the request. ``osd_version``, ``source`` and ``gitlab_branch``
-      have no effect on the data returned.
-
-    * ``cycle_gitlab_release_version_mapping.json`` was the earlier mechanism
-      for resolving a ``cycle_id`` (or an explicit ``osd_version`` /
-      ``gitlab_branch``) to a specific ``tmdata`` GitLab release.
-      ``POST /osd_release`` is deprecated but still available; the Makefile
-      automation that used to drive it (the ``osd-pre-release`` and
-      ``osddata-do-publish`` targets) has been removed entirely. The mapping
-      file itself is kept only for backward compatibility.
-
-If user wants to access this framework from CDM, Jupyter Notebook or any other client below is the example.
-If there is any error then the end user will get the appropriate error message.
-
-This framework can be access by below command:
-
-.. code::
+.. code-block:: python
 
     from ska_telmodel_client import TMData
-    from ska_ost_osd.osd.osd import osd_tmdata_source, get_osd_data
 
-    source_uris = osd_tmdata_source()
-    tmdata = TMData(source_uris=source_uris)
-    osd_data = get_osd_data(tmdata=tmdata)
+    from ska_ost_osd.osd.common.constant import Telescope
+    from ska_ost_osd.osd.osd import get_osd_using_tmdata
 
-
-* `Location of this framework <https://gitlab.com/ska-telescope/ska-ost-osd/-/tree/master/src/ska_ost_osd/telvalidation>`_
+    tmdata = TMData(["car:ost/ska-ost-osd?7.0.0"], update=True)
+    osd_data = get_osd_using_tmdata(tmdata, telescope=Telescope.MID, cycle_id=1)
 
 ===================    ============================================================
 Parameters             Description
 ===================    ============================================================
+tm_data                the TMData client to read the tmdata from
 cycle_id               Cycle Id a integer value 1, 2, 3
-osd_version            OSD version i.e 1.9.0, 1.12.0 in string format
-source                 From where to get OSD data ``car`` or ``gitlab`` or ``file``
-capabilities           Mid or Low
+telescope              ``Telescope.MID`` or ``Telescope.LOW``
 array_assembly         AA0.5, AA1 or any Array Assembly
+process_templates      whether to replace the ``subarray_templates`` patterns with
+                       the templates, see `Subarray Template Support`_
 ===================    ============================================================
 
 
-API json response template
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Response
+~~~~~~~~~
 
 .. code-block:: json
 
@@ -143,756 +103,63 @@ Low                       file content of ``low_capabilities.json`` with ``basic
 ======================    ============================================================================================================
 
 
-Endpoints
-~~~~~~~~~~~~~~~~~
-
-GET /osd
-==========================
-
-.. list-table:: OSD REST resources
-   :widths: 5 15 80
-   :header-rows: 1
-
-   * - HTTP Method
-     - Resource URL
-     - Description
-   * - GET
-     - ``/ska-ost-osd/osd/api/v<majorversion>/osd/``
-     - **Getting Data**
-
-       Return the OSD cycle_id data
-
-
-
-1. Query Parameters
-
-  * The API supports the following query parameters to filter the OSD data:
-
-    ===================    ============================================================
-    Parameters             Description
-    ===================    ============================================================
-    cycle_id               Cycle Id a integer value 1, 2, 3
-    osd_version            OSD version i.e 1.9.0, 1.12.0 in string format
-    source                 From where to get OSD data ``car`` or ``gitlab`` or ``file``
-    gitlab_branch          Gitlab Branch Name
-    capabilities           Mid or Low
-    array_assembly         AA0.5, AA1 or any Array Assembly
-    ===================    ============================================================
-
-
-2. For example:
-
-.. code:: python
-
-    "/ska-ost-osd/osd/api/v<majorversion>/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
-
-
-3. CURL Example Request
-
-.. code:: python
-
-    curl -X GET "/ska-ost-osd/osd/api/v<majorversion>/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
-
-
-4. Example Response
-
-    * The API returns a JSON object containing the matched OSD data for default AA2.
-
-        Calling API with parameters ``cycle_id``, ``source``, ``capabilities``
-        their valid inputs will return the JSON containing the matched OSD data.
-
-    .. code:: python
-
-        client.get(
-            "/ska-ost-osd/osd/api/v<majorversion>/osd",
-            query_string={
-                "cycle_id": 1,
-                "source": "file",
-                "capabilities": "mid",
-            },
-        )
-
-    * Response
-
-    .. code:: python
-
-        {
-          "result_data": [
-            {
-              "observatory_policy": {
-                "cycle_number": 1,
-                "cycle_description": "Science Verification",
-                "cycle_information": {
-                  "cycle_id": "SKAO_2027_1",
-                  "proposal_open": "20260327T12:00:00.000Z",
-                  "proposal_close": "20260512T15:00:00.000z"
-                },
-                "cycle_policies": {
-                  "normal_max_hours": 100
-                },
-                "telescope_capabilities": {
-                  "Mid": "AA2",
-                  "Low": "AA2"
-                }
-              },
-              "capabilities": {
-                "mid": {
-                  "basic_capabilities": {
-                    "dish_elevation_limit_deg": 15,
-                    "receiver_information": [
-                      {
-                        "max_frequency_hz": 1050000000,
-                        "min_frequency_hz": 350000000,
-                        "rx_id": "Band_1"
-                      },
-                      {
-                        "max_frequency_hz": 1760000000,
-                        "min_frequency_hz": 950000000,
-                        "rx_id": "Band_2"
-                      },
-                      {
-                        "max_frequency_hz": 3050000000,
-                        "min_frequency_hz": 1650000000,
-                        "rx_id": "Band_3"
-                      },
-                      {
-                        "max_frequency_hz": 5180000000,
-                        "min_frequency_hz": 2800000000,
-                        "rx_id": "Band_4"
-                      },
-                      {
-                        "max_frequency_hz": 8500000000,
-                        "min_frequency_hz": 4600000000,
-                        "rx_id": "Band_5a"
-                      },
-                      {
-                        "max_frequency_hz": 15400000000,
-                        "min_frequency_hz": 8300000000,
-                        "rx_id": "Band_5b"
-                      }
-                    ]
-                  },
-                  "AA2": {
-                    "allowed_channel_count_range_max": [
-                      214748647
-                    ],
-                    "allowed_channel_count_range_min": [
-                      1
-                    ],
-                    "allowed_channel_width_values": [
-                      210,
-                      420,
-                      840,
-                      1680,
-                      3360,
-                      6720,
-                      13440,
-                      26880,
-                      40320,
-                      53760,
-                      80640,
-                      107520,
-                      161280,
-                      215040,
-                      322560,
-                      416640,
-                      430080,
-                      645120
-                    ],
-                    "available_bandwidth_hz": 800000000,
-                    "available_receivers": [
-                      "Band_1",
-                      "Band_2",
-                      "Band_5a",
-                      "Band_5b"
-                    ],
-                    "cbf_modes": [
-                      "correlation",
-                      "pst",
-                      "pss"
-                    ],
-                    "max_baseline_km": 110,
-                    "number_dish_ids": [
-                      "SKA001",
-                      "SKA008",
-                      "SKA013",
-                      "SKA014",
-                      "SKA015",
-                      "SKA016",
-                      "SKA019",
-                      "SKA024",
-                      "SKA025",
-                      "SKA027",
-                      "SKA028",
-                      "SKA030",
-                      "SKA031",
-                      "SKA032",
-                      "SKA033",
-                      "SKA034",
-                      "SKA035",
-                      "SKA036",
-                      "SKA037",
-                      "SKA038",
-                      "SKA039",
-                      "SKA040",
-                      "SKA041",
-                      "SKA042",
-                      "SKA043",
-                      "SKA045",
-                      "SKA046",
-                      "SKA048",
-                      "SKA049",
-                      "SKA050",
-                      "SKA051",
-                      "SKA055",
-                      "SKA061",
-                      "SKA063",
-                      "SKA067",
-                      "SKA068",
-                      "SKA070",
-                      "SKA075",
-                      "SKA077",
-                      "SKA079",
-                      "SKA081",
-                      "SKA082",
-                      "SKA083",
-                      "SKA089",
-                      "SKA091",
-                      "SKA092",
-                      "SKA095",
-                      "SKA096",
-                      "SKA097",
-                      "SKA098",
-                      "SKA099",
-                      "SKA100",
-                      "SKA101",
-                      "SKA102",
-                      "SKA103",
-                      "SKA104",
-                      "SKA106",
-                      "SKA108",
-                      "SKA109",
-                      "SKA113",
-                      "SKA114",
-                      "SKA123",
-                      "SKA125",
-                      "SKA126"
-                    ],
-                    "number_fsps": 26,
-                    "number_meerkat_dishes": 4,
-                    "number_meerkatplus_dishes": 0,
-                    "number_pss_beams": 384,
-                    "number_pst_beams": 6,
-                    "number_ska_dishes": 64,
-                    "number_zoom_channels": 14880,
-                    "number_zoom_windows": 16,
-                    "ps_beam_bandwidth_hz": 800000000
-                  }
-                }
-              }
-            }
-          ],
-          "result_status": "success",
-          "result_code": 200
-        }
-
-
-5. Scenarios
-
-    1. If no parameters are provided, the API returns the complete OSD catalogue: every
-       telescope's ``basic_capabilities`` together with all of its named array assemblies.
-       No ``observatory_policy`` is included, since no ``cycle_id`` was selected.
-
-    2. Calling the API with only ``cycle_id`` checks that the corresponding
-       ``cycles/cycle_<id>.json`` file exists, then uses that file's
-       ``telescope_capabilities`` to select the OSD data.
-
-    3. If source is not provided in the API call, the default is set to car. API will
-       fetch data from car. other option is file and gitlab.
-       If ``source`` is 'gitlab' and ``gitlab_branch`` is 'main' then it will fetch data from main branch.
-       If ``source`` is 'car' then API will fetch data from Car Gitlab repo.
-
-    4. If ``osd_version`` and ``gitlab_branch`` are given together then API will return appropriate error message.
-
-    5. If ``cycle_id`` and ``array_assembly`` are provided together then API will return appropriate error message.
-
-
-GET /cycle
-==========================
-
-.. list-table:: OSD REST resources
-   :widths: 5 15 80
-   :header-rows: 1
-
-   * - HTTP Method
-     - Resource URL
-     - Description
-   * - GET
-     - ``/ska-ost-osd/osd/api/v<majorversion>/cycle``
-     - **Getting Data**
-
-       Return the OSD cycle_id data.
-
-
-1. Query Parameters
-
-  * The API supports the following query parameters to filter the OSD data:
-
-    ===================    ============================================================
-    Parameters             Description
-    ===================    ============================================================
-    cycle_id               Cycle Id with integer value 1, 2, 3
-    ===================    ============================================================
-
-
-2. For example:
-
-.. code:: python
-
-    "/ska-ost-osd/osd/api/v<majorversion>/cycle"
-
-
-3. CURL Example Request
-
-.. code:: python
-
-    curl -X GET "/ska-ost-osd/osd/api/v<majorversion>/cycle"
-
-
-4. Example Response
-
-    * The API returns a JSON object containing the matched OSD data for default AA2.
-
-        Calling API with parameters ``cycle_id`` and their valid inputs will return the JSON containing the matched OSD data.
-
-    .. code:: python
-
-        client.get(
-            "/ska-ost-osd/osd/api/v<majorversion>/cycle"
-         )
-
-    * Response
-
-    .. code:: python
-
-        {
-        "result_data":
-            {
-            "cycles": [
-                1
-            ]
-            },
-        "result_status": "success",
-        "result_code": 200
-        }
-
-
-5. Scenarios
-
-    1. When this API is called, it returns the available ``cycle_id`` values
-       from the ``cycles/cycle_<id>.json`` filenames.
-
-
-POST /osd_release
-==========================
-
-.. list-table:: OSD REST resources
-   :widths: 5 15 80
-   :header-rows: 1
-
-   * - HTTP Method
-     - Resource URL
-     - Description
-   * - PUT
-     - ``/ska-ost-osd/osd/api/v<majorversion>/osd/``
-     - **Updating Data**
-
-       Update the OSD capabilities data.
-
-
-1. Query Parameters
-
-  * The API supports the following query parameters to update the OSD data:
-
-    ===================    ============================================================
-    Parameters             Description
-    ===================    ============================================================
-    cycle_id               Cycle Id a integer value 1, 2, 3
-    release_type           Major and Minor
-    ===================    ============================================================
-
-
-
-2. For example:
-
-    .. code:: python
-
-      "/ska-ost-osd/osd/api/v<majorversion>/osd_release?cycle_id=1&release_type=minor"
-
-
-3. CURL Example Request
-
-    .. code:: python
-
-       curl -X POST "/ska-ost-osd/osd/api/v<majorversion>/osd_release?cycle_id=1&release_type=minor"
-
-
-4. Example Response
-
-    * The POST API initiate release process.
-
-    .. code:: python
-
-        client.post(
-            "/ska-ost-osd/osd/api/v<majorversion>/osd_release?cycle_id=1&release_type=minor",
-            query_params={
-                "cycle_id": 1,
-                "release_type": "minor"
-            },
-        )
-
-    * Response
-
-    .. code:: python
-
-        {
-        "result_data":
-            {
-            "message": f"Released new version 1.0.0",
-            "version": 1.0.0,
-            "cycle_id": 1,
-        }
-        ,
-        "result_status": "success",
-        "result_code": 200
-        }
-
-
-5. Scenarios
-
-    1. If ``cycle_id``, ``capabilities`` and ``array_assembly`` are provided together with valid data in the request body, the API will update the capabilities JSON for the specified mid/low capabilities and return a 200 OK status code with the updated resource.
-
-    2. If ``cycle_id``, ``capabilities`` are provided together and the request body contains ``basic_capabilities``, the API will update the ``basic_capabilities`` and return a 200 OK status code.
-
-    3. If invalid ``cycle_id`` is provided in the request, the API will return a 404 Not Found status with an appropriate error message.
-
-    4. If an invalid ``array_assembly`` value is provided (values other than 'AA0.5', 'AA1', or 'AA2'), the API will return a 400 Bad Request status with an error message indicating the allowed ``array_assembly`` values.
-
-    5. If the ``array_assembly`` value doesn't match the required pattern (must be 'AA' followed by a number), the API will return a 400 Bad Request status with a message indicating the correct format pattern.
-
-    6. If the request body is missing required fields or contains invalid data formats, the API will return a 400 Bad Request status with validation error details.
-
-    7. If the API encounters an unexpected server-side error (such as database connection failures, internal processing errors, or system-level issues), the API will return a 500 Internal Server Error status with a generic error message.
-
-PUT /osd
-==========================
-
-.. list-table:: OSD REST resources
-   :widths: 5 15 80
-   :header-rows: 1
-
-   * - HTTP Method
-     - Resource URL
-     - Description
-   * - PUT
-     - ``/ska-ost-osd/osd/api/v<majorversion>/osd/``
-     - **Updating Data**
-
-       Update the OSD capabilities data.
-
-
-1. Query Parameters
-
-  * The API supports the following query parameters to update the OSD data:
-
-    ===================    ============================================================
-    Parameters             Description
-    ===================    ============================================================
-    cycle_id               Cycle Id a integer value 1, 2, 3
-    capabilities           Mid or Low
-    array_assembly         AA0.5, AA1 or any Array Assembly
-    ===================    ============================================================
-
-
-2. For example:
-
-    .. code:: python
-
-     "/ska-ost-osd/osd/api/v<majorversion>/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
-
-
-3. CURL Example Request
-
-    .. code:: python
-
-      curl -X PUT "/ska-ost-osd/osd/api/v<majorversion>/osd?cycle_id=1&capabilities=mid&array_assembly=AA2"
-
-
-4. Example Response
-
-    * The PUT API allows updating the OSD data by providing a JSON object in the request body.
-
-      When calling the PUT API, provide a complete JSON object containing all required fields including
-      ``cycle_id``, ``capabilities``, and ``array_assembly``. The API will replace the existing OSD data
-      that matches these parameters with the new data provided in the request body.
-
-
-    .. code:: python
-
-        client.put(
-            "/ska-ost-osd/osd/api/v<majorversion>/osd",
-            query_string={
-                "cycle_id": 1,
-                "capabilities": "mid",
-                "array_assembly": "AA1",
-            },
-        )
-
-    * Response
-
-    .. code:: python
-
-     {
-      "result_data": {
-        "telescope": "Mid",
-        "basic_capabilities": {
-          "dish_elevation_limit_deg": 15,
-          "receiver_information": [
-            {
-              "max_frequency_hz": 350000000,
-              "min_frequency_hz": 1050000000,
-              "rx_id": "Band_1"
-            }
-          ]
-        },
-        "AA0.5": {
-          "allowed_channel_count_range_max": [
-            58982
-          ],
-          "allowed_channel_count_range_min": [
-            1
-          ],
-          "allowed_channel_width_values": [
-            13440
-          ],
-          "available_bandwidth_hz": 800000000,
-          "available_receivers": [
-            "Band_1",
-            "Band_2",
-            "Band_5b"
-          ],
-          "cbf_modes": [
-            "correlation",
-            "pst"
-          ],
-          "max_baseline_km": 1.5,
-          "number_dish_ids": [
-            "SKA001",
-            "SKA036",
-            "SKA063",
-            "SKA100"
-          ],
-          "number_fsps": 4,
-          "number_meerkat_dishes": 0,
-          "number_meerkatplus_dishes": 0,
-          "number_pss_beams": 0,
-          "number_pst_beams": 1,
-          "number_ska_dishes": 4,
-          "number_zoom_channels": 0,
-          "number_zoom_windows": 0,
-          "ps_beam_bandwidth_hz": 400000000
-        },
-        "AA1": {
-          "allowed_channel_count_range_max": [
-            58982
-          ],
-          "allowed_channel_count_range_min": [
-            1
-          ],
-          "allowed_channel_width_values": [
-            13440
-          ],
-          "available_bandwidth_hz": 800000000,
-          "available_receivers": [
-            "Band_1",
-            "Band_2",
-            "Band_5a",
-            "Band_5b"
-          ],
-          "cbf_modes": [
-            "correlation",
-            "pst"
-          ],
-          "max_baseline_km": 1.5,
-          "number_dish_ids": [
-            "SKA001",
-            "SKA036",
-            "SKA046",
-            "SKA048",
-            "SKA063",
-            "SKA077",
-            "SKA081",
-            "SKA100"
-          ],
-          "number_fsps": 8,
-          "number_meerkat_dishes": 0,
-          "number_meerkatplus_dishes": 0,
-          "number_pss_beams": 0,
-          "number_pst_beams": 1,
-          "number_ska_dishes": 8,
-          "number_zoom_channels": 0,
-          "number_zoom_windows": 0,
-          "ps_beam_bandwidth_hz": 400000000
-        },
-        "AA2": {
-          "allowed_channel_count_range_max": [
-            214748647
-          ],
-          "allowed_channel_count_range_min": [
-            1
-          ],
-          "allowed_channel_width_values": [
-            210,
-            420,
-            840,
-            1680,
-            3360,
-            6720,
-            13440,
-            26880,
-            40320,
-            53760,
-            80640,
-            107520,
-            161280,
-            215040,
-            322560,
-            416640,
-            430080,
-            645120
-          ],
-          "available_bandwidth_hz": 800000000,
-          "available_receivers": [
-            "Band_1",
-            "Band_2",
-            "Band_5a",
-            "Band_5b"
-          ],
-          "cbf_modes": [
-            "correlation",
-            "pst",
-            "pss"
-          ],
-          "max_baseline_km": 110,
-          "number_dish_ids": [
-            "string"
-          ],
-          "number_fsps": 26,
-          "number_meerkat_dishes": 4,
-          "number_meerkatplus_dishes": 0,
-          "number_pss_beams": 384,
-          "number_pst_beams": 6,
-          "number_ska_dishes": 64,
-          "number_zoom_channels": 14880,
-          "number_zoom_windows": 16,
-          "ps_beam_bandwidth_hz": 800000000
-        }
-      },
-      "result_status": "success",
-      "result_code": 200
-     }
-
-5. Scenarios
-
-    1. If ``cycle_id``, ``capabilities`` and ``array_assembly`` are provided together with valid data in the request body, the API will update the capabilities JSON for the specified mid/low capabilities and return a 200 OK status code with the updated resource.
-
-    2. If ``cycle_id``, ``capabilities`` are provided together and the request body contains ``basic_capabilities``, the API will update the ``basic_capabilities`` and return a 200 OK status code.
-
-    3. If invalid ``cycle_id`` is provided in the request, the API will return a 404 Not Found status with an appropriate error message.
-
-    4. If an invalid ``array_assembly`` value is provided (values other than 'AA0.5', 'AA1', or 'AA2'), the API will return a 400 Bad Request status with an error message indicating the allowed ``array_assembly`` values.
-
-    5. If the ``array_assembly`` value doesn't match the required pattern (must be 'AA' followed by a number), the API will return a 400 Bad Request status with a message indicating the correct format pattern.
-
-    6. If the request body is missing required fields or contains invalid data formats, the API will return a 400 Bad Request status with validation error details.
-
-    7. If the API encounters an unexpected server-side error (such as database connection failures, internal processing errors, or system-level issues), the API will return a 500 Internal Server Error status with a generic error message.
-
+Scenarios
+~~~~~~~~~~
+
+1. With no filters, it returns the complete OSD catalogue: every telescope's
+   ``basic_capabilities`` together with all of its named array assemblies. No
+   ``observatory_policy`` is included, since no ``cycle_id`` was selected.
+
+2. With ``cycle_id``, it checks that the corresponding ``cycles/cycle_<id>.json``
+   file exists, then uses that file's ``telescope_capabilities`` to select the array
+   assembly of each telescope. The cycle file is returned as ``observatory_policy``.
+
+3. With ``telescope``, it returns only that telescope; with ``array_assembly`` as
+   well, only that array assembly.
 
 
 Error Handling
 ```````````````
 
-.. error::
+If the query is invalid, ``get_osd_using_tmdata`` raises a ``ValueError`` whose
+argument is the list of error messages. For example:
 
-    if ``osd_version`` value is not valid following error will be raised.
+* ``array_assembly`` without ``telescope``:
 
-    .. code:: python
+  .. code:: python
 
-        osd_version {osd_version} is not valid
+      Array assembly requires a capability.
 
-    if ``capabilities`` value is not valid following error will be raised.
+* ``cycle_id`` and ``array_assembly`` without ``telescope``:
 
-    .. code:: python
+  .. code:: python
 
-        Capability {capabilities} does not exists. Available are low, mid
+      Cycle_id and Array_assembly cannot be used together.
+
+* an ``array_assembly`` that isn't the one the cycle offers for the telescope:
+
+  .. code:: python
+
+      Array assembly AA1 does not match capability mid in cycle 2. Expected AA2.
+
+* a ``cycle_id``, ``telescope`` or ``array_assembly`` with no data, or a telescope
+  that the cycle doesn't offer.
 
 
-    if ``array_assembly`` value is not valid following error will be raised.
+Publishing tmdata
+~~~~~~~~~~~~~~~~~~
 
-    .. code:: python
+The tmdata is published to CAR with the same version as the Python package, so a
+breaking change to the tmdata is released as a new major version. Consumers should
+read a pinned version, such as ``car:ost/ska-ost-osd?7.0.0``, rather than ``main``.
 
-        array_assembly {array_assembly} is not valid
-
-
-.. note::
-
-    All the error_messages are combined in a single string.
-
-TMData Release Process using API.
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. warning::
-
-   The ``POST /osd_release`` endpoint is deprecated. It remains available for
-   backward compatibility while the TMData release workflow is redesigned.
-
-TMData releases are now handled separately from the main ska-ost-osd codebase through an automated process:
-
-1. **Automatic Release via API**: Use the ``POST /osd_release`` endpoint to trigger automated TMData releases
-
-2. **Version Mapping Update**: The release process creates a new entry in ``cycle_gitlab_release_version_mapping.json`` with the new version
-
-3. **Latest Release Update**: Automatically updates ``latest_release.txt`` with the current version
-
-4. **Automated Publishing**: TMData is published automatically through the ``tmdata_publish`` process
-
-API Usage
-~~~~~~~~~~
-
-.. code-block:: bash
-
-    # Trigger TMData release
-    curl -X POST "/ska-ost-osd/osd/api/v<majorversion>/osd_release" \
-         -H "Content-Type: application/json" \
-         -d '{"cycle_id": <cycle_number>, "release_type": "minor"}'
-
-Trigger pipeline with makefile target
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+It is published by the manual ``tmdata-publish`` job of the GitLab pipeline, which
+runs:
 
 .. code-block:: bash
 
     # Publish TMData to artifact repository
     make tmdata-publish
-
-.. note::
-
-    The ``push_to_gitlab`` environment variable controls TMData publishing:
-
-    - ``push_to_gitlab=0``: Local environment (default) - won't publish to artifact repository
-    - ``push_to_gitlab=1``: Publishes TMData to artifact repository
-
-    It's not recommended to set this flag to "1" during local testing.
 
 View TMData Releases
 ~~~~~~~~~~~~~~~~~~~~~
@@ -952,15 +219,7 @@ This will ensure that a compatible version of the ``ska-ost-osd`` package is ins
 Usage
 -----
 
-You can import the relevant components from the package as follows:
-
-.. code-block:: python
-
-    from ska_ost_osd.telvalidation.common.error_handling import (
-        SchematicValidationError,
-    )
-
-This allows you to catch or raise semantic validation-related exceptions when working with OSD validation workflows.
+See :doc:`python_api` for reading the OSD through the repository and the views.
 
 Subarray Template Support
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1002,14 +261,15 @@ The template mapping system processes subarray templates through:
 Template Processing Flag
 --------------------------------
 
-OSD uses an internal ``process_templates`` flag to differentiate between library usage and API usage. This flag is not exposed to end users but controls the behavior internally:
+``get_osd_using_tmdata`` takes a ``process_templates`` flag, ``False`` by default:
 
-* **Library Usage**: Returns raw capability data without template processing (process_templates=False internally)
-* **API Usage**: Automatically processes subarray_templates patterns and replaces them with actual template data (process_templates=True internally)
+* ``False``: the array assemblies are returned as stored, with their
+  ``subarray_templates`` patterns.
+* ``True``: each array assembly's ``subarray_templates`` patterns are replaced by
+  the templates they match.
 
-.. note::
-
-    The ``process_templates`` parameter is an internal implementation detail and is not exposed through the REST API. Users cannot control this behavior - it is automatically determined based on whether the request comes through the API layer or direct library usage.
+The repository's ``get_subarray_templates(telescope, capability_set)`` returns the
+matching templates as ``SubarrayTemplate`` models.
 
 Template File Structure
 -----------------------
@@ -1035,62 +295,53 @@ Template files should contain telescope-specific templates:
         }
     }
 
-API Integration
----------------
+Processed Templates
+-------------------
 
-Subarray templates are automatically processed when retrieving OSD data:
+With ``process_templates=True``, the templates are included in the OSD data:
 
 .. code-block:: python
 
-    response = client.get("/ska-ost-osd/osd/api/v1/osd?cycle_id=1&capabilities=mid")
+    get_osd_using_tmdata(
+        tmdata, telescope=Telescope.MID, cycle_id=1, process_templates=True
+    )
 
 * Complete response structure with processed templates:
 
 .. code-block:: json
 
     {
-        "result_data": [
-            {
-                "observatory_policy": {
-                    "cycle_number": 1,
-                    "telescope_capabilities": {
-                        "Mid": "AA2",
-                        "Low": "AA2"
-                    }
+        "observatory_policy": {
+            "cycle_number": 1,
+            "telescope_capabilities": {
+                "Mid": "AA2",
+                "Low": "AA2"
+            }
+        },
+        "capabilities": {
+            "mid": {
+                "basic_capabilities": {
+                    "dish_elevation_limit_deg": 15,
+                    "receiver_information": [
+                        {
+                            "max_frequency_hz": 1050000000,
+                            "min_frequency_hz": 350000000,
+                            "rx_id": "Band_1"
+                        }
+                    ]
                 },
-                "capabilities": {
-                    "mid": {
-                        "basic_capabilities": {
-                            "dish_elevation_limit_deg": 15,
-                            "receiver_information": [
-                                {
-                                    "max_frequency_hz": 1050000000,
-                                    "min_frequency_hz": 350000000,
-                                    "rx_id": "Band_1"
-                                }
-                            ]
-                        },
-                        "AA2": {
-                            "available_receivers": ["Band_1", "Band_2"],
-                            "number_ska_dishes": 64,
-                            "cbf_modes": ["correlation", "pst", "pss"],
-                            "subarray_templates": {
-                                "LOW_FULL_AA2": {
-                                    "subarray_type": "AA2",
-                                    "custom_stations": "",
-                                    "description": "Full SKA-Low array, AA2 release."
-                                }
-                            }
+                "AA2": {
+                    "available_receivers": ["Band_1", "Band_2"],
+                    "number_ska_dishes": 64,
+                    "cbf_modes": ["correlation", "pst", "pss"],
+                    "subarray_templates": {
+                        "MID_FULL_AA2": {
+                            "subarray_type": "AA2",
+                            "custom_stations": "",
+                            "description": "Full SKA-Mid array, AA2 release."
                         }
                     }
                 }
             }
-        ],
-        "result_status": "success",
-        "result_code": 200
+        }
     }
-
-TMData publishing
------------------
-
-`tmdata-publish` (from gitlab) is needed when user need to test on main using OSD UI, in this no tag is pushed to gitlab or CAR.

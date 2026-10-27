@@ -1,8 +1,8 @@
 Python API
 -------------------
 
-Besides the REST API, the OSD can be used as a Python library, through a
-*repository* that returns the data as Pydantic models.
+The OSD is a Python library: its data is read through a *repository* that returns
+the data as Pydantic models.
 
 .. contents::
 
