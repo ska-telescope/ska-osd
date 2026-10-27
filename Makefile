@@ -1,30 +1,8 @@
-
-#
-# CAR_OCI_REGISTRY_HOST, CAR_OCI_REGISTRY_USERNAME and PROJECT_NAME are combined to define
-# the Docker tag for this project. The definition below inherits the standard
-# value for CAR_OCI_REGISTRY_HOST (=artefact.skao.int) and overwrites
-# PROJECT_NAME to give a final Docker tag of artefact.skao.int/ska-ost-osd
-#
-CAR_OCI_REGISTRY_HOST ?= artefact.skao.int
-CAR_OCI_REGISTRY_USERNAME ?= ska-telescope
 PROJECT_NAME = ska-ost-osd
-KUBE_NAMESPACE ?= ska-ost-osd
-RELEASE_NAME ?= test
-
-##
-SKA_K8S_TOOLS_BUILD_DEPLOY ?= $(CAR_OCI_REGISTRY_HOST)/ska-cicd-k8s-tools-build-deploy:0.14.1
-K8S_TEST_IMAGE_TO_TEST=$(SKA_K8S_TOOLS_BUILD_DEPLOY)
-# The source code is used in the tests, so we set the PYTHONPATH in the tests to the location
-# the source is copied into so that the imports work
-PYTHONPATH = /src
-
 
 # include makefile to pick up the standard Make targets from the submodule
 
--include .make/helm.mk
 -include .make/base.mk
--include .make/oci.mk
--include .make/k8s.mk
 -include .make/python-uv.mk
 -include .make/tmdata.mk
 # Set sphinx documentation build to fail on warnings (as it is configured
@@ -34,51 +12,8 @@ DOCS_SPHINXOPTS ?= -W --keep-going
 PYTHON_RUNNER = uv run
 DOCS_PYTHON_RUNNER = uv run python3
 
-IMAGE_TO_TEST = $(CAR_OCI_REGISTRY_HOST)/$(strip $(OCI_IMAGE)):$(VERSION)
-K8S_CHART = ska-ost-osd-umbrella
-
- # Set cluster_domain to minikube default (cluster.local) in local development
-# (CI_ENVIRONMENT_SLUG should only be defined when running on the CI/CD pipeline)
-ifeq ($(CI_ENVIRONMENT_SLUG),)
-K8S_CHART_PARAMS += --set global.cluster_domain="cluster.local"
-endif
-
-# For the test, dev and integration environment, use the freshly built image in the GitLab registry
-ENV_CHECK := $(shell echo $(CI_ENVIRONMENT_SLUG) | egrep 'test|dev|integration')
-ifneq ($(ENV_CHECK),)
-K8S_CHART_PARAMS = --set ska-ost-osd.rest.image.tag=$(VERSION)-dev.c$(CI_COMMIT_SHORT_SHA) \
-	--set ska-ost-osd.rest.image.registry=$(CI_REGISTRY)/ska-telescope/ost/ska-ost-osd \
-	--set ska-ost-osd.vaultStaticSecret.enabled=false
-endif
-
-# For the staging environment, make k8s-install-chart-car will pull the chart from CAR so we do not need to
-# change any values
-ENV_CHECK := $(shell echo $(CI_ENVIRONMENT_SLUG) | egrep 'staging')
-ifneq ($(ENV_CHECK),)
-K8S_CHART_PARAMS += --set ska-ost-osd.vaultStaticSecret.enabled=false
-endif
-
 # Set python-test make target to run unit tests and not the component tests
 PYTHON_TEST_FILE = tests/unit/
 
-openapi:
-	$(PYTHON_RUNNER) python -c "from docs.openapi.export_openapi import export_openapi; export_openapi()"
-
-# include your own private variables for custom deployment configuration
+# include your own private variables for custom configuration
 -include PrivateRules.mak
-
-REST_POD_NAME=$(shell kubectl get pods -o name -n $(KUBE_NAMESPACE) -l app=ska-ost-osd,component=rest | cut -c 5-)
-
-
-# install helm plugin from https://github.com/helm-unittest/helm-unittest.git
-k8s-chart-test:
-	mkdir -p charts/build; \
-	helm unittest charts/ska-ost-osd/ --with-subchart \
-		--output-type JUnit --output-file charts/build/chart_template_tests.xml
-
-dev-up: K8S_CHART_PARAMS = \
-	--set ska-ost-osd.rest.image.tag=$(VERSION) \
-	--set ska-ost-osd.rest.ingress.enabled=true
-dev-up: k8s-namespace k8s-install-chart k8s-wait ## bring up developer deployment
-
-dev-down: k8s-uninstall-chart k8s-delete-namespace  ## tear down developer deployment
