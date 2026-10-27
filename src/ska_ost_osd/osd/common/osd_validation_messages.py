@@ -23,14 +23,6 @@ ARRAY_ASSEMBLY_REQUIRES_CAPABILITY_ERROR_MESSAGE = (
 ARRAY_ASSEMBLY_DOESNOT_MATCH_CYCLE_CAPABILITY_ERROR_MESSAGE = (
     "Array assembly {} does not match capability {} in cycle {}. Expected {}."
 )
-GITLAB_BRANCH_ERROR_MESSAGE = "gitlab_branch and osd_version cannot be used together"
-SOURCE_ERROR_MESSAGE = "Source {} is invalid"
-AVAILABLE_SOURCE_ERROR_MESSAGE = "Source is invalid. Valid sources are {}."
 CYCLE_ID_ARRAY_ASSEMBLY_ERROR_MESSAGE = (
     "Cycle_id and Array_assembly cannot be used together."
 )
-CYCLE_ID_CAPABILITIES_ERROR_MESSAGE = (
-    "Either cycle_id or capabilities must be provided."
-)
-OSD_VERSION_INVALID_ERROR_MESSAGE = "osd_version {} is invalid."
-ARRAY_ASSEMBLY_INVALID_ERROR_MESSAGE = "array_assembly {} is invalid."

@@ -21,11 +21,3 @@ class OSDModelError(BaseOSDError):
     :param errors: List[dict], a list of error details related to model
         validation.
     """
-
-
-class CapabilityError(BaseOSDError):
-    """Exception raised for capability-related errors.
-
-    :param errors: List[dict], a list of error details related to
-        capability checks.
-    """

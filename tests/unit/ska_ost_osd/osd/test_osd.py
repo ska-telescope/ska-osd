@@ -1,11 +1,11 @@
+import logging
 from unittest.mock import patch
 
 import pytest
+from ska_telmodel_client import TMData
 
-from ska_ost_osd.osd.common.constant import osd_file_mapping
-from ska_ost_osd.osd.common.error_handling import OSDModelError
-from ska_ost_osd.osd.models.models import OSDModel, ValidationOnCapabilities
-from ska_ost_osd.osd.osd import get_osd_data, update_osd_file
+from ska_ost_osd.osd.common.constant import Telescope, osd_file_mapping
+from ska_ost_osd.osd.osd import get_osd_data, get_osd_using_tmdata
 
 
 @pytest.mark.parametrize(
@@ -176,148 +176,6 @@ def test_get_osd_data_missing_subarray_templates_falls_back_to_empty(
     assert "AA1" in osd_data["capabilities"]["mid"]
 
 
-@pytest.fixture
-def sample_existing_data():
-    return {
-        "telescope": "SKA-Mid",
-        "basic_capabilities": {
-            "max_frequency": 15.3e9,
-            "min_frequency": 350e6,
-        },
-        "AA0.5": {
-            "max_baseline": 1000,
-            "num_stations": 64,
-        },
-    }
-
-
-def test_update_osd_file_1():
-    """Test update_osd_file function when updating nested dictionary fields
-    and observatory policy."""
-    validated_capabilities = {
-        "capabilities": {
-            "mid": {
-                "AA0.5": {
-                    "existing_key": {"nested_key": "new_value"},
-                    "new_key": "new_value",
-                }
-            }
-        }
-    }
-    validated_capabilities = ValidationOnCapabilities(**validated_capabilities)
-    observatory_policy = {"new_policy": "value"}
-    existing_stored_data = {
-        "AA0.5": {
-            "existing_key": {
-                "nested_key": "old_value",
-                "untouched_key": "untouched_value",
-            },
-            "untouched_field": "untouched_value",
-        }
-    }
-
-    expected_updated_data = {
-        "AA0.5": {
-            "existing_key": {"nested_key": "new_value"},
-            "untouched_field": "untouched_value",
-            "new_key": "new_value",
-        }
-    }
-
-    with patch("ska_ost_osd.osd.osd.update_file"):
-        updated_data = update_osd_file(
-            validated_capabilities,
-            observatory_policy,
-            existing_stored_data,
-            telescope="mid",
-        )
-    assert updated_data == expected_updated_data
-
-
-def test_update_osd_file_invalid_input(
-    sample_existing_data,
-):  # pylint: disable=W0621
-    """Test update_osd_file with invalid input structure."""
-    invalid_input = {"invalid_key": {"telescope": "SKA-Mid"}}
-    with patch("ska_ost_osd.osd.osd.update_file"):
-        with pytest.raises(AttributeError):
-            update_osd_file(invalid_input, {}, sample_existing_data, telescope="mid")
-
-
-def test_update_osd_file_nested_dict_update(
-    sample_existing_data,
-):  # pylint: disable=W0621
-    """Test update_osd_file with nested dictionary updates."""
-
-    update_data = {
-        "capabilities": {
-            "SKA-Mid": {
-                "basic_capabilities": {
-                    "new_capability": "value",
-                    "max_frequency": 16e9,  # Updating existing value
-                },
-                "AA0.5": {
-                    "new_field": "new_value",
-                },
-            }
-        }
-    }
-    validated_capabilities = ValidationOnCapabilities(**update_data)
-    result = update_osd_file(
-        validated_capabilities, {}, sample_existing_data, telescope="mid"
-    )
-
-    assert result["basic_capabilities"]["new_capability"] == "value"
-    assert result["basic_capabilities"]["max_frequency"] == 16e9
-    assert result["AA0.5"]["new_field"] == "new_value"
-    assert result["AA0.5"]["max_baseline"] == 1000  # Existing value should be preserved
-
-
-def test_update_osd_file_non_existent_telescope(
-    sample_existing_data,
-):  # pylint: disable=W0621
-    non_existent_telescope = {
-        "capabilities": {
-            "SKA-Low": {  # This telescope doesn't exist in the sample data
-                "basic_capabilities": {
-                    "max_frequency": 350e6,
-                }
-            }
-        }
-    }
-    validated_capabilities = ValidationOnCapabilities(**non_existent_telescope)
-    result = update_osd_file(
-        validated_capabilities, {}, sample_existing_data, telescope="low"
-    )
-    assert "SKA-Low" not in result
-
-
-def test_update_osd_file_observatory_policy_update(sample_existing_data, mocker):  # pylint: disable=W0621
-    """Test update_osd_file with observatory policy updates."""
-    mock_update_file = mocker.patch("ska_ost_osd.osd.osd.update_file")
-
-    update_data = {
-        "capabilities": {
-            "SKA-Mid": {
-                "basic_capabilities": {
-                    "new_capability": "value",
-                }
-            }
-        }
-    }
-
-    observatory_policy = {"new_policy": "value"}
-    validated_capabilities = ValidationOnCapabilities(**update_data)
-    update_osd_file(
-        validated_capabilities,
-        observatory_policy,
-        sample_existing_data,
-        telescope="mid",
-    )
-
-    assert mock_update_file.call_count == 1
-
-
 def test_get_osd_data_with_process_templates(tests_tmdata):
     """Test that process_templates parameter is properly passed through."""
     # Test with process_templates=False (default)
@@ -380,14 +238,141 @@ def test_get_osd_data_template_processing_called(mock_process_templates, tests_t
     )
 
 
-def test_osd_model_accepts_cycle_id_zero():
-    """Regression test that OSDModel with cycle_id=0 is valid"""
-    model = OSDModel(cycle_id=0)
-    assert model.cycle_id == 0
+@pytest.fixture
+def failing_tmdata(tests_tmdata_source, monkeypatch):
+    """TMData fixture that fails on item access to simulate CAR backend errors."""
+    tmdata = TMData(source_uris=[tests_tmdata_source])
+
+    def raise_car_backend_error(_, __):
+        raise ValueError(
+            "car://gitlab.com/ska-telescope/ost/ska-ost-osd?1.0.0#tmdata "
+            "not found in SKA CAR - make sure to add tmdata CI!"
+        )
+
+    monkeypatch.setattr(TMData, "__getitem__", raise_car_backend_error)
+    return tmdata
 
 
-def test_osd_model_fails_cycle_id_zero_and_array_assembly():
-    """Regression test that OSDModel with cycle_id=0 and array_assembly raises
-    OSDModelError"""
-    with pytest.raises(OSDModelError):
-        OSDModel(cycle_id=0, array_assembly="AA0.5")
+def test_get_osd_using_tmdata_cycle_uses_selected_cycle_file(tests_tmdata):
+    """A cycle-specific query includes its selected cycle-file policy."""
+    osd_data = get_osd_using_tmdata(tests_tmdata, cycle_id=2)
+
+    assert osd_data["observatory_policy"]["cycle_number"] == 2
+    assert osd_data["observatory_policy"]["cycle_id"] == "TEST_SKAO_2027_AA2_Proposal"
+    assert set(osd_data["capabilities"]) == {"mid", "low"}
+
+
+def test_get_osd_using_tmdata_cycle_capability_uses_cycle_array_assembly(
+    tests_tmdata,
+):
+    """A cycle and capability query uses the array assembly from the cycle."""
+    osd_data = get_osd_using_tmdata(tests_tmdata, telescope=Telescope.MID, cycle_id=2)
+
+    assert list(osd_data["capabilities"]) == ["mid"]
+    assert set(osd_data["capabilities"]["mid"]) == {"basic_capabilities", "AA2"}
+
+
+def test_get_osd_using_tmdata_capability_only_returns_complete_catalogue(
+    tests_tmdata,
+):
+    """A capability-only query returns all of that capability's assemblies."""
+    osd_data = get_osd_using_tmdata(tests_tmdata, telescope=Telescope.MID)
+    source_data = tests_tmdata[osd_file_mapping["mid"]].get_dict()
+
+    assert "observatory_policy" not in osd_data
+    assert set(osd_data["capabilities"]) == {"mid"}
+    assert set(osd_data["capabilities"]["mid"]) == set(source_data) - {
+        "telescope",
+        "constraints",
+    }
+
+
+@pytest.mark.parametrize(
+    "telescope, array_assembly",
+    [("mid", "AA1"), ("mid", "AA2"), ("low", "AA1"), ("low", "AA2")],
+)
+def test_get_osd_using_tmdata_catalogue_filter(telescope, array_assembly, tests_tmdata):
+    """A non-cycle filter selects catalogue data without a cycle policy."""
+    osd_data = get_osd_using_tmdata(
+        tests_tmdata, telescope=Telescope(telescope), array_assembly=array_assembly
+    )
+
+    assert "observatory_policy" not in osd_data
+    assert list(osd_data["capabilities"]) == [telescope]
+    assert array_assembly in osd_data["capabilities"][telescope]
+
+
+def test_get_osd_using_tmdata_band_5b_has_sub_bands(tests_tmdata):
+    """Band 5b of the Mid basic capabilities is split into sub-bands."""
+    osd_data = get_osd_using_tmdata(
+        tests_tmdata, telescope=Telescope.MID, array_assembly="AA1"
+    )
+    band_5b = osd_data["capabilities"]["mid"]["basic_capabilities"][
+        "receiver_information"
+    ][5]
+
+    assert len(band_5b["sub_bands"]) == 3
+
+
+def test_get_osd_using_tmdata_matching_array_assembly_is_redundant(
+    tests_tmdata, caplog
+):
+    """A matching explicit assembly does not override the cycle policy."""
+    with caplog.at_level(logging.WARNING):
+        osd_data = get_osd_using_tmdata(
+            tests_tmdata, telescope=Telescope.MID, array_assembly="AA2", cycle_id=2
+        )
+
+    assert list(osd_data["capabilities"]) == ["mid"]
+    assert "AA2" in osd_data["capabilities"]["mid"]
+    assert (
+        "Ignoring redundant array assembly AA2 for capability mid in cycle 2"
+        in caplog.messages
+    )
+
+
+@pytest.mark.parametrize(
+    "query, expected_errors",
+    [
+        (
+            {"array_assembly": "AA1"},
+            ["Array assembly requires a capability."],
+        ),
+        (
+            {"cycle_id": 2, "array_assembly": "AA1"},
+            ["Cycle_id and Array_assembly cannot be used together."],
+        ),
+        (
+            {"telescope": Telescope.MID, "cycle_id": 2, "array_assembly": "AA1"},
+            [
+                "Array assembly AA1 does not match capability mid in cycle 2."
+                " Expected AA2."
+            ],
+        ),
+        (
+            {"telescope": Telescope.MID, "cycle_id": 1},
+            ["Capability mid is invalid for cycle 1. Valid capabilities are low."],
+        ),
+    ],
+)
+def test_get_osd_using_tmdata_invalid_query(query, expected_errors, tests_tmdata):
+    """An invalid combination of query filters raises a ValueError listing the
+    errors."""
+    with pytest.raises(ValueError) as error:
+        get_osd_using_tmdata(tests_tmdata, **query)
+
+    assert error.value.args[0] == expected_errors
+
+
+def test_get_osd_using_tmdata_invalid_cycle_id(tests_tmdata):
+    """A cycle with no cycle file raises a ValueError naming the cycle."""
+    with pytest.raises(ValueError) as error:
+        get_osd_using_tmdata(tests_tmdata, telescope=Telescope.MID, cycle_id=3)
+
+    assert "Cycle 3 is invalid" in error.value.args[0][0]
+
+
+def test_get_osd_using_tmdata_surfaces_tmdata_read_errors(failing_tmdata):
+    """An error reading the TMData source is raised to the caller."""
+    with pytest.raises(ValueError, match="not found in SKA CAR"):
+        get_osd_using_tmdata(failing_tmdata, cycle_id=1)
