@@ -131,19 +131,19 @@ def get_cycle_configuration(
         capabilities=CycleCapabilities(
             mid=MidCycleCapabilities(
                 basic_capabilities=MidCycleBasicCapabilities.model_validate(
-                    repository.get_basic_capabilities(Telescope.MID),
+                    repository.get_basic_capabilities(Telescope.SKA_MID),
                     from_attributes=True,
                 ),
                 capability_set=repository.get_capability_set(
-                    Telescope.MID, offered.ska_mid
+                    Telescope.SKA_MID, offered.ska_mid
                 ),
             )
             if offered.ska_mid is not None
             else None,
             low=LowCycleCapabilities(
-                basic_capabilities=repository.get_basic_capabilities(Telescope.LOW),
+                basic_capabilities=repository.get_basic_capabilities(Telescope.SKA_LOW),
                 capability_set=repository.get_capability_set(
-                    Telescope.LOW, offered.ska_low
+                    Telescope.SKA_LOW, offered.ska_low
                 ),
             )
             if offered.ska_low is not None

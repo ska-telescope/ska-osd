@@ -266,7 +266,9 @@ def test_get_osd_using_tmdata_cycle_capability_uses_cycle_array_assembly(
     tests_tmdata,
 ):
     """A cycle and capability query uses the array assembly from the cycle."""
-    osd_data = get_osd_using_tmdata(tests_tmdata, telescope=Telescope.MID, cycle_id=2)
+    osd_data = get_osd_using_tmdata(
+        tests_tmdata, telescope=Telescope.SKA_MID, cycle_id=2
+    )
 
     assert list(osd_data["capabilities"]) == ["mid"]
     assert set(osd_data["capabilities"]["mid"]) == {"basic_capabilities", "AA2"}
@@ -276,7 +278,7 @@ def test_get_osd_using_tmdata_capability_only_returns_complete_catalogue(
     tests_tmdata,
 ):
     """A capability-only query returns all of that capability's assemblies."""
-    osd_data = get_osd_using_tmdata(tests_tmdata, telescope=Telescope.MID)
+    osd_data = get_osd_using_tmdata(tests_tmdata, telescope=Telescope.SKA_MID)
     source_data = tests_tmdata[osd_file_mapping["mid"]].get_dict()
 
     assert "observatory_policy" not in osd_data
@@ -288,24 +290,33 @@ def test_get_osd_using_tmdata_capability_only_returns_complete_catalogue(
 
 
 @pytest.mark.parametrize(
-    "telescope, array_assembly",
-    [("mid", "AA1"), ("mid", "AA2"), ("low", "AA1"), ("low", "AA2")],
+    "telescope, key, array_assembly",
+    [
+        (Telescope.SKA_MID, "mid", "AA1"),
+        (Telescope.SKA_MID, "mid", "AA2"),
+        (Telescope.SKA_LOW, "low", "AA1"),
+        (Telescope.SKA_LOW, "low", "AA2"),
+        ("mid", "mid", "AA1"),
+        ("low", "low", "AA1"),
+    ],
 )
-def test_get_osd_using_tmdata_catalogue_filter(telescope, array_assembly, tests_tmdata):
+def test_get_osd_using_tmdata_catalogue_filter(
+    telescope, key, array_assembly, tests_tmdata
+):
     """A non-cycle filter selects catalogue data without a cycle policy."""
     osd_data = get_osd_using_tmdata(
-        tests_tmdata, telescope=Telescope(telescope), array_assembly=array_assembly
+        tests_tmdata, telescope=telescope, array_assembly=array_assembly
     )
 
     assert "observatory_policy" not in osd_data
-    assert list(osd_data["capabilities"]) == [telescope]
-    assert array_assembly in osd_data["capabilities"][telescope]
+    assert list(osd_data["capabilities"]) == [key]
+    assert array_assembly in osd_data["capabilities"][key]
 
 
 def test_get_osd_using_tmdata_band_5b_has_sub_bands(tests_tmdata):
     """Band 5b of the Mid basic capabilities is split into sub-bands."""
     osd_data = get_osd_using_tmdata(
-        tests_tmdata, telescope=Telescope.MID, array_assembly="AA1"
+        tests_tmdata, telescope=Telescope.SKA_MID, array_assembly="AA1"
     )
     band_5b = osd_data["capabilities"]["mid"]["basic_capabilities"][
         "receiver_information"
@@ -320,7 +331,7 @@ def test_get_osd_using_tmdata_matching_array_assembly_is_redundant(
     """A matching explicit assembly does not override the cycle policy."""
     with caplog.at_level(logging.WARNING):
         osd_data = get_osd_using_tmdata(
-            tests_tmdata, telescope=Telescope.MID, array_assembly="AA2", cycle_id=2
+            tests_tmdata, telescope=Telescope.SKA_MID, array_assembly="AA2", cycle_id=2
         )
 
     assert list(osd_data["capabilities"]) == ["mid"]
@@ -343,14 +354,14 @@ def test_get_osd_using_tmdata_matching_array_assembly_is_redundant(
             ["Cycle_id and Array_assembly cannot be used together."],
         ),
         (
-            {"telescope": Telescope.MID, "cycle_id": 2, "array_assembly": "AA1"},
+            {"telescope": Telescope.SKA_MID, "cycle_id": 2, "array_assembly": "AA1"},
             [
                 "Array assembly AA1 does not match capability mid in cycle 2."
                 " Expected AA2."
             ],
         ),
         (
-            {"telescope": Telescope.MID, "cycle_id": 1},
+            {"telescope": Telescope.SKA_MID, "cycle_id": 1},
             ["Capability mid is invalid for cycle 1. Valid capabilities are low."],
         ),
     ],
@@ -367,7 +378,7 @@ def test_get_osd_using_tmdata_invalid_query(query, expected_errors, tests_tmdata
 def test_get_osd_using_tmdata_invalid_cycle_id(tests_tmdata):
     """A cycle with no cycle file raises a ValueError naming the cycle."""
     with pytest.raises(ValueError) as error:
-        get_osd_using_tmdata(tests_tmdata, telescope=Telescope.MID, cycle_id=3)
+        get_osd_using_tmdata(tests_tmdata, telescope=Telescope.SKA_MID, cycle_id=3)
 
     assert "Cycle 3 is invalid" in error.value.args[0][0]
 

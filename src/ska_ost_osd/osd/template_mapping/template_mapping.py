@@ -28,7 +28,7 @@ def find_matching_templates(
     """
     matching_templates = {}
     telescope_type = "mid" if "ska1_mid" in base_path else "low"
-    excluded_prefix = "low_" if telescope_type == "mid" else "mid_"
+    excluded_prefix = "ska_low_" if telescope_type == "mid" else "ska_mid_"
 
     LOGGER.info(
         "Finding templates for telescope type: %s with patterns: %s",

@@ -1,6 +1,6 @@
 """Created file to maintain OSD Model constants."""
 
-from enum import Enum
+from enum import StrEnum
 
 MID_CONSTANT_JSON_FILE_PATH = "ska1_mid/mid_capabilities.json"
 LOW_CONSTANT_JSON_FILE_PATH = "ska1_low/low_capabilities.json"
@@ -19,25 +19,21 @@ osd_file_mapping = {
 }
 
 
-class Telescope(str, Enum):
-    """Supported telescope names."""
+class Telescope(StrEnum):
+    """Supported telescopes, with the values of the PDM's ``TelescopeType``."""
 
-    LOW = "low"
-    MID = "mid"
-
-    def __str__(self) -> str:
-        """Return the telescope name used in TMData and API responses."""
-        return self.value
+    SKA_LOW = "ska_low"
+    SKA_MID = "ska_mid"
 
 
 CAPABILITIES_JSON_FILE_PATHS = {
-    Telescope.MID: MID_CONSTANT_JSON_FILE_PATH,
-    Telescope.LOW: LOW_CONSTANT_JSON_FILE_PATH,
+    Telescope.SKA_MID: MID_CONSTANT_JSON_FILE_PATH,
+    Telescope.SKA_LOW: LOW_CONSTANT_JSON_FILE_PATH,
 }
 
 DEFAULTS_JSON_FILE_PATHS = {
-    Telescope.MID: MID_DEFAULTS_JSON_FILE_PATH,
-    Telescope.LOW: LOW_DEFAULTS_JSON_FILE_PATH,
+    Telescope.SKA_MID: MID_DEFAULTS_JSON_FILE_PATH,
+    Telescope.SKA_LOW: LOW_DEFAULTS_JSON_FILE_PATH,
 }
 
 

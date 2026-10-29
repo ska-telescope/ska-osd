@@ -387,7 +387,7 @@ LOW_CONSTRAINTS = Constraints(
 
 # tests/tmdata/subarray_templates/subarray_template_library.json
 MID_FULL_AA2_TEMPLATE = SubarrayTemplate(
-    name="MID_FULL_AA2",
+    name="SKA_MID_FULL_AA2",
     subarray_type=SubarrayType.CUSTOM,
     custom_stations=[
         "SKA001",
@@ -402,19 +402,19 @@ MID_FULL_AA2_TEMPLATE = SubarrayTemplate(
     description="TEST full Mid AA2 array.",
 )
 LOW_TEST_AA1_TEMPLATE = SubarrayTemplate(
-    name="LOW_TEST_AA1",
+    name="SKA_LOW_TEST_AA1",
     subarray_type=SubarrayType.CUSTOM,
     custom_stations=["S8-1", "S8-2"],
     description="TEST Low AA1 subset of stations.",
 )
 LOW_FULL_AA2_TEMPLATE = SubarrayTemplate(
-    name="LOW_FULL_AA2",
+    name="SKA_LOW_FULL_AA2",
     subarray_type=SubarrayType.AA2,
     custom_stations=[],
     description="TEST full Low AA2 array.",
 )
 LOW_TEST_AA2_TEMPLATE = SubarrayTemplate(
-    name="LOW_TEST_AA2",
+    name="SKA_LOW_TEST_AA2",
     subarray_type=SubarrayType.CUSTOM,
     custom_stations=["S8-1", "S8-2", "S8-3", "S8-4"],
     description="TEST Low AA2 subset of stations.",

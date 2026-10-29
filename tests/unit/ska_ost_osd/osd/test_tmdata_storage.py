@@ -41,8 +41,8 @@ class TestGetTelescopeCapabilities:
     @pytest.mark.parametrize(
         "telescope, expected",
         [
-            (Telescope.MID, MID_CAPABILITIES_FILE),
-            (Telescope.LOW, LOW_CAPABILITIES_FILE),
+            (Telescope.SKA_MID, MID_CAPABILITIES_FILE),
+            (Telescope.SKA_LOW, LOW_CAPABILITIES_FILE),
         ],
     )
     def test_returns_capabilities(self, tests_tmdata, telescope, expected):
@@ -51,8 +51,8 @@ class TestGetTelescopeCapabilities:
     @pytest.mark.parametrize(
         "telescope, path",
         [
-            (Telescope.MID, "ska1_mid/mid_capabilities.json"),
-            (Telescope.LOW, "ska1_low/low_capabilities.json"),
+            (Telescope.SKA_MID, "ska1_mid/mid_capabilities.json"),
+            (Telescope.SKA_LOW, "ska1_low/low_capabilities.json"),
         ],
     )
     def test_raises_when_file_missing(self, empty_tmdata, telescope, path):
@@ -63,7 +63,10 @@ class TestGetTelescopeCapabilities:
 class TestGetTelescopeDefaults:
     @pytest.mark.parametrize(
         "telescope, expected",
-        [(Telescope.MID, MID_DEFAULTS_FILE), (Telescope.LOW, LOW_DEFAULTS_FILE)],
+        [
+            (Telescope.SKA_MID, MID_DEFAULTS_FILE),
+            (Telescope.SKA_LOW, LOW_DEFAULTS_FILE),
+        ],
     )
     def test_returns_defaults(self, tests_tmdata, telescope, expected):
         assert get_telescope_defaults(tests_tmdata, telescope) == expected
@@ -71,8 +74,8 @@ class TestGetTelescopeDefaults:
     @pytest.mark.parametrize(
         "telescope, path",
         [
-            (Telescope.MID, "ska1_mid/mid_defaults.json"),
-            (Telescope.LOW, "ska1_low/low_defaults.json"),
+            (Telescope.SKA_MID, "ska1_mid/mid_defaults.json"),
+            (Telescope.SKA_LOW, "ska1_low/low_defaults.json"),
         ],
     )
     def test_raises_when_file_missing(self, empty_tmdata, telescope, path):

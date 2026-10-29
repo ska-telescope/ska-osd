@@ -83,8 +83,8 @@ class TestGetBasicCapabilities:
     @pytest.mark.parametrize(
         "telescope, expected",
         [
-            (Telescope.MID, MID_BASIC_CAPABILITIES),
-            (Telescope.LOW, LOW_BASIC_CAPABILITIES),
+            (Telescope.SKA_MID, MID_BASIC_CAPABILITIES),
+            (Telescope.SKA_LOW, LOW_BASIC_CAPABILITIES),
         ],
     )
     def test_returns_basic_capabilities(
@@ -96,7 +96,7 @@ class TestGetBasicCapabilities:
         """The PHT's name for Mid's receiver bands (receiver_information)
         belongs to the PHT view, not to the reader model."""
         served = test_tmdata_repository.get_basic_capabilities(
-            Telescope.MID
+            Telescope.SKA_MID
         ).model_dump(by_alias=True)
 
         assert list(served) == ["frequency_bands"]
@@ -105,13 +105,13 @@ class TestGetBasicCapabilities:
         with pytest.raises(
             FileNotFoundError, match="file not found: ska1_low/low_capabilities.json"
         ):
-            empty_tmdata_repository.get_basic_capabilities(Telescope.LOW)
+            empty_tmdata_repository.get_basic_capabilities(Telescope.SKA_LOW)
 
 
 class TestGetConstraints:
     @pytest.mark.parametrize(
         "telescope, expected",
-        [(Telescope.MID, MID_CONSTRAINTS), (Telescope.LOW, LOW_CONSTRAINTS)],
+        [(Telescope.SKA_MID, MID_CONSTRAINTS), (Telescope.SKA_LOW, LOW_CONSTRAINTS)],
     )
     def test_returns_constraints(self, test_tmdata_repository, telescope, expected):
         assert test_tmdata_repository.get_constraints(telescope) == expected
@@ -120,13 +120,13 @@ class TestGetConstraints:
         with pytest.raises(
             FileNotFoundError, match="file not found: ska1_mid/mid_capabilities.json"
         ):
-            empty_tmdata_repository.get_constraints(Telescope.MID)
+            empty_tmdata_repository.get_constraints(Telescope.SKA_MID)
 
 
 class TestGetDefaults:
     @pytest.mark.parametrize(
         "telescope, expected",
-        [(Telescope.MID, MID_DEFAULTS), (Telescope.LOW, LOW_DEFAULTS)],
+        [(Telescope.SKA_MID, MID_DEFAULTS), (Telescope.SKA_LOW, LOW_DEFAULTS)],
     )
     def test_returns_defaults(self, test_tmdata_repository, telescope, expected):
         assert test_tmdata_repository.get_defaults(telescope) == expected
@@ -135,15 +135,15 @@ class TestGetDefaults:
         with pytest.raises(
             FileNotFoundError, match="file not found: ska1_mid/mid_defaults.json"
         ):
-            empty_tmdata_repository.get_defaults(Telescope.MID)
+            empty_tmdata_repository.get_defaults(Telescope.SKA_MID)
 
 
 class TestGetCapabilitySets:
     @pytest.mark.parametrize(
         "telescope, expected",
         [
-            (Telescope.MID, [MID_AA1, MID_AA2]),
-            (Telescope.LOW, [LOW_AA1, LOW_AA2]),
+            (Telescope.SKA_MID, [MID_AA1, MID_AA2]),
+            (Telescope.SKA_LOW, [LOW_AA1, LOW_AA2]),
         ],
     )
     def test_returns_capability_sets_in_file_order(
@@ -155,17 +155,17 @@ class TestGetCapabilitySets:
         with pytest.raises(
             FileNotFoundError, match="file not found: ska1_mid/mid_capabilities.json"
         ):
-            empty_tmdata_repository.get_capability_sets(Telescope.MID)
+            empty_tmdata_repository.get_capability_sets(Telescope.SKA_MID)
 
 
 class TestGetCapabilitySet:
     @pytest.mark.parametrize(
         "telescope, name, expected",
         [
-            (Telescope.MID, "AA1", MID_AA1),
-            (Telescope.MID, "AA2", MID_AA2),
-            (Telescope.LOW, "AA1", LOW_AA1),
-            (Telescope.LOW, "AA2", LOW_AA2),
+            (Telescope.SKA_MID, "AA1", MID_AA1),
+            (Telescope.SKA_MID, "AA2", MID_AA2),
+            (Telescope.SKA_LOW, "AA1", LOW_AA1),
+            (Telescope.SKA_LOW, "AA2", LOW_AA2),
         ],
     )
     def test_returns_capability_set(
@@ -177,13 +177,13 @@ class TestGetCapabilitySet:
         with pytest.raises(
             CapabilitySetNotFoundError,
             match=(
-                r"Capability set AA3 is invalid for telescope mid\. "
+                r"Capability set AA3 is invalid for telescope ska_mid\. "
                 r"Valid capability sets are AA1, AA2\."
             ),
         ) as excinfo:
-            test_tmdata_repository.get_capability_set(Telescope.MID, "AA3")
+            test_tmdata_repository.get_capability_set(Telescope.SKA_MID, "AA3")
 
-        assert excinfo.value.telescope == Telescope.MID
+        assert excinfo.value.telescope == Telescope.SKA_MID
         assert excinfo.value.name == "AA3"
         assert excinfo.value.available_names == ["AA1", "AA2"]
 
@@ -191,17 +191,17 @@ class TestGetCapabilitySet:
         with pytest.raises(
             FileNotFoundError, match="file not found: ska1_low/low_capabilities.json"
         ):
-            empty_tmdata_repository.get_capability_set(Telescope.LOW, "AA1")
+            empty_tmdata_repository.get_capability_set(Telescope.SKA_LOW, "AA1")
 
 
 class TestGetSubarrayTemplates:
     @pytest.mark.parametrize(
         "telescope, capability_set, expected",
         [
-            (Telescope.MID, "AA1", []),
-            (Telescope.MID, "AA2", [MID_FULL_AA2_TEMPLATE]),
-            (Telescope.LOW, "AA1", [LOW_TEST_AA1_TEMPLATE]),
-            (Telescope.LOW, "AA2", [LOW_FULL_AA2_TEMPLATE, LOW_TEST_AA2_TEMPLATE]),
+            (Telescope.SKA_MID, "AA1", []),
+            (Telescope.SKA_MID, "AA2", [MID_FULL_AA2_TEMPLATE]),
+            (Telescope.SKA_LOW, "AA1", [LOW_TEST_AA1_TEMPLATE]),
+            (Telescope.SKA_LOW, "AA2", [LOW_FULL_AA2_TEMPLATE, LOW_TEST_AA2_TEMPLATE]),
         ],
         ids=[
             "no template",
@@ -222,15 +222,15 @@ class TestGetSubarrayTemplates:
 
     def test_raises_for_unknown_capability_set(self, test_tmdata_repository):
         with pytest.raises(CapabilitySetNotFoundError):
-            test_tmdata_repository.get_subarray_templates(Telescope.MID, "AA3")
+            test_tmdata_repository.get_subarray_templates(Telescope.SKA_MID, "AA3")
 
 
 class TestGetCycleCapabilitySets:
     @pytest.mark.parametrize(
         "cycle_id, expected",
         [
-            (CycleID(1), {Telescope.LOW: LOW_AA1}),
-            (CycleID(2), {Telescope.MID: MID_AA2, Telescope.LOW: LOW_AA2}),
+            (CycleID(1), {Telescope.SKA_LOW: LOW_AA1}),
+            (CycleID(2), {Telescope.SKA_MID: MID_AA2, Telescope.SKA_LOW: LOW_AA2}),
         ],
         ids=["low only", "mid and low"],
     )

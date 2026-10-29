@@ -47,10 +47,10 @@ class OSDRepository(Protocol):
     # Per telescope
 
     @overload
-    def get_defaults(self, telescope: Literal[Telescope.MID]) -> MidDefaults: ...
+    def get_defaults(self, telescope: Literal[Telescope.SKA_MID]) -> MidDefaults: ...
 
     @overload
-    def get_defaults(self, telescope: Literal[Telescope.LOW]) -> LowDefaults: ...
+    def get_defaults(self, telescope: Literal[Telescope.SKA_LOW]) -> LowDefaults: ...
 
     def get_defaults(self, telescope: Telescope) -> MidDefaults | LowDefaults:
         """A telescope's defaults: Mid's SPFRx defaults or Low's quality
@@ -59,12 +59,12 @@ class OSDRepository(Protocol):
 
     @overload
     def get_basic_capabilities(
-        self, telescope: Literal[Telescope.MID]
+        self, telescope: Literal[Telescope.SKA_MID]
     ) -> MidBasicCapabilities: ...
 
     @overload
     def get_basic_capabilities(
-        self, telescope: Literal[Telescope.LOW]
+        self, telescope: Literal[Telescope.SKA_LOW]
     ) -> LowBasicCapabilities: ...
 
     def get_basic_capabilities(
@@ -83,12 +83,12 @@ class OSDRepository(Protocol):
 
     @overload
     def get_capability_sets(
-        self, telescope: Literal[Telescope.MID]
+        self, telescope: Literal[Telescope.SKA_MID]
     ) -> list[MidCapabilitySet]: ...
 
     @overload
     def get_capability_sets(
-        self, telescope: Literal[Telescope.LOW]
+        self, telescope: Literal[Telescope.SKA_LOW]
     ) -> list[LowCapabilitySet]: ...
 
     def get_capability_sets(
@@ -99,12 +99,12 @@ class OSDRepository(Protocol):
 
     @overload
     def get_capability_set(
-        self, telescope: Literal[Telescope.MID], name: str
+        self, telescope: Literal[Telescope.SKA_MID], name: str
     ) -> MidCapabilitySet: ...
 
     @overload
     def get_capability_set(
-        self, telescope: Literal[Telescope.LOW], name: str
+        self, telescope: Literal[Telescope.SKA_LOW], name: str
     ) -> LowCapabilitySet: ...
 
     def get_capability_set(self, telescope: Telescope, name: str) -> CapabilitySet:

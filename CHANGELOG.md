@@ -19,6 +19,12 @@ Unreleased
 * [BREAKING] Removed ``ska_ost_osd.common``, including the FastAPI
   ``generic_exception_handler``
 * Removed the ``fastapi``, ``astropy`` and ``simpleeval`` dependencies
+* [BREAKING] Renamed the ``Telescope`` members to ``SKA_MID`` and ``SKA_LOW``, with
+  the values ``ska_mid`` and ``ska_low`` of the PDM's ``TelescopeType``. The
+  ``telescope`` of a capability set in the PHT view changes to match.
+  ``get_osd_using_tmdata`` still accepts ``"mid"`` and ``"low"``
+* [BREAKING] Renamed the subarray templates in ``subarray_template_library.json``
+  to start with ``SKA_MID_`` and ``SKA_LOW_``
 * [BREAKING] Define multiple cycles through a single TelModel backend in ``tmdata/cycles``
 * [BREAKING] Users pass a TMData client to public API functions instead of OSD creating one from ``tmdata/version_mapping``
 * [BREAKING] Removed ``number_beams`` from the SKA-Low array assemblies in

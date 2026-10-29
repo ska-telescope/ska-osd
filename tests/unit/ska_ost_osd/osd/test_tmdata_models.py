@@ -57,14 +57,14 @@ class TestOsdOutput:
     """What the OSD serves from the tmdata validates against the models."""
 
     @pytest.mark.parametrize(
-        "model, telescope, path",
+        "model, telescope, key, path",
         [
-            (MidCapabilitiesFile, Telescope.MID, MID_CAPABILITIES),
-            (LowCapabilitiesFile, Telescope.LOW, LOW_CAPABILITIES),
+            (MidCapabilitiesFile, Telescope.SKA_MID, "mid", MID_CAPABILITIES),
+            (LowCapabilitiesFile, Telescope.SKA_LOW, "low", LOW_CAPABILITIES),
         ],
     )
     def test_template_processed_output_validates(
-        self, model, telescope, path, tests_tmdata
+        self, model, telescope, key, path, tests_tmdata
     ):
         """The OSD's output with subarray templates resolved, as
         ska-oso-services fetches it, validates once the constraints, which
@@ -72,7 +72,7 @@ class TestOsdOutput:
         osd_data = get_osd_using_tmdata(
             tests_tmdata, telescope=telescope, process_templates=True
         )
-        served = osd_data["capabilities"][telescope.value]
+        served = osd_data["capabilities"][key]
         assert "constraints" not in served
 
         model.model_validate({**served, "constraints": load(path)["constraints"]})
@@ -163,8 +163,8 @@ class TestCapabilities:
     @pytest.mark.parametrize(
         "model, path, telescope",
         [
-            (MidCapabilitiesFile, MID_CAPABILITIES, Telescope.MID),
-            (LowCapabilitiesFile, LOW_CAPABILITIES, Telescope.LOW),
+            (MidCapabilitiesFile, MID_CAPABILITIES, Telescope.SKA_MID),
+            (LowCapabilitiesFile, LOW_CAPABILITIES, Telescope.SKA_LOW),
         ],
     )
     def test_capability_sets_know_their_telescope(self, model, path, telescope):
@@ -198,7 +198,9 @@ class TestCapabilities:
     def test_capability_set_rejects_another_telescope(self):
         data = load(LOW_CAPABILITIES)["AA1"]
         with pytest.raises(ValidationError, match="telescope"):
-            LowCapabilitySet.model_validate({"name": "AA1", **data, "telescope": "mid"})
+            LowCapabilitySet.model_validate(
+                {"name": "AA1", **data, "telescope": "ska_mid"}
+            )
 
     @pytest.mark.parametrize(
         "model, path",

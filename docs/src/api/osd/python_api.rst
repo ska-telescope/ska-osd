@@ -70,15 +70,15 @@ Reading the data
 
     from ska_ost_osd.osd.common.constant import Telescope
 
-    aa2 = repository.get_capability_set(Telescope.LOW, "AA2")
+    aa2 = repository.get_capability_set(Telescope.SKA_LOW, "AA2")
     aa2.number_subarray_beams                                    # 8
-    repository.get_constraints(Telescope.MID).min_elevation_deg  # 15.0
+    repository.get_constraints(Telescope.SKA_MID).min_elevation_deg  # 15.0
 
 Mid's receiver bands are looked up on its basic capabilities:
 
 .. code-block:: python
 
-    bands = repository.get_basic_capabilities(Telescope.MID)
+    bands = repository.get_basic_capabilities(Telescope.SKA_MID)
     bands.get_frequency_band("Band_2").max_frequency_hz
     bands.get_frequency_band("Band_5b").get_band5b_subband(2).lo_frequency_hz
 
@@ -97,7 +97,7 @@ Joins
    * - ``get_subarray_templates(telescope, capability_set)``
      - the ``SubarrayTemplate`` objects of a capability set: those whose name
        matches one of its ``subarray_templates`` patterns and starts with the
-       telescope, e.g. ``MID_``
+       telescope, e.g. ``SKA_MID_``
 
 
 Views
