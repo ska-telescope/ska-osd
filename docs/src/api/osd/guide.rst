@@ -63,7 +63,7 @@ Pydantic models.
     from ska_ost_osd.osd.osd import get_osd_using_tmdata
 
     tmdata = TMData(["car:ost/ska-ost-osd?7.0.0"], update=True)
-    osd_data = get_osd_using_tmdata(tmdata, telescope=Telescope.MID, cycle_id=1)
+    osd_data = get_osd_using_tmdata(tmdata, telescope=Telescope.LOW, cycle_id=1)
 
 ===================    ============================================================
 Parameters             Description
@@ -83,12 +83,13 @@ Response
 .. code-block:: json
 
     {
-    "observatory_policy": {
-      "cycle_number": 1,
-    "telescope_capabilities": []},
-    "capabilities": {
-      "mid": {},
-      "low": {}}
+      "observatory_policy": {
+        "cycle_number": 1,
+        "telescope_capabilities": {"Low": "AA2_SV"}
+      },
+      "capabilities": {
+        "low": {"basic_capabilities": {}, "AA2_SV": {}}
+      }
     }
 
 
@@ -140,7 +141,7 @@ argument is the list of error messages. For example:
 
   .. code:: python
 
-      Array assembly AA1 does not match capability mid in cycle 2. Expected AA2.
+      Array assembly AA1 does not match capability low in cycle 2. Expected AA2.
 
 * a ``cycle_id``, ``telescope`` or ``array_assembly`` with no data, or a telescope
   that the cycle doesn't offer.
@@ -151,7 +152,7 @@ Publishing tmdata
 
 The tmdata is published to CAR with the same version as the Python package, so a
 breaking change to the tmdata is released as a new major version. Consumers should
-read a pinned version, such as ``car:ost/ska-ost-osd?7.0.0``, rather than ``main``.
+read a pinned version, such as ``car:ost/ska-ost-osd?8.0.0``, rather than ``main``.
 
 It is published by the manual ``tmdata-publish`` job of the GitLab pipeline, which
 runs:
@@ -303,7 +304,7 @@ With ``process_templates=True``, the templates are included in the OSD data:
 .. code-block:: python
 
     get_osd_using_tmdata(
-        tmdata, telescope=Telescope.MID, cycle_id=1, process_templates=True
+        tmdata, telescope=Telescope.LOW, cycle_id=1, process_templates=True
     )
 
 * Complete response structure with processed templates:
@@ -314,31 +315,23 @@ With ``process_templates=True``, the templates are included in the OSD data:
         "observatory_policy": {
             "cycle_number": 1,
             "telescope_capabilities": {
-                "Mid": "AA2",
-                "Low": "AA2"
+                "Low": "AA2_SV"
             }
         },
         "capabilities": {
-            "mid": {
+            "low": {
                 "basic_capabilities": {
-                    "dish_elevation_limit_deg": 15,
-                    "receiver_information": [
-                        {
-                            "max_frequency_hz": 1050000000,
-                            "min_frequency_hz": 350000000,
-                            "rx_id": "Band_1"
-                        }
-                    ]
+                    "min_frequency_hz": 50000000.0,
+                    "max_frequency_hz": 350000000.0
                 },
-                "AA2": {
-                    "available_receivers": ["Band_1", "Band_2"],
-                    "number_ska_dishes": 64,
-                    "cbf_modes": ["correlation", "pst", "pss"],
+                "AA2_SV": {
+                    "number_stations": 68,
+                    "cbf_modes": ["vis", "pst"],
                     "subarray_templates": {
-                        "MID_FULL_AA2": {
+                        "LOW_FULL_AA2": {
                             "subarray_type": "AA2",
                             "custom_stations": "",
-                            "description": "Full SKA-Mid array, AA2 release."
+                            "description": "Full SKA-Low array, AA2 release."
                         }
                     }
                 }
