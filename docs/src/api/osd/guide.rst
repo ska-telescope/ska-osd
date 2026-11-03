@@ -62,15 +62,16 @@ Pydantic models.
     from ska_ost_osd.osd.common.constant import Telescope
     from ska_ost_osd.osd.osd import get_osd_using_tmdata
 
-    tmdata = TMData(["car:ost/ska-ost-osd?7.0.0"], update=True)
-    osd_data = get_osd_using_tmdata(tmdata, telescope=Telescope.LOW, cycle_id=1)
+    tmdata = TMData(["car:ost/ska-ost-osd?<version>"], update=True)
+    osd_data = get_osd_using_tmdata(tmdata, telescope=Telescope.SKA_LOW, cycle_id=1)
 
 ===================    ============================================================
 Parameters             Description
 ===================    ============================================================
 tm_data                the TMData client to read the tmdata from
 cycle_id               Cycle Id a integer value 1, 2, 3
-telescope              ``Telescope.MID`` or ``Telescope.LOW``
+telescope              ``Telescope.SKA_MID`` or ``Telescope.SKA_LOW``; ``"mid"``
+                       and ``"low"`` are still accepted
 array_assembly         AA0.5, AA1 or any Array Assembly
 process_templates      whether to replace the ``subarray_templates`` patterns with
                        the templates, see `Subarray Template Support`_
@@ -152,7 +153,8 @@ Publishing tmdata
 
 The tmdata is published to CAR with the same version as the Python package, so a
 breaking change to the tmdata is released as a new major version. Consumers should
-read a pinned version, such as ``car:ost/ska-ost-osd?8.0.0``, rather than ``main``.
+read a pinned version, ``car:ost/ska-ost-osd?<version>`` (e.g. ``?8.0.0``), rather
+than ``main``.
 
 It is published by the manual ``tmdata-publish`` job of the GitLab pipeline, which
 runs:
@@ -255,7 +257,7 @@ Template Processing
 The template mapping system processes subarray templates through:
 
 1. **Pattern Matching**: Uses fnmatch patterns to find matching templates
-2. **Telescope Filtering**: Automatically filters templates based on telescope type (MID/LOW)
+2. **Telescope Filtering**: Automatically filters templates based on telescope type (``SKA_MID_``/``SKA_LOW_`` prefix)
 3. **Dynamic Loading**: Templates are loaded from JSON files and merged into capabilities
 4. **Key Normalization**: Template keys are converted to lowercase for consistency
 
@@ -280,14 +282,14 @@ Template files should contain telescope-specific templates:
 .. code-block:: json
 
     {
-        "MID_Template_AA0.5": {
+        "SKA_MID_Template_AA0.5": {
             "frequency_band": "1",
             "config": {
                 "beam_id": 1,
                 "channels": [[0, 1], [744, 8191]]
             }
         },
-        "LOW_Template_AA1": {
+        "SKA_LOW_Template_AA1": {
             "frequency_band": "low1",
             "config": {
                 "beam_id": 1,
@@ -304,7 +306,7 @@ With ``process_templates=True``, the templates are included in the OSD data:
 .. code-block:: python
 
     get_osd_using_tmdata(
-        tmdata, telescope=Telescope.LOW, cycle_id=1, process_templates=True
+        tmdata, telescope=Telescope.SKA_LOW, cycle_id=1, process_templates=True
     )
 
 * Complete response structure with processed templates:
@@ -328,7 +330,7 @@ With ``process_templates=True``, the templates are included in the OSD data:
                     "number_stations": 68,
                     "cbf_modes": ["vis", "pst"],
                     "subarray_templates": {
-                        "LOW_FULL_AA2": {
+                        "SKA_LOW_FULL_AA2": {
                             "subarray_type": "AA2",
                             "custom_stations": "",
                             "description": "Full SKA-Low array, AA2 release."
