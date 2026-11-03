@@ -1,12 +1,9 @@
-import copy
 import logging
-import re
 from functools import cached_property
 from typing import Any, Dict, Optional
 
 from ska_telmodel_client import TMData
 
-from ska_ost_osd.common.utils import update_file
 from ska_ost_osd.osd.common.osd_validation_messages import (
     ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE,
     ARRAY_ASSEMBLY_DOESNOT_MATCH_CYCLE_CAPABILITY_ERROR_MESSAGE,
@@ -19,10 +16,6 @@ from ska_ost_osd.osd.common.osd_validation_messages import (
 from ska_ost_osd.osd.template_mapping.template_mapping import process_template_mappings
 
 from .common.constant import (
-    ARRAY_ASSEMBLY_PATTERN,
-    LOW_CAPABILITIES_JSON_PATH,
-    MID_CAPABILITIES_JSON_PATH,
-    OBSERVATORY_POLICIES_JSON_PATH,
     OBSERVING_CYCLES_TMDATA_DIR,
     RELEASE_FILE_PATH_LATEST,
     Telescope,
@@ -371,105 +364,3 @@ def get_osd_using_tmdata(
         raise ValueError(errors)
 
     return osd_data
-
-
-def update_osd_file(
-    validated_capabilities: Dict,
-    observatory_policy: Dict,
-    existing_stored_data: Dict,
-    telescope: str,
-) -> Dict:
-    """Process and validate OSD data for insertion into the capabilities file.
-
-    :param validated_capabilities: Dict, dictionary containing the
-        validated capabilities.
-    :param observatory_policy: Dict, dictionary containing the
-        observatory policies.
-    :param existing_stored_data: Dict, the existing stored capabilities
-        data.
-    :param telescope: str, mid or low
-    :return: Dict, dictionary with the processed capabilities data.
-    :raises OSDModelError: If validation fails.
-    :raises ValueError: If required data is missing or invalid.
-    """
-    # Validate request body against schema
-
-    capabilities = validated_capabilities.capabilities
-
-    telescope = next(iter(capabilities.keys()))
-    telescope_data = capabilities[telescope]
-
-    # Create a copy of existing data to avoid modifying it directly
-    updated_data = copy.deepcopy(existing_stored_data)
-
-    # Allow new fields while preserving existing data structure
-    for key, value in telescope_data.items():
-        if key in updated_data:
-            # Update existing fields
-            if isinstance(value, dict) and isinstance(existing_stored_data[key], dict):
-                updated_data[key].update(value)
-            else:
-                updated_data[key] = value
-        else:
-            # Add new fields
-            updated_data[key] = value
-
-    _get_data(telescope, updated_data)
-
-    if observatory_policy:
-        update_file(OBSERVATORY_POLICIES_JSON_PATH, observatory_policy)
-
-    return updated_data
-
-
-def add_new_data_storage(body: Dict) -> Dict:
-    """Process and validate OSD data for insertion into the capabilities file.
-
-    :param body: Dict, dictionary containing the OSD data to insert.
-    :return: Dict, dictionary with the processed capabilities data.
-    :raises OSDModelError: If validation fails.
-    :raises ValueError: If required data is missing or invalid.
-    """
-    mid_capabilities = {}
-    result = {}
-    if not body.get("capabilities", {}).get("mid"):
-        return mid_capabilities
-
-    capabilities = body["capabilities"]
-    telescope = next(iter(capabilities.keys()))
-    telescope_data = capabilities[telescope]
-
-    mid_capabilities.update(
-        {
-            "telescope": telescope,
-            "basic_capabilities": telescope_data["basic_capabilities"],
-            **{
-                key: telescope_data[key]
-                for key in telescope_data
-                if re.match(ARRAY_ASSEMBLY_PATTERN, key)
-            },
-        }
-    )
-    mid_capabilities["telescope"] = mid_capabilities["telescope"].title()
-    update_file(MID_CAPABILITIES_JSON_PATH, mid_capabilities)
-    if body.get("observatory_policy"):
-        update_file(OBSERVATORY_POLICIES_JSON_PATH, body["observatory_policy"])
-        result.update(body["observatory_policy"])
-    result.update(mid_capabilities)
-    return mid_capabilities
-
-
-def _get_data(telescope: str, data: Dict) -> None:
-    """Update capabilities file based on telescope type.
-
-    :param data: Dict, dictionary containing the
-        observatory policies.
-    :param telescope: str, mid or low
-    """
-
-    match telescope:
-        case "mid":
-            update_file(MID_CAPABILITIES_JSON_PATH, data)
-
-        case "low":
-            update_file(LOW_CAPABILITIES_JSON_PATH, data)

@@ -1,8 +1,8 @@
-SKA Observatory Static Data Services
-=====================================
+SKA Observatory Static Data
+===========================
 
-The Observatory Static Data Services is the server component of the
-Observatory Support Tools. It provides the web services used by the OSO tools such as PPT and ODT.The idea of OSD is to provide a single source of truth that is used to configure the science domain behavior of each tool.
+The Observatory Static Data (OSD) is a Python library, and the tmdata files it reads,
+used by the Observatory Support Tools such as the PHT and ODT. The idea of OSD is to provide a single source of truth that is used to configure the science domain behavior of each tool.
 
 # Quick start
 To clone this repository, run
@@ -27,12 +27,6 @@ uv sync --all-groups
 source .venv/bin/activate
 ```
 
-To build a new Docker image for the OSD, run
-
-```
-make oci-build
-```
-
 Execute the test suite and lint the project with:
 
 ```
@@ -46,93 +40,11 @@ Reformat the code and apply lint autofixes with:
 make python-format
 ```
 
-To run a helm chart unit tests to verify helm chart configuration:
-
-```
-helm plugin install https://github.com/helm-unittest/helm-unittest.git
-make k8s-chart-test
-```
-
-### Deploy to Kubernetes
-
-Install the Helm umbrella chart into a Kubernetes cluster with ingress enabled:
-
-```
-make k8s-install-chart
-```
-
-The Swagger UI should be available external to the cluster at `http://<KUBE_HOST>/<KUBE_NAMESPACE>/osd/api/<MAJOR_VERSION>/ui/ and the API accessible via the same URL.
-
-If using minikube, `KUBE_HOST` can be found by running `minikube ip`.
-`KUBE_NAMESPACE` is the namespace the chart was deployed to, likely `ska-ost-osd`
-
-To uninstall the chart, run
-
-```
-make k8s-uninstall-chart
-```
-
-### Post-Release OpenAPI Specification Updates
-
-To ensure the openapi.json file reflects the latest API structure and version, run the following command from the command line:
-
-```
-make openapi
-```
-
-This command will regenerate the openapi.json file and update its content to match the most recent API definitions. It will refresh all paths, schemas, and version details to keep the specification consistent with the current implementation.
-
-# Deployments from CICD
-
-### Deploying to non-production environments
-
-There are 3 different environments which are defined through the standard pipeline templates. They need to be manually triggered in the Gitlab UI.
-
-1. `dev` - a temporary (4 hours) deployment from a feature branch, using the artefacts built in the branch pipeline
-2. `integration` - a permanent deployment from the main branch, using the latest version of the artefacts built in the main pipeline
-3. `staging` - a permanent deployment of the latest published artefact from CAR
-
-To find the URL for the environment, see the 'info' job of the CICD pipeline stage, which should output the URL alongside the status of the Kubernetes pods.
-Generally the API URL should be available at  `https://k8s.stfc.skao.int/$KUBE_NAMESPACE/osd/api/v1`
-
-
-## FastAPI
-To start the FastAPI server run the following command in a terminal bash prompt
-
-```
-fastapi run src/ska_ost_osd/app.py
-```
-
-After starting FastAPI server you can view swagger UI on below URL on local environment:
-
-http://0.0.0.0:8000/ska-ost-osd/osd/api/<MAJOR_VERSION>/ui/
-
-# Configuring Semantic Validation
-
-An explanation of validation strictness levels and configuring OSD semantic validation can be found in the
-[ska-ost-osd Documentation](https://developer.skao.int/projects/ska-ost-osd/en/latest/api/semantic-validation/guide.html#configuring-semantic-validation).
-
 # Publish tmdata
 
-Now OSD is handling releases separately for tmdata and ska-ost-osd codebase.
-User can now update tmdata with the help of [ OSD UI editor](https://k8s.stfc.skao.int/ska-oso-integration/osd) and publish it separately on artefact repository with enabling `push_to_gitlab` environment variable to "1".
-
-`push_to_gitlab` environment variable configured into values.yaml in chart directory
-which allow restrict tmdata publish on artefact. Default set as "0" for local environment.
-
-`push_to_gitlab` = 0 ## for local environment, it won't publish tmdata on artefact repository.
-
-`push_to_gitlab` = 1 ## it will publish tmdata on artefact repository.
+The tmdata is published to the artefact repository with the same version as the ska-ost-osd Python package, by the manual `tmdata-publish` job of the GitLab pipeline. Consumers should read a pinned version rather than `main`.
 
 To view tmdata releases, [Click here](https://gitlab.com/ska-telescope/ost/ska-ost-osd/-/blob/main/tmdata/version_mapping/latest_release.txt?ref_type=heads).
-
-It's not recommended  to set this flag value as "1" while doing testing on local environment.
-
-# Install charts
-
-```
-make k8s-install-chart
-```
 
 # Documentation
 
@@ -142,7 +54,7 @@ Documentation can be found in the ``docs`` folder. To build docs, install the
 documentation specific requirements:
 
 ```
-pip3 install sphinx sphinx-rtd-theme recommonmark sphinxcontrib-openapi mistune==0.8.4
+uv sync --group docs
 ```
 
 and build the documentation (will be built in docs/build folder) with
