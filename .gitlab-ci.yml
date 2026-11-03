@@ -17,13 +17,10 @@ variables:
 stages:
   - build
   - test
-  - deploy
   - lint
   - publish
   - pages
   - scan
-  - integration
-  - staging
 
 include:
   # Python
