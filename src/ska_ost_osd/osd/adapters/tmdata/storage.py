@@ -28,13 +28,13 @@ from ska_ost_osd.osd.common.constant import (
 from ska_ost_osd.osd.models.cycles import CycleID
 
 _CAPABILITIES_FILE_MODELS = {
-    Telescope.MID: MidCapabilitiesFile,
-    Telescope.LOW: LowCapabilitiesFile,
+    Telescope.SKA_MID: MidCapabilitiesFile,
+    Telescope.SKA_LOW: LowCapabilitiesFile,
 }
 
 _DEFAULTS_FILE_MODELS = {
-    Telescope.MID: MidDefaultsFile,
-    Telescope.LOW: LowDefaultsFile,
+    Telescope.SKA_MID: MidDefaultsFile,
+    Telescope.SKA_LOW: LowDefaultsFile,
 }
 
 
@@ -69,13 +69,13 @@ def get_cycle_file(tmdata: TMData, cycle_id: CycleID) -> CycleFile:
 
 @overload
 def get_telescope_capabilities(
-    tmdata: TMData, telescope: Literal[Telescope.MID]
+    tmdata: TMData, telescope: Literal[Telescope.SKA_MID]
 ) -> MidCapabilitiesFile: ...
 
 
 @overload
 def get_telescope_capabilities(
-    tmdata: TMData, telescope: Literal[Telescope.LOW]
+    tmdata: TMData, telescope: Literal[Telescope.SKA_LOW]
 ) -> LowCapabilitiesFile: ...
 
 
@@ -98,13 +98,13 @@ def get_telescope_capabilities(
 
 @overload
 def get_telescope_defaults(
-    tmdata: TMData, telescope: Literal[Telescope.MID]
+    tmdata: TMData, telescope: Literal[Telescope.SKA_MID]
 ) -> MidDefaultsFile: ...
 
 
 @overload
 def get_telescope_defaults(
-    tmdata: TMData, telescope: Literal[Telescope.LOW]
+    tmdata: TMData, telescope: Literal[Telescope.SKA_LOW]
 ) -> LowDefaultsFile: ...
 
 

@@ -14,38 +14,38 @@ class TestFindMatchingTemplates:
     def test_find_matching_templates_mid(self):
         """Test finding templates for mid telescope."""
         templates = {
-            "mid_template_1": {"data": "mid1"},
-            "mid_template_2": {"data": "mid2"},
-            "low_template_1": {"data": "low1"},
+            "ska_mid_template_1": {"data": "mid1"},
+            "ska_mid_template_2": {"data": "mid2"},
+            "ska_low_template_1": {"data": "low1"},
             "other_template": {"data": "other"},
         }
-        patterns = ["mid_*", "other_*"]
+        patterns = ["ska_mid_*", "other_*"]
         base_path = "tmdata/ska1_mid"
 
         result = find_matching_templates(templates, patterns, base_path)
 
-        assert "mid_template_1" in result
-        assert "mid_template_2" in result
+        assert "ska_mid_template_1" in result
+        assert "ska_mid_template_2" in result
         assert "other_template" in result
-        assert "low_template_1" not in result
+        assert "ska_low_template_1" not in result
 
     def test_find_matching_templates_low(self):
         """Test finding templates for low telescope."""
         templates = {
-            "mid_template_1": {"data": "mid1"},
-            "low_template_1": {"data": "low1"},
-            "low_template_2": {"data": "low2"},
+            "ska_mid_template_1": {"data": "mid1"},
+            "ska_low_template_1": {"data": "low1"},
+            "ska_low_template_2": {"data": "low2"},
             "other_template": {"data": "other"},
         }
-        patterns = ["low_*", "other_*"]
+        patterns = ["ska_low_*", "other_*"]
         base_path = "tmdata/ska1_low"
 
         result = find_matching_templates(templates, patterns, base_path)
 
-        assert "low_template_1" in result
-        assert "low_template_2" in result
+        assert "ska_low_template_1" in result
+        assert "ska_low_template_2" in result
         assert "other_template" in result
-        assert "mid_template_1" not in result
+        assert "ska_mid_template_1" not in result
 
     def test_find_matching_templates_no_matches(self):
         """Test when no templates match the patterns."""
@@ -66,12 +66,12 @@ class TestProcessTemplateMappings:
         capabilities_data = {
             "AA1": {
                 "basic_capabilities": {"test": "data"},
-                "subarray_templates": ["mid_*"],
+                "subarray_templates": ["ska_mid_*"],
             }
         }
         template_data = {
-            "mid_template_1": {"config": "test1"},
-            "mid_template_2": {"config": "test2"},
+            "ska_mid_template_1": {"config": "test1"},
+            "ska_mid_template_2": {"config": "test2"},
         }
         capability = "ska1_mid/mid_capabilities.json"
 
@@ -80,8 +80,8 @@ class TestProcessTemplateMappings:
         assert "AA1" in result
         assert "subarray_templates" in result["AA1"]
         assert isinstance(result["AA1"]["subarray_templates"], dict)
-        assert "mid_template_1" in result["AA1"]["subarray_templates"]
-        assert "mid_template_2" in result["AA1"]["subarray_templates"]
+        assert "ska_mid_template_1" in result["AA1"]["subarray_templates"]
+        assert "ska_mid_template_2" in result["AA1"]["subarray_templates"]
 
     def test_process_template_mappings_no_matches(self):
         """Test template mapping when no templates match."""
@@ -91,7 +91,7 @@ class TestProcessTemplateMappings:
                 "subarray_templates": ["nonexistent_*"],
             }
         }
-        template_data = {"mid_template_1": {"config": "test1"}}
+        template_data = {"ska_mid_template_1": {"config": "test1"}}
         capability = "ska1_mid/mid_capabilities.json"
 
         result = process_template_mappings(capabilities_data, capability, template_data)
@@ -110,7 +110,7 @@ class TestProcessTemplateMappings:
     def test_process_template_mappings_no_subarray_templates(self):
         """Test template mapping when no subarray_templates key exists."""
         capabilities_data = {"AA1": {"basic_capabilities": {"test": "data"}}}
-        template_data = {"mid_template_1": {"config": "test1"}}
+        template_data = {"ska_mid_template_1": {"config": "test1"}}
         capability = "ska1_mid/mid_capabilities.json"
 
         result = process_template_mappings(capabilities_data, capability, template_data)
@@ -125,7 +125,7 @@ class TestProcessTemplateMappings:
                 "subarray_templates": "invalid_format",
             }
         }
-        template_data = {"mid_template_1": {"config": "test1"}}
+        template_data = {"ska_mid_template_1": {"config": "test1"}}
         capability = "ska1_mid/mid_capabilities.json"
 
         result = process_template_mappings(capabilities_data, capability, template_data)
@@ -139,10 +139,10 @@ class TestProcessTemplateMappings:
         capabilities_data = {
             "AA1": {
                 "basic_capabilities": {"test": "data"},
-                "subarray_templates": ["mid_*"],
+                "subarray_templates": ["ska_mid_*"],
             }
         }
-        template_data = {"mid_template_1": {"config": "test1"}}
+        template_data = {"ska_mid_template_1": {"config": "test1"}}
         capability = "ska1_mid/mid_capabilities.json"
 
         with patch(

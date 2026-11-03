@@ -22,14 +22,14 @@ from ska_ost_osd.osd.models.defaults import LowDefaults, MidDefaults
 from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplate
 
 _DEFAULTS_MODELS = {
-    Telescope.MID: MidDefaults,
-    Telescope.LOW: LowDefaults,
+    Telescope.SKA_MID: MidDefaults,
+    Telescope.SKA_LOW: LowDefaults,
 }
 
 # The fields of a cycle's telescope_capabilities, by telescope
 _CYCLE_TELESCOPE_FIELDS = {
-    Telescope.MID: "ska_mid",
-    Telescope.LOW: "ska_low",
+    Telescope.SKA_MID: "ska_mid",
+    Telescope.SKA_LOW: "ska_low",
 }
 
 
@@ -63,10 +63,10 @@ class TMDataRepository:
     # Per telescope
 
     @overload
-    def get_defaults(self, telescope: Literal[Telescope.MID]) -> MidDefaults: ...
+    def get_defaults(self, telescope: Literal[Telescope.SKA_MID]) -> MidDefaults: ...
 
     @overload
-    def get_defaults(self, telescope: Literal[Telescope.LOW]) -> LowDefaults: ...
+    def get_defaults(self, telescope: Literal[Telescope.SKA_LOW]) -> LowDefaults: ...
 
     def get_defaults(self, telescope: Telescope) -> MidDefaults | LowDefaults:
         return _DEFAULTS_MODELS[telescope].model_validate(
@@ -76,12 +76,12 @@ class TMDataRepository:
 
     @overload
     def get_basic_capabilities(
-        self, telescope: Literal[Telescope.MID]
+        self, telescope: Literal[Telescope.SKA_MID]
     ) -> MidBasicCapabilities: ...
 
     @overload
     def get_basic_capabilities(
-        self, telescope: Literal[Telescope.LOW]
+        self, telescope: Literal[Telescope.SKA_LOW]
     ) -> LowBasicCapabilities: ...
 
     def get_basic_capabilities(
@@ -106,12 +106,12 @@ class TMDataRepository:
 
     @overload
     def get_capability_sets(
-        self, telescope: Literal[Telescope.MID]
+        self, telescope: Literal[Telescope.SKA_MID]
     ) -> list[MidCapabilitySet]: ...
 
     @overload
     def get_capability_sets(
-        self, telescope: Literal[Telescope.LOW]
+        self, telescope: Literal[Telescope.SKA_LOW]
     ) -> list[LowCapabilitySet]: ...
 
     def get_capability_sets(
@@ -121,12 +121,12 @@ class TMDataRepository:
 
     @overload
     def get_capability_set(
-        self, telescope: Literal[Telescope.MID], name: str
+        self, telescope: Literal[Telescope.SKA_MID], name: str
     ) -> MidCapabilitySet: ...
 
     @overload
     def get_capability_set(
-        self, telescope: Literal[Telescope.LOW], name: str
+        self, telescope: Literal[Telescope.SKA_LOW], name: str
     ) -> LowCapabilitySet: ...
 
     def get_capability_set(self, telescope: Telescope, name: str) -> CapabilitySet:
@@ -145,7 +145,7 @@ class TMDataRepository:
     ) -> list[SubarrayTemplate]:
         """A template belongs to the capability set when its name matches one
         of the set's ``subarray_templates`` patterns (e.g. ``"*_AA2"``) and
-        starts with the set's telescope (e.g. ``"MID_"``). A pattern alone is
+        starts with the set's telescope (e.g. ``"SKA_MID_"``). A pattern alone is
         not enough: ``"*_AA2"`` matches both telescopes' AA2 templates."""
         patterns = (
             self.get_capability_set(telescope, capability_set).subarray_templates or []

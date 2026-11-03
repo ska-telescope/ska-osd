@@ -74,29 +74,29 @@ def get_configuration(repository: OSDRepository) -> Configuration:
     return Configuration(
         ska_mid=MidConfiguration(
             frequency_band=repository.get_basic_capabilities(
-                Telescope.MID
+                Telescope.SKA_MID
             ).frequency_bands,
-            constraints=repository.get_constraints(Telescope.MID),
+            constraints=repository.get_constraints(Telescope.SKA_MID),
             subarrays=[
                 MidConfigurationCapabilitySet.model_validate(
                     capability_set, from_attributes=True
                 )
-                for capability_set in repository.get_capability_sets(Telescope.MID)
+                for capability_set in repository.get_capability_sets(Telescope.SKA_MID)
             ],
-            spfrx_defaults=repository.get_defaults(Telescope.MID).spfrx_defaults,
+            spfrx_defaults=repository.get_defaults(Telescope.SKA_MID).spfrx_defaults,
         ),
         ska_low=LowConfiguration(
-            frequency_band=repository.get_basic_capabilities(Telescope.LOW),
-            constraints=repository.get_constraints(Telescope.LOW),
+            frequency_band=repository.get_basic_capabilities(Telescope.SKA_LOW),
+            constraints=repository.get_constraints(Telescope.SKA_LOW),
             quality_attribute_metrics=ConfigurationLowQualityAttributeMetrics.model_validate(
-                repository.get_defaults(Telescope.LOW).quality_attribute_metrics,
+                repository.get_defaults(Telescope.SKA_LOW).quality_attribute_metrics,
                 from_attributes=True,
             ),
             subarrays=[
                 LowConfigurationCapabilitySet.model_validate(
                     capability_set, from_attributes=True
                 )
-                for capability_set in repository.get_capability_sets(Telescope.LOW)
+                for capability_set in repository.get_capability_sets(Telescope.SKA_LOW)
             ],
         ),
     )

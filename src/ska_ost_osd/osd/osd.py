@@ -24,6 +24,12 @@ from .common.constant import (
 
 LOGGER = logging.getLogger(__name__)
 
+# The telescope names the capability documents and responses use
+_LEGACY_TELESCOPE_NAMES = {
+    Telescope.SKA_MID: "mid",
+    Telescope.SKA_LOW: "low",
+}
+
 
 class OSD:
     """Build OSD responses from telescope capability documents and cycle definitions."""
@@ -38,7 +44,9 @@ class OSD:
     ) -> None:
         """Initialize the OSD class.
 
-        :param telescope: requested telescope name (``"mid"`` or ``"low"``).
+        :param telescope: requested telescope, ``Telescope.SKA_MID`` or
+            ``Telescope.SKA_LOW``. The legacy names ``"mid"`` and ``"low"``
+            are still accepted.
         :param array_assembly: requested capability-set name, such as ``"AA2"`` or ``"AA2_SV"``.
         :param tmdata: TMData, TMData class object.
         :param cycle_id: int, cycle identifier.
@@ -46,7 +54,7 @@ class OSD:
         :return: None
         """
         self.cycle_id = cycle_id
-        self.requested_telescope = telescope
+        self.requested_telescope = _LEGACY_TELESCOPE_NAMES.get(telescope, telescope)
         self.requested_capability_set = array_assembly
         self.tmdata = tmdata
         self.process_templates = process_templates

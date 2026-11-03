@@ -17,7 +17,7 @@ from ska_ost_osd.osd.models.cycles import CycleID
     "error",
     [
         CycleNotFoundError(CycleID(3), [CycleID(1), CycleID(2)]),
-        CapabilitySetNotFoundError(Telescope.LOW, "AA3", ["AA1", "AA2"]),
+        CapabilitySetNotFoundError(Telescope.SKA_LOW, "AA3", ["AA1", "AA2"]),
         FrequencyBandNotFoundError("Band_9", ["Band_1"]),
         Band5bSubbandNotFoundError("Band_5b", 4, [1, 2, 3]),
     ],

@@ -105,7 +105,7 @@ class MidBasicCapabilities(OSDBaseModel):
 
 
 class MidCapabilitySet(CapabilitySetBase):
-    telescope: Literal[Telescope.MID] = Telescope.MID
+    telescope: Literal[Telescope.SKA_MID] = Telescope.SKA_MID
     allowed_channel_width_values_hz: list[int]
     allowed_channel_count_range_min: list[int]
     allowed_channel_count_range_max: list[int]
@@ -146,7 +146,7 @@ class LowBasicCapabilities(FrequencyBand):
 
 
 class LowCapabilitySet(CapabilitySetBase):
-    telescope: Literal[Telescope.LOW] = Telescope.LOW
+    telescope: Literal[Telescope.SKA_LOW] = Telescope.SKA_LOW
     number_substations: int = Field(ge=0)
     number_subarray_beams: int = Field(ge=0)
     number_stations: int = Field(ge=0)
