@@ -192,10 +192,26 @@ class OSD:
         return {self.requested_telescope.lower(): cycle_capability_set}, None
 
     def get_telescope_capability_data(self, telescope: str) -> dict[str, Any]:
-        """Load one telescope capability document and optional template mappings."""
-        telescope_capability_data = self.tmdata[
-            self.capability_filepaths[telescope]
-        ].get_dict()
+        """Load one telescope capability document and optional template mappings.
+
+        The document is rebuilt in its legacy shape: the capabilities file,
+        with the basic capabilities and each capability set from their own
+        files."""
+        capability_filepath = self.capability_filepaths[telescope]
+        telescope_dir = posixpath.dirname(capability_filepath)
+        capability_sets_dir = f"{telescope_dir}/capabilities"
+        telescope_capability_data = {
+            **self.tmdata[capability_filepath].get_dict(),
+            "basic_capabilities": self.tmdata[
+                f"{telescope_dir}/basic_capabilities.json"
+            ].get_dict(),
+            **{
+                name.removesuffix(".json"): self.tmdata[
+                    f"{capability_sets_dir}/{name}"
+                ].get_dict()
+                for name in sorted(self.tmdata[capability_sets_dir])
+            },
+        }
         if not self.process_templates:
             return telescope_capability_data
 
@@ -243,14 +259,8 @@ class OSD:
             capability_set,
         ) in selected_telescope_capability_sets.items():
             telescope_capability_data = self.get_telescope_capability_data(telescope)
-            basic_capabilities_filepath = posixpath.join(
-                posixpath.dirname(self.capability_filepaths[telescope]),
-                "basic_capabilities.json",
-            )
             selected_data = {
-                "basic_capabilities": self.tmdata[
-                    basic_capabilities_filepath
-                ].get_dict()
+                "basic_capabilities": telescope_capability_data["basic_capabilities"]
             }
 
             if capability_set is None:

@@ -54,10 +54,11 @@ def test_get_osd_data_without_cycle_returns_complete_catalogue(tests_tmdata):
     assert set(result["capabilities"]) == {"mid", "low"}
 
     for capability in ("mid", "low"):
-        source_data = tests_tmdata[osd_file_mapping[capability]].get_dict()
-        assert set(result["capabilities"][capability]) == (
-            set(source_data) - {"telescope", "constraints"}
-        ) | {"basic_capabilities"}
+        assert set(result["capabilities"][capability]) == {
+            "basic_capabilities",
+            "AA1",
+            "AA2",
+        }
 
 
 def test_invalid_get_osd_data_capability(tests_tmdata):
@@ -278,13 +279,10 @@ def test_get_osd_using_tmdata_capability_only_returns_complete_catalogue(
 ):
     """A capability-only query returns all of that capability's assemblies."""
     osd_data = get_osd_using_tmdata(tests_tmdata, telescope=Telescope.SKA_MID)
-    source_data = tests_tmdata[osd_file_mapping["mid"]].get_dict()
 
     assert "observatory_policy" not in osd_data
     assert set(osd_data["capabilities"]) == {"mid"}
-    assert set(osd_data["capabilities"]["mid"]) == (
-        set(source_data) - {"telescope", "constraints"}
-    ) | {"basic_capabilities"}
+    assert set(osd_data["capabilities"]["mid"]) == {"basic_capabilities", "AA1", "AA2"}
 
 
 @pytest.mark.parametrize(

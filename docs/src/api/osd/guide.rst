@@ -31,9 +31,13 @@ Folder Structure
     │   ├── cycle_1.json
     │   └── cycle_<id>.json
     ├── ska1_low
+    │   ├── capabilities
+    │   │   └── <capability set>.json
     │   ├── basic_capabilities.json
     │   └── low_capabilities.json
     └── ska1_mid
+        ├── capabilities
+        │   └── <capability set>.json
         ├── basic_capabilities.json
         └── mid_capabilities.json
 
@@ -43,7 +47,9 @@ Folder Structure
 * `low_capabilities.json <https://confluence.skatelescope.org/pages/viewpage.action?spaceKey=SWSI&title=Observatory+Static+Data>`_
 
 Each telescope's basic capabilities (Mid's receiver bands, Low's frequency
-band and channels) are in its ``basic_capabilities.json`` file.
+band and channels) are in its ``basic_capabilities.json`` file, and each of
+its capability sets is in its own file in ``capabilities``, named after the
+capability set, such as ``capabilities/AA2.json``.
 
 .. note::
 
@@ -105,8 +111,8 @@ Keys                      Description
 observatory_policy        file content of the selected ``cycles/cycle_<id>.json`` file
 telescope_capabilities    value of ``telescope_capabilities`` in the selected cycle file
 capabilities              key value pair of mid and low
-Mid                       file content of ``mid_capabilities.json`` with ``basic_capabilities`` and ``Array Assembly`` AA0.5, AA1 etc
-Low                       file content of ``low_capabilities.json`` with ``basic_capabilities`` and ``Array Assembly`` AA0.5, AA1 etc
+Mid                       ``basic_capabilities`` and the capability sets (``Array Assembly`` AA0.5, AA1 etc) of SKA-Mid
+Low                       ``basic_capabilities`` and the capability sets (``Array Assembly`` AA0.5, AA1 etc) of SKA-Low
 ======================    ============================================================================================================
 
 

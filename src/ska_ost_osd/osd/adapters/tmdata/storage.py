@@ -14,15 +14,18 @@ from ska_ost_osd.osd.adapters.tmdata.models import (
     CycleFile,
     LowBasicCapabilitiesFile,
     LowCapabilitiesFile,
+    LowCapabilitySetFile,
     LowDefaultsFile,
     MidBasicCapabilitiesFile,
     MidCapabilitiesFile,
+    MidCapabilitySetFile,
     MidDefaultsFile,
     SubarrayTemplateLibraryFile,
 )
 from ska_ost_osd.osd.common.constant import (
     BASIC_CAPABILITIES_JSON_FILE_PATHS,
     CAPABILITIES_JSON_FILE_PATHS,
+    CAPABILITY_SETS_TMDATA_DIRS,
     DEFAULTS_JSON_FILE_PATHS,
     OBSERVING_CYCLES_TMDATA_DIR,
     SUBARRAY_TEMPLATES_PATH,
@@ -33,6 +36,11 @@ from ska_ost_osd.osd.models.cycles import CycleID
 _CAPABILITIES_FILE_MODELS = {
     Telescope.SKA_MID: MidCapabilitiesFile,
     Telescope.SKA_LOW: LowCapabilitiesFile,
+}
+
+_CAPABILITY_SET_FILE_MODELS = {
+    Telescope.SKA_MID: MidCapabilitySetFile,
+    Telescope.SKA_LOW: LowCapabilitySetFile,
 }
 
 _BASIC_CAPABILITIES_FILE_MODELS = {
@@ -90,8 +98,7 @@ def get_telescope_capabilities(
 def get_telescope_capabilities(
     tmdata: TMData, telescope: Telescope
 ) -> MidCapabilitiesFile | LowCapabilitiesFile:
-    """Read one telescope's capabilities file: its elevation constraints
-    and capability sets.
+    """Read one telescope's capabilities file: its elevation constraints.
 
     :param tmdata: TMData to read from.
     :param telescope: the telescope.
@@ -102,6 +109,45 @@ def get_telescope_capabilities(
     return _CAPABILITIES_FILE_MODELS[telescope].model_validate(
         _read(tmdata, CAPABILITIES_JSON_FILE_PATHS[telescope])
     )
+
+
+@overload
+def get_capability_set_files(
+    tmdata: TMData, telescope: Literal[Telescope.SKA_MID]
+) -> dict[str, MidCapabilitySetFile]: ...
+
+
+@overload
+def get_capability_set_files(
+    tmdata: TMData, telescope: Literal[Telescope.SKA_LOW]
+) -> dict[str, LowCapabilitySetFile]: ...
+
+
+def get_capability_set_files(
+    tmdata: TMData, telescope: Telescope
+) -> dict[str, MidCapabilitySetFile] | dict[str, LowCapabilitySetFile]:
+    """Read each of one telescope's capability set files,
+    ``ska1_<telescope>/capabilities/<name>.json``.
+
+    :param tmdata: TMData to read from.
+    :param telescope: the telescope.
+    :return: the telescope's capability set files keyed by name, the file
+        name without ``.json``, in name order.
+    :raises FileNotFoundError: If the tmdata has no capabilities directory
+        for the telescope.
+    """
+    directory = CAPABILITY_SETS_TMDATA_DIRS[telescope]
+    if not any(key.startswith(f"{directory}/") for key in tmdata):
+        raise FileNotFoundError(f"file not found: {directory}")
+    names = sorted(
+        key.removesuffix(".json") for key in tmdata[directory] if key.endswith(".json")
+    )
+    return {
+        name: _CAPABILITY_SET_FILE_MODELS[telescope].model_validate(
+            _read(tmdata, f"{directory}/{name}.json")
+        )
+        for name in names
+    }
 
 
 @overload

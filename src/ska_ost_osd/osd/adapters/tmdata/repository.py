@@ -21,6 +21,11 @@ from ska_ost_osd.osd.models.cycles import Cycle, CycleID
 from ska_ost_osd.osd.models.defaults import LowDefaults, MidDefaults
 from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplate
 
+_CAPABILITY_SET_MODELS = {
+    Telescope.SKA_MID: MidCapabilitySet,
+    Telescope.SKA_LOW: LowCapabilitySet,
+}
+
 _DEFAULTS_MODELS = {
     Telescope.SKA_MID: MidDefaults,
     Telescope.SKA_LOW: LowDefaults,
@@ -115,7 +120,14 @@ class TMDataRepository:
     def get_capability_sets(
         self, telescope: Telescope
     ) -> list[MidCapabilitySet] | list[LowCapabilitySet]:
-        return storage.get_telescope_capabilities(self._tmdata, telescope).subarrays
+        return [
+            _CAPABILITY_SET_MODELS[telescope].model_validate(
+                {"name": name, **capability_set_file.model_dump()}
+            )
+            for name, capability_set_file in storage.get_capability_set_files(
+                self._tmdata, telescope
+            ).items()
+        ]
 
     @overload
     def get_capability_set(

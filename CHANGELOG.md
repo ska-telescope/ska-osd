@@ -34,6 +34,7 @@ Unreleased
 * [BREAKING] Removed the sun, moon and Jupiter avoidance angles from the capabilities
   files; they are defined in ``mid_defaults.json`` and ``low_defaults.json``
 * Moved telescope ``basic_capabilities`` to standalone tmdata files
+* Moved telescope capability sets to standalone tmdata files
 * Removed the unused semantic validation constants from ``tmdata/instrument``
 * ``get_osd_using_tmdata`` queries without a cycle now return the complete capability
   catalogue

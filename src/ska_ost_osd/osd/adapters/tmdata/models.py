@@ -2,17 +2,15 @@
 whole. ``storage`` reads the files into these, and ``TMDataRepository`` maps
 them to the reader models."""
 
-import re
 from typing import Any, Literal, Self
 
 from pydantic import AliasChoices, Field, model_validator
 
-from ska_ost_osd.osd.common.constant import ARRAY_ASSEMBLY_PATTERN
 from ska_ost_osd.osd.models.capabilities import (
     LowBasicCapabilities,
-    LowCapabilitySet,
+    LowCBFMode,
     MidBasicCapabilities,
-    MidCapabilitySet,
+    MidCBFMode,
 )
 from ska_ost_osd.osd.models.cycles import (
     CycleID,
@@ -44,40 +42,80 @@ class TelescopeCapabilitiesFileBase(OSDBaseModel):
 
     constraints: ElevationConstraints
 
-    @model_validator(mode="before")
-    @classmethod
-    def collect_subarrays(cls, data: Any) -> Any:
-        """
-        In the tmdata file each array assembly is a top-level key;
-        gather the keys matching ``ARRAY_ASSEMBLY_PATTERN`` into
-        ``subarrays``, using the key as the subarray name.
-
-        The pattern separates the array assemblies from the file's other
-        top-level keys.
-        """
-        if not isinstance(data, dict) or "subarrays" in data:
-            return data
-        data = data.copy()
-        data["subarrays"] = [
-            {"name": key, **data.pop(key)}
-            for key in list(data)
-            if re.match(ARRAY_ASSEMBLY_PATTERN, key)
-        ]
-        return data
-
 
 class MidCapabilitiesFile(TelescopeCapabilitiesFileBase):
     """Top-level model for mid_capabilities.json."""
 
     telescope: Literal["Mid"] = "Mid"
-    subarrays: list[MidCapabilitySet]
 
 
 class LowCapabilitiesFile(TelescopeCapabilitiesFileBase):
     """Top-level model for low_capabilities.json."""
 
     telescope: Literal["Low"] = "Low"
-    subarrays: list[LowCapabilitySet]
+
+
+class CapabilitySetFileBase(OSDBaseModel):
+    """Base for the Mid and Low capability set file models. Each file is
+    named after its capability set, so it holds neither the name nor the
+    telescope."""
+
+    available_bandwidth_hz: float = Field(gt=0)
+    number_pst_beams: int = Field(ge=0)
+    number_fsps: int = Field(ge=0)
+    max_baseline_km: float = Field(gt=0)
+    number_zoom_windows: int = Field(ge=0)
+    number_zoom_channels: int = Field(ge=0)
+    number_pss_beams: int = Field(ge=0)
+    ps_beam_bandwidth_hz: float = Field(ge=0)
+    # Name patterns, e.g. ["*_AA2"]; the *_ITF capability sets have none
+    subarray_templates: list[str] | None = None
+
+
+class MidCapabilitySetFile(CapabilitySetFileBase):
+    """Model for ska1_mid/capabilities/<name>.json."""
+
+    number_dish_ids: list[str]
+    allowed_channel_width_values_hz: list[int]
+    allowed_channel_count_range_min: list[int]
+    allowed_channel_count_range_max: list[int]
+    available_receivers: list[str]
+    cbf_modes: list[MidCBFMode]
+    number_ska_dishes: int = Field(ge=0)
+    number_meerkat_dishes: int = Field(ge=0)
+    number_meerkatplus_dishes: int = Field(ge=0)
+
+    @model_validator(mode="after")
+    def check_dish_count(self) -> Self:
+        # number_dish_ids lists SKA dishes only; MeerKAT dishes are counted
+        # separately
+        if self.number_ska_dishes != len(self.number_dish_ids):
+            raise ValueError(
+                f"number_ska_dishes ({self.number_ska_dishes}) does not match "
+                f"the number of dish IDs ({len(self.number_dish_ids)})"
+            )
+        return self
+
+
+class LowCapabilitySetFile(CapabilitySetFileBase):
+    """Model for ska1_low/capabilities/<name>.json."""
+
+    number_station_ids: list[int]
+    number_substations: int = Field(ge=0)
+    number_subarray_beams: int = Field(ge=0)
+    number_stations: int = Field(ge=0)
+    cbf_modes: list[LowCBFMode]
+    number_vlbi_beams: int = Field(ge=0)
+    allowed_zoom_factors: list[int]
+
+    @model_validator(mode="after")
+    def check_station_count(self) -> Self:
+        if self.number_stations != len(self.number_station_ids):
+            raise ValueError(
+                f"number_stations ({self.number_stations}) does not match "
+                f"the number of station IDs ({len(self.number_station_ids)})"
+            )
+        return self
 
 
 # Basic capabilities file structure matches the reader models

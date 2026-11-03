@@ -14,9 +14,11 @@ from ska_ost_osd.osd.adapters.tmdata.models import (
     CycleFile,
     LowBasicCapabilitiesFile,
     LowCapabilitiesFile,
+    LowCapabilitySetFile,
     LowDefaultsFile,
     MidBasicCapabilitiesFile,
     MidCapabilitiesFile,
+    MidCapabilitySetFile,
     MidDefaultsFile,
     SubarrayTemplateLibraryFile,
 )
@@ -38,6 +40,14 @@ TMDATA = Path(__file__).parents[4] / "tmdata"
             SubarrayTemplateLibraryFile,
             "subarray_templates/subarray_template_library.json",
         ),
+    ]
+    + [
+        (model, f"{directory}/{capability_set.name}")
+        for model, directory in [
+            (MidCapabilitySetFile, "ska1_mid/capabilities"),
+            (LowCapabilitySetFile, "ska1_low/capabilities"),
+        ]
+        for capability_set in sorted((TMDATA / directory).glob("*.json"))
     ]
     + [
         (CycleFile, f"cycles/{cycle.name}")

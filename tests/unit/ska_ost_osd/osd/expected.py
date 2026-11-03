@@ -9,8 +9,10 @@ from ska_ost_osd.osd.adapters.tmdata.models import (
     CycleFile,
     ElevationConstraints,
     LowCapabilitiesFile,
+    LowCapabilitySetFile,
     LowDefaultsFile,
     MidCapabilitiesFile,
+    MidCapabilitySetFile,
     MidDefaultsFile,
     SubarrayTemplateLibraryFile,
 )
@@ -145,7 +147,7 @@ CYCLE_2_FILE = CycleFile(
     telescope_capabilities=TelescopeCapabilities(ska_mid="AA2", ska_low="AA2"),
 )
 
-# tests/tmdata/ska1_mid/mid_capabilities.json
+# tests/tmdata/ska1_mid/capabilities/AA1.json and AA2.json
 MID_AA1 = MidCapabilitySet(
     name="AA1",
     receptors=["SKA001", "SKA002", "SKA003", "SKA004"],
@@ -254,12 +256,22 @@ MID_BASIC_CAPABILITIES = MidBasicCapabilities(
     ],
 )
 
+# The capability sets as stored: keyed by name, with the receptors under the
+# file's own key and no telescope
+MID_CAPABILITY_SET_FILES = {
+    capability_set.name: MidCapabilitySetFile(
+        number_dish_ids=capability_set.receptors,
+        **capability_set.model_dump(exclude={"name", "telescope", "receptors"}),
+    )
+    for capability_set in (MID_AA1, MID_AA2)
+}
+
+# tests/tmdata/ska1_mid/mid_capabilities.json
 MID_CAPABILITIES_FILE = MidCapabilitiesFile(
     constraints=ElevationConstraints(min_elevation_deg=15.0, max_elevation_deg=90.0),
-    subarrays=[MID_AA1, MID_AA2],
 )
 
-# tests/tmdata/ska1_low/low_capabilities.json
+# tests/tmdata/ska1_low/capabilities/AA1.json and AA2.json
 LOW_AA1 = LowCapabilitySet(
     name="AA1",
     receptors=[345, 346, 347, 348],
@@ -313,9 +325,17 @@ LOW_BASIC_CAPABILITIES = LowBasicCapabilities(
     number_pss_channels_per_coarse_channel=54,
 )
 
+LOW_CAPABILITY_SET_FILES = {
+    capability_set.name: LowCapabilitySetFile(
+        number_station_ids=capability_set.receptors,
+        **capability_set.model_dump(exclude={"name", "telescope", "receptors"}),
+    )
+    for capability_set in (LOW_AA1, LOW_AA2)
+}
+
+# tests/tmdata/ska1_low/low_capabilities.json
 LOW_CAPABILITIES_FILE = LowCapabilitiesFile(
     constraints=ElevationConstraints(min_elevation_deg=45.0, max_elevation_deg=90.0),
-    subarrays=[LOW_AA1, LOW_AA2],
 )
 
 # The defaults in tests/tmdata/ska1_mid/mid_defaults.json

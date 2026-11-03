@@ -18,9 +18,11 @@ from ska_ost_osd.osd.adapters.tmdata.models import (
     CycleFile,
     LowBasicCapabilitiesFile,
     LowCapabilitiesFile,
+    LowCapabilitySetFile,
     LowDefaultsFile,
     MidBasicCapabilitiesFile,
     MidCapabilitiesFile,
+    MidCapabilitySetFile,
     MidDefaultsFile,
     SubarrayTemplateLibraryFile,
 )
@@ -38,7 +40,11 @@ from ska_ost_osd.osd.models.capabilities import (
 )
 from ska_ost_osd.osd.models.constraints import Constraints
 from ska_ost_osd.osd.osd import get_osd_using_tmdata
-from tests.unit.ska_ost_osd.osd.expected import MID_BASIC_CAPABILITIES
+from tests.unit.ska_ost_osd.osd.expected import (
+    LOW_AA2,
+    MID_AA2,
+    MID_BASIC_CAPABILITIES,
+)
 
 TESTS_TMDATA = Path(__file__).parents[3] / "tmdata"
 
@@ -46,6 +52,8 @@ MID_CAPABILITIES = "ska1_mid/mid_capabilities.json"
 LOW_CAPABILITIES = "ska1_low/low_capabilities.json"
 MID_BASIC_CAPABILITIES_FILE = "ska1_mid/basic_capabilities.json"
 LOW_BASIC_CAPABILITIES_FILE = "ska1_low/basic_capabilities.json"
+MID_CAPABILITY_SET = "ska1_mid/capabilities/AA2.json"
+LOW_CAPABILITY_SET = "ska1_low/capabilities/AA2.json"
 MID_DEFAULTS = "ska1_mid/mid_defaults.json"
 LOW_DEFAULTS = "ska1_low/low_defaults.json"
 CYCLE = "cycles/cycle_1.json"
@@ -61,25 +69,26 @@ class TestOsdOutput:
     """What the OSD serves from the tmdata validates against the models."""
 
     @pytest.mark.parametrize(
-        "model, telescope, key, path",
+        "model, telescope, key",
         [
-            (MidCapabilitiesFile, Telescope.SKA_MID, "mid", MID_CAPABILITIES),
-            (LowCapabilitiesFile, Telescope.SKA_LOW, "low", LOW_CAPABILITIES),
+            (MidCapabilitySet, Telescope.SKA_MID, "mid"),
+            (LowCapabilitySet, Telescope.SKA_LOW, "low"),
         ],
     )
     def test_template_processed_output_validates(
-        self, model, telescope, key, path, tests_tmdata
+        self, model, telescope, key, tests_tmdata
     ):
-        """The OSD's output with subarray templates resolved, as
-        ska-oso-services fetches it, validates once the constraints, which
-        the OSD no longer returns, are added from the capabilities file."""
+        """The capability sets in the OSD's output with subarray templates
+        resolved, as ska-oso-services fetches it, validate."""
         osd_data = get_osd_using_tmdata(
             tests_tmdata, telescope=telescope, process_templates=True
         )
         served = osd_data["capabilities"][key]
         assert "constraints" not in served
 
-        model.model_validate({**served, "constraints": load(path)["constraints"]})
+        for name, capability_set in served.items():
+            if name != "basic_capabilities":
+                model.model_validate({"name": name, **capability_set})
 
 
 class TestBreakingChanges:
@@ -90,9 +99,9 @@ class TestBreakingChanges:
         "model, path, break_file",
         [
             (
-                MidCapabilitiesFile,
-                MID_CAPABILITIES,
-                lambda data: data["AA2"].pop("number_fsps"),
+                MidCapabilitySetFile,
+                MID_CAPABILITY_SET,
+                lambda data: data.pop("number_fsps"),
             ),
             (
                 LowBasicCapabilitiesFile,
@@ -144,56 +153,16 @@ class TestBreakingChanges:
 class TestCapabilities:
     """The capabilities models' own logic."""
 
-    def test_array_assemblies_are_found_by_name(self):
-        """Every top-level key matching the array assembly pattern, whether
-        an AA name or a telescope-prefixed one such as Low_ITF, becomes a
-        capability set, so a new one is picked up and other keys are
-        ignored. A capability set need not list subarray templates."""
-        data = load(LOW_CAPABILITIES)
-        names = {s.name for s in LowCapabilitiesFile.model_validate(data).subarrays}
-        data["AA3"] = data["AA2"]
-        data["Low_ITF"] = {
-            key: value
-            for key, value in data["AA2"].items()
-            if key != "subarray_templates"
-        }
-        data["version"] = "1.0"
-
-        capabilities = LowCapabilitiesFile.model_validate(data)
-
-        subarrays = {subarray.name: subarray for subarray in capabilities.subarrays}
-        assert set(subarrays) == names | {"AA3", "Low_ITF"}
-        assert subarrays["AA1"].receptors == data["AA1"]["number_station_ids"]
-        assert subarrays["Low_ITF"].subarray_templates is None
-
     @pytest.mark.parametrize(
-        "model, path, telescope",
-        [
-            (MidCapabilitiesFile, MID_CAPABILITIES, Telescope.SKA_MID),
-            (LowCapabilitiesFile, LOW_CAPABILITIES, Telescope.SKA_LOW),
-        ],
-    )
-    def test_capability_sets_know_their_telescope(self, model, path, telescope):
-        """tmdata doesn't repeat the telescope on each array assembly; the
-        capability set models fill it in."""
-        capabilities = model.model_validate(load(path))
-        assert {cs.telescope for cs in capabilities.subarrays} == {telescope}
-
-    @pytest.mark.parametrize(
-        "model, path, capability_set_model",
-        [
-            (MidCapabilitiesFile, MID_CAPABILITIES, MidCapabilitySet),
-            (LowCapabilitiesFile, LOW_CAPABILITIES, LowCapabilitySet),
-        ],
+        "expected, capability_set_model",
+        [(MID_AA2, MidCapabilitySet), (LOW_AA2, LowCapabilitySet)],
     )
     @pytest.mark.parametrize("mode", ["python", "json"])
     def test_capability_set_is_chosen_by_telescope(
-        self, model, path, capability_set_model, mode
+        self, expected, capability_set_model, mode
     ):
         """A serialised capability set reads back as the right capability
         set model, chosen by its telescope."""
-        expected = model.model_validate(load(path)).subarrays[0]
-
         capability_set = TypeAdapter(CapabilitySet).validate_python(
             expected.model_dump(mode=mode)
         )
@@ -202,10 +171,10 @@ class TestCapabilities:
         assert capability_set == expected
 
     def test_capability_set_rejects_another_telescope(self):
-        data = load(LOW_CAPABILITIES)["AA1"]
+        data = load(LOW_CAPABILITY_SET)
         with pytest.raises(ValidationError, match="telescope"):
             LowCapabilitySet.model_validate(
-                {"name": "AA1", **data, "telescope": "ska_mid"}
+                {"name": "AA2", **data, "telescope": "ska_mid"}
             )
 
     @pytest.mark.parametrize(
@@ -213,6 +182,8 @@ class TestCapabilities:
         [
             (MidCapabilitiesFile, MID_CAPABILITIES),
             (LowCapabilitiesFile, LOW_CAPABILITIES),
+            (MidCapabilitySetFile, MID_CAPABILITY_SET),
+            (LowCapabilitySetFile, LOW_CAPABILITY_SET),
         ],
     )
     def test_serialised_capabilities_validate(self, model, path):
@@ -249,15 +220,15 @@ class TestCapabilities:
                 "min_frequency_hz must not exceed max_frequency_hz",
             ),
             (
-                MidCapabilitiesFile,
-                MID_CAPABILITIES,
-                lambda data: data["AA2"]["number_dish_ids"].pop(),
+                MidCapabilitySetFile,
+                MID_CAPABILITY_SET,
+                lambda data: data["number_dish_ids"].pop(),
                 "number_ska_dishes",
             ),
             (
-                LowCapabilitiesFile,
-                LOW_CAPABILITIES,
-                lambda data: data["AA2"]["number_station_ids"].pop(),
+                LowCapabilitySetFile,
+                LOW_CAPABILITY_SET,
+                lambda data: data["number_station_ids"].pop(),
                 "number_stations",
             ),
         ],

@@ -1,0 +1,42 @@
+{
+  "number_stations": 16,
+  "number_substations": 512,
+  "number_subarray_beams": 8,
+  "max_baseline_km": 6.0,
+  "available_bandwidth_hz": 75000000.0,
+  "cbf_modes": [
+    "vis",
+    "pst"
+  ],
+  "number_zoom_windows": 0,
+  "number_zoom_channels": 0,
+  "number_pss_beams": 0,
+  "number_pst_beams": 1,
+  "number_vlbi_beams": 0,
+  "ps_beam_bandwidth_hz": 75000000.0,
+  "number_fsps": 6,
+  "number_station_ids": [
+    345,
+    346,
+    347,
+    348,
+    349,
+    350,
+    352,
+    353,
+    354,
+    355,
+    429,
+    430,
+    431,
+    432,
+    433,
+    434
+  ],
+  "allowed_zoom_factors": [
+    1,
+    2,
+    4,
+    8
+  ]
+}
