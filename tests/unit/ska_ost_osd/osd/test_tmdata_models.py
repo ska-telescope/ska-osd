@@ -16,8 +16,10 @@ from pydantic import TypeAdapter, ValidationError
 
 from ska_ost_osd.osd.adapters.tmdata.models import (
     CycleFile,
+    LowBasicCapabilitiesFile,
     LowCapabilitiesFile,
     LowDefaultsFile,
+    MidBasicCapabilitiesFile,
     MidCapabilitiesFile,
     MidDefaultsFile,
     SubarrayTemplateLibraryFile,
@@ -42,6 +44,8 @@ TESTS_TMDATA = Path(__file__).parents[3] / "tmdata"
 
 MID_CAPABILITIES = "ska1_mid/mid_capabilities.json"
 LOW_CAPABILITIES = "ska1_low/low_capabilities.json"
+MID_BASIC_CAPABILITIES_FILE = "ska1_mid/basic_capabilities.json"
+LOW_BASIC_CAPABILITIES_FILE = "ska1_low/basic_capabilities.json"
 MID_DEFAULTS = "ska1_mid/mid_defaults.json"
 LOW_DEFAULTS = "ska1_low/low_defaults.json"
 CYCLE = "cycles/cycle_1.json"
@@ -91,9 +95,11 @@ class TestBreakingChanges:
                 lambda data: data["AA2"].pop("number_fsps"),
             ),
             (
-                LowCapabilitiesFile,
-                LOW_CAPABILITIES,
-                lambda data: data.update(frequency=data.pop("basic_capabilities")),
+                LowBasicCapabilitiesFile,
+                LOW_BASIC_CAPABILITIES_FILE,
+                lambda data: data.update(
+                    coarse_channel_width=data.pop("coarse_channel_width_hz")
+                ),
             ),
             (
                 MidDefaultsFile,
@@ -235,11 +241,11 @@ class TestCapabilities:
                 "min_elevation_deg must not exceed max_elevation_deg",
             ),
             (
-                MidCapabilitiesFile,
-                MID_CAPABILITIES,
-                lambda data: data["basic_capabilities"]["receiver_information"][
-                    0
-                ].update(min_frequency_hz=2e9, max_frequency_hz=1e9),
+                MidBasicCapabilitiesFile,
+                MID_BASIC_CAPABILITIES_FILE,
+                lambda data: data["receiver_information"][0].update(
+                    min_frequency_hz=2e9, max_frequency_hz=1e9
+                ),
                 "min_frequency_hz must not exceed max_frequency_hz",
             ),
             (
@@ -247,12 +253,6 @@ class TestCapabilities:
                 MID_CAPABILITIES,
                 lambda data: data["AA2"]["number_dish_ids"].pop(),
                 "number_ska_dishes",
-            ),
-            (
-                MidCapabilitiesFile,
-                MID_CAPABILITIES,
-                lambda data: data["AA2"]["available_receivers"].append("Band_9"),
-                "available_receivers",
             ),
             (
                 LowCapabilitiesFile,
@@ -265,7 +265,6 @@ class TestCapabilities:
             "elevation range",
             "frequency range",
             "dish count",
-            "unknown receiver",
             "station count",
         ],
     )

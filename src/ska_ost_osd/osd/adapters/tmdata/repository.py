@@ -87,9 +87,7 @@ class TMDataRepository:
     def get_basic_capabilities(
         self, telescope: Telescope
     ) -> MidBasicCapabilities | LowBasicCapabilities:
-        return storage.get_telescope_capabilities(
-            self._tmdata, telescope
-        ).basic_capabilities
+        return storage.get_telescope_basic_capabilities(self._tmdata, telescope)
 
     def get_constraints(self, telescope: Telescope) -> Constraints:
         """tmdata stores the constraints in two files: the elevation limits

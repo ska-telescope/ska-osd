@@ -6,6 +6,8 @@ MID_CONSTANT_JSON_FILE_PATH = "ska1_mid/mid_capabilities.json"
 LOW_CONSTANT_JSON_FILE_PATH = "ska1_low/low_capabilities.json"
 MID_DEFAULTS_JSON_FILE_PATH = "ska1_mid/mid_defaults.json"
 LOW_DEFAULTS_JSON_FILE_PATH = "ska1_low/low_defaults.json"
+MID_BASIC_CAPABILITIES_JSON_FILE_PATH = "ska1_mid/basic_capabilities.json"
+LOW_BASIC_CAPABILITIES_JSON_FILE_PATH = "ska1_low/basic_capabilities.json"
 OBSERVING_CYCLES_TMDATA_DIR = "cycles"
 POLICIES_CONSTANT_JSON_FILE_PATH = "observatory_policies.json"
 RELEASE_FILE_PATH_LATEST = "version_mapping/latest_release.txt"
@@ -29,6 +31,11 @@ class Telescope(StrEnum):
 CAPABILITIES_JSON_FILE_PATHS = {
     Telescope.SKA_MID: MID_CONSTANT_JSON_FILE_PATH,
     Telescope.SKA_LOW: LOW_CONSTANT_JSON_FILE_PATH,
+}
+
+BASIC_CAPABILITIES_JSON_FILE_PATHS = {
+    Telescope.SKA_MID: MID_BASIC_CAPABILITIES_JSON_FILE_PATH,
+    Telescope.SKA_LOW: LOW_BASIC_CAPABILITIES_JSON_FILE_PATH,
 }
 
 DEFAULTS_JSON_FILE_PATHS = {

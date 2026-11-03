@@ -70,28 +70,22 @@ class MidCapabilitiesFile(TelescopeCapabilitiesFileBase):
     """Top-level model for mid_capabilities.json."""
 
     telescope: Literal["Mid"] = "Mid"
-    basic_capabilities: MidBasicCapabilities
     subarrays: list[MidCapabilitySet]
-
-    @model_validator(mode="after")
-    def check_available_receivers(self) -> Self:
-        rx_ids = {band.rx_id for band in self.basic_capabilities.frequency_bands}
-        for subarray in self.subarrays:
-            unknown = set(subarray.available_receivers) - rx_ids
-            if unknown:
-                raise ValueError(
-                    f"{subarray.name}: available_receivers {sorted(unknown)} "
-                    "not found in frequency_bands"
-                )
-        return self
 
 
 class LowCapabilitiesFile(TelescopeCapabilitiesFileBase):
     """Top-level model for low_capabilities.json."""
 
     telescope: Literal["Low"] = "Low"
-    basic_capabilities: LowBasicCapabilities
     subarrays: list[LowCapabilitySet]
+
+
+# Basic capabilities file structure matches the reader models
+MidBasicCapabilitiesFile = MidBasicCapabilities
+"""Model for ska1_mid/basic_capabilities.json."""
+
+LowBasicCapabilitiesFile = LowBasicCapabilities
+"""Model for ska1_low/basic_capabilities.json."""
 
 
 class AvoidanceConstraints(OSDBaseModel):

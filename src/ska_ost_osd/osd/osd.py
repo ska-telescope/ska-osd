@@ -1,4 +1,5 @@
 import logging
+import posixpath
 from functools import cached_property
 from typing import Any, Dict, Optional
 
@@ -64,7 +65,9 @@ class OSD:
         """Return telescope-keyed TMData capability document paths."""
         capability_filepaths = {}
         for entry in self.tmdata:
-            if entry.endswith("_capabilities.json"):
+            if entry.endswith("_capabilities.json") and not entry.endswith(
+                "/basic_capabilities.json"
+            ):
                 telescope = self.tmdata[entry].get_dict()["telescope"]
                 capability_filepaths[telescope.lower()] = entry
         return capability_filepaths
@@ -240,8 +243,14 @@ class OSD:
             capability_set,
         ) in selected_telescope_capability_sets.items():
             telescope_capability_data = self.get_telescope_capability_data(telescope)
+            basic_capabilities_filepath = posixpath.join(
+                posixpath.dirname(self.capability_filepaths[telescope]),
+                "basic_capabilities.json",
+            )
             selected_data = {
-                "basic_capabilities": telescope_capability_data["basic_capabilities"]
+                "basic_capabilities": self.tmdata[
+                    basic_capabilities_filepath
+                ].get_dict()
             }
 
             if capability_set is None:

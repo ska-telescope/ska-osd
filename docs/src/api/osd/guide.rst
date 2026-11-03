@@ -31,14 +31,19 @@ Folder Structure
     │   ├── cycle_1.json
     │   └── cycle_<id>.json
     ├── ska1_low
+    │   ├── basic_capabilities.json
     │   └── low_capabilities.json
     └── ska1_mid
+        ├── basic_capabilities.json
         └── mid_capabilities.json
 
 
 * `mid_capabilities.json <https://confluence.skatelescope.org/pages/viewpage.action?spaceKey=SWSI&title=Observatory+Static+Data>`_
 
 * `low_capabilities.json <https://confluence.skatelescope.org/pages/viewpage.action?spaceKey=SWSI&title=Observatory+Static+Data>`_
+
+Each telescope's basic capabilities (Mid's receiver bands, Low's frequency
+band and channels) are in its ``basic_capabilities.json`` file.
 
 .. note::
 

@@ -1,0 +1,11 @@
+{
+  "min_frequency_hz": 50000000.0,
+  "max_frequency_hz": 350000000.0,
+  "min_coarse_channel": 64,
+  "max_coarse_channel": 447,
+  "coarse_channel_width_hz": 7.8125E+5,
+  "number_continuum_channels_per_coarse_channel": 144,
+  "number_zoom_channels_per_coarse_channel": 432,
+  "number_pst_channels_per_coarse_channel": 216,
+  "number_pss_channels_per_coarse_channel": 54
+}

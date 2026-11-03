@@ -1,0 +1,57 @@
+{
+  "receiver_information": [
+    {
+      "max_frequency_hz": 1050000000,
+      "min_frequency_hz": 350000000,
+      "rx_id": "Band_1"
+    },
+    {
+      "max_frequency_hz": 1760000000,
+      "min_frequency_hz": 950000000,
+      "rx_id": "Band_2"
+    },
+    {
+      "max_frequency_hz": 3050000000,
+      "min_frequency_hz": 1650000000,
+      "rx_id": "Band_3"
+    },
+    {
+      "max_frequency_hz": 5180000000,
+      "min_frequency_hz": 2800000000,
+      "rx_id": "Band_4"
+    },
+    {
+      "max_frequency_hz": 8500000000,
+      "min_frequency_hz": 4600000000,
+      "rx_id": "Band_5a"
+    },
+    {
+      "max_frequency_hz": 13510000000,
+      "min_frequency_hz": 11450000000,
+      "rx_id": "Band_5b",
+      "sub_bands": [
+        {
+          "sub_band": 1,
+          "max_frequency_hz": 12150000000,
+          "min_frequency_hz": 11450000000,
+          "lo_frequency_hz": 11100000000,
+          "sideband": "high"
+        },
+        {
+          "sub_band": 2,
+          "max_frequency_hz": 13510000000,
+          "min_frequency_hz": 12810000000,
+          "lo_frequency_hz": 13860000000,
+          "sideband": "low"
+        },
+        {
+          "sub_band": 3,
+          "max_frequency_hz": 12850000000,
+          "min_frequency_hz": 12150000000,
+          "lo_frequency_hz": 13200000000,
+          "sideband": "low"
+        }
+      ]
+    }
+  ]
+}

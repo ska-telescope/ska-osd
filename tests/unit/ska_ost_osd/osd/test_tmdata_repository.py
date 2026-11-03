@@ -103,7 +103,7 @@ class TestGetBasicCapabilities:
 
     def test_raises_when_file_missing(self, empty_tmdata_repository):
         with pytest.raises(
-            FileNotFoundError, match="file not found: ska1_low/low_capabilities.json"
+            FileNotFoundError, match="file not found: ska1_low/basic_capabilities.json"
         ):
             empty_tmdata_repository.get_basic_capabilities(Telescope.SKA_LOW)
 

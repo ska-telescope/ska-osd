@@ -199,6 +199,7 @@ MID_AA2 = MidCapabilitySet(
     number_meerkatplus_dishes=0,
 )
 
+# tests/tmdata/ska1_mid/basic_capabilities.json
 MID_BASIC_CAPABILITIES = MidBasicCapabilities(
     frequency_bands=[
         MidFrequencyBand(
@@ -255,7 +256,6 @@ MID_BASIC_CAPABILITIES = MidBasicCapabilities(
 
 MID_CAPABILITIES_FILE = MidCapabilitiesFile(
     constraints=ElevationConstraints(min_elevation_deg=15.0, max_elevation_deg=90.0),
-    basic_capabilities=MID_BASIC_CAPABILITIES,
     subarrays=[MID_AA1, MID_AA2],
 )
 
@@ -300,6 +300,7 @@ LOW_AA2 = LowCapabilitySet(
     allowed_zoom_factors=[1, 2, 4, 8],
 )
 
+# tests/tmdata/ska1_low/basic_capabilities.json
 LOW_BASIC_CAPABILITIES = LowBasicCapabilities(
     min_frequency_hz=50_000_000.0,
     max_frequency_hz=350_000_000.0,
@@ -314,7 +315,6 @@ LOW_BASIC_CAPABILITIES = LowBasicCapabilities(
 
 LOW_CAPABILITIES_FILE = LowCapabilitiesFile(
     constraints=ElevationConstraints(min_elevation_deg=45.0, max_elevation_deg=90.0),
-    basic_capabilities=LOW_BASIC_CAPABILITIES,
     subarrays=[LOW_AA1, LOW_AA2],
 )
 

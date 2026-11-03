@@ -12,13 +12,16 @@ from ska_telmodel_client import TMData
 
 from ska_ost_osd.osd.adapters.tmdata.models import (
     CycleFile,
+    LowBasicCapabilitiesFile,
     LowCapabilitiesFile,
     LowDefaultsFile,
+    MidBasicCapabilitiesFile,
     MidCapabilitiesFile,
     MidDefaultsFile,
     SubarrayTemplateLibraryFile,
 )
 from ska_ost_osd.osd.common.constant import (
+    BASIC_CAPABILITIES_JSON_FILE_PATHS,
     CAPABILITIES_JSON_FILE_PATHS,
     DEFAULTS_JSON_FILE_PATHS,
     OBSERVING_CYCLES_TMDATA_DIR,
@@ -30,6 +33,11 @@ from ska_ost_osd.osd.models.cycles import CycleID
 _CAPABILITIES_FILE_MODELS = {
     Telescope.SKA_MID: MidCapabilitiesFile,
     Telescope.SKA_LOW: LowCapabilitiesFile,
+}
+
+_BASIC_CAPABILITIES_FILE_MODELS = {
+    Telescope.SKA_MID: MidBasicCapabilitiesFile,
+    Telescope.SKA_LOW: LowBasicCapabilitiesFile,
 }
 
 _DEFAULTS_FILE_MODELS = {
@@ -82,8 +90,8 @@ def get_telescope_capabilities(
 def get_telescope_capabilities(
     tmdata: TMData, telescope: Telescope
 ) -> MidCapabilitiesFile | LowCapabilitiesFile:
-    """Read one telescope's capabilities file: its elevation constraints,
-    frequency bands and capability sets.
+    """Read one telescope's capabilities file: its elevation constraints
+    and capability sets.
 
     :param tmdata: TMData to read from.
     :param telescope: the telescope.
@@ -93,6 +101,35 @@ def get_telescope_capabilities(
     """
     return _CAPABILITIES_FILE_MODELS[telescope].model_validate(
         _read(tmdata, CAPABILITIES_JSON_FILE_PATHS[telescope])
+    )
+
+
+@overload
+def get_telescope_basic_capabilities(
+    tmdata: TMData, telescope: Literal[Telescope.SKA_MID]
+) -> MidBasicCapabilitiesFile: ...
+
+
+@overload
+def get_telescope_basic_capabilities(
+    tmdata: TMData, telescope: Literal[Telescope.SKA_LOW]
+) -> LowBasicCapabilitiesFile: ...
+
+
+def get_telescope_basic_capabilities(
+    tmdata: TMData, telescope: Telescope
+) -> MidBasicCapabilitiesFile | LowBasicCapabilitiesFile:
+    """Read one telescope's basic capabilities file: Mid's receiver bands,
+    or Low's frequency band and how it is divided into channels.
+
+    :param tmdata: TMData to read from.
+    :param telescope: the telescope.
+    :return: the telescope's basic capabilities.
+    :raises FileNotFoundError: If the tmdata has no basic capabilities file
+        for the telescope.
+    """
+    return _BASIC_CAPABILITIES_FILE_MODELS[telescope].model_validate(
+        _read(tmdata, BASIC_CAPABILITIES_JSON_FILE_PATHS[telescope])
     )
 
 
