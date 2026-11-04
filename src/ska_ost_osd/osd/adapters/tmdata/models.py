@@ -68,8 +68,9 @@ class CapabilitySetFileBase(OSDBaseModel):
     number_zoom_channels: int = Field(ge=0)
     number_pss_beams: int = Field(ge=0)
     ps_beam_bandwidth_hz: float = Field(ge=0)
-    # Name patterns, e.g. ["*_AA2"]; the *_ITF capability sets have none
-    subarray_templates: list[str] | None = None
+    # The array assembly whose subarray templates the capability set offers,
+    # e.g. "AA2"; the *_ITF capability sets have none
+    array_assembly: str | None = None
 
 
 class MidCapabilitySetFile(CapabilitySetFileBase):
@@ -172,7 +173,8 @@ class CycleFile(OSDBaseModel):
 
 
 class SubarrayTemplateLibraryFile(OSDBaseModel):
-    """Top-level model for subarray_template_library.json."""
+    """Top-level model for ska1_<telescope>/subarray_templates/<array
+    assembly>.json: one array assembly's templates."""
 
     templates: list[SubarrayTemplate]
 

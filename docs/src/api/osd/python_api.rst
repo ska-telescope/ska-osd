@@ -95,9 +95,8 @@ Joins
      - the capability set the cycle offers for each telescope, as a ``dict`` keyed
        by ``Telescope``; a telescope the cycle does not offer is left out
    * - ``get_subarray_templates(telescope, capability_set)``
-     - the ``SubarrayTemplate`` objects of a capability set: those whose name
-       matches one of its ``subarray_templates`` patterns and starts with the
-       telescope, e.g. ``SKA_MID_``
+     - the ``SubarrayTemplate`` objects of a capability set: the templates of
+       the array assembly the capability set names, or none
 
 
 Views
@@ -165,7 +164,10 @@ PHT cycle data
 ^^^^^^^^^^^^^^^
 
 ``get_cycle_configuration(repository, cycle_id)`` returns one cycle with what it
-offers; ``get_cycle_configurations(repository)`` returns every cycle:
+offers; ``get_cycle_configurations(repository)`` returns every cycle. Both take
+``include_subarray_templates``, ``False`` by default, to serve each offered
+capability set's subarray templates as the legacy API does with
+``process_templates=True``:
 
 .. code-block:: text
 
@@ -175,7 +177,9 @@ offers; ``get_cycle_configurations(repository)`` returns every cycle:
     capabilities
         mid                     null if the cycle doesn't offer Mid
             basic_capabilities  receiver_information: the receiver bands
-            "AA2"               the offered capability set, keyed by its name
+            "AA2"               the offered capability set, keyed by its name;
+                                with include_subarray_templates, its
+                                subarray_templates keyed by template name
         low                     null if the cycle doesn't offer Low
             basic_capabilities  the band and its channels
             "AA2"               the offered capability set, keyed by its name

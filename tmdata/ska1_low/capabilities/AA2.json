@@ -92,7 +92,5 @@
     4,
     8
   ],
-  "subarray_templates": [
-    "*_AA2"
-  ]
+  "array_assembly": "AA2"
 }

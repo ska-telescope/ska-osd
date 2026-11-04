@@ -42,7 +42,5 @@
   "number_zoom_channels": 0,
   "number_zoom_windows": 0,
   "ps_beam_bandwidth_hz": 400000000,
-  "subarray_templates": [
-    "*_AA1"
-  ]
+  "array_assembly": "AA1"
 }

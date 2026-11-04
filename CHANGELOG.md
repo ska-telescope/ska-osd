@@ -35,6 +35,12 @@ Unreleased
   files; they are defined in ``mid_defaults.json`` and ``low_defaults.json``
 * Moved telescope ``basic_capabilities`` to standalone tmdata files
 * Moved telescope capability sets to standalone tmdata files
+* Moved subarray templates to a tmdata file per telescope and array assembly; each
+  capability set names its ``array_assembly`` instead of template wildcard patterns
+* [BREAKING] Removed ``ska_ost_osd.osd.template_mapping``; ``get_osd_using_tmdata``
+  reads each capability set's templates from its array assembly's file
+* The PHT views take ``include_subarray_templates`` to serve each capability set's
+  subarray templates, as ``get_osd_using_tmdata`` does with ``process_templates``
 * Removed the unused semantic validation constants from ``tmdata/instrument``
 * ``get_osd_using_tmdata`` queries without a cycle now return the complete capability
   catalogue

@@ -21,9 +21,7 @@
   "number_vlbi_beams": 0,
   "ps_beam_bandwidth_hz": 75000000.0,
   "number_fsps": 6,
-  "subarray_templates": [
-    "*_AA0.5"
-  ],
+  "array_assembly": "AA0.5",
   "allowed_zoom_factors": [
     0
   ]

@@ -1,6 +1,5 @@
 """The OSD repository backed by the tmdata, read through a TMData client."""
 
-from fnmatch import fnmatchcase
 from typing import Literal, overload
 
 from ska_telmodel_client import TMData
@@ -122,7 +121,10 @@ class TMDataRepository:
     ) -> list[MidCapabilitySet] | list[LowCapabilitySet]:
         return [
             _CAPABILITY_SET_MODELS[telescope].model_validate(
-                {"name": name, **capability_set_file.model_dump()}
+                {
+                    "name": name,
+                    **capability_set_file.model_dump(exclude={"array_assembly"}),
+                }
             )
             for name, capability_set_file in storage.get_capability_set_files(
                 self._tmdata, telescope
@@ -153,22 +155,24 @@ class TMDataRepository:
     def get_subarray_templates(
         self, telescope: Telescope, capability_set: str
     ) -> list[SubarrayTemplate]:
-        """A template belongs to the capability set when its name matches one
-        of the set's ``subarray_templates`` patterns (e.g. ``"*_AA2"``) and
-        starts with the set's telescope (e.g. ``"SKA_MID_"``). A pattern alone is
-        not enough: ``"*_AA2"`` matches both telescopes' AA2 templates."""
-        patterns = (
-            self.get_capability_set(telescope, capability_set).subarray_templates or []
-        )
-        prefix = f"{telescope.value.upper()}_"
-        return [
-            template
-            for template in storage.get_subarray_template_library(
-                self._tmdata
-            ).templates
-            if template.name.startswith(prefix)
-            and any(fnmatchcase(template.name, pattern) for pattern in patterns)
-        ]
+        """The capability set's file names the array assembly whose template
+        library it offers. A capability set with no array assembly, or an
+        array assembly with no template library, offers none."""
+        capability_set_files = storage.get_capability_set_files(self._tmdata, telescope)
+        if capability_set not in capability_set_files:
+            raise CapabilitySetNotFoundError(
+                telescope, capability_set, list(capability_set_files)
+            )
+        array_assembly = capability_set_files[capability_set].array_assembly
+        if array_assembly is None:
+            return []
+        try:
+            library = storage.get_subarray_template_library(
+                self._tmdata, telescope, array_assembly
+            )
+        except FileNotFoundError:
+            return []
+        return library.templates
 
     def get_cycle_capability_sets(
         self, cycle_id: CycleID

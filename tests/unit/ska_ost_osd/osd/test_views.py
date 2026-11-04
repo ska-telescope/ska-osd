@@ -102,15 +102,18 @@ class TestGetCycleConfiguration:
         with pytest.raises(CapabilitySetNotFoundError, match="Capability set AA3"):
             get_cycle_configuration(repository, CycleID(1))
 
-    def test_serves_the_pht_cycle_fields(self, test_tmdata_repository):
+    @pytest.mark.parametrize("include_subarray_templates", [False, True])
+    def test_serves_the_pht_cycle_fields(
+        self, test_tmdata_repository, include_subarray_templates
+    ):
         """The JSON, with aliases as ska-oso-services serves it, has the
         names the PHT UI reads: telescope_capabilities Mid/Low, Mid's
         basic_capabilities.receiver_information, and under each telescope
         only basic_capabilities and the offered capability set, keyed by
-        its name."""
-        served = get_cycle_configuration(test_tmdata_repository, CycleID(2)).model_dump(
-            mode="json", by_alias=True
-        )
+        its name, with its subarray templates when they are asked for."""
+        served = get_cycle_configuration(
+            test_tmdata_repository, CycleID(2), include_subarray_templates
+        ).model_dump(mode="json", by_alias=True)
 
         assert list(served) == ["observatory_policy", "capabilities"]
         assert served["observatory_policy"]["telescope_capabilities"] == {
@@ -121,6 +124,10 @@ class TestGetCycleConfiguration:
         assert list(mid) == ["basic_capabilities", "AA2"]
         assert list(mid["basic_capabilities"]) == ["receiver_information"]
         assert mid["AA2"]["name"] == "AA2"
+        if include_subarray_templates:
+            assert "SKA_MID_FULL_AA2" in mid["AA2"]["subarray_templates"]
+        else:
+            assert "subarray_templates" not in mid["AA2"]
         assert list(served["capabilities"]["low"]) == ["basic_capabilities", "AA2"]
 
     def test_serves_the_pht_names_without_by_alias(self, test_tmdata_repository):
@@ -150,11 +157,14 @@ class TestGetCycleConfiguration:
         }
         assert served["capabilities"]["mid"] is None
 
+    @pytest.mark.parametrize("include_subarray_templates", [False, True])
     @pytest.mark.parametrize("cycle_id", [CycleID(1), CycleID(2)])
     def test_served_cycle_configuration_validates(
-        self, test_tmdata_repository, cycle_id
+        self, test_tmdata_repository, cycle_id, include_subarray_templates
     ):
-        configuration = get_cycle_configuration(test_tmdata_repository, cycle_id)
+        configuration = get_cycle_configuration(
+            test_tmdata_repository, cycle_id, include_subarray_templates
+        )
         served = configuration.model_dump(mode="json", by_alias=True)
         assert CycleConfiguration.model_validate(served) == configuration
 

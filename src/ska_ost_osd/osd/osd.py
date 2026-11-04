@@ -14,7 +14,6 @@ from ska_ost_osd.osd.common.osd_validation_messages import (
     CYCLE_ID_ARRAY_ASSEMBLY_ERROR_MESSAGE,
     CYCLE_ID_ERROR_MESSAGE,
 )
-from ska_ost_osd.osd.template_mapping.template_mapping import process_template_mappings
 
 from .common.constant import (
     OBSERVING_CYCLES_TMDATA_DIR,
@@ -199,33 +198,37 @@ class OSD:
         files."""
         capability_filepath = self.capability_filepaths[telescope]
         telescope_dir = posixpath.dirname(capability_filepath)
-        capability_sets_dir = f"{telescope_dir}/capabilities"
-        telescope_capability_data = {
+        return {
             **self.tmdata[capability_filepath].get_dict(),
             "basic_capabilities": self.tmdata[
                 f"{telescope_dir}/basic_capabilities.json"
             ].get_dict(),
             **{
-                name.removesuffix(".json"): self.tmdata[
-                    f"{capability_sets_dir}/{name}"
-                ].get_dict()
-                for name in sorted(self.tmdata[capability_sets_dir])
+                name.removesuffix(".json"): self._legacy_capability_set(
+                    telescope_dir, name
+                )
+                for name in sorted(self.tmdata[f"{telescope_dir}/capabilities"])
             },
         }
-        if not self.process_templates:
-            return telescope_capability_data
 
+    def _legacy_capability_set(self, telescope_dir: str, name: str) -> dict[str, Any]:
+        """A capability set in its legacy shape: its array assembly as a template
+        pattern, or as that array assembly's templates when they are processed."""
+        capability_set = self.tmdata[f"{telescope_dir}/capabilities/{name}"].get_dict()
+        array_assembly = capability_set.pop("array_assembly", None)
+        if array_assembly is None:
+            return capability_set
+        if not self.process_templates:
+            capability_set["subarray_templates"] = [f"*_{array_assembly}"]
+            return capability_set
+        templates_dir = f"{telescope_dir}/{osd_file_mapping['subarray_templates']}"
         try:
-            template_data = self.tmdata[
-                osd_file_mapping["subarray_templates"]
+            capability_set["subarray_templates"] = self.tmdata[
+                f"{templates_dir}/{array_assembly}.json"
             ].get_dict()
-        except (KeyError, AttributeError):
-            template_data = {}
-        return process_template_mappings(
-            telescope_capability_data,
-            self.capability_filepaths[telescope],
-            template_data,
-        )
+        except KeyError:
+            pass
+        return capability_set
 
     def check_capability_set(
         self, capability_set: str, telescope_capability_data: dict[str, Any]

@@ -33,11 +33,15 @@ Folder Structure
     ├── ska1_low
     │   ├── capabilities
     │   │   └── <capability set>.json
+    │   ├── subarray_templates
+    │   │   └── <array assembly>.json
     │   ├── basic_capabilities.json
     │   └── low_capabilities.json
     └── ska1_mid
         ├── capabilities
         │   └── <capability set>.json
+        ├── subarray_templates
+        │   └── <array assembly>.json
         ├── basic_capabilities.json
         └── mid_capabilities.json
 
@@ -238,76 +242,48 @@ See :doc:`python_api` for reading the OSD through the repository and the views.
 Subarray Template Support
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-OSD now supports subarray templates through the ``subarray_templates`` field in array assembly configurations. This feature enables dynamic template loading and processing for different telescope configurations.
-
-Configuration
--------------
-
-Each array assembly (AA0.5, AA1, AA2) can specify subarray templates using wildcard patterns:
+A subarray template is a named set of receptors from an array assembly. Each
+telescope's templates are stored by array assembly, in
+``ska1_<telescope>/subarray_templates/<array assembly>.json``, keyed by template
+name:
 
 .. code-block:: json
 
     {
-        "AA0.5": {
-            "subarray_templates": ["*_AA0.5"],
-            "other_config": "..."
-        },
-        "AA1": {
-            "subarray_templates": ["*_AA1"],
-            "other_config": "..."
-        },
-        "AA2": {
-            "subarray_templates": ["*_AA2"],
-            "other_config": "..."
+        "SKA_LOW_FULL_AA2": {
+            "subarray_type": "AA2",
+            "custom_stations": "",
+            "description": "Full SKA-Low array, AA2 release."
         }
     }
 
-Template Processing
--------------------
-
-The template mapping system processes subarray templates through:
-
-1. **Pattern Matching**: Uses fnmatch patterns to find matching templates
-2. **Telescope Filtering**: Automatically filters templates based on telescope type (``SKA_MID_``/``SKA_LOW_`` prefix)
-3. **Dynamic Loading**: Templates are loaded from JSON files and merged into capabilities
-4. **Key Normalization**: Template keys are converted to lowercase for consistency
-
-Template Processing Flag
---------------------------------
-
-``get_osd_using_tmdata`` takes a ``process_templates`` flag, ``False`` by default:
-
-* ``False``: the array assemblies are returned as stored, with their
-  ``subarray_templates`` patterns.
-* ``True``: each array assembly's ``subarray_templates`` patterns are replaced by
-  the templates they match.
-
-The repository's ``get_subarray_templates(telescope, capability_set)`` returns the
-matching templates as ``SubarrayTemplate`` models.
-
-Template File Structure
------------------------
-
-Template files should contain telescope-specific templates:
+A capability set offers the templates of the array assembly it names in its
+``array_assembly`` field:
 
 .. code-block:: json
 
     {
-        "SKA_MID_Template_AA0.5": {
-            "frequency_band": "1",
-            "config": {
-                "beam_id": 1,
-                "channels": [[0, 1], [744, 8191]]
-            }
-        },
-        "SKA_LOW_Template_AA1": {
-            "frequency_band": "low1",
-            "config": {
-                "beam_id": 1,
-                "stations": [[0, 1], [2, 3]]
-            }
-        }
+        "number_stations": 68,
+        "array_assembly": "AA2"
     }
+
+A capability set with no ``array_assembly`` (the ITFs), or whose array assembly
+has no template file, offers no templates.
+
+Reading the templates
+---------------------
+
+* The repository's ``get_subarray_templates(telescope, capability_set)`` returns
+  a capability set's templates as a list of ``SubarrayTemplate`` models.
+* The PHT views take ``include_subarray_templates``, ``False`` by default. With
+  ``True``, each offered capability set is served with ``subarray_templates``: its
+  templates keyed by name, as the legacy API serves them, or ``{}`` if it has
+  none. With ``False`` the key is left out.
+* The legacy ``get_osd_using_tmdata`` takes ``process_templates``, ``False`` by
+  default. With ``False``, each capability set is returned with the template
+  pattern of its array assembly, e.g. ``"subarray_templates": ["*_AA2"]``, as
+  before. With ``True``, the pattern is replaced by its array assembly's
+  templates, as below.
 
 Processed Templates
 -------------------

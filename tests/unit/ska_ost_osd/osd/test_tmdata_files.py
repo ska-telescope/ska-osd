@@ -36,10 +36,12 @@ TMDATA = Path(__file__).parents[4] / "tmdata"
         (MidDefaultsFile, "ska1_mid/mid_defaults.json"),
         (LowDefaultsFile, "ska1_low/low_defaults.json"),
         (CycleFile, "observatory_policies.json"),
-        (
-            SubarrayTemplateLibraryFile,
-            "subarray_templates/subarray_template_library.json",
-        ),
+        (SubarrayTemplateLibraryFile, "ska1_mid/subarray_templates/AA2.json"),
+        (SubarrayTemplateLibraryFile, "ska1_mid/subarray_templates/AA4.json"),
+        (SubarrayTemplateLibraryFile, "ska1_mid/subarray_templates/AASTAR.json"),
+        (SubarrayTemplateLibraryFile, "ska1_low/subarray_templates/AA2.json"),
+        (SubarrayTemplateLibraryFile, "ska1_low/subarray_templates/AA4.json"),
+        (SubarrayTemplateLibraryFile, "ska1_low/subarray_templates/AASTAR.json"),
     ]
     + [
         (model, f"{directory}/{capability_set.name}")

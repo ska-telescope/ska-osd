@@ -1,5 +1,4 @@
 import logging
-from unittest.mock import patch
 
 import pytest
 from ska_telmodel_client import TMData
@@ -161,9 +160,7 @@ def test_get_osd_data_missing_subarray_templates_falls_back_to_empty(
     :param tests_tmdata: tests_tmdata
     :param monkeypatch: pytest monkeypatch fixture
     """
-    monkeypatch.setitem(
-        osd_file_mapping, "subarray_templates", "missing/templates.json"
-    )
+    monkeypatch.setitem(osd_file_mapping, "subarray_templates", "missing")
 
     osd_data, error_msgs = get_osd_data(
         telescope="mid",
@@ -201,40 +198,19 @@ def test_get_osd_data_with_process_templates(tests_tmdata):
     assert "mid" in result_true["capabilities"]
 
 
-@patch("ska_ost_osd.osd.osd.process_template_mappings")
-def test_get_osd_data_template_processing_called(mock_process_templates, tests_tmdata):
-    """Test that process_template_mappings is called when process_templates=True."""
-
-    # Mock the template processing function to return modified data
-    def mock_template_processing(data, _capability, _template_data):
-        # Add mock subarray_templates to the data
-        modified_data = data.copy()
-        if "AA1" in modified_data:
-            modified_data["AA1"]["subarray_templates"] = {
-                "mid_template_1": {"config": "test"}
-            }
-        return modified_data
-
-    mock_process_templates.side_effect = mock_template_processing
-
-    # Test with process_templates=True
+def test_get_osd_data_processes_templates(tests_tmdata):
+    """With process_templates=True, a capability set's template pattern is
+    replaced by its array assembly's templates."""
     result, _ = get_osd_data(
         telescope="mid",
-        array_assembly="AA1",
+        array_assembly="AA2",
         tmdata=tests_tmdata,
         process_templates=True,
     )
 
-    # Verify that process_template_mappings was called
-    assert mock_process_templates.called
-
-    # Verify the result contains the mocked template data
-    assert "capabilities" in result
-    assert "mid" in result["capabilities"]
-    assert "AA1" in result["capabilities"]["mid"]
-    assert "subarray_templates" in result["capabilities"]["mid"]["AA1"]
+    assert "subarray_templates" in result["capabilities"]["mid"]["AA2"]
     assert (
-        "mid_template_1" in result["capabilities"]["mid"]["AA1"]["subarray_templates"]
+        "SKA_MID_FULL_AA2" in result["capabilities"]["mid"]["AA2"]["subarray_templates"]
     )
 
 

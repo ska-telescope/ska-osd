@@ -1,5 +1,5 @@
 from enum import StrEnum
-from typing import Annotated, Any, Literal, Self
+from typing import Annotated, Literal, Self
 
 from pydantic import AliasChoices, Field, model_validator
 
@@ -38,10 +38,6 @@ class CapabilitySetBase(OSDBaseModel):
     number_zoom_channels: int = Field(ge=0)
     number_pss_beams: int = Field(ge=0)
     ps_beam_bandwidth_hz: float = Field(ge=0)
-    # Name patterns in tmdata, e.g. ["*_AA2"]; when the OSD processes
-    # templates, the matching templates keyed by name. The *_ITF assemblies
-    # have none.
-    subarray_templates: list[str] | dict[str, Any] | None = None
 
 
 class MidCBFMode(StrEnum):

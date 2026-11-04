@@ -28,7 +28,7 @@ from ska_ost_osd.osd.common.constant import (
     CAPABILITY_SETS_TMDATA_DIRS,
     DEFAULTS_JSON_FILE_PATHS,
     OBSERVING_CYCLES_TMDATA_DIR,
-    SUBARRAY_TEMPLATES_PATH,
+    SUBARRAY_TEMPLATES_TMDATA_DIRS,
     Telescope,
 )
 from ska_ost_osd.osd.models.cycles import CycleID
@@ -208,16 +208,23 @@ def get_telescope_defaults(
     )
 
 
-def get_subarray_template_library(tmdata: TMData) -> SubarrayTemplateLibraryFile:
-    """Read the subarray template library file: every template, for both
-    telescopes.
+def get_subarray_template_library(
+    tmdata: TMData, telescope: Telescope, array_assembly: str
+) -> SubarrayTemplateLibraryFile:
+    """Read one array assembly's subarray template library file,
+    ``ska1_<telescope>/subarray_templates/<array_assembly>.json``.
 
     :param tmdata: TMData to read from.
-    :return: the template library.
-    :raises FileNotFoundError: If the tmdata has no template library file.
+    :param telescope: the telescope.
+    :param array_assembly: the array assembly, e.g. ``"AA2"``.
+    :return: the array assembly's template library.
+    :raises FileNotFoundError: If the tmdata has no template library file
+        for the array assembly.
     """
     return SubarrayTemplateLibraryFile.model_validate(
-        _read(tmdata, SUBARRAY_TEMPLATES_PATH)
+        _read(
+            tmdata, f"{SUBARRAY_TEMPLATES_TMDATA_DIRS[telescope]}/{array_assembly}.json"
+        )
     )
 
 

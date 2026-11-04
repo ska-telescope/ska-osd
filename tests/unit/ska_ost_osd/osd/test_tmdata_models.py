@@ -57,7 +57,7 @@ LOW_CAPABILITY_SET = "ska1_low/capabilities/AA2.json"
 MID_DEFAULTS = "ska1_mid/mid_defaults.json"
 LOW_DEFAULTS = "ska1_low/low_defaults.json"
 CYCLE = "cycles/cycle_1.json"
-SUBARRAY_TEMPLATES = "subarray_templates/subarray_template_library.json"
+SUBARRAY_TEMPLATES = "ska1_low/subarray_templates/AA2.json"
 
 
 def load(path: str) -> dict:

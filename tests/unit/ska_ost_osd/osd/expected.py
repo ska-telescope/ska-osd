@@ -159,7 +159,6 @@ MID_AA1 = MidCapabilitySet(
     number_zoom_channels=0,
     number_pss_beams=0,
     ps_beam_bandwidth_hz=400_000_000,
-    subarray_templates=["*_AA1"],
     allowed_channel_width_values_hz=[13440],
     allowed_channel_count_range_min=[1],
     allowed_channel_count_range_max=[58982],
@@ -190,7 +189,6 @@ MID_AA2 = MidCapabilitySet(
     number_zoom_channels=0,
     number_pss_beams=0,
     ps_beam_bandwidth_hz=400_000_000,
-    subarray_templates=["*_AA2"],
     allowed_channel_width_values_hz=[13440],
     allowed_channel_count_range_min=[1],
     allowed_channel_count_range_max=[58982],
@@ -257,10 +255,12 @@ MID_BASIC_CAPABILITIES = MidBasicCapabilities(
 )
 
 # The capability sets as stored: keyed by name, with the receptors under the
-# file's own key and no telescope
+# file's own key, no telescope, and the array assembly that keys their
+# subarray templates (in the test tmdata, the same as the name)
 MID_CAPABILITY_SET_FILES = {
     capability_set.name: MidCapabilitySetFile(
         number_dish_ids=capability_set.receptors,
+        array_assembly=capability_set.name,
         **capability_set.model_dump(exclude={"name", "telescope", "receptors"}),
     )
     for capability_set in (MID_AA1, MID_AA2)
@@ -288,7 +288,6 @@ LOW_AA1 = LowCapabilitySet(
     number_vlbi_beams=0,
     ps_beam_bandwidth_hz=75_000_000.0,
     number_fsps=6,
-    subarray_templates=["*_AA1"],
     allowed_zoom_factors=[0],
 )
 
@@ -308,7 +307,6 @@ LOW_AA2 = LowCapabilitySet(
     number_vlbi_beams=0,
     ps_beam_bandwidth_hz=75_000_000.0,
     number_fsps=6,
-    subarray_templates=["*_AA2"],
     allowed_zoom_factors=[1, 2, 4, 8],
 )
 
@@ -328,6 +326,7 @@ LOW_BASIC_CAPABILITIES = LowBasicCapabilities(
 LOW_CAPABILITY_SET_FILES = {
     capability_set.name: LowCapabilitySetFile(
         number_station_ids=capability_set.receptors,
+        array_assembly=capability_set.name,
         **capability_set.model_dump(exclude={"name", "telescope", "receptors"}),
     )
     for capability_set in (LOW_AA1, LOW_AA2)
@@ -405,7 +404,7 @@ LOW_CONSTRAINTS = Constraints(
     jupiter_avoidance_angle_deg=10.0,
 )
 
-# tests/tmdata/subarray_templates/subarray_template_library.json
+# tests/tmdata/ska1_<telescope>/subarray_templates/<array assembly>.json
 MID_FULL_AA2_TEMPLATE = SubarrayTemplate(
     name="SKA_MID_FULL_AA2",
     subarray_type=SubarrayType.CUSTOM,
@@ -440,13 +439,16 @@ LOW_TEST_AA2_TEMPLATE = SubarrayTemplate(
     description="TEST Low AA2 subset of stations.",
 )
 
-SUBARRAY_TEMPLATE_LIBRARY_FILE = SubarrayTemplateLibraryFile(
-    templates=[
-        MID_FULL_AA2_TEMPLATE,
-        LOW_TEST_AA1_TEMPLATE,
-        LOW_FULL_AA2_TEMPLATE,
-        LOW_TEST_AA2_TEMPLATE,
-    ]
+MID_AA2_SUBARRAY_TEMPLATE_LIBRARY_FILE = SubarrayTemplateLibraryFile(
+    templates=[MID_FULL_AA2_TEMPLATE]
+)
+
+LOW_AA1_SUBARRAY_TEMPLATE_LIBRARY_FILE = SubarrayTemplateLibraryFile(
+    templates=[LOW_TEST_AA1_TEMPLATE]
+)
+
+LOW_AA2_SUBARRAY_TEMPLATE_LIBRARY_FILE = SubarrayTemplateLibraryFile(
+    templates=[LOW_FULL_AA2_TEMPLATE, LOW_TEST_AA2_TEMPLATE]
 )
 
 # The ODT configuration view of tests/tmdata: what ska-oso-services serves
