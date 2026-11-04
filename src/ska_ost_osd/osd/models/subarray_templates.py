@@ -2,9 +2,9 @@
 library file is in ``ska_ost_osd.osd.adapters.tmdata.models``."""
 
 from enum import StrEnum
-from typing import Any, Self
+from typing import Self
 
-from pydantic import Field, field_validator, model_validator
+from pydantic import Field, model_validator
 
 from ska_ost_osd.osd.models.defaults import OSDBaseModel
 
@@ -23,14 +23,6 @@ class SubarrayTemplate(OSDBaseModel):
     subarray_type: SubarrayType
     custom_stations: list[str] = Field(examples=[["SKA001", "SKA013"]])
     description: str
-
-    @field_validator("custom_stations", mode="before")
-    @classmethod
-    def split_stations(cls, value: Any) -> Any:
-        """tmdata lists the stations as one comma-separated string."""
-        if isinstance(value, str):
-            return [station.strip() for station in value.split(",") if station.strip()]
-        return value
 
     @model_validator(mode="after")
     def check_custom_stations(self) -> Self:

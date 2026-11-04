@@ -253,7 +253,7 @@ telescope's templates are stored by array assembly, in
             {
                 "name": "SKA_LOW_FULL_AA2",
                 "subarray_type": "AA2",
-                "custom_stations": "",
+                "custom_stations": [],
                 "description": "Full SKA-Low array, AA2 release."
             }
         ]

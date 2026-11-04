@@ -3,7 +3,10 @@
     {
       "name": "SKA_LOW_TEST_AA1",
       "subarray_type": "custom",
-      "custom_stations": "S8-1,S8-2",
+      "custom_stations": [
+        "S8-1",
+        "S8-2"
+      ],
       "description": "TEST Low AA1 subset of stations."
     }
   ]

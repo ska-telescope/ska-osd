@@ -420,21 +420,11 @@ class TestCycleFile:
 class TestSubarrayTemplates:
     """The subarray template models' own logic."""
 
-    def test_custom_stations_are_split(self):
-        """tmdata's comma-separated stations become a list."""
-        data = load(SUBARRAY_TEMPLATES)
-        stored = next(t for t in data["templates"] if t["subarray_type"] == "custom")
-
-        library = SubarrayTemplateLibraryFile.model_validate(data)
-
-        template = next(t for t in library.templates if t.name == stored["name"])
-        assert template.custom_stations == stored["custom_stations"].split(",")
-
     @pytest.mark.parametrize(
         "custom, stations, message",
         [
-            (True, "", "lists no custom_stations"),
-            (False, "SKA001", "only custom templates list custom_stations"),
+            (True, [], "lists no custom_stations"),
+            (False, ["SKA001"], "only custom templates list custom_stations"),
         ],
         ids=["custom without stations", "stations on a non-custom template"],
     )

@@ -226,8 +226,13 @@ class OSD:
             templates = self.tmdata[f"{templates_dir}/{array_assembly}.json"].get_dict()
         except KeyError:
             return capability_set
+        # Keyed by name, with the stations as one comma-separated string
         capability_set["subarray_templates"] = {
-            template.pop("name"): template for template in templates["templates"]
+            template.pop("name"): {
+                **template,
+                "custom_stations": ",".join(template["custom_stations"]),
+            }
+            for template in templates["templates"]
         }
         return capability_set
 
