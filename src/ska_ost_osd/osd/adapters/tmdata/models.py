@@ -2,7 +2,7 @@
 whole. ``storage`` reads the files into these, and ``TMDataRepository`` maps
 them to the reader models."""
 
-from typing import Any, Literal, Self
+from typing import Literal, Self
 
 from pydantic import AliasChoices, Field, model_validator
 
@@ -177,12 +177,3 @@ class SubarrayTemplateLibraryFile(OSDBaseModel):
     assembly>.json: one array assembly's templates."""
 
     templates: list[SubarrayTemplate]
-
-    @model_validator(mode="before")
-    @classmethod
-    def collect_templates(cls, data: Any) -> Any:
-        """In tmdata each template is a top-level value that holds its own
-        name; gather them into ``templates``. The keys are ignored."""
-        if not isinstance(data, dict) or "templates" in data:
-            return data
-        return {"templates": list(data.values())}

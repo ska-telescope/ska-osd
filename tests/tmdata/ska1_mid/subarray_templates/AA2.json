@@ -1,8 +1,10 @@
 {
-  "SKA_MID_FULL_AA2": {
-    "name": "SKA_MID_FULL_AA2",
-    "subarray_type": "custom",
-    "custom_stations": "SKA001,SKA002,SKA003,SKA004,SKA005,SKA006,SKA007,SKA008",
-    "description": "TEST full Mid AA2 array."
-  }
+  "templates": [
+    {
+      "name": "SKA_MID_FULL_AA2",
+      "subarray_type": "custom",
+      "custom_stations": "SKA001,SKA002,SKA003,SKA004,SKA005,SKA006,SKA007,SKA008",
+      "description": "TEST full Mid AA2 array."
+    }
+  ]
 }

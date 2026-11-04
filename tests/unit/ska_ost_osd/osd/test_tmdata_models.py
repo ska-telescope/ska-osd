@@ -130,7 +130,7 @@ class TestBreakingChanges:
             (
                 SubarrayTemplateLibraryFile,
                 SUBARRAY_TEMPLATES,
-                lambda data: next(iter(data.values())).update(subarray_type="AA9"),
+                lambda data: data["templates"][0].update(subarray_type="AA9"),
             ),
         ],
         ids=[
@@ -420,29 +420,15 @@ class TestCycleFile:
 class TestSubarrayTemplates:
     """The subarray template models' own logic."""
 
-    def test_templates_are_named_by_their_name_field(self):
-        """Each top-level value becomes a template, named by its name field,
-        not its key."""
-        data = {
-            f"key_{index}": template
-            for index, template in enumerate(load(SUBARRAY_TEMPLATES).values())
-        }
-
-        library = SubarrayTemplateLibraryFile.model_validate(data)
-
-        assert [template.name for template in library.templates] == [
-            template["name"] for template in data.values()
-        ]
-
     def test_custom_stations_are_split(self):
         """tmdata's comma-separated stations become a list."""
         data = load(SUBARRAY_TEMPLATES)
-        name = next(n for n, t in data.items() if t["subarray_type"] == "custom")
+        stored = next(t for t in data["templates"] if t["subarray_type"] == "custom")
 
         library = SubarrayTemplateLibraryFile.model_validate(data)
 
-        template = next(t for t in library.templates if t.name == name)
-        assert template.custom_stations == data[name]["custom_stations"].split(",")
+        template = next(t for t in library.templates if t.name == stored["name"])
+        assert template.custom_stations == stored["custom_stations"].split(",")
 
     @pytest.mark.parametrize(
         "custom, stations, message",
@@ -455,10 +441,10 @@ class TestSubarrayTemplates:
     def test_only_custom_templates_list_stations(self, custom, stations, message):
         """Custom templates, and only those, list their stations."""
         data = load(SUBARRAY_TEMPLATES)
-        name = next(
-            n for n, t in data.items() if (t["subarray_type"] == "custom") == custom
+        stored = next(
+            t for t in data["templates"] if (t["subarray_type"] == "custom") == custom
         )
-        data[name]["custom_stations"] = stations
+        stored["custom_stations"] = stations
 
         with pytest.raises(ValidationError, match=message):
             SubarrayTemplateLibraryFile.model_validate(data)

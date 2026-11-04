@@ -1,8 +1,10 @@
 {
-  "SKA_LOW_FULL_AA2": {
-    "name": "SKA_LOW_FULL_AA2",
-    "subarray_type": "AA2",
-    "custom_stations": "",
-    "description": "Full SKA-Low array, AA2 release."
-  }
+  "templates": [
+    {
+      "name": "SKA_LOW_FULL_AA2",
+      "subarray_type": "AA2",
+      "custom_stations": "",
+      "description": "Full SKA-Low array, AA2 release."
+    }
+  ]
 }

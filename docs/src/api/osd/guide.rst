@@ -244,17 +244,19 @@ Subarray Template Support
 
 A subarray template is a named set of receptors from an array assembly. Each
 telescope's templates are stored by array assembly, in
-``ska1_<telescope>/subarray_templates/<array assembly>.json``, keyed by template
-name:
+``ska1_<telescope>/subarray_templates/<array assembly>.json``, as a list:
 
 .. code-block:: json
 
     {
-        "SKA_LOW_FULL_AA2": {
-            "subarray_type": "AA2",
-            "custom_stations": "",
-            "description": "Full SKA-Low array, AA2 release."
-        }
+        "templates": [
+            {
+                "name": "SKA_LOW_FULL_AA2",
+                "subarray_type": "AA2",
+                "custom_stations": "",
+                "description": "Full SKA-Low array, AA2 release."
+            }
+        ]
     }
 
 A capability set offers the templates of the array assembly it names in its

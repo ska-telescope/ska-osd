@@ -227,7 +227,7 @@ class OSD:
         except KeyError:
             return capability_set
         capability_set["subarray_templates"] = {
-            template.pop("name"): template for template in templates.values()
+            template.pop("name"): template for template in templates["templates"]
         }
         return capability_set
 
