@@ -177,3 +177,9 @@ class SubarrayTemplateLibraryFile(OSDBaseModel):
     assembly>.json: one array assembly's templates."""
 
     templates: list[SubarrayTemplate]
+
+    @model_validator(mode="after")
+    def check_unique_names(self) -> Self:
+        if len({template.name for template in self.templates}) != len(self.templates):
+            raise ValueError("template names are not unique")
+        return self

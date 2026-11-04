@@ -420,6 +420,14 @@ class TestCycleFile:
 class TestSubarrayTemplates:
     """The subarray template models' own logic."""
 
+    def test_template_names_are_unique(self):
+        """A library listing two templates with the same name is rejected."""
+        data = load(SUBARRAY_TEMPLATES)
+        data["templates"].append(data["templates"][0])
+
+        with pytest.raises(ValidationError, match="template names are not unique"):
+            SubarrayTemplateLibraryFile.model_validate(data)
+
     @pytest.mark.parametrize(
         "custom, stations, message",
         [
