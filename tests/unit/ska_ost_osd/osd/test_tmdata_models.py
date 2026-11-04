@@ -420,13 +420,19 @@ class TestCycleFile:
 class TestSubarrayTemplates:
     """The subarray template models' own logic."""
 
-    def test_templates_are_named_by_key(self):
-        """Each top-level key becomes a template, named after the key."""
-        data = load(SUBARRAY_TEMPLATES)
+    def test_templates_are_named_by_their_name_field(self):
+        """Each top-level value becomes a template, named by its name field,
+        not its key."""
+        data = {
+            f"key_{index}": template
+            for index, template in enumerate(load(SUBARRAY_TEMPLATES).values())
+        }
 
         library = SubarrayTemplateLibraryFile.model_validate(data)
 
-        assert [template.name for template in library.templates] == list(data)
+        assert [template.name for template in library.templates] == [
+            template["name"] for template in data.values()
+        ]
 
     def test_custom_stations_are_split(self):
         """tmdata's comma-separated stations become a list."""

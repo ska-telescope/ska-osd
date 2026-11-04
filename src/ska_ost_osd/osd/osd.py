@@ -223,11 +223,12 @@ class OSD:
             return capability_set
         templates_dir = f"{telescope_dir}/{osd_file_mapping['subarray_templates']}"
         try:
-            capability_set["subarray_templates"] = self.tmdata[
-                f"{templates_dir}/{array_assembly}.json"
-            ].get_dict()
+            templates = self.tmdata[f"{templates_dir}/{array_assembly}.json"].get_dict()
         except KeyError:
-            pass
+            return capability_set
+        capability_set["subarray_templates"] = {
+            template.pop("name"): template for template in templates.values()
+        }
         return capability_set
 
     def check_capability_set(

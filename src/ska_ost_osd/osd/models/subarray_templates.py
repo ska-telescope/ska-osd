@@ -17,7 +17,7 @@ class SubarrayType(StrEnum):
 
 
 class SubarrayTemplate(OSDBaseModel):
-    """One template. tmdata: a top-level key and its value."""
+    """One template. tmdata: a top-level value."""
 
     name: str = Field(examples=["SKA_MID_FULL_AA2"])
     subarray_type: SubarrayType

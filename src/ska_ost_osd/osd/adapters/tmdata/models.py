@@ -181,10 +181,8 @@ class SubarrayTemplateLibraryFile(OSDBaseModel):
     @model_validator(mode="before")
     @classmethod
     def collect_templates(cls, data: Any) -> Any:
-        """In tmdata each template is a top-level key; gather them into
-        ``templates``, using the key as the template name."""
+        """In tmdata each template is a top-level value that holds its own
+        name; gather them into ``templates``. The keys are ignored."""
         if not isinstance(data, dict) or "templates" in data:
             return data
-        return {
-            "templates": [{"name": name, **template} for name, template in data.items()]
-        }
+        return {"templates": list(data.values())}
