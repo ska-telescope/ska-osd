@@ -66,6 +66,8 @@ def validate_file(path: Path, model: type[BaseModel]) -> list[str]:
         instance = model.model_validate(data)
     except ValidationError as error:
         return describe(error)
+    except Exception as error:
+        return [f"could not be validated: {type(error).__name__}: {error}"]
 
     try:
         read_back = model.model_validate_json(instance.model_dump_json(by_alias=True))
