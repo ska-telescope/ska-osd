@@ -52,3 +52,7 @@ tmdata-validate:
 
 tmdata-publish:
   when: manual
+  needs:
+    - tmdata-build
+    - tmdata-validate
+    - python-uv-test
