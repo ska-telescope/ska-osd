@@ -45,5 +45,10 @@ include:
   - project: 'ska-telescope/templates-repository'
     file: 'gitlab-ci/includes/sonar-scan.gitlab-ci.yml'
 
+tmdata-validate:
+  stage: test
+  script:
+    - make tmdata-validate
+
 tmdata-publish:
   when: manual
