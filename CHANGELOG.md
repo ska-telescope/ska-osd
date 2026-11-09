@@ -7,6 +7,10 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 Unreleased
 **********
+* Added the ``osd-validate-tmdata`` command, which validates a tmdata directory
+  against the storage models, by default ``tmdata`` in the directory it is run in, and
+  the ``tmdata-validate`` make target and pipeline job that run it. ``tmdata-publish``
+  can only be run once it passes
 * [BREAKING] Removed the REST API: the FastAPI app, its Helm charts and OCI image, and
   the ``/osd``, ``/cycle``, ``/osd_release`` and ``/semantic_validation`` endpoints.
   The OSD is now a Python library only
