@@ -24,7 +24,7 @@ Overview
 
 The repository returns *reader models*, the data as callers use it. The
 ``TMDataRepository`` reads each tmdata file through a *storage model*, named with a
-``File`` suffix (e.g. ``MidCapabilitiesFile``), which validates the file as a whole.
+``File`` suffix (e.g. ``MidCapabilitySetFile``), which validates the file as a whole.
 The storage models are part of the TMData adapter
 (``ska_ost_osd.osd.adapters.tmdata.models``), not of the API.
 

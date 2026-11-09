@@ -17,11 +17,9 @@ from pydantic import TypeAdapter, ValidationError
 from ska_ost_osd.osd.adapters.tmdata.models import (
     CycleFile,
     LowBasicCapabilitiesFile,
-    LowCapabilitiesFile,
     LowCapabilitySetFile,
     LowDefaultsFile,
     MidBasicCapabilitiesFile,
-    MidCapabilitiesFile,
     MidCapabilitySetFile,
     MidDefaultsFile,
     SubarrayTemplateLibraryFile,
@@ -48,8 +46,6 @@ from tests.unit.ska_ost_osd.osd.expected import (
 
 TESTS_TMDATA = Path(__file__).parents[3] / "tmdata"
 
-MID_CAPABILITIES = "ska1_mid/mid_capabilities.json"
-LOW_CAPABILITIES = "ska1_low/low_capabilities.json"
 MID_BASIC_CAPABILITIES_FILE = "ska1_mid/basic_capabilities.json"
 LOW_BASIC_CAPABILITIES_FILE = "ska1_low/basic_capabilities.json"
 MID_CAPABILITY_SET = "ska1_mid/capabilities/AA2.json"
@@ -180,8 +176,6 @@ class TestCapabilities:
     @pytest.mark.parametrize(
         "model, path",
         [
-            (MidCapabilitiesFile, MID_CAPABILITIES),
-            (LowCapabilitiesFile, LOW_CAPABILITIES),
             (MidCapabilitySetFile, MID_CAPABILITY_SET),
             (LowCapabilitySetFile, LOW_CAPABILITY_SET),
         ],
@@ -192,21 +186,13 @@ class TestCapabilities:
         capabilities = model.model_validate(load(path))
         assert model.model_validate(capabilities.model_dump()) == capabilities
 
-    def test_quality_attribute_metrics_not_needed(self):
-        """Low's quality attribute metrics now live only in the defaults
-        file, so the capabilities file validates without them."""
-        data = load(LOW_CAPABILITIES)
-        data.pop("quality_attribute_metrics", None)
-
-        LowCapabilitiesFile.model_validate(data)
-
     @pytest.mark.parametrize(
         "model, path, break_file, message",
         [
             (
-                MidCapabilitiesFile,
-                MID_CAPABILITIES,
-                lambda data: data["constraints"].update(
+                MidBasicCapabilitiesFile,
+                MID_BASIC_CAPABILITIES_FILE,
+                lambda data: data["elevation_limits"].update(
                     min_elevation_deg=90.0, max_elevation_deg=10.0
                 ),
                 "min_elevation_deg must not exceed max_elevation_deg",

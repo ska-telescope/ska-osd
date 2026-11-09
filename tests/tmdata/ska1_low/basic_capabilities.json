@@ -7,5 +7,9 @@
   "number_continuum_channels_per_coarse_channel": 144,
   "number_zoom_channels_per_coarse_channel": 432,
   "number_pst_channels_per_coarse_channel": 216,
-  "number_pss_channels_per_coarse_channel": 54
+  "number_pss_channels_per_coarse_channel": 54,
+  "elevation_limits": {
+    "min_elevation_deg": 45.0,
+    "max_elevation_deg": 90.0
+  }
 }

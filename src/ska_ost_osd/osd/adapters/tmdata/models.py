@@ -26,35 +26,6 @@ from ska_ost_osd.osd.models.defaults import (
 from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplate
 
 
-class ElevationConstraints(OSDBaseModel):
-    min_elevation_deg: float = Field(ge=0, le=90, examples=[45.0])
-    max_elevation_deg: float = Field(ge=0, le=90, examples=[90.0])
-
-    @model_validator(mode="after")
-    def check_elevation_range(self) -> Self:
-        if self.min_elevation_deg > self.max_elevation_deg:
-            raise ValueError("min_elevation_deg must not exceed max_elevation_deg")
-        return self
-
-
-class TelescopeCapabilitiesFileBase(OSDBaseModel):
-    """Base for the Mid and Low capabilities file models."""
-
-    constraints: ElevationConstraints
-
-
-class MidCapabilitiesFile(TelescopeCapabilitiesFileBase):
-    """Top-level model for mid_capabilities.json."""
-
-    telescope: Literal["Mid"] = "Mid"
-
-
-class LowCapabilitiesFile(TelescopeCapabilitiesFileBase):
-    """Top-level model for low_capabilities.json."""
-
-    telescope: Literal["Low"] = "Low"
-
-
 class CapabilitySetFileBase(OSDBaseModel):
     """Base for the Mid and Low capability set file models. Each file is
     named after its capability set, so it holds neither the name nor the

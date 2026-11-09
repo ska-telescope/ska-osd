@@ -15,8 +15,8 @@ from pydantic import (
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
     CapabilitySet,
-    LowBasicCapabilities,
     LowCapabilitySet,
+    LowFrequencyBand,
     MidCapabilitySet,
     MidFrequencyBand,
 )
@@ -109,7 +109,7 @@ class MidCycleCapabilities(CycleCapabilitiesBase):
 
 
 class LowCycleCapabilities(CycleCapabilitiesBase):
-    basic_capabilities: LowBasicCapabilities
+    basic_capabilities: LowFrequencyBand
     capability_set: LowCapabilitySet
 
 
@@ -190,7 +190,11 @@ def get_cycle_configuration(
             if offered.ska_mid is not None
             else None,
             low=LowCycleCapabilities(
-                basic_capabilities=repository.get_basic_capabilities(Telescope.SKA_LOW),
+                basic_capabilities=LowFrequencyBand.model_validate(
+                    repository.get_basic_capabilities(Telescope.SKA_LOW).model_dump(
+                        exclude={"elevation_limits"}
+                    )
+                ),
                 capability_set=repository.get_capability_set(
                     Telescope.SKA_LOW, offered.ska_low
                 ),

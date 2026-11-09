@@ -71,7 +71,8 @@ class OSDRepository(Protocol):
         self, telescope: Telescope
     ) -> MidBasicCapabilities | LowBasicCapabilities:
         """A telescope's basic capabilities: Mid's receiver bands, or Low's
-        frequency band and how it is divided into channels."""
+        frequency band and how it is divided into channels, and the
+        telescope's elevation limits."""
         ...
 
     def get_constraints(self, telescope: Telescope) -> Constraints:

@@ -61,15 +61,13 @@ class OSD:
 
     @cached_property
     def capability_filepaths(self) -> dict[str, str]:
-        """Return telescope-keyed TMData capability document paths."""
-        capability_filepaths = {}
-        for entry in self.tmdata:
-            if entry.endswith("_capabilities.json") and not entry.endswith(
-                "/basic_capabilities.json"
-            ):
-                telescope = self.tmdata[entry].get_dict()["telescope"]
-                capability_filepaths[telescope.lower()] = entry
-        return capability_filepaths
+        """Return telescope-keyed TMData basic capabilities paths, e.g.
+        ``{"mid": "ska1_mid/basic_capabilities.json"}``."""
+        return {
+            posixpath.dirname(entry).removeprefix("ska1_"): entry
+            for entry in self.tmdata
+            if entry.endswith("/basic_capabilities.json")
+        }
 
     def cycle_files(self):
         """Return the TMData cycle directory or raise when it is absent."""
@@ -193,16 +191,14 @@ class OSD:
     def get_telescope_capability_data(self, telescope: str) -> dict[str, Any]:
         """Load one telescope capability document and optional template mappings.
 
-        The document is rebuilt in its legacy shape: the capabilities file,
-        with the basic capabilities and each capability set from their own
-        files."""
+        The document is rebuilt in its legacy shape: the basic capabilities,
+        without the elevation limits, and each capability set."""
         capability_filepath = self.capability_filepaths[telescope]
         telescope_dir = posixpath.dirname(capability_filepath)
+        basic_capabilities = self.tmdata[capability_filepath].get_dict()
+        basic_capabilities.pop("elevation_limits")
         return {
-            **self.tmdata[capability_filepath].get_dict(),
-            "basic_capabilities": self.tmdata[
-                f"{telescope_dir}/basic_capabilities.json"
-            ].get_dict(),
+            "basic_capabilities": basic_capabilities,
             **{
                 name.removesuffix(".json"): self._legacy_capability_set(
                     telescope_dir, name

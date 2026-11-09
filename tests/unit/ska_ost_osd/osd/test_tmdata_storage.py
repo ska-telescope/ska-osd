@@ -8,7 +8,6 @@ from ska_ost_osd.osd.adapters.tmdata.storage import (
     get_cycle_file,
     get_subarray_template_library,
     get_telescope_basic_capabilities,
-    get_telescope_capabilities,
     get_telescope_defaults,
 )
 from ska_ost_osd.osd.common.constant import Telescope
@@ -19,12 +18,10 @@ from tests.unit.ska_ost_osd.osd.expected import (
     LOW_AA1_SUBARRAY_TEMPLATE_LIBRARY_FILE,
     LOW_AA2_SUBARRAY_TEMPLATE_LIBRARY_FILE,
     LOW_BASIC_CAPABILITIES,
-    LOW_CAPABILITIES_FILE,
     LOW_CAPABILITY_SET_FILES,
     LOW_DEFAULTS_FILE,
     MID_AA2_SUBARRAY_TEMPLATE_LIBRARY_FILE,
     MID_BASIC_CAPABILITIES,
-    MID_CAPABILITIES_FILE,
     MID_CAPABILITY_SET_FILES,
     MID_DEFAULTS_FILE,
 )
@@ -43,29 +40,6 @@ class TestGetCycleFile:
             FileNotFoundError, match="file not found: cycles/cycle_1.json"
         ):
             get_cycle_file(empty_tmdata, CycleID(1))
-
-
-class TestGetTelescopeCapabilities:
-    @pytest.mark.parametrize(
-        "telescope, expected",
-        [
-            (Telescope.SKA_MID, MID_CAPABILITIES_FILE),
-            (Telescope.SKA_LOW, LOW_CAPABILITIES_FILE),
-        ],
-    )
-    def test_returns_capabilities(self, tests_tmdata, telescope, expected):
-        assert get_telescope_capabilities(tests_tmdata, telescope) == expected
-
-    @pytest.mark.parametrize(
-        "telescope, path",
-        [
-            (Telescope.SKA_MID, "ska1_mid/mid_capabilities.json"),
-            (Telescope.SKA_LOW, "ska1_low/low_capabilities.json"),
-        ],
-    )
-    def test_raises_when_file_missing(self, empty_tmdata, telescope, path):
-        with pytest.raises(FileNotFoundError, match=f"file not found: {path}"):
-            get_telescope_capabilities(empty_tmdata, telescope)
 
 
 class TestGetCapabilitySetFiles:

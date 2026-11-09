@@ -7,11 +7,8 @@ from datetime import datetime, timezone
 from ska_ost_osd.osd.adapters.tmdata.models import (
     AvoidanceConstraints,
     CycleFile,
-    ElevationConstraints,
-    LowCapabilitiesFile,
     LowCapabilitySetFile,
     LowDefaultsFile,
-    MidCapabilitiesFile,
     MidCapabilitySetFile,
     MidDefaultsFile,
     SubarrayTemplateLibraryFile,
@@ -21,12 +18,13 @@ from ska_ost_osd.osd.models.capabilities import (
     LowBasicCapabilities,
     LowCapabilitySet,
     LowCBFMode,
+    LowFrequencyBand,
     MidBasicCapabilities,
     MidCapabilitySet,
     MidCBFMode,
     MidFrequencyBand,
 )
-from ska_ost_osd.osd.models.constraints import Constraints
+from ska_ost_osd.osd.models.constraints import Constraints, ElevationLimits
 from ska_ost_osd.osd.models.cycles import (
     Cycle,
     CycleID,
@@ -252,6 +250,7 @@ MID_BASIC_CAPABILITIES = MidBasicCapabilities(
             ],
         ),
     ],
+    elevation_limits=ElevationLimits(min_elevation_deg=15.0, max_elevation_deg=90.0),
 )
 
 # The capability sets as stored: keyed by name, with the receptors under the
@@ -265,11 +264,6 @@ MID_CAPABILITY_SET_FILES = {
     )
     for capability_set in (MID_AA1, MID_AA2)
 }
-
-# tests/tmdata/ska1_mid/mid_capabilities.json
-MID_CAPABILITIES_FILE = MidCapabilitiesFile(
-    constraints=ElevationConstraints(min_elevation_deg=15.0, max_elevation_deg=90.0),
-)
 
 # tests/tmdata/ska1_low/capabilities/AA1.json and AA2.json
 LOW_AA1 = LowCapabilitySet(
@@ -310,8 +304,8 @@ LOW_AA2 = LowCapabilitySet(
     allowed_zoom_factors=[1, 2, 4, 8],
 )
 
-# tests/tmdata/ska1_low/basic_capabilities.json
-LOW_BASIC_CAPABILITIES = LowBasicCapabilities(
+# The band in tests/tmdata/ska1_low/basic_capabilities.json
+LOW_FREQUENCY_BAND = LowFrequencyBand(
     min_frequency_hz=50_000_000.0,
     max_frequency_hz=350_000_000.0,
     min_coarse_channel=64,
@@ -323,6 +317,12 @@ LOW_BASIC_CAPABILITIES = LowBasicCapabilities(
     number_pss_channels_per_coarse_channel=54,
 )
 
+# tests/tmdata/ska1_low/basic_capabilities.json
+LOW_BASIC_CAPABILITIES = LowBasicCapabilities(
+    **LOW_FREQUENCY_BAND.model_dump(),
+    elevation_limits=ElevationLimits(min_elevation_deg=45.0, max_elevation_deg=90.0),
+)
+
 LOW_CAPABILITY_SET_FILES = {
     capability_set.name: LowCapabilitySetFile(
         number_station_ids=capability_set.receptors,
@@ -331,11 +331,6 @@ LOW_CAPABILITY_SET_FILES = {
     )
     for capability_set in (LOW_AA1, LOW_AA2)
 }
-
-# tests/tmdata/ska1_low/low_capabilities.json
-LOW_CAPABILITIES_FILE = LowCapabilitiesFile(
-    constraints=ElevationConstraints(min_elevation_deg=45.0, max_elevation_deg=90.0),
-)
 
 # The defaults in tests/tmdata/ska1_mid/mid_defaults.json
 MID_DEFAULTS = MidDefaults(
@@ -384,7 +379,7 @@ LOW_DEFAULTS_FILE = LowDefaultsFile(
     quality_attribute_metrics=LOW_DEFAULTS.quality_attribute_metrics,
 )
 
-# Elevation limits from tests/tmdata/ska1_mid/mid_capabilities.json and
+# Elevation limits from tests/tmdata/ska1_mid/basic_capabilities.json and
 # avoidance angles from mid_defaults.json
 MID_CONSTRAINTS = Constraints(
     min_elevation_deg=15.0,
@@ -394,7 +389,7 @@ MID_CONSTRAINTS = Constraints(
     jupiter_avoidance_angle_deg=10.0,
 )
 
-# Elevation limits from tests/tmdata/ska1_low/low_capabilities.json and
+# Elevation limits from tests/tmdata/ska1_low/basic_capabilities.json and
 # avoidance angles from low_defaults.json
 LOW_CONSTRAINTS = Constraints(
     min_elevation_deg=45.0,
@@ -487,7 +482,7 @@ CONFIGURATION = Configuration(
         spfrx_defaults=MID_DEFAULTS.spfrx_defaults,
     ),
     ska_low=LowConfiguration(
-        frequency_band=LOW_BASIC_CAPABILITIES,
+        frequency_band=LOW_FREQUENCY_BAND,
         constraints=LOW_CONSTRAINTS,
         quality_attribute_metrics=ConfigurationLowQualityAttributeMetrics(
             cbf=ConfigurationLowCBFMetrics(processors_ready_percent=100.0)
@@ -530,7 +525,7 @@ CYCLE_1_CONFIGURATION = CycleConfiguration(
     capabilities=CycleCapabilities(
         mid=None,
         low=LowCycleCapabilities(
-            basic_capabilities=LOW_BASIC_CAPABILITIES, capability_set=LOW_AA1
+            basic_capabilities=LOW_FREQUENCY_BAND, capability_set=LOW_AA1
         ),
     ),
 )
@@ -553,7 +548,7 @@ CYCLE_2_CONFIGURATION = CycleConfiguration(
             capability_set=MID_AA2,
         ),
         low=LowCycleCapabilities(
-            basic_capabilities=LOW_BASIC_CAPABILITIES, capability_set=LOW_AA2
+            basic_capabilities=LOW_FREQUENCY_BAND, capability_set=LOW_AA2
         ),
     ),
 )

@@ -13,18 +13,15 @@ from ska_telmodel_client import TMData
 from ska_ost_osd.osd.adapters.tmdata.models import (
     CycleFile,
     LowBasicCapabilitiesFile,
-    LowCapabilitiesFile,
     LowCapabilitySetFile,
     LowDefaultsFile,
     MidBasicCapabilitiesFile,
-    MidCapabilitiesFile,
     MidCapabilitySetFile,
     MidDefaultsFile,
     SubarrayTemplateLibraryFile,
 )
 from ska_ost_osd.osd.common.constant import (
     BASIC_CAPABILITIES_JSON_FILE_PATHS,
-    CAPABILITIES_JSON_FILE_PATHS,
     CAPABILITY_SETS_TMDATA_DIRS,
     DEFAULTS_JSON_FILE_PATHS,
     OBSERVING_CYCLES_TMDATA_DIR,
@@ -32,11 +29,6 @@ from ska_ost_osd.osd.common.constant import (
     Telescope,
 )
 from ska_ost_osd.osd.models.cycles import CycleID
-
-_CAPABILITIES_FILE_MODELS = {
-    Telescope.SKA_MID: MidCapabilitiesFile,
-    Telescope.SKA_LOW: LowCapabilitiesFile,
-}
 
 _CAPABILITY_SET_FILE_MODELS = {
     Telescope.SKA_MID: MidCapabilitySetFile,
@@ -80,34 +72,6 @@ def get_cycle_file(tmdata: TMData, cycle_id: CycleID) -> CycleFile:
     """
     return CycleFile.model_validate(
         _read(tmdata, f"{OBSERVING_CYCLES_TMDATA_DIR}/cycle_{cycle_id}.json")
-    )
-
-
-@overload
-def get_telescope_capabilities(
-    tmdata: TMData, telescope: Literal[Telescope.SKA_MID]
-) -> MidCapabilitiesFile: ...
-
-
-@overload
-def get_telescope_capabilities(
-    tmdata: TMData, telescope: Literal[Telescope.SKA_LOW]
-) -> LowCapabilitiesFile: ...
-
-
-def get_telescope_capabilities(
-    tmdata: TMData, telescope: Telescope
-) -> MidCapabilitiesFile | LowCapabilitiesFile:
-    """Read one telescope's capabilities file: its elevation constraints.
-
-    :param tmdata: TMData to read from.
-    :param telescope: the telescope.
-    :return: the telescope's capabilities.
-    :raises FileNotFoundError: If the tmdata has no capabilities file for
-        the telescope.
-    """
-    return _CAPABILITIES_FILE_MODELS[telescope].model_validate(
-        _read(tmdata, CAPABILITIES_JSON_FILE_PATHS[telescope])
     )
 
 

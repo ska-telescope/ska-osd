@@ -4,7 +4,7 @@ serves."""
 
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
-    LowBasicCapabilities,
+    LowFrequencyBand,
     MidFrequencyBand,
 )
 from ska_ost_osd.osd.models.constraints import Constraints
@@ -49,7 +49,7 @@ class MidConfiguration(ConfigurationModel):
 
 
 class LowConfiguration(ConfigurationModel):
-    frequency_band: LowBasicCapabilities
+    frequency_band: LowFrequencyBand
     constraints: Constraints
     quality_attribute_metrics: ConfigurationLowQualityAttributeMetrics
     subarrays: list[LowConfigurationCapabilitySet]
@@ -61,6 +61,16 @@ class Configuration(ConfigurationModel):
 
     ska_mid: MidConfiguration
     ska_low: LowConfiguration
+
+
+def _low_frequency_band(repository: OSDRepository) -> LowFrequencyBand:
+    """Low's band, without the elevation limits, which the view serves in
+    ``constraints``."""
+    return LowFrequencyBand.model_validate(
+        repository.get_basic_capabilities(Telescope.SKA_LOW).model_dump(
+            exclude={"elevation_limits"}
+        )
+    )
 
 
 def get_configuration(repository: OSDRepository) -> Configuration:
@@ -86,7 +96,7 @@ def get_configuration(repository: OSDRepository) -> Configuration:
             spfrx_defaults=repository.get_defaults(Telescope.SKA_MID).spfrx_defaults,
         ),
         ska_low=LowConfiguration(
-            frequency_band=repository.get_basic_capabilities(Telescope.SKA_LOW),
+            frequency_band=_low_frequency_band(repository),
             constraints=repository.get_constraints(Telescope.SKA_LOW),
             quality_attribute_metrics=ConfigurationLowQualityAttributeMetrics.model_validate(
                 repository.get_defaults(Telescope.SKA_LOW).quality_attribute_metrics,

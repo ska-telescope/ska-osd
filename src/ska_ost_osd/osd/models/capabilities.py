@@ -8,6 +8,7 @@ from ska_ost_osd.osd.exceptions import (
     Band5bSubbandNotFoundError,
     FrequencyBandNotFoundError,
 )
+from ska_ost_osd.osd.models.constraints import ElevationLimits
 from ska_ost_osd.osd.models.defaults import OSDBaseModel
 
 
@@ -79,11 +80,13 @@ class MidFrequencyBand(FrequencyBand):
 
 
 class MidBasicCapabilities(OSDBaseModel):
-    """Mid's receiver bands. tmdata: ``basic_capabilities``."""
+    """Mid's receiver bands and elevation limits. tmdata:
+    ``basic_capabilities``."""
 
     frequency_bands: list[MidFrequencyBand] = Field(
         validation_alias=AliasChoices("frequency_bands", "receiver_information"),
     )
+    elevation_limits: ElevationLimits
 
     def get_frequency_band(self, rx_id: str) -> MidFrequencyBand:
         """Look up one receiver band by its ID.
@@ -128,9 +131,8 @@ class LowCBFMode(StrEnum):
     PSS = "pss"
 
 
-class LowBasicCapabilities(FrequencyBand):
-    """Low's frequency band and how it is divided into channels.
-    tmdata: ``basic_capabilities``."""
+class LowFrequencyBand(FrequencyBand):
+    """Low's frequency band and how it is divided into channels."""
 
     min_coarse_channel: int = Field(ge=0, examples=[64])
     max_coarse_channel: int = Field(ge=0, examples=[447])
@@ -139,6 +141,13 @@ class LowBasicCapabilities(FrequencyBand):
     number_zoom_channels_per_coarse_channel: int = Field(ge=0, examples=[432])
     number_pst_channels_per_coarse_channel: int = Field(ge=0, examples=[216])
     number_pss_channels_per_coarse_channel: int = Field(ge=0, examples=[54])
+
+
+class LowBasicCapabilities(LowFrequencyBand):
+    """Low's frequency band and elevation limits. tmdata:
+    ``basic_capabilities``."""
+
+    elevation_limits: ElevationLimits
 
 
 class LowCapabilitySet(CapabilitySetBase):

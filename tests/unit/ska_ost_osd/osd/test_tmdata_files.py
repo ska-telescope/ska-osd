@@ -13,11 +13,9 @@ import pytest
 from ska_ost_osd.osd.adapters.tmdata.models import (
     CycleFile,
     LowBasicCapabilitiesFile,
-    LowCapabilitiesFile,
     LowCapabilitySetFile,
     LowDefaultsFile,
     MidBasicCapabilitiesFile,
-    MidCapabilitiesFile,
     MidCapabilitySetFile,
     MidDefaultsFile,
     SubarrayTemplateLibraryFile,
@@ -29,8 +27,6 @@ TMDATA = Path(__file__).parents[4] / "tmdata"
 @pytest.mark.parametrize(
     "model, path",
     [
-        (MidCapabilitiesFile, "ska1_mid/mid_capabilities.json"),
-        (LowCapabilitiesFile, "ska1_low/low_capabilities.json"),
         (MidBasicCapabilitiesFile, "ska1_mid/basic_capabilities.json"),
         (LowBasicCapabilitiesFile, "ska1_low/basic_capabilities.json"),
         (MidDefaultsFile, "ska1_mid/mid_defaults.json"),

@@ -1,7 +1,0 @@
-{
-  "telescope": "Low",
-  "constraints": {
-    "min_elevation_deg": 45.0,
-    "max_elevation_deg": 90.0
-  }
-}

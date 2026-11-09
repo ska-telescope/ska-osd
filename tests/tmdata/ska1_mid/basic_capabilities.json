@@ -53,5 +53,9 @@
         }
       ]
     }
-  ]
+  ],
+  "elevation_limits": {
+    "min_elevation_deg": 15.0,
+    "max_elevation_deg": 90.0
+  }
 }

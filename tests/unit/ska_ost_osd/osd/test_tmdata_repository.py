@@ -99,7 +99,7 @@ class TestGetBasicCapabilities:
             Telescope.SKA_MID
         ).model_dump(by_alias=True)
 
-        assert list(served) == ["frequency_bands"]
+        assert list(served) == ["frequency_bands", "elevation_limits"]
 
     def test_raises_when_file_missing(self, empty_tmdata_repository):
         with pytest.raises(
@@ -118,7 +118,7 @@ class TestGetConstraints:
 
     def test_raises_when_files_missing(self, empty_tmdata_repository):
         with pytest.raises(
-            FileNotFoundError, match="file not found: ska1_mid/mid_capabilities.json"
+            FileNotFoundError, match="file not found: ska1_mid/basic_capabilities.json"
         ):
             empty_tmdata_repository.get_constraints(Telescope.SKA_MID)
 

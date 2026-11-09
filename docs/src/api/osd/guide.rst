@@ -36,14 +36,14 @@ Folder Structure
     │   ├── subarray_templates
     │   │   └── <array assembly>.json
     │   ├── basic_capabilities.json
-    │   └── low_capabilities.json
+    │   └── low_capabilities.json        (legacy)
     └── ska1_mid
         ├── capabilities
         │   └── <capability set>.json
         ├── subarray_templates
         │   └── <array assembly>.json
         ├── basic_capabilities.json
-        └── mid_capabilities.json
+        └── mid_capabilities.json        (legacy)
 
 
 * `mid_capabilities.json <https://confluence.skatelescope.org/pages/viewpage.action?spaceKey=SWSI&title=Observatory+Static+Data>`_
@@ -51,7 +51,8 @@ Folder Structure
 * `low_capabilities.json <https://confluence.skatelescope.org/pages/viewpage.action?spaceKey=SWSI&title=Observatory+Static+Data>`_
 
 Each telescope's basic capabilities (Mid's receiver bands, Low's frequency
-band and channels) are in its ``basic_capabilities.json`` file, and each of
+band and channels, and the telescope's elevation limits) are in its
+``basic_capabilities.json`` file, and each of
 its capability sets is in its own file in ``capabilities``, named after the
 capability set, such as ``capabilities/AA2.json``.
 
