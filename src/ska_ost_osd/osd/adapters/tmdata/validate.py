@@ -23,17 +23,26 @@ from ska_ost_osd.osd.adapters.tmdata.models import (
     MidDefaultsFile,
     SubarrayTemplateLibraryFile,
 )
+from ska_ost_osd.osd.common.constant import (
+    LOW_CONSTANT_JSON_FILE_PATH,
+    LOW_DEFAULTS_JSON_FILE_PATH,
+    MID_CONSTANT_JSON_FILE_PATH,
+    MID_DEFAULTS_JSON_FILE_PATH,
+    OBSERVING_CYCLES_TMDATA_DIR,
+    POLICIES_CONSTANT_JSON_FILE_PATH,
+    SUBARRAY_TEMPLATES_PATH,
+)
 
 TMDATA_DIR = Path("tmdata")
 FILE_MODELS: dict[str, type[BaseModel]] = {
-    "ska1_mid/mid_capabilities.json": MidCapabilitiesFile,
-    "ska1_low/low_capabilities.json": LowCapabilitiesFile,
-    "ska1_mid/mid_defaults.json": MidDefaultsFile,
-    "ska1_low/low_defaults.json": LowDefaultsFile,
-    "observatory_policies.json": CycleFile,
-    "subarray_templates/subarray_template_library.json": SubarrayTemplateLibraryFile,
+    MID_CONSTANT_JSON_FILE_PATH: MidCapabilitiesFile,
+    LOW_CONSTANT_JSON_FILE_PATH: LowCapabilitiesFile,
+    MID_DEFAULTS_JSON_FILE_PATH: MidDefaultsFile,
+    LOW_DEFAULTS_JSON_FILE_PATH: LowDefaultsFile,
+    POLICIES_CONSTANT_JSON_FILE_PATH: CycleFile,
+    SUBARRAY_TEMPLATES_PATH: SubarrayTemplateLibraryFile,
 }
-CYCLE_FILES = "cycles/cycle_*.json"
+CYCLE_FILES = f"{OBSERVING_CYCLES_TMDATA_DIR}/cycle_*.json"
 
 
 def get_file_models(tmdata_dir: Path) -> dict[str, type[BaseModel]]:
