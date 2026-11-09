@@ -136,7 +136,7 @@ class TestGetDefaults:
     def test_raises_when_file_missing(self, empty_tmdata_repository):
         with pytest.raises(
             FileNotFoundError,
-            match="file not found: telescopes/ska1_mid/mid_defaults.json",
+            match="file not found: telescopes/ska1_mid/defaults.json",
         ):
             empty_tmdata_repository.get_defaults(Telescope.SKA_MID)
 

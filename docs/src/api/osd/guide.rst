@@ -37,14 +37,14 @@ Folder Structure
     │   │   ├── subarray_templates
     │   │   │   └── <array assembly>.json
     │   │   ├── basic_capabilities.json
-    │   │   └── low_defaults.json
+    │   │   └── defaults.json
     │   └── ska1_mid
     │       ├── capabilities
     │       │   └── <capability set>.json
     │       ├── subarray_templates
     │       │   └── <array assembly>.json
     │       ├── basic_capabilities.json
-    │       └── mid_defaults.json
+    │       └── defaults.json
     ├── ska1_low                             (legacy)
     │   ├── low_capabilities.json
     │   └── low_defaults.json

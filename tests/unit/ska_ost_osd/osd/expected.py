@@ -332,7 +332,7 @@ LOW_CAPABILITY_SET_FILES = {
     for capability_set in (LOW_AA1, LOW_AA2)
 }
 
-# The defaults in tests/tmdata/telescopes/ska1_mid/mid_defaults.json
+# The defaults in tests/tmdata/telescopes/ska1_mid/defaults.json
 MID_DEFAULTS = MidDefaults(
     spfrx_defaults=SPFRxParameters(
         target_spfrx=TargetSPFRx(
@@ -352,7 +352,7 @@ MID_DEFAULTS = MidDefaults(
     ),
 )
 
-# The whole of tests/tmdata/telescopes/ska1_mid/mid_defaults.json
+# The whole of tests/tmdata/telescopes/ska1_mid/defaults.json
 MID_DEFAULTS_FILE = MidDefaultsFile(
     constraints=AvoidanceConstraints(
         sun_avoidance_angle_deg=30.0,
@@ -362,14 +362,14 @@ MID_DEFAULTS_FILE = MidDefaultsFile(
     spfrx_defaults=MID_DEFAULTS.spfrx_defaults,
 )
 
-# The defaults in tests/tmdata/telescopes/ska1_low/low_defaults.json
+# The defaults in tests/tmdata/telescopes/ska1_low/defaults.json
 LOW_DEFAULTS = LowDefaults(
     quality_attribute_metrics=LowQualityAttributeMetrics(
         cbf=LowCBFMetrics(processors_ready_percent=100, alveo_configured_percent=100)
     ),
 )
 
-# The whole of tests/tmdata/telescopes/ska1_low/low_defaults.json
+# The whole of tests/tmdata/telescopes/ska1_low/defaults.json
 LOW_DEFAULTS_FILE = LowDefaultsFile(
     constraints=AvoidanceConstraints(
         sun_avoidance_angle_deg=30.0,
@@ -380,7 +380,7 @@ LOW_DEFAULTS_FILE = LowDefaultsFile(
 )
 
 # Elevation limits from tests/tmdata/telescopes/ska1_mid/basic_capabilities.json and
-# avoidance angles from mid_defaults.json
+# avoidance angles from defaults.json
 MID_CONSTRAINTS = Constraints(
     min_elevation_deg=15.0,
     max_elevation_deg=90.0,
@@ -390,7 +390,7 @@ MID_CONSTRAINTS = Constraints(
 )
 
 # Elevation limits from tests/tmdata/telescopes/ska1_low/basic_capabilities.json and
-# avoidance angles from low_defaults.json
+# avoidance angles from defaults.json
 LOW_CONSTRAINTS = Constraints(
     min_elevation_deg=45.0,
     max_elevation_deg=90.0,

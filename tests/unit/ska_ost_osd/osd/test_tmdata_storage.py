@@ -104,8 +104,8 @@ class TestGetTelescopeDefaults:
     @pytest.mark.parametrize(
         "telescope, path",
         [
-            (Telescope.SKA_MID, "telescopes/ska1_mid/mid_defaults.json"),
-            (Telescope.SKA_LOW, "telescopes/ska1_low/low_defaults.json"),
+            (Telescope.SKA_MID, "telescopes/ska1_mid/defaults.json"),
+            (Telescope.SKA_LOW, "telescopes/ska1_low/defaults.json"),
         ],
     )
     def test_raises_when_file_missing(self, empty_tmdata, telescope, path):

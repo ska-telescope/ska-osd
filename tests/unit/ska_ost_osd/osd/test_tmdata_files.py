@@ -29,8 +29,8 @@ TMDATA = Path(__file__).parents[4] / "tmdata"
     [
         (MidBasicCapabilitiesFile, "telescopes/ska1_mid/basic_capabilities.json"),
         (LowBasicCapabilitiesFile, "telescopes/ska1_low/basic_capabilities.json"),
-        (MidDefaultsFile, "telescopes/ska1_mid/mid_defaults.json"),
-        (LowDefaultsFile, "telescopes/ska1_low/low_defaults.json"),
+        (MidDefaultsFile, "telescopes/ska1_mid/defaults.json"),
+        (LowDefaultsFile, "telescopes/ska1_low/defaults.json"),
         (CycleFile, "observatory_policies.json"),
         (
             SubarrayTemplateLibraryFile,

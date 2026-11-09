@@ -115,7 +115,7 @@ class TelescopeDefaultsFileBase(OSDBaseModel):
 
 
 class MidDefaultsFile(TelescopeDefaultsFileBase):
-    """Top-level model for mid_defaults.json."""
+    """Top-level model for telescopes/ska1_mid/defaults.json."""
 
     telescope: Literal["Mid"] = "Mid"
     spfrx_defaults: SPFRxParameters = Field(
@@ -124,7 +124,7 @@ class MidDefaultsFile(TelescopeDefaultsFileBase):
 
 
 class LowDefaultsFile(TelescopeDefaultsFileBase):
-    """Top-level model for low_defaults.json."""
+    """Top-level model for telescopes/ska1_low/defaults.json."""
 
     telescope: Literal["Low"] = "Low"
     quality_attribute_metrics: LowQualityAttributeMetrics
