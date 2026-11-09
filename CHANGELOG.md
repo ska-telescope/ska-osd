@@ -38,6 +38,9 @@ Unreleased
   its ``elevation_limits``. ``mid_capabilities.json`` and ``low_capabilities.json``
   are kept for older releases but are no longer read
 * Moved telescope capability sets to standalone tmdata files
+* Moved each telescope's current tmdata files under ``telescopes/<telescope>``. The
+  legacy files stay at their old paths for older releases and for consumers that read
+  them directly, including copies of ``mid_defaults.json`` and ``low_defaults.json``
 * Moved subarray templates to a tmdata file per telescope and array assembly; each
   capability set names its ``array_assembly`` instead of template wildcard patterns
 * [BREAKING] Removed ``ska_ost_osd.osd.template_mapping``; ``get_osd_using_tmdata``

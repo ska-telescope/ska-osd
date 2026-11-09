@@ -30,20 +30,34 @@ Folder Structure
     ├── cycles
     │   ├── cycle_1.json
     │   └── cycle_<id>.json
-    ├── ska1_low
-    │   ├── capabilities
-    │   │   └── <capability set>.json
-    │   ├── subarray_templates
-    │   │   └── <array assembly>.json
-    │   ├── basic_capabilities.json
-    │   └── low_capabilities.json        (legacy)
-    └── ska1_mid
-        ├── capabilities
-        │   └── <capability set>.json
-        ├── subarray_templates
-        │   └── <array assembly>.json
-        ├── basic_capabilities.json
-        └── mid_capabilities.json        (legacy)
+    ├── telescopes
+    │   ├── ska1_low
+    │   │   ├── capabilities
+    │   │   │   └── <capability set>.json
+    │   │   ├── subarray_templates
+    │   │   │   └── <array assembly>.json
+    │   │   ├── basic_capabilities.json
+    │   │   └── low_defaults.json
+    │   └── ska1_mid
+    │       ├── capabilities
+    │       │   └── <capability set>.json
+    │       ├── subarray_templates
+    │       │   └── <array assembly>.json
+    │       ├── basic_capabilities.json
+    │       └── mid_defaults.json
+    ├── ska1_low                             (legacy)
+    │   ├── low_capabilities.json
+    │   └── low_defaults.json
+    ├── ska1_mid                             (legacy)
+    │   ├── mid_capabilities.json
+    │   └── mid_defaults.json
+    ├── subarray_templates                   (legacy)
+    │   └── subarray_template_library.json
+    └── observatory_policies.json            (legacy)
+
+The current files are in ``cycles`` and ``telescopes``. The legacy files are
+kept for older releases of the OSD and for consumers that read them directly;
+the current code does not read them.
 
 
 * `mid_capabilities.json <https://confluence.skatelescope.org/pages/viewpage.action?spaceKey=SWSI&title=Observatory+Static+Data>`_
@@ -245,7 +259,7 @@ Subarray Template Support
 
 A subarray template is a named set of receptors from an array assembly. Each
 telescope's templates are stored by array assembly, in
-``ska1_<telescope>/subarray_templates/<array assembly>.json``, as a list:
+``telescopes/ska1_<telescope>/subarray_templates/<array assembly>.json``, as a list:
 
 .. code-block:: json
 

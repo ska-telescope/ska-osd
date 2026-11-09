@@ -1,0 +1,14 @@
+{
+  "telescope": "Low",
+  "constraints": {
+    "sun_avoidance_angle_deg": 30.0,
+    "moon_avoidance_angle_deg": 10.0,
+    "jupiter_avoidance_angle_deg": 10.0
+  },
+  "quality_attribute_metrics": {
+    "cbf": {
+      "alveo_configured_percent": 100,
+      "processors_ready_percent": 100
+    }
+  }
+}

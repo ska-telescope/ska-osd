@@ -62,9 +62,9 @@ class OSD:
     @cached_property
     def capability_filepaths(self) -> dict[str, str]:
         """Return telescope-keyed TMData basic capabilities paths, e.g.
-        ``{"mid": "ska1_mid/basic_capabilities.json"}``."""
+        ``{"mid": "telescopes/ska1_mid/basic_capabilities.json"}``."""
         return {
-            posixpath.dirname(entry).removeprefix("ska1_"): entry
+            posixpath.basename(posixpath.dirname(entry)).removeprefix("ska1_"): entry
             for entry in self.tmdata
             if entry.endswith("/basic_capabilities.json")
         }

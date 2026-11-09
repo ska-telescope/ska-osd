@@ -2,20 +2,28 @@
 
 from enum import StrEnum
 
+# Legacy files, kept for older releases and for consumers that read them
+# directly; the current code does not read them
 MID_CONSTANT_JSON_FILE_PATH = "ska1_mid/mid_capabilities.json"
 LOW_CONSTANT_JSON_FILE_PATH = "ska1_low/low_capabilities.json"
-MID_DEFAULTS_JSON_FILE_PATH = "ska1_mid/mid_defaults.json"
-LOW_DEFAULTS_JSON_FILE_PATH = "ska1_low/low_defaults.json"
-MID_BASIC_CAPABILITIES_JSON_FILE_PATH = "ska1_mid/basic_capabilities.json"
-LOW_BASIC_CAPABILITIES_JSON_FILE_PATH = "ska1_low/basic_capabilities.json"
-MID_CAPABILITY_SETS_TMDATA_DIR = "ska1_mid/capabilities"
-LOW_CAPABILITY_SETS_TMDATA_DIR = "ska1_low/capabilities"
-OBSERVING_CYCLES_TMDATA_DIR = "cycles"
 POLICIES_CONSTANT_JSON_FILE_PATH = "observatory_policies.json"
-RELEASE_FILE_PATH_LATEST = "version_mapping/latest_release.txt"
+
+# Each telescope's files are in its own directory under telescopes
+TELESCOPES_TMDATA_DIR = "telescopes"
+MID_TMDATA_DIR = f"{TELESCOPES_TMDATA_DIR}/ska1_mid"
+LOW_TMDATA_DIR = f"{TELESCOPES_TMDATA_DIR}/ska1_low"
+MID_DEFAULTS_JSON_FILE_PATH = f"{MID_TMDATA_DIR}/mid_defaults.json"
+LOW_DEFAULTS_JSON_FILE_PATH = f"{LOW_TMDATA_DIR}/low_defaults.json"
+MID_BASIC_CAPABILITIES_JSON_FILE_PATH = f"{MID_TMDATA_DIR}/basic_capabilities.json"
+LOW_BASIC_CAPABILITIES_JSON_FILE_PATH = f"{LOW_TMDATA_DIR}/basic_capabilities.json"
+MID_CAPABILITY_SETS_TMDATA_DIR = f"{MID_TMDATA_DIR}/capabilities"
+LOW_CAPABILITY_SETS_TMDATA_DIR = f"{LOW_TMDATA_DIR}/capabilities"
 SUBARRAY_TEMPLATES_DIRNAME = "subarray_templates"
-MID_SUBARRAY_TEMPLATES_TMDATA_DIR = f"ska1_mid/{SUBARRAY_TEMPLATES_DIRNAME}"
-LOW_SUBARRAY_TEMPLATES_TMDATA_DIR = f"ska1_low/{SUBARRAY_TEMPLATES_DIRNAME}"
+MID_SUBARRAY_TEMPLATES_TMDATA_DIR = f"{MID_TMDATA_DIR}/{SUBARRAY_TEMPLATES_DIRNAME}"
+LOW_SUBARRAY_TEMPLATES_TMDATA_DIR = f"{LOW_TMDATA_DIR}/{SUBARRAY_TEMPLATES_DIRNAME}"
+
+OBSERVING_CYCLES_TMDATA_DIR = "cycles"
+RELEASE_FILE_PATH_LATEST = "version_mapping/latest_release.txt"
 
 osd_file_mapping = {
     "low": LOW_CONSTANT_JSON_FILE_PATH,

@@ -103,7 +103,8 @@ class TestGetBasicCapabilities:
 
     def test_raises_when_file_missing(self, empty_tmdata_repository):
         with pytest.raises(
-            FileNotFoundError, match="file not found: ska1_low/basic_capabilities.json"
+            FileNotFoundError,
+            match="file not found: telescopes/ska1_low/basic_capabilities.json",
         ):
             empty_tmdata_repository.get_basic_capabilities(Telescope.SKA_LOW)
 
@@ -118,7 +119,8 @@ class TestGetConstraints:
 
     def test_raises_when_files_missing(self, empty_tmdata_repository):
         with pytest.raises(
-            FileNotFoundError, match="file not found: ska1_mid/basic_capabilities.json"
+            FileNotFoundError,
+            match="file not found: telescopes/ska1_mid/basic_capabilities.json",
         ):
             empty_tmdata_repository.get_constraints(Telescope.SKA_MID)
 
@@ -133,7 +135,8 @@ class TestGetDefaults:
 
     def test_raises_when_file_missing(self, empty_tmdata_repository):
         with pytest.raises(
-            FileNotFoundError, match="file not found: ska1_mid/mid_defaults.json"
+            FileNotFoundError,
+            match="file not found: telescopes/ska1_mid/mid_defaults.json",
         ):
             empty_tmdata_repository.get_defaults(Telescope.SKA_MID)
 
@@ -153,7 +156,7 @@ class TestGetCapabilitySets:
 
     def test_raises_when_file_missing(self, empty_tmdata_repository):
         with pytest.raises(
-            FileNotFoundError, match="file not found: ska1_mid/capabilities"
+            FileNotFoundError, match="file not found: telescopes/ska1_mid/capabilities"
         ):
             empty_tmdata_repository.get_capability_sets(Telescope.SKA_MID)
 
@@ -189,7 +192,7 @@ class TestGetCapabilitySet:
 
     def test_raises_when_file_missing(self, empty_tmdata_repository):
         with pytest.raises(
-            FileNotFoundError, match="file not found: ska1_low/capabilities"
+            FileNotFoundError, match="file not found: telescopes/ska1_low/capabilities"
         ):
             empty_tmdata_repository.get_capability_set(Telescope.SKA_LOW, "AA1")
 
