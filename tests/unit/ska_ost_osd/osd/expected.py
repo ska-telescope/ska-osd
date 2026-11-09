@@ -319,7 +319,7 @@ LOW_FREQUENCY_BAND = LowFrequencyBand(
 
 # tests/tmdata/ska1_low/basic_capabilities.json
 LOW_BASIC_CAPABILITIES = LowBasicCapabilities(
-    **LOW_FREQUENCY_BAND.model_dump(),
+    frequency_bands=[LOW_FREQUENCY_BAND],
     elevation_limits=ElevationLimits(min_elevation_deg=45.0, max_elevation_deg=90.0),
 )
 

@@ -33,10 +33,10 @@ Unreleased
   ``low_capabilities.json``; use ``coarse_channel_width_hz``
 * [BREAKING] Removed the sun, moon and Jupiter avoidance angles from the capabilities
   files; they are defined in ``mid_defaults.json`` and ``low_defaults.json``
-* Moved telescope ``basic_capabilities`` to standalone tmdata files
-* Moved each telescope's elevation limits into its ``basic_capabilities.json``, as
-  ``elevation_limits``. ``mid_capabilities.json`` and ``low_capabilities.json`` are
-  kept for older releases but are no longer read
+* Added a ``basic_capabilities.json`` for each telescope, holding its
+  ``frequency_bands`` (Mid's receiver bands; Low's one band and its channels) and
+  its ``elevation_limits``. ``mid_capabilities.json`` and ``low_capabilities.json``
+  are kept for older releases but are no longer read
 * Moved telescope capability sets to standalone tmdata files
 * Moved subarray templates to a tmdata file per telescope and array assembly; each
   capability set names its ``array_assembly`` instead of template wildcard patterns

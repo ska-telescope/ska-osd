@@ -192,11 +192,14 @@ class OSD:
         """Load one telescope capability document and optional template mappings.
 
         The document is rebuilt in its legacy shape: the basic capabilities,
-        without the elevation limits, and each capability set."""
+        without the elevation limits, as Mid's ``receiver_information`` or
+        Low's one band, and each capability set."""
         capability_filepath = self.capability_filepaths[telescope]
         telescope_dir = posixpath.dirname(capability_filepath)
-        basic_capabilities = self.tmdata[capability_filepath].get_dict()
-        basic_capabilities.pop("elevation_limits")
+        bands = self.tmdata[capability_filepath].get_dict()["frequency_bands"]
+        basic_capabilities = (
+            {"receiver_information": bands} if telescope == "mid" else bands[0]
+        )
         return {
             "basic_capabilities": basic_capabilities,
             **{

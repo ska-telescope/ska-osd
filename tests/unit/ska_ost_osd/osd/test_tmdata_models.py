@@ -102,8 +102,10 @@ class TestBreakingChanges:
             (
                 LowBasicCapabilitiesFile,
                 LOW_BASIC_CAPABILITIES_FILE,
-                lambda data: data.update(
-                    coarse_channel_width=data.pop("coarse_channel_width_hz")
+                lambda data: data["frequency_bands"][0].update(
+                    coarse_channel_width=data["frequency_bands"][0].pop(
+                        "coarse_channel_width_hz"
+                    )
                 ),
             ),
             (
@@ -200,7 +202,7 @@ class TestCapabilities:
             (
                 MidBasicCapabilitiesFile,
                 MID_BASIC_CAPABILITIES_FILE,
-                lambda data: data["receiver_information"][0].update(
+                lambda data: data["frequency_bands"][0].update(
                     min_frequency_hz=2e9, max_frequency_hz=1e9
                 ),
                 "min_frequency_hz must not exceed max_frequency_hz",

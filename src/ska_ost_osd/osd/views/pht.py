@@ -147,6 +147,13 @@ def _subarray_templates(
     }
 
 
+def _low_frequency_band(repository: OSDRepository) -> LowFrequencyBand:
+    """Low's one frequency band, which the PHT reads as Low's basic
+    capabilities."""
+    (band,) = repository.get_basic_capabilities(Telescope.SKA_LOW).frequency_bands
+    return band
+
+
 def get_cycle_configuration(
     repository: OSDRepository,
     cycle_id: CycleID,
@@ -190,11 +197,7 @@ def get_cycle_configuration(
             if offered.ska_mid is not None
             else None,
             low=LowCycleCapabilities(
-                basic_capabilities=LowFrequencyBand.model_validate(
-                    repository.get_basic_capabilities(Telescope.SKA_LOW).model_dump(
-                        exclude={"elevation_limits"}
-                    )
-                ),
+                basic_capabilities=_low_frequency_band(repository),
                 capability_set=repository.get_capability_set(
                     Telescope.SKA_LOW, offered.ska_low
                 ),

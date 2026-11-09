@@ -64,13 +64,9 @@ class Configuration(ConfigurationModel):
 
 
 def _low_frequency_band(repository: OSDRepository) -> LowFrequencyBand:
-    """Low's band, without the elevation limits, which the view serves in
-    ``constraints``."""
-    return LowFrequencyBand.model_validate(
-        repository.get_basic_capabilities(Telescope.SKA_LOW).model_dump(
-            exclude={"elevation_limits"}
-        )
-    )
+    """Low's one frequency band, which the ODT reads as a single object."""
+    (band,) = repository.get_basic_capabilities(Telescope.SKA_LOW).frequency_bands
+    return band
 
 
 def get_configuration(repository: OSDRepository) -> Configuration:

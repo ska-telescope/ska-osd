@@ -57,8 +57,9 @@ Reading the data
      - ``MidCapabilitySet`` / ``LowCapabilitySet``: one array assembly of a
        telescope, e.g. ``"AA2"``
    * - ``get_basic_capabilities(telescope)``
-     - ``MidBasicCapabilities`` (the receiver bands) / ``LowBasicCapabilities``
-       (the frequency band and its channels)
+     - ``MidBasicCapabilities`` / ``LowBasicCapabilities``: the
+       ``frequency_bands`` (Mid's receiver bands; Low's one band and its
+       channels) and the ``elevation_limits``
    * - ``get_constraints(telescope)``
      - ``Constraints``: the elevation limits and the sun, moon and Jupiter
        avoidance angles

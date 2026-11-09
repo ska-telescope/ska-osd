@@ -50,9 +50,9 @@ Folder Structure
 
 * `low_capabilities.json <https://confluence.skatelescope.org/pages/viewpage.action?spaceKey=SWSI&title=Observatory+Static+Data>`_
 
-Each telescope's basic capabilities (Mid's receiver bands, Low's frequency
-band and channels, and the telescope's elevation limits) are in its
-``basic_capabilities.json`` file, and each of
+Each telescope's basic capabilities are in its ``basic_capabilities.json``
+file: its ``frequency_bands`` (Mid's receiver bands; Low's one band, with its
+coarse channels) and its ``elevation_limits``. Each of
 its capability sets is in its own file in ``capabilities``, named after the
 capability set, such as ``capabilities/AA2.json``.
 

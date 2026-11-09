@@ -54,7 +54,7 @@ class Band5bSubband(FrequencyBand):
 
 
 class MidFrequencyBand(FrequencyBand):
-    """One receiver band. tmdata: ``basic_capabilities.receiver_information[]``."""
+    """One receiver band. tmdata: ``basic_capabilities.frequency_bands[]``."""
 
     rx_id: str = Field(examples=["Band_1"])
     band5b_subbands: list[Band5bSubband] | None = Field(
@@ -83,9 +83,7 @@ class MidBasicCapabilities(OSDBaseModel):
     """Mid's receiver bands and elevation limits. tmdata:
     ``basic_capabilities``."""
 
-    frequency_bands: list[MidFrequencyBand] = Field(
-        validation_alias=AliasChoices("frequency_bands", "receiver_information"),
-    )
+    frequency_bands: list[MidFrequencyBand]
     elevation_limits: ElevationLimits
 
     def get_frequency_band(self, rx_id: str) -> MidFrequencyBand:
@@ -132,7 +130,8 @@ class LowCBFMode(StrEnum):
 
 
 class LowFrequencyBand(FrequencyBand):
-    """Low's frequency band and how it is divided into channels."""
+    """A Low frequency band and how it is divided into channels. tmdata:
+    ``basic_capabilities.frequency_bands[]``."""
 
     min_coarse_channel: int = Field(ge=0, examples=[64])
     max_coarse_channel: int = Field(ge=0, examples=[447])
@@ -143,10 +142,11 @@ class LowFrequencyBand(FrequencyBand):
     number_pss_channels_per_coarse_channel: int = Field(ge=0, examples=[54])
 
 
-class LowBasicCapabilities(LowFrequencyBand):
+class LowBasicCapabilities(OSDBaseModel):
     """Low's frequency band and elevation limits. tmdata:
     ``basic_capabilities``."""
 
+    frequency_bands: list[LowFrequencyBand]
     elevation_limits: ElevationLimits
 
 
