@@ -98,7 +98,7 @@ def validate_tmdata(tmdata_dir: Path) -> list[str]:
     """
     file_models = get_file_models(tmdata_dir)
     problems = []
-    if file_models.keys() == FILE_MODELS.keys():
+    if not any(tmdata_dir.glob(CYCLE_FILES)):
         problems.append(f"{CYCLE_FILES}: no cycle files found")
     for name, model in file_models.items():
         problems.extend(
