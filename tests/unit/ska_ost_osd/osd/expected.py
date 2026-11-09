@@ -10,7 +10,9 @@ from ska_ost_osd.osd.adapters.tmdata.models import (
     LowCapabilitySetFile,
     LowDefaultsFile,
     MidCapabilitySetFile,
+    MidCSPConfigurationDefaults,
     MidDefaultsFile,
+    MidTargetDefaults,
     SubarrayTemplateLibraryFile,
 )
 from ska_ost_osd.osd.models.capabilities import (
@@ -359,7 +361,12 @@ MID_DEFAULTS_FILE = MidDefaultsFile(
         moon_avoidance_angle_deg=10.0,
         jupiter_avoidance_angle_deg=10.0,
     ),
-    spfrx_defaults=MID_DEFAULTS.spfrx_defaults,
+    target=MidTargetDefaults(
+        dish_spfrx_params=MID_DEFAULTS.spfrx_defaults.target_spfrx
+    ),
+    csp_configuration=MidCSPConfigurationDefaults(
+        spfrx=MID_DEFAULTS.spfrx_defaults.csp_spfrx
+    ),
 )
 
 # The defaults in tests/tmdata/telescopes/ska1_low/defaults.json

@@ -2,8 +2,6 @@ from enum import StrEnum
 from typing import Annotated, Any, Literal, Self
 
 from pydantic import (
-    AliasChoices,
-    AliasPath,
     BaseModel,
     ConfigDict,
     Field,
@@ -112,16 +110,8 @@ class CSPSPFRx(OSDBaseModel):
 
 
 class SPFRxParameters(OSDBaseModel):
-    target_spfrx: TargetSPFRx = Field(
-        validation_alias=AliasChoices(
-            "target_spfrx", AliasPath("target", "dish_spfrx_params")
-        )
-    )
-    csp_spfrx: CSPSPFRx = Field(
-        validation_alias=AliasChoices(
-            "csp_spfrx", AliasPath("csp_configuration", "spfrx")
-        )
-    )
+    target_spfrx: TargetSPFRx
+    csp_spfrx: CSPSPFRx
 
 
 class MidDefaults(OSDBaseModel):

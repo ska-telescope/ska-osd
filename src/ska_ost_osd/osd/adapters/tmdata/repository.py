@@ -5,7 +5,7 @@ from typing import Literal, overload
 from ska_telmodel_client import TMData
 
 from ska_ost_osd.osd.adapters.tmdata import storage
-from ska_ost_osd.osd.adapters.tmdata.models import CycleFile
+from ska_ost_osd.osd.adapters.tmdata.models import CycleFile, MidDefaultsFile
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.exceptions import CapabilitySetNotFoundError, CycleNotFoundError
 from ska_ost_osd.osd.models.capabilities import (
@@ -17,17 +17,12 @@ from ska_ost_osd.osd.models.capabilities import (
 )
 from ska_ost_osd.osd.models.constraints import Constraints
 from ska_ost_osd.osd.models.cycles import Cycle, CycleID
-from ska_ost_osd.osd.models.defaults import LowDefaults, MidDefaults
+from ska_ost_osd.osd.models.defaults import LowDefaults, MidDefaults, SPFRxParameters
 from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplate
 
 _CAPABILITY_SET_MODELS = {
     Telescope.SKA_MID: MidCapabilitySet,
     Telescope.SKA_LOW: LowCapabilitySet,
-}
-
-_DEFAULTS_MODELS = {
-    Telescope.SKA_MID: MidDefaults,
-    Telescope.SKA_LOW: LowDefaults,
 }
 
 # The fields of a cycle's telescope_capabilities, by telescope
@@ -73,10 +68,15 @@ class TMDataRepository:
     def get_defaults(self, telescope: Literal[Telescope.SKA_LOW]) -> LowDefaults: ...
 
     def get_defaults(self, telescope: Telescope) -> MidDefaults | LowDefaults:
-        return _DEFAULTS_MODELS[telescope].model_validate(
-            storage.get_telescope_defaults(self._tmdata, telescope),
-            from_attributes=True,
-        )
+        defaults = storage.get_telescope_defaults(self._tmdata, telescope)
+        if isinstance(defaults, MidDefaultsFile):
+            return MidDefaults(
+                spfrx_defaults=SPFRxParameters(
+                    target_spfrx=defaults.target.dish_spfrx_params,
+                    csp_spfrx=defaults.csp_configuration.spfrx,
+                )
+            )
+        return LowDefaults(quality_attribute_metrics=defaults.quality_attribute_metrics)
 
     @overload
     def get_basic_capabilities(

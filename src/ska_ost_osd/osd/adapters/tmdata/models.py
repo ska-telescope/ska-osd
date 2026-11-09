@@ -2,9 +2,9 @@
 whole. ``storage`` reads the files into these, and ``TMDataRepository`` maps
 them to the reader models."""
 
-from typing import Literal, Self
+from typing import Self
 
-from pydantic import AliasChoices, Field, model_validator
+from pydantic import Field, model_validator
 
 from ska_ost_osd.osd.models.capabilities import (
     LowBasicCapabilities,
@@ -19,9 +19,10 @@ from ska_ost_osd.osd.models.cycles import (
     TelescopeCapabilities,
 )
 from ska_ost_osd.osd.models.defaults import (
+    CSPSPFRx,
     LowQualityAttributeMetrics,
     OSDBaseModel,
-    SPFRxParameters,
+    TargetSPFRx,
 )
 from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplate
 
@@ -114,19 +115,28 @@ class TelescopeDefaultsFileBase(OSDBaseModel):
     constraints: AvoidanceConstraints
 
 
+class MidTargetDefaults(OSDBaseModel):
+    """The SPFRx parameters each Mid target starts with."""
+
+    dish_spfrx_params: TargetSPFRx
+
+
+class MidCSPConfigurationDefaults(OSDBaseModel):
+    """The SPFRx settings Mid's CSP configuration starts with."""
+
+    spfrx: CSPSPFRx
+
+
 class MidDefaultsFile(TelescopeDefaultsFileBase):
     """Top-level model for telescopes/ska1_mid/defaults.json."""
 
-    telescope: Literal["Mid"] = "Mid"
-    spfrx_defaults: SPFRxParameters = Field(
-        validation_alias=AliasChoices("spfrx_defaults", "defaults")
-    )
+    target: MidTargetDefaults
+    csp_configuration: MidCSPConfigurationDefaults
 
 
 class LowDefaultsFile(TelescopeDefaultsFileBase):
     """Top-level model for telescopes/ska1_low/defaults.json."""
 
-    telescope: Literal["Low"] = "Low"
     quality_attribute_metrics: LowQualityAttributeMetrics
 
 

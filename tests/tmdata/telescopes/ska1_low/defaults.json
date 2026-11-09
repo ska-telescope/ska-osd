@@ -1,5 +1,4 @@
 {
-  "telescope": "Low",
   "constraints": {
     "sun_avoidance_angle_deg": 30.0,
     "moon_avoidance_angle_deg": 10.0,

@@ -111,7 +111,7 @@ class TestBreakingChanges:
             (
                 MidDefaultsFile,
                 MID_DEFAULTS,
-                lambda data: data["defaults"].pop("csp_configuration"),
+                lambda data: data.pop("csp_configuration"),
             ),
             (
                 LowDefaultsFile,
@@ -305,9 +305,9 @@ class TestDefaults:
         """tmdata keys the noise diode options by mode under ``noise_diode``;
         the model lists them, with the default mode alongside."""
         data = load(MID_DEFAULTS)
-        noise_diode = data["defaults"]["target"]["dish_spfrx_params"]["noise_diode"]
+        noise_diode = data["target"]["dish_spfrx_params"]["noise_diode"]
 
-        target_spfrx = MidDefaultsFile.model_validate(data).spfrx_defaults.target_spfrx
+        target_spfrx = MidDefaultsFile.model_validate(data).target.dish_spfrx_params
 
         options = {option.mode: option for option in target_spfrx.noise_diode_options}
         assert target_spfrx.default_noise_diode_mode == noise_diode["mode"]
@@ -317,7 +317,7 @@ class TestDefaults:
     def test_default_noise_diode_mode_needs_an_option(self):
         """The default mode must be one of the options."""
         data = load(MID_DEFAULTS)
-        noise_diode = data["defaults"]["target"]["dish_spfrx_params"]["noise_diode"]
+        noise_diode = data["target"]["dish_spfrx_params"]["noise_diode"]
         noise_diode["mode"] = "periodic"
         noise_diode.pop("periodic")
 
@@ -328,16 +328,16 @@ class TestDefaults:
     def test_boolean_sync_pps_is_read(self, old, new):
         """Releases up to 6.0.9 have a boolean sync_pps; it still reads."""
         data = load(MID_DEFAULTS)
-        data["defaults"]["csp_configuration"]["spfrx"]["sync_pps"] = old
+        data["csp_configuration"]["spfrx"]["sync_pps"] = old
 
         defaults = MidDefaultsFile.model_validate(data)
 
-        assert defaults.spfrx_defaults.csp_spfrx.sync_pps == new
+        assert defaults.csp_configuration.spfrx.sync_pps == new
 
     def test_noise_diode_off_needs_no_option(self):
         """Switching the noise diode off doesn't need an option for it."""
         data = load(MID_DEFAULTS)
-        noise_diode = data["defaults"]["target"]["dish_spfrx_params"]["noise_diode"]
+        noise_diode = data["target"]["dish_spfrx_params"]["noise_diode"]
         noise_diode["mode"] = "off"
         noise_diode.pop("periodic")
 
