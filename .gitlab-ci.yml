@@ -47,6 +47,7 @@ include:
 
 tmdata-validate:
   stage: test
+  needs: []
   script:
     - make tmdata-validate
 

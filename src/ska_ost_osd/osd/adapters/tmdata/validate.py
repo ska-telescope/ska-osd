@@ -1,12 +1,14 @@
 """Validate the tmdata files against the OSD storage models.
 
-Each file in the repository's ``tmdata`` directory is read into its storage
-model, then serialised and read back, which must give the same model. Every
-problem is reported, and the script exits with status 1 if there are any.
+Each file in the tmdata directory is read into its storage model, then
+serialised and read back, which must give the same model. Every problem is
+reported, and the command exits with status 1 if there are any.
 
-Usage: ``python scripts/validate_tmdata.py``
+Usage: ``osd-validate-tmdata [TMDATA_DIR]``, where ``TMDATA_DIR`` defaults to
+the ``tmdata`` directory where the command is run.
 """
 
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -22,7 +24,7 @@ from ska_ost_osd.osd.adapters.tmdata.models import (
     SubarrayTemplateLibraryFile,
 )
 
-TMDATA_DIR = Path(__file__).resolve().parents[1] / "tmdata"
+TMDATA_DIR = Path("tmdata")
 FILE_MODELS: dict[str, type[BaseModel]] = {
     "ska1_mid/mid_capabilities.json": MidCapabilitiesFile,
     "ska1_low/low_capabilities.json": LowCapabilitiesFile,
@@ -111,21 +113,35 @@ def describe(error: ValidationError) -> list[str]:
     return descriptions
 
 
-def main() -> int:
-    """Validate the repository's tmdata directory.
+def main(argv: list[str] | None = None) -> int:
+    """Validate the tmdata directory given on the command line.
 
+    :param argv: the command's arguments, or ``None`` for those it was run
+        with.
     :return: the exit status, 1 if any problem was found.
     """
-    problems = validate_tmdata(TMDATA_DIR)
+    parser = argparse.ArgumentParser(
+        prog="osd-validate-tmdata",
+        description="Validate the tmdata files against the OSD storage models.",
+    )
+    parser.add_argument(
+        "tmdata_dir",
+        nargs="?",
+        type=Path,
+        default=TMDATA_DIR,
+        help="the tmdata directory (default: tmdata)",
+    )
+    tmdata_dir = parser.parse_args(argv).tmdata_dir
+    if not tmdata_dir.is_dir():
+        print(f"no tmdata directory at {tmdata_dir.resolve()}", file=sys.stderr)
+        return 1
+
+    problems = validate_tmdata(tmdata_dir)
     for problem in problems:
         print(problem, file=sys.stderr)
     if problems:
         print(f"{len(problems)} problem(s) in the tmdata", file=sys.stderr)
         return 1
 
-    print(f"{len(get_file_models(TMDATA_DIR))} tmdata files are valid")
+    print(f"{len(get_file_models(tmdata_dir))} tmdata files are valid")
     return 0
-
-
-if __name__ == "__main__":
-    sys.exit(main())
