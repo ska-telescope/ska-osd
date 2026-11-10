@@ -116,10 +116,10 @@ Response
     {
       "observatory_policy": {
         "cycle_number": 1,
-        "telescope_capabilities": {"Low": "AA2_SV"}
+        "telescope_capabilities": {"Low": "AA2"}
       },
       "capabilities": {
-        "low": {"basic_capabilities": {}, "AA2_SV": {}}
+        "low": {"basic_capabilities": {}, "AA2": {}}
       }
     }
 
@@ -128,7 +128,7 @@ Response
 Keys                      Description
 ======================    ============================================================================================================
 observatory_policy        file content of the selected ``cycles/cycle_<id>.json`` file
-telescope_capabilities    value of ``telescope_capabilities`` in the selected cycle file
+telescope_capabilities    value of ``telescope_capabilities`` in the selected cycle file, keyed ``Mid`` and ``Low``
 capabilities              key value pair of mid and low
 Mid                       ``basic_capabilities`` and the capability sets (``Array Assembly`` AA0.5, AA1 etc) of SKA-Mid
 Low                       ``basic_capabilities`` and the capability sets (``Array Assembly`` AA0.5, AA1 etc) of SKA-Low
@@ -321,7 +321,7 @@ With ``process_templates=True``, the templates are included in the OSD data:
         "observatory_policy": {
             "cycle_number": 1,
             "telescope_capabilities": {
-                "Low": "AA2_SV"
+                "Low": "AA2"
             }
         },
         "capabilities": {
@@ -330,7 +330,7 @@ With ``process_templates=True``, the templates are included in the OSD data:
                     "min_frequency_hz": 50000000.0,
                     "max_frequency_hz": 350000000.0
                 },
-                "AA2_SV": {
+                "AA2": {
                     "number_stations": 68,
                     "cbf_modes": ["vis", "pst"],
                     "subarray_templates": {

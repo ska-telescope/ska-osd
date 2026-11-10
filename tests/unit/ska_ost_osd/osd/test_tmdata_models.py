@@ -359,12 +359,17 @@ class TestCycleFile:
 
     def test_cycle_response_policy_validates(self, tests_tmdata):
         """The policy in the OSD's response for the cycle, as the PHT
-        endpoints fetch it, validates."""
-        cycle = load(CYCLE)["cycle_number"]
+        endpoints fetch it, is the cycle file with the telescopes named Mid
+        and Low."""
+        cycle = load(CYCLE)
         osd_data = get_osd_using_tmdata(
-            tests_tmdata, cycle_id=cycle, process_templates=True
+            tests_tmdata, cycle_id=cycle["cycle_number"], process_templates=True
         )
-        CycleFile.model_validate(osd_data["observatory_policy"])
+        cycle["telescope_capabilities"] = {
+            telescope.removeprefix("ska_").capitalize(): capability_set
+            for telescope, capability_set in cycle["telescope_capabilities"].items()
+        }
+        assert osd_data["observatory_policy"] == cycle
 
     def test_proposal_dates_are_served_as_the_same_time(self):
         """The dates are parsed, so ``.000Z`` is served as ``Z``, but the
@@ -386,12 +391,12 @@ class TestCycleFile:
         """A telescope missing from the file's telescope_capabilities is read
         as None. (The PHT view serves it as null: see test_views.py.)"""
         data = load(CYCLE)
-        data["telescope_capabilities"] = {"Low": "AA2_SV"}
+        data["telescope_capabilities"] = {"ska_low": "AA2"}
 
         policy = CycleFile.model_validate(data)
 
         assert policy.telescope_capabilities.ska_mid is None
-        assert policy.telescope_capabilities.ska_low == "AA2_SV"
+        assert policy.telescope_capabilities.ska_low == "AA2"
 
     def test_proposals_must_open_before_they_close(self):
         """A proposal window that closes before it opens is rejected."""

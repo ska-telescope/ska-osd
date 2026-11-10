@@ -25,6 +25,9 @@ Unreleased
   ``get_osd_using_tmdata`` still accepts ``"mid"`` and ``"low"``
 * [BREAKING] Renamed the subarray templates in ``subarray_template_library.json``
   to start with ``SKA_MID_`` and ``SKA_LOW_``
+* [BREAKING] Keyed ``telescope_capabilities`` in the ``cycles/cycle_<N>.json`` tmdata
+  files by the ``Telescope`` values, ``ska_mid`` and ``ska_low``, instead of ``Mid``
+  and ``Low``. The legacy response and the PHT view still serve ``Mid`` and ``Low``
 * [BREAKING] Define multiple cycles through a single TelModel backend in ``tmdata/cycles``
 * [BREAKING] Users pass a TMData client to public API functions instead of OSD creating one from ``tmdata/version_mapping``
 * [BREAKING] Removed ``number_beams`` from the SKA-Low array assemblies in

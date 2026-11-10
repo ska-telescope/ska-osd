@@ -30,11 +30,8 @@ class CyclePolicies(OSDBaseModel):
 class TelescopeCapabilities(OSDBaseModel):
     """The array assembly each telescope offers in the cycle, or ``None``."""
 
-    # Read from the tmdata keys Mid and Low
-    ska_mid: str | None = Field(default=None, validation_alias="Mid", examples=["AA2"])
-    ska_low: str | None = Field(
-        default=None, validation_alias="Low", examples=["AA2_SV"]
-    )
+    ska_mid: str | None = Field(default=None, examples=["AA2"])
+    ska_low: str | None = Field(default=None, examples=["AA2"])
 
 
 class Cycle(OSDBaseModel):

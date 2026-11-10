@@ -47,7 +47,7 @@ class OSD:
         :param telescope: requested telescope, ``Telescope.SKA_MID`` or
             ``Telescope.SKA_LOW``. The legacy names ``"mid"`` and ``"low"``
             are still accepted.
-        :param array_assembly: requested capability-set name, such as ``"AA2"`` or ``"AA2_SV"``.
+        :param array_assembly: requested capability-set name, such as ``"AA2"``.
         :param tmdata: TMData, TMData class object.
         :param cycle_id: int, cycle identifier.
         :param process_templates: bool, whether to process template mappings.
@@ -121,12 +121,18 @@ class OSD:
             return None, cycle_error
         if self.cycle_id is None:
             return None, None
-        return (
-            self.tmdata[
-                f"{OBSERVING_CYCLES_TMDATA_DIR}/cycle_{self.cycle_id}.json"
-            ].get_dict(),
-            None,
-        )
+        cycle_definition = self.tmdata[
+            f"{OBSERVING_CYCLES_TMDATA_DIR}/cycle_{self.cycle_id}.json"
+        ].get_dict()
+        # The cycle files name the telescopes by Telescope value; the legacy
+        # response names them Mid and Low
+        cycle_definition["telescope_capabilities"] = {
+            _LEGACY_TELESCOPE_NAMES[Telescope(telescope)].capitalize(): capability_set
+            for telescope, capability_set in cycle_definition[
+                "telescope_capabilities"
+            ].items()
+        }
+        return cycle_definition, None
 
     def select_telescope_capability_sets(
         self, cycle_definition: dict[str, Any] | None

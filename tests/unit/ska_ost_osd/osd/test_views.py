@@ -94,7 +94,7 @@ class TestGetCycleConfiguration:
             {
                 "cycles/cycle_1.json": {
                     **CYCLE_1_FILE.model_dump(mode="json", by_alias=True),
-                    "telescope_capabilities": {"Low": "AA3"},
+                    "telescope_capabilities": {"ska_low": "AA3"},
                 }
             }
         )
