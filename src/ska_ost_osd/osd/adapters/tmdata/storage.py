@@ -91,7 +91,7 @@ def get_capability_set_files(
     tmdata: TMData, telescope: Telescope
 ) -> dict[str, MidCapabilitySetFile] | dict[str, LowCapabilitySetFile]:
     """Read each of one telescope's capability set files,
-    ``telescopes/ska1_<telescope>/capabilities/<name>.json``.
+    ``telescopes/<telescope>/capabilities/<name>.json``.
 
     :param tmdata: TMData to read from.
     :param telescope: the telescope.
@@ -176,7 +176,7 @@ def get_subarray_template_library(
     tmdata: TMData, telescope: Telescope, array_assembly: str
 ) -> SubarrayTemplateLibraryFile:
     """Read one array assembly's subarray template library file,
-    ``telescopes/ska1_<telescope>/subarray_templates/<array_assembly>.json``.
+    ``telescopes/<telescope>/subarray_templates/<array_assembly>.json``.
 
     :param tmdata: TMData to read from.
     :param telescope: the telescope.

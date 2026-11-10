@@ -46,14 +46,14 @@ from tests.unit.ska_ost_osd.osd.expected import (
 
 TESTS_TMDATA = Path(__file__).parents[3] / "tmdata"
 
-MID_BASIC_CAPABILITIES_FILE = "telescopes/ska1_mid/basic_capabilities.json"
-LOW_BASIC_CAPABILITIES_FILE = "telescopes/ska1_low/basic_capabilities.json"
-MID_CAPABILITY_SET = "telescopes/ska1_mid/capabilities/AA2.json"
-LOW_CAPABILITY_SET = "telescopes/ska1_low/capabilities/AA2.json"
-MID_DEFAULTS = "telescopes/ska1_mid/defaults.json"
-LOW_DEFAULTS = "telescopes/ska1_low/defaults.json"
+MID_BASIC_CAPABILITIES_FILE = "telescopes/ska_mid/basic_capabilities.json"
+LOW_BASIC_CAPABILITIES_FILE = "telescopes/ska_low/basic_capabilities.json"
+MID_CAPABILITY_SET = "telescopes/ska_mid/capabilities/AA2.json"
+LOW_CAPABILITY_SET = "telescopes/ska_low/capabilities/AA2.json"
+MID_DEFAULTS = "telescopes/ska_mid/defaults.json"
+LOW_DEFAULTS = "telescopes/ska_low/defaults.json"
 CYCLE = "cycles/cycle_1.json"
-SUBARRAY_TEMPLATES = "telescopes/ska1_low/subarray_templates/AA2.json"
+SUBARRAY_TEMPLATES = "telescopes/ska_low/subarray_templates/AA2.json"
 
 
 def load(path: str) -> dict:

@@ -58,8 +58,8 @@ class TestGetCapabilitySetFiles:
     @pytest.mark.parametrize(
         "telescope, path",
         [
-            (Telescope.SKA_MID, "telescopes/ska1_mid/capabilities"),
-            (Telescope.SKA_LOW, "telescopes/ska1_low/capabilities"),
+            (Telescope.SKA_MID, "telescopes/ska_mid/capabilities"),
+            (Telescope.SKA_LOW, "telescopes/ska_low/capabilities"),
         ],
     )
     def test_raises_when_directory_missing(self, empty_tmdata, telescope, path):
@@ -81,8 +81,8 @@ class TestGetTelescopeBasicCapabilities:
     @pytest.mark.parametrize(
         "telescope, path",
         [
-            (Telescope.SKA_MID, "telescopes/ska1_mid/basic_capabilities.json"),
-            (Telescope.SKA_LOW, "telescopes/ska1_low/basic_capabilities.json"),
+            (Telescope.SKA_MID, "telescopes/ska_mid/basic_capabilities.json"),
+            (Telescope.SKA_LOW, "telescopes/ska_low/basic_capabilities.json"),
         ],
     )
     def test_raises_when_file_missing(self, empty_tmdata, telescope, path):
@@ -104,8 +104,8 @@ class TestGetTelescopeDefaults:
     @pytest.mark.parametrize(
         "telescope, path",
         [
-            (Telescope.SKA_MID, "telescopes/ska1_mid/defaults.json"),
-            (Telescope.SKA_LOW, "telescopes/ska1_low/defaults.json"),
+            (Telescope.SKA_MID, "telescopes/ska_mid/defaults.json"),
+            (Telescope.SKA_LOW, "telescopes/ska_low/defaults.json"),
         ],
     )
     def test_raises_when_file_missing(self, empty_tmdata, telescope, path):
@@ -133,8 +133,8 @@ class TestGetSubarrayTemplateLibrary:
     @pytest.mark.parametrize(
         "telescope, path",
         [
-            (Telescope.SKA_MID, "telescopes/ska1_mid/subarray_templates/AA2.json"),
-            (Telescope.SKA_LOW, "telescopes/ska1_low/subarray_templates/AA2.json"),
+            (Telescope.SKA_MID, "telescopes/ska_mid/subarray_templates/AA2.json"),
+            (Telescope.SKA_LOW, "telescopes/ska_low/subarray_templates/AA2.json"),
         ],
     )
     def test_raises_when_file_missing(self, empty_tmdata, telescope, path):

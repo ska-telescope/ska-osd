@@ -10,8 +10,8 @@ POLICIES_CONSTANT_JSON_FILE_PATH = "observatory_policies.json"
 
 # Each telescope's files are in its own directory under telescopes
 TELESCOPES_TMDATA_DIR = "telescopes"
-MID_TMDATA_DIR = f"{TELESCOPES_TMDATA_DIR}/ska1_mid"
-LOW_TMDATA_DIR = f"{TELESCOPES_TMDATA_DIR}/ska1_low"
+MID_TMDATA_DIR = f"{TELESCOPES_TMDATA_DIR}/ska_mid"
+LOW_TMDATA_DIR = f"{TELESCOPES_TMDATA_DIR}/ska_low"
 MID_DEFAULTS_JSON_FILE_PATH = f"{MID_TMDATA_DIR}/defaults.json"
 LOW_DEFAULTS_JSON_FILE_PATH = f"{LOW_TMDATA_DIR}/defaults.json"
 MID_BASIC_CAPABILITIES_JSON_FILE_PATH = f"{MID_TMDATA_DIR}/basic_capabilities.json"

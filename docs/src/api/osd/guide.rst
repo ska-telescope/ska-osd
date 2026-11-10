@@ -31,14 +31,14 @@ Folder Structure
     │   ├── cycle_1.json
     │   └── cycle_<id>.json
     ├── telescopes
-    │   ├── ska1_low
+    │   ├── ska_low
     │   │   ├── capabilities
     │   │   │   └── <capability set>.json
     │   │   ├── subarray_templates
     │   │   │   └── <array assembly>.json
     │   │   ├── basic_capabilities.json
     │   │   └── defaults.json
-    │   └── ska1_mid
+    │   └── ska_mid
     │       ├── capabilities
     │       │   └── <capability set>.json
     │       ├── subarray_templates
@@ -259,7 +259,7 @@ Subarray Template Support
 
 A subarray template is a named set of receptors from an array assembly. Each
 telescope's templates are stored by array assembly, in
-``telescopes/ska1_<telescope>/subarray_templates/<array assembly>.json``, as a list:
+``telescopes/<telescope>/subarray_templates/<array assembly>.json``, as a list:
 
 .. code-block:: json
 

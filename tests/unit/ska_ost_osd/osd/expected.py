@@ -147,7 +147,7 @@ CYCLE_2_FILE = CycleFile(
     telescope_capabilities=TelescopeCapabilities(ska_mid="AA2", ska_low="AA2"),
 )
 
-# tests/tmdata/telescopes/ska1_mid/capabilities/AA1.json and AA2.json
+# tests/tmdata/telescopes/ska_mid/capabilities/AA1.json and AA2.json
 MID_AA1 = MidCapabilitySet(
     name="AA1",
     receptors=["SKA001", "SKA002", "SKA003", "SKA004"],
@@ -199,7 +199,7 @@ MID_AA2 = MidCapabilitySet(
     number_meerkatplus_dishes=0,
 )
 
-# tests/tmdata/telescopes/ska1_mid/basic_capabilities.json
+# tests/tmdata/telescopes/ska_mid/basic_capabilities.json
 MID_BASIC_CAPABILITIES = MidBasicCapabilities(
     frequency_bands=[
         MidFrequencyBand(
@@ -267,7 +267,7 @@ MID_CAPABILITY_SET_FILES = {
     for capability_set in (MID_AA1, MID_AA2)
 }
 
-# tests/tmdata/telescopes/ska1_low/capabilities/AA1.json and AA2.json
+# tests/tmdata/telescopes/ska_low/capabilities/AA1.json and AA2.json
 LOW_AA1 = LowCapabilitySet(
     name="AA1",
     receptors=[345, 346, 347, 348],
@@ -306,7 +306,7 @@ LOW_AA2 = LowCapabilitySet(
     allowed_zoom_factors=[1, 2, 4, 8],
 )
 
-# The band in tests/tmdata/telescopes/ska1_low/basic_capabilities.json
+# The band in tests/tmdata/telescopes/ska_low/basic_capabilities.json
 LOW_FREQUENCY_BAND = LowFrequencyBand(
     min_frequency_hz=50_000_000.0,
     max_frequency_hz=350_000_000.0,
@@ -319,7 +319,7 @@ LOW_FREQUENCY_BAND = LowFrequencyBand(
     number_pss_channels_per_coarse_channel=54,
 )
 
-# tests/tmdata/telescopes/ska1_low/basic_capabilities.json
+# tests/tmdata/telescopes/ska_low/basic_capabilities.json
 LOW_BASIC_CAPABILITIES = LowBasicCapabilities(
     frequency_bands=[LOW_FREQUENCY_BAND],
     elevation_limits=ElevationLimits(min_elevation_deg=45.0, max_elevation_deg=90.0),
@@ -334,7 +334,7 @@ LOW_CAPABILITY_SET_FILES = {
     for capability_set in (LOW_AA1, LOW_AA2)
 }
 
-# The defaults in tests/tmdata/telescopes/ska1_mid/defaults.json
+# The defaults in tests/tmdata/telescopes/ska_mid/defaults.json
 MID_DEFAULTS = MidDefaults(
     spfrx_defaults=SPFRxParameters(
         target_spfrx=TargetSPFRx(
@@ -354,7 +354,7 @@ MID_DEFAULTS = MidDefaults(
     ),
 )
 
-# The whole of tests/tmdata/telescopes/ska1_mid/defaults.json
+# The whole of tests/tmdata/telescopes/ska_mid/defaults.json
 MID_DEFAULTS_FILE = MidDefaultsFile(
     constraints=AvoidanceConstraints(
         sun_avoidance_angle_deg=30.0,
@@ -369,14 +369,14 @@ MID_DEFAULTS_FILE = MidDefaultsFile(
     ),
 )
 
-# The defaults in tests/tmdata/telescopes/ska1_low/defaults.json
+# The defaults in tests/tmdata/telescopes/ska_low/defaults.json
 LOW_DEFAULTS = LowDefaults(
     quality_attribute_metrics=LowQualityAttributeMetrics(
         cbf=LowCBFMetrics(processors_ready_percent=100, alveo_configured_percent=100)
     ),
 )
 
-# The whole of tests/tmdata/telescopes/ska1_low/defaults.json
+# The whole of tests/tmdata/telescopes/ska_low/defaults.json
 LOW_DEFAULTS_FILE = LowDefaultsFile(
     constraints=AvoidanceConstraints(
         sun_avoidance_angle_deg=30.0,
@@ -386,7 +386,7 @@ LOW_DEFAULTS_FILE = LowDefaultsFile(
     quality_attribute_metrics=LOW_DEFAULTS.quality_attribute_metrics,
 )
 
-# Elevation limits from tests/tmdata/telescopes/ska1_mid/basic_capabilities.json and
+# Elevation limits from tests/tmdata/telescopes/ska_mid/basic_capabilities.json and
 # avoidance angles from defaults.json
 MID_CONSTRAINTS = Constraints(
     min_elevation_deg=15.0,
@@ -396,7 +396,7 @@ MID_CONSTRAINTS = Constraints(
     jupiter_avoidance_angle_deg=10.0,
 )
 
-# Elevation limits from tests/tmdata/telescopes/ska1_low/basic_capabilities.json and
+# Elevation limits from tests/tmdata/telescopes/ska_low/basic_capabilities.json and
 # avoidance angles from defaults.json
 LOW_CONSTRAINTS = Constraints(
     min_elevation_deg=45.0,
@@ -406,7 +406,7 @@ LOW_CONSTRAINTS = Constraints(
     jupiter_avoidance_angle_deg=10.0,
 )
 
-# tests/tmdata/ska1_<telescope>/subarray_templates/<array assembly>.json
+# tests/tmdata/telescopes/<telescope>/subarray_templates/<array assembly>.json
 MID_FULL_AA2_TEMPLATE = SubarrayTemplate(
     name="SKA_MID_FULL_AA2",
     subarray_type=SubarrayType.CUSTOM,

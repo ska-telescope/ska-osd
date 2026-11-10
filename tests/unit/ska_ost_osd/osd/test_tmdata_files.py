@@ -27,41 +27,41 @@ TMDATA = Path(__file__).parents[4] / "tmdata"
 @pytest.mark.parametrize(
     "model, path",
     [
-        (MidBasicCapabilitiesFile, "telescopes/ska1_mid/basic_capabilities.json"),
-        (LowBasicCapabilitiesFile, "telescopes/ska1_low/basic_capabilities.json"),
-        (MidDefaultsFile, "telescopes/ska1_mid/defaults.json"),
-        (LowDefaultsFile, "telescopes/ska1_low/defaults.json"),
+        (MidBasicCapabilitiesFile, "telescopes/ska_mid/basic_capabilities.json"),
+        (LowBasicCapabilitiesFile, "telescopes/ska_low/basic_capabilities.json"),
+        (MidDefaultsFile, "telescopes/ska_mid/defaults.json"),
+        (LowDefaultsFile, "telescopes/ska_low/defaults.json"),
         (CycleFile, "observatory_policies.json"),
         (
             SubarrayTemplateLibraryFile,
-            "telescopes/ska1_mid/subarray_templates/AA2.json",
+            "telescopes/ska_mid/subarray_templates/AA2.json",
         ),
         (
             SubarrayTemplateLibraryFile,
-            "telescopes/ska1_mid/subarray_templates/AA4.json",
+            "telescopes/ska_mid/subarray_templates/AA4.json",
         ),
         (
             SubarrayTemplateLibraryFile,
-            "telescopes/ska1_mid/subarray_templates/AASTAR.json",
+            "telescopes/ska_mid/subarray_templates/AASTAR.json",
         ),
         (
             SubarrayTemplateLibraryFile,
-            "telescopes/ska1_low/subarray_templates/AA2.json",
+            "telescopes/ska_low/subarray_templates/AA2.json",
         ),
         (
             SubarrayTemplateLibraryFile,
-            "telescopes/ska1_low/subarray_templates/AA4.json",
+            "telescopes/ska_low/subarray_templates/AA4.json",
         ),
         (
             SubarrayTemplateLibraryFile,
-            "telescopes/ska1_low/subarray_templates/AASTAR.json",
+            "telescopes/ska_low/subarray_templates/AASTAR.json",
         ),
     ]
     + [
         (model, f"{directory}/{capability_set.name}")
         for model, directory in [
-            (MidCapabilitySetFile, "telescopes/ska1_mid/capabilities"),
-            (LowCapabilitySetFile, "telescopes/ska1_low/capabilities"),
+            (MidCapabilitySetFile, "telescopes/ska_mid/capabilities"),
+            (LowCapabilitySetFile, "telescopes/ska_low/capabilities"),
         ]
         for capability_set in sorted((TMDATA / directory).glob("*.json"))
     ]

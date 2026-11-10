@@ -46,7 +46,7 @@ class CapabilitySetFileBase(OSDBaseModel):
 
 
 class MidCapabilitySetFile(CapabilitySetFileBase):
-    """Model for telescopes/ska1_mid/capabilities/<name>.json."""
+    """Model for telescopes/ska_mid/capabilities/<name>.json."""
 
     number_dish_ids: list[str]
     allowed_channel_width_values_hz: list[int]
@@ -71,7 +71,7 @@ class MidCapabilitySetFile(CapabilitySetFileBase):
 
 
 class LowCapabilitySetFile(CapabilitySetFileBase):
-    """Model for telescopes/ska1_low/capabilities/<name>.json."""
+    """Model for telescopes/ska_low/capabilities/<name>.json."""
 
     number_station_ids: list[int]
     number_substations: int = Field(ge=0)
@@ -93,10 +93,10 @@ class LowCapabilitySetFile(CapabilitySetFileBase):
 
 # Basic capabilities file structure matches the reader models
 MidBasicCapabilitiesFile = MidBasicCapabilities
-"""Model for telescopes/ska1_mid/basic_capabilities.json."""
+"""Model for telescopes/ska_mid/basic_capabilities.json."""
 
 LowBasicCapabilitiesFile = LowBasicCapabilities
-"""Model for telescopes/ska1_low/basic_capabilities.json."""
+"""Model for telescopes/ska_low/basic_capabilities.json."""
 
 
 class AvoidanceConstraints(OSDBaseModel):
@@ -128,14 +128,14 @@ class MidCSPConfigurationDefaults(OSDBaseModel):
 
 
 class MidDefaultsFile(TelescopeDefaultsFileBase):
-    """Top-level model for telescopes/ska1_mid/defaults.json."""
+    """Top-level model for telescopes/ska_mid/defaults.json."""
 
     target: MidTargetDefaults
     csp_configuration: MidCSPConfigurationDefaults
 
 
 class LowDefaultsFile(TelescopeDefaultsFileBase):
-    """Top-level model for telescopes/ska1_low/defaults.json."""
+    """Top-level model for telescopes/ska_low/defaults.json."""
 
     quality_attribute_metrics: LowQualityAttributeMetrics
 
@@ -154,7 +154,7 @@ class CycleFile(OSDBaseModel):
 
 
 class SubarrayTemplateLibraryFile(OSDBaseModel):
-    """Top-level model for telescopes/ska1_<telescope>/subarray_templates/<array
+    """Top-level model for telescopes/<telescope>/subarray_templates/<array
     assembly>.json: one array assembly's templates."""
 
     templates: list[SubarrayTemplate]
