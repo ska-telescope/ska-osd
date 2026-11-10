@@ -147,6 +147,27 @@ CYCLE_2_FILE = CycleFile(
     telescope_capabilities=TelescopeCapabilities(ska_mid="AA2", ska_low="AA2"),
 )
 
+# The policy in the legacy response for cycle 1: tests/tmdata/cycles/cycle_1.json
+# as stored, with the telescopes keyed Mid and Low
+CYCLE_1_LEGACY_OBSERVATORY_POLICY = {
+    "cycle_number": 1,
+    "cycle_id": "TEST_SKAO_2027_Low_AA1_SV",
+    "type": "Science Verification",
+    "cycle_description": "TEST Low AA1 Science Verification",
+    "cycle_information": {
+        "cycle_id": "TEST_SKAO_2027_1",
+        "proposal_open": "2026-03-27T12:00:00.000Z",
+        "proposal_close": "2027-04-01T15:00:00.000Z",
+    },
+    "cycle_policies": {
+        "normal_max_hours": 100.0,
+        "max_targets": 1,
+        "max_observation_setups": 1,
+        "max_data_products": 1,
+    },
+    "telescope_capabilities": {"Low": "AA1"},
+}
+
 # tests/tmdata/telescopes/ska_mid/capabilities/AA1.json and AA2.json
 MID_AA1 = MidCapabilitySet(
     name="AA1",

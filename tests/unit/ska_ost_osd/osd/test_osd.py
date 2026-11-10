@@ -5,6 +5,7 @@ from ska_telmodel_client import TMData
 
 from ska_ost_osd.osd.common.constant import Telescope, osd_file_mapping
 from ska_ost_osd.osd.osd import get_osd_data, get_osd_using_tmdata
+from tests.unit.ska_ost_osd.osd.expected import CYCLE_1_LEGACY_OBSERVATORY_POLICY
 
 
 @pytest.mark.parametrize(
@@ -236,6 +237,14 @@ def test_get_osd_using_tmdata_cycle_uses_selected_cycle_file(tests_tmdata):
     assert osd_data["observatory_policy"]["cycle_number"] == 2
     assert osd_data["observatory_policy"]["cycle_id"] == "TEST_SKAO_2027_AA2_Proposal"
     assert set(osd_data["capabilities"]) == {"mid", "low"}
+
+
+def test_get_osd_using_tmdata_cycle_observatory_policy(tests_tmdata):
+    """The legacy response serves the cycle as observatory_policy, with the
+    telescopes keyed Mid and Low."""
+    osd_data = get_osd_using_tmdata(tests_tmdata, cycle_id=1)
+
+    assert osd_data["observatory_policy"] == CYCLE_1_LEGACY_OBSERVATORY_POLICY
 
 
 def test_get_osd_using_tmdata_cycle_capability_uses_cycle_array_assembly(

@@ -357,20 +357,6 @@ class TestDefaults:
 class TestCycleFile:
     """The cycle file model's own logic."""
 
-    def test_cycle_response_policy_validates(self, tests_tmdata):
-        """The policy in the OSD's response for the cycle, as the PHT
-        endpoints fetch it, is the cycle file with the telescopes named Mid
-        and Low."""
-        cycle = load(CYCLE)
-        osd_data = get_osd_using_tmdata(
-            tests_tmdata, cycle_id=cycle["cycle_number"], process_templates=True
-        )
-        cycle["telescope_capabilities"] = {
-            telescope.removeprefix("ska_").capitalize(): capability_set
-            for telescope, capability_set in cycle["telescope_capabilities"].items()
-        }
-        assert osd_data["observatory_policy"] == cycle
-
     def test_proposal_dates_are_served_as_the_same_time(self):
         """The dates are parsed, so ``.000Z`` is served as ``Z``, but the
         time is unchanged."""
