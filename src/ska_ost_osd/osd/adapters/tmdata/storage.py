@@ -21,11 +21,8 @@ from ska_ost_osd.osd.adapters.tmdata.models import (
     SubarrayTemplateLibraryFile,
 )
 from ska_ost_osd.osd.common.constant import (
-    BASIC_CAPABILITIES_JSON_FILE_PATHS,
-    CAPABILITY_SETS_TMDATA_DIRS,
-    DEFAULTS_JSON_FILE_PATHS,
     OBSERVING_CYCLES_TMDATA_DIR,
-    SUBARRAY_TEMPLATES_TMDATA_DIRS,
+    TELESCOPE_FILES,
     Telescope,
 )
 from ska_ost_osd.osd.models.cycles import CycleID
@@ -100,7 +97,8 @@ def get_capability_set_files(
     :raises FileNotFoundError: If the tmdata has no capabilities directory
         for the telescope.
     """
-    directory = CAPABILITY_SETS_TMDATA_DIRS[telescope]
+    files = TELESCOPE_FILES[telescope]
+    directory = files.capability_sets
     if not any(key.startswith(f"{directory}/") for key in tmdata):
         raise FileNotFoundError(f"file not found: {directory}")
     names = sorted(
@@ -108,7 +106,7 @@ def get_capability_set_files(
     )
     return {
         name: _CAPABILITY_SET_FILE_MODELS[telescope].model_validate(
-            _read(tmdata, f"{directory}/{name}.json")
+            _read(tmdata, files.capability_set(name))
         )
         for name in names
     }
@@ -139,7 +137,7 @@ def get_telescope_basic_capabilities(
         for the telescope.
     """
     return _BASIC_CAPABILITIES_FILE_MODELS[telescope].model_validate(
-        _read(tmdata, BASIC_CAPABILITIES_JSON_FILE_PATHS[telescope])
+        _read(tmdata, TELESCOPE_FILES[telescope].basic_capabilities)
     )
 
 
@@ -168,7 +166,7 @@ def get_telescope_defaults(
         telescope.
     """
     return _DEFAULTS_FILE_MODELS[telescope].model_validate(
-        _read(tmdata, DEFAULTS_JSON_FILE_PATHS[telescope])
+        _read(tmdata, TELESCOPE_FILES[telescope].defaults)
     )
 
 
@@ -187,7 +185,7 @@ def get_subarray_template_library(
     """
     return SubarrayTemplateLibraryFile.model_validate(
         _read(
-            tmdata, f"{SUBARRAY_TEMPLATES_TMDATA_DIRS[telescope]}/{array_assembly}.json"
+            tmdata, TELESCOPE_FILES[telescope].subarray_template_library(array_assembly)
         )
     )
 

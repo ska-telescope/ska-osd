@@ -1,5 +1,6 @@
 """Created file to maintain OSD Model constants."""
 
+from dataclasses import dataclass
 from enum import StrEnum
 
 # Legacy files, kept for older releases and for consumers that read them
@@ -10,17 +11,7 @@ POLICIES_CONSTANT_JSON_FILE_PATH = "observatory_policies.json"
 
 # Each telescope's files are in its own directory under telescopes
 TELESCOPES_TMDATA_DIR = "telescopes"
-MID_TMDATA_DIR = f"{TELESCOPES_TMDATA_DIR}/ska_mid"
-LOW_TMDATA_DIR = f"{TELESCOPES_TMDATA_DIR}/ska_low"
-MID_DEFAULTS_JSON_FILE_PATH = f"{MID_TMDATA_DIR}/defaults.json"
-LOW_DEFAULTS_JSON_FILE_PATH = f"{LOW_TMDATA_DIR}/defaults.json"
-MID_BASIC_CAPABILITIES_JSON_FILE_PATH = f"{MID_TMDATA_DIR}/basic_capabilities.json"
-LOW_BASIC_CAPABILITIES_JSON_FILE_PATH = f"{LOW_TMDATA_DIR}/basic_capabilities.json"
-MID_CAPABILITY_SETS_TMDATA_DIR = f"{MID_TMDATA_DIR}/capabilities"
-LOW_CAPABILITY_SETS_TMDATA_DIR = f"{LOW_TMDATA_DIR}/capabilities"
 SUBARRAY_TEMPLATES_DIRNAME = "subarray_templates"
-MID_SUBARRAY_TEMPLATES_TMDATA_DIR = f"{MID_TMDATA_DIR}/{SUBARRAY_TEMPLATES_DIRNAME}"
-LOW_SUBARRAY_TEMPLATES_TMDATA_DIR = f"{LOW_TMDATA_DIR}/{SUBARRAY_TEMPLATES_DIRNAME}"
 
 OBSERVING_CYCLES_TMDATA_DIR = "cycles"
 RELEASE_FILE_PATH_LATEST = "version_mapping/latest_release.txt"
@@ -40,22 +31,41 @@ class Telescope(StrEnum):
     SKA_MID = "ska_mid"
 
 
-BASIC_CAPABILITIES_JSON_FILE_PATHS = {
-    Telescope.SKA_MID: MID_BASIC_CAPABILITIES_JSON_FILE_PATH,
-    Telescope.SKA_LOW: LOW_BASIC_CAPABILITIES_JSON_FILE_PATH,
-}
+@dataclass(frozen=True)
+class TelescopeFiles:
+    """Paths of one telescope's tmdata files, relative to the tmdata root.
 
-CAPABILITY_SETS_TMDATA_DIRS = {
-    Telescope.SKA_MID: MID_CAPABILITY_SETS_TMDATA_DIR,
-    Telescope.SKA_LOW: LOW_CAPABILITY_SETS_TMDATA_DIR,
-}
+    Every telescope's files have the same names; only the directory differs.
+    """
 
-SUBARRAY_TEMPLATES_TMDATA_DIRS = {
-    Telescope.SKA_MID: MID_SUBARRAY_TEMPLATES_TMDATA_DIR,
-    Telescope.SKA_LOW: LOW_SUBARRAY_TEMPLATES_TMDATA_DIR,
-}
+    directory: str
 
-DEFAULTS_JSON_FILE_PATHS = {
-    Telescope.SKA_MID: MID_DEFAULTS_JSON_FILE_PATH,
-    Telescope.SKA_LOW: LOW_DEFAULTS_JSON_FILE_PATH,
+    @property
+    def basic_capabilities(self) -> str:
+        return f"{self.directory}/basic_capabilities.json"
+
+    @property
+    def defaults(self) -> str:
+        return f"{self.directory}/defaults.json"
+
+    @property
+    def capability_sets(self) -> str:
+        return f"{self.directory}/capabilities"
+
+    @property
+    def subarray_templates(self) -> str:
+        return f"{self.directory}/{SUBARRAY_TEMPLATES_DIRNAME}"
+
+    def capability_set(self, name: str) -> str:
+        return f"{self.capability_sets}/{name}.json"
+
+    def subarray_template_library(self, array_assembly: str) -> str:
+        return f"{self.subarray_templates}/{array_assembly}.json"
+
+
+# Each telescope's directory is named by its Telescope value, so a new
+# telescope needs only a new Telescope member
+TELESCOPE_FILES = {
+    telescope: TelescopeFiles(f"{TELESCOPES_TMDATA_DIR}/{telescope}")
+    for telescope in Telescope
 }
