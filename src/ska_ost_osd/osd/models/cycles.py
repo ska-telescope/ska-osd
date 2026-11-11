@@ -1,11 +1,8 @@
-from typing import Annotated, Self
+from typing import Self
 
 from pydantic import AwareDatetime, Field, model_validator
 
 from ska_ost_osd.osd.models.defaults import OSDBaseModel
-
-# The key that identifies a cycle: currently the cycle_number in its file
-CycleID = Annotated[int, Field(ge=0, examples=[1])]
 
 
 class CycleInformation(OSDBaseModel):
@@ -38,8 +35,8 @@ class Cycle(OSDBaseModel):
     """One cycle: its metadata, proposal dates, policies and the capability
     set each telescope offers."""
 
-    cycle_number: CycleID
-    cycle_id: str | None = None
+    cycle_number: int = Field(ge=0, examples=[1])
+    cycle_id: str
     type: str | None = Field(default=None, examples=["Science Verification"])
     cycle_description: str
     cycle_information: CycleInformation

@@ -29,7 +29,6 @@ from ska_ost_osd.osd.models.capabilities import (
 from ska_ost_osd.osd.models.constraints import Constraints, ElevationLimits
 from ska_ost_osd.osd.models.cycles import (
     Cycle,
-    CycleID,
     CycleInformation,
     CyclePolicies,
     TelescopeCapabilities,
@@ -69,7 +68,7 @@ from ska_ost_osd.osd.views.pht import (
 
 # tests/tmdata/cycles/TEST_SKAO_2027_Low_AA1_SV.json
 CYCLE_1 = Cycle(
-    cycle_number=CycleID(1),
+    cycle_number=1,
     cycle_id="TEST_SKAO_2027_Low_AA1_SV",
     type="Science Verification",
     cycle_description="TEST Low AA1 Science Verification",
@@ -89,7 +88,7 @@ CYCLE_1 = Cycle(
 
 # tests/tmdata/cycles/TEST_SKAO_2027_AA2_Proposal.json
 CYCLE_2 = Cycle(
-    cycle_number=CycleID(2),
+    cycle_number=2,
     cycle_id="TEST_SKAO_2027_AA2_Proposal",
     type="Proposal",
     cycle_description="TEST AA2 Proposal",
@@ -109,7 +108,7 @@ CYCLE_2 = Cycle(
 
 # tests/tmdata/cycles/TEST_SKAO_2027_Low_AA1_SV.json, as stored
 CYCLE_1_FILE = CycleFile(
-    cycle_number=CycleID(1),
+    cycle_number=1,
     cycle_id="TEST_SKAO_2027_Low_AA1_SV",
     type="Science Verification",
     cycle_description="TEST Low AA1 Science Verification",
@@ -129,7 +128,7 @@ CYCLE_1_FILE = CycleFile(
 
 # tests/tmdata/cycles/TEST_SKAO_2027_AA2_Proposal.json, as stored
 CYCLE_2_FILE = CycleFile(
-    cycle_number=CycleID(2),
+    cycle_number=2,
     cycle_id="TEST_SKAO_2027_AA2_Proposal",
     type="Proposal",
     cycle_description="TEST AA2 Proposal",
@@ -542,7 +541,7 @@ CONFIGURATION = Configuration(
 # each telescope offers and that telescope's basic capabilities
 CYCLE_1_CONFIGURATION = CycleConfiguration(
     observatory_policy=ObservatoryPolicy(
-        cycle_number=CycleID(1),
+        cycle_number=1,
         cycle_id="TEST_SKAO_2027_Low_AA1_SV",
         type="Science Verification",
         cycle_description="TEST Low AA1 Science Verification",
@@ -560,7 +559,7 @@ CYCLE_1_CONFIGURATION = CycleConfiguration(
 
 CYCLE_2_CONFIGURATION = CycleConfiguration(
     observatory_policy=ObservatoryPolicy(
-        cycle_number=CycleID(2),
+        cycle_number=2,
         cycle_id="TEST_SKAO_2027_AA2_Proposal",
         type="Proposal",
         cycle_description="TEST AA2 Proposal",

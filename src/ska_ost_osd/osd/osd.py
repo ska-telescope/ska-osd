@@ -71,8 +71,13 @@ class OSD:
 
     def cycle_filepaths(self) -> dict[int, str]:
         """Return the TMData cycle file paths keyed by the ``cycle_number``
-        in each file; a cycle file may have any name."""
-        return get_cycle_paths(self.tmdata)
+        in each file, which the legacy OSD API looks cycles up by."""
+        return dict(
+            sorted(
+                (self.tmdata[path].get_dict()["cycle_number"], path)
+                for path in get_cycle_paths(self.tmdata).values()
+            )
+        )
 
     def get_available_cycles(self) -> list[int]:
         """List available cycle IDs from the observing-cycle files."""

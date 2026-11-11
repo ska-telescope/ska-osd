@@ -13,7 +13,6 @@ from ska_ost_osd.osd.models.capabilities import (
     MidCBFMode,
 )
 from ska_ost_osd.osd.models.cycles import (
-    CycleID,
     CycleInformation,
     CyclePolicies,
     TelescopeCapabilities,
@@ -143,8 +142,8 @@ class LowDefaultsFile(TelescopeDefaultsFileBase):
 class CycleFile(OSDBaseModel):
     """Top-level model for a cycle file, cycles/<name>.json."""
 
-    cycle_number: CycleID
-    cycle_id: str | None = None
+    cycle_number: int = Field(ge=0, examples=[1])
+    cycle_id: str
     type: str | None = Field(default=None, examples=["Science Verification"])
     cycle_description: str
     cycle_information: CycleInformation

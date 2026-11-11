@@ -8,7 +8,6 @@ from ska_ost_osd.osd.common.osd_validation_messages import (
     CYCLE_ID_ERROR_MESSAGE,
     FREQUENCY_BAND_DOESNOT_EXIST_ERROR_MESSAGE,
 )
-from ska_ost_osd.osd.models.cycles import CycleID
 
 
 class OSDQueryError(Exception):
@@ -22,7 +21,7 @@ class CycleNotFoundError(OSDQueryError, LookupError):
     :param available_cycle_ids: the cycle IDs that do exist.
     """
 
-    def __init__(self, cycle_id: CycleID, available_cycle_ids: list[CycleID]):
+    def __init__(self, cycle_id: str, available_cycle_ids: list[str]):
         self.cycle_id = cycle_id
         self.available_cycle_ids = available_cycle_ids
         super().__init__(

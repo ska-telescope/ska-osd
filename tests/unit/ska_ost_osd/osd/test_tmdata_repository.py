@@ -5,7 +5,7 @@ import pytest
 
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.exceptions import CapabilitySetNotFoundError, CycleNotFoundError
-from ska_ost_osd.osd.models.cycles import Cycle, CycleID
+from ska_ost_osd.osd.models.cycles import Cycle
 from tests.unit.ska_ost_osd.osd.expected import (
     CYCLE_1,
     CYCLE_1_FILE,
@@ -29,7 +29,10 @@ from tests.unit.ska_ost_osd.osd.expected import (
 
 class TestGetCycleIds:
     def test_returns_sorted_cycle_ids(self, test_tmdata_repository):
-        assert test_tmdata_repository.get_cycle_ids() == [CycleID(1), CycleID(2)]
+        assert test_tmdata_repository.get_cycle_ids() == [
+            "TEST_SKAO_2027_AA2_Proposal",
+            "TEST_SKAO_2027_Low_AA1_SV",
+        ]
 
     def test_raises_when_cycles_directory_missing(self, empty_tmdata_repository):
         with pytest.raises(FileNotFoundError, match="file not found: cycles"):
@@ -38,19 +41,39 @@ class TestGetCycleIds:
     def test_raises_when_two_cycle_files_share_a_number(self, tmdata_repository_with):
         repository = tmdata_repository_with(
             {
-                "cycles/another_cycle_1.json": CYCLE_1_FILE.model_dump(
-                    mode="json", by_alias=True
-                )
+                "cycles/another_cycle_1.json": {
+                    **CYCLE_1_FILE.model_dump(mode="json", by_alias=True),
+                    "cycle_id": "ANOTHER_CYCLE",
+                }
             }
         )
 
         with pytest.raises(ValueError, match="cycle_number 1 is in both"):
             repository.get_cycle_ids()
 
+    def test_raises_when_two_cycle_files_share_an_id(self, tmdata_repository_with):
+        repository = tmdata_repository_with(
+            {
+                "cycles/another_cycle.json": {
+                    **CYCLE_1_FILE.model_dump(mode="json", by_alias=True),
+                    "cycle_number": 3,
+                }
+            }
+        )
+
+        with pytest.raises(
+            ValueError, match="cycle_id TEST_SKAO_2027_Low_AA1_SV is in both"
+        ):
+            repository.get_cycle_ids()
+
 
 class TestGetCycle:
     @pytest.mark.parametrize(
-        "cycle_id, expected", [(CycleID(1), CYCLE_1), (CycleID(2), CYCLE_2)]
+        "cycle_id, expected",
+        [
+            ("TEST_SKAO_2027_Low_AA1_SV", CYCLE_1),
+            ("TEST_SKAO_2027_AA2_Proposal", CYCLE_2),
+        ],
     )
     def test_returns_cycle(self, test_tmdata_repository, cycle_id, expected):
         assert test_tmdata_repository.get_cycle(cycle_id) == expected
@@ -58,33 +81,42 @@ class TestGetCycle:
     def test_returns_reader_model(self, test_tmdata_repository):
         """The repository returns the reader model, not the storage model it
         is read through."""
-        assert type(test_tmdata_repository.get_cycle(CycleID(1))) is Cycle
+        assert (
+            type(test_tmdata_repository.get_cycle("TEST_SKAO_2027_Low_AA1_SV")) is Cycle
+        )
         assert {type(cycle) for cycle in test_tmdata_repository.get_cycles()} == {Cycle}
 
     def test_serialises_with_reader_field_names(self, test_tmdata_repository):
         """The PHT's names for the offered telescopes (Mid, Low) belong to
         the PHT view, not to the reader model."""
-        served = test_tmdata_repository.get_cycle(CycleID(1)).model_dump(by_alias=True)
+        served = test_tmdata_repository.get_cycle(
+            "TEST_SKAO_2027_Low_AA1_SV"
+        ).model_dump(by_alias=True)
 
         assert served["telescope_capabilities"] == {"ska_mid": None, "ska_low": "AA1"}
 
     def test_raises_for_unknown_cycle(self, test_tmdata_repository):
         with pytest.raises(
-            CycleNotFoundError, match=r"Cycle 3 is invalid\. Valid IDs are 1, 2\."
+            CycleNotFoundError,
+            match=r"Cycle NO_SUCH_CYCLE is invalid\. Valid IDs are "
+            r"TEST_SKAO_2027_AA2_Proposal, TEST_SKAO_2027_Low_AA1_SV\.",
         ) as excinfo:
-            test_tmdata_repository.get_cycle(CycleID(3))
+            test_tmdata_repository.get_cycle("NO_SUCH_CYCLE")
 
-        assert excinfo.value.cycle_id == 3
-        assert excinfo.value.available_cycle_ids == [1, 2]
+        assert excinfo.value.cycle_id == "NO_SUCH_CYCLE"
+        assert excinfo.value.available_cycle_ids == [
+            "TEST_SKAO_2027_AA2_Proposal",
+            "TEST_SKAO_2027_Low_AA1_SV",
+        ]
 
     def test_raises_when_cycles_directory_missing(self, empty_tmdata_repository):
         with pytest.raises(FileNotFoundError, match="file not found: cycles"):
-            empty_tmdata_repository.get_cycle(CycleID(1))
+            empty_tmdata_repository.get_cycle("TEST_SKAO_2027_Low_AA1_SV")
 
 
 class TestGetCycles:
     def test_returns_every_cycle_in_id_order(self, test_tmdata_repository):
-        assert test_tmdata_repository.get_cycles() == [CYCLE_1, CYCLE_2]
+        assert test_tmdata_repository.get_cycles() == [CYCLE_2, CYCLE_1]
 
     def test_raises_when_cycles_directory_missing(self, empty_tmdata_repository):
         with pytest.raises(FileNotFoundError, match="file not found: cycles"):
@@ -244,8 +276,11 @@ class TestGetCycleCapabilitySets:
     @pytest.mark.parametrize(
         "cycle_id, expected",
         [
-            (CycleID(1), {Telescope.SKA_LOW: LOW_AA1}),
-            (CycleID(2), {Telescope.SKA_MID: MID_AA2, Telescope.SKA_LOW: LOW_AA2}),
+            ("TEST_SKAO_2027_Low_AA1_SV", {Telescope.SKA_LOW: LOW_AA1}),
+            (
+                "TEST_SKAO_2027_AA2_Proposal",
+                {Telescope.SKA_MID: MID_AA2, Telescope.SKA_LOW: LOW_AA2},
+            ),
         ],
         ids=["low only", "mid and low"],
     )
@@ -256,7 +291,7 @@ class TestGetCycleCapabilitySets:
 
     def test_raises_for_unknown_cycle(self, test_tmdata_repository):
         with pytest.raises(CycleNotFoundError):
-            test_tmdata_repository.get_cycle_capability_sets(CycleID(3))
+            test_tmdata_repository.get_cycle_capability_sets("NO_SUCH_CYCLE")
 
     def test_raises_when_cycle_names_unknown_capability_set(
         self, tmdata_repository_with
@@ -273,4 +308,4 @@ class TestGetCycleCapabilitySets:
         )
 
         with pytest.raises(CapabilitySetNotFoundError, match="Capability set AA3"):
-            repository.get_cycle_capability_sets(CycleID(1))
+            repository.get_cycle_capability_sets("TEST_SKAO_2027_Low_AA1_SV")

@@ -11,7 +11,6 @@ from ska_ost_osd.osd.adapters.tmdata.storage import (
     get_telescope_defaults,
 )
 from ska_ost_osd.osd.common.constant import Telescope
-from ska_ost_osd.osd.models.cycles import CycleID
 from tests.unit.ska_ost_osd.osd.expected import (
     CYCLE_1_FILE,
     CYCLE_2_FILE,
@@ -30,21 +29,24 @@ from tests.unit.ska_ost_osd.osd.expected import (
 class TestGetCycleFile:
     @pytest.mark.parametrize(
         "cycle_id, expected",
-        [(CycleID(1), CYCLE_1_FILE), (CycleID(2), CYCLE_2_FILE)],
+        [
+            ("TEST_SKAO_2027_Low_AA1_SV", CYCLE_1_FILE),
+            ("TEST_SKAO_2027_AA2_Proposal", CYCLE_2_FILE),
+        ],
     )
     def test_returns_cycle_file(self, tests_tmdata, cycle_id, expected):
         assert get_cycle_file(tests_tmdata, cycle_id) == expected
 
     def test_raises_when_file_missing(self, empty_tmdata):
         with pytest.raises(FileNotFoundError, match="file not found: cycles"):
-            get_cycle_file(empty_tmdata, CycleID(1))
+            get_cycle_file(empty_tmdata, "TEST_SKAO_2027_Low_AA1_SV")
 
     def test_raises_when_no_file_has_cycle_number(self, tests_tmdata):
         with pytest.raises(
             FileNotFoundError,
-            match="file not found: no cycle file in cycles has cycle_number 3",
+            match="file not found: no cycle file in cycles has cycle_id NO_SUCH_CYCLE",
         ):
-            get_cycle_file(tests_tmdata, CycleID(3))
+            get_cycle_file(tests_tmdata, "NO_SUCH_CYCLE")
 
 
 class TestGetCapabilitySetFiles:

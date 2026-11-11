@@ -16,7 +16,7 @@ from ska_ost_osd.osd.models.capabilities import (
     MidCapabilitySet,
 )
 from ska_ost_osd.osd.models.constraints import Constraints
-from ska_ost_osd.osd.models.cycles import Cycle, CycleID
+from ska_ost_osd.osd.models.cycles import Cycle
 from ska_ost_osd.osd.models.defaults import LowDefaults, MidDefaults, SPFRxParameters
 from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplate
 
@@ -44,10 +44,10 @@ class TMDataRepository:
 
     # Cycles
 
-    def get_cycle_ids(self) -> list[CycleID]:
+    def get_cycle_ids(self) -> list[str]:
         return storage.get_cycle_ids(self._tmdata)
 
-    def get_cycle(self, cycle_id: CycleID) -> Cycle:
+    def get_cycle(self, cycle_id: str) -> Cycle:
         cycle_ids = self.get_cycle_ids()
         if cycle_id not in cycle_ids:
             raise CycleNotFoundError(cycle_id, cycle_ids)
@@ -177,7 +177,7 @@ class TMDataRepository:
         return library.templates
 
     def get_cycle_capability_sets(
-        self, cycle_id: CycleID
+        self, cycle_id: str
     ) -> dict[Telescope, CapabilitySet]:
         offered = self.get_cycle(cycle_id).telescope_capabilities
         return {

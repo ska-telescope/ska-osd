@@ -29,10 +29,8 @@ Unreleased
   files by the ``Telescope`` values, ``ska_mid`` and ``ska_low``, instead of ``Mid``
   and ``Low``. The legacy response and the PHT view still serve ``Mid`` and ``Low``
 * [BREAKING] Define multiple cycles through a single TelModel backend in ``tmdata/cycles``
-* A cycle file in ``tmdata/cycles`` may have any name: the cycle's ID is the
-  ``cycle_number`` in the file, not ``N`` in ``cycle_<N>.json``. The cycle files are
-  renamed after their ``cycle_id``. Two cycle files with the same ``cycle_number``
-  are an error
+* Each cycle is identified by its unique ``cycle_id``, and its file may have any name.
+  ``get_osd_using_tmdata`` still selects a cycle by its ``cycle_number``
 * A cycle's ``cycle_number`` may be 0, for Cycle 0
 * [BREAKING] Users pass a TMData client to public API functions instead of OSD creating one from ``tmdata/version_mapping``
 * [BREAKING] Removed ``number_beams`` from the SKA-Low array assemblies in

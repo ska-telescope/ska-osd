@@ -73,7 +73,7 @@ capability set, such as ``capabilities/AA2.json``.
 .. note::
 
     Each observing cycle is stored in its own file in ``cycles``. The file
-    may have any name; the cycle's ID is the ``cycle_number`` in the file. The legacy ``observatory_policies.json``
+    may have any name; the cycle's ID is the ``cycle_id`` in the file. The legacy ``observatory_policies.json``
     file remains at the root on main for backward compatibility with the old
     legacy version mapper.
 
@@ -99,7 +99,7 @@ Pydantic models.
 Parameters             Description
 ===================    ============================================================
 tm_data                the TMData client to read the tmdata from
-cycle_id               Cycle Id a integer value 1, 2, 3
+cycle_id               the cycle's ``cycle_number``, an integer such as 0, 1, 2
 telescope              ``Telescope.SKA_MID`` or ``Telescope.SKA_LOW``; ``"mid"``
                        and ``"low"`` are still accepted
 array_assembly         AA0.5, AA1 or any Array Assembly

@@ -20,7 +20,7 @@ from ska_ost_osd.osd.models.capabilities import (
     MidCapabilitySet,
     MidFrequencyBand,
 )
-from ska_ost_osd.osd.models.cycles import CycleID, CycleInformation, CyclePolicies
+from ska_ost_osd.osd.models.cycles import CycleInformation, CyclePolicies
 from ska_ost_osd.osd.models.subarray_templates import SubarrayType
 from ska_ost_osd.osd.repository import OSDRepository
 from ska_ost_osd.osd.views.base import ConfigurationModel
@@ -37,8 +37,8 @@ class CycleTelescopeCapabilities(ConfigurationModel):
 class ObservatoryPolicy(ConfigurationModel):
     """The cycle, as the PHT UI reads it."""
 
-    cycle_number: CycleID
-    cycle_id: str | None
+    cycle_number: int
+    cycle_id: str
     type: str | None
     cycle_description: str
     cycle_information: CycleInformation
@@ -156,7 +156,7 @@ def _low_frequency_band(repository: OSDRepository) -> LowFrequencyBand:
 
 def get_cycle_configuration(
     repository: OSDRepository,
-    cycle_id: CycleID,
+    cycle_id: str,
     include_subarray_templates: bool = False,
 ) -> CycleConfiguration:
     """Build one cycle's view for the PHT: what ska-oso-services serves from

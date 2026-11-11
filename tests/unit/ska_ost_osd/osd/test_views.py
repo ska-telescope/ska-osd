@@ -4,7 +4,6 @@ tests/tmdata."""
 import pytest
 
 from ska_ost_osd.osd.exceptions import CapabilitySetNotFoundError, CycleNotFoundError
-from ska_ost_osd.osd.models.cycles import CycleID
 from ska_ost_osd.osd.views.odt import Configuration, get_configuration
 from ska_ost_osd.osd.views.pht import (
     CycleConfiguration,
@@ -75,7 +74,10 @@ class TestGetConfiguration:
 class TestGetCycleConfiguration:
     @pytest.mark.parametrize(
         "cycle_id, expected",
-        [(CycleID(1), CYCLE_1_CONFIGURATION), (CycleID(2), CYCLE_2_CONFIGURATION)],
+        [
+            ("TEST_SKAO_2027_Low_AA1_SV", CYCLE_1_CONFIGURATION),
+            ("TEST_SKAO_2027_AA2_Proposal", CYCLE_2_CONFIGURATION),
+        ],
         ids=["low only", "mid and low"],
     )
     def test_returns_cycle_configuration(
@@ -85,7 +87,7 @@ class TestGetCycleConfiguration:
 
     def test_raises_for_unknown_cycle(self, test_tmdata_repository):
         with pytest.raises(CycleNotFoundError):
-            get_cycle_configuration(test_tmdata_repository, CycleID(3))
+            get_cycle_configuration(test_tmdata_repository, "NO_SUCH_CYCLE")
 
     def test_raises_when_cycle_names_unknown_capability_set(
         self, tmdata_repository_with
@@ -100,7 +102,7 @@ class TestGetCycleConfiguration:
         )
 
         with pytest.raises(CapabilitySetNotFoundError, match="Capability set AA3"):
-            get_cycle_configuration(repository, CycleID(1))
+            get_cycle_configuration(repository, "TEST_SKAO_2027_Low_AA1_SV")
 
     @pytest.mark.parametrize("include_subarray_templates", [False, True])
     def test_serves_the_pht_cycle_fields(
@@ -112,7 +114,9 @@ class TestGetCycleConfiguration:
         only basic_capabilities and the offered capability set, keyed by
         its name, with its subarray templates when they are asked for."""
         served = get_cycle_configuration(
-            test_tmdata_repository, CycleID(2), include_subarray_templates
+            test_tmdata_repository,
+            "TEST_SKAO_2027_AA2_Proposal",
+            include_subarray_templates,
         ).model_dump(mode="json", by_alias=True)
 
         assert list(served) == ["observatory_policy", "capabilities"]
@@ -133,9 +137,9 @@ class TestGetCycleConfiguration:
     def test_serves_the_pht_names_without_by_alias(self, test_tmdata_repository):
         """The view serialises with the PHT's names by default, so a caller
         doesn't need to remember by_alias=True."""
-        served = get_cycle_configuration(test_tmdata_repository, CycleID(2)).model_dump(
-            mode="json"
-        )
+        served = get_cycle_configuration(
+            test_tmdata_repository, "TEST_SKAO_2027_AA2_Proposal"
+        ).model_dump(mode="json")
 
         assert served["observatory_policy"]["telescope_capabilities"] == {
             "Mid": "AA2",
@@ -148,9 +152,9 @@ class TestGetCycleConfiguration:
     def test_telescope_not_offered_is_null(self, test_tmdata_repository):
         """The PHT UI checks for null, so a telescope the cycle doesn't offer
         is served as null rather than left out."""
-        served = get_cycle_configuration(test_tmdata_repository, CycleID(1)).model_dump(
-            mode="json", by_alias=True
-        )
+        served = get_cycle_configuration(
+            test_tmdata_repository, "TEST_SKAO_2027_Low_AA1_SV"
+        ).model_dump(mode="json", by_alias=True)
         assert served["observatory_policy"]["telescope_capabilities"] == {
             "Mid": None,
             "Low": "AA1",
@@ -158,7 +162,9 @@ class TestGetCycleConfiguration:
         assert served["capabilities"]["mid"] is None
 
     @pytest.mark.parametrize("include_subarray_templates", [False, True])
-    @pytest.mark.parametrize("cycle_id", [CycleID(1), CycleID(2)])
+    @pytest.mark.parametrize(
+        "cycle_id", ["TEST_SKAO_2027_Low_AA1_SV", "TEST_SKAO_2027_AA2_Proposal"]
+    )
     def test_served_cycle_configuration_validates(
         self, test_tmdata_repository, cycle_id, include_subarray_templates
     ):
@@ -172,8 +178,8 @@ class TestGetCycleConfiguration:
 class TestGetCycleConfigurations:
     def test_returns_every_cycle_in_id_order(self, test_tmdata_repository):
         assert get_cycle_configurations(test_tmdata_repository) == [
-            CYCLE_1_CONFIGURATION,
             CYCLE_2_CONFIGURATION,
+            CYCLE_1_CONFIGURATION,
         ]
 
     def test_raises_when_cycles_directory_missing(self, empty_tmdata_repository):
