@@ -99,7 +99,8 @@ Pydantic models.
 Parameters             Description
 ===================    ============================================================
 tm_data                the TMData client to read the tmdata from
-cycle_id               the cycle's ``number``, an integer such as 0, 1, 2
+cycle_id               the cycle's ``number``, an integer such as 0, 1, 2; a cycle
+                       without a number can't be selected
 telescope              ``Telescope.SKA_MID`` or ``Telescope.SKA_LOW``; ``"mid"``
                        and ``"low"`` are still accepted
 array_assembly         AA0.5, AA1 or any Array Assembly

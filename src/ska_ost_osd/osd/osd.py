@@ -83,13 +83,13 @@ class OSD:
 
     def cycle_filepaths(self) -> dict[int, str]:
         """Return the TMData cycle file paths keyed by the ``number`` in each
-        file, which the legacy OSD API looks cycles up by."""
-        return dict(
-            sorted(
-                (self.tmdata[path].get_dict()["number"], path)
-                for path in get_cycle_paths(self.tmdata).values()
-            )
+        file, which the legacy OSD API looks cycles up by. A cycle without a
+        number can't be selected."""
+        numbers = (
+            (self.tmdata[path].get_dict().get("number"), path)
+            for path in get_cycle_paths(self.tmdata).values()
         )
+        return dict(sorted((n, path) for n, path in numbers if n is not None))
 
     def get_available_cycles(self) -> list[int]:
         """List available cycle IDs from the observing-cycle files."""

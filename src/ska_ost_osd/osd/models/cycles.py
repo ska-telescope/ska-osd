@@ -39,7 +39,7 @@ class Cycle(OSDBaseModel):
     id: str
     name: str
     description: str
-    number: int = Field(ge=0, examples=[1])
+    number: int | None = Field(default=None, ge=0, examples=[1])
     type: str | None = Field(default=None, examples=["Science Verification"])
     proposal_window: ProposalWindow
     proposal_policy: ProposalPolicy

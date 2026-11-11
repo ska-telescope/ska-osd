@@ -55,7 +55,7 @@ class CyclePolicies(ConfigurationModel):
 class ObservatoryPolicy(ConfigurationModel):
     """The cycle, as the PHT UI reads it."""
 
-    cycle_number: int
+    cycle_number: int | None
     cycle_id: str
     type: str | None
     cycle_description: str

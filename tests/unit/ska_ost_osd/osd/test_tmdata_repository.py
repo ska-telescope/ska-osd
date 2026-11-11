@@ -51,6 +51,26 @@ class TestGetCycleIds:
         with pytest.raises(ValueError, match="number 1 is in both"):
             repository.get_cycle_ids()
 
+    def test_cycles_without_a_number_are_listed(self, tmdata_repository_with):
+        """Cycles without a number, such as science verification before
+        Cycle 0, don't clash with each other."""
+        unnumbered = CYCLE_1_FILE.model_dump(
+            mode="json", by_alias=True, exclude={"number"}
+        )
+        repository = tmdata_repository_with(
+            {
+                "cycles/unnumbered_a.json": {**unnumbered, "id": "UNNUMBERED_A"},
+                "cycles/unnumbered_b.json": {**unnumbered, "id": "UNNUMBERED_B"},
+            }
+        )
+
+        assert repository.get_cycle_ids() == [
+            "TEST_SKAO_2027_AA2_Proposal",
+            "TEST_SKAO_2027_Low_AA1_SV",
+            "UNNUMBERED_A",
+            "UNNUMBERED_B",
+        ]
+
     def test_raises_when_two_cycle_files_share_an_id(self, tmdata_repository_with):
         repository = tmdata_repository_with(
             {

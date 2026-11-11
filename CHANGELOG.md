@@ -30,12 +30,12 @@ Unreleased
   and ``Low``. The legacy response and the PHT view still serve ``Mid`` and ``Low``
 * [BREAKING] Define multiple cycles through a single TelModel backend in ``tmdata/cycles``
 * Each cycle file in ``tmdata/cycles`` may have any name. A cycle has a unique ``id``,
-  a ``name``, a ``description``, a unique ``number``, a ``proposal_window`` and a
+  a ``name``, a ``description``, an optional unique ``number``, a ``proposal_window`` and a
   ``proposal_policy``. The legacy response and the PHT view serve the fields they
   already had under their old names: ``cycle_id``, ``cycle_description``,
   ``cycle_number``, ``cycle_information`` (the ``cycle_id`` and the proposal dates) and
   ``cycle_policies`` (with ``max_observing_hours`` as ``normal_max_hours``).
-  ``get_osd_using_tmdata`` selects a cycle by its ``number``
+  ``get_osd_using_tmdata`` selects a cycle by its ``number``, so can't select one without
 * A cycle's ``cycle_number`` may be 0, for Cycle 0
 * [BREAKING] Users pass a TMData client to public API functions instead of OSD creating one from ``tmdata/version_mapping``
 * [BREAKING] Removed ``number_beams`` from the SKA-Low array assemblies in

@@ -62,18 +62,20 @@ def get_cycle_paths(tmdata: TMData) -> dict[str, str]:
             continue
         path = f"{OBSERVING_CYCLES_TMDATA_DIR}/{name}"
         cycle = _read(tmdata, path)
-        cycle_id, cycle_number = cycle["id"], cycle["number"]
+        cycle_id, cycle_number = cycle["id"], cycle.get("number")
         # The ID identifies the cycle, so no two files may share one; nor may
-        # they share a number, which the legacy OSD API looks cycles up by
+        # two cycles with numbers share one, as the legacy OSD API looks cycles
+        # up by number
         if cycle_id in paths:
             raise ValueError(f"id {cycle_id} is in both {paths[cycle_id]} and {path}")
-        if cycle_number in paths_by_number:
-            raise ValueError(
-                f"number {cycle_number} is in both "
-                f"{paths_by_number[cycle_number]} and {path}"
-            )
+        if cycle_number is not None:
+            if cycle_number in paths_by_number:
+                raise ValueError(
+                    f"number {cycle_number} is in both "
+                    f"{paths_by_number[cycle_number]} and {path}"
+                )
+            paths_by_number[cycle_number] = path
         paths[cycle_id] = path
-        paths_by_number[cycle_number] = path
     return dict(sorted(paths.items()))
 
 
