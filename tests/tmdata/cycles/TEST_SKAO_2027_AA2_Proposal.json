@@ -3,7 +3,6 @@
   "name": "TEST SKAO 2027 AA2 Proposal",
   "description": "TEST AA2 Proposal",
   "number": 2,
-  "type": "standard_operations",
   "proposal_window": {
     "opens": "2026-03-27T12:00:00.000Z",
     "closes": "2027-04-01T15:00:00.000Z"
@@ -14,8 +13,18 @@
     "max_observation_setups": 2,
     "max_data_products": 2
   },
-  "telescope_capabilities": {
-    "ska_low": "AA2",
-    "ska_mid": "AA2"
+  "capabilities": {
+    "ska_low": {
+      "array_assembly": "AA2",
+      "policies": {
+        "standard_operations": "AA2"
+      }
+    },
+    "ska_mid": {
+      "array_assembly": "AA2",
+      "policies": {
+        "standard_operations": "AA2"
+      }
+    }
   }
 }

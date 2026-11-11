@@ -3,7 +3,6 @@
   "name": "TEST SKAO 2027 Low AA1 SV",
   "description": "TEST Low AA1 Science Verification",
   "number": 1,
-  "type": "science_verification",
   "proposal_window": {
     "opens": "2026-03-27T12:00:00.000Z",
     "closes": "2027-04-01T15:00:00.000Z"
@@ -14,7 +13,12 @@
     "max_observation_setups": 1,
     "max_data_products": 1
   },
-  "telescope_capabilities": {
-    "ska_low": "AA1"
+  "capabilities": {
+    "ska_low": {
+      "array_assembly": "AA1",
+      "policies": {
+        "science_verification": "AA1"
+      }
+    }
   }
 }

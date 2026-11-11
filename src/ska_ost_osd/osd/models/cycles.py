@@ -3,6 +3,7 @@ from typing import Self
 
 from pydantic import AwareDatetime, Field, model_validator
 
+from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.defaults import OSDBaseModel
 
 
@@ -33,21 +34,23 @@ class ProposalPolicy(OSDBaseModel):
 
 
 class TelescopeCapabilities(OSDBaseModel):
-    """The array assembly each telescope offers in the cycle, or ``None``."""
+    """What a cycle offers on one telescope: its array assembly, and the
+    policy offered for each type, by capability set name."""
 
-    ska_mid: str | None = Field(default=None, examples=["AA2"])
-    ska_low: str | None = Field(default=None, examples=["AA2"])
+    array_assembly: str = Field(examples=["AA2"])
+    policies: dict[PolicyType, str] = Field(
+        min_length=1, examples=[{"science_verification": "AA2_SV"}]
+    )
 
 
 class Cycle(OSDBaseModel):
-    """One cycle: its metadata, proposal dates, policies and the capability
-    set each telescope offers."""
+    """One cycle: its metadata, proposal window and policy, and what it offers
+    on each telescope."""
 
     id: str
     name: str
     description: str
     number: int | None = Field(default=None, ge=0, examples=[1])
-    type: PolicyType
     proposal_window: ProposalWindow
     proposal_policy: ProposalPolicy
-    telescope_capabilities: TelescopeCapabilities
+    capabilities: dict[Telescope, TelescopeCapabilities] = Field(min_length=1)

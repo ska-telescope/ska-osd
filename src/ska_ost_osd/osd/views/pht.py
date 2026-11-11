@@ -172,12 +172,17 @@ def _subarray_templates(
     }
 
 
-def _observatory_policy(cycle: Cycle) -> ObservatoryPolicy:
+def _observatory_policy(
+    cycle: Cycle,
+    policy_type: PolicyType,
+    mid: MidCapabilitySet | None,
+    low: LowCapabilitySet | None,
+) -> ObservatoryPolicy:
     """The cycle, with the field names the PHT UI reads."""
     return ObservatoryPolicy(
         cycle_number=cycle.number,
         cycle_id=cycle.id,
-        type=_TYPE_NAMES[cycle.type],
+        type=_TYPE_NAMES[policy_type],
         cycle_description=cycle.description,
         cycle_information=CycleInformation(
             cycle_id=cycle.id,
@@ -190,8 +195,9 @@ def _observatory_policy(cycle: Cycle) -> ObservatoryPolicy:
             max_observation_setups=cycle.proposal_policy.max_observation_setups,
             max_data_products=cycle.proposal_policy.max_data_products,
         ),
-        telescope_capabilities=CycleTelescopeCapabilities.model_validate(
-            cycle.telescope_capabilities, from_attributes=True
+        telescope_capabilities=CycleTelescopeCapabilities(
+            ska_mid=mid.name if mid is not None else None,
+            ska_low=low.name if low is not None else None,
         ),
     )
 
@@ -220,42 +226,51 @@ def get_cycle_configuration(
     :raises CycleNotFoundError: If there is no cycle with that ID.
     :raises CapabilitySetNotFoundError: If the cycle names a capability set
         that does not exist.
+    :raises ValueError: If the cycle offers more than one policy type.
     """
     cycle = repository.get_cycle(cycle_id)
-    offered = cycle.telescope_capabilities
+    capability_sets = repository.get_cycle_capability_sets(cycle_id)
+    # The PHT UI handles one policy type per cycle
+    types = {
+        policy_type for by_type in capability_sets.values() for policy_type in by_type
+    }
+    if len(types) != 1:
+        raise ValueError(
+            f"Cycle {cycle_id} offers more than one policy type, which the PHT "
+            "view can't serve"
+        )
+    (policy_type,) = types
+    mid = capability_sets.get(Telescope.SKA_MID, {}).get(policy_type)
+    low = capability_sets.get(Telescope.SKA_LOW, {}).get(policy_type)
     return CycleConfiguration(
-        observatory_policy=_observatory_policy(cycle),
+        observatory_policy=_observatory_policy(cycle, policy_type, mid, low),
         capabilities=CycleCapabilities(
             mid=MidCycleCapabilities(
                 basic_capabilities=MidCycleBasicCapabilities.model_validate(
                     repository.get_basic_capabilities(Telescope.SKA_MID),
                     from_attributes=True,
                 ),
-                capability_set=repository.get_capability_set(
-                    Telescope.SKA_MID, offered.ska_mid
-                ),
+                capability_set=mid,
                 subarray_templates=_subarray_templates(
                     repository,
                     Telescope.SKA_MID,
-                    offered.ska_mid,
+                    mid.name,
                     include_subarray_templates,
                 ),
             )
-            if offered.ska_mid is not None
+            if mid is not None
             else None,
             low=LowCycleCapabilities(
                 basic_capabilities=_low_frequency_band(repository),
-                capability_set=repository.get_capability_set(
-                    Telescope.SKA_LOW, offered.ska_low
-                ),
+                capability_set=low,
                 subarray_templates=_subarray_templates(
                     repository,
                     Telescope.SKA_LOW,
-                    offered.ska_low,
+                    low.name,
                     include_subarray_templates,
                 ),
             )
-            if offered.ska_low is not None
+            if low is not None
             else None,
         ),
     )
@@ -273,6 +288,7 @@ def get_cycle_configurations(
     :return: the cycle views.
     :raises CapabilitySetNotFoundError: If a cycle names a capability set
         that does not exist.
+    :raises ValueError: If a cycle offers more than one policy type.
     """
     return [
         get_cycle_configuration(repository, cycle_id, include_subarray_templates)

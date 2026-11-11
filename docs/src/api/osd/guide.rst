@@ -129,7 +129,7 @@ Response
 Keys                      Description
 ======================    ============================================================================================================
 observatory_policy        the cycle file whose ``number`` is ``cycle_id``, with the legacy field names
-telescope_capabilities    value of ``telescope_capabilities`` in the selected cycle file, keyed ``Mid`` and ``Low``
+telescope_capabilities    the capability set the selected cycle offers on each telescope, keyed ``Mid`` and ``Low``
 capabilities              key value pair of mid and low
 Mid                       ``basic_capabilities`` and the capability sets (``Array Assembly`` AA0.5, AA1 etc) of SKA-Mid
 Low                       ``basic_capabilities`` and the capability sets (``Array Assembly`` AA0.5, AA1 etc) of SKA-Low
@@ -143,7 +143,7 @@ Scenarios
    ``basic_capabilities`` together with all of its named array assemblies. No
    ``observatory_policy`` is included, since no ``cycle_id`` was selected.
 
-2. With ``cycle_id``, it checks that a file in ``cycles`` has that ``number``, then uses that file's ``telescope_capabilities`` to select the array
+2. With ``cycle_id``, it checks that a file in ``cycles`` has that ``number``, then uses the capability set the cycle offers on each telescope to select the array
    assembly of each telescope. The cycle file is returned as ``observatory_policy``.
 
 3. With ``telescope``, it returns only that telescope; with ``array_assembly`` as

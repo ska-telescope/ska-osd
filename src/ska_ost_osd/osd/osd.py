@@ -40,7 +40,7 @@ _LEGACY_CYCLE_FIELD_NAMES = {
     "description": "cycle_description",
     "proposal_window": "cycle_information",
     "proposal_policy": "cycle_policies",
-    "telescope_capabilities": "telescope_capabilities",
+    "capabilities": "telescope_capabilities",
 }
 
 # A frozen copy of the PHT view's type names, which will change when the PHT
@@ -142,6 +142,18 @@ class OSD:
         if self.cycle_id is None:
             return None, None
         cycle = self.tmdata[self.cycle_filepaths()[self.cycle_id]].get_dict()
+        # The legacy response has one type for the whole cycle
+        types = {
+            policy_type
+            for offered in cycle["capabilities"].values()
+            for policy_type in offered["policies"]
+        }
+        if len(types) != 1:
+            return None, (
+                f"Cycle {self.cycle_id} offers more than one policy type, which "
+                "the legacy OSD API can't serve"
+            )
+        (cycle["type"],) = types
         cycle_definition = {
             legacy_name: cycle[name]
             for name, legacy_name in _LEGACY_CYCLE_FIELD_NAMES.items()
@@ -160,10 +172,10 @@ class OSD:
         # The cycle files name the telescopes by Telescope value; the legacy
         # response names them Mid and Low
         cycle_definition["telescope_capabilities"] = {
-            _LEGACY_TELESCOPE_NAMES[Telescope(telescope)].capitalize(): capability_set
-            for telescope, capability_set in cycle_definition[
-                "telescope_capabilities"
-            ].items()
+            _LEGACY_TELESCOPE_NAMES[Telescope(telescope)].capitalize(): offered[
+                "policies"
+            ][cycle["type"]]
+            for telescope, offered in cycle_definition["telescope_capabilities"].items()
         }
         return cycle_definition, None
 

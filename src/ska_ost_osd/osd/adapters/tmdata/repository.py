@@ -16,7 +16,7 @@ from ska_ost_osd.osd.models.capabilities import (
     MidCapabilitySet,
 )
 from ska_ost_osd.osd.models.constraints import Constraints
-from ska_ost_osd.osd.models.cycles import Cycle
+from ska_ost_osd.osd.models.cycles import Cycle, PolicyType
 from ska_ost_osd.osd.models.defaults import LowDefaults, MidDefaults, SPFRxParameters
 from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplate
 
@@ -172,12 +172,13 @@ class TMDataRepository:
 
     def get_cycle_capability_sets(
         self, cycle_id: str
-    ) -> dict[Telescope, CapabilitySet]:
-        offered = self.get_cycle(cycle_id).telescope_capabilities
+    ) -> dict[Telescope, dict[PolicyType, CapabilitySet]]:
         return {
-            telescope: self.get_capability_set(telescope, name)
-            for telescope in Telescope
-            if (name := getattr(offered, telescope)) is not None
+            telescope: {
+                policy_type: self.get_capability_set(telescope, name)
+                for policy_type, name in offered.policies.items()
+            }
+            for telescope, offered in self.get_cycle(cycle_id).capabilities.items()
         }
 
     # Storage to reader models

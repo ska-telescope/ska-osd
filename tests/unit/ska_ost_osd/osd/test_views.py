@@ -96,12 +96,39 @@ class TestGetCycleConfiguration:
             {
                 "cycles/TEST_SKAO_2027_Low_AA1_SV.json": {
                     **CYCLE_1_FILE.model_dump(mode="json", by_alias=True),
-                    "telescope_capabilities": {"ska_low": "AA3"},
+                    "capabilities": {
+                        "ska_low": {
+                            "array_assembly": "AA1",
+                            "policies": {"science_verification": "AA3"},
+                        }
+                    },
                 }
             }
         )
 
         with pytest.raises(CapabilitySetNotFoundError, match="Capability set AA3"):
+            get_cycle_configuration(repository, "TEST_SKAO_2027_Low_AA1_SV")
+
+    def test_raises_when_cycle_offers_more_than_one_type(self, tmdata_repository_with):
+        """Today's PHT handles one policy type per cycle."""
+        repository = tmdata_repository_with(
+            {
+                "cycles/TEST_SKAO_2027_Low_AA1_SV.json": {
+                    **CYCLE_1_FILE.model_dump(mode="json", by_alias=True),
+                    "capabilities": {
+                        "ska_low": {
+                            "array_assembly": "AA1",
+                            "policies": {
+                                "science_verification": "AA1",
+                                "shared_risk": "AA1",
+                            },
+                        }
+                    },
+                }
+            }
+        )
+
+        with pytest.raises(ValueError, match="more than one policy type"):
             get_cycle_configuration(repository, "TEST_SKAO_2027_Low_AA1_SV")
 
     @pytest.mark.parametrize("include_subarray_templates", [False, True])

@@ -5,7 +5,7 @@ import pytest
 
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.exceptions import CapabilitySetNotFoundError, CycleNotFoundError
-from ska_ost_osd.osd.models.cycles import Cycle
+from ska_ost_osd.osd.models.cycles import Cycle, PolicyType
 from tests.unit.ska_ost_osd.osd.expected import (
     CYCLE_1,
     CYCLE_1_FILE,
@@ -111,7 +111,12 @@ class TestGetCycle:
             "TEST_SKAO_2027_Low_AA1_SV"
         ).model_dump(by_alias=True)
 
-        assert served["telescope_capabilities"] == {"ska_mid": None, "ska_low": "AA1"}
+        assert served["capabilities"] == {
+            "ska_low": {
+                "array_assembly": "AA1",
+                "policies": {"science_verification": "AA1"},
+            }
+        }
 
     def test_raises_for_unknown_cycle(self, test_tmdata_repository):
         with pytest.raises(
@@ -294,10 +299,16 @@ class TestGetCycleCapabilitySets:
     @pytest.mark.parametrize(
         "cycle_id, expected",
         [
-            ("TEST_SKAO_2027_Low_AA1_SV", {Telescope.SKA_LOW: LOW_AA1}),
+            (
+                "TEST_SKAO_2027_Low_AA1_SV",
+                {Telescope.SKA_LOW: {PolicyType.SCIENCE_VERIFICATION: LOW_AA1}},
+            ),
             (
                 "TEST_SKAO_2027_AA2_Proposal",
-                {Telescope.SKA_MID: MID_AA2, Telescope.SKA_LOW: LOW_AA2},
+                {
+                    Telescope.SKA_MID: {PolicyType.STANDARD_OPERATIONS: MID_AA2},
+                    Telescope.SKA_LOW: {PolicyType.STANDARD_OPERATIONS: LOW_AA2},
+                },
             ),
         ],
         ids=["low only", "mid and low"],
@@ -320,7 +331,12 @@ class TestGetCycleCapabilitySets:
             {
                 "cycles/TEST_SKAO_2027_Low_AA1_SV.json": {
                     **CYCLE_1_FILE.model_dump(mode="json", by_alias=True),
-                    "telescope_capabilities": {"ska_low": "AA3"},
+                    "capabilities": {
+                        "ska_low": {
+                            "array_assembly": "AA1",
+                            "policies": {"science_verification": "AA3"},
+                        }
+                    },
                 }
             }
         )

@@ -17,7 +17,7 @@ from ska_ost_osd.osd.models.capabilities import (
     MidCapabilitySet,
 )
 from ska_ost_osd.osd.models.constraints import Constraints
-from ska_ost_osd.osd.models.cycles import Cycle
+from ska_ost_osd.osd.models.cycles import Cycle, PolicyType
 from ska_ost_osd.osd.models.defaults import LowDefaults, MidDefaults
 from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplate
 
@@ -124,9 +124,10 @@ class OSDRepository(Protocol):
 
     def get_cycle_capability_sets(
         self, cycle_id: str
-    ) -> dict[Telescope, CapabilitySet]:
-        """The capability set a cycle offers for each telescope; a telescope
-        it does not offer is left out. Raises ``CycleNotFoundError`` if there
-        is no such cycle, and ``CapabilitySetNotFoundError`` if the cycle
-        names a capability set that does not exist."""
+    ) -> dict[Telescope, dict[PolicyType, CapabilitySet]]:
+        """The capability set a cycle offers for each telescope and policy
+        type; a telescope it does not offer is left out. Raises
+        ``CycleNotFoundError`` if there is no such cycle, and
+        ``CapabilitySetNotFoundError`` if the cycle names a capability set that
+        does not exist."""
         ...

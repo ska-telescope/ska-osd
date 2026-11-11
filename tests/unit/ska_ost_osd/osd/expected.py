@@ -15,6 +15,7 @@ from ska_ost_osd.osd.adapters.tmdata.models import (
     MidTargetDefaults,
     SubarrayTemplateLibraryFile,
 )
+from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
     Band5bSubband,
     LowBasicCapabilities,
@@ -75,7 +76,6 @@ CYCLE_1 = Cycle(
     name="TEST SKAO 2027 Low AA1 SV",
     description="TEST Low AA1 Science Verification",
     number=1,
-    type=PolicyType.SCIENCE_VERIFICATION,
     proposal_window=ProposalWindow(
         opens=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
         closes=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
@@ -86,7 +86,12 @@ CYCLE_1 = Cycle(
         max_observation_setups=1,
         max_data_products=1,
     ),
-    telescope_capabilities=TelescopeCapabilities(ska_mid=None, ska_low="AA1"),
+    capabilities={
+        Telescope.SKA_LOW: TelescopeCapabilities(
+            array_assembly="AA1",
+            policies={PolicyType.SCIENCE_VERIFICATION: "AA1"},
+        )
+    },
 )
 
 # tests/tmdata/cycles/TEST_SKAO_2027_AA2_Proposal.json
@@ -95,7 +100,6 @@ CYCLE_2 = Cycle(
     name="TEST SKAO 2027 AA2 Proposal",
     description="TEST AA2 Proposal",
     number=2,
-    type=PolicyType.STANDARD_OPERATIONS,
     proposal_window=ProposalWindow(
         opens=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
         closes=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
@@ -106,7 +110,16 @@ CYCLE_2 = Cycle(
         max_observation_setups=2,
         max_data_products=2,
     ),
-    telescope_capabilities=TelescopeCapabilities(ska_mid="AA2", ska_low="AA2"),
+    capabilities={
+        Telescope.SKA_LOW: TelescopeCapabilities(
+            array_assembly="AA2",
+            policies={PolicyType.STANDARD_OPERATIONS: "AA2"},
+        ),
+        Telescope.SKA_MID: TelescopeCapabilities(
+            array_assembly="AA2",
+            policies={PolicyType.STANDARD_OPERATIONS: "AA2"},
+        ),
+    },
 )
 
 # tests/tmdata/cycles/TEST_SKAO_2027_Low_AA1_SV.json, as stored
@@ -115,7 +128,6 @@ CYCLE_1_FILE = CycleFile(
     name="TEST SKAO 2027 Low AA1 SV",
     description="TEST Low AA1 Science Verification",
     number=1,
-    type=PolicyType.SCIENCE_VERIFICATION,
     proposal_window=ProposalWindow(
         opens=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
         closes=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
@@ -126,7 +138,12 @@ CYCLE_1_FILE = CycleFile(
         max_observation_setups=1,
         max_data_products=1,
     ),
-    telescope_capabilities=TelescopeCapabilities(ska_mid=None, ska_low="AA1"),
+    capabilities={
+        Telescope.SKA_LOW: TelescopeCapabilities(
+            array_assembly="AA1",
+            policies={PolicyType.SCIENCE_VERIFICATION: "AA1"},
+        )
+    },
 )
 
 # tests/tmdata/cycles/TEST_SKAO_2027_AA2_Proposal.json, as stored
@@ -135,7 +152,6 @@ CYCLE_2_FILE = CycleFile(
     name="TEST SKAO 2027 AA2 Proposal",
     description="TEST AA2 Proposal",
     number=2,
-    type=PolicyType.STANDARD_OPERATIONS,
     proposal_window=ProposalWindow(
         opens=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
         closes=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
@@ -146,7 +162,16 @@ CYCLE_2_FILE = CycleFile(
         max_observation_setups=2,
         max_data_products=2,
     ),
-    telescope_capabilities=TelescopeCapabilities(ska_mid="AA2", ska_low="AA2"),
+    capabilities={
+        Telescope.SKA_LOW: TelescopeCapabilities(
+            array_assembly="AA2",
+            policies={PolicyType.STANDARD_OPERATIONS: "AA2"},
+        ),
+        Telescope.SKA_MID: TelescopeCapabilities(
+            array_assembly="AA2",
+            policies={PolicyType.STANDARD_OPERATIONS: "AA2"},
+        ),
+    },
 )
 
 # The policy in the legacy response for cycle 1: tests/tmdata/cycles/TEST_SKAO_2027_Low_AA1_SV.json

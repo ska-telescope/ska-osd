@@ -385,15 +385,13 @@ class TestCycleFile:
             CycleFile.model_validate(data)
 
     def test_telescope_offering_nothing_is_none(self):
-        """A telescope missing from the file's telescope_capabilities is read
-        as None. (The PHT view serves it as null: see test_views.py.)"""
+        """A telescope missing from the file's capabilities is not offered.
+        (The PHT view serves it as null: see test_views.py.)"""
         data = load(CYCLE)
-        data["telescope_capabilities"] = {"ska_low": "AA2"}
 
         policy = CycleFile.model_validate(data)
 
-        assert policy.telescope_capabilities.ska_mid is None
-        assert policy.telescope_capabilities.ska_low == "AA2"
+        assert Telescope.SKA_MID not in policy.capabilities
 
     def test_proposals_must_open_before_they_close(self):
         """A proposal window that closes before it opens is rejected."""

@@ -6,6 +6,7 @@ from typing import Self
 
 from pydantic import Field, model_validator
 
+from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
     LowBasicCapabilities,
     LowCBFMode,
@@ -13,7 +14,6 @@ from ska_ost_osd.osd.models.capabilities import (
     MidCBFMode,
 )
 from ska_ost_osd.osd.models.cycles import (
-    PolicyType,
     ProposalPolicy,
     ProposalWindow,
     TelescopeCapabilities,
@@ -147,10 +147,9 @@ class CycleFile(OSDBaseModel):
     name: str
     description: str
     number: int | None = Field(default=None, ge=0, examples=[1])
-    type: PolicyType
     proposal_window: ProposalWindow
     proposal_policy: ProposalPolicy
-    telescope_capabilities: TelescopeCapabilities
+    capabilities: dict[Telescope, TelescopeCapabilities] = Field(min_length=1)
 
 
 class SubarrayTemplateLibraryFile(OSDBaseModel):

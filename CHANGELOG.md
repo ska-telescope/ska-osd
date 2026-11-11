@@ -25,18 +25,18 @@ Unreleased
   ``get_osd_using_tmdata`` still accepts ``"mid"`` and ``"low"``
 * [BREAKING] Renamed the subarray templates in ``subarray_template_library.json``
   to start with ``SKA_MID_`` and ``SKA_LOW_``
-* [BREAKING] Keyed ``telescope_capabilities`` in the ``cycles`` tmdata
-  files by the ``Telescope`` values, ``ska_mid`` and ``ska_low``, instead of ``Mid``
-  and ``Low``. The legacy response and the PHT view still serve ``Mid`` and ``Low``
 * [BREAKING] Define multiple cycles through a single TelModel backend in ``tmdata/cycles``
 * Each cycle file in ``tmdata/cycles`` may have any name. A cycle has a unique ``id``,
-  a ``name``, a ``description``, an optional unique ``number``, a ``type``
-  (``science_verification``, ``shared_risk`` or ``standard_operations``), a
-  ``proposal_window`` and a ``proposal_policy``. The legacy response and the PHT view
-  serve the fields they already had under their old names: the ``type`` as
-  ``Science Verification``, ``Shared Risk`` or ``Proposal``, ``cycle_id``, ``cycle_description``,
-  ``cycle_number``, ``cycle_information`` (the ``cycle_id`` and the proposal dates) and
-  ``cycle_policies`` (with ``max_observing_hours`` as ``normal_max_hours``).
+  a ``name``, a ``description``, an optional unique ``number``, a ``proposal_window``,
+  a ``proposal_policy`` and ``capabilities``: for each telescope, keyed ``ska_low`` or
+  ``ska_mid``, its ``array_assembly`` and the capability set offered for each policy
+  type (``science_verification``, ``shared_risk`` or ``standard_operations``). The
+  legacy response and the PHT view serve a cycle offering one policy type, under the
+  old field names: ``cycle_id``, ``cycle_description``, ``cycle_number``, ``type``
+  (``Science Verification``, ``Shared Risk`` or ``Proposal``), ``cycle_information``
+  (the ``cycle_id`` and the proposal dates), ``cycle_policies`` (with
+  ``max_observing_hours`` as ``normal_max_hours``) and ``telescope_capabilities``
+  (keyed ``Mid`` and ``Low``).
   ``get_osd_using_tmdata`` selects a cycle by its ``number``, so can't select one without
 * A cycle's ``cycle_number`` may be 0, for Cycle 0
 * [BREAKING] Users pass a TMData client to public API functions instead of OSD creating one from ``tmdata/version_mapping``

@@ -51,8 +51,9 @@ Reading the data
    * - ``get_cycle_ids()``
      - the cycle IDs, in ascending order
    * - ``get_cycles()`` / ``get_cycle(cycle_id)``
-     - ``Cycle``: a cycle's description, proposal dates, policies and the
-       capability set each telescope offers
+     - ``Cycle``: a cycle's description, proposal window and policy, and for
+       each telescope its array assembly and the capability set offered for
+       each policy type
    * - ``get_capability_sets(telescope)`` / ``get_capability_set(telescope, name)``
      - ``MidCapabilitySet`` / ``LowCapabilitySet``: one array assembly of a
        telescope, e.g. ``"AA2"``
@@ -93,8 +94,9 @@ Joins
    * - Method
      - Returns
    * - ``get_cycle_capability_sets(cycle_id)``
-     - the capability set the cycle offers for each telescope, as a ``dict`` keyed
-       by ``Telescope``; a telescope the cycle does not offer is left out
+     - the capability set the cycle offers for each telescope and policy type,
+       as a ``dict`` keyed by ``Telescope`` and then ``PolicyType``; a telescope
+       the cycle does not offer is left out
    * - ``get_subarray_templates(telescope, capability_set)``
      - the ``SubarrayTemplate`` objects of a capability set: the templates of
        the array assembly the capability set names, or none
