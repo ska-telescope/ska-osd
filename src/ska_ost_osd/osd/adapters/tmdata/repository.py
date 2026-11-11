@@ -25,12 +25,6 @@ _CAPABILITY_SET_MODELS = {
     Telescope.SKA_LOW: LowCapabilitySet,
 }
 
-# The fields of a cycle's telescope_capabilities, by telescope
-_CYCLE_TELESCOPE_FIELDS = {
-    Telescope.SKA_MID: "ska_mid",
-    Telescope.SKA_LOW: "ska_low",
-}
-
 
 class TMDataRepository:
     """Implements ``OSDRepository`` by reading the tmdata through a TMData
@@ -182,8 +176,8 @@ class TMDataRepository:
         offered = self.get_cycle(cycle_id).telescope_capabilities
         return {
             telescope: self.get_capability_set(telescope, name)
-            for telescope, field in _CYCLE_TELESCOPE_FIELDS.items()
-            if (name := getattr(offered, field)) is not None
+            for telescope in Telescope
+            if (name := getattr(offered, telescope)) is not None
         }
 
     # Storage to reader models
