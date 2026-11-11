@@ -29,7 +29,7 @@ from ska_ost_osd.osd.models.capabilities import (
 from ska_ost_osd.osd.models.constraints import Constraints, ElevationLimits
 from ska_ost_osd.osd.models.cycles import (
     Cycle,
-    CyclePolicies,
+    ProposalPolicy,
     ProposalWindow,
     TelescopeCapabilities,
 )
@@ -60,6 +60,7 @@ from ska_ost_osd.osd.views.pht import (
     CycleCapabilities,
     CycleConfiguration,
     CycleInformation,
+    CyclePolicies,
     CycleTelescopeCapabilities,
     LowCycleCapabilities,
     MidCycleBasicCapabilities,
@@ -78,8 +79,8 @@ CYCLE_1 = Cycle(
         opens=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
         closes=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
     ),
-    cycle_policies=CyclePolicies(
-        normal_max_hours=100.0,
+    proposal_policy=ProposalPolicy(
+        max_observing_hours=100.0,
         max_targets=1,
         max_observation_setups=1,
         max_data_products=1,
@@ -98,8 +99,8 @@ CYCLE_2 = Cycle(
         opens=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
         closes=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
     ),
-    cycle_policies=CyclePolicies(
-        normal_max_hours=100.0,
+    proposal_policy=ProposalPolicy(
+        max_observing_hours=100.0,
         max_targets=3,
         max_observation_setups=2,
         max_data_products=2,
@@ -118,8 +119,8 @@ CYCLE_1_FILE = CycleFile(
         opens=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
         closes=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
     ),
-    cycle_policies=CyclePolicies(
-        normal_max_hours=100.0,
+    proposal_policy=ProposalPolicy(
+        max_observing_hours=100.0,
         max_targets=1,
         max_observation_setups=1,
         max_data_products=1,
@@ -138,8 +139,8 @@ CYCLE_2_FILE = CycleFile(
         opens=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
         closes=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
     ),
-    cycle_policies=CyclePolicies(
-        normal_max_hours=100.0,
+    proposal_policy=ProposalPolicy(
+        max_observing_hours=100.0,
         max_targets=3,
         max_observation_setups=2,
         max_data_products=2,
@@ -551,7 +552,12 @@ CYCLE_1_CONFIGURATION = CycleConfiguration(
             proposal_open=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
             proposal_close=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
         ),
-        cycle_policies=CYCLE_1.cycle_policies,
+        cycle_policies=CyclePolicies(
+            normal_max_hours=100.0,
+            max_targets=1,
+            max_observation_setups=1,
+            max_data_products=1,
+        ),
         telescope_capabilities=CycleTelescopeCapabilities(ska_mid=None, ska_low="AA1"),
     ),
     capabilities=CycleCapabilities(
@@ -573,7 +579,12 @@ CYCLE_2_CONFIGURATION = CycleConfiguration(
             proposal_open=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
             proposal_close=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
         ),
-        cycle_policies=CYCLE_2.cycle_policies,
+        cycle_policies=CyclePolicies(
+            normal_max_hours=100.0,
+            max_targets=3,
+            max_observation_setups=2,
+            max_data_products=2,
+        ),
         telescope_capabilities=CycleTelescopeCapabilities(ska_mid="AA2", ska_low="AA2"),
     ),
     capabilities=CycleCapabilities(

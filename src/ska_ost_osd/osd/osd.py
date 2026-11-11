@@ -38,7 +38,7 @@ _LEGACY_CYCLE_FIELD_NAMES = {
     "type": "type",
     "description": "cycle_description",
     "proposal_window": "cycle_information",
-    "cycle_policies": "cycle_policies",
+    "proposal_policy": "cycle_policies",
     "telescope_capabilities": "telescope_capabilities",
 }
 
@@ -142,6 +142,10 @@ class OSD:
             "cycle_id": cycle["id"],
             "proposal_open": cycle["proposal_window"]["opens"],
             "proposal_close": cycle["proposal_window"]["closes"],
+        }
+        cycle_definition["cycle_policies"] = {
+            ("normal_max_hours" if name == "max_observing_hours" else name): value
+            for name, value in cycle["proposal_policy"].items()
         }
         # The cycle files name the telescopes by Telescope value; the legacy
         # response names them Mid and Low

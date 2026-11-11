@@ -16,8 +16,10 @@ class ProposalWindow(OSDBaseModel):
         return self
 
 
-class CyclePolicies(OSDBaseModel):
-    normal_max_hours: float = Field(ge=0, examples=[100.0])
+class ProposalPolicy(OSDBaseModel):
+    """What one proposal in the cycle may ask for."""
+
+    max_observing_hours: float = Field(ge=0, examples=[100.0])
     max_targets: int | None = Field(default=None, ge=0)
     max_observation_setups: int | None = Field(default=None, ge=0)
     max_data_products: int | None = Field(default=None, ge=0)
@@ -40,5 +42,5 @@ class Cycle(OSDBaseModel):
     number: int = Field(ge=0, examples=[1])
     type: str | None = Field(default=None, examples=["Science Verification"])
     proposal_window: ProposalWindow
-    cycle_policies: CyclePolicies
+    proposal_policy: ProposalPolicy
     telescope_capabilities: TelescopeCapabilities

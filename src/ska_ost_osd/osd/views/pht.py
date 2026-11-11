@@ -21,7 +21,7 @@ from ska_ost_osd.osd.models.capabilities import (
     MidCapabilitySet,
     MidFrequencyBand,
 )
-from ska_ost_osd.osd.models.cycles import Cycle, CyclePolicies
+from ska_ost_osd.osd.models.cycles import Cycle
 from ska_ost_osd.osd.models.subarray_templates import SubarrayType
 from ska_ost_osd.osd.repository import OSDRepository
 from ska_ost_osd.osd.views.base import ConfigurationModel
@@ -41,6 +41,15 @@ class CycleInformation(ConfigurationModel):
     cycle_id: str
     proposal_open: datetime
     proposal_close: datetime
+
+
+class CyclePolicies(ConfigurationModel):
+    """The cycle's proposal policy, as the PHT UI reads it."""
+
+    normal_max_hours: float
+    max_targets: int | None
+    max_observation_setups: int | None
+    max_data_products: int | None
 
 
 class ObservatoryPolicy(ConfigurationModel):
@@ -168,7 +177,12 @@ def _observatory_policy(cycle: Cycle) -> ObservatoryPolicy:
             proposal_open=cycle.proposal_window.opens,
             proposal_close=cycle.proposal_window.closes,
         ),
-        cycle_policies=cycle.cycle_policies,
+        cycle_policies=CyclePolicies(
+            normal_max_hours=cycle.proposal_policy.max_observing_hours,
+            max_targets=cycle.proposal_policy.max_targets,
+            max_observation_setups=cycle.proposal_policy.max_observation_setups,
+            max_data_products=cycle.proposal_policy.max_data_products,
+        ),
         telescope_capabilities=CycleTelescopeCapabilities.model_validate(
             cycle.telescope_capabilities, from_attributes=True
         ),

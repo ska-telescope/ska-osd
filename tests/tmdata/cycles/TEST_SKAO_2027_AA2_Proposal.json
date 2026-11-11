@@ -8,8 +8,8 @@
     "opens": "2026-03-27T12:00:00.000Z",
     "closes": "2027-04-01T15:00:00.000Z"
   },
-  "cycle_policies": {
-    "normal_max_hours": 100.0,
+  "proposal_policy": {
+    "max_observing_hours": 100.0,
     "max_targets": 3,
     "max_observation_setups": 2,
     "max_data_products": 2
