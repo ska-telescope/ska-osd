@@ -33,6 +33,7 @@ Unreleased
   ``cycle_number`` in the file, not ``N`` in ``cycle_<N>.json``. The cycle files are
   renamed after their ``cycle_id``. Two cycle files with the same ``cycle_number``
   are an error
+* A cycle's ``cycle_number`` may be 0, for Cycle 0
 * [BREAKING] Users pass a TMData client to public API functions instead of OSD creating one from ``tmdata/version_mapping``
 * [BREAKING] Removed ``number_beams`` from the SKA-Low array assemblies in
   ``low_capabilities.json``; use ``number_subarray_beams``

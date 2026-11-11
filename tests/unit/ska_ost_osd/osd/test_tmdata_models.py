@@ -367,6 +367,12 @@ class TestCycleFile:
                 policy["cycle_information"][key]
             ) == datetime.fromisoformat(data["cycle_information"][key])
 
+    def test_cycle_number_can_be_zero(self):
+        """Cycle 0 is the first numbered cycle."""
+        data = load(CYCLE)
+        data["cycle_number"] = 0
+        assert CycleFile.model_validate(data).cycle_number == 0
+
     def test_proposal_dates_need_a_timezone(self):
         data = load(CYCLE)
         data["cycle_information"]["proposal_open"] = "2026-03-27T12:00:00"
