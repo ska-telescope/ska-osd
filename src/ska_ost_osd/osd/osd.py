@@ -21,6 +21,7 @@ from .common.constant import (
     Telescope,
     osd_file_mapping,
 )
+from .models.cycles import PolicyType
 
 LOGGER = logging.getLogger(__name__)
 
@@ -40,6 +41,14 @@ _LEGACY_CYCLE_FIELD_NAMES = {
     "proposal_window": "cycle_information",
     "proposal_policy": "cycle_policies",
     "telescope_capabilities": "telescope_capabilities",
+}
+
+# A frozen copy of the PHT view's type names, which will change when the PHT
+# reads the policy types
+_LEGACY_TYPE_NAMES = {
+    PolicyType.SCIENCE_VERIFICATION: "Science Verification",
+    PolicyType.SHARED_RISK: "Shared Risk",
+    PolicyType.STANDARD_OPERATIONS: "Proposal",
 }
 
 
@@ -138,6 +147,7 @@ class OSD:
             for name, legacy_name in _LEGACY_CYCLE_FIELD_NAMES.items()
             if name in cycle
         }
+        cycle_definition["type"] = _LEGACY_TYPE_NAMES[cycle["type"]]
         cycle_definition["cycle_information"] = {
             "cycle_id": cycle["id"],
             "proposal_open": cycle["proposal_window"]["opens"],

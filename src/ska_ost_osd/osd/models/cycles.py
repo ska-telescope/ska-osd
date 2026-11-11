@@ -1,8 +1,15 @@
+from enum import StrEnum
 from typing import Self
 
 from pydantic import AwareDatetime, Field, model_validator
 
 from ska_ost_osd.osd.models.defaults import OSDBaseModel
+
+
+class PolicyType(StrEnum):
+    SCIENCE_VERIFICATION = "science_verification"
+    SHARED_RISK = "shared_risk"
+    STANDARD_OPERATIONS = "standard_operations"
 
 
 class ProposalWindow(OSDBaseModel):
@@ -40,7 +47,7 @@ class Cycle(OSDBaseModel):
     name: str
     description: str
     number: int | None = Field(default=None, ge=0, examples=[1])
-    type: str | None = Field(default=None, examples=["Science Verification"])
+    type: PolicyType
     proposal_window: ProposalWindow
     proposal_policy: ProposalPolicy
     telescope_capabilities: TelescopeCapabilities

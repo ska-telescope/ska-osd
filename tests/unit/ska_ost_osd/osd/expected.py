@@ -29,6 +29,7 @@ from ska_ost_osd.osd.models.capabilities import (
 from ska_ost_osd.osd.models.constraints import Constraints, ElevationLimits
 from ska_ost_osd.osd.models.cycles import (
     Cycle,
+    PolicyType,
     ProposalPolicy,
     ProposalWindow,
     TelescopeCapabilities,
@@ -74,7 +75,7 @@ CYCLE_1 = Cycle(
     name="TEST SKAO 2027 Low AA1 SV",
     description="TEST Low AA1 Science Verification",
     number=1,
-    type="Science Verification",
+    type=PolicyType.SCIENCE_VERIFICATION,
     proposal_window=ProposalWindow(
         opens=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
         closes=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
@@ -94,7 +95,7 @@ CYCLE_2 = Cycle(
     name="TEST SKAO 2027 AA2 Proposal",
     description="TEST AA2 Proposal",
     number=2,
-    type="Proposal",
+    type=PolicyType.STANDARD_OPERATIONS,
     proposal_window=ProposalWindow(
         opens=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
         closes=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
@@ -114,7 +115,7 @@ CYCLE_1_FILE = CycleFile(
     name="TEST SKAO 2027 Low AA1 SV",
     description="TEST Low AA1 Science Verification",
     number=1,
-    type="Science Verification",
+    type=PolicyType.SCIENCE_VERIFICATION,
     proposal_window=ProposalWindow(
         opens=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
         closes=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
@@ -134,7 +135,7 @@ CYCLE_2_FILE = CycleFile(
     name="TEST SKAO 2027 AA2 Proposal",
     description="TEST AA2 Proposal",
     number=2,
-    type="Proposal",
+    type=PolicyType.STANDARD_OPERATIONS,
     proposal_window=ProposalWindow(
         opens=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
         closes=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),

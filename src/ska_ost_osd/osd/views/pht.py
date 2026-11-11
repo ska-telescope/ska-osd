@@ -21,10 +21,17 @@ from ska_ost_osd.osd.models.capabilities import (
     MidCapabilitySet,
     MidFrequencyBand,
 )
-from ska_ost_osd.osd.models.cycles import Cycle
+from ska_ost_osd.osd.models.cycles import Cycle, PolicyType
 from ska_ost_osd.osd.models.subarray_templates import SubarrayType
 from ska_ost_osd.osd.repository import OSDRepository
 from ska_ost_osd.osd.views.base import ConfigurationModel
+
+# The PHT UI recognises science verification by its name
+_TYPE_NAMES = {
+    PolicyType.SCIENCE_VERIFICATION: "Science Verification",
+    PolicyType.SHARED_RISK: "Shared Risk",
+    PolicyType.STANDARD_OPERATIONS: "Proposal",
+}
 
 
 class CycleTelescopeCapabilities(ConfigurationModel):
@@ -57,7 +64,7 @@ class ObservatoryPolicy(ConfigurationModel):
 
     cycle_number: int | None
     cycle_id: str
-    type: str | None
+    type: str
     cycle_description: str
     cycle_information: CycleInformation
     cycle_policies: CyclePolicies
@@ -170,7 +177,7 @@ def _observatory_policy(cycle: Cycle) -> ObservatoryPolicy:
     return ObservatoryPolicy(
         cycle_number=cycle.number,
         cycle_id=cycle.id,
-        type=cycle.type,
+        type=_TYPE_NAMES[cycle.type],
         cycle_description=cycle.description,
         cycle_information=CycleInformation(
             cycle_id=cycle.id,
