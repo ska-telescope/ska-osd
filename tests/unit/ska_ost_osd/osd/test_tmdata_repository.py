@@ -35,6 +35,18 @@ class TestGetCycleIds:
         with pytest.raises(FileNotFoundError, match="file not found: cycles"):
             empty_tmdata_repository.get_cycle_ids()
 
+    def test_raises_when_two_cycle_files_share_a_number(self, tmdata_repository_with):
+        repository = tmdata_repository_with(
+            {
+                "cycles/another_cycle_1.json": CYCLE_1_FILE.model_dump(
+                    mode="json", by_alias=True
+                )
+            }
+        )
+
+        with pytest.raises(ValueError, match="cycle_number 1 is in both"):
+            repository.get_cycle_ids()
+
 
 class TestGetCycle:
     @pytest.mark.parametrize(
@@ -253,7 +265,7 @@ class TestGetCycleCapabilitySets:
         capability set is an error rather than being skipped."""
         repository = tmdata_repository_with(
             {
-                "cycles/cycle_1.json": {
+                "cycles/TEST_SKAO_2027_Low_AA1_SV.json": {
                     **CYCLE_1_FILE.model_dump(mode="json", by_alias=True),
                     "telescope_capabilities": {"ska_low": "AA3"},
                 }

@@ -92,7 +92,7 @@ class TestGetCycleConfiguration:
     ):
         repository = tmdata_repository_with(
             {
-                "cycles/cycle_1.json": {
+                "cycles/TEST_SKAO_2027_Low_AA1_SV.json": {
                     **CYCLE_1_FILE.model_dump(mode="json", by_alias=True),
                     "telescope_capabilities": {"ska_low": "AA3"},
                 }

@@ -141,7 +141,7 @@ class LowDefaultsFile(TelescopeDefaultsFileBase):
 
 
 class CycleFile(OSDBaseModel):
-    """Top-level model for cycles/cycle_<N>.json."""
+    """Top-level model for a cycle file, cycles/<name>.json."""
 
     cycle_number: CycleID
     cycle_id: str | None = None

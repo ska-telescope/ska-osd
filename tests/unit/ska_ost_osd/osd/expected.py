@@ -67,7 +67,7 @@ from ska_ost_osd.osd.views.pht import (
     ObservatoryPolicy,
 )
 
-# tests/tmdata/cycles/cycle_1.json
+# tests/tmdata/cycles/TEST_SKAO_2027_Low_AA1_SV.json
 CYCLE_1 = Cycle(
     cycle_number=CycleID(1),
     cycle_id="TEST_SKAO_2027_Low_AA1_SV",
@@ -87,7 +87,7 @@ CYCLE_1 = Cycle(
     telescope_capabilities=TelescopeCapabilities(ska_mid=None, ska_low="AA1"),
 )
 
-# tests/tmdata/cycles/cycle_2.json
+# tests/tmdata/cycles/TEST_SKAO_2027_AA2_Proposal.json
 CYCLE_2 = Cycle(
     cycle_number=CycleID(2),
     cycle_id="TEST_SKAO_2027_AA2_Proposal",
@@ -107,7 +107,7 @@ CYCLE_2 = Cycle(
     telescope_capabilities=TelescopeCapabilities(ska_mid="AA2", ska_low="AA2"),
 )
 
-# tests/tmdata/cycles/cycle_1.json, as stored
+# tests/tmdata/cycles/TEST_SKAO_2027_Low_AA1_SV.json, as stored
 CYCLE_1_FILE = CycleFile(
     cycle_number=CycleID(1),
     cycle_id="TEST_SKAO_2027_Low_AA1_SV",
@@ -127,7 +127,7 @@ CYCLE_1_FILE = CycleFile(
     telescope_capabilities=TelescopeCapabilities(ska_mid=None, ska_low="AA1"),
 )
 
-# tests/tmdata/cycles/cycle_2.json, as stored
+# tests/tmdata/cycles/TEST_SKAO_2027_AA2_Proposal.json, as stored
 CYCLE_2_FILE = CycleFile(
     cycle_number=CycleID(2),
     cycle_id="TEST_SKAO_2027_AA2_Proposal",
@@ -147,7 +147,7 @@ CYCLE_2_FILE = CycleFile(
     telescope_capabilities=TelescopeCapabilities(ska_mid="AA2", ska_low="AA2"),
 )
 
-# The policy in the legacy response for cycle 1: tests/tmdata/cycles/cycle_1.json
+# The policy in the legacy response for cycle 1: tests/tmdata/cycles/TEST_SKAO_2027_Low_AA1_SV.json
 # as stored, with the telescopes keyed Mid and Low
 CYCLE_1_LEGACY_OBSERVATORY_POLICY = {
     "cycle_number": 1,

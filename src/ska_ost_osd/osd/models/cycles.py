@@ -4,7 +4,7 @@ from pydantic import AwareDatetime, Field, model_validator
 
 from ska_ost_osd.osd.models.defaults import OSDBaseModel
 
-# The key that identifies a cycle: currently the number N in cycles/cycle_<N>.json
+# The key that identifies a cycle: currently the cycle_number in its file
 CycleID = Annotated[int, Field(gt=0, examples=[1])]
 
 

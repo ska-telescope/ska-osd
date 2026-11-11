@@ -28,8 +28,8 @@ Folder Structure
 
     tmdata
     ├── cycles
-    │   ├── cycle_1.json
-    │   └── cycle_<id>.json
+    │   ├── TEST_SKAO_2027_Low_AA2_SV.json
+    │   └── <cycle>.json
     ├── telescopes
     │   ├── ska_low
     │   │   ├── capabilities
@@ -72,8 +72,8 @@ capability set, such as ``capabilities/AA2.json``.
 
 .. note::
 
-    Each observing cycle is stored in its own
-    ``cycles/cycle_<id>.json`` file. The legacy ``observatory_policies.json``
+    Each observing cycle is stored in its own file in ``cycles``. The file
+    may have any name; the cycle's ID is the ``cycle_number`` in the file. The legacy ``observatory_policies.json``
     file remains at the root on main for backward compatibility with the old
     legacy version mapper.
 
@@ -127,7 +127,7 @@ Response
 ======================    ============================================================================================================
 Keys                      Description
 ======================    ============================================================================================================
-observatory_policy        file content of the selected ``cycles/cycle_<id>.json`` file
+observatory_policy        file content of the cycle file whose ``cycle_number`` is ``cycle_id``
 telescope_capabilities    value of ``telescope_capabilities`` in the selected cycle file, keyed ``Mid`` and ``Low``
 capabilities              key value pair of mid and low
 Mid                       ``basic_capabilities`` and the capability sets (``Array Assembly`` AA0.5, AA1 etc) of SKA-Mid
@@ -142,8 +142,7 @@ Scenarios
    ``basic_capabilities`` together with all of its named array assemblies. No
    ``observatory_policy`` is included, since no ``cycle_id`` was selected.
 
-2. With ``cycle_id``, it checks that the corresponding ``cycles/cycle_<id>.json``
-   file exists, then uses that file's ``telescope_capabilities`` to select the array
+2. With ``cycle_id``, it checks that a file in ``cycles`` has that ``cycle_number``, then uses that file's ``telescope_capabilities`` to select the array
    assembly of each telescope. The cycle file is returned as ``observatory_policy``.
 
 3. With ``telescope``, it returns only that telescope; with ``array_assembly`` as

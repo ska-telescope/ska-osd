@@ -43,33 +43,61 @@ _DEFAULTS_FILE_MODELS = {
 }
 
 
+def get_cycle_paths(tmdata: TMData) -> dict[CycleID, str]:
+    """Find each cycle's file, ``cycles/<name>.json``. A cycle file may have
+    any name: the cycle's ID is the ``cycle_number`` in the file.
+
+    :param tmdata: TMData to read from.
+    :return: the path of each cycle's file, keyed by cycle ID in ascending
+        order.
+    :raises FileNotFoundError: If the tmdata has no cycles directory.
+    :raises ValueError: If two cycle files have the same ``cycle_number``.
+    """
+    if not any(key.startswith(OBSERVING_CYCLES_TMDATA_DIR) for key in tmdata):
+        raise FileNotFoundError(f"file not found: {OBSERVING_CYCLES_TMDATA_DIR}")
+    paths = {}
+    for name in tmdata[OBSERVING_CYCLES_TMDATA_DIR]:
+        if not name.endswith(".json"):
+            continue
+        path = f"{OBSERVING_CYCLES_TMDATA_DIR}/{name}"
+        cycle_id = _read(tmdata, path)["cycle_number"]
+        # The number identifies the cycle, so no two files may share one
+        if cycle_id in paths:
+            raise ValueError(
+                f"cycle_number {cycle_id} is in both {paths[cycle_id]} and {path}"
+            )
+        paths[cycle_id] = path
+    return dict(sorted(paths.items()))
+
+
 def get_cycle_ids(tmdata: TMData) -> list[CycleID]:
-    """List the cycle IDs, from the ``cycles/cycle_<N>.json`` file names.
+    """List the cycle IDs, from the ``cycle_number`` in each cycle file.
 
     :param tmdata: TMData to read from.
     :return: the cycle IDs in ascending order.
     :raises FileNotFoundError: If the tmdata has no cycles directory.
+    :raises ValueError: If two cycle files have the same ``cycle_number``.
     """
-    if not any(key.startswith(OBSERVING_CYCLES_TMDATA_DIR) for key in tmdata):
-        raise FileNotFoundError(f"file not found: {OBSERVING_CYCLES_TMDATA_DIR}")
-    return sorted(
-        CycleID(key.removeprefix("cycle_").removesuffix(".json"))
-        for key in tmdata[OBSERVING_CYCLES_TMDATA_DIR]
-        if key.startswith("cycle_") and key.endswith(".json")
-    )
+    return list(get_cycle_paths(tmdata))
 
 
 def get_cycle_file(tmdata: TMData, cycle_id: CycleID) -> CycleFile:
-    """Read one cycle's file, ``cycles/cycle_<N>.json``.
+    """Read one cycle's file: the one whose ``cycle_number`` is the ID.
 
     :param tmdata: TMData to read from.
     :param cycle_id: the ID of the cycle.
     :return: the cycle file, as stored.
-    :raises FileNotFoundError: If the file is missing.
+    :raises FileNotFoundError: If the tmdata has no cycles directory, or no
+        cycle file has the ID.
+    :raises ValueError: If two cycle files have the same ``cycle_number``.
     """
-    return CycleFile.model_validate(
-        _read(tmdata, f"{OBSERVING_CYCLES_TMDATA_DIR}/cycle_{cycle_id}.json")
-    )
+    paths = get_cycle_paths(tmdata)
+    if cycle_id not in paths:
+        raise FileNotFoundError(
+            f"file not found: no cycle file in {OBSERVING_CYCLES_TMDATA_DIR} "
+            f"has cycle_number {cycle_id}"
+        )
+    return CycleFile.model_validate(_read(tmdata, paths[cycle_id]))
 
 
 @overload

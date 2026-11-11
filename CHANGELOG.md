@@ -25,10 +25,14 @@ Unreleased
   ``get_osd_using_tmdata`` still accepts ``"mid"`` and ``"low"``
 * [BREAKING] Renamed the subarray templates in ``subarray_template_library.json``
   to start with ``SKA_MID_`` and ``SKA_LOW_``
-* [BREAKING] Keyed ``telescope_capabilities`` in the ``cycles/cycle_<N>.json`` tmdata
+* [BREAKING] Keyed ``telescope_capabilities`` in the ``cycles`` tmdata
   files by the ``Telescope`` values, ``ska_mid`` and ``ska_low``, instead of ``Mid``
   and ``Low``. The legacy response and the PHT view still serve ``Mid`` and ``Low``
 * [BREAKING] Define multiple cycles through a single TelModel backend in ``tmdata/cycles``
+* A cycle file in ``tmdata/cycles`` may have any name: the cycle's ID is the
+  ``cycle_number`` in the file, not ``N`` in ``cycle_<N>.json``. The cycle files are
+  renamed after their ``cycle_id``. Two cycle files with the same ``cycle_number``
+  are an error
 * [BREAKING] Users pass a TMData client to public API functions instead of OSD creating one from ``tmdata/version_mapping``
 * [BREAKING] Removed ``number_beams`` from the SKA-Low array assemblies in
   ``low_capabilities.json``; use ``number_subarray_beams``
@@ -59,7 +63,7 @@ Unreleased
 * Added proposal cycle data to the release-cycle version mapping.
 * Added Pydantic storage models for the tmdata files: ``MidDefaultsFile`` and
   ``LowDefaultsFile``, ``CycleFile``
-  (``cycles/cycle_*.json``) and ``SubarrayTemplateLibraryFile``, in
+  (``cycles/*.json``) and ``SubarrayTemplateLibraryFile``, in
   ``ska_ost_osd.osd.adapters.tmdata.models``
 * ``Cycle`` reads ``proposal_open`` and ``proposal_close`` as timezone-aware
   datetimes, a date without a timezone is rejected.

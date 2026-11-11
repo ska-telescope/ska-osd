@@ -36,10 +36,15 @@ class TestGetCycleFile:
         assert get_cycle_file(tests_tmdata, cycle_id) == expected
 
     def test_raises_when_file_missing(self, empty_tmdata):
-        with pytest.raises(
-            FileNotFoundError, match="file not found: cycles/cycle_1.json"
-        ):
+        with pytest.raises(FileNotFoundError, match="file not found: cycles"):
             get_cycle_file(empty_tmdata, CycleID(1))
+
+    def test_raises_when_no_file_has_cycle_number(self, tests_tmdata):
+        with pytest.raises(
+            FileNotFoundError,
+            match="file not found: no cycle file in cycles has cycle_number 3",
+        ):
+            get_cycle_file(tests_tmdata, CycleID(3))
 
 
 class TestGetCapabilitySetFiles:

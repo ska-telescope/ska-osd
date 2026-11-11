@@ -15,8 +15,8 @@ from ska_ost_osd.osd.common.osd_validation_messages import (
     CYCLE_ID_ERROR_MESSAGE,
 )
 
+from .adapters.tmdata.storage import get_cycle_paths
 from .common.constant import (
-    OBSERVING_CYCLES_TMDATA_DIR,
     RELEASE_FILE_PATH_LATEST,
     Telescope,
     osd_file_mapping,
@@ -69,27 +69,21 @@ class OSD:
             if entry.endswith("/basic_capabilities.json")
         }
 
-    def cycle_files(self):
-        """Return the TMData cycle directory or raise when it is absent."""
-        if not any(k.startswith(OBSERVING_CYCLES_TMDATA_DIR) for k in self.tmdata):
-            raise FileNotFoundError(f"file not found: {OBSERVING_CYCLES_TMDATA_DIR}")
-        return self.tmdata[OBSERVING_CYCLES_TMDATA_DIR]
+    def cycle_filepaths(self) -> dict[int, str]:
+        """Return the TMData cycle file paths keyed by the ``cycle_number``
+        in each file; a cycle file may have any name."""
+        return get_cycle_paths(self.tmdata)
 
     def get_available_cycles(self) -> list[int]:
-        """List available cycle IDs from observing-cycle file names."""
-        return [
-            int(str(key).removesuffix(".json").removeprefix("cycle_"))
-            for key in self.cycle_files()
-            if key.startswith("cycle_") and key.endswith(".json")
-        ]
+        """List available cycle IDs from the observing-cycle files."""
+        return list(self.cycle_filepaths())
 
     def check_cycle_id(self) -> str | None:
         """Return an error message when the selected cycle file is absent."""
         if self.cycle_id is None:
             return None
 
-        cycle_filename = f"cycle_{self.cycle_id}.json"
-        if cycle_filename not in self.cycle_files():
+        if self.cycle_id not in self.cycle_filepaths():
             cycle_numbers = ",".join(
                 str(cycle) for cycle in self.get_available_cycles()
             )
@@ -115,15 +109,13 @@ class OSD:
         return None
 
     def get_cycle_definition(self) -> tuple[dict[str, Any] | None, str | None]:
-        """Load the selected cycle definition after validating its file name."""
+        """Load the selected cycle definition after checking it exists."""
         cycle_error = self.check_cycle_id()
         if cycle_error:
             return None, cycle_error
         if self.cycle_id is None:
             return None, None
-        cycle_definition = self.tmdata[
-            f"{OBSERVING_CYCLES_TMDATA_DIR}/cycle_{self.cycle_id}.json"
-        ].get_dict()
+        cycle_definition = self.tmdata[self.cycle_filepaths()[self.cycle_id]].get_dict()
         # The cycle files name the telescopes by Telescope value; the legacy
         # response names them Mid and Low
         cycle_definition["telescope_capabilities"] = {

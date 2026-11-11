@@ -52,7 +52,7 @@ MID_CAPABILITY_SET = "telescopes/ska_mid/capabilities/AA2.json"
 LOW_CAPABILITY_SET = "telescopes/ska_low/capabilities/AA2.json"
 MID_DEFAULTS = "telescopes/ska_mid/defaults.json"
 LOW_DEFAULTS = "telescopes/ska_low/defaults.json"
-CYCLE = "cycles/cycle_1.json"
+CYCLE = "cycles/TEST_SKAO_2027_Low_AA1_SV.json"
 SUBARRAY_TEMPLATES = "telescopes/ska_low/subarray_templates/AA2.json"
 
 
