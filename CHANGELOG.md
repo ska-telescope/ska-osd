@@ -50,7 +50,9 @@ Unreleased
   ``frequency_bands`` (Mid's receiver bands; Low's one band and its channels) and
   its ``elevation_limits``. ``mid_capabilities.json`` and ``low_capabilities.json``
   are kept for older releases but are no longer read
-* Moved telescope capability sets to standalone tmdata files
+* Moved telescope capability sets to standalone tmdata files. Mid's channel widths
+  are only stored as ``allowed_channel_width_values_hz``; the legacy response and the
+  PHT view also serve them as ``allowed_channel_width_values``
 * Moved each telescope's current tmdata files under ``telescopes/ska_low`` and
   ``telescopes/ska_mid``, named by the ``Telescope`` values, with its defaults in
   ``defaults.json``. The legacy files stay at their old paths for older releases and

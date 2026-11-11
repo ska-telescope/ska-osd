@@ -155,6 +155,10 @@ class TestGetCycleConfiguration:
         assert list(mid) == ["basic_capabilities", "AA2"]
         assert list(mid["basic_capabilities"]) == ["receiver_information"]
         assert mid["AA2"]["name"] == "AA2"
+        assert (
+            mid["AA2"]["allowed_channel_width_values"]
+            == mid["AA2"]["allowed_channel_width_values_hz"]
+        )
         if include_subarray_templates:
             assert "SKA_MID_FULL_AA2" in mid["AA2"]["subarray_templates"]
         else:

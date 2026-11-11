@@ -190,8 +190,9 @@ capability set's subarray templates as the legacy API does with
 
 The PHT UI reads the field names of the response it already uses, and the views
 serialise with those names by default, without ``by_alias=True``:
-``telescope_capabilities`` as ``Mid`` and ``Low``, and Mid's receiver bands as
-``receiver_information``. The PHT UI finds the capability set as the first key
+``telescope_capabilities`` as ``Mid`` and ``Low``, Mid's receiver bands as
+``receiver_information``, and Mid's channel widths also as
+``allowed_channel_width_values``. The PHT UI finds the capability set as the first key
 under ``mid`` or ``low`` that isn't ``basic_capabilities``.
 
 .. code-block:: python

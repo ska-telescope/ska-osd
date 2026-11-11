@@ -265,6 +265,11 @@ class OSD:
         """A capability set in its legacy shape: its array assembly as a template
         pattern, or as that array assembly's templates when they are processed."""
         capability_set = self.tmdata[f"{telescope_dir}/capabilities/{name}"].get_dict()
+        # Mid's channel widths are also served without the _hz suffix
+        if "allowed_channel_width_values_hz" in capability_set:
+            capability_set["allowed_channel_width_values"] = capability_set[
+                "allowed_channel_width_values_hz"
+            ]
         array_assembly = capability_set.pop("array_assembly", None)
         if array_assembly is None:
             return capability_set

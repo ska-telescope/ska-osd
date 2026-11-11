@@ -122,7 +122,13 @@ class CycleCapabilitiesBase(ConfigurationModel):
         self, handler: SerializerFunctionWrapHandler
     ) -> dict[str, Any]:
         data = handler(self)
-        data[self.capability_set.name] = data.pop("capability_set")
+        capability_set = data.pop("capability_set")
+        # The PHT UI reads Mid's channel widths without the _hz suffix
+        if "allowed_channel_width_values_hz" in capability_set:
+            capability_set["allowed_channel_width_values"] = capability_set[
+                "allowed_channel_width_values_hz"
+            ]
+        data[self.capability_set.name] = capability_set
         if (subarray_templates := data.pop("subarray_templates")) is not None:
             data[self.capability_set.name]["subarray_templates"] = subarray_templates
         return data
