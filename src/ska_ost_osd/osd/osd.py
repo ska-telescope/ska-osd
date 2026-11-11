@@ -30,6 +30,18 @@ _LEGACY_TELESCOPE_NAMES = {
     Telescope.SKA_LOW: "low",
 }
 
+# The legacy names of the cycle file fields, in the order the legacy response
+# serves them. A field not listed, such as name, is not served.
+_LEGACY_CYCLE_FIELD_NAMES = {
+    "number": "cycle_number",
+    "id": "cycle_id",
+    "type": "type",
+    "description": "cycle_description",
+    "cycle_information": "cycle_information",
+    "cycle_policies": "cycle_policies",
+    "telescope_capabilities": "telescope_capabilities",
+}
+
 
 class OSD:
     """Build OSD responses from telescope capability documents and cycle definitions."""
@@ -70,11 +82,11 @@ class OSD:
         }
 
     def cycle_filepaths(self) -> dict[int, str]:
-        """Return the TMData cycle file paths keyed by the ``cycle_number``
-        in each file, which the legacy OSD API looks cycles up by."""
+        """Return the TMData cycle file paths keyed by the ``number`` in each
+        file, which the legacy OSD API looks cycles up by."""
         return dict(
             sorted(
-                (self.tmdata[path].get_dict()["cycle_number"], path)
+                (self.tmdata[path].get_dict()["number"], path)
                 for path in get_cycle_paths(self.tmdata).values()
             )
         )
@@ -120,7 +132,12 @@ class OSD:
             return None, cycle_error
         if self.cycle_id is None:
             return None, None
-        cycle_definition = self.tmdata[self.cycle_filepaths()[self.cycle_id]].get_dict()
+        cycle = self.tmdata[self.cycle_filepaths()[self.cycle_id]].get_dict()
+        cycle_definition = {
+            legacy_name: cycle[name]
+            for name, legacy_name in _LEGACY_CYCLE_FIELD_NAMES.items()
+            if name in cycle
+        }
         # The cycle files name the telescopes by Telescope value; the legacy
         # response names them Mid and Low
         cycle_definition["telescope_capabilities"] = {

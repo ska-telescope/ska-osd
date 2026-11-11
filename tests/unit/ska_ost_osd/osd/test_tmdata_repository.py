@@ -43,12 +43,12 @@ class TestGetCycleIds:
             {
                 "cycles/another_cycle_1.json": {
                     **CYCLE_1_FILE.model_dump(mode="json", by_alias=True),
-                    "cycle_id": "ANOTHER_CYCLE",
+                    "id": "ANOTHER_CYCLE",
                 }
             }
         )
 
-        with pytest.raises(ValueError, match="cycle_number 1 is in both"):
+        with pytest.raises(ValueError, match="number 1 is in both"):
             repository.get_cycle_ids()
 
     def test_raises_when_two_cycle_files_share_an_id(self, tmdata_repository_with):
@@ -56,14 +56,12 @@ class TestGetCycleIds:
             {
                 "cycles/another_cycle.json": {
                     **CYCLE_1_FILE.model_dump(mode="json", by_alias=True),
-                    "cycle_number": 3,
+                    "number": 3,
                 }
             }
         )
 
-        with pytest.raises(
-            ValueError, match="cycle_id TEST_SKAO_2027_Low_AA1_SV is in both"
-        ):
+        with pytest.raises(ValueError, match="id TEST_SKAO_2027_Low_AA1_SV is in both"):
             repository.get_cycle_ids()
 
 

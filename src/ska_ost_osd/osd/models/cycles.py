@@ -35,10 +35,11 @@ class Cycle(OSDBaseModel):
     """One cycle: its metadata, proposal dates, policies and the capability
     set each telescope offers."""
 
-    cycle_number: int = Field(ge=0, examples=[1])
-    cycle_id: str
+    id: str
+    name: str
+    description: str
+    number: int = Field(ge=0, examples=[1])
     type: str | None = Field(default=None, examples=["Science Verification"])
-    cycle_description: str
     cycle_information: CycleInformation
     cycle_policies: CyclePolicies
     telescope_capabilities: TelescopeCapabilities

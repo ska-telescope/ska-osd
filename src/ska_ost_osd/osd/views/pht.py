@@ -35,12 +35,14 @@ class CycleTelescopeCapabilities(ConfigurationModel):
 
 
 class ObservatoryPolicy(ConfigurationModel):
-    """The cycle, as the PHT UI reads it."""
+    """The cycle, as the PHT UI reads it: read from a ``Cycle``'s ``number``,
+    ``id`` and ``description``, and served as ``cycle_number``, ``cycle_id``
+    and ``cycle_description``."""
 
-    cycle_number: int
-    cycle_id: str
+    cycle_number: int = Field(validation_alias="number")
+    cycle_id: str = Field(validation_alias="id")
     type: str | None
-    cycle_description: str
+    cycle_description: str = Field(validation_alias="description")
     cycle_information: CycleInformation
     cycle_policies: CyclePolicies
     telescope_capabilities: CycleTelescopeCapabilities

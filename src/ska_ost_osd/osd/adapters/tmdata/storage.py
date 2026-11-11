@@ -44,14 +44,14 @@ _DEFAULTS_FILE_MODELS = {
 
 def get_cycle_paths(tmdata: TMData) -> dict[str, str]:
     """Find each cycle's file, ``cycles/<name>.json``. A cycle file may have
-    any name: the cycle's ID is the ``cycle_id`` in the file.
+    any name: the cycle's ID is the ``id`` in the file.
 
     :param tmdata: TMData to read from.
     :return: the path of each cycle's file, keyed by cycle ID in ascending
         order.
     :raises FileNotFoundError: If the tmdata has no cycles directory.
-    :raises ValueError: If two cycle files have the same ``cycle_id`` or the
-        same ``cycle_number``.
+    :raises ValueError: If two cycle files have the same ``id`` or the same
+        ``number``.
     """
     if not any(key.startswith(OBSERVING_CYCLES_TMDATA_DIR) for key in tmdata):
         raise FileNotFoundError(f"file not found: {OBSERVING_CYCLES_TMDATA_DIR}")
@@ -62,16 +62,14 @@ def get_cycle_paths(tmdata: TMData) -> dict[str, str]:
             continue
         path = f"{OBSERVING_CYCLES_TMDATA_DIR}/{name}"
         cycle = _read(tmdata, path)
-        cycle_id, cycle_number = cycle["cycle_id"], cycle["cycle_number"]
+        cycle_id, cycle_number = cycle["id"], cycle["number"]
         # The ID identifies the cycle, so no two files may share one; nor may
         # they share a number, which the legacy OSD API looks cycles up by
         if cycle_id in paths:
-            raise ValueError(
-                f"cycle_id {cycle_id} is in both {paths[cycle_id]} and {path}"
-            )
+            raise ValueError(f"id {cycle_id} is in both {paths[cycle_id]} and {path}")
         if cycle_number in paths_by_number:
             raise ValueError(
-                f"cycle_number {cycle_number} is in both "
+                f"number {cycle_number} is in both "
                 f"{paths_by_number[cycle_number]} and {path}"
             )
         paths[cycle_id] = path
@@ -80,33 +78,33 @@ def get_cycle_paths(tmdata: TMData) -> dict[str, str]:
 
 
 def get_cycle_ids(tmdata: TMData) -> list[str]:
-    """List the cycle IDs, from the ``cycle_id`` in each cycle file.
+    """List the cycle IDs, from the ``id`` in each cycle file.
 
     :param tmdata: TMData to read from.
     :return: the cycle IDs in ascending order.
     :raises FileNotFoundError: If the tmdata has no cycles directory.
-    :raises ValueError: If two cycle files have the same ``cycle_id`` or the
-        same ``cycle_number``.
+    :raises ValueError: If two cycle files have the same ``id`` or the same
+        ``number``.
     """
     return list(get_cycle_paths(tmdata))
 
 
 def get_cycle_file(tmdata: TMData, cycle_id: str) -> CycleFile:
-    """Read one cycle's file: the one whose ``cycle_id`` is the ID.
+    """Read one cycle's file: the one whose ``id`` is the ID.
 
     :param tmdata: TMData to read from.
     :param cycle_id: the ID of the cycle.
     :return: the cycle file, as stored.
     :raises FileNotFoundError: If the tmdata has no cycles directory, or no
         cycle file has the ID.
-    :raises ValueError: If two cycle files have the same ``cycle_id`` or the
-        same ``cycle_number``.
+    :raises ValueError: If two cycle files have the same ``id`` or the same
+        ``number``.
     """
     paths = get_cycle_paths(tmdata)
     if cycle_id not in paths:
         raise FileNotFoundError(
             f"file not found: no cycle file in {OBSERVING_CYCLES_TMDATA_DIR} "
-            f"has cycle_id {cycle_id}"
+            f"has id {cycle_id}"
         )
     return CycleFile.model_validate(_read(tmdata, paths[cycle_id]))
 

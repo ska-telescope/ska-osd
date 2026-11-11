@@ -1,8 +1,9 @@
 {
-  "cycle_number": 1,
-  "cycle_id": "TEST_SKAO_2027_Low_AA1_SV",
+  "id": "TEST_SKAO_2027_Low_AA1_SV",
+  "name": "TEST SKAO 2027 Low AA1 SV",
+  "description": "TEST Low AA1 Science Verification",
+  "number": 1,
   "type": "Science Verification",
-  "cycle_description": "TEST Low AA1 Science Verification",
   "cycle_information": {
     "cycle_id": "TEST_SKAO_2027_1",
     "proposal_open": "2026-03-27T12:00:00.000Z",

@@ -1,8 +1,9 @@
 {
-  "cycle_number": 2,
-  "cycle_id": "TEST_SKAO_2027_Low_AA2_Proposal",
+  "id": "TEST_SKAO_2027_Low_AA2_Proposal",
+  "name": "TEST SKAO 2027 Low AA2 Proposal",
+  "description": "TEST Low AA2 Proposal",
+  "number": 2,
   "type": "Proposal",
-  "cycle_description": "TEST Low AA2 Proposal",
   "cycle_information": {
     "cycle_id": "TEST_SKAO_2027_2",
     "proposal_open": "2026-03-27T12:00:00.000Z",

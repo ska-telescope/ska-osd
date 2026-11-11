@@ -123,7 +123,7 @@ class TestBreakingChanges:
             (
                 CycleFile,
                 CYCLE,
-                lambda data: data.update(cycle=data.pop("cycle_number")),
+                lambda data: data.update(cycle_number=data.pop("number")),
             ),
             (
                 SubarrayTemplateLibraryFile,
@@ -370,8 +370,8 @@ class TestCycleFile:
     def test_cycle_number_can_be_zero(self):
         """Cycle 0 is the first numbered cycle."""
         data = load(CYCLE)
-        data["cycle_number"] = 0
-        assert CycleFile.model_validate(data).cycle_number == 0
+        data["number"] = 0
+        assert CycleFile.model_validate(data).number == 0
 
     def test_proposal_dates_need_a_timezone(self):
         data = load(CYCLE)
