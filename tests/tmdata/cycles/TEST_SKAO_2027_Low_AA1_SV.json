@@ -4,10 +4,9 @@
   "description": "TEST Low AA1 Science Verification",
   "number": 1,
   "type": "Science Verification",
-  "cycle_information": {
-    "cycle_id": "TEST_SKAO_2027_1",
-    "proposal_open": "2026-03-27T12:00:00.000Z",
-    "proposal_close": "2027-04-01T15:00:00.000Z"
+  "proposal_window": {
+    "opens": "2026-03-27T12:00:00.000Z",
+    "closes": "2027-04-01T15:00:00.000Z"
   },
   "cycle_policies": {
     "normal_max_hours": 100.0,

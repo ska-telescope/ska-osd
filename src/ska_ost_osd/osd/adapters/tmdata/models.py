@@ -13,8 +13,8 @@ from ska_ost_osd.osd.models.capabilities import (
     MidCBFMode,
 )
 from ska_ost_osd.osd.models.cycles import (
-    CycleInformation,
     CyclePolicies,
+    ProposalWindow,
     TelescopeCapabilities,
 )
 from ska_ost_osd.osd.models.defaults import (
@@ -147,7 +147,7 @@ class CycleFile(OSDBaseModel):
     description: str
     number: int = Field(ge=0, examples=[1])
     type: str | None = Field(default=None, examples=["Science Verification"])
-    cycle_information: CycleInformation
+    proposal_window: ProposalWindow
     cycle_policies: CyclePolicies
     telescope_capabilities: TelescopeCapabilities
 

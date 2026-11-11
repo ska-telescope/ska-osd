@@ -362,10 +362,10 @@ class TestCycleFile:
         time is unchanged."""
         data = load(CYCLE)
         policy = CycleFile.model_validate(data).model_dump(mode="json")
-        for key in ("proposal_open", "proposal_close"):
+        for key in ("opens", "closes"):
             assert datetime.fromisoformat(
-                policy["cycle_information"][key]
-            ) == datetime.fromisoformat(data["cycle_information"][key])
+                policy["proposal_window"][key]
+            ) == datetime.fromisoformat(data["proposal_window"][key])
 
     def test_cycle_number_can_be_zero(self):
         """Cycle 0 is the first numbered cycle."""
@@ -375,7 +375,7 @@ class TestCycleFile:
 
     def test_proposal_dates_need_a_timezone(self):
         data = load(CYCLE)
-        data["cycle_information"]["proposal_open"] = "2026-03-27T12:00:00"
+        data["proposal_window"]["opens"] = "2026-03-27T12:00:00"
         with pytest.raises(ValidationError, match="timezone"):
             CycleFile.model_validate(data)
 
@@ -393,12 +393,9 @@ class TestCycleFile:
     def test_proposals_must_open_before_they_close(self):
         """A proposal window that closes before it opens is rejected."""
         data = load(CYCLE)
-        information = data["cycle_information"]
-        information["proposal_open"], information["proposal_close"] = (
-            information["proposal_close"],
-            information["proposal_open"],
-        )
-        with pytest.raises(ValidationError, match="proposal_open must be before"):
+        window = data["proposal_window"]
+        window["opens"], window["closes"] = window["closes"], window["opens"]
+        with pytest.raises(ValidationError, match="must open before it closes"):
             CycleFile.model_validate(data)
 
 

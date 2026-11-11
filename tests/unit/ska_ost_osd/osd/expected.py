@@ -29,8 +29,8 @@ from ska_ost_osd.osd.models.capabilities import (
 from ska_ost_osd.osd.models.constraints import Constraints, ElevationLimits
 from ska_ost_osd.osd.models.cycles import (
     Cycle,
-    CycleInformation,
     CyclePolicies,
+    ProposalWindow,
     TelescopeCapabilities,
 )
 from ska_ost_osd.osd.models.defaults import (
@@ -59,6 +59,7 @@ from ska_ost_osd.osd.views.odt import (
 from ska_ost_osd.osd.views.pht import (
     CycleCapabilities,
     CycleConfiguration,
+    CycleInformation,
     CycleTelescopeCapabilities,
     LowCycleCapabilities,
     MidCycleBasicCapabilities,
@@ -73,10 +74,9 @@ CYCLE_1 = Cycle(
     description="TEST Low AA1 Science Verification",
     number=1,
     type="Science Verification",
-    cycle_information=CycleInformation(
-        cycle_id="TEST_SKAO_2027_1",
-        proposal_open=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
-        proposal_close=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
+    proposal_window=ProposalWindow(
+        opens=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
+        closes=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
     ),
     cycle_policies=CyclePolicies(
         normal_max_hours=100.0,
@@ -94,10 +94,9 @@ CYCLE_2 = Cycle(
     description="TEST AA2 Proposal",
     number=2,
     type="Proposal",
-    cycle_information=CycleInformation(
-        cycle_id="TEST_SKAO_2027_2",
-        proposal_open=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
-        proposal_close=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
+    proposal_window=ProposalWindow(
+        opens=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
+        closes=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
     ),
     cycle_policies=CyclePolicies(
         normal_max_hours=100.0,
@@ -115,10 +114,9 @@ CYCLE_1_FILE = CycleFile(
     description="TEST Low AA1 Science Verification",
     number=1,
     type="Science Verification",
-    cycle_information=CycleInformation(
-        cycle_id="TEST_SKAO_2027_1",
-        proposal_open=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
-        proposal_close=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
+    proposal_window=ProposalWindow(
+        opens=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
+        closes=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
     ),
     cycle_policies=CyclePolicies(
         normal_max_hours=100.0,
@@ -136,10 +134,9 @@ CYCLE_2_FILE = CycleFile(
     description="TEST AA2 Proposal",
     number=2,
     type="Proposal",
-    cycle_information=CycleInformation(
-        cycle_id="TEST_SKAO_2027_2",
-        proposal_open=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
-        proposal_close=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
+    proposal_window=ProposalWindow(
+        opens=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
+        closes=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
     ),
     cycle_policies=CyclePolicies(
         normal_max_hours=100.0,
@@ -151,14 +148,14 @@ CYCLE_2_FILE = CycleFile(
 )
 
 # The policy in the legacy response for cycle 1: tests/tmdata/cycles/TEST_SKAO_2027_Low_AA1_SV.json
-# as stored, with the telescopes keyed Mid and Low
+# with the legacy field names, and the telescopes keyed Mid and Low
 CYCLE_1_LEGACY_OBSERVATORY_POLICY = {
     "cycle_number": 1,
     "cycle_id": "TEST_SKAO_2027_Low_AA1_SV",
     "type": "Science Verification",
     "cycle_description": "TEST Low AA1 Science Verification",
     "cycle_information": {
-        "cycle_id": "TEST_SKAO_2027_1",
+        "cycle_id": "TEST_SKAO_2027_Low_AA1_SV",
         "proposal_open": "2026-03-27T12:00:00.000Z",
         "proposal_close": "2027-04-01T15:00:00.000Z",
     },
@@ -549,7 +546,11 @@ CYCLE_1_CONFIGURATION = CycleConfiguration(
         cycle_id="TEST_SKAO_2027_Low_AA1_SV",
         type="Science Verification",
         cycle_description="TEST Low AA1 Science Verification",
-        cycle_information=CYCLE_1.cycle_information,
+        cycle_information=CycleInformation(
+            cycle_id="TEST_SKAO_2027_Low_AA1_SV",
+            proposal_open=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
+            proposal_close=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
+        ),
         cycle_policies=CYCLE_1.cycle_policies,
         telescope_capabilities=CycleTelescopeCapabilities(ska_mid=None, ska_low="AA1"),
     ),
@@ -567,7 +568,11 @@ CYCLE_2_CONFIGURATION = CycleConfiguration(
         cycle_id="TEST_SKAO_2027_AA2_Proposal",
         type="Proposal",
         cycle_description="TEST AA2 Proposal",
-        cycle_information=CYCLE_2.cycle_information,
+        cycle_information=CycleInformation(
+            cycle_id="TEST_SKAO_2027_AA2_Proposal",
+            proposal_open=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
+            proposal_close=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
+        ),
         cycle_policies=CYCLE_2.cycle_policies,
         telescope_capabilities=CycleTelescopeCapabilities(ska_mid="AA2", ska_low="AA2"),
     ),

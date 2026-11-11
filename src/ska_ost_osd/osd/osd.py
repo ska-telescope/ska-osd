@@ -37,7 +37,7 @@ _LEGACY_CYCLE_FIELD_NAMES = {
     "id": "cycle_id",
     "type": "type",
     "description": "cycle_description",
-    "cycle_information": "cycle_information",
+    "proposal_window": "cycle_information",
     "cycle_policies": "cycle_policies",
     "telescope_capabilities": "telescope_capabilities",
 }
@@ -137,6 +137,11 @@ class OSD:
             legacy_name: cycle[name]
             for name, legacy_name in _LEGACY_CYCLE_FIELD_NAMES.items()
             if name in cycle
+        }
+        cycle_definition["cycle_information"] = {
+            "cycle_id": cycle["id"],
+            "proposal_open": cycle["proposal_window"]["opens"],
+            "proposal_close": cycle["proposal_window"]["closes"],
         }
         # The cycle files name the telescopes by Telescope value; the legacy
         # response names them Mid and Low

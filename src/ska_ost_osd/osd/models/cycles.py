@@ -5,15 +5,14 @@ from pydantic import AwareDatetime, Field, model_validator
 from ska_ost_osd.osd.models.defaults import OSDBaseModel
 
 
-class CycleInformation(OSDBaseModel):
-    cycle_id: str = Field(examples=["SKAO_2027_1"])
-    proposal_open: AwareDatetime = Field(examples=["2026-03-27T12:00:00.000Z"])
-    proposal_close: AwareDatetime = Field(examples=["2027-04-01T15:00:00.000Z"])
+class ProposalWindow(OSDBaseModel):
+    opens: AwareDatetime = Field(examples=["2026-03-27T12:00:00.000Z"])
+    closes: AwareDatetime = Field(examples=["2027-04-01T15:00:00.000Z"])
 
     @model_validator(mode="after")
-    def check_proposal_window(self) -> Self:
-        if self.proposal_open >= self.proposal_close:
-            raise ValueError("proposal_open must be before proposal_close")
+    def check_opens_before_closes(self) -> Self:
+        if self.opens >= self.closes:
+            raise ValueError("the proposal window must open before it closes")
         return self
 
 
@@ -40,6 +39,6 @@ class Cycle(OSDBaseModel):
     description: str
     number: int = Field(ge=0, examples=[1])
     type: str | None = Field(default=None, examples=["Science Verification"])
-    cycle_information: CycleInformation
+    proposal_window: ProposalWindow
     cycle_policies: CyclePolicies
     telescope_capabilities: TelescopeCapabilities

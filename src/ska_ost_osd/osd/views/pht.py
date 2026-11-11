@@ -3,6 +3,7 @@
 set each telescope offers and that telescope's basic capabilities. Served
 with aliases, the field names are the ones the PHT UI reads."""
 
+from datetime import datetime
 from typing import Any
 
 from pydantic import (
@@ -20,7 +21,7 @@ from ska_ost_osd.osd.models.capabilities import (
     MidCapabilitySet,
     MidFrequencyBand,
 )
-from ska_ost_osd.osd.models.cycles import CycleInformation, CyclePolicies
+from ska_ost_osd.osd.models.cycles import Cycle, CyclePolicies
 from ska_ost_osd.osd.models.subarray_templates import SubarrayType
 from ska_ost_osd.osd.repository import OSDRepository
 from ska_ost_osd.osd.views.base import ConfigurationModel
@@ -34,15 +35,21 @@ class CycleTelescopeCapabilities(ConfigurationModel):
     ska_low: str | None = Field(validation_alias="Low", serialization_alias="Low")
 
 
-class ObservatoryPolicy(ConfigurationModel):
-    """The cycle, as the PHT UI reads it: read from a ``Cycle``'s ``number``,
-    ``id`` and ``description``, and served as ``cycle_number``, ``cycle_id``
-    and ``cycle_description``."""
+class CycleInformation(ConfigurationModel):
+    """The cycle's ID and proposal window, as the PHT UI reads them."""
 
-    cycle_number: int = Field(validation_alias="number")
-    cycle_id: str = Field(validation_alias="id")
+    cycle_id: str
+    proposal_open: datetime
+    proposal_close: datetime
+
+
+class ObservatoryPolicy(ConfigurationModel):
+    """The cycle, as the PHT UI reads it."""
+
+    cycle_number: int
+    cycle_id: str
     type: str | None
-    cycle_description: str = Field(validation_alias="description")
+    cycle_description: str
     cycle_information: CycleInformation
     cycle_policies: CyclePolicies
     telescope_capabilities: CycleTelescopeCapabilities
@@ -149,6 +156,25 @@ def _subarray_templates(
     }
 
 
+def _observatory_policy(cycle: Cycle) -> ObservatoryPolicy:
+    """The cycle, with the field names the PHT UI reads."""
+    return ObservatoryPolicy(
+        cycle_number=cycle.number,
+        cycle_id=cycle.id,
+        type=cycle.type,
+        cycle_description=cycle.description,
+        cycle_information=CycleInformation(
+            cycle_id=cycle.id,
+            proposal_open=cycle.proposal_window.opens,
+            proposal_close=cycle.proposal_window.closes,
+        ),
+        cycle_policies=cycle.cycle_policies,
+        telescope_capabilities=CycleTelescopeCapabilities.model_validate(
+            cycle.telescope_capabilities, from_attributes=True
+        ),
+    )
+
+
 def _low_frequency_band(repository: OSDRepository) -> LowFrequencyBand:
     """Low's one frequency band, which the PHT reads as Low's basic
     capabilities."""
@@ -177,9 +203,7 @@ def get_cycle_configuration(
     cycle = repository.get_cycle(cycle_id)
     offered = cycle.telescope_capabilities
     return CycleConfiguration(
-        observatory_policy=ObservatoryPolicy.model_validate(
-            cycle, from_attributes=True
-        ),
+        observatory_policy=_observatory_policy(cycle),
         capabilities=CycleCapabilities(
             mid=MidCycleCapabilities(
                 basic_capabilities=MidCycleBasicCapabilities.model_validate(

@@ -30,8 +30,10 @@ Unreleased
   and ``Low``. The legacy response and the PHT view still serve ``Mid`` and ``Low``
 * [BREAKING] Define multiple cycles through a single TelModel backend in ``tmdata/cycles``
 * Each cycle file in ``tmdata/cycles`` may have any name. A cycle has a unique ``id``,
-  a ``name``, a ``description`` and a unique ``number``. The legacy response and the
-  PHT view serve them as ``cycle_id``, ``cycle_description`` and ``cycle_number``, and
+  a ``name``, a ``description``, a unique ``number`` and a ``proposal_window`` that
+  ``opens`` and ``closes``. The legacy response and the PHT view serve them as
+  ``cycle_id``, ``cycle_description``, ``cycle_number`` and ``cycle_information``, which
+  holds the ``cycle_id`` and the ``proposal_open`` and ``proposal_close`` dates.
   ``get_osd_using_tmdata`` selects a cycle by its ``number``
 * A cycle's ``cycle_number`` may be 0, for Cycle 0
 * [BREAKING] Users pass a TMData client to public API functions instead of OSD creating one from ``tmdata/version_mapping``
@@ -66,7 +68,7 @@ Unreleased
   ``LowDefaultsFile``, ``CycleFile``
   (``cycles/*.json``) and ``SubarrayTemplateLibraryFile``, in
   ``ska_ost_osd.osd.adapters.tmdata.models``
-* ``Cycle`` reads ``proposal_open`` and ``proposal_close`` as timezone-aware
+* ``Cycle`` reads when its proposal window ``opens`` and ``closes`` as timezone-aware
   datetimes, a date without a timezone is rejected.
 * Added a test that validates the real tmdata files against these models
 * Added ``OSDRepository`` (``ska_ost_osd.osd.repository``), the interface for

@@ -173,8 +173,9 @@ capability set's subarray templates as the legacy API does with
 .. code-block:: text
 
     observatory_policy          the cycle: cycle_number, cycle_id, type,
-                                cycle_description, cycle_information (proposal
-                                dates), cycle_policies, telescope_capabilities
+                                cycle_description, cycle_information (the
+                                cycle ID and proposal dates), cycle_policies,
+                                telescope_capabilities
     capabilities
         mid                     null if the cycle doesn't offer Mid
             basic_capabilities  receiver_information: the receiver bands
