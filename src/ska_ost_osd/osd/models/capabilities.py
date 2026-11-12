@@ -261,29 +261,32 @@ class LowStationBeamforming(OSDBaseModel):
     max_substations_per_subarray_beam: int = Field(ge=0, examples=[720])
 
 
-class LowCapabilitySet(OSDBaseModel):
-    name: str = Field(examples=["AA0.5"])
-    receptors: list[str | int] = Field(
-        validation_alias=AliasChoices("receptors", "stations", "number_station_ids"),
-        examples=[[345, 350]],
-    )
-    available_bandwidth_hz: float = Field(gt=0)
-    number_fsps: int = Field(ge=0)
-    max_baseline_km: float = Field(gt=0)
-    telescope: Literal[Telescope.SKA_LOW] = Telescope.SKA_LOW
-    station_beamforming: LowStationBeamforming
-    number_stations: int = Field(ge=0)
-    cbf_modes: list[LowCBFMode]
-    modes: LowArrayAssemblyModes
+class LowArrayAssemblyStations(OSDBaseModel):
+    """The stations a Low capability set is made of, by ID."""
+
+    number: int = Field(ge=0, examples=[68])
+    max_baseline_km: float = Field(gt=0, examples=[40.0])
+    ids: list[int] = Field(examples=[[345, 350]])
 
     @model_validator(mode="after")
-    def check_station_count(self) -> Self:
-        if self.number_stations != len(self.receptors):
+    def check_number(self) -> Self:
+        if self.number != len(self.ids):
             raise ValueError(
-                f"{self.name}: number_stations ({self.number_stations}) does not "
-                f"match the number of receptors ({len(self.receptors)})"
+                f"number ({self.number}) does not match the number of station "
+                f"ids ({len(self.ids)})"
             )
         return self
+
+
+class LowCapabilitySet(OSDBaseModel):
+    name: str = Field(examples=["AA0.5"])
+    available_bandwidth_hz: float = Field(gt=0)
+    number_fsps: int = Field(ge=0)
+    telescope: Literal[Telescope.SKA_LOW] = Telescope.SKA_LOW
+    station_beamforming: LowStationBeamforming
+    cbf_modes: list[LowCBFMode]
+    modes: LowArrayAssemblyModes
+    stations: LowArrayAssemblyStations
 
     @model_validator(mode="after")
     def check_cbf_modes(self) -> Self:

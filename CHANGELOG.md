@@ -53,9 +53,12 @@ Unreleased
   coarse channels and channels per mode as fields of its band.
   ``mid_capabilities.json`` and ``low_capabilities.json`` are kept for older releases
   but are no longer read
-* Moved telescope capability sets to standalone tmdata files. Low's stations are
-  listed as ``stations`` and Mid's dishes as ``dishes``, which the legacy response
-  serves as ``number_station_ids`` and ``number_dish_ids``.
+* Moved telescope capability sets to standalone tmdata files. Low's stations are in
+  ``stations``, as ``number``, ``max_baseline_km`` and ``ids``, which the legacy
+  response serves as ``number_stations``, ``max_baseline_km`` and
+  ``number_station_ids``, and the views serve with the IDs as ``receptors``. Mid's
+  dishes are listed as ``dishes``, which the legacy response serves as
+  ``number_dish_ids``.
   Mid's channel widths are only stored as ``allowed_channel_width_values_hz``; the
   legacy response and the PHT view also serve them as ``allowed_channel_width_values``.
   Low's zoom windows are in ``modes.spectral``, as ``max_zoom_windows``,

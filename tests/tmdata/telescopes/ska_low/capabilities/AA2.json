@@ -32,16 +32,18 @@
     "max_substations_per_subarray_beam": 512
   },
   "number_fsps": 6,
-  "number_stations": 8,
-  "max_baseline_km": 6.0,
-  "stations": [
-    345,
-    346,
-    347,
-    348,
-    349,
-    350,
-    351,
-    352
-  ]
+  "stations": {
+    "number": 8,
+    "max_baseline_km": 6.0,
+    "ids": [
+      345,
+      346,
+      347,
+      348,
+      349,
+      350,
+      351,
+      352
+    ]
+  }
 }

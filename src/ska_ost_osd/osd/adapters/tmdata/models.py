@@ -9,6 +9,7 @@ from pydantic import Field, model_validator
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
     LowArrayAssemblyModes,
+    LowArrayAssemblyStations,
     LowBasicCapabilities,
     LowCBFMode,
     LowStationBeamforming,
@@ -83,24 +84,13 @@ class LowCapabilitySetFile(OSDBaseModel):
 
     available_bandwidth_hz: float = Field(gt=0)
     number_fsps: int = Field(ge=0)
-    max_baseline_km: float = Field(gt=0)
     # The array assembly whose subarray templates the capability set offers,
     # e.g. "AA2"; Low_ITF has none
     array_assembly: str | None = None
-    stations: list[int]
     station_beamforming: LowStationBeamforming
-    number_stations: int = Field(ge=0)
     cbf_modes: list[LowCBFMode]
     modes: LowArrayAssemblyModes
-
-    @model_validator(mode="after")
-    def check_station_count(self) -> Self:
-        if self.number_stations != len(self.stations):
-            raise ValueError(
-                f"number_stations ({self.number_stations}) does not match "
-                f"the number of stations ({len(self.stations)})"
-            )
-        return self
+    stations: LowArrayAssemblyStations
 
     @model_validator(mode="after")
     def check_cbf_modes(self) -> Self:

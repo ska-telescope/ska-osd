@@ -187,8 +187,8 @@ class TestCapabilities:
             (
                 LowCapabilitySetFile,
                 LOW_CAPABILITY_SET,
-                lambda data: data["stations"].pop(),
-                "number_stations",
+                lambda data: data["stations"]["ids"].pop(),
+                "number of station ids",
             ),
             (
                 LowCapabilitySetFile,

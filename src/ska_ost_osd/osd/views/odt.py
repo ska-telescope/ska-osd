@@ -85,7 +85,7 @@ def _low_capability_set(
 ) -> LowConfigurationCapabilitySet:
     return LowConfigurationCapabilitySet(
         name=capability_set.name,
-        receptors=capability_set.receptors,
+        receptors=capability_set.stations.ids,
         available_bandwidth_hz=capability_set.available_bandwidth_hz,
         number_pst_beams=capability_set.modes.pst.max_beams,
         number_fsps=capability_set.number_fsps,

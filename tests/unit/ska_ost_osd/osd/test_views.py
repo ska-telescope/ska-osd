@@ -182,6 +182,10 @@ class TestGetCycleConfiguration:
         assert "station_beamforming" not in low["AA2"]
         assert low["AA2"]["number_subarray_beams"] == 8
         assert low["AA2"]["number_substations"] == 512
+        assert "stations" not in low["AA2"]
+        assert low["AA2"]["number_stations"] == 8
+        assert low["AA2"]["max_baseline_km"] == 6.0
+        assert low["AA2"]["receptors"] == [345, 346, 347, 348, 349, 350, 351, 352]
 
     def test_serves_the_pht_names_without_by_alias(self, test_tmdata_repository):
         """The view serialises with the PHT's names by default, so a caller

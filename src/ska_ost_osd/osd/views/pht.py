@@ -138,6 +138,12 @@ class CycleCapabilitiesBase(ConfigurationModel):
                         "max_beams": capability_set.pop("number_vlbi_beams")
                     }
                 capability_set["modes"] = modes
+            if "number_stations" in capability_set:
+                capability_set["stations"] = {
+                    "number": capability_set.pop("number_stations"),
+                    "max_baseline_km": capability_set.pop("max_baseline_km"),
+                    "ids": capability_set.pop("receptors"),
+                }
             if "number_substations" in capability_set:
                 capability_set["station_beamforming"] = {
                     "max_subarray_beams": capability_set.pop("number_subarray_beams"),
@@ -159,8 +165,8 @@ class CycleCapabilitiesBase(ConfigurationModel):
             capability_set["allowed_channel_width_values"] = capability_set[
                 "allowed_channel_width_values_hz"
             ]
-        # The PHT UI reads the modes, and Low's station beamforming, flat
-        # under their old names
+        # The PHT UI reads the modes, and Low's stations and station
+        # beamforming, flat under their old names
         modes = capability_set.pop("modes")
         capability_set["number_zoom_windows"] = modes["spectral"]["max_zoom_windows"]
         capability_set["number_zoom_channels"] = modes["spectral"]["max_zoom_channels"]
@@ -171,6 +177,11 @@ class CycleCapabilitiesBase(ConfigurationModel):
         capability_set["number_pst_beams"] = modes["pst"]["max_beams"]
         if "vlbi" in modes:
             capability_set["number_vlbi_beams"] = modes["vlbi"]["max_beams"]
+        if "stations" in capability_set:
+            stations = capability_set.pop("stations")
+            capability_set["receptors"] = stations["ids"]
+            capability_set["number_stations"] = stations["number"]
+            capability_set["max_baseline_km"] = stations["max_baseline_km"]
         if "station_beamforming" in capability_set:
             station_beamforming = capability_set.pop("station_beamforming")
             capability_set["number_substations"] = station_beamforming[

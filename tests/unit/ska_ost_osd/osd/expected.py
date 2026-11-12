@@ -24,6 +24,7 @@ from ska_ost_osd.osd.models.capabilities import (
     LowArrayAssemblyPSSMode,
     LowArrayAssemblyPSTMode,
     LowArrayAssemblySpectralMode,
+    LowArrayAssemblyStations,
     LowArrayAssemblyVLBIMode,
     LowBasicCapabilities,
     LowBasicContinuumMode,
@@ -335,12 +336,9 @@ MID_CAPABILITY_SET_FILES = {
 # tests/tmdata/telescopes/ska_low/capabilities/AA1.json and AA2.json
 LOW_AA1 = LowCapabilitySet(
     name="AA1",
-    receptors=[345, 346, 347, 348],
-    number_stations=4,
     station_beamforming=LowStationBeamforming(
         max_subarray_beams=1, max_substations_per_subarray_beam=0
     ),
-    max_baseline_km=3.0,
     available_bandwidth_hz=75_000_000.0,
     cbf_modes=[LowCBFMode.VIS, LowCBFMode.PST],
     number_fsps=6,
@@ -352,16 +350,16 @@ LOW_AA1 = LowCapabilitySet(
         pst=LowArrayAssemblyPSTMode(max_beams=1),
         vlbi=LowArrayAssemblyVLBIMode(max_beams=0),
     ),
+    stations=LowArrayAssemblyStations(
+        number=4, max_baseline_km=3.0, ids=[345, 346, 347, 348]
+    ),
 )
 
 LOW_AA2 = LowCapabilitySet(
     name="AA2",
-    receptors=[345, 346, 347, 348, 349, 350, 351, 352],
-    number_stations=8,
     station_beamforming=LowStationBeamforming(
         max_subarray_beams=8, max_substations_per_subarray_beam=512
     ),
-    max_baseline_km=6.0,
     available_bandwidth_hz=75_000_000.0,
     cbf_modes=[LowCBFMode.VIS, LowCBFMode.PST],
     number_fsps=6,
@@ -372,6 +370,9 @@ LOW_AA2 = LowCapabilitySet(
         pss=LowArrayAssemblyPSSMode(max_beams=0, beam_bandwidth_hz=75_000_000.0),
         pst=LowArrayAssemblyPSTMode(max_beams=1),
         vlbi=LowArrayAssemblyVLBIMode(max_beams=0),
+    ),
+    stations=LowArrayAssemblyStations(
+        number=8, max_baseline_km=6.0, ids=[345, 346, 347, 348, 349, 350, 351, 352]
     ),
 )
 
@@ -409,9 +410,8 @@ LOW_FREQUENCY_BAND_WITH_CHANNELS = LowFrequencyBandWithChannels(
 
 LOW_CAPABILITY_SET_FILES = {
     capability_set.name: LowCapabilitySetFile(
-        stations=capability_set.receptors,
         array_assembly=capability_set.name,
-        **capability_set.model_dump(exclude={"name", "telescope", "receptors"}),
+        **capability_set.model_dump(exclude={"name", "telescope"}),
     )
     for capability_set in (LOW_AA1, LOW_AA2)
 }
