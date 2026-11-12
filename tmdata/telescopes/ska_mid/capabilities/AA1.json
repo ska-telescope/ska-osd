@@ -34,6 +34,10 @@
   "number_meerkat_dishes": 0,
   "number_meerkatplus_dishes": 0,
   "modes": {
+    "spectral": {
+      "max_zoom_windows": 0,
+      "max_zoom_channels": 0
+    },
     "pss": {
       "max_beams": 0,
       "beam_bandwidth_hz": 400000000
@@ -43,7 +47,5 @@
     }
   },
   "number_ska_dishes": 8,
-  "number_zoom_channels": 0,
-  "number_zoom_windows": 0,
   "array_assembly": "AA1"
 }

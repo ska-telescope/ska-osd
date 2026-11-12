@@ -61,9 +61,10 @@ Unreleased
   Low's zoom windows are in ``modes.spectral``, as ``max_zoom_windows``,
   ``max_zoom_channels`` (per window) and ``zoom_factors``, and its beams in
   ``modes.pss``, ``modes.pst`` and ``modes.vlbi`` as ``max_beams``, with the pulsar
-  search beam bandwidth as ``modes.pss.beam_bandwidth_hz``; Mid's beams are in its
-  ``modes.pss`` and ``modes.pst`` in the same way. The legacy response and
-  the PHT view serve them as ``number_zoom_windows``, ``number_zoom_channels``,
+  search beam bandwidth as ``modes.pss.beam_bandwidth_hz``; Mid's zoom windows and
+  beams are in its ``modes`` in the same way, without zoom factors. The legacy
+  response and the PHT view serve them as ``number_zoom_windows``,
+  ``number_zoom_channels``,
   ``allowed_zoom_factors``, ``number_<mode>_beams`` and ``ps_beam_bandwidth_hz``;
   the ODT view serves ``number_pst_beams``. Low's subarray beams are in
   ``station_beamforming``, as ``max_subarray_beams`` and

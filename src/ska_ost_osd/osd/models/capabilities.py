@@ -83,6 +83,14 @@ class MidBasicCapabilities(OSDBaseModel):
         )
 
 
+class MidArrayAssemblySpectralMode(OSDBaseModel):
+    """The zoom windows a Mid capability set offers for spectral line
+    observations. ``max_zoom_channels`` is the most channels in one window."""
+
+    max_zoom_windows: int = Field(ge=0, examples=[16])
+    max_zoom_channels: int = Field(ge=0, examples=[14880])
+
+
 class MidArrayAssemblyPSSMode(OSDBaseModel):
     """The pulsar search beams a Mid capability set offers."""
 
@@ -99,6 +107,7 @@ class MidArrayAssemblyPSTMode(OSDBaseModel):
 class MidArrayAssemblyModes(OSDBaseModel):
     """What a Mid capability set offers in each observing mode."""
 
+    spectral: MidArrayAssemblySpectralMode
     pss: MidArrayAssemblyPSSMode
     pst: MidArrayAssemblyPSTMode
 
@@ -114,8 +123,6 @@ class MidCapabilitySet(OSDBaseModel):
     max_baseline_km: float = Field(gt=0)
     telescope: Literal[Telescope.SKA_MID] = Telescope.SKA_MID
     modes: MidArrayAssemblyModes
-    number_zoom_windows: int = Field(ge=0)
-    number_zoom_channels: int = Field(ge=0)
     allowed_channel_width_values_hz: list[int]
     allowed_channel_count_range_min: list[int]
     allowed_channel_count_range_max: list[int]

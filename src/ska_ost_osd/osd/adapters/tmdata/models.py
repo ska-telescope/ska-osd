@@ -43,8 +43,6 @@ class MidCapabilitySetFile(OSDBaseModel):
     array_assembly: str | None = None
     dishes: list[str]
     modes: MidArrayAssemblyModes
-    number_zoom_windows: int = Field(ge=0)
-    number_zoom_channels: int = Field(ge=0)
     allowed_channel_width_values_hz: list[int]
     allowed_channel_count_range_min: list[int]
     allowed_channel_count_range_max: list[int]

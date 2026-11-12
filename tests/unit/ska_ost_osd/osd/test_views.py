@@ -159,6 +159,8 @@ class TestGetCycleConfiguration:
         assert mid["AA2"]["number_pss_beams"] == 0
         assert mid["AA2"]["ps_beam_bandwidth_hz"] == 400_000_000
         assert mid["AA2"]["number_pst_beams"] == 1
+        assert mid["AA2"]["number_zoom_windows"] == 0
+        assert mid["AA2"]["number_zoom_channels"] == 0
         assert (
             mid["AA2"]["allowed_channel_width_values"]
             == mid["AA2"]["allowed_channel_width_values_hz"]

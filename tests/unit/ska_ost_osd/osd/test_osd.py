@@ -326,6 +326,9 @@ def test_get_osd_using_tmdata_serves_mid_modes_flat(tests_tmdata):
     assert capability_set["number_pss_beams"] == 0
     assert capability_set["ps_beam_bandwidth_hz"] == 400_000_000
     assert capability_set["number_pst_beams"] == 1
+    assert capability_set["number_zoom_windows"] == 0
+    assert capability_set["number_zoom_channels"] == 0
+    assert "allowed_zoom_factors" not in capability_set
 
 
 def test_get_osd_using_tmdata_band_5b_has_sub_bands(tests_tmdata):

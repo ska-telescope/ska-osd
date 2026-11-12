@@ -299,13 +299,9 @@ class OSD:
         # The modes, and Low's station beamforming, are served flat under
         # their legacy names
         modes = capability_set.pop("modes")
-        if "spectral" in modes:
-            capability_set["number_zoom_windows"] = modes["spectral"][
-                "max_zoom_windows"
-            ]
-            capability_set["number_zoom_channels"] = modes["spectral"][
-                "max_zoom_channels"
-            ]
+        capability_set["number_zoom_windows"] = modes["spectral"]["max_zoom_windows"]
+        capability_set["number_zoom_channels"] = modes["spectral"]["max_zoom_channels"]
+        if "zoom_factors" in modes["spectral"]:
             capability_set["allowed_zoom_factors"] = modes["spectral"]["zoom_factors"]
         capability_set["number_pss_beams"] = modes["pss"]["max_beams"]
         capability_set["ps_beam_bandwidth_hz"] = modes["pss"]["beam_bandwidth_hz"]
