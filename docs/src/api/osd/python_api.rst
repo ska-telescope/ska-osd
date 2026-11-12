@@ -56,7 +56,8 @@ Reading the data
        each policy type
    * - ``get_capability_sets(telescope)`` / ``get_capability_set(telescope, name)``
      - ``MidCapabilitySet`` / ``LowCapabilitySet``: one array assembly of a
-       telescope, e.g. ``"AA2"``
+       telescope, e.g. ``"AA2"``. Low's zoom windows are in its
+       ``modes.spectral``
    * - ``get_basic_capabilities(telescope)``
      - ``MidBasicCapabilities`` / ``LowBasicCapabilities``: the
        ``frequency_bands`` (Mid's receiver bands; Low's one band and its

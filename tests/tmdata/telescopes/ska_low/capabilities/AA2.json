@@ -8,8 +8,18 @@
     "vis",
     "pst"
   ],
-  "number_zoom_windows": 0,
-  "number_zoom_channels": 0,
+  "modes": {
+    "spectral": {
+      "max_zoom_windows": 0,
+      "max_zoom_channels": 0,
+      "zoom_factors": [
+        1,
+        2,
+        4,
+        8
+      ]
+    }
+  },
   "number_pss_beams": 0,
   "number_pst_beams": 1,
   "number_vlbi_beams": 0,
@@ -24,12 +34,6 @@
     350,
     351,
     352
-  ],
-  "allowed_zoom_factors": [
-    1,
-    2,
-    4,
-    8
   ],
   "array_assembly": "AA2"
 }

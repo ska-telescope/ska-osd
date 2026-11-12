@@ -163,7 +163,12 @@ class TestGetCycleConfiguration:
             assert "SKA_MID_FULL_AA2" in mid["AA2"]["subarray_templates"]
         else:
             assert "subarray_templates" not in mid["AA2"]
-        assert list(served["capabilities"]["low"]) == ["basic_capabilities", "AA2"]
+        low = served["capabilities"]["low"]
+        assert list(low) == ["basic_capabilities", "AA2"]
+        assert "modes" not in low["AA2"]
+        assert low["AA2"]["number_zoom_windows"] == 0
+        assert low["AA2"]["number_zoom_channels"] == 0
+        assert low["AA2"]["allowed_zoom_factors"] == [1, 2, 4, 8]
 
     def test_serves_the_pht_names_without_by_alias(self, test_tmdata_repository):
         """The view serialises with the PHT's names by default, so a caller

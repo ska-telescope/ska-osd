@@ -294,6 +294,17 @@ def test_get_osd_using_tmdata_catalogue_filter(
     assert array_assembly in osd_data["capabilities"][key]
 
 
+def test_get_osd_using_tmdata_serves_low_spectral_mode_flat(tests_tmdata):
+    """Low's spectral mode is served under its legacy names."""
+    osd_data = get_osd_using_tmdata(tests_tmdata, telescope=Telescope.SKA_LOW)
+
+    capability_set = osd_data["capabilities"]["low"]["AA2"]
+    assert "modes" not in capability_set
+    assert capability_set["number_zoom_windows"] == 0
+    assert capability_set["number_zoom_channels"] == 0
+    assert capability_set["allowed_zoom_factors"] == [1, 2, 4, 8]
+
+
 def test_get_osd_using_tmdata_band_5b_has_sub_bands(tests_tmdata):
     """Band 5b of the Mid basic capabilities is split into sub-bands."""
     osd_data = get_osd_using_tmdata(

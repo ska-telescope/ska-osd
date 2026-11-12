@@ -117,6 +117,14 @@ class CycleCapabilitiesBase(ConfigurationModel):
             capability_set = dict(data.pop(names[0]))
             if "subarray_templates" in capability_set:
                 data["subarray_templates"] = capability_set.pop("subarray_templates")
+            if "allowed_zoom_factors" in capability_set:
+                capability_set["modes"] = {
+                    "spectral": {
+                        "max_zoom_windows": capability_set.pop("number_zoom_windows"),
+                        "max_zoom_channels": capability_set.pop("number_zoom_channels"),
+                        "zoom_factors": capability_set.pop("allowed_zoom_factors"),
+                    }
+                }
             data["capability_set"] = capability_set
         return data
 
@@ -131,6 +139,12 @@ class CycleCapabilitiesBase(ConfigurationModel):
             capability_set["allowed_channel_width_values"] = capability_set[
                 "allowed_channel_width_values_hz"
             ]
+        # The PHT UI reads Low's spectral mode flat, under its old names
+        if "modes" in capability_set:
+            spectral = capability_set.pop("modes")["spectral"]
+            capability_set["number_zoom_windows"] = spectral["max_zoom_windows"]
+            capability_set["number_zoom_channels"] = spectral["max_zoom_channels"]
+            capability_set["allowed_zoom_factors"] = spectral["zoom_factors"]
         data[self.capability_set.name] = capability_set
         if (subarray_templates := data.pop("subarray_templates")) is not None:
             data[self.capability_set.name]["subarray_templates"] = subarray_templates

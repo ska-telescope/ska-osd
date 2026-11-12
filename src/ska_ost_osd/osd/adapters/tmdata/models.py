@@ -9,6 +9,7 @@ from pydantic import Field, model_validator
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
     LowBasicCapabilities,
+    LowCapabilitySetModes,
     LowCBFMode,
     MidBasicCapabilities,
     MidCBFMode,
@@ -36,8 +37,6 @@ class CapabilitySetFileBase(OSDBaseModel):
     number_pst_beams: int = Field(ge=0)
     number_fsps: int = Field(ge=0)
     max_baseline_km: float = Field(gt=0)
-    number_zoom_windows: int = Field(ge=0)
-    number_zoom_channels: int = Field(ge=0)
     number_pss_beams: int = Field(ge=0)
     ps_beam_bandwidth_hz: float = Field(ge=0)
     # The array assembly whose subarray templates the capability set offers,
@@ -49,6 +48,8 @@ class MidCapabilitySetFile(CapabilitySetFileBase):
     """Model for telescopes/ska_mid/capabilities/<name>.json."""
 
     dishes: list[str]
+    number_zoom_windows: int = Field(ge=0)
+    number_zoom_channels: int = Field(ge=0)
     allowed_channel_width_values_hz: list[int]
     allowed_channel_count_range_min: list[int]
     allowed_channel_count_range_max: list[int]
@@ -78,7 +79,7 @@ class LowCapabilitySetFile(CapabilitySetFileBase):
     number_stations: int = Field(ge=0)
     cbf_modes: list[LowCBFMode]
     number_vlbi_beams: int = Field(ge=0)
-    allowed_zoom_factors: list[int]
+    modes: LowCapabilitySetModes
 
     @model_validator(mode="after")
     def check_station_count(self) -> Self:

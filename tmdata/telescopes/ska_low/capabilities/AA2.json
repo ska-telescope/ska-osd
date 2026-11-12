@@ -9,8 +9,18 @@
     "pst",
     "pss"
   ],
-  "number_zoom_windows": 16,
-  "number_zoom_channels": 1800,
+  "modes": {
+    "spectral": {
+      "max_zoom_windows": 16,
+      "max_zoom_channels": 1800,
+      "zoom_factors": [
+        1,
+        2,
+        4,
+        8
+      ]
+    }
+  },
   "number_pss_beams": 30,
   "number_pst_beams": 4,
   "number_vlbi_beams": 0,
@@ -85,12 +95,6 @@
     508,
     509,
     510
-  ],
-  "allowed_zoom_factors": [
-    1,
-    2,
-    4,
-    8
   ],
   "array_assembly": "AA2"
 }

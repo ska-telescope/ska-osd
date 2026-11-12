@@ -57,7 +57,11 @@ Unreleased
   listed as ``stations`` and Mid's dishes as ``dishes``, which the legacy response
   serves as ``number_station_ids`` and ``number_dish_ids``.
   Mid's channel widths are only stored as ``allowed_channel_width_values_hz``; the
-  legacy response and the PHT view also serve them as ``allowed_channel_width_values``
+  legacy response and the PHT view also serve them as ``allowed_channel_width_values``.
+  Low's zoom windows are in ``modes.spectral``, as ``max_zoom_windows``,
+  ``max_zoom_channels`` (per window) and ``zoom_factors``, which the legacy response
+  and the PHT view serve as ``number_zoom_windows``, ``number_zoom_channels`` and
+  ``allowed_zoom_factors``
 * Moved each telescope's current tmdata files under ``telescopes/ska_low`` and
   ``telescopes/ska_mid``, named by the ``Telescope`` values, with its defaults in
   ``defaults.json``. The legacy files stay at their old paths for older releases and

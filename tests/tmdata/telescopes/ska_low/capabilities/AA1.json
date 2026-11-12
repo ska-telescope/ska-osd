@@ -14,15 +14,19 @@
     "vis",
     "pst"
   ],
-  "number_zoom_windows": 0,
-  "number_zoom_channels": 0,
+  "modes": {
+    "spectral": {
+      "max_zoom_windows": 0,
+      "max_zoom_channels": 0,
+      "zoom_factors": [
+        0
+      ]
+    }
+  },
   "number_pss_beams": 0,
   "number_pst_beams": 1,
   "number_vlbi_beams": 0,
   "ps_beam_bandwidth_hz": 75000000.0,
   "number_fsps": 6,
-  "array_assembly": "AA1",
-  "allowed_zoom_factors": [
-    0
-  ]
+  "array_assembly": "AA1"
 }

@@ -35,8 +35,6 @@ class CapabilitySetBase(OSDBaseModel):
     number_pst_beams: int = Field(ge=0)
     number_fsps: int = Field(ge=0)
     max_baseline_km: float = Field(gt=0)
-    number_zoom_windows: int = Field(ge=0)
-    number_zoom_channels: int = Field(ge=0)
     number_pss_beams: int = Field(ge=0)
     ps_beam_bandwidth_hz: float = Field(ge=0)
 
@@ -103,6 +101,8 @@ class MidBasicCapabilities(OSDBaseModel):
 
 class MidCapabilitySet(CapabilitySetBase):
     telescope: Literal[Telescope.SKA_MID] = Telescope.SKA_MID
+    number_zoom_windows: int = Field(ge=0)
+    number_zoom_channels: int = Field(ge=0)
     allowed_channel_width_values_hz: list[int]
     allowed_channel_count_range_min: list[int]
     allowed_channel_count_range_max: list[int]
@@ -163,6 +163,21 @@ class LowBasicCapabilities(OSDBaseModel):
     modes: LowModes
 
 
+class LowCapabilitySetSpectralMode(OSDBaseModel):
+    """The zoom windows a Low capability set offers for spectral line
+    observations. ``max_zoom_channels`` is the most channels in one window."""
+
+    max_zoom_windows: int = Field(ge=0, examples=[16])
+    max_zoom_channels: int = Field(ge=0, examples=[1800])
+    zoom_factors: list[int] = Field(examples=[[1, 2, 4, 8]])
+
+
+class LowCapabilitySetModes(OSDBaseModel):
+    """What a Low capability set offers in each observing mode."""
+
+    spectral: LowCapabilitySetSpectralMode
+
+
 class LowCapabilitySet(CapabilitySetBase):
     telescope: Literal[Telescope.SKA_LOW] = Telescope.SKA_LOW
     number_substations: int = Field(ge=0)
@@ -170,7 +185,7 @@ class LowCapabilitySet(CapabilitySetBase):
     number_stations: int = Field(ge=0)
     cbf_modes: list[LowCBFMode]
     number_vlbi_beams: int = Field(ge=0)
-    allowed_zoom_factors: list[int]
+    modes: LowCapabilitySetModes
 
     @model_validator(mode="after")
     def check_station_count(self) -> Self:

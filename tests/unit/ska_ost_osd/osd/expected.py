@@ -22,6 +22,8 @@ from ska_ost_osd.osd.models.capabilities import (
     FrequencyBand,
     LowBasicCapabilities,
     LowCapabilitySet,
+    LowCapabilitySetModes,
+    LowCapabilitySetSpectralMode,
     LowCBFMode,
     LowMode,
     LowModes,
@@ -329,14 +331,16 @@ LOW_AA1 = LowCapabilitySet(
     max_baseline_km=3.0,
     available_bandwidth_hz=75_000_000.0,
     cbf_modes=[LowCBFMode.VIS, LowCBFMode.PST],
-    number_zoom_windows=0,
-    number_zoom_channels=0,
     number_pss_beams=0,
     number_pst_beams=1,
     number_vlbi_beams=0,
     ps_beam_bandwidth_hz=75_000_000.0,
     number_fsps=6,
-    allowed_zoom_factors=[0],
+    modes=LowCapabilitySetModes(
+        spectral=LowCapabilitySetSpectralMode(
+            max_zoom_windows=0, max_zoom_channels=0, zoom_factors=[0]
+        )
+    ),
 )
 
 LOW_AA2 = LowCapabilitySet(
@@ -348,14 +352,16 @@ LOW_AA2 = LowCapabilitySet(
     max_baseline_km=6.0,
     available_bandwidth_hz=75_000_000.0,
     cbf_modes=[LowCBFMode.VIS, LowCBFMode.PST],
-    number_zoom_windows=0,
-    number_zoom_channels=0,
     number_pss_beams=0,
     number_pst_beams=1,
     number_vlbi_beams=0,
     ps_beam_bandwidth_hz=75_000_000.0,
     number_fsps=6,
-    allowed_zoom_factors=[1, 2, 4, 8],
+    modes=LowCapabilitySetModes(
+        spectral=LowCapabilitySetSpectralMode(
+            max_zoom_windows=0, max_zoom_channels=0, zoom_factors=[1, 2, 4, 8]
+        )
+    ),
 )
 
 # The band in tests/tmdata/telescopes/ska_low/basic_capabilities.json
