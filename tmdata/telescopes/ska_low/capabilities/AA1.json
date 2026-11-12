@@ -1,10 +1,5 @@
 {
-  "number_stations": 16,
-  "station_beamforming": {
-    "max_subarray_beams": 8,
-    "max_substations_per_subarray_beam": 512
-  },
-  "max_baseline_km": 6.0,
+  "array_assembly": "AA1",
   "available_bandwidth_hz": 75000000.0,
   "cbf_modes": [
     "vis",
@@ -32,7 +27,13 @@
       "max_beams": 0
     }
   },
+  "station_beamforming": {
+    "max_subarray_beams": 8,
+    "max_substations_per_subarray_beam": 512
+  },
   "number_fsps": 6,
+  "number_stations": 16,
+  "max_baseline_km": 6.0,
   "stations": [
     345,
     346,
@@ -50,6 +51,5 @@
     432,
     433,
     434
-  ],
-  "array_assembly": "AA1"
+  ]
 }

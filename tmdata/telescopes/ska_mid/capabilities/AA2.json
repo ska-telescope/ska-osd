@@ -1,10 +1,31 @@
 {
-  "allowed_channel_count_range_max": [
-    214748647
+  "array_assembly": "AA2",
+  "available_bandwidth_hz": 800000000,
+  "available_receivers": [
+    "Band_1",
+    "Band_2",
+    "Band_5a",
+    "Band_5b"
   ],
-  "allowed_channel_count_range_min": [
-    1
+  "cbf_modes": [
+    "correlation",
+    "pst",
+    "pss"
   ],
+  "modes": {
+    "spectral": {
+      "max_zoom_windows": 16,
+      "max_zoom_channels": 14880
+    },
+    "pss": {
+      "max_beams": 384,
+      "beam_bandwidth_hz": 800000000
+    },
+    "pst": {
+      "max_beams": 6
+    }
+  },
+  "number_fsps": 26,
   "allowed_channel_width_values_hz": [
     210,
     420,
@@ -25,18 +46,15 @@
     430080,
     645120
   ],
-  "available_bandwidth_hz": 800000000,
-  "available_receivers": [
-    "Band_1",
-    "Band_2",
-    "Band_5a",
-    "Band_5b"
+  "allowed_channel_count_range_min": [
+    1
   ],
-  "cbf_modes": [
-    "correlation",
-    "pst",
-    "pss"
+  "allowed_channel_count_range_max": [
+    214748647
   ],
+  "number_ska_dishes": 64,
+  "number_meerkat_dishes": 4,
+  "number_meerkatplus_dishes": 0,
   "max_baseline_km": 110,
   "dishes": [
     "SKA001",
@@ -103,23 +121,5 @@
     "SKA123",
     "SKA125",
     "SKA126"
-  ],
-  "number_fsps": 26,
-  "number_meerkat_dishes": 4,
-  "number_meerkatplus_dishes": 0,
-  "modes": {
-    "spectral": {
-      "max_zoom_windows": 16,
-      "max_zoom_channels": 14880
-    },
-    "pss": {
-      "max_beams": 384,
-      "beam_bandwidth_hz": 800000000
-    },
-    "pst": {
-      "max_beams": 6
-    }
-  },
-  "number_ska_dishes": 64,
-  "array_assembly": "AA2"
+  ]
 }
