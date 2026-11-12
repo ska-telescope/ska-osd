@@ -148,7 +148,7 @@ class LowModes(OSDBaseModel):
     """Low's observing modes. tmdata: ``basic_capabilities.modes``."""
 
     continuum: LowMode
-    zoom: LowMode
+    spectral: LowMode
     pst: LowMode
     pss: LowMode
 

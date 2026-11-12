@@ -261,7 +261,7 @@ class OSD:
                 "number_continuum_channels_per_coarse_channel": modes["continuum"][
                     "channels_per_coarse_channel"
                 ],
-                "number_zoom_channels_per_coarse_channel": modes["zoom"][
+                "number_zoom_channels_per_coarse_channel": modes["spectral"][
                     "channels_per_coarse_channel"
                 ],
                 "number_pst_channels_per_coarse_channel": modes["pst"][

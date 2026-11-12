@@ -46,7 +46,7 @@ def low_frequency_band(repository: OSDRepository) -> LowFrequencyBandWithChannel
         number_continuum_channels_per_coarse_channel=(
             modes.continuum.channels_per_coarse_channel
         ),
-        number_zoom_channels_per_coarse_channel=modes.zoom.channels_per_coarse_channel,
+        number_zoom_channels_per_coarse_channel=modes.spectral.channels_per_coarse_channel,
         number_pst_channels_per_coarse_channel=modes.pst.channels_per_coarse_channel,
         number_pss_channels_per_coarse_channel=modes.pss.channels_per_coarse_channel,
     )
