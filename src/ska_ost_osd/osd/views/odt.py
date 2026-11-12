@@ -4,6 +4,7 @@ serves."""
 
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
+    LowCapabilitySet,
     MidFrequencyBand,
 )
 from ska_ost_osd.osd.models.constraints import Constraints
@@ -66,6 +67,20 @@ class Configuration(ConfigurationModel):
     ska_low: LowConfiguration
 
 
+def _low_capability_set(
+    capability_set: LowCapabilitySet,
+) -> LowConfigurationCapabilitySet:
+    return LowConfigurationCapabilitySet(
+        name=capability_set.name,
+        receptors=capability_set.receptors,
+        available_bandwidth_hz=capability_set.available_bandwidth_hz,
+        number_pst_beams=capability_set.modes.pst.max_beams,
+        number_fsps=capability_set.number_fsps,
+        number_substations=capability_set.number_substations,
+        number_subarray_beams=capability_set.number_subarray_beams,
+    )
+
+
 def get_configuration(repository: OSDRepository) -> Configuration:
     """Build the ODT configuration: what ska-oso-services serves from GET
     /configuration.
@@ -96,9 +111,7 @@ def get_configuration(repository: OSDRepository) -> Configuration:
                 from_attributes=True,
             ),
             subarrays=[
-                LowConfigurationCapabilitySet.model_validate(
-                    capability_set, from_attributes=True
-                )
+                _low_capability_set(capability_set)
                 for capability_set in repository.get_capability_sets(Telescope.SKA_LOW)
             ],
         ),

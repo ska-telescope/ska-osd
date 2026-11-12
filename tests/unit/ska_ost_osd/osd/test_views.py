@@ -169,6 +169,9 @@ class TestGetCycleConfiguration:
         assert low["AA2"]["number_zoom_windows"] == 0
         assert low["AA2"]["number_zoom_channels"] == 0
         assert low["AA2"]["allowed_zoom_factors"] == [1, 2, 4, 8]
+        assert low["AA2"]["number_pss_beams"] == 0
+        assert low["AA2"]["number_pst_beams"] == 1
+        assert low["AA2"]["number_vlbi_beams"] == 0
 
     def test_serves_the_pht_names_without_by_alias(self, test_tmdata_repository):
         """The view serialises with the PHT's names by default, so a caller

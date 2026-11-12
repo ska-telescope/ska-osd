@@ -21,11 +21,17 @@
       "zoom_factors": [
         0
       ]
+    },
+    "pss": {
+      "max_beams": 0
+    },
+    "pst": {
+      "max_beams": 1
+    },
+    "vlbi": {
+      "max_beams": 0
     }
   },
-  "number_pss_beams": 0,
-  "number_pst_beams": 1,
-  "number_vlbi_beams": 0,
   "ps_beam_bandwidth_hz": 75000000.0,
   "number_fsps": 6,
   "array_assembly": "AA1"

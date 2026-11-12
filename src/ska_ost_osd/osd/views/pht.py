@@ -123,7 +123,10 @@ class CycleCapabilitiesBase(ConfigurationModel):
                         "max_zoom_windows": capability_set.pop("number_zoom_windows"),
                         "max_zoom_channels": capability_set.pop("number_zoom_channels"),
                         "zoom_factors": capability_set.pop("allowed_zoom_factors"),
-                    }
+                    },
+                    "pss": {"max_beams": capability_set.pop("number_pss_beams")},
+                    "pst": {"max_beams": capability_set.pop("number_pst_beams")},
+                    "vlbi": {"max_beams": capability_set.pop("number_vlbi_beams")},
                 }
             data["capability_set"] = capability_set
         return data
@@ -139,12 +142,19 @@ class CycleCapabilitiesBase(ConfigurationModel):
             capability_set["allowed_channel_width_values"] = capability_set[
                 "allowed_channel_width_values_hz"
             ]
-        # The PHT UI reads Low's spectral mode flat, under its old names
+        # The PHT UI reads Low's modes flat, under their old names
         if "modes" in capability_set:
-            spectral = capability_set.pop("modes")["spectral"]
-            capability_set["number_zoom_windows"] = spectral["max_zoom_windows"]
-            capability_set["number_zoom_channels"] = spectral["max_zoom_channels"]
-            capability_set["allowed_zoom_factors"] = spectral["zoom_factors"]
+            modes = capability_set.pop("modes")
+            capability_set["number_zoom_windows"] = modes["spectral"][
+                "max_zoom_windows"
+            ]
+            capability_set["number_zoom_channels"] = modes["spectral"][
+                "max_zoom_channels"
+            ]
+            capability_set["allowed_zoom_factors"] = modes["spectral"]["zoom_factors"]
+            capability_set["number_pss_beams"] = modes["pss"]["max_beams"]
+            capability_set["number_pst_beams"] = modes["pst"]["max_beams"]
+            capability_set["number_vlbi_beams"] = modes["vlbi"]["max_beams"]
         data[self.capability_set.name] = capability_set
         if (subarray_templates := data.pop("subarray_templates")) is not None:
             data[self.capability_set.name]["subarray_templates"] = subarray_templates

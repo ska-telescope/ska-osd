@@ -67,7 +67,7 @@ class TestOsdOutput:
     def test_template_processed_output_validates(self, tests_tmdata):
         """Mid's capability sets in the OSD's output with subarray templates
         resolved, as ska-oso-services fetches it, validate. Low's serve its
-        spectral mode flat, so don't."""
+        modes flat, so don't."""
         osd_data = get_osd_using_tmdata(
             tests_tmdata, telescope=Telescope.SKA_MID, process_templates=True
         )

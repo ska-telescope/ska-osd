@@ -34,10 +34,8 @@ class CapabilitySetFileBase(OSDBaseModel):
     telescope."""
 
     available_bandwidth_hz: float = Field(gt=0)
-    number_pst_beams: int = Field(ge=0)
     number_fsps: int = Field(ge=0)
     max_baseline_km: float = Field(gt=0)
-    number_pss_beams: int = Field(ge=0)
     ps_beam_bandwidth_hz: float = Field(ge=0)
     # The array assembly whose subarray templates the capability set offers,
     # e.g. "AA2"; the *_ITF capability sets have none
@@ -48,6 +46,8 @@ class MidCapabilitySetFile(CapabilitySetFileBase):
     """Model for telescopes/ska_mid/capabilities/<name>.json."""
 
     dishes: list[str]
+    number_pst_beams: int = Field(ge=0)
+    number_pss_beams: int = Field(ge=0)
     number_zoom_windows: int = Field(ge=0)
     number_zoom_channels: int = Field(ge=0)
     allowed_channel_width_values_hz: list[int]
@@ -78,7 +78,6 @@ class LowCapabilitySetFile(CapabilitySetFileBase):
     number_subarray_beams: int = Field(ge=0)
     number_stations: int = Field(ge=0)
     cbf_modes: list[LowCBFMode]
-    number_vlbi_beams: int = Field(ge=0)
     modes: LowCapabilitySetModes
 
     @model_validator(mode="after")

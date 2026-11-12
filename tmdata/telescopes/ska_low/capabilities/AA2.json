@@ -19,11 +19,17 @@
         4,
         8
       ]
+    },
+    "pss": {
+      "max_beams": 30
+    },
+    "pst": {
+      "max_beams": 4
+    },
+    "vlbi": {
+      "max_beams": 0
     }
   },
-  "number_pss_beams": 30,
-  "number_pst_beams": 4,
-  "number_vlbi_beams": 0,
   "ps_beam_bandwidth_hz": 118000000.0,
   "number_fsps": 10,
   "stations": [

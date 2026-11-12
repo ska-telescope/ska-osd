@@ -32,10 +32,8 @@ class CapabilitySetBase(OSDBaseModel):
         examples=[["SKA001", "SKA036"], [345, 350]],
     )
     available_bandwidth_hz: float = Field(gt=0)
-    number_pst_beams: int = Field(ge=0)
     number_fsps: int = Field(ge=0)
     max_baseline_km: float = Field(gt=0)
-    number_pss_beams: int = Field(ge=0)
     ps_beam_bandwidth_hz: float = Field(ge=0)
 
 
@@ -101,6 +99,8 @@ class MidBasicCapabilities(OSDBaseModel):
 
 class MidCapabilitySet(CapabilitySetBase):
     telescope: Literal[Telescope.SKA_MID] = Telescope.SKA_MID
+    number_pst_beams: int = Field(ge=0)
+    number_pss_beams: int = Field(ge=0)
     number_zoom_windows: int = Field(ge=0)
     number_zoom_channels: int = Field(ge=0)
     allowed_channel_width_values_hz: list[int]
@@ -172,10 +172,19 @@ class LowCapabilitySetSpectralMode(OSDBaseModel):
     zoom_factors: list[int] = Field(examples=[[1, 2, 4, 8]])
 
 
+class LowCapabilitySetBeamformedMode(OSDBaseModel):
+    """The beams a Low capability set offers in one beamformed mode."""
+
+    max_beams: int = Field(ge=0, examples=[4])
+
+
 class LowCapabilitySetModes(OSDBaseModel):
     """What a Low capability set offers in each observing mode."""
 
     spectral: LowCapabilitySetSpectralMode
+    pss: LowCapabilitySetBeamformedMode
+    pst: LowCapabilitySetBeamformedMode
+    vlbi: LowCapabilitySetBeamformedMode
 
 
 class LowCapabilitySet(CapabilitySetBase):
@@ -184,7 +193,6 @@ class LowCapabilitySet(CapabilitySetBase):
     number_subarray_beams: int = Field(ge=0)
     number_stations: int = Field(ge=0)
     cbf_modes: list[LowCBFMode]
-    number_vlbi_beams: int = Field(ge=0)
     modes: LowCapabilitySetModes
 
     @model_validator(mode="after")

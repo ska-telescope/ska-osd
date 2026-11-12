@@ -22,6 +22,7 @@ from ska_ost_osd.osd.models.capabilities import (
     FrequencyBand,
     LowBasicCapabilities,
     LowCapabilitySet,
+    LowCapabilitySetBeamformedMode,
     LowCapabilitySetModes,
     LowCapabilitySetSpectralMode,
     LowCBFMode,
@@ -331,15 +332,15 @@ LOW_AA1 = LowCapabilitySet(
     max_baseline_km=3.0,
     available_bandwidth_hz=75_000_000.0,
     cbf_modes=[LowCBFMode.VIS, LowCBFMode.PST],
-    number_pss_beams=0,
-    number_pst_beams=1,
-    number_vlbi_beams=0,
     ps_beam_bandwidth_hz=75_000_000.0,
     number_fsps=6,
     modes=LowCapabilitySetModes(
         spectral=LowCapabilitySetSpectralMode(
             max_zoom_windows=0, max_zoom_channels=0, zoom_factors=[0]
-        )
+        ),
+        pss=LowCapabilitySetBeamformedMode(max_beams=0),
+        pst=LowCapabilitySetBeamformedMode(max_beams=1),
+        vlbi=LowCapabilitySetBeamformedMode(max_beams=0),
     ),
 )
 
@@ -352,15 +353,15 @@ LOW_AA2 = LowCapabilitySet(
     max_baseline_km=6.0,
     available_bandwidth_hz=75_000_000.0,
     cbf_modes=[LowCBFMode.VIS, LowCBFMode.PST],
-    number_pss_beams=0,
-    number_pst_beams=1,
-    number_vlbi_beams=0,
     ps_beam_bandwidth_hz=75_000_000.0,
     number_fsps=6,
     modes=LowCapabilitySetModes(
         spectral=LowCapabilitySetSpectralMode(
             max_zoom_windows=0, max_zoom_channels=0, zoom_factors=[1, 2, 4, 8]
-        )
+        ),
+        pss=LowCapabilitySetBeamformedMode(max_beams=0),
+        pst=LowCapabilitySetBeamformedMode(max_beams=1),
+        vlbi=LowCapabilitySetBeamformedMode(max_beams=0),
     ),
 )
 
