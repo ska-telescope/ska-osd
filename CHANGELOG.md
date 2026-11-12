@@ -40,8 +40,8 @@ Unreleased
   ``get_osd_using_tmdata`` selects a cycle by its ``number``, so can't select one without
 * A cycle's ``cycle_number`` may be 0, for Cycle 0
 * [BREAKING] Users pass a TMData client to public API functions instead of OSD creating one from ``tmdata/version_mapping``
-* [BREAKING] Removed ``number_beams`` from the SKA-Low array assemblies in
-  ``low_capabilities.json``; use ``number_subarray_beams``
+* [BREAKING] Removed ``number_beams``, a duplicate of ``number_subarray_beams``, from
+  SKA-Low's capability sets, including in the legacy response and the PHT view
 * [BREAKING] Removed the duplicate ``coarse_channel_width`` from
   ``low_capabilities.json``; use ``coarse_channel_width_hz``
 * [BREAKING] Removed the sun, moon and Jupiter avoidance angles from the capabilities
@@ -63,7 +63,10 @@ Unreleased
   ``modes.pss``, ``modes.pst`` and ``modes.vlbi`` as ``max_beams``. The legacy
   response and the PHT view serve them as ``number_zoom_windows``,
   ``number_zoom_channels``, ``allowed_zoom_factors`` and ``number_<mode>_beams``;
-  the ODT view serves ``number_pst_beams``
+  the ODT view serves ``number_pst_beams``. Low's subarray beams are in
+  ``station_beamforming``, as ``max_subarray_beams`` and
+  ``max_substations_per_subarray_beam``, which the legacy response and the views
+  serve as ``number_subarray_beams`` and ``number_substations``
 * Moved each telescope's current tmdata files under ``telescopes/ska_low`` and
   ``telescopes/ska_mid``, named by the ``Telescope`` values, with its defaults in
   ``defaults.json``. The legacy files stay at their old paths for older releases and

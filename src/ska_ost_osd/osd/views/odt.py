@@ -76,8 +76,10 @@ def _low_capability_set(
         available_bandwidth_hz=capability_set.available_bandwidth_hz,
         number_pst_beams=capability_set.modes.pst.max_beams,
         number_fsps=capability_set.number_fsps,
-        number_substations=capability_set.number_substations,
-        number_subarray_beams=capability_set.number_subarray_beams,
+        number_substations=(
+            capability_set.station_beamforming.max_substations_per_subarray_beam
+        ),
+        number_subarray_beams=capability_set.station_beamforming.max_subarray_beams,
     )
 
 

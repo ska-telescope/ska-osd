@@ -187,10 +187,18 @@ class LowCapabilitySetModes(OSDBaseModel):
     vlbi: LowCapabilitySetBeamformedMode
 
 
+class LowStationBeamforming(OSDBaseModel):
+    """The subarray beams a Low capability set offers. Each subarray beam is
+    formed from substations: whole stations (substation 0) or parts of
+    stations."""
+
+    max_subarray_beams: int = Field(ge=0, examples=[8])
+    max_substations_per_subarray_beam: int = Field(ge=0, examples=[720])
+
+
 class LowCapabilitySet(CapabilitySetBase):
     telescope: Literal[Telescope.SKA_LOW] = Telescope.SKA_LOW
-    number_substations: int = Field(ge=0)
-    number_subarray_beams: int = Field(ge=0)
+    station_beamforming: LowStationBeamforming
     number_stations: int = Field(ge=0)
     cbf_modes: list[LowCBFMode]
     modes: LowCapabilitySetModes

@@ -295,7 +295,8 @@ def test_get_osd_using_tmdata_catalogue_filter(
 
 
 def test_get_osd_using_tmdata_serves_low_modes_flat(tests_tmdata):
-    """Low's modes are served under their legacy names."""
+    """Low's modes and station beamforming are served under their legacy
+    names."""
     osd_data = get_osd_using_tmdata(tests_tmdata, telescope=Telescope.SKA_LOW)
 
     capability_set = osd_data["capabilities"]["low"]["AA2"]
@@ -306,6 +307,9 @@ def test_get_osd_using_tmdata_serves_low_modes_flat(tests_tmdata):
     assert capability_set["number_pss_beams"] == 0
     assert capability_set["number_pst_beams"] == 1
     assert capability_set["number_vlbi_beams"] == 0
+    assert "station_beamforming" not in capability_set
+    assert capability_set["number_subarray_beams"] == 8
+    assert capability_set["number_substations"] == 512
 
 
 def test_get_osd_using_tmdata_band_5b_has_sub_bands(tests_tmdata):

@@ -57,7 +57,7 @@ Reading the data
    * - ``get_capability_sets(telescope)`` / ``get_capability_set(telescope, name)``
      - ``MidCapabilitySet`` / ``LowCapabilitySet``: one array assembly of a
        telescope, e.g. ``"AA2"``. Low's zoom windows and beams are in its
-       ``modes``
+       ``modes``, and its subarray beams in ``station_beamforming``
    * - ``get_basic_capabilities(telescope)``
      - ``MidBasicCapabilities`` / ``LowBasicCapabilities``: the
        ``frequency_bands`` (Mid's receiver bands; Low's one band and its
@@ -74,7 +74,7 @@ Reading the data
     from ska_ost_osd.osd.common.constant import Telescope
 
     aa2 = repository.get_capability_set(Telescope.SKA_LOW, "AA2")
-    aa2.number_subarray_beams                                    # 8
+    aa2.station_beamforming.max_subarray_beams                   # 8
     repository.get_constraints(Telescope.SKA_MID).min_elevation_deg  # 15.0
 
 Mid's receiver bands are looked up on its basic capabilities:

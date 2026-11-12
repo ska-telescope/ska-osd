@@ -28,6 +28,7 @@ from ska_ost_osd.osd.models.capabilities import (
     LowCBFMode,
     LowMode,
     LowModes,
+    LowStationBeamforming,
     MidBasicCapabilities,
     MidCapabilitySet,
     MidCBFMode,
@@ -327,8 +328,9 @@ LOW_AA1 = LowCapabilitySet(
     name="AA1",
     receptors=[345, 346, 347, 348],
     number_stations=4,
-    number_substations=0,
-    number_subarray_beams=1,
+    station_beamforming=LowStationBeamforming(
+        max_subarray_beams=1, max_substations_per_subarray_beam=0
+    ),
     max_baseline_km=3.0,
     available_bandwidth_hz=75_000_000.0,
     cbf_modes=[LowCBFMode.VIS, LowCBFMode.PST],
@@ -348,8 +350,9 @@ LOW_AA2 = LowCapabilitySet(
     name="AA2",
     receptors=[345, 346, 347, 348, 349, 350, 351, 352],
     number_stations=8,
-    number_substations=512,
-    number_subarray_beams=8,
+    station_beamforming=LowStationBeamforming(
+        max_subarray_beams=8, max_substations_per_subarray_beam=512
+    ),
     max_baseline_km=6.0,
     available_bandwidth_hz=75_000_000.0,
     cbf_modes=[LowCBFMode.VIS, LowCBFMode.PST],

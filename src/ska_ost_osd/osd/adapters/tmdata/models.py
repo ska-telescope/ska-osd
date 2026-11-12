@@ -11,6 +11,7 @@ from ska_ost_osd.osd.models.capabilities import (
     LowBasicCapabilities,
     LowCapabilitySetModes,
     LowCBFMode,
+    LowStationBeamforming,
     MidBasicCapabilities,
     MidCBFMode,
 )
@@ -74,8 +75,7 @@ class LowCapabilitySetFile(CapabilitySetFileBase):
     """Model for telescopes/ska_low/capabilities/<name>.json."""
 
     stations: list[int]
-    number_substations: int = Field(ge=0)
-    number_subarray_beams: int = Field(ge=0)
+    station_beamforming: LowStationBeamforming
     number_stations: int = Field(ge=0)
     cbf_modes: list[LowCBFMode]
     modes: LowCapabilitySetModes

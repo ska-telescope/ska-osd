@@ -1,7 +1,9 @@
 {
   "number_stations": 68,
-  "number_substations": 0,
-  "number_subarray_beams": 1,
+  "station_beamforming": {
+    "max_subarray_beams": 1,
+    "max_substations_per_subarray_beam": 0
+  },
   "max_baseline_km": 40.0,
   "available_bandwidth_hz": 150000000.0,
   "cbf_modes": [

@@ -128,6 +128,12 @@ class CycleCapabilitiesBase(ConfigurationModel):
                     "pst": {"max_beams": capability_set.pop("number_pst_beams")},
                     "vlbi": {"max_beams": capability_set.pop("number_vlbi_beams")},
                 }
+                capability_set["station_beamforming"] = {
+                    "max_subarray_beams": capability_set.pop("number_subarray_beams"),
+                    "max_substations_per_subarray_beam": capability_set.pop(
+                        "number_substations"
+                    ),
+                }
             data["capability_set"] = capability_set
         return data
 
@@ -142,7 +148,8 @@ class CycleCapabilitiesBase(ConfigurationModel):
             capability_set["allowed_channel_width_values"] = capability_set[
                 "allowed_channel_width_values_hz"
             ]
-        # The PHT UI reads Low's modes flat, under their old names
+        # The PHT UI reads Low's modes and station beamforming flat, under
+        # their old names
         if "modes" in capability_set:
             modes = capability_set.pop("modes")
             capability_set["number_zoom_windows"] = modes["spectral"][
@@ -155,6 +162,13 @@ class CycleCapabilitiesBase(ConfigurationModel):
             capability_set["number_pss_beams"] = modes["pss"]["max_beams"]
             capability_set["number_pst_beams"] = modes["pst"]["max_beams"]
             capability_set["number_vlbi_beams"] = modes["vlbi"]["max_beams"]
+            station_beamforming = capability_set.pop("station_beamforming")
+            capability_set["number_substations"] = station_beamforming[
+                "max_substations_per_subarray_beam"
+            ]
+            capability_set["number_subarray_beams"] = station_beamforming[
+                "max_subarray_beams"
+            ]
         data[self.capability_set.name] = capability_set
         if (subarray_templates := data.pop("subarray_templates")) is not None:
             data[self.capability_set.name]["subarray_templates"] = subarray_templates
