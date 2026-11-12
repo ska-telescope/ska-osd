@@ -47,9 +47,11 @@ Unreleased
 * [BREAKING] Removed the sun, moon and Jupiter avoidance angles from the capabilities
   files; they are defined in ``mid_defaults.json`` and ``low_defaults.json``
 * Added a ``basic_capabilities.json`` for each telescope, holding its
-  ``frequency_bands`` (Mid's receiver bands; Low's one band and its channels) and
-  its ``elevation_limits``. ``mid_capabilities.json`` and ``low_capabilities.json``
-  are kept for older releases but are no longer read
+  ``frequency_bands`` (Mid's receiver bands; Low's one band and its channels per
+  mode), its ``elevation_limits`` and, for Low, its ``coarse_channels``. The legacy
+  response and the views still serve Low's coarse channels as fields of its band.
+  ``mid_capabilities.json`` and ``low_capabilities.json`` are kept for older releases
+  but are no longer read
 * Moved telescope capability sets to standalone tmdata files. Mid's channel widths
   are only stored as ``allowed_channel_width_values_hz``; the legacy response and the
   PHT view also serve them as ``allowed_channel_width_values``

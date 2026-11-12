@@ -17,14 +17,17 @@ from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
     CapabilitySet,
     LowCapabilitySet,
-    LowFrequencyBand,
     MidCapabilitySet,
     MidFrequencyBand,
 )
 from ska_ost_osd.osd.models.cycles import Cycle, PolicyType
 from ska_ost_osd.osd.models.subarray_templates import SubarrayType
 from ska_ost_osd.osd.repository import OSDRepository
-from ska_ost_osd.osd.views.base import ConfigurationModel
+from ska_ost_osd.osd.views.base import (
+    ConfigurationModel,
+    LowFrequencyBandWithCoarseChannels,
+    low_frequency_band,
+)
 
 # The PHT UI recognises science verification by its name
 _TYPE_NAMES = {
@@ -140,7 +143,7 @@ class MidCycleCapabilities(CycleCapabilitiesBase):
 
 
 class LowCycleCapabilities(CycleCapabilitiesBase):
-    basic_capabilities: LowFrequencyBand
+    basic_capabilities: LowFrequencyBandWithCoarseChannels
     capability_set: LowCapabilitySet
 
 
@@ -208,13 +211,6 @@ def _observatory_policy(
     )
 
 
-def _low_frequency_band(repository: OSDRepository) -> LowFrequencyBand:
-    """Low's one frequency band, which the PHT reads as Low's basic
-    capabilities."""
-    (band,) = repository.get_basic_capabilities(Telescope.SKA_LOW).frequency_bands
-    return band
-
-
 def get_cycle_configuration(
     repository: OSDRepository,
     cycle_id: str,
@@ -267,7 +263,7 @@ def get_cycle_configuration(
             if mid is not None
             else None,
             low=LowCycleCapabilities(
-                basic_capabilities=_low_frequency_band(repository),
+                basic_capabilities=low_frequency_band(repository),
                 capability_set=low,
                 subarray_templates=_subarray_templates(
                     repository,

@@ -247,7 +247,16 @@ class OSD:
         Low's one band, and each capability set."""
         capability_filepath = self.capability_filepaths[telescope]
         telescope_dir = posixpath.dirname(capability_filepath)
-        bands = self.tmdata[capability_filepath].get_dict()["frequency_bands"]
+        stored = self.tmdata[capability_filepath].get_dict()
+        bands = stored["frequency_bands"]
+        if telescope == "low":
+            # Low's band is also served with its coarse channels
+            coarse_channels = stored["coarse_channels"]
+            bands[0] |= {
+                "min_coarse_channel": coarse_channels["min"],
+                "max_coarse_channel": coarse_channels["max"],
+                "coarse_channel_width_hz": coarse_channels["width_hz"],
+            }
         basic_capabilities = (
             {"receiver_information": bands} if telescope == "mid" else bands[0]
         )

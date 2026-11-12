@@ -18,6 +18,7 @@ from ska_ost_osd.osd.adapters.tmdata.models import (
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
     Band5bSubband,
+    CoarseChannels,
     LowBasicCapabilities,
     LowCapabilitySet,
     LowCBFMode,
@@ -49,6 +50,7 @@ from ska_ost_osd.osd.models.defaults import (
     TargetSPFRx,
 )
 from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplate, SubarrayType
+from ska_ost_osd.osd.views.base import LowFrequencyBandWithCoarseChannels
 from ska_ost_osd.osd.views.odt import (
     Configuration,
     ConfigurationLowCBFMetrics,
@@ -358,9 +360,6 @@ LOW_AA2 = LowCapabilitySet(
 LOW_FREQUENCY_BAND = LowFrequencyBand(
     min_frequency_hz=50_000_000.0,
     max_frequency_hz=350_000_000.0,
-    min_coarse_channel=64,
-    max_coarse_channel=447,
-    coarse_channel_width_hz=781_250.0,
     number_continuum_channels_per_coarse_channel=144,
     number_zoom_channels_per_coarse_channel=432,
     number_pst_channels_per_coarse_channel=216,
@@ -371,6 +370,20 @@ LOW_FREQUENCY_BAND = LowFrequencyBand(
 LOW_BASIC_CAPABILITIES = LowBasicCapabilities(
     frequency_bands=[LOW_FREQUENCY_BAND],
     elevation_limits=ElevationLimits(min_elevation_deg=45.0, max_elevation_deg=90.0),
+    coarse_channels=CoarseChannels(min=64, max=447, width_hz=781_250.0),
+)
+
+# Low's band with its coarse channels, as the ODT and PHT views serve it
+LOW_FREQUENCY_BAND_WITH_COARSE_CHANNELS = LowFrequencyBandWithCoarseChannels(
+    min_frequency_hz=50_000_000.0,
+    max_frequency_hz=350_000_000.0,
+    number_continuum_channels_per_coarse_channel=144,
+    number_zoom_channels_per_coarse_channel=432,
+    number_pst_channels_per_coarse_channel=216,
+    number_pss_channels_per_coarse_channel=54,
+    min_coarse_channel=64,
+    max_coarse_channel=447,
+    coarse_channel_width_hz=781_250.0,
 )
 
 LOW_CAPABILITY_SET_FILES = {
@@ -537,7 +550,7 @@ CONFIGURATION = Configuration(
         spfrx_defaults=MID_DEFAULTS.spfrx_defaults,
     ),
     ska_low=LowConfiguration(
-        frequency_band=LOW_FREQUENCY_BAND,
+        frequency_band=LOW_FREQUENCY_BAND_WITH_COARSE_CHANNELS,
         constraints=LOW_CONSTRAINTS,
         quality_attribute_metrics=ConfigurationLowQualityAttributeMetrics(
             cbf=ConfigurationLowCBFMetrics(processors_ready_percent=100.0)
@@ -589,7 +602,8 @@ CYCLE_1_CONFIGURATION = CycleConfiguration(
     capabilities=CycleCapabilities(
         mid=None,
         low=LowCycleCapabilities(
-            basic_capabilities=LOW_FREQUENCY_BAND, capability_set=LOW_AA1
+            basic_capabilities=LOW_FREQUENCY_BAND_WITH_COARSE_CHANNELS,
+            capability_set=LOW_AA1,
         ),
     ),
 )
@@ -621,7 +635,8 @@ CYCLE_2_CONFIGURATION = CycleConfiguration(
             capability_set=MID_AA2,
         ),
         low=LowCycleCapabilities(
-            basic_capabilities=LOW_FREQUENCY_BAND, capability_set=LOW_AA2
+            basic_capabilities=LOW_FREQUENCY_BAND_WITH_COARSE_CHANNELS,
+            capability_set=LOW_AA2,
         ),
     ),
 )

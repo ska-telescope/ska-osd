@@ -102,10 +102,8 @@ class TestBreakingChanges:
             (
                 LowBasicCapabilitiesFile,
                 LOW_BASIC_CAPABILITIES_FILE,
-                lambda data: data["frequency_bands"][0].update(
-                    coarse_channel_width=data["frequency_bands"][0].pop(
-                        "coarse_channel_width_hz"
-                    )
+                lambda data: data["coarse_channels"].update(
+                    width=data["coarse_channels"].pop("width_hz")
                 ),
             ),
             (

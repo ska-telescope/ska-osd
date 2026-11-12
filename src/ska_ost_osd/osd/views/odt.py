@@ -4,13 +4,16 @@ serves."""
 
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
-    LowFrequencyBand,
     MidFrequencyBand,
 )
 from ska_ost_osd.osd.models.constraints import Constraints
 from ska_ost_osd.osd.models.defaults import SPFRxParameters
 from ska_ost_osd.osd.repository import OSDRepository
-from ska_ost_osd.osd.views.base import ConfigurationModel
+from ska_ost_osd.osd.views.base import (
+    ConfigurationModel,
+    LowFrequencyBandWithCoarseChannels,
+    low_frequency_band,
+)
 
 
 class ConfigurationCapabilitySetBase(ConfigurationModel):
@@ -49,7 +52,7 @@ class MidConfiguration(ConfigurationModel):
 
 
 class LowConfiguration(ConfigurationModel):
-    frequency_band: LowFrequencyBand
+    frequency_band: LowFrequencyBandWithCoarseChannels
     constraints: Constraints
     quality_attribute_metrics: ConfigurationLowQualityAttributeMetrics
     subarrays: list[LowConfigurationCapabilitySet]
@@ -61,12 +64,6 @@ class Configuration(ConfigurationModel):
 
     ska_mid: MidConfiguration
     ska_low: LowConfiguration
-
-
-def _low_frequency_band(repository: OSDRepository) -> LowFrequencyBand:
-    """Low's one frequency band, which the ODT reads as a single object."""
-    (band,) = repository.get_basic_capabilities(Telescope.SKA_LOW).frequency_bands
-    return band
 
 
 def get_configuration(repository: OSDRepository) -> Configuration:
@@ -92,7 +89,7 @@ def get_configuration(repository: OSDRepository) -> Configuration:
             spfrx_defaults=repository.get_defaults(Telescope.SKA_MID).spfrx_defaults,
         ),
         ska_low=LowConfiguration(
-            frequency_band=_low_frequency_band(repository),
+            frequency_band=low_frequency_band(repository),
             constraints=repository.get_constraints(Telescope.SKA_LOW),
             quality_attribute_metrics=ConfigurationLowQualityAttributeMetrics.model_validate(
                 repository.get_defaults(Telescope.SKA_LOW).quality_attribute_metrics,
