@@ -48,7 +48,7 @@ class CapabilitySetFileBase(OSDBaseModel):
 class MidCapabilitySetFile(CapabilitySetFileBase):
     """Model for telescopes/ska_mid/capabilities/<name>.json."""
 
-    number_dish_ids: list[str]
+    dishes: list[str]
     allowed_channel_width_values_hz: list[int]
     allowed_channel_count_range_min: list[int]
     allowed_channel_count_range_max: list[int]
@@ -60,12 +60,11 @@ class MidCapabilitySetFile(CapabilitySetFileBase):
 
     @model_validator(mode="after")
     def check_dish_count(self) -> Self:
-        # number_dish_ids lists SKA dishes only; MeerKAT dishes are counted
-        # separately
-        if self.number_ska_dishes != len(self.number_dish_ids):
+        ska_dishes = [dish for dish in self.dishes if dish.startswith("SKA")]
+        if self.number_ska_dishes != len(ska_dishes):
             raise ValueError(
                 f"number_ska_dishes ({self.number_ska_dishes}) does not match "
-                f"the number of dish IDs ({len(self.number_dish_ids)})"
+                f"the number of SKA dishes ({len(ska_dishes)})"
             )
         return self
 

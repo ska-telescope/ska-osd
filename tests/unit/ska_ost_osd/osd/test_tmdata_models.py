@@ -208,7 +208,7 @@ class TestCapabilities:
             (
                 MidCapabilitySetFile,
                 MID_CAPABILITY_SET,
-                lambda data: data["number_dish_ids"].pop(),
+                lambda data: data["dishes"].pop(),
                 "number_ska_dishes",
             ),
             (

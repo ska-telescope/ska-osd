@@ -312,7 +312,7 @@ MID_BASIC_CAPABILITIES = MidBasicCapabilities(
 # subarray templates (in the test tmdata, the same as the name)
 MID_CAPABILITY_SET_FILES = {
     capability_set.name: MidCapabilitySetFile(
-        number_dish_ids=capability_set.receptors,
+        dishes=capability_set.receptors,
         array_assembly=capability_set.name,
         **capability_set.model_dump(exclude={"name", "telescope", "receptors"}),
     )

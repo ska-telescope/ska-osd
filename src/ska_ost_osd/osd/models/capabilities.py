@@ -27,7 +27,7 @@ class CapabilitySetBase(OSDBaseModel):
     name: str = Field(examples=["AA0.5"])
     receptors: list[str | int] = Field(
         validation_alias=AliasChoices(
-            "receptors", "stations", "number_dish_ids", "number_station_ids"
+            "receptors", "stations", "dishes", "number_dish_ids", "number_station_ids"
         ),
         examples=[["SKA001", "SKA036"], [345, 350]],
     )
@@ -114,11 +114,11 @@ class MidCapabilitySet(CapabilitySetBase):
 
     @model_validator(mode="after")
     def check_dish_count(self) -> Self:
-        # receptors lists SKA dish IDs only; MeerKAT dishes are counted separately
-        if self.number_ska_dishes != len(self.receptors):
+        ska_dishes = [dish for dish in self.receptors if str(dish).startswith("SKA")]
+        if self.number_ska_dishes != len(ska_dishes):
             raise ValueError(
                 f"{self.name}: number_ska_dishes ({self.number_ska_dishes}) does "
-                f"not match the number of receptors ({len(self.receptors)})"
+                f"not match the number of SKA dishes ({len(ska_dishes)})"
             )
         return self
 
