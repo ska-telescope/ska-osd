@@ -250,12 +250,25 @@ class OSD:
         stored = self.tmdata[capability_filepath].get_dict()
         bands = stored["frequency_bands"]
         if telescope == "low":
-            # Low's band is also served with its coarse channels
-            coarse_channels = stored["coarse_channels"]
+            # Low's band is also served with its coarse channels and the
+            # channels each mode divides them into
+            coarse_channels, modes = stored["coarse_channels"], stored["modes"]
             bands[0] |= {
                 "min_coarse_channel": coarse_channels["min"],
                 "max_coarse_channel": coarse_channels["max"],
                 "coarse_channel_width_hz": coarse_channels["width_hz"],
+                "number_continuum_channels_per_coarse_channel": modes["continuum"][
+                    "channels_per_coarse_channel"
+                ],
+                "number_zoom_channels_per_coarse_channel": modes["zoom"][
+                    "channels_per_coarse_channel"
+                ],
+                "number_pst_channels_per_coarse_channel": modes["pst"][
+                    "channels_per_coarse_channel"
+                ],
+                "number_pss_channels_per_coarse_channel": modes["pss"][
+                    "channels_per_coarse_channel"
+                ],
             }
         basic_capabilities = (
             {"receiver_information": bands} if telescope == "mid" else bands[0]

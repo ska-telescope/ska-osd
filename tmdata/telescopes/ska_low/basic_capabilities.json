@@ -2,11 +2,7 @@
   "frequency_bands": [
     {
       "min_frequency_hz": 50000000.0,
-      "max_frequency_hz": 350000000.0,
-      "number_continuum_channels_per_coarse_channel": 144,
-      "number_zoom_channels_per_coarse_channel": 432,
-      "number_pst_channels_per_coarse_channel": 216,
-      "number_pss_channels_per_coarse_channel": 54
+      "max_frequency_hz": 350000000.0
     }
   ],
   "elevation_limits": {
@@ -17,5 +13,19 @@
     "min": 64,
     "max": 447,
     "width_hz": 781250.0
+  },
+  "modes": {
+    "continuum": {
+      "channels_per_coarse_channel": 144
+    },
+    "zoom": {
+      "channels_per_coarse_channel": 432
+    },
+    "pst": {
+      "channels_per_coarse_channel": 216
+    },
+    "pss": {
+      "channels_per_coarse_channel": 54
+    }
   }
 }

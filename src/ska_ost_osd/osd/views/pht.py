@@ -25,7 +25,7 @@ from ska_ost_osd.osd.models.subarray_templates import SubarrayType
 from ska_ost_osd.osd.repository import OSDRepository
 from ska_ost_osd.osd.views.base import (
     ConfigurationModel,
-    LowFrequencyBandWithCoarseChannels,
+    LowFrequencyBandWithChannels,
     low_frequency_band,
 )
 
@@ -143,7 +143,7 @@ class MidCycleCapabilities(CycleCapabilitiesBase):
 
 
 class LowCycleCapabilities(CycleCapabilitiesBase):
-    basic_capabilities: LowFrequencyBandWithCoarseChannels
+    basic_capabilities: LowFrequencyBandWithChannels
     capability_set: LowCapabilitySet
 
 

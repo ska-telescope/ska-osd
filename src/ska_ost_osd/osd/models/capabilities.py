@@ -129,16 +129,6 @@ class LowCBFMode(StrEnum):
     PSS = "pss"
 
 
-class LowFrequencyBand(FrequencyBand):
-    """A Low frequency band and how each mode divides a coarse channel.
-    tmdata: ``basic_capabilities.frequency_bands[]``."""
-
-    number_continuum_channels_per_coarse_channel: int = Field(ge=0, examples=[144])
-    number_zoom_channels_per_coarse_channel: int = Field(ge=0, examples=[432])
-    number_pst_channels_per_coarse_channel: int = Field(ge=0, examples=[216])
-    number_pss_channels_per_coarse_channel: int = Field(ge=0, examples=[54])
-
-
 class CoarseChannels(OSDBaseModel):
     """The coarse channels Low's station beamformer divides its band into.
     tmdata: ``basic_capabilities.coarse_channels``."""
@@ -148,13 +138,29 @@ class CoarseChannels(OSDBaseModel):
     width_hz: float = Field(gt=0, examples=[781.25e3])
 
 
-class LowBasicCapabilities(OSDBaseModel):
-    """Low's frequency band, elevation limits and coarse channels. tmdata:
-    ``basic_capabilities``."""
+class LowMode(OSDBaseModel):
+    """How one observing mode divides each coarse channel."""
 
-    frequency_bands: list[LowFrequencyBand]
+    channels_per_coarse_channel: int = Field(ge=0, examples=[144])
+
+
+class LowModes(OSDBaseModel):
+    """Low's observing modes. tmdata: ``basic_capabilities.modes``."""
+
+    continuum: LowMode
+    zoom: LowMode
+    pst: LowMode
+    pss: LowMode
+
+
+class LowBasicCapabilities(OSDBaseModel):
+    """Low's frequency band, elevation limits, coarse channels and modes.
+    tmdata: ``basic_capabilities``."""
+
+    frequency_bands: list[FrequencyBand]
     elevation_limits: ElevationLimits
     coarse_channels: CoarseChannels
+    modes: LowModes
 
 
 class LowCapabilitySet(CapabilitySetBase):

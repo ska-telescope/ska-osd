@@ -11,7 +11,7 @@ from ska_ost_osd.osd.models.defaults import SPFRxParameters
 from ska_ost_osd.osd.repository import OSDRepository
 from ska_ost_osd.osd.views.base import (
     ConfigurationModel,
-    LowFrequencyBandWithCoarseChannels,
+    LowFrequencyBandWithChannels,
     low_frequency_band,
 )
 
@@ -52,7 +52,7 @@ class MidConfiguration(ConfigurationModel):
 
 
 class LowConfiguration(ConfigurationModel):
-    frequency_band: LowFrequencyBandWithCoarseChannels
+    frequency_band: LowFrequencyBandWithChannels
     constraints: Constraints
     quality_attribute_metrics: ConfigurationLowQualityAttributeMetrics
     subarrays: list[LowConfigurationCapabilitySet]
