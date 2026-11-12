@@ -19,11 +19,11 @@
     "spectral": {
       "channels_per_coarse_channel": 432
     },
-    "pst": {
-      "channels_per_coarse_channel": 216
-    },
     "pss": {
       "channels_per_coarse_channel": 54
+    },
+    "pst": {
+      "channels_per_coarse_channel": 216
     }
   }
 }

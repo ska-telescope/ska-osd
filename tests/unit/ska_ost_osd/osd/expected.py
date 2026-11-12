@@ -379,8 +379,8 @@ LOW_BASIC_CAPABILITIES = LowBasicCapabilities(
     modes=LowModes(
         continuum=LowMode(channels_per_coarse_channel=144),
         spectral=LowMode(channels_per_coarse_channel=432),
-        pst=LowMode(channels_per_coarse_channel=216),
         pss=LowMode(channels_per_coarse_channel=54),
+        pst=LowMode(channels_per_coarse_channel=216),
     ),
 )
 

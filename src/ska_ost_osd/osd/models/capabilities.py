@@ -149,8 +149,8 @@ class LowModes(OSDBaseModel):
 
     continuum: LowMode
     spectral: LowMode
-    pst: LowMode
     pss: LowMode
+    pst: LowMode
 
 
 class LowBasicCapabilities(OSDBaseModel):
