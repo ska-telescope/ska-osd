@@ -8,12 +8,12 @@ from pydantic import Field, model_validator
 
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
+    LowArrayAssemblyModes,
     LowBasicCapabilities,
-    LowCapabilitySetModes,
     LowCBFMode,
     LowStationBeamforming,
+    MidArrayAssemblyModes,
     MidBasicCapabilities,
-    MidCapabilitySetModes,
     MidCBFMode,
 )
 from ska_ost_osd.osd.models.cycles import (
@@ -42,7 +42,7 @@ class MidCapabilitySetFile(OSDBaseModel):
     # e.g. "AA2"; Mid_ITF has none
     array_assembly: str | None = None
     dishes: list[str]
-    modes: MidCapabilitySetModes
+    modes: MidArrayAssemblyModes
     number_zoom_windows: int = Field(ge=0)
     number_zoom_channels: int = Field(ge=0)
     allowed_channel_width_values_hz: list[int]
@@ -93,7 +93,7 @@ class LowCapabilitySetFile(OSDBaseModel):
     station_beamforming: LowStationBeamforming
     number_stations: int = Field(ge=0)
     cbf_modes: list[LowCBFMode]
-    modes: LowCapabilitySetModes
+    modes: LowArrayAssemblyModes
 
     @model_validator(mode="after")
     def check_station_count(self) -> Self:

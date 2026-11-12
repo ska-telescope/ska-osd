@@ -83,24 +83,24 @@ class MidBasicCapabilities(OSDBaseModel):
         )
 
 
-class MidCapabilitySetPSSMode(OSDBaseModel):
+class MidArrayAssemblyPSSMode(OSDBaseModel):
     """The pulsar search beams a Mid capability set offers."""
 
     max_beams: int = Field(ge=0, examples=[384])
     beam_bandwidth_hz: float = Field(ge=0, examples=[400e6])
 
 
-class MidCapabilitySetPSTMode(OSDBaseModel):
+class MidArrayAssemblyPSTMode(OSDBaseModel):
     """The pulsar timing beams a Mid capability set offers."""
 
     max_beams: int = Field(ge=0, examples=[6])
 
 
-class MidCapabilitySetModes(OSDBaseModel):
+class MidArrayAssemblyModes(OSDBaseModel):
     """What a Mid capability set offers in each observing mode."""
 
-    pss: MidCapabilitySetPSSMode
-    pst: MidCapabilitySetPSTMode
+    pss: MidArrayAssemblyPSSMode
+    pst: MidArrayAssemblyPSTMode
 
 
 class MidCapabilitySet(OSDBaseModel):
@@ -113,7 +113,7 @@ class MidCapabilitySet(OSDBaseModel):
     number_fsps: int = Field(ge=0)
     max_baseline_km: float = Field(gt=0)
     telescope: Literal[Telescope.SKA_MID] = Telescope.SKA_MID
-    modes: MidCapabilitySetModes
+    modes: MidArrayAssemblyModes
     number_zoom_windows: int = Field(ge=0)
     number_zoom_channels: int = Field(ge=0)
     allowed_channel_width_values_hz: list[int]
@@ -165,19 +165,37 @@ class CoarseChannels(OSDBaseModel):
     width_hz: float = Field(gt=0, examples=[781.25e3])
 
 
-class LowMode(OSDBaseModel):
-    """How one observing mode divides each coarse channel."""
+class LowBasicContinuumMode(OSDBaseModel):
+    """How Low's continuum mode divides each coarse channel."""
 
     channels_per_coarse_channel: int = Field(ge=0, examples=[144])
 
 
-class LowModes(OSDBaseModel):
+class LowBasicSpectralMode(OSDBaseModel):
+    """How Low's spectral line mode divides each coarse channel."""
+
+    channels_per_coarse_channel: int = Field(ge=0, examples=[432])
+
+
+class LowBasicPSSMode(OSDBaseModel):
+    """How Low's pulsar search mode divides each coarse channel."""
+
+    channels_per_coarse_channel: int = Field(ge=0, examples=[54])
+
+
+class LowBasicPSTMode(OSDBaseModel):
+    """How Low's pulsar timing mode divides each coarse channel."""
+
+    channels_per_coarse_channel: int = Field(ge=0, examples=[216])
+
+
+class LowBasicModes(OSDBaseModel):
     """Low's observing modes. tmdata: ``basic_capabilities.modes``."""
 
-    continuum: LowMode
-    spectral: LowMode
-    pss: LowMode
-    pst: LowMode
+    continuum: LowBasicContinuumMode
+    spectral: LowBasicSpectralMode
+    pss: LowBasicPSSMode
+    pst: LowBasicPSTMode
 
 
 class LowBasicCapabilities(OSDBaseModel):
@@ -187,10 +205,10 @@ class LowBasicCapabilities(OSDBaseModel):
     frequency_band: FrequencyBand
     elevation_limits: ElevationLimits
     coarse_channels: CoarseChannels
-    modes: LowModes
+    modes: LowBasicModes
 
 
-class LowCapabilitySetSpectralMode(OSDBaseModel):
+class LowArrayAssemblySpectralMode(OSDBaseModel):
     """The zoom windows a Low capability set offers for spectral line
     observations. ``max_zoom_channels`` is the most channels in one window."""
 
@@ -199,32 +217,32 @@ class LowCapabilitySetSpectralMode(OSDBaseModel):
     zoom_factors: list[int] = Field(examples=[[1, 2, 4, 8]])
 
 
-class LowCapabilitySetPSSMode(OSDBaseModel):
+class LowArrayAssemblyPSSMode(OSDBaseModel):
     """The pulsar search beams a Low capability set offers."""
 
     max_beams: int = Field(ge=0, examples=[30])
     beam_bandwidth_hz: float = Field(ge=0, examples=[118e6])
 
 
-class LowCapabilitySetPSTMode(OSDBaseModel):
+class LowArrayAssemblyPSTMode(OSDBaseModel):
     """The pulsar timing beams a Low capability set offers."""
 
     max_beams: int = Field(ge=0, examples=[4])
 
 
-class LowCapabilitySetVLBIMode(OSDBaseModel):
+class LowArrayAssemblyVLBIMode(OSDBaseModel):
     """The VLBI beams a Low capability set offers."""
 
     max_beams: int = Field(ge=0, examples=[0])
 
 
-class LowCapabilitySetModes(OSDBaseModel):
+class LowArrayAssemblyModes(OSDBaseModel):
     """What a Low capability set offers in each observing mode."""
 
-    spectral: LowCapabilitySetSpectralMode
-    pss: LowCapabilitySetPSSMode
-    pst: LowCapabilitySetPSTMode
-    vlbi: LowCapabilitySetVLBIMode
+    spectral: LowArrayAssemblySpectralMode
+    pss: LowArrayAssemblyPSSMode
+    pst: LowArrayAssemblyPSTMode
+    vlbi: LowArrayAssemblyVLBIMode
 
 
 class LowStationBeamforming(OSDBaseModel):
@@ -249,7 +267,7 @@ class LowCapabilitySet(OSDBaseModel):
     station_beamforming: LowStationBeamforming
     number_stations: int = Field(ge=0)
     cbf_modes: list[LowCBFMode]
-    modes: LowCapabilitySetModes
+    modes: LowArrayAssemblyModes
 
     @model_validator(mode="after")
     def check_station_count(self) -> Self:

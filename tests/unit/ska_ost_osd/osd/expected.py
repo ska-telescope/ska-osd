@@ -20,22 +20,25 @@ from ska_ost_osd.osd.models.capabilities import (
     Band5bSubband,
     CoarseChannels,
     FrequencyBand,
+    LowArrayAssemblyModes,
+    LowArrayAssemblyPSSMode,
+    LowArrayAssemblyPSTMode,
+    LowArrayAssemblySpectralMode,
+    LowArrayAssemblyVLBIMode,
     LowBasicCapabilities,
+    LowBasicContinuumMode,
+    LowBasicModes,
+    LowBasicPSSMode,
+    LowBasicPSTMode,
+    LowBasicSpectralMode,
     LowCapabilitySet,
-    LowCapabilitySetModes,
-    LowCapabilitySetPSSMode,
-    LowCapabilitySetPSTMode,
-    LowCapabilitySetSpectralMode,
-    LowCapabilitySetVLBIMode,
     LowCBFMode,
-    LowMode,
-    LowModes,
     LowStationBeamforming,
+    MidArrayAssemblyModes,
+    MidArrayAssemblyPSSMode,
+    MidArrayAssemblyPSTMode,
     MidBasicCapabilities,
     MidCapabilitySet,
-    MidCapabilitySetModes,
-    MidCapabilitySetPSSMode,
-    MidCapabilitySetPSTMode,
     MidCBFMode,
     MidFrequencyBand,
 )
@@ -217,9 +220,9 @@ MID_AA1 = MidCapabilitySet(
     max_baseline_km=1.5,
     number_zoom_windows=0,
     number_zoom_channels=0,
-    modes=MidCapabilitySetModes(
-        pss=MidCapabilitySetPSSMode(max_beams=0, beam_bandwidth_hz=400_000_000),
-        pst=MidCapabilitySetPSTMode(max_beams=1),
+    modes=MidArrayAssemblyModes(
+        pss=MidArrayAssemblyPSSMode(max_beams=0, beam_bandwidth_hz=400_000_000),
+        pst=MidArrayAssemblyPSTMode(max_beams=1),
     ),
     allowed_channel_width_values_hz=[13440],
     allowed_channel_count_range_min=[1],
@@ -248,9 +251,9 @@ MID_AA2 = MidCapabilitySet(
     max_baseline_km=1.5,
     number_zoom_windows=0,
     number_zoom_channels=0,
-    modes=MidCapabilitySetModes(
-        pss=MidCapabilitySetPSSMode(max_beams=0, beam_bandwidth_hz=400_000_000),
-        pst=MidCapabilitySetPSTMode(max_beams=1),
+    modes=MidArrayAssemblyModes(
+        pss=MidArrayAssemblyPSSMode(max_beams=0, beam_bandwidth_hz=400_000_000),
+        pst=MidArrayAssemblyPSTMode(max_beams=1),
     ),
     allowed_channel_width_values_hz=[13440],
     allowed_channel_count_range_min=[1],
@@ -342,13 +345,13 @@ LOW_AA1 = LowCapabilitySet(
     available_bandwidth_hz=75_000_000.0,
     cbf_modes=[LowCBFMode.VIS, LowCBFMode.PST],
     number_fsps=6,
-    modes=LowCapabilitySetModes(
-        spectral=LowCapabilitySetSpectralMode(
+    modes=LowArrayAssemblyModes(
+        spectral=LowArrayAssemblySpectralMode(
             max_zoom_windows=0, max_zoom_channels=0, zoom_factors=[0]
         ),
-        pss=LowCapabilitySetPSSMode(max_beams=0, beam_bandwidth_hz=75_000_000.0),
-        pst=LowCapabilitySetPSTMode(max_beams=1),
-        vlbi=LowCapabilitySetVLBIMode(max_beams=0),
+        pss=LowArrayAssemblyPSSMode(max_beams=0, beam_bandwidth_hz=75_000_000.0),
+        pst=LowArrayAssemblyPSTMode(max_beams=1),
+        vlbi=LowArrayAssemblyVLBIMode(max_beams=0),
     ),
 )
 
@@ -363,13 +366,13 @@ LOW_AA2 = LowCapabilitySet(
     available_bandwidth_hz=75_000_000.0,
     cbf_modes=[LowCBFMode.VIS, LowCBFMode.PST],
     number_fsps=6,
-    modes=LowCapabilitySetModes(
-        spectral=LowCapabilitySetSpectralMode(
+    modes=LowArrayAssemblyModes(
+        spectral=LowArrayAssemblySpectralMode(
             max_zoom_windows=0, max_zoom_channels=0, zoom_factors=[1, 2, 4, 8]
         ),
-        pss=LowCapabilitySetPSSMode(max_beams=0, beam_bandwidth_hz=75_000_000.0),
-        pst=LowCapabilitySetPSTMode(max_beams=1),
-        vlbi=LowCapabilitySetVLBIMode(max_beams=0),
+        pss=LowArrayAssemblyPSSMode(max_beams=0, beam_bandwidth_hz=75_000_000.0),
+        pst=LowArrayAssemblyPSTMode(max_beams=1),
+        vlbi=LowArrayAssemblyVLBIMode(max_beams=0),
     ),
 )
 
@@ -384,11 +387,11 @@ LOW_BASIC_CAPABILITIES = LowBasicCapabilities(
     frequency_band=LOW_FREQUENCY_BAND,
     elevation_limits=ElevationLimits(min_elevation_deg=45.0, max_elevation_deg=90.0),
     coarse_channels=CoarseChannels(min=64, max=447, width_hz=781_250.0),
-    modes=LowModes(
-        continuum=LowMode(channels_per_coarse_channel=144),
-        spectral=LowMode(channels_per_coarse_channel=432),
-        pss=LowMode(channels_per_coarse_channel=54),
-        pst=LowMode(channels_per_coarse_channel=216),
+    modes=LowBasicModes(
+        continuum=LowBasicContinuumMode(channels_per_coarse_channel=144),
+        spectral=LowBasicSpectralMode(channels_per_coarse_channel=432),
+        pss=LowBasicPSSMode(channels_per_coarse_channel=54),
+        pst=LowBasicPSTMode(channels_per_coarse_channel=216),
     ),
 )
 
