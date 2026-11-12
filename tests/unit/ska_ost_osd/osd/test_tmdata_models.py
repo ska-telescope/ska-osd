@@ -37,7 +37,6 @@ from ska_ost_osd.osd.models.capabilities import (
     MidFrequencyBand,
 )
 from ska_ost_osd.osd.models.constraints import Constraints
-from ska_ost_osd.osd.osd import get_osd_using_tmdata
 from tests.unit.ska_ost_osd.osd.expected import (
     LOW_AA2,
     MID_AA2,
@@ -59,24 +58,6 @@ SUBARRAY_TEMPLATES = "telescopes/ska_low/subarray_templates/AA2.json"
 def load(path: str) -> dict:
     with open(TESTS_TMDATA / path, encoding="utf-8") as json_file:
         return json.load(json_file)
-
-
-class TestOsdOutput:
-    """What the OSD serves from the tmdata validates against the models."""
-
-    def test_template_processed_output_validates(self, tests_tmdata):
-        """Mid's capability sets in the OSD's output with subarray templates
-        resolved, as ska-oso-services fetches it, validate. Low's serve its
-        modes flat, so don't."""
-        osd_data = get_osd_using_tmdata(
-            tests_tmdata, telescope=Telescope.SKA_MID, process_templates=True
-        )
-        served = osd_data["capabilities"]["mid"]
-        assert "constraints" not in served
-
-        for name, capability_set in served.items():
-            if name != "basic_capabilities":
-                MidCapabilitySet.model_validate({"name": name, **capability_set})
 
 
 class TestBreakingChanges:
@@ -221,6 +202,18 @@ class TestCapabilities:
                 lambda data: data["cbf_modes"].remove("pst"),
                 "cbf_modes must list pst",
             ),
+            (
+                MidCapabilitySetFile,
+                MID_CAPABILITY_SET,
+                lambda data: data["modes"]["pss"].update(max_beams=1),
+                "cbf_modes must list pss",
+            ),
+            (
+                MidCapabilitySetFile,
+                MID_CAPABILITY_SET,
+                lambda data: data["cbf_modes"].remove("pst"),
+                "cbf_modes must list pst",
+            ),
         ],
         ids=[
             "elevation range",
@@ -229,6 +222,8 @@ class TestCapabilities:
             "station count",
             "pss beams without the pss CBF mode",
             "pst CBF mode without pst beams",
+            "Mid pss beams without the pss CBF mode",
+            "Mid pst CBF mode without pst beams",
         ],
     )
     def test_consistency_checks(self, model, path, break_file, message):

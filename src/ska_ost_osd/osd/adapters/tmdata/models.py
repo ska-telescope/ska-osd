@@ -13,6 +13,7 @@ from ska_ost_osd.osd.models.capabilities import (
     LowCBFMode,
     LowStationBeamforming,
     MidBasicCapabilities,
+    MidCapabilitySetModes,
     MidCBFMode,
 )
 from ska_ost_osd.osd.models.cycles import (
@@ -41,9 +42,7 @@ class MidCapabilitySetFile(OSDBaseModel):
     # e.g. "AA2"; Mid_ITF has none
     array_assembly: str | None = None
     dishes: list[str]
-    number_pst_beams: int = Field(ge=0)
-    number_pss_beams: int = Field(ge=0)
-    ps_beam_bandwidth_hz: float = Field(ge=0)
+    modes: MidCapabilitySetModes
     number_zoom_windows: int = Field(ge=0)
     number_zoom_channels: int = Field(ge=0)
     allowed_channel_width_values_hz: list[int]
@@ -63,6 +62,19 @@ class MidCapabilitySetFile(OSDBaseModel):
                 f"number_ska_dishes ({self.number_ska_dishes}) does not match "
                 f"the number of SKA dishes ({len(ska_dishes)})"
             )
+        return self
+
+    @model_validator(mode="after")
+    def check_cbf_modes(self) -> Self:
+        for cbf_mode, mode in (
+            (MidCBFMode.PSS, self.modes.pss),
+            (MidCBFMode.PST, self.modes.pst),
+        ):
+            if (cbf_mode in self.cbf_modes) != (mode.max_beams > 0):
+                raise ValueError(
+                    f"cbf_modes must list {cbf_mode} exactly when "
+                    f"modes.{cbf_mode}.max_beams is above 0"
+                )
         return self
 
 

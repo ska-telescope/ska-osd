@@ -5,6 +5,7 @@ serves."""
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
     LowCapabilitySet,
+    MidCapabilitySet,
     MidFrequencyBand,
 )
 from ska_ost_osd.osd.models.constraints import Constraints
@@ -66,6 +67,19 @@ class Configuration(ConfigurationModel):
     ska_low: LowConfiguration
 
 
+def _mid_capability_set(
+    capability_set: MidCapabilitySet,
+) -> MidConfigurationCapabilitySet:
+    return MidConfigurationCapabilitySet(
+        name=capability_set.name,
+        receptors=capability_set.receptors,
+        available_bandwidth_hz=capability_set.available_bandwidth_hz,
+        number_pst_beams=capability_set.modes.pst.max_beams,
+        number_fsps=capability_set.number_fsps,
+        allowed_channel_width_values_hz=capability_set.allowed_channel_width_values_hz,
+    )
+
+
 def _low_capability_set(
     capability_set: LowCapabilitySet,
 ) -> LowConfigurationCapabilitySet:
@@ -97,9 +111,7 @@ def get_configuration(repository: OSDRepository) -> Configuration:
             ).frequency_bands,
             constraints=repository.get_constraints(Telescope.SKA_MID),
             subarrays=[
-                MidConfigurationCapabilitySet.model_validate(
-                    capability_set, from_attributes=True
-                )
+                _mid_capability_set(capability_set)
                 for capability_set in repository.get_capability_sets(Telescope.SKA_MID)
             ],
             spfrx_defaults=repository.get_defaults(Telescope.SKA_MID).spfrx_defaults,

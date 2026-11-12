@@ -117,20 +117,26 @@ class CycleCapabilitiesBase(ConfigurationModel):
             capability_set = dict(data.pop(names[0]))
             if "subarray_templates" in capability_set:
                 data["subarray_templates"] = capability_set.pop("subarray_templates")
-            if "allowed_zoom_factors" in capability_set:
-                capability_set["modes"] = {
-                    "spectral": {
-                        "max_zoom_windows": capability_set.pop("number_zoom_windows"),
-                        "max_zoom_channels": capability_set.pop("number_zoom_channels"),
-                        "zoom_factors": capability_set.pop("allowed_zoom_factors"),
-                    },
+            if "number_pss_beams" in capability_set:
+                modes: dict[str, Any] = {
                     "pss": {
                         "max_beams": capability_set.pop("number_pss_beams"),
                         "beam_bandwidth_hz": capability_set.pop("ps_beam_bandwidth_hz"),
                     },
                     "pst": {"max_beams": capability_set.pop("number_pst_beams")},
-                    "vlbi": {"max_beams": capability_set.pop("number_vlbi_beams")},
                 }
+                if "allowed_zoom_factors" in capability_set:
+                    modes["spectral"] = {
+                        "max_zoom_windows": capability_set.pop("number_zoom_windows"),
+                        "max_zoom_channels": capability_set.pop("number_zoom_channels"),
+                        "zoom_factors": capability_set.pop("allowed_zoom_factors"),
+                    }
+                if "number_vlbi_beams" in capability_set:
+                    modes["vlbi"] = {
+                        "max_beams": capability_set.pop("number_vlbi_beams")
+                    }
+                capability_set["modes"] = modes
+            if "number_substations" in capability_set:
                 capability_set["station_beamforming"] = {
                     "max_subarray_beams": capability_set.pop("number_subarray_beams"),
                     "max_substations_per_subarray_beam": capability_set.pop(
@@ -151,10 +157,10 @@ class CycleCapabilitiesBase(ConfigurationModel):
             capability_set["allowed_channel_width_values"] = capability_set[
                 "allowed_channel_width_values_hz"
             ]
-        # The PHT UI reads Low's modes and station beamforming flat, under
-        # their old names
-        if "modes" in capability_set:
-            modes = capability_set.pop("modes")
+        # The PHT UI reads the modes, and Low's station beamforming, flat
+        # under their old names
+        modes = capability_set.pop("modes")
+        if "spectral" in modes:
             capability_set["number_zoom_windows"] = modes["spectral"][
                 "max_zoom_windows"
             ]
@@ -162,10 +168,12 @@ class CycleCapabilitiesBase(ConfigurationModel):
                 "max_zoom_channels"
             ]
             capability_set["allowed_zoom_factors"] = modes["spectral"]["zoom_factors"]
-            capability_set["number_pss_beams"] = modes["pss"]["max_beams"]
-            capability_set["ps_beam_bandwidth_hz"] = modes["pss"]["beam_bandwidth_hz"]
-            capability_set["number_pst_beams"] = modes["pst"]["max_beams"]
+        capability_set["number_pss_beams"] = modes["pss"]["max_beams"]
+        capability_set["ps_beam_bandwidth_hz"] = modes["pss"]["beam_bandwidth_hz"]
+        capability_set["number_pst_beams"] = modes["pst"]["max_beams"]
+        if "vlbi" in modes:
             capability_set["number_vlbi_beams"] = modes["vlbi"]["max_beams"]
+        if "station_beamforming" in capability_set:
             station_beamforming = capability_set.pop("station_beamforming")
             capability_set["number_substations"] = station_beamforming[
                 "max_substations_per_subarray_beam"

@@ -313,6 +313,21 @@ def test_get_osd_using_tmdata_serves_low_modes_flat(tests_tmdata):
     assert capability_set["number_substations"] == 512
 
 
+def test_get_osd_using_tmdata_serves_mid_modes_flat(tests_tmdata):
+    """Mid's modes are served under their legacy names, and its capability
+    sets with templates processed have no constraints."""
+    osd_data = get_osd_using_tmdata(
+        tests_tmdata, telescope=Telescope.SKA_MID, process_templates=True
+    )
+
+    assert "constraints" not in osd_data["capabilities"]["mid"]
+    capability_set = osd_data["capabilities"]["mid"]["AA2"]
+    assert "modes" not in capability_set
+    assert capability_set["number_pss_beams"] == 0
+    assert capability_set["ps_beam_bandwidth_hz"] == 400_000_000
+    assert capability_set["number_pst_beams"] == 1
+
+
 def test_get_osd_using_tmdata_band_5b_has_sub_bands(tests_tmdata):
     """Band 5b of the Mid basic capabilities is split into sub-bands."""
     osd_data = get_osd_using_tmdata(

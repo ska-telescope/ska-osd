@@ -18,13 +18,12 @@ from ska_ost_osd.osd.adapters.tmdata.models import (
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
     Band5bSubband,
+    BeamformedMode,
     CoarseChannels,
     FrequencyBand,
     LowBasicCapabilities,
     LowCapabilitySet,
-    LowCapabilitySetBeamformedMode,
     LowCapabilitySetModes,
-    LowCapabilitySetPSSMode,
     LowCapabilitySetSpectralMode,
     LowCBFMode,
     LowMode,
@@ -32,8 +31,10 @@ from ska_ost_osd.osd.models.capabilities import (
     LowStationBeamforming,
     MidBasicCapabilities,
     MidCapabilitySet,
+    MidCapabilitySetModes,
     MidCBFMode,
     MidFrequencyBand,
+    PSSMode,
 )
 from ska_ost_osd.osd.models.constraints import Constraints, ElevationLimits
 from ska_ost_osd.osd.models.cycles import (
@@ -209,13 +210,14 @@ MID_AA1 = MidCapabilitySet(
     name="AA1",
     receptors=["SKA001", "SKA002", "SKA003", "SKA004"],
     available_bandwidth_hz=800_000_000,
-    number_pst_beams=1,
     number_fsps=4,
     max_baseline_km=1.5,
     number_zoom_windows=0,
     number_zoom_channels=0,
-    number_pss_beams=0,
-    ps_beam_bandwidth_hz=400_000_000,
+    modes=MidCapabilitySetModes(
+        pss=PSSMode(max_beams=0, beam_bandwidth_hz=400_000_000),
+        pst=BeamformedMode(max_beams=1),
+    ),
     allowed_channel_width_values_hz=[13440],
     allowed_channel_count_range_min=[1],
     allowed_channel_count_range_max=[58982],
@@ -239,13 +241,14 @@ MID_AA2 = MidCapabilitySet(
         "SKA008",
     ],  # fmt: skip
     available_bandwidth_hz=800_000_000,
-    number_pst_beams=1,
     number_fsps=8,
     max_baseline_km=1.5,
     number_zoom_windows=0,
     number_zoom_channels=0,
-    number_pss_beams=0,
-    ps_beam_bandwidth_hz=400_000_000,
+    modes=MidCapabilitySetModes(
+        pss=PSSMode(max_beams=0, beam_bandwidth_hz=400_000_000),
+        pst=BeamformedMode(max_beams=1),
+    ),
     allowed_channel_width_values_hz=[13440],
     allowed_channel_count_range_min=[1],
     allowed_channel_count_range_max=[58982],
@@ -340,9 +343,9 @@ LOW_AA1 = LowCapabilitySet(
         spectral=LowCapabilitySetSpectralMode(
             max_zoom_windows=0, max_zoom_channels=0, zoom_factors=[0]
         ),
-        pss=LowCapabilitySetPSSMode(max_beams=0, beam_bandwidth_hz=75_000_000.0),
-        pst=LowCapabilitySetBeamformedMode(max_beams=1),
-        vlbi=LowCapabilitySetBeamformedMode(max_beams=0),
+        pss=PSSMode(max_beams=0, beam_bandwidth_hz=75_000_000.0),
+        pst=BeamformedMode(max_beams=1),
+        vlbi=BeamformedMode(max_beams=0),
     ),
 )
 
@@ -361,9 +364,9 @@ LOW_AA2 = LowCapabilitySet(
         spectral=LowCapabilitySetSpectralMode(
             max_zoom_windows=0, max_zoom_channels=0, zoom_factors=[1, 2, 4, 8]
         ),
-        pss=LowCapabilitySetPSSMode(max_beams=0, beam_bandwidth_hz=75_000_000.0),
-        pst=LowCapabilitySetBeamformedMode(max_beams=1),
-        vlbi=LowCapabilitySetBeamformedMode(max_beams=0),
+        pss=PSSMode(max_beams=0, beam_bandwidth_hz=75_000_000.0),
+        pst=BeamformedMode(max_beams=1),
+        vlbi=BeamformedMode(max_beams=0),
     ),
 )
 

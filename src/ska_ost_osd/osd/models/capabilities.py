@@ -83,6 +83,26 @@ class MidBasicCapabilities(OSDBaseModel):
         )
 
 
+class BeamformedMode(OSDBaseModel):
+    """The beams a capability set offers in one beamformed mode."""
+
+    max_beams: int = Field(ge=0, examples=[4])
+
+
+class PSSMode(OSDBaseModel):
+    """The pulsar search beams a capability set offers."""
+
+    max_beams: int = Field(ge=0, examples=[30])
+    beam_bandwidth_hz: float = Field(ge=0, examples=[118e6])
+
+
+class MidCapabilitySetModes(OSDBaseModel):
+    """What a Mid capability set offers in each observing mode."""
+
+    pss: PSSMode
+    pst: BeamformedMode
+
+
 class MidCapabilitySet(OSDBaseModel):
     name: str = Field(examples=["AA0.5"])
     receptors: list[str | int] = Field(
@@ -93,9 +113,7 @@ class MidCapabilitySet(OSDBaseModel):
     number_fsps: int = Field(ge=0)
     max_baseline_km: float = Field(gt=0)
     telescope: Literal[Telescope.SKA_MID] = Telescope.SKA_MID
-    number_pst_beams: int = Field(ge=0)
-    number_pss_beams: int = Field(ge=0)
-    ps_beam_bandwidth_hz: float = Field(ge=0)
+    modes: MidCapabilitySetModes
     number_zoom_windows: int = Field(ge=0)
     number_zoom_channels: int = Field(ge=0)
     allowed_channel_width_values_hz: list[int]
@@ -115,6 +133,20 @@ class MidCapabilitySet(OSDBaseModel):
                 f"{self.name}: number_ska_dishes ({self.number_ska_dishes}) does "
                 f"not match the number of SKA dishes ({len(ska_dishes)})"
             )
+        return self
+
+    @model_validator(mode="after")
+    def check_cbf_modes(self) -> Self:
+        for cbf_mode, mode in (
+            (MidCBFMode.PSS, self.modes.pss),
+            (MidCBFMode.PST, self.modes.pst),
+        ):
+            if (cbf_mode in self.cbf_modes) != (mode.max_beams > 0):
+                raise ValueError(
+                    f"{self.name}: "
+                    f"cbf_modes must list {cbf_mode} exactly when "
+                    f"modes.{cbf_mode}.max_beams is above 0"
+                )
         return self
 
 
@@ -167,26 +199,13 @@ class LowCapabilitySetSpectralMode(OSDBaseModel):
     zoom_factors: list[int] = Field(examples=[[1, 2, 4, 8]])
 
 
-class LowCapabilitySetBeamformedMode(OSDBaseModel):
-    """The beams a Low capability set offers in one beamformed mode."""
-
-    max_beams: int = Field(ge=0, examples=[4])
-
-
-class LowCapabilitySetPSSMode(OSDBaseModel):
-    """The pulsar search beams a Low capability set offers."""
-
-    max_beams: int = Field(ge=0, examples=[30])
-    beam_bandwidth_hz: float = Field(ge=0, examples=[118e6])
-
-
 class LowCapabilitySetModes(OSDBaseModel):
     """What a Low capability set offers in each observing mode."""
 
     spectral: LowCapabilitySetSpectralMode
-    pss: LowCapabilitySetPSSMode
-    pst: LowCapabilitySetBeamformedMode
-    vlbi: LowCapabilitySetBeamformedMode
+    pss: PSSMode
+    pst: BeamformedMode
+    vlbi: BeamformedMode
 
 
 class LowStationBeamforming(OSDBaseModel):

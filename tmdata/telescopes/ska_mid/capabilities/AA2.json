@@ -107,11 +107,17 @@
   "number_fsps": 26,
   "number_meerkat_dishes": 4,
   "number_meerkatplus_dishes": 0,
-  "number_pss_beams": 384,
-  "number_pst_beams": 6,
+  "modes": {
+    "pss": {
+      "max_beams": 384,
+      "beam_bandwidth_hz": 800000000
+    },
+    "pst": {
+      "max_beams": 6
+    }
+  },
   "number_ska_dishes": 64,
   "number_zoom_channels": 14880,
   "number_zoom_windows": 16,
-  "ps_beam_bandwidth_hz": 800000000,
   "array_assembly": "AA2"
 }

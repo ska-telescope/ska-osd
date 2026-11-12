@@ -155,6 +155,10 @@ class TestGetCycleConfiguration:
         assert list(mid) == ["basic_capabilities", "AA2"]
         assert list(mid["basic_capabilities"]) == ["receiver_information"]
         assert mid["AA2"]["name"] == "AA2"
+        assert "modes" not in mid["AA2"]
+        assert mid["AA2"]["number_pss_beams"] == 0
+        assert mid["AA2"]["ps_beam_bandwidth_hz"] == 400_000_000
+        assert mid["AA2"]["number_pst_beams"] == 1
         assert (
             mid["AA2"]["allowed_channel_width_values"]
             == mid["AA2"]["allowed_channel_width_values_hz"]
