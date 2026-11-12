@@ -23,19 +23,6 @@ class FrequencyBand(OSDBaseModel):
         return self
 
 
-class CapabilitySetBase(OSDBaseModel):
-    name: str = Field(examples=["AA0.5"])
-    receptors: list[str | int] = Field(
-        validation_alias=AliasChoices(
-            "receptors", "stations", "dishes", "number_dish_ids", "number_station_ids"
-        ),
-        examples=[["SKA001", "SKA036"], [345, 350]],
-    )
-    available_bandwidth_hz: float = Field(gt=0)
-    number_fsps: int = Field(ge=0)
-    max_baseline_km: float = Field(gt=0)
-
-
 class MidCBFMode(StrEnum):
     CORRELATION = "correlation"
     PST = "pst"
@@ -96,7 +83,15 @@ class MidBasicCapabilities(OSDBaseModel):
         )
 
 
-class MidCapabilitySet(CapabilitySetBase):
+class MidCapabilitySet(OSDBaseModel):
+    name: str = Field(examples=["AA0.5"])
+    receptors: list[str | int] = Field(
+        validation_alias=AliasChoices("receptors", "dishes", "number_dish_ids"),
+        examples=[["SKA001", "SKA036"]],
+    )
+    available_bandwidth_hz: float = Field(gt=0)
+    number_fsps: int = Field(ge=0)
+    max_baseline_km: float = Field(gt=0)
     telescope: Literal[Telescope.SKA_MID] = Telescope.SKA_MID
     number_pst_beams: int = Field(ge=0)
     number_pss_beams: int = Field(ge=0)
@@ -178,9 +173,10 @@ class LowCapabilitySetBeamformedMode(OSDBaseModel):
     max_beams: int = Field(ge=0, examples=[4])
 
 
-class LowCapabilitySetPSSMode(LowCapabilitySetBeamformedMode):
+class LowCapabilitySetPSSMode(OSDBaseModel):
     """The pulsar search beams a Low capability set offers."""
 
+    max_beams: int = Field(ge=0, examples=[30])
     beam_bandwidth_hz: float = Field(ge=0, examples=[118e6])
 
 
@@ -202,7 +198,15 @@ class LowStationBeamforming(OSDBaseModel):
     max_substations_per_subarray_beam: int = Field(ge=0, examples=[720])
 
 
-class LowCapabilitySet(CapabilitySetBase):
+class LowCapabilitySet(OSDBaseModel):
+    name: str = Field(examples=["AA0.5"])
+    receptors: list[str | int] = Field(
+        validation_alias=AliasChoices("receptors", "stations", "number_station_ids"),
+        examples=[[345, 350]],
+    )
+    available_bandwidth_hz: float = Field(gt=0)
+    number_fsps: int = Field(ge=0)
+    max_baseline_km: float = Field(gt=0)
     telescope: Literal[Telescope.SKA_LOW] = Telescope.SKA_LOW
     station_beamforming: LowStationBeamforming
     number_stations: int = Field(ge=0)

@@ -17,22 +17,21 @@ from ska_ost_osd.osd.views.base import (
 )
 
 
-class ConfigurationCapabilitySetBase(ConfigurationModel):
-    """The fields of a capability set the configuration serves for both
-    telescopes."""
-
+class MidConfigurationCapabilitySet(ConfigurationModel):
     name: str
     receptors: list[str | int]
     available_bandwidth_hz: float
     number_pst_beams: int
     number_fsps: int
-
-
-class MidConfigurationCapabilitySet(ConfigurationCapabilitySetBase):
     allowed_channel_width_values_hz: list[int]
 
 
-class LowConfigurationCapabilitySet(ConfigurationCapabilitySetBase):
+class LowConfigurationCapabilitySet(ConfigurationModel):
+    name: str
+    receptors: list[str | int]
+    available_bandwidth_hz: float
+    number_pst_beams: int
+    number_fsps: int
     number_substations: int
     number_subarray_beams: int
 

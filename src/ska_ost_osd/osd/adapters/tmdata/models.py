@@ -29,8 +29,8 @@ from ska_ost_osd.osd.models.defaults import (
 from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplate
 
 
-class CapabilitySetFileBase(OSDBaseModel):
-    """Base for the Mid and Low capability set file models. Each file is
+class MidCapabilitySetFile(OSDBaseModel):
+    """Model for telescopes/ska_mid/capabilities/<name>.json. The file is
     named after its capability set, so it holds neither the name nor the
     telescope."""
 
@@ -38,13 +38,8 @@ class CapabilitySetFileBase(OSDBaseModel):
     number_fsps: int = Field(ge=0)
     max_baseline_km: float = Field(gt=0)
     # The array assembly whose subarray templates the capability set offers,
-    # e.g. "AA2"; the *_ITF capability sets have none
+    # e.g. "AA2"; Mid_ITF has none
     array_assembly: str | None = None
-
-
-class MidCapabilitySetFile(CapabilitySetFileBase):
-    """Model for telescopes/ska_mid/capabilities/<name>.json."""
-
     dishes: list[str]
     number_pst_beams: int = Field(ge=0)
     number_pss_beams: int = Field(ge=0)
@@ -71,9 +66,17 @@ class MidCapabilitySetFile(CapabilitySetFileBase):
         return self
 
 
-class LowCapabilitySetFile(CapabilitySetFileBase):
-    """Model for telescopes/ska_low/capabilities/<name>.json."""
+class LowCapabilitySetFile(OSDBaseModel):
+    """Model for telescopes/ska_low/capabilities/<name>.json. The file is
+    named after its capability set, so it holds neither the name nor the
+    telescope."""
 
+    available_bandwidth_hz: float = Field(gt=0)
+    number_fsps: int = Field(ge=0)
+    max_baseline_km: float = Field(gt=0)
+    # The array assembly whose subarray templates the capability set offers,
+    # e.g. "AA2"; Low_ITF has none
+    array_assembly: str | None = None
     stations: list[int]
     station_beamforming: LowStationBeamforming
     number_stations: int = Field(ge=0)
@@ -123,12 +126,6 @@ class AvoidanceConstraints(OSDBaseModel):
     jupiter_avoidance_angle_deg: float = Field(examples=[10.0])
 
 
-class TelescopeDefaultsFileBase(OSDBaseModel):
-    """Base for the Mid and Low defaults file models."""
-
-    constraints: AvoidanceConstraints
-
-
 class MidTargetDefaults(OSDBaseModel):
     """The SPFRx parameters each Mid target starts with."""
 
@@ -141,16 +138,18 @@ class MidCSPConfigurationDefaults(OSDBaseModel):
     spfrx: CSPSPFRx
 
 
-class MidDefaultsFile(TelescopeDefaultsFileBase):
+class MidDefaultsFile(OSDBaseModel):
     """Top-level model for telescopes/ska_mid/defaults.json."""
 
+    constraints: AvoidanceConstraints
     target: MidTargetDefaults
     csp_configuration: MidCSPConfigurationDefaults
 
 
-class LowDefaultsFile(TelescopeDefaultsFileBase):
+class LowDefaultsFile(OSDBaseModel):
     """Top-level model for telescopes/ska_low/defaults.json."""
 
+    constraints: AvoidanceConstraints
     quality_attribute_metrics: LowQualityAttributeMetrics
 
 
