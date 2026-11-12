@@ -15,7 +15,7 @@
   "number_vlbi_beams": 0,
   "ps_beam_bandwidth_hz": 75000000.0,
   "number_fsps": 6,
-  "number_station_ids": [
+  "stations": [
     345,
     346,
     347,

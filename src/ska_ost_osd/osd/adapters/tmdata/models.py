@@ -73,7 +73,7 @@ class MidCapabilitySetFile(CapabilitySetFileBase):
 class LowCapabilitySetFile(CapabilitySetFileBase):
     """Model for telescopes/ska_low/capabilities/<name>.json."""
 
-    number_station_ids: list[int]
+    stations: list[int]
     number_substations: int = Field(ge=0)
     number_subarray_beams: int = Field(ge=0)
     number_stations: int = Field(ge=0)
@@ -83,10 +83,10 @@ class LowCapabilitySetFile(CapabilitySetFileBase):
 
     @model_validator(mode="after")
     def check_station_count(self) -> Self:
-        if self.number_stations != len(self.number_station_ids):
+        if self.number_stations != len(self.stations):
             raise ValueError(
                 f"number_stations ({self.number_stations}) does not match "
-                f"the number of station IDs ({len(self.number_station_ids)})"
+                f"the number of stations ({len(self.stations)})"
             )
         return self
 

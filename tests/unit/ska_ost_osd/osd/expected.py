@@ -392,7 +392,7 @@ LOW_FREQUENCY_BAND_WITH_CHANNELS = LowFrequencyBandWithChannels(
 
 LOW_CAPABILITY_SET_FILES = {
     capability_set.name: LowCapabilitySetFile(
-        number_station_ids=capability_set.receptors,
+        stations=capability_set.receptors,
         array_assembly=capability_set.name,
         **capability_set.model_dump(exclude={"name", "telescope", "receptors"}),
     )

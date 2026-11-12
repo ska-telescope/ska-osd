@@ -1,6 +1,6 @@
 {
   "number_stations": 4,
-  "number_station_ids": [
+  "stations": [
     345,
     350,
     352,

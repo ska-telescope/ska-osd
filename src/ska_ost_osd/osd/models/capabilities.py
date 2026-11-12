@@ -27,7 +27,7 @@ class CapabilitySetBase(OSDBaseModel):
     name: str = Field(examples=["AA0.5"])
     receptors: list[str | int] = Field(
         validation_alias=AliasChoices(
-            "receptors", "number_dish_ids", "number_station_ids"
+            "receptors", "stations", "number_dish_ids", "number_station_ids"
         ),
         examples=[["SKA001", "SKA036"], [345, 350]],
     )
