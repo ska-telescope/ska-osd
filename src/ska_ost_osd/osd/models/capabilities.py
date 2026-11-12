@@ -204,6 +204,21 @@ class LowCapabilitySet(CapabilitySetBase):
             )
         return self
 
+    @model_validator(mode="after")
+    def check_cbf_modes(self) -> Self:
+        # vis isn't checked against modes.spectral: some capability sets list
+        # vis but offer no zoom windows
+        for cbf_mode, mode in (
+            (LowCBFMode.PSS, self.modes.pss),
+            (LowCBFMode.PST, self.modes.pst),
+        ):
+            if (cbf_mode in self.cbf_modes) != (mode.max_beams > 0):
+                raise ValueError(
+                    f"{self.name}: cbf_modes must list {cbf_mode} exactly "
+                    f"when modes.{cbf_mode}.max_beams is above 0"
+                )
+        return self
+
 
 # A capability set is one array assembly of either telescope; the
 # telescope field picks the model when one is read back.

@@ -209,12 +209,26 @@ class TestCapabilities:
                 lambda data: data["stations"].pop(),
                 "number_stations",
             ),
+            (
+                LowCapabilitySetFile,
+                LOW_CAPABILITY_SET,
+                lambda data: data["modes"]["pss"].update(max_beams=1),
+                "cbf_modes must list pss",
+            ),
+            (
+                LowCapabilitySetFile,
+                LOW_CAPABILITY_SET,
+                lambda data: data["cbf_modes"].remove("pst"),
+                "cbf_modes must list pst",
+            ),
         ],
         ids=[
             "elevation range",
             "frequency range",
             "dish count",
             "station count",
+            "pss beams without the pss CBF mode",
+            "pst CBF mode without pst beams",
         ],
     )
     def test_consistency_checks(self, model, path, break_file, message):
