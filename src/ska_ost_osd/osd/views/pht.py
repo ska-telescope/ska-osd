@@ -140,9 +140,11 @@ class CycleCapabilitiesBase(ConfigurationModel):
                 capability_set["modes"] = modes
             if "number_ska_dishes" in capability_set:
                 capability_set["dishes"] = {
-                    "number_ska": capability_set.pop("number_ska_dishes"),
-                    "number_meerkat": capability_set.pop("number_meerkat_dishes"),
-                    "number_meerkatplus": capability_set.pop(
+                    "number_ska_dishes": capability_set.pop("number_ska_dishes"),
+                    "number_meerkat_dishes": capability_set.pop(
+                        "number_meerkat_dishes"
+                    ),
+                    "number_meerkatplus_dishes": capability_set.pop(
                         "number_meerkatplus_dishes"
                     ),
                     "max_baseline_km": capability_set.pop("max_baseline_km"),
@@ -150,7 +152,7 @@ class CycleCapabilitiesBase(ConfigurationModel):
                 }
             if "number_stations" in capability_set:
                 capability_set["stations"] = {
-                    "number": capability_set.pop("number_stations"),
+                    "number_stations": capability_set.pop("number_stations"),
                     "max_baseline_km": capability_set.pop("max_baseline_km"),
                     "ids": capability_set.pop("receptors"),
                 }
@@ -190,14 +192,16 @@ class CycleCapabilitiesBase(ConfigurationModel):
         if "stations" in capability_set:
             stations = capability_set.pop("stations")
             capability_set["receptors"] = stations["ids"]
-            capability_set["number_stations"] = stations["number"]
+            capability_set["number_stations"] = stations["number_stations"]
             capability_set["max_baseline_km"] = stations["max_baseline_km"]
         if "dishes" in capability_set:
             dishes = capability_set.pop("dishes")
             capability_set["receptors"] = dishes["ids"]
-            capability_set["number_ska_dishes"] = dishes["number_ska"]
-            capability_set["number_meerkat_dishes"] = dishes["number_meerkat"]
-            capability_set["number_meerkatplus_dishes"] = dishes["number_meerkatplus"]
+            capability_set["number_ska_dishes"] = dishes["number_ska_dishes"]
+            capability_set["number_meerkat_dishes"] = dishes["number_meerkat_dishes"]
+            capability_set["number_meerkatplus_dishes"] = dishes[
+                "number_meerkatplus_dishes"
+            ]
             capability_set["max_baseline_km"] = dishes["max_baseline_km"]
         if "station_beamforming" in capability_set:
             station_beamforming = capability_set.pop("station_beamforming")

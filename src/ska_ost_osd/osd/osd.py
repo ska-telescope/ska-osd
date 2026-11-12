@@ -289,14 +289,16 @@ class OSD:
         # IDs as number_station_ids or number_dish_ids
         if "stations" in capability_set:
             stations = capability_set.pop("stations")
-            capability_set["number_stations"] = stations["number"]
+            capability_set["number_stations"] = stations["number_stations"]
             capability_set["max_baseline_km"] = stations["max_baseline_km"]
             capability_set["number_station_ids"] = stations["ids"]
         if "dishes" in capability_set:
             dishes = capability_set.pop("dishes")
-            capability_set["number_ska_dishes"] = dishes["number_ska"]
-            capability_set["number_meerkat_dishes"] = dishes["number_meerkat"]
-            capability_set["number_meerkatplus_dishes"] = dishes["number_meerkatplus"]
+            capability_set["number_ska_dishes"] = dishes["number_ska_dishes"]
+            capability_set["number_meerkat_dishes"] = dishes["number_meerkat_dishes"]
+            capability_set["number_meerkatplus_dishes"] = dishes[
+                "number_meerkatplus_dishes"
+            ]
             capability_set["max_baseline_km"] = dishes["max_baseline_km"]
             capability_set["number_dish_ids"] = dishes["ids"]
         # Mid's channel widths are also served without the _hz suffix

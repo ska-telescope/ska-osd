@@ -116,19 +116,19 @@ class MidArrayAssemblyDishes(OSDBaseModel):
     """The dishes a Mid capability set is made of, by ID: SKA dishes
     (``SKA…``) and MeerKAT dishes (``MKT…``)."""
 
-    number_ska: int = Field(ge=0, examples=[64])
-    number_meerkat: int = Field(ge=0, examples=[4])
-    number_meerkatplus: int = Field(ge=0, examples=[0])
+    number_ska_dishes: int = Field(ge=0, examples=[64])
+    number_meerkat_dishes: int = Field(ge=0, examples=[4])
+    number_meerkatplus_dishes: int = Field(ge=0, examples=[0])
     max_baseline_km: float = Field(gt=0, examples=[110.0])
     ids: list[str] = Field(examples=[["SKA001", "SKA036"]])
 
     @model_validator(mode="after")
-    def check_number_ska(self) -> Self:
+    def check_number_ska_dishes(self) -> Self:
         ska_ids = [dish for dish in self.ids if dish.startswith("SKA")]
-        if self.number_ska != len(ska_ids):
+        if self.number_ska_dishes != len(ska_ids):
             raise ValueError(
-                f"number_ska ({self.number_ska}) does not match the number of "
-                f"SKA dish ids ({len(ska_ids)})"
+                f"number_ska_dishes ({self.number_ska_dishes}) does not match the "
+                f"number of SKA dish ids ({len(ska_ids)})"
             )
         return self
 
@@ -268,16 +268,16 @@ class LowStationBeamforming(OSDBaseModel):
 class LowArrayAssemblyStations(OSDBaseModel):
     """The stations a Low capability set is made of, by ID."""
 
-    number: int = Field(ge=0, examples=[68])
+    number_stations: int = Field(ge=0, examples=[68])
     max_baseline_km: float = Field(gt=0, examples=[40.0])
     ids: list[int] = Field(examples=[[345, 350]])
 
     @model_validator(mode="after")
-    def check_number(self) -> Self:
-        if self.number != len(self.ids):
+    def check_number_stations(self) -> Self:
+        if self.number_stations != len(self.ids):
             raise ValueError(
-                f"number ({self.number}) does not match the number of station "
-                f"ids ({len(self.ids)})"
+                f"number_stations ({self.number_stations}) does not match the "
+                f"number of station ids ({len(self.ids)})"
             )
         return self
 

@@ -35,9 +35,9 @@
     58982
   ],
   "dishes": {
-    "number_ska": 8,
-    "number_meerkat": 0,
-    "number_meerkatplus": 0,
+    "number_ska_dishes": 8,
+    "number_meerkat_dishes": 0,
+    "number_meerkatplus_dishes": 0,
     "max_baseline_km": 1.5,
     "ids": [
       "SKA001",

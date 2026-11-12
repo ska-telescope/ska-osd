@@ -230,9 +230,9 @@ MID_AA1 = MidCapabilitySet(
     available_receivers=["Band_1", "Band_2", "Band_5b"],
     cbf_modes=[MidCBFMode.CORRELATION, MidCBFMode.PST],
     dishes=MidArrayAssemblyDishes(
-        number_ska=4,
-        number_meerkat=0,
-        number_meerkatplus=0,
+        number_ska_dishes=4,
+        number_meerkat_dishes=0,
+        number_meerkatplus_dishes=0,
         max_baseline_km=1.5,
         ids=["SKA001", "SKA002", "SKA003", "SKA004"],
     ),
@@ -253,9 +253,9 @@ MID_AA2 = MidCapabilitySet(
     available_receivers=["Band_1", "Band_2", "Band_5a", "Band_5b"],
     cbf_modes=[MidCBFMode.CORRELATION, MidCBFMode.PST],
     dishes=MidArrayAssemblyDishes(
-        number_ska=8,
-        number_meerkat=0,
-        number_meerkatplus=0,
+        number_ska_dishes=8,
+        number_meerkat_dishes=0,
+        number_meerkatplus_dishes=0,
         max_baseline_km=1.5,
         ids=[
             "SKA001",
@@ -354,7 +354,7 @@ LOW_AA1 = LowCapabilitySet(
         vlbi=LowArrayAssemblyVLBIMode(max_beams=0),
     ),
     stations=LowArrayAssemblyStations(
-        number=4, max_baseline_km=3.0, ids=[345, 346, 347, 348]
+        number_stations=4, max_baseline_km=3.0, ids=[345, 346, 347, 348]
     ),
 )
 
@@ -375,7 +375,9 @@ LOW_AA2 = LowCapabilitySet(
         vlbi=LowArrayAssemblyVLBIMode(max_beams=0),
     ),
     stations=LowArrayAssemblyStations(
-        number=8, max_baseline_km=6.0, ids=[345, 346, 347, 348, 349, 350, 351, 352]
+        number_stations=8,
+        max_baseline_km=6.0,
+        ids=[345, 346, 347, 348, 349, 350, 351, 352],
     ),
 )
 

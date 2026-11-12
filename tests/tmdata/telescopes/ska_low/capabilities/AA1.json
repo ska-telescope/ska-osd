@@ -30,7 +30,7 @@
   },
   "number_fsps": 6,
   "stations": {
-    "number": 4,
+    "number_stations": 4,
     "max_baseline_km": 3.0,
     "ids": [
       345,
