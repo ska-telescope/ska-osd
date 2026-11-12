@@ -112,15 +112,31 @@ class MidArrayAssemblyModes(OSDBaseModel):
     pst: MidArrayAssemblyPSTMode
 
 
+class MidArrayAssemblyDishes(OSDBaseModel):
+    """The dishes a Mid capability set is made of, by ID: SKA dishes
+    (``SKA…``) and MeerKAT dishes (``MKT…``)."""
+
+    number_ska: int = Field(ge=0, examples=[64])
+    number_meerkat: int = Field(ge=0, examples=[4])
+    number_meerkatplus: int = Field(ge=0, examples=[0])
+    max_baseline_km: float = Field(gt=0, examples=[110.0])
+    ids: list[str] = Field(examples=[["SKA001", "SKA036"]])
+
+    @model_validator(mode="after")
+    def check_number_ska(self) -> Self:
+        ska_ids = [dish for dish in self.ids if dish.startswith("SKA")]
+        if self.number_ska != len(ska_ids):
+            raise ValueError(
+                f"number_ska ({self.number_ska}) does not match the number of "
+                f"SKA dish ids ({len(ska_ids)})"
+            )
+        return self
+
+
 class MidCapabilitySet(OSDBaseModel):
     name: str = Field(examples=["AA0.5"])
-    receptors: list[str | int] = Field(
-        validation_alias=AliasChoices("receptors", "dishes", "number_dish_ids"),
-        examples=[["SKA001", "SKA036"]],
-    )
     available_bandwidth_hz: float = Field(gt=0)
     number_fsps: int = Field(ge=0)
-    max_baseline_km: float = Field(gt=0)
     telescope: Literal[Telescope.SKA_MID] = Telescope.SKA_MID
     modes: MidArrayAssemblyModes
     allowed_channel_width_values_hz: list[int]
@@ -128,19 +144,7 @@ class MidCapabilitySet(OSDBaseModel):
     allowed_channel_count_range_max: list[int]
     available_receivers: list[str] = Field(examples=[["Band_1", "Band_2"]])
     cbf_modes: list[MidCBFMode]
-    number_ska_dishes: int = Field(ge=0)
-    number_meerkat_dishes: int = Field(ge=0)
-    number_meerkatplus_dishes: int = Field(ge=0)
-
-    @model_validator(mode="after")
-    def check_dish_count(self) -> Self:
-        ska_dishes = [dish for dish in self.receptors if str(dish).startswith("SKA")]
-        if self.number_ska_dishes != len(ska_dishes):
-            raise ValueError(
-                f"{self.name}: number_ska_dishes ({self.number_ska_dishes}) does "
-                f"not match the number of SKA dishes ({len(ska_dishes)})"
-            )
-        return self
+    dishes: MidArrayAssemblyDishes
 
     @model_validator(mode="after")
     def check_cbf_modes(self) -> Self:

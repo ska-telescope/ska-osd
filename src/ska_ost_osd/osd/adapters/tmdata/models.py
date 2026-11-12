@@ -13,6 +13,7 @@ from ska_ost_osd.osd.models.capabilities import (
     LowBasicCapabilities,
     LowCBFMode,
     LowStationBeamforming,
+    MidArrayAssemblyDishes,
     MidArrayAssemblyModes,
     MidBasicCapabilities,
     MidCBFMode,
@@ -38,30 +39,16 @@ class MidCapabilitySetFile(OSDBaseModel):
 
     available_bandwidth_hz: float = Field(gt=0)
     number_fsps: int = Field(ge=0)
-    max_baseline_km: float = Field(gt=0)
     # The array assembly whose subarray templates the capability set offers,
     # e.g. "AA2"; Mid_ITF has none
     array_assembly: str | None = None
-    dishes: list[str]
     modes: MidArrayAssemblyModes
     allowed_channel_width_values_hz: list[int]
     allowed_channel_count_range_min: list[int]
     allowed_channel_count_range_max: list[int]
     available_receivers: list[str]
     cbf_modes: list[MidCBFMode]
-    number_ska_dishes: int = Field(ge=0)
-    number_meerkat_dishes: int = Field(ge=0)
-    number_meerkatplus_dishes: int = Field(ge=0)
-
-    @model_validator(mode="after")
-    def check_dish_count(self) -> Self:
-        ska_dishes = [dish for dish in self.dishes if dish.startswith("SKA")]
-        if self.number_ska_dishes != len(ska_dishes):
-            raise ValueError(
-                f"number_ska_dishes ({self.number_ska_dishes}) does not match "
-                f"the number of SKA dishes ({len(ska_dishes)})"
-            )
-        return self
+    dishes: MidArrayAssemblyDishes
 
     @model_validator(mode="after")
     def check_cbf_modes(self) -> Self:

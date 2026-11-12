@@ -159,6 +159,10 @@ class TestGetCycleConfiguration:
         assert mid["AA2"]["number_pss_beams"] == 0
         assert mid["AA2"]["ps_beam_bandwidth_hz"] == 400_000_000
         assert mid["AA2"]["number_pst_beams"] == 1
+        assert "dishes" not in mid["AA2"]
+        assert mid["AA2"]["number_ska_dishes"] == 8
+        assert mid["AA2"]["max_baseline_km"] == 1.5
+        assert mid["AA2"]["receptors"][0] == "SKA001"
         assert mid["AA2"]["number_zoom_windows"] == 0
         assert mid["AA2"]["number_zoom_channels"] == 0
         assert (

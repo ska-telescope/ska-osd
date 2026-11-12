@@ -33,14 +33,16 @@
   "allowed_channel_count_range_max": [
     58982
   ],
-  "number_ska_dishes": 4,
-  "number_meerkat_dishes": 0,
-  "number_meerkatplus_dishes": 0,
-  "max_baseline_km": 1.5,
-  "dishes": [
-    "SKA001",
-    "SKA036",
-    "SKA077",
-    "SKA100"
-  ]
+  "dishes": {
+    "number_ska": 4,
+    "number_meerkat": 0,
+    "number_meerkatplus": 0,
+    "max_baseline_km": 1.5,
+    "ids": [
+      "SKA001",
+      "SKA036",
+      "SKA077",
+      "SKA100"
+    ]
+  }
 }

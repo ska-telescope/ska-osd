@@ -285,15 +285,20 @@ class OSD:
         """A capability set in its legacy shape: its array assembly as a template
         pattern, or as that array assembly's templates when they are processed."""
         capability_set = self.tmdata[f"{telescope_dir}/capabilities/{name}"].get_dict()
-        # The legacy response serves Low's stations flat, with their IDs as
-        # number_station_ids, and Mid's dishes as number_dish_ids
+        # The legacy response serves the stations or dishes flat, with their
+        # IDs as number_station_ids or number_dish_ids
         if "stations" in capability_set:
             stations = capability_set.pop("stations")
             capability_set["number_stations"] = stations["number"]
             capability_set["max_baseline_km"] = stations["max_baseline_km"]
             capability_set["number_station_ids"] = stations["ids"]
         if "dishes" in capability_set:
-            capability_set["number_dish_ids"] = capability_set.pop("dishes")
+            dishes = capability_set.pop("dishes")
+            capability_set["number_ska_dishes"] = dishes["number_ska"]
+            capability_set["number_meerkat_dishes"] = dishes["number_meerkat"]
+            capability_set["number_meerkatplus_dishes"] = dishes["number_meerkatplus"]
+            capability_set["max_baseline_km"] = dishes["max_baseline_km"]
+            capability_set["number_dish_ids"] = dishes["ids"]
         # Mid's channel widths are also served without the _hz suffix
         if "allowed_channel_width_values_hz" in capability_set:
             capability_set["allowed_channel_width_values"] = capability_set[

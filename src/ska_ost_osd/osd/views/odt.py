@@ -72,7 +72,7 @@ def _mid_capability_set(
 ) -> MidConfigurationCapabilitySet:
     return MidConfigurationCapabilitySet(
         name=capability_set.name,
-        receptors=capability_set.receptors,
+        receptors=capability_set.dishes.ids,
         available_bandwidth_hz=capability_set.available_bandwidth_hz,
         number_pst_beams=capability_set.modes.pst.max_beams,
         number_fsps=capability_set.number_fsps,

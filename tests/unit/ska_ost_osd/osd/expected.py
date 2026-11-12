@@ -35,6 +35,7 @@ from ska_ost_osd.osd.models.capabilities import (
     LowCapabilitySet,
     LowCBFMode,
     LowStationBeamforming,
+    MidArrayAssemblyDishes,
     MidArrayAssemblyModes,
     MidArrayAssemblyPSSMode,
     MidArrayAssemblyPSTMode,
@@ -216,10 +217,8 @@ CYCLE_1_LEGACY_OBSERVATORY_POLICY = {
 # tests/tmdata/telescopes/ska_mid/capabilities/AA1.json and AA2.json
 MID_AA1 = MidCapabilitySet(
     name="AA1",
-    receptors=["SKA001", "SKA002", "SKA003", "SKA004"],
     available_bandwidth_hz=800_000_000,
     number_fsps=4,
-    max_baseline_km=1.5,
     modes=MidArrayAssemblyModes(
         spectral=MidArrayAssemblySpectralMode(max_zoom_windows=0, max_zoom_channels=0),
         pss=MidArrayAssemblyPSSMode(max_beams=0, beam_bandwidth_hz=400_000_000),
@@ -230,26 +229,19 @@ MID_AA1 = MidCapabilitySet(
     allowed_channel_count_range_max=[58982],
     available_receivers=["Band_1", "Band_2", "Band_5b"],
     cbf_modes=[MidCBFMode.CORRELATION, MidCBFMode.PST],
-    number_ska_dishes=4,
-    number_meerkat_dishes=0,
-    number_meerkatplus_dishes=0,
+    dishes=MidArrayAssemblyDishes(
+        number_ska=4,
+        number_meerkat=0,
+        number_meerkatplus=0,
+        max_baseline_km=1.5,
+        ids=["SKA001", "SKA002", "SKA003", "SKA004"],
+    ),
 )
 
 MID_AA2 = MidCapabilitySet(
     name="AA2",
-    receptors=[
-        "SKA001",
-        "SKA002",
-        "SKA003",
-        "SKA004",
-        "SKA005",
-        "SKA006",
-        "SKA007",
-        "SKA008",
-    ],  # fmt: skip
     available_bandwidth_hz=800_000_000,
     number_fsps=8,
-    max_baseline_km=1.5,
     modes=MidArrayAssemblyModes(
         spectral=MidArrayAssemblySpectralMode(max_zoom_windows=0, max_zoom_channels=0),
         pss=MidArrayAssemblyPSSMode(max_beams=0, beam_bandwidth_hz=400_000_000),
@@ -260,9 +252,22 @@ MID_AA2 = MidCapabilitySet(
     allowed_channel_count_range_max=[58982],
     available_receivers=["Band_1", "Band_2", "Band_5a", "Band_5b"],
     cbf_modes=[MidCBFMode.CORRELATION, MidCBFMode.PST],
-    number_ska_dishes=8,
-    number_meerkat_dishes=0,
-    number_meerkatplus_dishes=0,
+    dishes=MidArrayAssemblyDishes(
+        number_ska=8,
+        number_meerkat=0,
+        number_meerkatplus=0,
+        max_baseline_km=1.5,
+        ids=[
+            "SKA001",
+            "SKA002",
+            "SKA003",
+            "SKA004",
+            "SKA005",
+            "SKA006",
+            "SKA007",
+            "SKA008",
+        ],  # fmt: skip
+    ),
 )
 
 # tests/tmdata/telescopes/ska_mid/basic_capabilities.json
@@ -321,14 +326,12 @@ MID_BASIC_CAPABILITIES = MidBasicCapabilities(
     elevation_limits=ElevationLimits(min_elevation_deg=15.0, max_elevation_deg=90.0),
 )
 
-# The capability sets as stored: keyed by name, with the receptors under the
-# file's own key, no telescope, and the array assembly that keys their
+# The capability sets as stored: keyed by name, with no telescope, and the array assembly that keys their
 # subarray templates (in the test tmdata, the same as the name)
 MID_CAPABILITY_SET_FILES = {
     capability_set.name: MidCapabilitySetFile(
-        dishes=capability_set.receptors,
         array_assembly=capability_set.name,
-        **capability_set.model_dump(exclude={"name", "telescope", "receptors"}),
+        **capability_set.model_dump(exclude={"name", "telescope"}),
     )
     for capability_set in (MID_AA1, MID_AA2)
 }

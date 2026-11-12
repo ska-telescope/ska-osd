@@ -57,8 +57,8 @@ Reading the data
    * - ``get_capability_sets(telescope)`` / ``get_capability_set(telescope, name)``
      - ``MidCapabilitySet`` / ``LowCapabilitySet``: one array assembly of a
        telescope, e.g. ``"AA2"``. Its zoom windows and beams are in its
-       ``modes``; Low's stations are in ``stations`` and its subarray beams in
-       ``station_beamforming``
+       ``modes``, its receptors in ``stations`` (Low) or ``dishes`` (Mid), and
+       Low's subarray beams in ``station_beamforming``
    * - ``get_basic_capabilities(telescope)``
      - ``MidBasicCapabilities`` / ``LowBasicCapabilities``: the
        ``frequency_bands`` (Mid's receiver bands; Low's one band and its

@@ -339,6 +339,11 @@ def test_get_osd_using_tmdata_serves_mid_modes_flat(tests_tmdata):
     assert capability_set["number_pss_beams"] == 0
     assert capability_set["ps_beam_bandwidth_hz"] == 400_000_000
     assert capability_set["number_pst_beams"] == 1
+    assert "dishes" not in capability_set
+    assert capability_set["number_ska_dishes"] == 8
+    assert capability_set["number_meerkat_dishes"] == 0
+    assert capability_set["max_baseline_km"] == 1.5
+    assert capability_set["number_dish_ids"][0] == "SKA001"
     assert capability_set["number_zoom_windows"] == 0
     assert capability_set["number_zoom_channels"] == 0
     assert "allowed_zoom_factors" not in capability_set

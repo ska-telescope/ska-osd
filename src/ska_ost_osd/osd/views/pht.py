@@ -138,6 +138,16 @@ class CycleCapabilitiesBase(ConfigurationModel):
                         "max_beams": capability_set.pop("number_vlbi_beams")
                     }
                 capability_set["modes"] = modes
+            if "number_ska_dishes" in capability_set:
+                capability_set["dishes"] = {
+                    "number_ska": capability_set.pop("number_ska_dishes"),
+                    "number_meerkat": capability_set.pop("number_meerkat_dishes"),
+                    "number_meerkatplus": capability_set.pop(
+                        "number_meerkatplus_dishes"
+                    ),
+                    "max_baseline_km": capability_set.pop("max_baseline_km"),
+                    "ids": capability_set.pop("receptors"),
+                }
             if "number_stations" in capability_set:
                 capability_set["stations"] = {
                     "number": capability_set.pop("number_stations"),
@@ -165,8 +175,8 @@ class CycleCapabilitiesBase(ConfigurationModel):
             capability_set["allowed_channel_width_values"] = capability_set[
                 "allowed_channel_width_values_hz"
             ]
-        # The PHT UI reads the modes, and Low's stations and station
-        # beamforming, flat under their old names
+        # The PHT UI reads the modes, the stations or dishes, and Low's
+        # station beamforming, flat under their old names
         modes = capability_set.pop("modes")
         capability_set["number_zoom_windows"] = modes["spectral"]["max_zoom_windows"]
         capability_set["number_zoom_channels"] = modes["spectral"]["max_zoom_channels"]
@@ -182,6 +192,13 @@ class CycleCapabilitiesBase(ConfigurationModel):
             capability_set["receptors"] = stations["ids"]
             capability_set["number_stations"] = stations["number"]
             capability_set["max_baseline_km"] = stations["max_baseline_km"]
+        if "dishes" in capability_set:
+            dishes = capability_set.pop("dishes")
+            capability_set["receptors"] = dishes["ids"]
+            capability_set["number_ska_dishes"] = dishes["number_ska"]
+            capability_set["number_meerkat_dishes"] = dishes["number_meerkat"]
+            capability_set["number_meerkatplus_dishes"] = dishes["number_meerkatplus"]
+            capability_set["max_baseline_km"] = dishes["max_baseline_km"]
         if "station_beamforming" in capability_set:
             station_beamforming = capability_set.pop("station_beamforming")
             capability_set["number_substations"] = station_beamforming[
