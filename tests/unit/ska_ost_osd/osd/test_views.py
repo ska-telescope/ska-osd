@@ -170,6 +170,7 @@ class TestGetCycleConfiguration:
         assert low["AA2"]["number_zoom_channels"] == 0
         assert low["AA2"]["allowed_zoom_factors"] == [1, 2, 4, 8]
         assert low["AA2"]["number_pss_beams"] == 0
+        assert low["AA2"]["ps_beam_bandwidth_hz"] == 75_000_000.0
         assert low["AA2"]["number_pst_beams"] == 1
         assert low["AA2"]["number_vlbi_beams"] == 0
         assert "station_beamforming" not in low["AA2"]

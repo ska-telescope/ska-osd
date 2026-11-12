@@ -124,7 +124,10 @@ class CycleCapabilitiesBase(ConfigurationModel):
                         "max_zoom_channels": capability_set.pop("number_zoom_channels"),
                         "zoom_factors": capability_set.pop("allowed_zoom_factors"),
                     },
-                    "pss": {"max_beams": capability_set.pop("number_pss_beams")},
+                    "pss": {
+                        "max_beams": capability_set.pop("number_pss_beams"),
+                        "beam_bandwidth_hz": capability_set.pop("ps_beam_bandwidth_hz"),
+                    },
                     "pst": {"max_beams": capability_set.pop("number_pst_beams")},
                     "vlbi": {"max_beams": capability_set.pop("number_vlbi_beams")},
                 }
@@ -160,6 +163,7 @@ class CycleCapabilitiesBase(ConfigurationModel):
             ]
             capability_set["allowed_zoom_factors"] = modes["spectral"]["zoom_factors"]
             capability_set["number_pss_beams"] = modes["pss"]["max_beams"]
+            capability_set["ps_beam_bandwidth_hz"] = modes["pss"]["beam_bandwidth_hz"]
             capability_set["number_pst_beams"] = modes["pst"]["max_beams"]
             capability_set["number_vlbi_beams"] = modes["vlbi"]["max_beams"]
             station_beamforming = capability_set.pop("station_beamforming")

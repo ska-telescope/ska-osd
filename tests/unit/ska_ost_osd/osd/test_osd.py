@@ -305,6 +305,7 @@ def test_get_osd_using_tmdata_serves_low_modes_flat(tests_tmdata):
     assert capability_set["number_zoom_channels"] == 0
     assert capability_set["allowed_zoom_factors"] == [1, 2, 4, 8]
     assert capability_set["number_pss_beams"] == 0
+    assert capability_set["ps_beam_bandwidth_hz"] == 75_000_000.0
     assert capability_set["number_pst_beams"] == 1
     assert capability_set["number_vlbi_beams"] == 0
     assert "station_beamforming" not in capability_set

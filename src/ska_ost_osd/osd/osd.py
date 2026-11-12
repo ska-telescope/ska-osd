@@ -308,6 +308,7 @@ class OSD:
             ]
             capability_set["allowed_zoom_factors"] = modes["spectral"]["zoom_factors"]
             capability_set["number_pss_beams"] = modes["pss"]["max_beams"]
+            capability_set["ps_beam_bandwidth_hz"] = modes["pss"]["beam_bandwidth_hz"]
             capability_set["number_pst_beams"] = modes["pst"]["max_beams"]
             capability_set["number_vlbi_beams"] = modes["vlbi"]["max_beams"]
             station_beamforming = capability_set.pop("station_beamforming")

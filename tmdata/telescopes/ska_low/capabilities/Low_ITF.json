@@ -22,7 +22,8 @@
       ]
     },
     "pss": {
-      "max_beams": 0
+      "max_beams": 0,
+      "beam_bandwidth_hz": 75000000.0
     },
     "pst": {
       "max_beams": 1
@@ -31,7 +32,6 @@
       "max_beams": 0
     }
   },
-  "ps_beam_bandwidth_hz": 75000000.0,
   "number_fsps": 6,
   "stations": [
     345,
