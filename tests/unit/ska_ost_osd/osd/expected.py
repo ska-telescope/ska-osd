@@ -25,6 +25,7 @@ from ska_ost_osd.osd.models.capabilities import (
     LowArrayAssemblyPSTMode,
     LowArrayAssemblySpectralMode,
     LowArrayAssemblyStations,
+    LowArrayAssemblySubarrayBeams,
     LowArrayAssemblyVLBIMode,
     LowBasicCapabilities,
     LowBasicContinuumMode,
@@ -34,7 +35,6 @@ from ska_ost_osd.osd.models.capabilities import (
     LowBasicSpectralMode,
     LowCapabilitySet,
     LowCBFMode,
-    LowStationBeamforming,
     MidArrayAssemblyDishes,
     MidArrayAssemblyModes,
     MidArrayAssemblyPSSMode,
@@ -339,7 +339,7 @@ MID_CAPABILITY_SET_FILES = {
 # tests/tmdata/telescopes/ska_low/capabilities/AA1.json and AA2.json
 LOW_AA1 = LowCapabilitySet(
     name="AA1",
-    station_beamforming=LowStationBeamforming(
+    subarray_beams=LowArrayAssemblySubarrayBeams(
         max_subarray_beams=1, max_substations_per_subarray_beam=0
     ),
     available_bandwidth_hz=75_000_000.0,
@@ -360,7 +360,7 @@ LOW_AA1 = LowCapabilitySet(
 
 LOW_AA2 = LowCapabilitySet(
     name="AA2",
-    station_beamforming=LowStationBeamforming(
+    subarray_beams=LowArrayAssemblySubarrayBeams(
         max_subarray_beams=8, max_substations_per_subarray_beam=512
     ),
     available_bandwidth_hz=75_000_000.0,

@@ -157,7 +157,7 @@ class CycleCapabilitiesBase(ConfigurationModel):
                     "ids": capability_set.pop("receptors"),
                 }
             if "number_substations" in capability_set:
-                capability_set["station_beamforming"] = {
+                capability_set["subarray_beams"] = {
                     "max_subarray_beams": capability_set.pop("number_subarray_beams"),
                     "max_substations_per_subarray_beam": capability_set.pop(
                         "number_substations"
@@ -178,7 +178,7 @@ class CycleCapabilitiesBase(ConfigurationModel):
                 "allowed_channel_width_values_hz"
             ]
         # The PHT UI reads the modes, the stations or dishes, and Low's
-        # station beamforming, flat under their old names
+        # subarray beams, flat under their old names
         modes = capability_set.pop("modes")
         capability_set["number_zoom_windows"] = modes["spectral"]["max_zoom_windows"]
         capability_set["number_zoom_channels"] = modes["spectral"]["max_zoom_channels"]
@@ -203,12 +203,12 @@ class CycleCapabilitiesBase(ConfigurationModel):
                 "number_meerkatplus_dishes"
             ]
             capability_set["max_baseline_km"] = dishes["max_baseline_km"]
-        if "station_beamforming" in capability_set:
-            station_beamforming = capability_set.pop("station_beamforming")
-            capability_set["number_substations"] = station_beamforming[
+        if "subarray_beams" in capability_set:
+            subarray_beams = capability_set.pop("subarray_beams")
+            capability_set["number_substations"] = subarray_beams[
                 "max_substations_per_subarray_beam"
             ]
-            capability_set["number_subarray_beams"] = station_beamforming[
+            capability_set["number_subarray_beams"] = subarray_beams[
                 "max_subarray_beams"
             ]
         data[self.capability_set.name] = capability_set

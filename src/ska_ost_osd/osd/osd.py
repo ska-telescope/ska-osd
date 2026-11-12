@@ -306,7 +306,7 @@ class OSD:
             capability_set["allowed_channel_width_values"] = capability_set[
                 "allowed_channel_width_values_hz"
             ]
-        # The modes, and Low's station beamforming, are served flat under
+        # The modes, and Low's subarray beams, are served flat under
         # their legacy names
         modes = capability_set.pop("modes")
         capability_set["number_zoom_windows"] = modes["spectral"]["max_zoom_windows"]
@@ -318,12 +318,12 @@ class OSD:
         capability_set["number_pst_beams"] = modes["pst"]["max_beams"]
         if "vlbi" in modes:
             capability_set["number_vlbi_beams"] = modes["vlbi"]["max_beams"]
-        if "station_beamforming" in capability_set:
-            station_beamforming = capability_set.pop("station_beamforming")
-            capability_set["number_substations"] = station_beamforming[
+        if "subarray_beams" in capability_set:
+            subarray_beams = capability_set.pop("subarray_beams")
+            capability_set["number_substations"] = subarray_beams[
                 "max_substations_per_subarray_beam"
             ]
-            capability_set["number_subarray_beams"] = station_beamforming[
+            capability_set["number_subarray_beams"] = subarray_beams[
                 "max_subarray_beams"
             ]
         array_assembly = capability_set.pop("array_assembly", None)

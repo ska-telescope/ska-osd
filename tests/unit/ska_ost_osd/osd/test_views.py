@@ -183,7 +183,7 @@ class TestGetCycleConfiguration:
         assert low["AA2"]["ps_beam_bandwidth_hz"] == 75_000_000.0
         assert low["AA2"]["number_pst_beams"] == 1
         assert low["AA2"]["number_vlbi_beams"] == 0
-        assert "station_beamforming" not in low["AA2"]
+        assert "subarray_beams" not in low["AA2"]
         assert low["AA2"]["number_subarray_beams"] == 8
         assert low["AA2"]["number_substations"] == 512
         assert "stations" not in low["AA2"]

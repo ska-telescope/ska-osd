@@ -10,9 +10,9 @@ from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
     LowArrayAssemblyModes,
     LowArrayAssemblyStations,
+    LowArrayAssemblySubarrayBeams,
     LowBasicCapabilities,
     LowCBFMode,
-    LowStationBeamforming,
     MidArrayAssemblyDishes,
     MidArrayAssemblyModes,
     MidBasicCapabilities,
@@ -74,7 +74,7 @@ class LowCapabilitySetFile(OSDBaseModel):
     # The array assembly whose subarray templates the capability set offers,
     # e.g. "AA2"; Low_ITF has none
     array_assembly: str | None = None
-    station_beamforming: LowStationBeamforming
+    subarray_beams: LowArrayAssemblySubarrayBeams
     cbf_modes: list[LowCBFMode]
     modes: LowArrayAssemblyModes
     stations: LowArrayAssemblyStations

@@ -256,7 +256,7 @@ class LowArrayAssemblyModes(OSDBaseModel):
     vlbi: LowArrayAssemblyVLBIMode
 
 
-class LowStationBeamforming(OSDBaseModel):
+class LowArrayAssemblySubarrayBeams(OSDBaseModel):
     """The subarray beams a Low capability set offers. Each subarray beam is
     formed from substations: whole stations (substation 0) or parts of
     stations."""
@@ -287,7 +287,7 @@ class LowCapabilitySet(OSDBaseModel):
     available_bandwidth_hz: float = Field(gt=0)
     number_fsps: int = Field(ge=0)
     telescope: Literal[Telescope.SKA_LOW] = Telescope.SKA_LOW
-    station_beamforming: LowStationBeamforming
+    subarray_beams: LowArrayAssemblySubarrayBeams
     cbf_modes: list[LowCBFMode]
     modes: LowArrayAssemblyModes
     stations: LowArrayAssemblyStations

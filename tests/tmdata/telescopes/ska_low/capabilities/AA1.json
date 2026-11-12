@@ -24,7 +24,7 @@
       "max_beams": 0
     }
   },
-  "station_beamforming": {
+  "subarray_beams": {
     "max_subarray_beams": 1,
     "max_substations_per_subarray_beam": 0
   },

@@ -70,7 +70,7 @@ Unreleased
   ``number_zoom_channels``,
   ``allowed_zoom_factors``, ``number_<mode>_beams`` and ``ps_beam_bandwidth_hz``;
   the ODT view serves ``number_pst_beams``. Low's subarray beams are in
-  ``station_beamforming``, as ``max_subarray_beams`` and
+  ``subarray_beams``, as ``max_subarray_beams`` and
   ``max_substations_per_subarray_beam``, which the legacy response and the views
   serve as ``number_subarray_beams`` and ``number_substations``
 * Moved each telescope's current tmdata files under ``telescopes/ska_low`` and
