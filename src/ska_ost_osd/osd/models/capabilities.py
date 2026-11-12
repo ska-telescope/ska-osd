@@ -83,24 +83,24 @@ class MidBasicCapabilities(OSDBaseModel):
         )
 
 
-class BeamformedMode(OSDBaseModel):
-    """The beams a capability set offers in one beamformed mode."""
+class MidCapabilitySetPSSMode(OSDBaseModel):
+    """The pulsar search beams a Mid capability set offers."""
 
-    max_beams: int = Field(ge=0, examples=[4])
+    max_beams: int = Field(ge=0, examples=[384])
+    beam_bandwidth_hz: float = Field(ge=0, examples=[400e6])
 
 
-class PSSMode(OSDBaseModel):
-    """The pulsar search beams a capability set offers."""
+class MidCapabilitySetPSTMode(OSDBaseModel):
+    """The pulsar timing beams a Mid capability set offers."""
 
-    max_beams: int = Field(ge=0, examples=[30])
-    beam_bandwidth_hz: float = Field(ge=0, examples=[118e6])
+    max_beams: int = Field(ge=0, examples=[6])
 
 
 class MidCapabilitySetModes(OSDBaseModel):
     """What a Mid capability set offers in each observing mode."""
 
-    pss: PSSMode
-    pst: BeamformedMode
+    pss: MidCapabilitySetPSSMode
+    pst: MidCapabilitySetPSTMode
 
 
 class MidCapabilitySet(OSDBaseModel):
@@ -199,13 +199,32 @@ class LowCapabilitySetSpectralMode(OSDBaseModel):
     zoom_factors: list[int] = Field(examples=[[1, 2, 4, 8]])
 
 
+class LowCapabilitySetPSSMode(OSDBaseModel):
+    """The pulsar search beams a Low capability set offers."""
+
+    max_beams: int = Field(ge=0, examples=[30])
+    beam_bandwidth_hz: float = Field(ge=0, examples=[118e6])
+
+
+class LowCapabilitySetPSTMode(OSDBaseModel):
+    """The pulsar timing beams a Low capability set offers."""
+
+    max_beams: int = Field(ge=0, examples=[4])
+
+
+class LowCapabilitySetVLBIMode(OSDBaseModel):
+    """The VLBI beams a Low capability set offers."""
+
+    max_beams: int = Field(ge=0, examples=[0])
+
+
 class LowCapabilitySetModes(OSDBaseModel):
     """What a Low capability set offers in each observing mode."""
 
     spectral: LowCapabilitySetSpectralMode
-    pss: PSSMode
-    pst: BeamformedMode
-    vlbi: BeamformedMode
+    pss: LowCapabilitySetPSSMode
+    pst: LowCapabilitySetPSTMode
+    vlbi: LowCapabilitySetVLBIMode
 
 
 class LowStationBeamforming(OSDBaseModel):
