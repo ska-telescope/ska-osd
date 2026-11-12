@@ -65,7 +65,7 @@ the current code does not read them.
 * `low_capabilities.json <https://confluence.skatelescope.org/pages/viewpage.action?spaceKey=SWSI&title=Observatory+Static+Data>`_
 
 Each telescope's basic capabilities are in its ``basic_capabilities.json``
-file: its ``frequency_bands`` (Mid's receiver bands; Low's one band) and its
+file: Mid's receiver bands as ``frequency_bands``, or Low's one ``frequency_band``, and its
 ``elevation_limits``, and for Low its ``coarse_channels`` and the channels each
 of its ``modes`` divides them into. Each of
 its capability sets is in its own file in ``capabilities``, named after the

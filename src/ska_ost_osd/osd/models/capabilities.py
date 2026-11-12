@@ -157,7 +157,7 @@ class LowBasicCapabilities(OSDBaseModel):
     """Low's frequency band, elevation limits, coarse channels and modes.
     tmdata: ``basic_capabilities``."""
 
-    frequency_bands: list[FrequencyBand]
+    frequency_band: FrequencyBand
     elevation_limits: ElevationLimits
     coarse_channels: CoarseChannels
     modes: LowModes

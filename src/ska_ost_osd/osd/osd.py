@@ -248,12 +248,13 @@ class OSD:
         capability_filepath = self.capability_filepaths[telescope]
         telescope_dir = posixpath.dirname(capability_filepath)
         stored = self.tmdata[capability_filepath].get_dict()
-        bands = stored["frequency_bands"]
-        if telescope == "low":
+        if telescope == "mid":
+            basic_capabilities = {"receiver_information": stored["frequency_bands"]}
+        else:
             # Low's band is also served with its coarse channels and the
             # channels each mode divides them into
             coarse_channels, modes = stored["coarse_channels"], stored["modes"]
-            bands[0] |= {
+            basic_capabilities = stored["frequency_band"] | {
                 "min_coarse_channel": coarse_channels["min"],
                 "max_coarse_channel": coarse_channels["max"],
                 "coarse_channel_width_hz": coarse_channels["width_hz"],
@@ -270,9 +271,6 @@ class OSD:
                     "channels_per_coarse_channel"
                 ],
             }
-        basic_capabilities = (
-            {"receiver_information": bands} if telescope == "mid" else bands[0]
-        )
         return {
             "basic_capabilities": basic_capabilities,
             **{

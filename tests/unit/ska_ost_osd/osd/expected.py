@@ -366,7 +366,7 @@ LOW_FREQUENCY_BAND = FrequencyBand(
 
 # tests/tmdata/telescopes/ska_low/basic_capabilities.json
 LOW_BASIC_CAPABILITIES = LowBasicCapabilities(
-    frequency_bands=[LOW_FREQUENCY_BAND],
+    frequency_band=LOW_FREQUENCY_BAND,
     elevation_limits=ElevationLimits(min_elevation_deg=45.0, max_elevation_deg=90.0),
     coarse_channels=CoarseChannels(min=64, max=447, width_hz=781_250.0),
     modes=LowModes(
