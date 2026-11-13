@@ -237,10 +237,10 @@ class LowDefaultsFile(OSDBaseModel):
 class CycleFile(OSDBaseModel):
     """Top-level model for a cycle file, cycles/<name>.json."""
 
-    id: str
+    cycle_id: str
     name: str
     description: str
-    number: int | None = Field(default=None, ge=0, examples=[1])
+    cycle_number: int | None = Field(default=None, ge=0, examples=[1])
     proposal_window: ProposalWindow
     proposal_policy: ProposalPolicy
     capabilities: dict[Telescope, TelescopeCapabilities] = Field(min_length=1)

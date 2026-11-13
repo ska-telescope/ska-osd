@@ -35,8 +35,8 @@ _LEGACY_TELESCOPE_NAMES = {
 # The legacy names of the cycle file fields, in the order the legacy response
 # serves them. A field not listed, such as name, is not served.
 _LEGACY_CYCLE_FIELD_NAMES = {
-    "number": "cycle_number",
-    "id": "cycle_id",
+    "cycle_number": "cycle_number",
+    "cycle_id": "cycle_id",
     "type": "type",
     "description": "cycle_description",
     "proposal_window": "cycle_information",
@@ -92,11 +92,11 @@ class OSD:
         }
 
     def cycle_filepaths(self) -> dict[int, str]:
-        """Return the TMData cycle file paths keyed by the ``number`` in each
+        """Return the TMData cycle file paths keyed by the ``cycle_number`` in each
         file, which the legacy OSD API looks cycles up by. A cycle without a
         number can't be selected."""
         numbers = (
-            (self.tmdata[path].get_dict().get("number"), path)
+            (self.tmdata[path].get_dict().get("cycle_number"), path)
             for path in get_cycle_paths(self.tmdata).values()
         )
         return dict(sorted((n, path) for n, path in numbers if n is not None))
@@ -162,7 +162,7 @@ class OSD:
         }
         cycle_definition["type"] = _LEGACY_TYPE_NAMES[cycle["type"]]
         cycle_definition["cycle_information"] = {
-            "cycle_id": cycle["id"],
+            "cycle_id": cycle["cycle_id"],
             "proposal_open": cycle["proposal_window"]["opens"],
             "proposal_close": cycle["proposal_window"]["closes"],
         }

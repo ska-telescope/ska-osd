@@ -47,10 +47,10 @@ class Cycle(OSDBaseModel):
     """One cycle: its metadata, proposal window and policy, and what it offers
     on each telescope."""
 
-    id: str
+    cycle_id: str
     name: str
     description: str
-    number: int | None = Field(default=None, ge=0, examples=[1])
+    cycle_number: int | None = Field(default=None, ge=0, examples=[1])
     proposal_window: ProposalWindow
     proposal_policy: ProposalPolicy
     capabilities: dict[Telescope, TelescopeCapabilities] = Field(min_length=1)

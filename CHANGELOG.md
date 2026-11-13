@@ -38,8 +38,8 @@ Unreleased
   ``stations`` or ``dishes``. Subarray templates and defaults are in
   ``subarray_templates/<array assembly>.json`` and ``defaults.json``. Low's ``AA2_SV``
   is now a policy on ``AA2``. The legacy files are kept but no longer read
-* [BREAKING] Cycles are files in ``tmdata/cycles`` with an ``id``, ``name``,
-  ``description``, optional ``number``, ``proposal_window``, ``proposal_policy`` and,
+* [BREAKING] Cycles are files in ``tmdata/cycles`` with a ``cycle_id``,
+  ``name``, ``description``, optional ``cycle_number``, ``proposal_window``, ``proposal_policy`` and,
   for each telescope, an ``array_assembly`` and the policy offered for each policy
   type
 * Added ``OSDRepository`` and ``TMDataRepository``, which read the OSD as Pydantic

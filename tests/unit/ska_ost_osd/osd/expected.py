@@ -94,10 +94,10 @@ from ska_ost_osd.osd.views.pht import (
 
 # tests/tmdata/cycles/TEST_SKAO_2027_Low_AA1_SV.json
 CYCLE_1 = Cycle(
-    id="TEST_SKAO_2027_Low_AA1_SV",
+    cycle_id="TEST_SKAO_2027_Low_AA1_SV",
     name="TEST SKAO 2027 Low AA1 SV",
     description="TEST Low AA1 Science Verification",
-    number=1,
+    cycle_number=1,
     proposal_window=ProposalWindow(
         opens=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
         closes=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
@@ -118,10 +118,10 @@ CYCLE_1 = Cycle(
 
 # tests/tmdata/cycles/TEST_SKAO_2027_AA2_Proposal.json
 CYCLE_2 = Cycle(
-    id="TEST_SKAO_2027_AA2_Proposal",
+    cycle_id="TEST_SKAO_2027_AA2_Proposal",
     name="TEST SKAO 2027 AA2 Proposal",
     description="TEST AA2 Proposal",
-    number=2,
+    cycle_number=2,
     proposal_window=ProposalWindow(
         opens=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
         closes=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
@@ -146,10 +146,10 @@ CYCLE_2 = Cycle(
 
 # tests/tmdata/cycles/TEST_SKAO_2027_Low_AA1_SV.json, as stored
 CYCLE_1_FILE = CycleFile(
-    id="TEST_SKAO_2027_Low_AA1_SV",
+    cycle_id="TEST_SKAO_2027_Low_AA1_SV",
     name="TEST SKAO 2027 Low AA1 SV",
     description="TEST Low AA1 Science Verification",
-    number=1,
+    cycle_number=1,
     proposal_window=ProposalWindow(
         opens=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
         closes=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
@@ -170,10 +170,10 @@ CYCLE_1_FILE = CycleFile(
 
 # tests/tmdata/cycles/TEST_SKAO_2027_AA2_Proposal.json, as stored
 CYCLE_2_FILE = CycleFile(
-    id="TEST_SKAO_2027_AA2_Proposal",
+    cycle_id="TEST_SKAO_2027_AA2_Proposal",
     name="TEST SKAO 2027 AA2 Proposal",
     description="TEST AA2 Proposal",
-    number=2,
+    cycle_number=2,
     proposal_window=ProposalWindow(
         opens=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
         closes=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),

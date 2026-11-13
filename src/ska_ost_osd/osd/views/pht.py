@@ -311,12 +311,12 @@ def _observatory_policy(
 ) -> ObservatoryPolicy:
     """The cycle, with the field names the PHT UI reads."""
     return ObservatoryPolicy(
-        cycle_number=cycle.number,
-        cycle_id=cycle.id,
+        cycle_number=cycle.cycle_number,
+        cycle_id=cycle.cycle_id,
         type=_TYPE_NAMES[policy_type],
         cycle_description=cycle.description,
         cycle_information=CycleInformation(
-            cycle_id=cycle.id,
+            cycle_id=cycle.cycle_id,
             proposal_open=cycle.proposal_window.opens,
             proposal_close=cycle.proposal_window.closes,
         ),

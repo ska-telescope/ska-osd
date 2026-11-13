@@ -1,8 +1,8 @@
 {
-  "id": "TEST_SKAO_2027_AA2_Proposal",
+  "cycle_id": "TEST_SKAO_2027_AA2_Proposal",
   "name": "TEST SKAO 2027 AA2 Proposal",
   "description": "TEST AA2 Proposal",
-  "number": 2,
+  "cycle_number": 2,
   "proposal_window": {
     "opens": "2026-03-27T12:00:00.000Z",
     "closes": "2027-04-01T15:00:00.000Z"

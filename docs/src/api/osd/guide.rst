@@ -92,7 +92,7 @@ Each file names what it describes in a field, so file names don't matter:
      - what a cycle holds back of an array assembly: only the fields it
        changes, such as ``AA2_SV``
    * - ``cycles/*.json``
-     - ``id``
+     - ``cycle_id``
      - a cycle: its proposal window and policy, and for each telescope its
        array assembly and the policy offered for each policy type
 
@@ -149,7 +149,7 @@ Pydantic models.
 Parameters             Description
 ===================    ============================================================
 tm_data                the TMData client to read the tmdata from
-cycle_id               the cycle's ``number``, an integer such as 0, 1, 2; a cycle
+cycle_id               the cycle's ``cycle_number``, an integer such as 0, 1, 2; a cycle
                        without a number can't be selected
 telescope              ``Telescope.SKA_MID`` or ``Telescope.SKA_LOW``; ``"mid"``
                        and ``"low"`` are still accepted
@@ -178,7 +178,7 @@ Response
 ======================    ============================================================================================================
 Keys                      Description
 ======================    ============================================================================================================
-observatory_policy        the cycle file whose ``number`` is ``cycle_id``, with the legacy field names
+observatory_policy        the cycle file whose ``cycle_number`` is ``cycle_id``, with the legacy field names
 telescope_capabilities    the name of what the selected cycle offers on each telescope (its policy), keyed ``Mid`` and ``Low``
 capabilities              key value pair of mid and low
 Mid                       ``basic_capabilities``, and the capabilities of each array assembly (AA0.5, AA1 etc) and policy a cycle offers, by name, of SKA-Mid
@@ -193,7 +193,7 @@ Scenarios
    ``basic_capabilities`` together with all of its named array assemblies. No
    ``observatory_policy`` is included, since no ``cycle_id`` was selected.
 
-2. With ``cycle_id``, it checks that a file in ``cycles`` has that ``number``, then selects
+2. With ``cycle_id``, it checks that a file in ``cycles`` has that ``cycle_number``, then selects
    what the cycle offers on each telescope. The cycle file is returned as ``observatory_policy``.
 
 3. With ``telescope``, it returns only that telescope; with ``array_assembly`` as
