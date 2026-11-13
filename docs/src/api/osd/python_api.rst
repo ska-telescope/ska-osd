@@ -60,9 +60,12 @@ Reading the data
        ``modes``, its receptors in ``stations`` (Low) or ``dishes`` (Mid), and
        Low's subarray beams in ``subarray_beams``
    * - ``get_basic_capabilities(telescope)``
-     - ``MidBasicCapabilities`` / ``LowBasicCapabilities``: the
-       ``frequency_bands`` (Mid's receiver bands; Low's one band and its
-       channels) and the ``elevation_limits``
+     - ``MidBasicCapabilities`` / ``LowBasicCapabilities``: what is fixed for
+       the telescope, whatever the array assembly. For Mid, its receiver
+       bands as ``frequency_bands`` and its ``elevation_limits``; for Low, its
+       one ``frequency_band``, its ``elevation_limits``, its
+       ``coarse_channels`` and, in ``modes``, how each observing mode divides
+       a coarse channel
    * - ``get_constraints(telescope)``
      - ``Constraints``: the elevation limits and the sun, moon and Jupiter
        avoidance angles
