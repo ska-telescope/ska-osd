@@ -21,103 +21,39 @@ Unreleased
 * Removed the ``fastapi``, ``astropy`` and ``simpleeval`` dependencies
 * [BREAKING] Renamed the ``Telescope`` members to ``SKA_MID`` and ``SKA_LOW``, with
   the values ``ska_mid`` and ``ska_low`` of the PDM's ``TelescopeType``. The
-  ``telescope`` of a capability set in the PHT view changes to match.
-  ``get_osd_using_tmdata`` still accepts ``"mid"`` and ``"low"``
-* [BREAKING] Renamed the subarray templates in ``subarray_template_library.json``
-  to start with ``SKA_MID_`` and ``SKA_LOW_``
-* [BREAKING] Define multiple cycles through a single TelModel backend in ``tmdata/cycles``
-* Each cycle file in ``tmdata/cycles`` may have any name. A cycle has a unique ``id``,
-  a ``name``, a ``description``, an optional unique ``number``, a ``proposal_window``,
-  a ``proposal_policy`` and ``capabilities``: for each telescope, keyed ``ska_low`` or
-  ``ska_mid``, its ``array_assembly`` and the policy offered for each policy type
-  (``science_verification``, ``shared_risk`` or ``standard_operations``). A policy,
-  in ``telescopes/<telescope>/policies``, is identified by its ``policy`` and sets only
-  what it changes
-  of the array assembly a cycle pairs it with; the repository returns the two
-  merged. Low's ``AA2_SV`` is now the ``AA2_SV`` policy applied to ``AA2``, which the
-  legacy response still serves as ``AA2_SV``.
-  [BREAKING] The ODT view serves only array assemblies, so it no longer lists Low's
-  ``AA2_SV``. The
-  legacy response and the PHT view serve a cycle offering one policy type, under the
-  old field names: ``cycle_id``, ``cycle_description``, ``cycle_number``, ``type``
-  (``Science Verification``, ``Shared Risk`` or ``Proposal``), ``cycle_information``
-  (the ``cycle_id`` and the proposal dates), ``cycle_policies`` (with
-  ``max_observing_hours`` as ``normal_max_hours``) and ``telescope_capabilities``
-  (keyed ``Mid`` and ``Low``).
-  ``get_osd_using_tmdata`` selects a cycle by its ``number``, so can't select one without
-* A cycle's ``cycle_number`` may be 0, for Cycle 0
-* [BREAKING] Users pass a TMData client to public API functions instead of OSD creating one from ``tmdata/version_mapping``
-* [BREAKING] Removed ``number_beams``, a duplicate of ``number_subarray_beams``, from
-  SKA-Low's capability sets, including in the legacy response and the PHT view
-* [BREAKING] Removed the duplicate ``coarse_channel_width`` from
-  ``low_capabilities.json``; use ``coarse_channel_width_hz``
-* [BREAKING] Removed the sun, moon and Jupiter avoidance angles from the capabilities
-  files; they are defined in ``mid_defaults.json`` and ``low_defaults.json``
-* Added a ``basic_capabilities.json`` for each telescope, holding its
-  receiver bands as ``frequency_bands`` (Mid) or its one ``frequency_band`` (Low), its
-  ``elevation_limits`` and, for Low, its ``coarse_channels`` and the channels each of
-  its ``modes`` divides them into. The legacy response and the views still serve Low's
-  coarse channels and channels per mode as fields of its band.
-  ``mid_capabilities.json`` and ``low_capabilities.json`` are kept for older releases
-  but are no longer read
-* Moved telescope capability sets to standalone tmdata files, one per array assembly,
-  in ``telescopes/<telescope>/array_assemblies``. Low's stations are in
-  ``stations``, as ``number_stations``, ``max_baseline_km`` and ``ids``, and Mid's
-  dishes in ``dishes``, as ``number_ska_dishes``, ``number_meerkat_dishes``,
-  ``number_meerkatplus_dishes``, ``max_baseline_km`` and ``ids``. The legacy response
-  serves these fields flat, with the IDs as ``number_station_ids`` or
-  ``number_dish_ids``; the views serve the IDs as ``receptors``. Mid's receivers are
-  listed as ``receivers``, served as ``available_receivers``.
-  Mid's channel widths are only stored as ``allowed_channel_width_values_hz``; the
-  legacy response and the PHT view also serve them as ``allowed_channel_width_values``.
-  Low's zoom windows are in ``modes.spectral``, as ``max_zoom_windows``,
-  ``max_zoom_channels`` (per window) and ``zoom_factors``, and its beams in
-  ``modes.pss``, ``modes.pst`` and ``modes.vlbi`` as ``max_beams``, with the pulsar
-  search beam bandwidth as ``modes.pss.beam_bandwidth_hz``; Mid's zoom windows and
-  beams are in its ``modes`` in the same way, without zoom factors. The legacy
-  response and the PHT view serve them as ``number_zoom_windows``,
-  ``number_zoom_channels``,
-  ``allowed_zoom_factors``, ``number_<mode>_beams`` and ``ps_beam_bandwidth_hz``;
-  the ODT view serves ``number_pst_beams``. Low's subarray beams are in
-  ``subarray_beams``, as ``max_subarray_beams`` and
-  ``max_substations_per_subarray_beam``, which the legacy response and the views
-  serve as ``number_subarray_beams`` and ``number_substations``
-* Moved each telescope's current tmdata files under ``telescopes/ska_low`` and
-  ``telescopes/ska_mid``, named by the ``Telescope`` values, with its defaults in
-  ``defaults.json``. The legacy files stay at their old paths for older releases and
-  for consumers that read them directly, including copies of ``mid_defaults.json``
-  and ``low_defaults.json``
-* Moved subarray templates to a tmdata file per telescope and array assembly; each
-  capability set names its ``array_assembly`` instead of template wildcard patterns
-* Each tmdata file names what it describes: a basic capabilities file its
-  ``telescope``, an array assembly file its ``array_assembly`` and a policy file its
-  ``policy``, so file names don't matter. ``Capabilities`` carry the same three
-  fields. Without ``process_templates``, the legacy response now gives the ITF capability
-  sets a template pattern (``*_Low_ITF``, ``*_Mid_ITF``), which matches no templates
-* [BREAKING] Removed ``ska_ost_osd.osd.template_mapping``; ``get_osd_using_tmdata``
-  reads each capability set's templates from its array assembly's file
-* The PHT views take ``include_subarray_templates`` to serve each capability set's
-  subarray templates, as ``get_osd_using_tmdata`` does with ``process_templates``
+  ``telescope`` the PHT view serves with each telescope's capabilities changes to
+  match. ``get_osd_using_tmdata`` still accepts ``"mid"`` and ``"low"``
+* [BREAKING] Users pass a TMData client to public API functions instead of OSD creating
+  one from ``tmdata/version_mapping``
+* [BREAKING] Restructured the tmdata under ``telescopes/ska_low`` and
+  ``telescopes/ska_mid``. Each file names what it describes, so file names don't
+  matter: ``basic_capabilities.json`` (``telescope``) holds what is fixed for the
+  telescope, ``array_assemblies/*.json`` (``array_assembly``) what each array assembly
+  offers, and ``policies/*.json`` (``policy``) only what a cycle changes of an array
+  assembly. Each observing mode's limits are under ``modes`` and the receptors under
+  ``stations`` or ``dishes``. Subarray templates and defaults are in
+  ``subarray_templates/<array assembly>.json`` and ``defaults.json``. Low's ``AA2_SV``
+  is now a policy on ``AA2``. The legacy files are kept but no longer read
+* [BREAKING] Cycles are files in ``tmdata/cycles`` with an ``id``, ``name``,
+  ``description``, optional ``number``, ``proposal_window``, ``proposal_policy`` and,
+  for each telescope, an ``array_assembly`` and the policy offered for each policy
+  type
+* Added ``OSDRepository`` and ``TMDataRepository``, which read the OSD as Pydantic
+  models. ``get_capabilities(telescope, array_assembly, policy_id=None)`` returns a
+  telescope's basic capabilities and array assembly with the policy applied, and
+  ``get_cycle_capabilities(cycle_id)`` what a cycle offers
+* Added ``ska_ost_osd.osd.views``, the ODT and PHT responses served by
+  ska-oso-services. [BREAKING] The ODT view lists array assemblies only, so no longer
+  includes Low's ``AA2_SV``
+* ``get_osd_using_tmdata`` keeps its response format, serving each cycle's policy as a
+  capability set named after it, and returns the complete catalogue for a query
+  without a cycle. [BREAKING] Removed Low's ``number_beams`` and
+  ``coarse_channel_width``, the avoidance angles from the capabilities, and
+  ``ska_ost_osd.osd.template_mapping``. The ITFs now have a template pattern that
+  matches no templates
 * Removed the unused semantic validation constants from ``tmdata/instrument``
-* ``get_osd_using_tmdata`` queries without a cycle now return the complete capability
-  catalogue
 * Removed ``osd-pre-release``, ``osd-tmdata-publish`` and ``release.sh``
 * Added proposal cycle data to the release-cycle version mapping.
-* Added Pydantic storage models for the tmdata files: ``MidDefaultsFile`` and
-  ``LowDefaultsFile``, ``CycleFile``
-  (``cycles/*.json``) and ``SubarrayTemplateLibraryFile``, in
-  ``ska_ost_osd.osd.adapters.tmdata.models``
-* ``Cycle`` reads when its proposal window ``opens`` and ``closes`` as timezone-aware
-  datetimes, a date without a timezone is rejected.
-* Added a test that validates the real tmdata files against these models
-* Added ``OSDRepository`` (``ska_ost_osd.osd.repository``), the interface for
-  reading cycles, capability sets, basic capabilities, constraints, defaults and
-  subarray templates as Pydantic models, and ``TMDataRepository``
-  (``ska_ost_osd.osd.adapters.tmdata``), which implements it over a TMData client
-* Added ``ska_ost_osd.osd.views``: the configuration ska-oso-services serves to the
-  ODT (``views.odt``) and the cycle data it serves to the PHT (``views.pht``), built
-  from an ``OSDRepository``. The views serialise with the names their consumers
-  read by default, without ``by_alias=True``
 * Raised the minimum pydantic version to 2.11, for ``serialize_by_alias``
 * Bump the build and runtime base images to ``ska-build-python-ubuntu26:1.1.2`` and
   ``ska-python-ubuntu26:1.1.2`` to pick up the OpenSSL DTLS retransmission fix
