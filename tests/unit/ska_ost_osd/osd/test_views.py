@@ -160,6 +160,13 @@ class TestGetCycleConfiguration:
         assert mid["AA2"]["ps_beam_bandwidth_hz"] == 400_000_000
         assert mid["AA2"]["number_pst_beams"] == 1
         assert "dishes" not in mid["AA2"]
+        assert "receivers" not in mid["AA2"]
+        assert mid["AA2"]["available_receivers"] == [
+            "Band_1",
+            "Band_2",
+            "Band_5a",
+            "Band_5b",
+        ]
         assert mid["AA2"]["number_ska_dishes"] == 8
         assert mid["AA2"]["max_baseline_km"] == 1.5
         assert mid["AA2"]["receptors"][0] == "SKA001"

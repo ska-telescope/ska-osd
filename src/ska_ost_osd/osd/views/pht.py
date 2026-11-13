@@ -138,6 +138,8 @@ class CycleCapabilitiesBase(ConfigurationModel):
                         "max_beams": capability_set.pop("number_vlbi_beams")
                     }
                 capability_set["modes"] = modes
+            if "available_receivers" in capability_set:
+                capability_set["receivers"] = capability_set.pop("available_receivers")
             if "number_ska_dishes" in capability_set:
                 capability_set["dishes"] = {
                     "number_ska_dishes": capability_set.pop("number_ska_dishes"),
@@ -172,6 +174,8 @@ class CycleCapabilitiesBase(ConfigurationModel):
     ) -> dict[str, Any]:
         data = handler(self)
         capability_set = data.pop("capability_set")
+        if "receivers" in capability_set:
+            capability_set["available_receivers"] = capability_set.pop("receivers")
         # The PHT UI reads Mid's channel widths without the _hz suffix
         if "allowed_channel_width_values_hz" in capability_set:
             capability_set["allowed_channel_width_values"] = capability_set[

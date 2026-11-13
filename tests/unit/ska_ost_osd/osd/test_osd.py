@@ -340,6 +340,13 @@ def test_get_osd_using_tmdata_serves_mid_modes_flat(tests_tmdata):
     assert capability_set["ps_beam_bandwidth_hz"] == 400_000_000
     assert capability_set["number_pst_beams"] == 1
     assert "dishes" not in capability_set
+    assert "receivers" not in capability_set
+    assert capability_set["available_receivers"] == [
+        "Band_1",
+        "Band_2",
+        "Band_5a",
+        "Band_5b",
+    ]
     assert capability_set["number_ska_dishes"] == 8
     assert capability_set["number_meerkat_dishes"] == 0
     assert capability_set["max_baseline_km"] == 1.5

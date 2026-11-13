@@ -46,7 +46,7 @@ class MidCapabilitySetFile(OSDBaseModel):
     allowed_channel_width_values_hz: list[int]
     allowed_channel_count_range_min: list[int]
     allowed_channel_count_range_max: list[int]
-    available_receivers: list[str]
+    receivers: list[str]
     cbf_modes: list[MidCBFMode]
     dishes: MidArrayAssemblyDishes
 

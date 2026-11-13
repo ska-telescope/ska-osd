@@ -58,7 +58,8 @@ Unreleased
   dishes in ``dishes``, as ``number_ska_dishes``, ``number_meerkat_dishes``,
   ``number_meerkatplus_dishes``, ``max_baseline_km`` and ``ids``. The legacy response
   serves these fields flat, with the IDs as ``number_station_ids`` or
-  ``number_dish_ids``; the views serve the IDs as ``receptors``.
+  ``number_dish_ids``; the views serve the IDs as ``receptors``. Mid's receivers are
+  listed as ``receivers``, served as ``available_receivers``.
   Mid's channel widths are only stored as ``allowed_channel_width_values_hz``; the
   legacy response and the PHT view also serve them as ``allowed_channel_width_values``.
   Low's zoom windows are in ``modes.spectral``, as ``max_zoom_windows``,

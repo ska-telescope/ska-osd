@@ -301,6 +301,8 @@ class OSD:
             ]
             capability_set["max_baseline_km"] = dishes["max_baseline_km"]
             capability_set["number_dish_ids"] = dishes["ids"]
+        if "receivers" in capability_set:
+            capability_set["available_receivers"] = capability_set.pop("receivers")
         # Mid's channel widths are also served without the _hz suffix
         if "allowed_channel_width_values_hz" in capability_set:
             capability_set["allowed_channel_width_values"] = capability_set[
