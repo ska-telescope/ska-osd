@@ -322,7 +322,7 @@ class OSD:
         if "number_stations" in receptors:
             capabilities["number_stations"] = receptors["number_stations"]
             capabilities["max_baseline_km"] = receptors["max_baseline_km"]
-            capabilities["number_station_ids"] = receptors["ids"]
+            capabilities["number_station_ids"] = receptors["receptor_ids"]
         else:
             capabilities["number_ska_dishes"] = receptors["number_ska_dishes"]
             capabilities["number_meerkat_dishes"] = receptors["number_meerkat_dishes"]
@@ -330,7 +330,7 @@ class OSD:
                 "number_meerkatplus_dishes"
             ]
             capabilities["max_baseline_km"] = receptors["max_baseline_km"]
-            capabilities["number_dish_ids"] = receptors["ids"]
+            capabilities["number_dish_ids"] = receptors["receptor_ids"]
         if "receivers" in capabilities:
             capabilities["available_receivers"] = capabilities.pop("receivers")
         # Mid's channel widths are also served without the _hz suffix

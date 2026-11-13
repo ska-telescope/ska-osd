@@ -116,7 +116,7 @@ class MidPolicyReceptors(OSDBaseModel):
     number_meerkat_dishes: int | None = Field(default=None, ge=0)
     number_meerkatplus_dishes: int | None = Field(default=None, ge=0)
     max_baseline_km: float | None = Field(default=None, gt=0)
-    ids: list[str] | None = None
+    receptor_ids: list[str] | None = None
 
 
 class MidPolicyFile(OSDBaseModel):
@@ -171,7 +171,7 @@ class LowPolicySubarrayBeams(OSDBaseModel):
 class LowPolicyReceptors(OSDBaseModel):
     number_stations: int | None = Field(default=None, ge=0)
     max_baseline_km: float | None = Field(default=None, gt=0)
-    ids: list[int] | None = None
+    receptor_ids: list[int] | None = None
 
 
 class LowPolicyFile(OSDBaseModel):

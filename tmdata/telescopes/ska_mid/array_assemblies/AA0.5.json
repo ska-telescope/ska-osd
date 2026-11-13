@@ -38,7 +38,7 @@
     "number_meerkat_dishes": 0,
     "number_meerkatplus_dishes": 0,
     "max_baseline_km": 1.5,
-    "ids": [
+    "receptor_ids": [
       "SKA001",
       "SKA036",
       "SKA077",

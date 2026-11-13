@@ -36,7 +36,7 @@
   "receptors": {
     "number_stations": 68,
     "max_baseline_km": 40.0,
-    "ids": [
+    "receptor_ids": [
       315,
       316,
       317,

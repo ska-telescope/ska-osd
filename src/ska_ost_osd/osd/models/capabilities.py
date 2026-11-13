@@ -121,15 +121,15 @@ class MidArrayAssemblyReceptors(OSDBaseModel):
     number_meerkat_dishes: int = Field(ge=0, examples=[4])
     number_meerkatplus_dishes: int = Field(ge=0, examples=[0])
     max_baseline_km: float = Field(gt=0, examples=[110.0])
-    ids: list[str] = Field(examples=[["SKA001", "SKA036"]])
+    receptor_ids: list[str] = Field(examples=[["SKA001", "SKA036"]])
 
     @model_validator(mode="after")
     def check_number_ska_dishes(self) -> Self:
-        ska_ids = [dish for dish in self.ids if dish.startswith("SKA")]
+        ska_ids = [dish for dish in self.receptor_ids if dish.startswith("SKA")]
         if self.number_ska_dishes != len(ska_ids):
             raise ValueError(
                 f"number_ska_dishes ({self.number_ska_dishes}) does not match the "
-                f"number of SKA dish ids ({len(ska_ids)})"
+                f"number of SKA dishes in receptor_ids ({len(ska_ids)})"
             )
         return self
 
@@ -307,14 +307,14 @@ class LowArrayAssemblyReceptors(OSDBaseModel):
 
     number_stations: int = Field(ge=0, examples=[68])
     max_baseline_km: float = Field(gt=0, examples=[40.0])
-    ids: list[int] = Field(examples=[[345, 350]])
+    receptor_ids: list[int] = Field(examples=[[345, 350]])
 
     @model_validator(mode="after")
     def check_number_stations(self) -> Self:
-        if self.number_stations != len(self.ids):
+        if self.number_stations != len(self.receptor_ids):
             raise ValueError(
                 f"number_stations ({self.number_stations}) does not match the "
-                f"number of station ids ({len(self.ids)})"
+                f"number of receptor_ids ({len(self.receptor_ids)})"
             )
         return self
 

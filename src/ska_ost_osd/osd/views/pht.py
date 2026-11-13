@@ -184,13 +184,13 @@ class CycleCapabilitiesBase(ConfigurationModel):
                         "number_meerkatplus_dishes"
                     ),
                     "max_baseline_km": capabilities.pop("max_baseline_km"),
-                    "ids": capabilities.pop("receptors"),
+                    "receptor_ids": capabilities.pop("receptors"),
                 }
             if "number_stations" in capabilities:
                 capabilities["receptors"] = {
                     "number_stations": capabilities.pop("number_stations"),
                     "max_baseline_km": capabilities.pop("max_baseline_km"),
-                    "ids": capabilities.pop("receptors"),
+                    "receptor_ids": capabilities.pop("receptors"),
                 }
             if "number_substations" in capabilities:
                 capabilities["subarray_beams"] = {
@@ -228,7 +228,7 @@ class CycleCapabilitiesBase(ConfigurationModel):
         if "vlbi" in modes:
             capabilities["number_vlbi_beams"] = modes["vlbi"]["max_beams"]
         receptors = capabilities.pop("receptors")
-        capabilities["receptors"] = receptors["ids"]
+        capabilities["receptors"] = receptors["receptor_ids"]
         if "number_stations" in receptors:
             capabilities["number_stations"] = receptors["number_stations"]
         else:

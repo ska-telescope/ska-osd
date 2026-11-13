@@ -298,7 +298,7 @@ MID_AA1 = MidCapabilities(
         number_meerkat_dishes=0,
         number_meerkatplus_dishes=0,
         max_baseline_km=1.5,
-        ids=["SKA001", "SKA002", "SKA003", "SKA004"],
+        receptor_ids=["SKA001", "SKA002", "SKA003", "SKA004"],
     ),
 )
 
@@ -324,7 +324,7 @@ MID_AA2 = MidCapabilities(
         number_meerkat_dishes=0,
         number_meerkatplus_dishes=0,
         max_baseline_km=1.5,
-        ids=[
+        receptor_ids=[
             "SKA001",
             "SKA002",
             "SKA003",
@@ -413,7 +413,7 @@ LOW_AA1 = LowCapabilities(
         vlbi=LowVLBIMode(max_beams=0),
     ),
     receptors=LowArrayAssemblyReceptors(
-        number_stations=4, max_baseline_km=3.0, ids=[345, 346, 347, 348]
+        number_stations=4, max_baseline_km=3.0, receptor_ids=[345, 346, 347, 348]
     ),
 )
 
@@ -448,7 +448,7 @@ LOW_AA2 = LowCapabilities(
     receptors=LowArrayAssemblyReceptors(
         number_stations=8,
         max_baseline_km=6.0,
-        ids=[345, 346, 347, 348, 349, 350, 351, 352],
+        receptor_ids=[345, 346, 347, 348, 349, 350, 351, 352],
     ),
 )
 
