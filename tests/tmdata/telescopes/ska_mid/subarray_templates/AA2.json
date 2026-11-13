@@ -3,7 +3,7 @@
     {
       "name": "SKA_MID_FULL_AA2",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "SKA001",
         "SKA002",
         "SKA003",

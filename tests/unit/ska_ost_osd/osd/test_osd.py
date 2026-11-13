@@ -215,6 +215,30 @@ def test_get_osd_data_processes_templates(tests_tmdata):
     )
 
 
+def test_get_osd_using_tmdata_serves_templates_in_legacy_shape(tests_tmdata):
+    """Processed templates are keyed by name, with their receptor IDs served
+    as custom_stations, one comma-separated string."""
+    osd_data = get_osd_using_tmdata(
+        tests_tmdata,
+        telescope=Telescope.SKA_LOW,
+        array_assembly="AA2",
+        process_templates=True,
+    )
+
+    assert osd_data["capabilities"]["low"]["AA2"]["subarray_templates"] == {
+        "SKA_LOW_FULL_AA2": {
+            "subarray_type": "AA2",
+            "custom_stations": "",
+            "description": "TEST full Low AA2 array.",
+        },
+        "SKA_LOW_TEST_AA2": {
+            "subarray_type": "custom",
+            "custom_stations": "S8-1,S8-2,S8-3,S8-4",
+            "description": "TEST Low AA2 subset of stations.",
+        },
+    }
+
+
 @pytest.fixture
 def failing_tmdata(tests_tmdata_source, monkeypatch):
     """TMData fixture that fails on item access to simulate CAR backend errors."""

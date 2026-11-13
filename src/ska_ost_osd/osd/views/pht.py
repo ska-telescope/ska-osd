@@ -287,7 +287,7 @@ def _subarray_templates(
     return {
         template.name: CycleSubarrayTemplate(
             subarray_type=template.subarray_type,
-            custom_stations=",".join(template.custom_stations),
+            custom_stations=",".join(template.receptor_ids),
             description=template.description,
         )
         for template in repository.get_subarray_templates(telescope, array_assembly)

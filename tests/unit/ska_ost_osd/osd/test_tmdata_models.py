@@ -447,20 +447,20 @@ class TestSubarrayTemplates:
             SubarrayTemplateLibraryFile.model_validate(data)
 
     @pytest.mark.parametrize(
-        "custom, stations, message",
+        "custom, receptor_ids, message",
         [
-            (True, [], "lists no custom_stations"),
-            (False, ["SKA001"], "only custom templates list custom_stations"),
+            (True, [], "lists no receptor_ids"),
+            (False, ["SKA001"], "only custom templates list receptor_ids"),
         ],
-        ids=["custom without stations", "stations on a non-custom template"],
+        ids=["custom without receptors", "receptors on a non-custom template"],
     )
-    def test_only_custom_templates_list_stations(self, custom, stations, message):
-        """Custom templates, and only those, list their stations."""
+    def test_only_custom_templates_list_receptors(self, custom, receptor_ids, message):
+        """Custom templates, and only those, list their receptors."""
         data = load(SUBARRAY_TEMPLATES)
         stored = next(
             t for t in data["templates"] if (t["subarray_type"] == "custom") == custom
         )
-        stored["custom_stations"] = stations
+        stored["receptor_ids"] = receptor_ids
 
         with pytest.raises(ValidationError, match=message):
             SubarrayTemplateLibraryFile.model_validate(data)

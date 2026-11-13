@@ -3,13 +3,13 @@
     {
       "name": "SKA_LOW_FULL_AASTAR",
       "subarray_type": "AA*",
-      "custom_stations": [],
+      "receptor_ids": [],
       "description": "Full SKA-Low array, AA* release."
     },
     {
       "name": "SKA_LOW_INNER_R350M_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C1",
         "C10",
         "C100",
@@ -153,7 +153,7 @@
     {
       "name": "SKA_LOW_INNER_R700M_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C1",
         "C10",
         "C100",
@@ -364,7 +364,7 @@
     {
       "name": "SKA_LOW_INNER_R1KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C1",
         "C10",
         "C100",
@@ -585,7 +585,7 @@
     {
       "name": "SKA_LOW_INNER_R1.5KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C1",
         "C10",
         "C100",
@@ -814,7 +814,7 @@
     {
       "name": "SKA_LOW_INNER_R3KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C1",
         "C10",
         "C100",
@@ -1052,7 +1052,7 @@
     {
       "name": "SKA_LOW_INNER_R6KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C1",
         "C10",
         "C100",
@@ -1304,7 +1304,7 @@
     {
       "name": "SKA_LOW_INNER_R10KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C1",
         "C10",
         "C100",
@@ -1582,7 +1582,7 @@
     {
       "name": "SKA_LOW_INNER_R12KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C1",
         "C10",
         "C100",
@@ -1860,7 +1860,7 @@
     {
       "name": "SKA_LOW_INNER_R24KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C10",
         "C100",
         "C101",
@@ -2149,7 +2149,7 @@
     {
       "name": "SKA_LOW_OUTER_R350M_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C133",
         "C138",
         "C141",
@@ -2326,7 +2326,7 @@
     {
       "name": "SKA_LOW_OUTER_R700M_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "E10-1",
         "E10-2",
         "E10-3",
@@ -2436,7 +2436,7 @@
     {
       "name": "SKA_LOW_OUTER_R1KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "E10-1",
         "E10-2",
         "E10-3",
@@ -2536,7 +2536,7 @@
     {
       "name": "SKA_LOW_OUTER_R1.5KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "E10-1",
         "E10-2",
         "E10-3",
@@ -2628,7 +2628,7 @@
     {
       "name": "SKA_LOW_OUTER_R3KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "E10-1",
         "E10-2",
         "E10-3",
@@ -2711,7 +2711,7 @@
     {
       "name": "SKA_LOW_OUTER_R6KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "E10-1",
         "E10-2",
         "E10-3",
@@ -2780,7 +2780,7 @@
     {
       "name": "SKA_LOW_OUTER_R10KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "E13-1",
         "E13-2",
         "E13-3",
@@ -2823,7 +2823,7 @@
     {
       "name": "SKA_LOW_OUTER_R12KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "E12-1",
         "E12-2",
         "E12-3",
@@ -2884,7 +2884,7 @@
     {
       "name": "SKA_LOW_OUTER_R24KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C1",
         "E15-1",
         "E15-2",
@@ -2916,7 +2916,7 @@
     {
       "name": "SKA_LOW_INNER_400M_SPARSE_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C1",
         "C10",
         "C103",
@@ -2974,7 +2974,7 @@
     {
       "name": "SKA_LOW_REDUCED_INNER_400M_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C100",
         "C101",
         "C102",
@@ -3237,7 +3237,7 @@
     {
       "name": "SKA_LOW_REMOTE_PHASED_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "S13-1",
         "S13-2",
         "S13-3",
@@ -3248,7 +3248,7 @@
     {
       "name": "SKA_LOW_REMOTE_SINGLE_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "S13-1"
       ],
       "description": "Single remote station for shortest VLBI baseline."
@@ -3256,7 +3256,7 @@
     {
       "name": "SKA_LOW_CORE_SPLIT5_1_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C1",
         "C10",
         "C113",
@@ -3302,7 +3302,7 @@
     {
       "name": "SKA_LOW_CORE_SPLIT5_2_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C100",
         "C103",
         "C104",
@@ -3348,7 +3348,7 @@
     {
       "name": "SKA_LOW_CORE_SPLIT5_3_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C101",
         "C102",
         "C109",
@@ -3394,7 +3394,7 @@
     {
       "name": "SKA_LOW_CORE_SPLIT5_4_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C110",
         "C124",
         "C125",
@@ -3440,7 +3440,7 @@
     {
       "name": "SKA_LOW_CORE_SPLIT5_5_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C108",
         "C112",
         "C117",
@@ -3486,7 +3486,7 @@
     {
       "name": "SKA_LOW_SPLIT16_1_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C1",
         "C104",
         "C111",
@@ -3512,7 +3512,7 @@
     {
       "name": "SKA_LOW_SPLIT16_2_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C100",
         "C128",
         "C13",
@@ -3538,7 +3538,7 @@
     {
       "name": "SKA_LOW_SPLIT16_3_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C125",
         "C132",
         "C137",
@@ -3564,7 +3564,7 @@
     {
       "name": "SKA_LOW_SPLIT16_4_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C103",
         "C143",
         "C16",
@@ -3590,7 +3590,7 @@
     {
       "name": "SKA_LOW_SPLIT16_5_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C123",
         "C164",
         "C190",
@@ -3616,7 +3616,7 @@
     {
       "name": "SKA_LOW_SPLIT16_6_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C102",
         "C11",
         "C12",
@@ -3642,7 +3642,7 @@
     {
       "name": "SKA_LOW_SPLIT16_7_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C10",
         "C105",
         "C114",
@@ -3668,7 +3668,7 @@
     {
       "name": "SKA_LOW_SPLIT16_8_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C101",
         "C106",
         "C145",
@@ -3694,7 +3694,7 @@
     {
       "name": "SKA_LOW_SPLIT16_9_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C133",
         "C135",
         "C148",
@@ -3720,7 +3720,7 @@
     {
       "name": "SKA_LOW_SPLIT16_10_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C119",
         "C129",
         "C173",
@@ -3746,7 +3746,7 @@
     {
       "name": "SKA_LOW_SPLIT16_11_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C107",
         "C108",
         "C158",
@@ -3772,7 +3772,7 @@
     {
       "name": "SKA_LOW_SPLIT16_12_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C130",
         "C155",
         "C168",
@@ -3798,7 +3798,7 @@
     {
       "name": "SKA_LOW_SPLIT16_13_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C112",
         "C115",
         "C144",
@@ -3824,7 +3824,7 @@
     {
       "name": "SKA_LOW_SPLIT16_14_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C138",
         "C142",
         "C147",
@@ -3850,7 +3850,7 @@
     {
       "name": "SKA_LOW_SPLIT16_15_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C110",
         "C124",
         "C15",
@@ -3876,7 +3876,7 @@
     {
       "name": "SKA_LOW_SPLIT16_16_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C109",
         "C113",
         "C117",
@@ -3902,7 +3902,7 @@
     {
       "name": "SKA_LOW_SPLIT8_1_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C1",
         "C104",
         "C111",
@@ -3947,7 +3947,7 @@
     {
       "name": "SKA_LOW_SPLIT8_2_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C100",
         "C119",
         "C128",
@@ -3992,7 +3992,7 @@
     {
       "name": "SKA_LOW_SPLIT8_3_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C107",
         "C108",
         "C125",
@@ -4037,7 +4037,7 @@
     {
       "name": "SKA_LOW_SPLIT8_4_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C103",
         "C130",
         "C143",
@@ -4082,7 +4082,7 @@
     {
       "name": "SKA_LOW_SPLIT8_5_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C112",
         "C115",
         "C123",
@@ -4127,7 +4127,7 @@
     {
       "name": "SKA_LOW_SPLIT8_6_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C102",
         "C11",
         "C12",
@@ -4172,7 +4172,7 @@
     {
       "name": "SKA_LOW_SPLIT8_7_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C10",
         "C105",
         "C110",
@@ -4217,7 +4217,7 @@
     {
       "name": "SKA_LOW_SPLIT8_8_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C101",
         "C106",
         "C109",
@@ -4262,7 +4262,7 @@
     {
       "name": "SKA_LOW_SPLIT4_1_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C100",
         "C11",
         "C119",
@@ -4345,7 +4345,7 @@
     {
       "name": "SKA_LOW_SPLIT4_2_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C10",
         "C102",
         "C107",
@@ -4428,7 +4428,7 @@
     {
       "name": "SKA_LOW_SPLIT4_3_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C103",
         "C105",
         "C109",
@@ -4511,7 +4511,7 @@
     {
       "name": "SKA_LOW_SPLIT4_4_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C1",
         "C101",
         "C104",
@@ -4594,7 +4594,7 @@
     {
       "name": "SKA_LOW_SPLIT2_1_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C10",
         "C100",
         "C101",
@@ -4754,7 +4754,7 @@
     {
       "name": "SKA_LOW_SPLIT2_2_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C1",
         "C105",
         "C106",
@@ -4914,7 +4914,7 @@
     {
       "name": "SKA_LOW_4STAT_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "C11",
         "C38",
         "C41",

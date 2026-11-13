@@ -563,7 +563,7 @@ LOW_CONSTRAINTS = Constraints(
 MID_FULL_AA2_TEMPLATE = SubarrayTemplate(
     name="SKA_MID_FULL_AA2",
     subarray_type=SubarrayType.CUSTOM,
-    custom_stations=[
+    receptor_ids=[
         "SKA001",
         "SKA002",
         "SKA003",
@@ -578,19 +578,19 @@ MID_FULL_AA2_TEMPLATE = SubarrayTemplate(
 LOW_TEST_AA1_TEMPLATE = SubarrayTemplate(
     name="SKA_LOW_TEST_AA1",
     subarray_type=SubarrayType.CUSTOM,
-    custom_stations=["S8-1", "S8-2"],
+    receptor_ids=["S8-1", "S8-2"],
     description="TEST Low AA1 subset of stations.",
 )
 LOW_FULL_AA2_TEMPLATE = SubarrayTemplate(
     name="SKA_LOW_FULL_AA2",
     subarray_type=SubarrayType.AA2,
-    custom_stations=[],
+    receptor_ids=[],
     description="TEST full Low AA2 array.",
 )
 LOW_TEST_AA2_TEMPLATE = SubarrayTemplate(
     name="SKA_LOW_TEST_AA2",
     subarray_type=SubarrayType.CUSTOM,
-    custom_stations=["S8-1", "S8-2", "S8-3", "S8-4"],
+    receptor_ids=["S8-1", "S8-2", "S8-3", "S8-4"],
     description="TEST Low AA2 subset of stations.",
 )
 

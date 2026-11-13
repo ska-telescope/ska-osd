@@ -21,13 +21,13 @@ class SubarrayTemplate(OSDBaseModel):
 
     name: str = Field(examples=["SKA_MID_FULL_AA2"])
     subarray_type: SubarrayType
-    custom_stations: list[str] = Field(examples=[["SKA001", "SKA013"]])
+    receptor_ids: list[str] = Field(examples=[["SKA001", "SKA013"]])
     description: str
 
     @model_validator(mode="after")
-    def check_custom_stations(self) -> Self:
-        if self.subarray_type == SubarrayType.CUSTOM and not self.custom_stations:
-            raise ValueError(f"{self.name}: a custom template lists no custom_stations")
-        if self.subarray_type != SubarrayType.CUSTOM and self.custom_stations:
-            raise ValueError(f"{self.name}: only custom templates list custom_stations")
+    def check_receptor_ids(self) -> Self:
+        if self.subarray_type == SubarrayType.CUSTOM and not self.receptor_ids:
+            raise ValueError(f"{self.name}: a custom template lists no receptor_ids")
+        if self.subarray_type != SubarrayType.CUSTOM and self.receptor_ids:
+            raise ValueError(f"{self.name}: only custom templates list receptor_ids")
         return self

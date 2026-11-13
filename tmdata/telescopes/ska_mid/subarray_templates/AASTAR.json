@@ -3,7 +3,7 @@
     {
       "name": "SKA_MID_FULL_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M000",
         "M001",
         "M002",
@@ -153,13 +153,13 @@
     {
       "name": "SKA_MID_FULL_AASTAR_WITH_SKA008",
       "subarray_type": "AA*",
-      "custom_stations": [],
+      "receptor_ids": [],
       "description": "Full SKA-Low array, AA4 release (including SKA008)."
     },
     {
       "name": "SKA_MID_13.5M_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M000",
         "M001",
         "M002",
@@ -230,7 +230,7 @@
     {
       "name": "SKA_MID_15M_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "SKA001",
         "SKA013",
         "SKA014",
@@ -316,7 +316,7 @@
     {
       "name": "SKA_MID_INNER_R125M_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M000",
         "M001",
         "M002",
@@ -338,7 +338,7 @@
     {
       "name": "SKA_MID_15M_INNER_R125M_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "SKA049",
         "SKA050",
         "SKA075",
@@ -351,7 +351,7 @@
     {
       "name": "SKA_MID_INNER_R250M_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M000",
         "M001",
         "M002",
@@ -393,7 +393,7 @@
     {
       "name": "SKA_MID_15M_INNER_R250M_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "SKA042",
         "SKA046",
         "SKA048",
@@ -415,7 +415,7 @@
     {
       "name": "SKA_MID_INNER_R500M_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M000",
         "M001",
         "M002",
@@ -483,7 +483,7 @@
     {
       "name": "SKA_MID_15M_INNER_R500M_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "SKA039",
         "SKA041",
         "SKA042",
@@ -512,7 +512,7 @@
     {
       "name": "SKA_MID_INNER_R1KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M000",
         "M001",
         "M002",
@@ -601,7 +601,7 @@
     {
       "name": "SKA_MID_15M_INNER_R1KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "SKA001",
         "SKA033",
         "SKA035",
@@ -645,7 +645,7 @@
     {
       "name": "SKA_MID_INNER_R2KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M000",
         "M001",
         "M002",
@@ -751,7 +751,7 @@
     {
       "name": "SKA_MID_15M_INNER_R2KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "SKA001",
         "SKA028",
         "SKA029",
@@ -804,7 +804,7 @@
     {
       "name": "SKA_MID_INNER_R4KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M000",
         "M001",
         "M002",
@@ -929,7 +929,7 @@
     {
       "name": "SKA_MID_15M_INNER_R4KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "SKA001",
         "SKA024",
         "SKA026",
@@ -992,7 +992,7 @@
     {
       "name": "SKA_MID_INNER_R8KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M000",
         "M001",
         "M002",
@@ -1127,7 +1127,7 @@
     {
       "name": "SKA_MID_15M_INNER_R8KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "SKA001",
         "SKA018",
         "SKA020",
@@ -1198,7 +1198,7 @@
     {
       "name": "SKA_MID_INNER_R10KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M000",
         "M001",
         "M002",
@@ -1336,7 +1336,7 @@
     {
       "name": "SKA_MID_15M_INNER_R10KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "SKA001",
         "SKA017",
         "SKA018",
@@ -1410,7 +1410,7 @@
     {
       "name": "SKA_MID_INNER_R16KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M000",
         "M001",
         "M002",
@@ -1555,7 +1555,7 @@
     {
       "name": "SKA_MID_INNER_R20KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M000",
         "M001",
         "M002",
@@ -1703,7 +1703,7 @@
     {
       "name": "SKA_MID_INNER_R32KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M000",
         "M001",
         "M002",
@@ -1853,7 +1853,7 @@
     {
       "name": "SKA_MID_OUTER_R125M_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M007",
         "M008",
         "M009",
@@ -1988,7 +1988,7 @@
     {
       "name": "SKA_MID_15M_OUTER_R125M_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "SKA001",
         "SKA013",
         "SKA014",
@@ -2068,7 +2068,7 @@
     {
       "name": "SKA_MID_OUTER_R250M_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M008",
         "M010",
         "M013",
@@ -2183,7 +2183,7 @@
     {
       "name": "SKA_MID_15M_OUTER_R250M_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "SKA001",
         "SKA013",
         "SKA014",
@@ -2254,7 +2254,7 @@
     {
       "name": "SKA_MID_OUTER_R500M_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M032",
         "M033",
         "M040",
@@ -2343,7 +2343,7 @@
     {
       "name": "SKA_MID_15M_OUTER_R500M_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "SKA001",
         "SKA013",
         "SKA014",
@@ -2407,7 +2407,7 @@
     {
       "name": "SKA_MID_OUTER_R1KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M033",
         "M044",
         "M045",
@@ -2475,7 +2475,7 @@
     {
       "name": "SKA_MID_15M_OUTER_R1KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "SKA013",
         "SKA014",
         "SKA015",
@@ -2524,7 +2524,7 @@
     {
       "name": "SKA_MID_OUTER_R2KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M046",
         "M048",
         "M049",
@@ -2575,7 +2575,7 @@
     {
       "name": "SKA_MID_15M_OUTER_R2KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "SKA013",
         "SKA014",
         "SKA015",
@@ -2615,7 +2615,7 @@
     {
       "name": "SKA_MID_OUTER_R4KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M048",
         "M058",
         "SKA013",
@@ -2647,7 +2647,7 @@
     {
       "name": "SKA_MID_15M_OUTER_R4KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "SKA013",
         "SKA014",
         "SKA015",
@@ -2677,7 +2677,7 @@
     {
       "name": "SKA_MID_OUTER_R8KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "SKA013",
         "SKA014",
         "SKA015",
@@ -2699,7 +2699,7 @@
     {
       "name": "SKA_MID_15M_OUTER_R8KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "SKA013",
         "SKA014",
         "SKA015",
@@ -2721,7 +2721,7 @@
     {
       "name": "SKA_MID_OUTER_R10KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "SKA013",
         "SKA014",
         "SKA015",
@@ -2740,7 +2740,7 @@
     {
       "name": "SKA_MID_15M_OUTER_R10KM_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "SKA013",
         "SKA014",
         "SKA015",
@@ -2759,7 +2759,7 @@
     {
       "name": "SKA_MID_REMOTE_SINGLE_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "SKA008"
       ],
       "description": "Single remote station for shortest VLBI baseline (SKA008)."
@@ -2767,7 +2767,7 @@
     {
       "name": "SKA_MID_SPLIT2_1_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M000",
         "M003",
         "M005",
@@ -2845,7 +2845,7 @@
     {
       "name": "SKA_MID_SPLIT2_2_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M001",
         "M002",
         "M004",
@@ -2923,7 +2923,7 @@
     {
       "name": "SKA_MID_SPLIT4_1_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M003",
         "M006",
         "M013",
@@ -2965,7 +2965,7 @@
     {
       "name": "SKA_MID_SPLIT4_2_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M007",
         "M009",
         "M014",
@@ -3008,7 +3008,7 @@
     {
       "name": "SKA_MID_SPLIT4_3_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M000",
         "M005",
         "M008",
@@ -3051,7 +3051,7 @@
     {
       "name": "SKA_MID_SPLIT4_4_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M001",
         "M002",
         "M004",
@@ -3094,7 +3094,7 @@
     {
       "name": "SKA_MID_SPLIT8_1_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M003",
         "M013",
         "M022",
@@ -3118,7 +3118,7 @@
     {
       "name": "SKA_MID_SPLIT8_2_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M014",
         "M023",
         "M029",
@@ -3143,7 +3143,7 @@
     {
       "name": "SKA_MID_SPLIT8_3_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M005",
         "M019",
         "M028",
@@ -3168,7 +3168,7 @@
     {
       "name": "SKA_MID_SPLIT8_4_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M001",
         "M004",
         "M018",
@@ -3193,7 +3193,7 @@
     {
       "name": "SKA_MID_SPLIT8_5_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M006",
         "M020",
         "M021",
@@ -3218,7 +3218,7 @@
     {
       "name": "SKA_MID_SPLIT8_6_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M007",
         "M009",
         "M015",
@@ -3243,7 +3243,7 @@
     {
       "name": "SKA_MID_SPLIT8_7_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M000",
         "M008",
         "M011",
@@ -3268,7 +3268,7 @@
     {
       "name": "SKA_MID_SPLIT8_8_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M002",
         "M010",
         "M012",
@@ -3293,7 +3293,7 @@
     {
       "name": "SKA_MID_SPLIT16_1_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M013",
         "M035",
         "M043",
@@ -3308,7 +3308,7 @@
     {
       "name": "SKA_MID_SPLIT16_2_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M014",
         "M034",
         "M049",
@@ -3323,7 +3323,7 @@
     {
       "name": "SKA_MID_SPLIT16_3_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M019",
         "M031",
         "M047",
@@ -3338,7 +3338,7 @@
     {
       "name": "SKA_MID_SPLIT16_4_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M018",
         "M030",
         "M032",
@@ -3354,7 +3354,7 @@
     {
       "name": "SKA_MID_SPLIT16_5_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M020",
         "M053",
         "M061",
@@ -3370,7 +3370,7 @@
     {
       "name": "SKA_MID_SPLIT16_6_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M015",
         "M027",
         "M033",
@@ -3387,7 +3387,7 @@
     {
       "name": "SKA_MID_SPLIT16_7_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M000",
         "M016",
         "M025",
@@ -3404,7 +3404,7 @@
     {
       "name": "SKA_MID_SPLIT16_8_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M002",
         "M017",
         "M024",
@@ -3420,7 +3420,7 @@
     {
       "name": "SKA_MID_SPLIT16_9_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M003",
         "M022",
         "M042",
@@ -3436,7 +3436,7 @@
     {
       "name": "SKA_MID_SPLIT16_10_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M023",
         "M029",
         "M041",
@@ -3452,7 +3452,7 @@
     {
       "name": "SKA_MID_SPLIT16_11_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M005",
         "M028",
         "M040",
@@ -3468,7 +3468,7 @@
     {
       "name": "SKA_MID_SPLIT16_12_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M001",
         "M004",
         "M026",
@@ -3484,7 +3484,7 @@
     {
       "name": "SKA_MID_SPLIT16_13_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M006",
         "M021",
         "M038",
@@ -3500,7 +3500,7 @@
     {
       "name": "SKA_MID_SPLIT16_14_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M007",
         "M009",
         "M039",
@@ -3516,7 +3516,7 @@
     {
       "name": "SKA_MID_SPLIT16_15_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M008",
         "M011",
         "M037",
@@ -3532,7 +3532,7 @@
     {
       "name": "SKA_MID_SPLIT16_16_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M010",
         "M012",
         "M036",
@@ -3548,7 +3548,7 @@
     {
       "name": "SKA_MID_INNER_R20KM_SPLIT5_1_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M002",
         "M009",
         "M015",
@@ -3583,7 +3583,7 @@
     {
       "name": "SKA_MID_INNER_R20KM_SPLIT5_2_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M001",
         "M006",
         "M007",
@@ -3618,7 +3618,7 @@
     {
       "name": "SKA_MID_INNER_R20KM_SPLIT5_3_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M005",
         "M008",
         "M013",
@@ -3653,7 +3653,7 @@
     {
       "name": "SKA_MID_INNER_R20KM_SPLIT5_4_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M003",
         "M004",
         "M010",
@@ -3688,7 +3688,7 @@
     {
       "name": "SKA_MID_INNER_R20KM_SPLIT5_5_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "M000",
         "M011",
         "M016",
@@ -3724,7 +3724,7 @@
     {
       "name": "SKA_MID_4ANT_BAND1_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "SKA036",
         "SKA038",
         "SKA040",
@@ -3735,7 +3735,7 @@
     {
       "name": "SKA_MID_4ANT_BAND2_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "SKA033",
         "SKA081",
         "SKA083",
@@ -3746,7 +3746,7 @@
     {
       "name": "SKA_MID_4ANT_BAND5A_AASTAR",
       "subarray_type": "custom",
-      "custom_stations": [
+      "receptor_ids": [
         "SKA042",
         "SKA067",
         "SKA068",
