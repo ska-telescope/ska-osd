@@ -236,6 +236,19 @@ class TestGetCycleConfiguration:
         served = configuration.model_dump(mode="json", by_alias=True)
         assert CycleConfiguration.model_validate(served) == configuration
 
+    @pytest.mark.parametrize("include_subarray_templates", [False, True])
+    def test_serves_without_nulls(
+        self, test_tmdata_repository, include_subarray_templates
+    ):
+        served = get_cycle_configuration(
+            test_tmdata_repository,
+            "TEST_SKAO_2027_AA2_Proposal",
+            include_subarray_templates,
+        ).model_dump(mode="json", exclude_none=True)
+
+        mid = served["capabilities"]["mid"]["AA2"]
+        assert ("subarray_templates" in mid) == include_subarray_templates
+
 
 class TestGetCycleConfigurations:
     def test_returns_every_cycle_in_id_order(self, test_tmdata_repository):

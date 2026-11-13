@@ -246,7 +246,7 @@ class CycleCapabilitiesBase(ConfigurationModel):
             ]
             capabilities["number_subarray_beams"] = subarray_beams["max_subarray_beams"]
         data[self.capabilities.name] = capabilities
-        if (subarray_templates := data.pop("subarray_templates")) is not None:
+        if (subarray_templates := data.pop("subarray_templates", None)) is not None:
             data[self.capabilities.name]["subarray_templates"] = subarray_templates
         return data
 
