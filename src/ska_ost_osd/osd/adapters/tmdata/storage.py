@@ -12,11 +12,11 @@ from ska_telmodel_client import TMData
 
 from ska_ost_osd.osd.adapters.tmdata.models import (
     CycleFile,
+    LowArrayAssemblyFile,
     LowBasicCapabilitiesFile,
-    LowCapabilitySetFile,
     LowDefaultsFile,
+    MidArrayAssemblyFile,
     MidBasicCapabilitiesFile,
-    MidCapabilitySetFile,
     MidDefaultsFile,
     SubarrayTemplateLibraryFile,
 )
@@ -26,9 +26,9 @@ from ska_ost_osd.osd.common.constant import (
     Telescope,
 )
 
-_CAPABILITY_SET_FILE_MODELS = {
-    Telescope.SKA_MID: MidCapabilitySetFile,
-    Telescope.SKA_LOW: LowCapabilitySetFile,
+_ARRAY_ASSEMBLY_FILE_MODELS = {
+    Telescope.SKA_MID: MidArrayAssemblyFile,
+    Telescope.SKA_LOW: LowArrayAssemblyFile,
 }
 
 _BASIC_CAPABILITIES_FILE_MODELS = {
@@ -112,40 +112,40 @@ def get_cycle_file(tmdata: TMData, cycle_id: str) -> CycleFile:
 
 
 @overload
-def get_capability_set_files(
+def get_array_assembly_files(
     tmdata: TMData, telescope: Literal[Telescope.SKA_MID]
-) -> dict[str, MidCapabilitySetFile]: ...
+) -> dict[str, MidArrayAssemblyFile]: ...
 
 
 @overload
-def get_capability_set_files(
+def get_array_assembly_files(
     tmdata: TMData, telescope: Literal[Telescope.SKA_LOW]
-) -> dict[str, LowCapabilitySetFile]: ...
+) -> dict[str, LowArrayAssemblyFile]: ...
 
 
-def get_capability_set_files(
+def get_array_assembly_files(
     tmdata: TMData, telescope: Telescope
-) -> dict[str, MidCapabilitySetFile] | dict[str, LowCapabilitySetFile]:
-    """Read each of one telescope's capability set files,
+) -> dict[str, MidArrayAssemblyFile] | dict[str, LowArrayAssemblyFile]:
+    """Read each of one telescope's array assembly files,
     ``telescopes/<telescope>/array_assemblies/<name>.json``.
 
     :param tmdata: TMData to read from.
     :param telescope: the telescope.
-    :return: the telescope's capability set files keyed by name, the file
+    :return: the telescope's array assembly files keyed by name, the file
         name without ``.json``, in name order.
-    :raises FileNotFoundError: If the tmdata has no capabilities directory
-        for the telescope.
+    :raises FileNotFoundError: If the tmdata has no array_assemblies
+        directory for the telescope.
     """
     files = TELESCOPE_FILES[telescope]
-    directory = files.capability_sets
+    directory = files.array_assemblies
     if not any(key.startswith(f"{directory}/") for key in tmdata):
         raise FileNotFoundError(f"file not found: {directory}")
     names = sorted(
         key.removesuffix(".json") for key in tmdata[directory] if key.endswith(".json")
     )
     return {
-        name: _CAPABILITY_SET_FILE_MODELS[telescope].model_validate(
-            _read(tmdata, files.capability_set(name))
+        name: _ARRAY_ASSEMBLY_FILE_MODELS[telescope].model_validate(
+            _read(tmdata, files.array_assembly(name))
         )
         for name in names
     }

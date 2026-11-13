@@ -32,9 +32,9 @@ from ska_ost_osd.osd.models.defaults import (
 from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplate
 
 
-class MidCapabilitySetFile(OSDBaseModel):
+class MidArrayAssemblyFile(OSDBaseModel):
     """Model for telescopes/ska_mid/array_assemblies/<name>.json. The file is
-    named after its capability set, so it holds neither the name nor the
+    named after its array assembly, so it holds neither the name nor the
     telescope."""
 
     available_bandwidth_hz: float = Field(gt=0)
@@ -64,9 +64,9 @@ class MidCapabilitySetFile(OSDBaseModel):
         return self
 
 
-class LowCapabilitySetFile(OSDBaseModel):
+class LowArrayAssemblyFile(OSDBaseModel):
     """Model for telescopes/ska_low/array_assemblies/<name>.json. The file is
-    named after its capability set, so it holds neither the name nor the
+    named after its array assembly, so it holds neither the name nor the
     telescope."""
 
     available_bandwidth_hz: float = Field(gt=0)

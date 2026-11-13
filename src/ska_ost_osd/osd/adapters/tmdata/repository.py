@@ -119,10 +119,10 @@ class TMDataRepository:
             _CAPABILITY_SET_MODELS[telescope].model_validate(
                 {
                     "name": name,
-                    **capability_set_file.model_dump(exclude={"array_assembly"}),
+                    **array_assembly_file.model_dump(exclude={"array_assembly"}),
                 }
             )
-            for name, capability_set_file in storage.get_capability_set_files(
+            for name, array_assembly_file in storage.get_array_assembly_files(
                 self._tmdata, telescope
             ).items()
         ]
@@ -154,12 +154,12 @@ class TMDataRepository:
         """The capability set's file names the array assembly whose template
         library it offers. A capability set with no array assembly, or an
         array assembly with no template library, offers none."""
-        capability_set_files = storage.get_capability_set_files(self._tmdata, telescope)
-        if capability_set not in capability_set_files:
+        array_assembly_files = storage.get_array_assembly_files(self._tmdata, telescope)
+        if capability_set not in array_assembly_files:
             raise CapabilitySetNotFoundError(
-                telescope, capability_set, list(capability_set_files)
+                telescope, capability_set, list(array_assembly_files)
             )
-        array_assembly = capability_set_files[capability_set].array_assembly
+        array_assembly = array_assembly_files[capability_set].array_assembly
         if array_assembly is None:
             return []
         try:

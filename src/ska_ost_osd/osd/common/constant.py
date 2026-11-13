@@ -49,15 +49,15 @@ class TelescopeFiles:
         return f"{self.directory}/defaults.json"
 
     @property
-    def capability_sets(self) -> str:
+    def array_assemblies(self) -> str:
         return f"{self.directory}/array_assemblies"
 
     @property
     def subarray_templates(self) -> str:
         return f"{self.directory}/{SUBARRAY_TEMPLATES_DIRNAME}"
 
-    def capability_set(self, name: str) -> str:
-        return f"{self.capability_sets}/{name}.json"
+    def array_assembly(self, name: str) -> str:
+        return f"{self.array_assemblies}/{name}.json"
 
     def subarray_template_library(self, array_assembly: str) -> str:
         return f"{self.subarray_templates}/{array_assembly}.json"

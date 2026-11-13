@@ -12,11 +12,11 @@ import pytest
 
 from ska_ost_osd.osd.adapters.tmdata.models import (
     CycleFile,
+    LowArrayAssemblyFile,
     LowBasicCapabilitiesFile,
-    LowCapabilitySetFile,
     LowDefaultsFile,
+    MidArrayAssemblyFile,
     MidBasicCapabilitiesFile,
-    MidCapabilitySetFile,
     MidDefaultsFile,
     SubarrayTemplateLibraryFile,
 )
@@ -57,12 +57,12 @@ TMDATA = Path(__file__).parents[4] / "tmdata"
         ),
     ]
     + [
-        (model, f"{directory}/{capability_set.name}")
+        (model, f"{directory}/{array_assembly.name}")
         for model, directory in [
-            (MidCapabilitySetFile, "telescopes/ska_mid/array_assemblies"),
-            (LowCapabilitySetFile, "telescopes/ska_low/array_assemblies"),
+            (MidArrayAssemblyFile, "telescopes/ska_mid/array_assemblies"),
+            (LowArrayAssemblyFile, "telescopes/ska_low/array_assemblies"),
         ]
-        for capability_set in sorted((TMDATA / directory).glob("*.json"))
+        for array_assembly in sorted((TMDATA / directory).glob("*.json"))
     ]
     + [
         (CycleFile, f"cycles/{cycle.name}")

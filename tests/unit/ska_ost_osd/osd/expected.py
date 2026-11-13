@@ -7,9 +7,9 @@ from datetime import datetime, timezone
 from ska_ost_osd.osd.adapters.tmdata.models import (
     AvoidanceConstraints,
     CycleFile,
-    LowCapabilitySetFile,
+    LowArrayAssemblyFile,
     LowDefaultsFile,
-    MidCapabilitySetFile,
+    MidArrayAssemblyFile,
     MidCSPConfigurationDefaults,
     MidDefaultsFile,
     MidTargetDefaults,
@@ -326,10 +326,11 @@ MID_BASIC_CAPABILITIES = MidBasicCapabilities(
     elevation_limits=ElevationLimits(min_elevation_deg=15.0, max_elevation_deg=90.0),
 )
 
-# The capability sets as stored: keyed by name, with no telescope, and the array assembly that keys their
-# subarray templates (in the test tmdata, the same as the name)
-MID_CAPABILITY_SET_FILES = {
-    capability_set.name: MidCapabilitySetFile(
+# The array assembly files as stored: keyed by name, with no telescope, and
+# the array assembly that keys their subarray templates (in the test tmdata,
+# the same as the name)
+MID_ARRAY_ASSEMBLY_FILES = {
+    capability_set.name: MidArrayAssemblyFile(
         array_assembly=capability_set.name,
         **capability_set.model_dump(exclude={"name", "telescope"}),
     )
@@ -413,8 +414,8 @@ LOW_FREQUENCY_BAND_WITH_CHANNELS = LowFrequencyBandWithChannels(
     number_pss_channels_per_coarse_channel=54,
 )
 
-LOW_CAPABILITY_SET_FILES = {
-    capability_set.name: LowCapabilitySetFile(
+LOW_ARRAY_ASSEMBLY_FILES = {
+    capability_set.name: LowArrayAssemblyFile(
         array_assembly=capability_set.name,
         **capability_set.model_dump(exclude={"name", "telescope"}),
     )

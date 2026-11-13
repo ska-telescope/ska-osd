@@ -16,11 +16,11 @@ from pydantic import TypeAdapter, ValidationError
 
 from ska_ost_osd.osd.adapters.tmdata.models import (
     CycleFile,
+    LowArrayAssemblyFile,
     LowBasicCapabilitiesFile,
-    LowCapabilitySetFile,
     LowDefaultsFile,
+    MidArrayAssemblyFile,
     MidBasicCapabilitiesFile,
-    MidCapabilitySetFile,
     MidDefaultsFile,
     SubarrayTemplateLibraryFile,
 )
@@ -47,8 +47,8 @@ TESTS_TMDATA = Path(__file__).parents[3] / "tmdata"
 
 MID_BASIC_CAPABILITIES_FILE = "telescopes/ska_mid/basic_capabilities.json"
 LOW_BASIC_CAPABILITIES_FILE = "telescopes/ska_low/basic_capabilities.json"
-MID_CAPABILITY_SET = "telescopes/ska_mid/array_assemblies/AA2.json"
-LOW_CAPABILITY_SET = "telescopes/ska_low/array_assemblies/AA2.json"
+MID_ARRAY_ASSEMBLY = "telescopes/ska_mid/array_assemblies/AA2.json"
+LOW_ARRAY_ASSEMBLY = "telescopes/ska_low/array_assemblies/AA2.json"
 MID_DEFAULTS = "telescopes/ska_mid/defaults.json"
 LOW_DEFAULTS = "telescopes/ska_low/defaults.json"
 CYCLE = "cycles/TEST_SKAO_2027_Low_AA1_SV.json"
@@ -68,8 +68,8 @@ class TestBreakingChanges:
         "model, path, break_file",
         [
             (
-                MidCapabilitySetFile,
-                MID_CAPABILITY_SET,
+                MidArrayAssemblyFile,
+                MID_ARRAY_ASSEMBLY,
                 lambda data: data.pop("number_fsps"),
             ),
             (
@@ -140,7 +140,7 @@ class TestCapabilities:
         assert capability_set == expected
 
     def test_capability_set_rejects_another_telescope(self):
-        data = load(LOW_CAPABILITY_SET)
+        data = load(LOW_ARRAY_ASSEMBLY)
         with pytest.raises(ValidationError, match="telescope"):
             LowCapabilitySet.model_validate(
                 {"name": "AA2", **data, "telescope": "ska_mid"}
@@ -149,8 +149,8 @@ class TestCapabilities:
     @pytest.mark.parametrize(
         "model, path",
         [
-            (MidCapabilitySetFile, MID_CAPABILITY_SET),
-            (LowCapabilitySetFile, LOW_CAPABILITY_SET),
+            (MidArrayAssemblyFile, MID_ARRAY_ASSEMBLY),
+            (LowArrayAssemblyFile, LOW_ARRAY_ASSEMBLY),
         ],
     )
     def test_serialised_capabilities_validate(self, model, path):
@@ -179,38 +179,38 @@ class TestCapabilities:
                 "min_frequency_hz must not exceed max_frequency_hz",
             ),
             (
-                MidCapabilitySetFile,
-                MID_CAPABILITY_SET,
+                MidArrayAssemblyFile,
+                MID_ARRAY_ASSEMBLY,
                 lambda data: data["dishes"]["ids"].pop(),
                 "number_ska_dishes",
             ),
             (
-                LowCapabilitySetFile,
-                LOW_CAPABILITY_SET,
+                LowArrayAssemblyFile,
+                LOW_ARRAY_ASSEMBLY,
                 lambda data: data["stations"]["ids"].pop(),
                 "number_stations",
             ),
             (
-                LowCapabilitySetFile,
-                LOW_CAPABILITY_SET,
+                LowArrayAssemblyFile,
+                LOW_ARRAY_ASSEMBLY,
                 lambda data: data["modes"]["pss"].update(max_beams=1),
                 "cbf_modes must list pss",
             ),
             (
-                LowCapabilitySetFile,
-                LOW_CAPABILITY_SET,
+                LowArrayAssemblyFile,
+                LOW_ARRAY_ASSEMBLY,
                 lambda data: data["cbf_modes"].remove("pst"),
                 "cbf_modes must list pst",
             ),
             (
-                MidCapabilitySetFile,
-                MID_CAPABILITY_SET,
+                MidArrayAssemblyFile,
+                MID_ARRAY_ASSEMBLY,
                 lambda data: data["modes"]["pss"].update(max_beams=1),
                 "cbf_modes must list pss",
             ),
             (
-                MidCapabilitySetFile,
-                MID_CAPABILITY_SET,
+                MidArrayAssemblyFile,
+                MID_ARRAY_ASSEMBLY,
                 lambda data: data["cbf_modes"].remove("pst"),
                 "cbf_modes must list pst",
             ),

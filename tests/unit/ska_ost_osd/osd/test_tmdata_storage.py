@@ -4,7 +4,7 @@ its storage model, using the test copy of the tmdata in tests/tmdata."""
 import pytest
 
 from ska_ost_osd.osd.adapters.tmdata.storage import (
-    get_capability_set_files,
+    get_array_assembly_files,
     get_cycle_file,
     get_subarray_template_library,
     get_telescope_basic_capabilities,
@@ -16,12 +16,12 @@ from tests.unit.ska_ost_osd.osd.expected import (
     CYCLE_2_FILE,
     LOW_AA1_SUBARRAY_TEMPLATE_LIBRARY_FILE,
     LOW_AA2_SUBARRAY_TEMPLATE_LIBRARY_FILE,
+    LOW_ARRAY_ASSEMBLY_FILES,
     LOW_BASIC_CAPABILITIES,
-    LOW_CAPABILITY_SET_FILES,
     LOW_DEFAULTS_FILE,
     MID_AA2_SUBARRAY_TEMPLATE_LIBRARY_FILE,
+    MID_ARRAY_ASSEMBLY_FILES,
     MID_BASIC_CAPABILITIES,
-    MID_CAPABILITY_SET_FILES,
     MID_DEFAULTS_FILE,
 )
 
@@ -49,18 +49,18 @@ class TestGetCycleFile:
             get_cycle_file(tests_tmdata, "NO_SUCH_CYCLE")
 
 
-class TestGetCapabilitySetFiles:
+class TestGetArrayAssemblyFiles:
     @pytest.mark.parametrize(
         "telescope, expected",
         [
-            (Telescope.SKA_MID, MID_CAPABILITY_SET_FILES),
-            (Telescope.SKA_LOW, LOW_CAPABILITY_SET_FILES),
+            (Telescope.SKA_MID, MID_ARRAY_ASSEMBLY_FILES),
+            (Telescope.SKA_LOW, LOW_ARRAY_ASSEMBLY_FILES),
         ],
     )
-    def test_returns_capability_sets_named_by_file(
+    def test_returns_array_assemblies_named_by_file(
         self, tests_tmdata, telescope, expected
     ):
-        assert get_capability_set_files(tests_tmdata, telescope) == expected
+        assert get_array_assembly_files(tests_tmdata, telescope) == expected
 
     @pytest.mark.parametrize(
         "telescope, path",
@@ -71,7 +71,7 @@ class TestGetCapabilitySetFiles:
     )
     def test_raises_when_directory_missing(self, empty_tmdata, telescope, path):
         with pytest.raises(FileNotFoundError, match=f"file not found: {path}"):
-            get_capability_set_files(empty_tmdata, telescope)
+            get_array_assembly_files(empty_tmdata, telescope)
 
 
 class TestGetTelescopeBasicCapabilities:
