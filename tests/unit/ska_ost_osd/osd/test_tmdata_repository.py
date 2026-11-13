@@ -6,6 +6,7 @@ from pydantic import ValidationError
 
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.exceptions import ArrayAssemblyNotFoundError, CycleNotFoundError
+from ska_ost_osd.osd.models.capabilities import merge_capabilities
 from ska_ost_osd.osd.models.cycles import Cycle, PolicyType
 from tests.unit.ska_ost_osd.osd.expected import (
     CYCLE_1,
@@ -27,6 +28,56 @@ from tests.unit.ska_ost_osd.osd.expected import (
     MID_DEFAULTS,
     MID_FULL_AA2_TEMPLATE,
 )
+
+
+class TestMergeCapabilities:
+    def test_combines_the_basic_capabilities_and_array_assembly(self):
+        """Groups both set are combined field by field; groups only one sets
+        are kept."""
+        assert merge_capabilities(
+            {
+                "modes": {
+                    "continuum": {"channels_per_coarse_channel": 144},
+                    "spectral": {"channels_per_coarse_channel": 432},
+                }
+            },
+            {"modes": {"spectral": {"max_zoom_windows": 16}, "vlbi": {"max_beams": 0}}},
+        ) == {
+            "modes": {
+                "continuum": {"channels_per_coarse_channel": 144},
+                "spectral": {
+                    "channels_per_coarse_channel": 432,
+                    "max_zoom_windows": 16,
+                },
+                "vlbi": {"max_beams": 0},
+            }
+        }
+
+    def test_a_policy_replaces_array_assembly_fields(self):
+        assert merge_capabilities(
+            {},
+            {"cbf_modes": ["vis", "pst"], "modes": {"pst": {"max_beams": 4}}},
+            {"cbf_modes": ["vis"], "modes": {"pst": {"max_beams": 0}}},
+        ) == {"cbf_modes": ["vis"], "modes": {"pst": {"max_beams": 0}}}
+
+    @pytest.mark.parametrize(
+        "array_assembly, policy",
+        [
+            ({"modes": {"spectral": {"channels_per_coarse_channel": 1}}}, None),
+            ({}, {"modes": {"spectral": {"channels_per_coarse_channel": 1}}}),
+        ],
+        ids=["array assembly", "policy"],
+    )
+    def test_basic_capabilities_cant_be_changed(self, array_assembly, policy):
+        with pytest.raises(
+            ValueError,
+            match="modes.spectral.channels_per_coarse_channel is set by both",
+        ):
+            merge_capabilities(
+                {"modes": {"spectral": {"channels_per_coarse_channel": 432}}},
+                array_assembly,
+                policy,
+            )
 
 
 class TestGetCycleIds:

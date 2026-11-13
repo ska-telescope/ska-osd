@@ -1,6 +1,6 @@
 """The OSD repository backed by the tmdata, read through a TMData client."""
 
-from typing import Any, Literal, overload
+from typing import Literal, overload
 
 from ska_telmodel_client import TMData
 
@@ -14,6 +14,7 @@ from ska_ost_osd.osd.models.capabilities import (
     LowCapabilities,
     MidBasicCapabilities,
     MidCapabilities,
+    merge_capabilities,
 )
 from ska_ost_osd.osd.models.constraints import Constraints
 from ska_ost_osd.osd.models.cycles import Cycle, PolicyType
@@ -24,21 +25,6 @@ _CAPABILITIES_MODELS = {
     Telescope.SKA_MID: MidCapabilities,
     Telescope.SKA_LOW: LowCapabilities,
 }
-
-
-def merge_capabilities(
-    capabilities: dict[str, Any], policy: dict[str, Any]
-) -> dict[str, Any]:
-    """The capabilities with each field the policy sets replaced, nested
-    groups field by field."""
-    merged = dict(capabilities)
-    for field, value in policy.items():
-        merged[field] = (
-            merge_capabilities(capabilities[field], value)
-            if isinstance(value, dict)
-            else value
-        )
-    return merged
 
 
 class TMDataRepository:
@@ -131,15 +117,8 @@ class TMDataRepository:
         self, telescope: Telescope
     ) -> list[MidCapabilities] | list[LowCapabilities]:
         return [
-            _CAPABILITIES_MODELS[telescope].model_validate(
-                {
-                    "name": name,
-                    **array_assembly_file.model_dump(exclude={"array_assembly"}),
-                }
-            )
-            for name, array_assembly_file in storage.get_array_assembly_files(
-                self._tmdata, telescope
-            ).items()
+            self.get_capabilities(telescope, name)
+            for name in storage.get_array_assembly_files(self._tmdata, telescope)
         ]
 
     @overload
@@ -166,14 +145,20 @@ class TMDataRepository:
             raise ArrayAssemblyNotFoundError(
                 telescope, array_assembly, list(array_assembly_files)
             )
-        capabilities = array_assembly_files[array_assembly].model_dump(
-            exclude={"array_assembly"}
-        )
-        if policy_id is not None:
-            policy = storage.get_policy_file(self._tmdata, telescope, policy_id)
-            capabilities = merge_capabilities(
-                capabilities, policy.model_dump(exclude={"id"}, exclude_unset=True)
+        policy = (
+            storage.get_policy_file(self._tmdata, telescope, policy_id).model_dump(
+                exclude={"id"}, exclude_unset=True
             )
+            if policy_id is not None
+            else None
+        )
+        capabilities = merge_capabilities(
+            storage.get_telescope_basic_capabilities(
+                self._tmdata, telescope
+            ).model_dump(),
+            array_assembly_files[array_assembly].model_dump(exclude={"array_assembly"}),
+            policy,
+        )
         return _CAPABILITIES_MODELS[telescope].model_validate(
             {"name": policy_id or array_assembly, **capabilities}
         )

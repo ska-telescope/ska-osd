@@ -57,11 +57,12 @@ Reading the data
    * - ``get_array_assembly_capabilities(telescope)``
      - each of a telescope's array assemblies, as below
    * - ``get_capabilities(telescope, array_assembly, policy_id=None)``
-     - ``MidCapabilities`` / ``LowCapabilities``: one array assembly of a
-       telescope, e.g. ``"AA2"``, with a policy's changes applied if one is
-       given, e.g. ``"AA2_SV"``. Its zoom windows and beams are in its
-       ``modes``, its receptors in ``stations`` (Low) or ``dishes`` (Mid), and
-       Low's subarray beams in ``subarray_beams``
+     - ``MidCapabilities`` / ``LowCapabilities``: everything a telescope
+       offers with one array assembly, e.g. ``"AA2"``: its basic capabilities
+       and the array assembly's, with a policy's changes applied if one is
+       given, e.g. ``"AA2_SV"``. Each observing mode's channels, zoom windows
+       and beams are in ``modes``, its receptors in ``stations`` (Low) or
+       ``dishes`` (Mid), and Low's subarray beams in ``subarray_beams``
    * - ``get_basic_capabilities(telescope)``
      - ``MidBasicCapabilities`` / ``LowBasicCapabilities``: what is fixed for
        the telescope, whatever the array assembly. For Mid, its receiver

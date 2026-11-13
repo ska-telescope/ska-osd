@@ -15,13 +15,13 @@ from ska_ost_osd.osd.common.osd_validation_messages import (
     CYCLE_ID_ERROR_MESSAGE,
 )
 
-from .adapters.tmdata.repository import merge_capabilities
 from .adapters.tmdata.storage import get_cycle_paths, get_policy_paths
 from .common.constant import (
     RELEASE_FILE_PATH_LATEST,
     Telescope,
     osd_file_mapping,
 )
+from .models.capabilities import merge_capabilities
 from .models.cycles import PolicyType
 
 LOGGER = logging.getLogger(__name__)
@@ -301,8 +301,9 @@ class OSD:
                 policy_path = get_policy_paths(self.tmdata, telescope)[policy_id]
                 policy = self.tmdata[policy_path].get_dict()
                 del policy["id"]
+                # The legacy response serves the basic capabilities apart
                 policies[policy_id] = merge_capabilities(
-                    array_assemblies[offered["array_assembly"]], policy
+                    {}, array_assemblies[offered["array_assembly"]], policy
                 )
         return dict(sorted((array_assemblies | policies).items()))
 

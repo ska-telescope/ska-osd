@@ -4,7 +4,7 @@ capabilities each telescope offers and that telescope's basic capabilities. Serv
 with aliases, the field names are the ones the PHT UI reads."""
 
 from datetime import datetime
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import (
     Field,
@@ -15,12 +15,19 @@ from pydantic import (
 
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
-    Capabilities,
+    LowArrayAssemblyModes,
+    LowArrayAssemblyStations,
+    LowArrayAssemblySubarrayBeams,
     LowCapabilities,
+    LowCBFMode,
+    MidArrayAssemblyDishes,
+    MidArrayAssemblyModes,
     MidCapabilities,
+    MidCBFMode,
     MidFrequencyBand,
 )
 from ska_ost_osd.osd.models.cycles import Cycle, PolicyType
+from ska_ost_osd.osd.models.defaults import OSDBaseModel
 from ska_ost_osd.osd.models.subarray_templates import SubarrayType
 from ska_ost_osd.osd.repository import OSDRepository
 from ska_ost_osd.osd.views.base import (
@@ -93,6 +100,37 @@ class CycleSubarrayTemplate(ConfigurationModel):
     description: str
 
 
+class MidOfferedCapabilities(OSDBaseModel):
+    """What the PHT view serves of Mid's capabilities in a cycle: all but the
+    basic capabilities, which it serves beside them."""
+
+    name: str
+    available_bandwidth_hz: float
+    number_fsps: int
+    telescope: Literal[Telescope.SKA_MID] = Telescope.SKA_MID
+    modes: MidArrayAssemblyModes
+    allowed_channel_width_values_hz: list[int]
+    allowed_channel_count_range_min: list[int]
+    allowed_channel_count_range_max: list[int]
+    receivers: list[str]
+    cbf_modes: list[MidCBFMode]
+    dishes: MidArrayAssemblyDishes
+
+
+class LowOfferedCapabilities(OSDBaseModel):
+    """What the PHT view serves of Low's capabilities in a cycle: all but the
+    basic capabilities, which it serves beside them."""
+
+    name: str
+    available_bandwidth_hz: float
+    number_fsps: int
+    telescope: Literal[Telescope.SKA_LOW] = Telescope.SKA_LOW
+    subarray_beams: LowArrayAssemblySubarrayBeams
+    cbf_modes: list[LowCBFMode]
+    modes: LowArrayAssemblyModes
+    stations: LowArrayAssemblyStations
+
+
 class CycleCapabilitiesBase(ConfigurationModel):
     """One telescope's capabilities in a cycle. Served keyed by the name of
     the policy or array assembly, e.g. ``"AA2": {...}``, beside
@@ -100,7 +138,7 @@ class CycleCapabilitiesBase(ConfigurationModel):
     are served in the capabilities, keyed by name, as
     ``subarray_templates``."""
 
-    capabilities: Capabilities
+    capabilities: MidOfferedCapabilities | LowOfferedCapabilities
     subarray_templates: dict[str, CycleSubarrayTemplate] | None = None
 
     @model_validator(mode="before")
@@ -217,12 +255,12 @@ class CycleCapabilitiesBase(ConfigurationModel):
 
 class MidCycleCapabilities(CycleCapabilitiesBase):
     basic_capabilities: MidCycleBasicCapabilities
-    capabilities: MidCapabilities
+    capabilities: MidOfferedCapabilities
 
 
 class LowCycleCapabilities(CycleCapabilitiesBase):
     basic_capabilities: LowFrequencyBandWithChannels
-    capabilities: LowCapabilities
+    capabilities: LowOfferedCapabilities
 
 
 class CycleCapabilities(ConfigurationModel):
@@ -331,7 +369,9 @@ def get_cycle_configuration(
                     repository.get_basic_capabilities(Telescope.SKA_MID),
                     from_attributes=True,
                 ),
-                capabilities=mid,
+                capabilities=MidOfferedCapabilities.model_validate(
+                    mid, from_attributes=True
+                ),
                 subarray_templates=_subarray_templates(
                     repository,
                     Telescope.SKA_MID,
@@ -343,7 +383,9 @@ def get_cycle_configuration(
             else None,
             low=LowCycleCapabilities(
                 basic_capabilities=low_frequency_band(repository),
-                capabilities=low,
+                capabilities=LowOfferedCapabilities.model_validate(
+                    low, from_attributes=True
+                ),
                 subarray_templates=_subarray_templates(
                     repository,
                     Telescope.SKA_LOW,

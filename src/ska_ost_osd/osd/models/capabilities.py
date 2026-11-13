@@ -1,5 +1,5 @@
 from enum import StrEnum
-from typing import Annotated, Literal, Self
+from typing import Annotated, Any, Literal, Self
 
 from pydantic import AliasChoices, Field, model_validator
 
@@ -133,12 +133,46 @@ class MidArrayAssemblyDishes(OSDBaseModel):
         return self
 
 
+class MidSpectralMode(OSDBaseModel):
+    """What Mid offers for spectral line observations: its zoom windows.
+    ``max_zoom_channels`` is the most channels in one window."""
+
+    max_zoom_windows: int = Field(ge=0, examples=[16])
+    max_zoom_channels: int = Field(ge=0, examples=[14880])
+
+
+class MidPSSMode(OSDBaseModel):
+    """What Mid offers for pulsar search: its beams."""
+
+    max_beams: int = Field(ge=0, examples=[384])
+    beam_bandwidth_hz: float = Field(ge=0, examples=[400e6])
+
+
+class MidPSTMode(OSDBaseModel):
+    """What Mid offers for pulsar timing: its beams."""
+
+    max_beams: int = Field(ge=0, examples=[6])
+
+
+class MidModes(OSDBaseModel):
+    """What Mid offers in each observing mode."""
+
+    spectral: MidSpectralMode
+    pss: MidPSSMode
+    pst: MidPSTMode
+
+
 class MidCapabilities(OSDBaseModel):
+    """Everything Mid offers: its basic capabilities, an array assembly's
+    capabilities, and a policy's changes to them if one applies."""
+
     name: str = Field(examples=["AA0.5"])
+    telescope: Literal[Telescope.SKA_MID] = Telescope.SKA_MID
+    frequency_bands: list[MidFrequencyBand]
+    elevation_limits: ElevationLimits
     available_bandwidth_hz: float = Field(gt=0)
     number_fsps: int = Field(ge=0)
-    telescope: Literal[Telescope.SKA_MID] = Telescope.SKA_MID
-    modes: MidArrayAssemblyModes
+    modes: MidModes
     allowed_channel_width_values_hz: list[int]
     allowed_channel_count_range_min: list[int]
     allowed_channel_count_range_max: list[int]
@@ -282,14 +316,71 @@ class LowArrayAssemblyStations(OSDBaseModel):
         return self
 
 
+class LowContinuumMode(OSDBaseModel):
+    """What Low offers for continuum observations: how it divides each
+    coarse channel."""
+
+    channels_per_coarse_channel: int = Field(ge=0, examples=[144])
+
+
+class LowSpectralMode(OSDBaseModel):
+    """What Low offers for spectral line observations: how it divides each
+    coarse channel, and its zoom windows. ``max_zoom_channels`` is the most
+    channels in one window."""
+
+    channels_per_coarse_channel: int = Field(ge=0, examples=[432])
+    max_zoom_windows: int = Field(ge=0, examples=[16])
+    max_zoom_channels: int = Field(ge=0, examples=[1800])
+    zoom_factors: list[int] = Field(examples=[[1, 2, 4, 8]])
+
+
+class LowPSSMode(OSDBaseModel):
+    """What Low offers for pulsar search: how it divides each coarse
+    channel, and its beams."""
+
+    channels_per_coarse_channel: int = Field(ge=0, examples=[54])
+    max_beams: int = Field(ge=0, examples=[30])
+    beam_bandwidth_hz: float = Field(ge=0, examples=[118e6])
+
+
+class LowPSTMode(OSDBaseModel):
+    """What Low offers for pulsar timing: how it divides each coarse
+    channel, and its beams."""
+
+    channels_per_coarse_channel: int = Field(ge=0, examples=[216])
+    max_beams: int = Field(ge=0, examples=[4])
+
+
+class LowVLBIMode(OSDBaseModel):
+    """What Low offers for VLBI: its beams."""
+
+    max_beams: int = Field(ge=0, examples=[0])
+
+
+class LowModes(OSDBaseModel):
+    """What Low offers in each observing mode."""
+
+    continuum: LowContinuumMode
+    spectral: LowSpectralMode
+    pss: LowPSSMode
+    pst: LowPSTMode
+    vlbi: LowVLBIMode
+
+
 class LowCapabilities(OSDBaseModel):
+    """Everything Low offers: its basic capabilities, an array assembly's
+    capabilities, and a policy's changes to them if one applies."""
+
     name: str = Field(examples=["AA0.5"])
+    telescope: Literal[Telescope.SKA_LOW] = Telescope.SKA_LOW
+    frequency_band: FrequencyBand
+    elevation_limits: ElevationLimits
+    coarse_channels: CoarseChannels
     available_bandwidth_hz: float = Field(gt=0)
     number_fsps: int = Field(ge=0)
-    telescope: Literal[Telescope.SKA_LOW] = Telescope.SKA_LOW
     subarray_beams: LowArrayAssemblySubarrayBeams
     cbf_modes: list[LowCBFMode]
-    modes: LowArrayAssemblyModes
+    modes: LowModes
     stations: LowArrayAssemblyStations
 
     @model_validator(mode="after")
@@ -308,8 +399,54 @@ class LowCapabilities(OSDBaseModel):
         return self
 
 
-# A capability set is one array assembly of either telescope; the
-# telescope field picks the model when one is read back.
+def merge_capabilities(
+    basic: dict[str, Any],
+    array_assembly: dict[str, Any],
+    policy: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Everything a telescope offers: the array assembly's capabilities with
+    the policy's changes applied, combined with the basic capabilities.
+
+    :raises ValueError: If the basic capabilities and the array assembly, or
+        the policy, set the same field. Basic capabilities can't be changed.
+    """
+    return _combine(basic, _apply(array_assembly, policy or {}))
+
+
+def _apply(capabilities: dict[str, Any], changes: dict[str, Any]) -> dict[str, Any]:
+    """The capabilities with each field the changes set replaced, groups field
+    by field."""
+    applied = dict(capabilities)
+    for field, value in changes.items():
+        applied[field] = (
+            _apply(applied[field], value)
+            if isinstance(value, dict) and isinstance(applied.get(field), dict)
+            else value
+        )
+    return applied
+
+
+def _combine(
+    basic: dict[str, Any], offered: dict[str, Any], path: str = ""
+) -> dict[str, Any]:
+    """The basic capabilities with the offered ones added. A group in both
+    is combined field by field; any other field in both is an error."""
+    combined = dict(basic)
+    for field, value in offered.items():
+        if field not in combined:
+            combined[field] = value
+        elif isinstance(value, dict) and isinstance(combined[field], dict):
+            combined[field] = _combine(combined[field], value, f"{path}{field}.")
+        else:
+            raise ValueError(
+                f"{path}{field} is set by both the basic capabilities and the "
+                "array assembly or policy"
+            )
+    return combined
+
+
+# Either telescope's capabilities; the telescope field picks the model when
+# they are read back.
 Capabilities = Annotated[
     MidCapabilities | LowCapabilities, Field(discriminator="telescope")
 ]

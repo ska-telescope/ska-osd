@@ -20,13 +20,8 @@ from ska_ost_osd.osd.models.capabilities import (
     Band5bSubband,
     CoarseChannels,
     FrequencyBand,
-    LowArrayAssemblyModes,
-    LowArrayAssemblyPSSMode,
-    LowArrayAssemblyPSTMode,
-    LowArrayAssemblySpectralMode,
     LowArrayAssemblyStations,
     LowArrayAssemblySubarrayBeams,
-    LowArrayAssemblyVLBIMode,
     LowBasicCapabilities,
     LowBasicContinuumMode,
     LowBasicModes,
@@ -35,15 +30,21 @@ from ska_ost_osd.osd.models.capabilities import (
     LowBasicSpectralMode,
     LowCapabilities,
     LowCBFMode,
+    LowContinuumMode,
+    LowModes,
+    LowPSSMode,
+    LowPSTMode,
+    LowSpectralMode,
+    LowVLBIMode,
     MidArrayAssemblyDishes,
-    MidArrayAssemblyModes,
-    MidArrayAssemblyPSSMode,
-    MidArrayAssemblyPSTMode,
-    MidArrayAssemblySpectralMode,
     MidBasicCapabilities,
     MidCapabilities,
     MidCBFMode,
     MidFrequencyBand,
+    MidModes,
+    MidPSSMode,
+    MidPSTMode,
+    MidSpectralMode,
 )
 from ska_ost_osd.osd.models.constraints import Constraints, ElevationLimits
 from ska_ost_osd.osd.models.cycles import (
@@ -84,8 +85,10 @@ from ska_ost_osd.osd.views.pht import (
     CyclePolicies,
     CycleTelescopeCapabilities,
     LowCycleCapabilities,
+    LowOfferedCapabilities,
     MidCycleBasicCapabilities,
     MidCycleCapabilities,
+    MidOfferedCapabilities,
     ObservatoryPolicy,
 )
 
@@ -214,62 +217,6 @@ CYCLE_1_LEGACY_OBSERVATORY_POLICY = {
     "telescope_capabilities": {"Low": "AA1"},
 }
 
-# tests/tmdata/telescopes/ska_mid/array_assemblies/AA1.json and AA2.json
-MID_AA1 = MidCapabilities(
-    name="AA1",
-    available_bandwidth_hz=800_000_000,
-    number_fsps=4,
-    modes=MidArrayAssemblyModes(
-        spectral=MidArrayAssemblySpectralMode(max_zoom_windows=0, max_zoom_channels=0),
-        pss=MidArrayAssemblyPSSMode(max_beams=0, beam_bandwidth_hz=400_000_000),
-        pst=MidArrayAssemblyPSTMode(max_beams=1),
-    ),
-    allowed_channel_width_values_hz=[13440],
-    allowed_channel_count_range_min=[1],
-    allowed_channel_count_range_max=[58982],
-    receivers=["Band_1", "Band_2", "Band_5b"],
-    cbf_modes=[MidCBFMode.CORRELATION, MidCBFMode.PST],
-    dishes=MidArrayAssemblyDishes(
-        number_ska_dishes=4,
-        number_meerkat_dishes=0,
-        number_meerkatplus_dishes=0,
-        max_baseline_km=1.5,
-        ids=["SKA001", "SKA002", "SKA003", "SKA004"],
-    ),
-)
-
-MID_AA2 = MidCapabilities(
-    name="AA2",
-    available_bandwidth_hz=800_000_000,
-    number_fsps=8,
-    modes=MidArrayAssemblyModes(
-        spectral=MidArrayAssemblySpectralMode(max_zoom_windows=0, max_zoom_channels=0),
-        pss=MidArrayAssemblyPSSMode(max_beams=0, beam_bandwidth_hz=400_000_000),
-        pst=MidArrayAssemblyPSTMode(max_beams=1),
-    ),
-    allowed_channel_width_values_hz=[13440],
-    allowed_channel_count_range_min=[1],
-    allowed_channel_count_range_max=[58982],
-    receivers=["Band_1", "Band_2", "Band_5a", "Band_5b"],
-    cbf_modes=[MidCBFMode.CORRELATION, MidCBFMode.PST],
-    dishes=MidArrayAssemblyDishes(
-        number_ska_dishes=8,
-        number_meerkat_dishes=0,
-        number_meerkatplus_dishes=0,
-        max_baseline_km=1.5,
-        ids=[
-            "SKA001",
-            "SKA002",
-            "SKA003",
-            "SKA004",
-            "SKA005",
-            "SKA006",
-            "SKA007",
-            "SKA008",
-        ],  # fmt: skip
-    ),
-)
-
 # tests/tmdata/telescopes/ska_mid/basic_capabilities.json
 MID_BASIC_CAPABILITIES = MidBasicCapabilities(
     frequency_bands=[
@@ -326,81 +273,79 @@ MID_BASIC_CAPABILITIES = MidBasicCapabilities(
     elevation_limits=ElevationLimits(min_elevation_deg=15.0, max_elevation_deg=90.0),
 )
 
+# The capabilities of tests/tmdata/telescopes/ska_mid/array_assemblies/AA1.json
+# and AA2.json, with Mid's basic capabilities
+MID_AA1 = MidCapabilities(
+    name="AA1",
+    frequency_bands=MID_BASIC_CAPABILITIES.frequency_bands,
+    elevation_limits=MID_BASIC_CAPABILITIES.elevation_limits,
+    available_bandwidth_hz=800_000_000,
+    number_fsps=4,
+    modes=MidModes(
+        spectral=MidSpectralMode(max_zoom_windows=0, max_zoom_channels=0),
+        pss=MidPSSMode(max_beams=0, beam_bandwidth_hz=400_000_000),
+        pst=MidPSTMode(max_beams=1),
+    ),
+    allowed_channel_width_values_hz=[13440],
+    allowed_channel_count_range_min=[1],
+    allowed_channel_count_range_max=[58982],
+    receivers=["Band_1", "Band_2", "Band_5b"],
+    cbf_modes=[MidCBFMode.CORRELATION, MidCBFMode.PST],
+    dishes=MidArrayAssemblyDishes(
+        number_ska_dishes=4,
+        number_meerkat_dishes=0,
+        number_meerkatplus_dishes=0,
+        max_baseline_km=1.5,
+        ids=["SKA001", "SKA002", "SKA003", "SKA004"],
+    ),
+)
+
+MID_AA2 = MidCapabilities(
+    name="AA2",
+    frequency_bands=MID_BASIC_CAPABILITIES.frequency_bands,
+    elevation_limits=MID_BASIC_CAPABILITIES.elevation_limits,
+    available_bandwidth_hz=800_000_000,
+    number_fsps=8,
+    modes=MidModes(
+        spectral=MidSpectralMode(max_zoom_windows=0, max_zoom_channels=0),
+        pss=MidPSSMode(max_beams=0, beam_bandwidth_hz=400_000_000),
+        pst=MidPSTMode(max_beams=1),
+    ),
+    allowed_channel_width_values_hz=[13440],
+    allowed_channel_count_range_min=[1],
+    allowed_channel_count_range_max=[58982],
+    receivers=["Band_1", "Band_2", "Band_5a", "Band_5b"],
+    cbf_modes=[MidCBFMode.CORRELATION, MidCBFMode.PST],
+    dishes=MidArrayAssemblyDishes(
+        number_ska_dishes=8,
+        number_meerkat_dishes=0,
+        number_meerkatplus_dishes=0,
+        max_baseline_km=1.5,
+        ids=[
+            "SKA001",
+            "SKA002",
+            "SKA003",
+            "SKA004",
+            "SKA005",
+            "SKA006",
+            "SKA007",
+            "SKA008",
+        ],  # fmt: skip
+    ),
+)
+
 # The array assembly files as stored: keyed by name, with no telescope, and
 # the array assembly that keys their subarray templates (in the test tmdata,
 # the same as the name)
 MID_ARRAY_ASSEMBLY_FILES = {
     capabilities.name: MidArrayAssemblyFile(
         array_assembly=capabilities.name,
-        **capabilities.model_dump(exclude={"name", "telescope"}),
+        **capabilities.model_dump(
+            exclude={"name", "telescope", "frequency_bands", "elevation_limits"}
+        ),
     )
     for capabilities in (MID_AA1, MID_AA2)
 }
-
-# tests/tmdata/telescopes/ska_low/array_assemblies/AA1.json and AA2.json
-LOW_AA1 = LowCapabilities(
-    name="AA1",
-    subarray_beams=LowArrayAssemblySubarrayBeams(
-        max_subarray_beams=1, max_substations_per_subarray_beam=0
-    ),
-    available_bandwidth_hz=75_000_000.0,
-    cbf_modes=[LowCBFMode.VIS, LowCBFMode.PST],
-    number_fsps=6,
-    modes=LowArrayAssemblyModes(
-        spectral=LowArrayAssemblySpectralMode(
-            max_zoom_windows=0, max_zoom_channels=0, zoom_factors=[0]
-        ),
-        pss=LowArrayAssemblyPSSMode(max_beams=0, beam_bandwidth_hz=75_000_000.0),
-        pst=LowArrayAssemblyPSTMode(max_beams=1),
-        vlbi=LowArrayAssemblyVLBIMode(max_beams=0),
-    ),
-    stations=LowArrayAssemblyStations(
-        number_stations=4, max_baseline_km=3.0, ids=[345, 346, 347, 348]
-    ),
-)
-
-LOW_AA2 = LowCapabilities(
-    name="AA2",
-    subarray_beams=LowArrayAssemblySubarrayBeams(
-        max_subarray_beams=8, max_substations_per_subarray_beam=512
-    ),
-    available_bandwidth_hz=75_000_000.0,
-    cbf_modes=[LowCBFMode.VIS, LowCBFMode.PST],
-    number_fsps=6,
-    modes=LowArrayAssemblyModes(
-        spectral=LowArrayAssemblySpectralMode(
-            max_zoom_windows=0, max_zoom_channels=0, zoom_factors=[1, 2, 4, 8]
-        ),
-        pss=LowArrayAssemblyPSSMode(max_beams=0, beam_bandwidth_hz=75_000_000.0),
-        pst=LowArrayAssemblyPSTMode(max_beams=1),
-        vlbi=LowArrayAssemblyVLBIMode(max_beams=0),
-    ),
-    stations=LowArrayAssemblyStations(
-        number_stations=8,
-        max_baseline_km=6.0,
-        ids=[345, 346, 347, 348, 349, 350, 351, 352],
-    ),
-)
-
-# LOW_AA2 with tests/tmdata/telescopes/ska_low/policies/AA2_SV.json applied
-LOW_AA2_SV = LOW_AA2.model_copy(
-    update={
-        "name": "AA2_SV",
-        "cbf_modes": [LowCBFMode.VIS, LowCBFMode.PST],
-        "modes": LOW_AA2.modes.model_copy(
-            update={
-                "spectral": LOW_AA2.modes.spectral.model_copy(
-                    update={"max_zoom_windows": 1, "max_zoom_channels": 4000}
-                ),
-                "pss": LOW_AA2.modes.pss.model_copy(update={"max_beams": 0}),
-                "pst": LOW_AA2.modes.pst.model_copy(update={"max_beams": 1}),
-            }
-        ),
-        "subarray_beams": LowArrayAssemblySubarrayBeams(
-            max_subarray_beams=1, max_substations_per_subarray_beam=0
-        ),
-    }
-)
 
 # The band in tests/tmdata/telescopes/ska_low/basic_capabilities.json
 LOW_FREQUENCY_BAND = FrequencyBand(
@@ -434,10 +379,106 @@ LOW_FREQUENCY_BAND_WITH_CHANNELS = LowFrequencyBandWithChannels(
     number_pss_channels_per_coarse_channel=54,
 )
 
+# The capabilities of tests/tmdata/telescopes/ska_low/array_assemblies/AA1.json
+# and AA2.json, with Low's basic capabilities
+LOW_AA1 = LowCapabilities(
+    name="AA1",
+    frequency_band=LOW_BASIC_CAPABILITIES.frequency_band,
+    elevation_limits=LOW_BASIC_CAPABILITIES.elevation_limits,
+    coarse_channels=LOW_BASIC_CAPABILITIES.coarse_channels,
+    subarray_beams=LowArrayAssemblySubarrayBeams(
+        max_subarray_beams=1, max_substations_per_subarray_beam=0
+    ),
+    available_bandwidth_hz=75_000_000.0,
+    cbf_modes=[LowCBFMode.VIS, LowCBFMode.PST],
+    number_fsps=6,
+    modes=LowModes(
+        continuum=LowContinuumMode(channels_per_coarse_channel=144),
+        spectral=LowSpectralMode(
+            channels_per_coarse_channel=432,
+            max_zoom_windows=0,
+            max_zoom_channels=0,
+            zoom_factors=[0],
+        ),
+        pss=LowPSSMode(
+            channels_per_coarse_channel=54,
+            max_beams=0,
+            beam_bandwidth_hz=75_000_000.0,
+        ),
+        pst=LowPSTMode(channels_per_coarse_channel=216, max_beams=1),
+        vlbi=LowVLBIMode(max_beams=0),
+    ),
+    stations=LowArrayAssemblyStations(
+        number_stations=4, max_baseline_km=3.0, ids=[345, 346, 347, 348]
+    ),
+)
+
+LOW_AA2 = LowCapabilities(
+    name="AA2",
+    frequency_band=LOW_BASIC_CAPABILITIES.frequency_band,
+    elevation_limits=LOW_BASIC_CAPABILITIES.elevation_limits,
+    coarse_channels=LOW_BASIC_CAPABILITIES.coarse_channels,
+    subarray_beams=LowArrayAssemblySubarrayBeams(
+        max_subarray_beams=8, max_substations_per_subarray_beam=512
+    ),
+    available_bandwidth_hz=75_000_000.0,
+    cbf_modes=[LowCBFMode.VIS, LowCBFMode.PST],
+    number_fsps=6,
+    modes=LowModes(
+        continuum=LowContinuumMode(channels_per_coarse_channel=144),
+        spectral=LowSpectralMode(
+            channels_per_coarse_channel=432,
+            max_zoom_windows=0,
+            max_zoom_channels=0,
+            zoom_factors=[1, 2, 4, 8],
+        ),
+        pss=LowPSSMode(
+            channels_per_coarse_channel=54,
+            max_beams=0,
+            beam_bandwidth_hz=75_000_000.0,
+        ),
+        pst=LowPSTMode(channels_per_coarse_channel=216, max_beams=1),
+        vlbi=LowVLBIMode(max_beams=0),
+    ),
+    stations=LowArrayAssemblyStations(
+        number_stations=8,
+        max_baseline_km=6.0,
+        ids=[345, 346, 347, 348, 349, 350, 351, 352],
+    ),
+)
+
+# LOW_AA2 with tests/tmdata/telescopes/ska_low/policies/AA2_SV.json applied
+LOW_AA2_SV = LOW_AA2.model_copy(
+    update={
+        "name": "AA2_SV",
+        "cbf_modes": [LowCBFMode.VIS, LowCBFMode.PST],
+        "modes": LOW_AA2.modes.model_copy(
+            update={
+                "spectral": LOW_AA2.modes.spectral.model_copy(
+                    update={"max_zoom_windows": 1, "max_zoom_channels": 4000}
+                ),
+                "pss": LOW_AA2.modes.pss.model_copy(update={"max_beams": 0}),
+                "pst": LOW_AA2.modes.pst.model_copy(update={"max_beams": 1}),
+            }
+        ),
+        "subarray_beams": LowArrayAssemblySubarrayBeams(
+            max_subarray_beams=1, max_substations_per_subarray_beam=0
+        ),
+    }
+)
+
 LOW_ARRAY_ASSEMBLY_FILES = {
     capabilities.name: LowArrayAssemblyFile(
         array_assembly=capabilities.name,
-        **capabilities.model_dump(exclude={"name", "telescope"}),
+        **capabilities.model_dump(
+            exclude={
+                "name",
+                "telescope",
+                "frequency_band",
+                "elevation_limits",
+                "coarse_channels",
+            }
+        ),
     )
     for capabilities in (LOW_AA1, LOW_AA2)
 }
@@ -650,7 +691,9 @@ CYCLE_1_CONFIGURATION = CycleConfiguration(
         mid=None,
         low=LowCycleCapabilities(
             basic_capabilities=LOW_FREQUENCY_BAND_WITH_CHANNELS,
-            capabilities=LOW_AA1,
+            capabilities=LowOfferedCapabilities.model_validate(
+                LOW_AA1, from_attributes=True
+            ),
         ),
     ),
 )
@@ -679,11 +722,15 @@ CYCLE_2_CONFIGURATION = CycleConfiguration(
             basic_capabilities=MidCycleBasicCapabilities(
                 frequency_bands=MID_BASIC_CAPABILITIES.frequency_bands
             ),
-            capabilities=MID_AA2,
+            capabilities=MidOfferedCapabilities.model_validate(
+                MID_AA2, from_attributes=True
+            ),
         ),
         low=LowCycleCapabilities(
             basic_capabilities=LOW_FREQUENCY_BAND_WITH_CHANNELS,
-            capabilities=LOW_AA2,
+            capabilities=LowOfferedCapabilities.model_validate(
+                LOW_AA2, from_attributes=True
+            ),
         ),
     ),
 )
