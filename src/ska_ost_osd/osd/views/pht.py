@@ -210,7 +210,8 @@ class CycleCapabilitiesBase(ConfigurationModel):
         capabilities = data.pop("capabilities")
         if "receivers" in capabilities:
             capabilities["available_receivers"] = capabilities.pop("receivers")
-        # The PHT UI reads Mid's channel widths without the _hz suffix
+        # The PHT UI reads Mid's channel widths without the _hz suffix; the
+        # _hz name is served too, so it can switch to the new name
         if "allowed_channel_width_values_hz" in capabilities:
             capabilities["allowed_channel_width_values"] = capabilities[
                 "allowed_channel_width_values_hz"
