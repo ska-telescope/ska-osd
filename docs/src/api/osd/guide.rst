@@ -106,13 +106,33 @@ Each file names what it describes in a field, so file names don't matter:
 How capabilities are built
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-What a telescope offers, its *capabilities*, is built from three layers:
+What a telescope offers, its *capabilities*, is built from three layers, each
+changed for its own reason:
 
 .. code-block:: text
 
     capabilities = basic capabilities           fixed for the telescope
-                 + array assembly               what is built
-                 with a policy's changes        what a cycle offers, if a policy applies
+                 + array assembly               a construction milestone
+                 with a policy's changes        SciOps' access rules, if a policy applies
+
+Basic capabilities
+    What the telescope's design fixes, however much of it is built: Mid's
+    receiver bands, Low's frequency band and coarse channels, and the elevation
+    limits. They change only if the design does.
+
+Array assemblies
+    What has been built at each construction milestone, such as ``AA2``: the
+    receptors, bandwidth, CBF modes, and each observing mode's beams and zoom
+    windows. They follow the construction rollout; each milestone is its own
+    array assembly.
+
+Policies
+    The rules Science Operations sets for what can be used of an array assembly
+    in a cycle, such as fewer zoom windows and beams during Science
+    Verification. A cycle names the policy it offers for each policy type, so
+    SciOps can change what is offered without changing what is built.
+
+How the layers combine:
 
 * A policy replaces only the fields it sets; anything it doesn't set comes from
   the array assembly. An empty policy offers the whole array assembly.
