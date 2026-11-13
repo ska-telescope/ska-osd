@@ -17,44 +17,55 @@ from pydantic import BaseModel, ValidationError
 
 from ska_ost_osd.osd.adapters.tmdata.models import (
     CycleFile,
-    LowCapabilitiesFile,
+    LowArrayAssemblyFile,
+    LowBasicCapabilitiesFile,
     LowDefaultsFile,
-    MidCapabilitiesFile,
+    LowPolicyFile,
+    MidArrayAssemblyFile,
+    MidBasicCapabilitiesFile,
     MidDefaultsFile,
+    MidPolicyFile,
     SubarrayTemplateLibraryFile,
 )
 from ska_ost_osd.osd.common.constant import (
-    LOW_CONSTANT_JSON_FILE_PATH,
-    LOW_DEFAULTS_JSON_FILE_PATH,
-    MID_CONSTANT_JSON_FILE_PATH,
-    MID_DEFAULTS_JSON_FILE_PATH,
     OBSERVING_CYCLES_TMDATA_DIR,
-    POLICIES_CONSTANT_JSON_FILE_PATH,
-    SUBARRAY_TEMPLATES_PATH,
+    TELESCOPE_FILES,
+    Telescope,
 )
 
 TMDATA_DIR = Path("tmdata")
+MID = TELESCOPE_FILES[Telescope.SKA_MID]
+LOW = TELESCOPE_FILES[Telescope.SKA_LOW]
 FILE_MODELS: dict[str, type[BaseModel]] = {
-    MID_CONSTANT_JSON_FILE_PATH: MidCapabilitiesFile,
-    LOW_CONSTANT_JSON_FILE_PATH: LowCapabilitiesFile,
-    MID_DEFAULTS_JSON_FILE_PATH: MidDefaultsFile,
-    LOW_DEFAULTS_JSON_FILE_PATH: LowDefaultsFile,
-    POLICIES_CONSTANT_JSON_FILE_PATH: CycleFile,
-    SUBARRAY_TEMPLATES_PATH: SubarrayTemplateLibraryFile,
+    MID.basic_capabilities: MidBasicCapabilitiesFile,
+    LOW.basic_capabilities: LowBasicCapabilitiesFile,
+    MID.defaults: MidDefaultsFile,
+    LOW.defaults: LowDefaultsFile,
 }
-CYCLE_FILES = f"{OBSERVING_CYCLES_TMDATA_DIR}/cycle_*.json"
+# The storage model of every file in each directory
+DIRECTORY_MODELS: dict[str, type[BaseModel]] = {
+    MID.array_assemblies: MidArrayAssemblyFile,
+    LOW.array_assemblies: LowArrayAssemblyFile,
+    MID.policies: MidPolicyFile,
+    LOW.policies: LowPolicyFile,
+    MID.subarray_templates: SubarrayTemplateLibraryFile,
+    LOW.subarray_templates: SubarrayTemplateLibraryFile,
+    OBSERVING_CYCLES_TMDATA_DIR: CycleFile,
+}
 
 
 def get_file_models(tmdata_dir: Path) -> dict[str, type[BaseModel]]:
-    """Map each file to validate to its storage model.
+    """Map each file to validate to its storage model: the current files, not
+    the legacy ones kept for older releases.
 
     :param tmdata_dir: the tmdata directory.
     :return: the storage model of each file, keyed by its path relative to
         ``tmdata_dir``.
     """
     return FILE_MODELS | {
-        path.relative_to(tmdata_dir).as_posix(): CycleFile
-        for path in sorted(tmdata_dir.glob(CYCLE_FILES))
+        path.relative_to(tmdata_dir).as_posix(): model
+        for directory, model in DIRECTORY_MODELS.items()
+        for path in sorted((tmdata_dir / directory).glob("*.json"))
     }
 
 
@@ -98,8 +109,8 @@ def validate_tmdata(tmdata_dir: Path) -> list[str]:
     """
     file_models = get_file_models(tmdata_dir)
     problems = []
-    if not any(tmdata_dir.glob(CYCLE_FILES)):
-        problems.append(f"{CYCLE_FILES}: no cycle files found")
+    if CycleFile not in file_models.values():
+        problems.append(f"{OBSERVING_CYCLES_TMDATA_DIR}: no cycle files found")
     for name, model in file_models.items():
         problems.extend(
             f"{name}: {problem}" for problem in validate_file(tmdata_dir / name, model)
