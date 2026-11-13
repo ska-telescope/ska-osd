@@ -41,7 +41,7 @@ class TestGetCycleFile:
         with pytest.raises(FileNotFoundError, match="file not found: cycles"):
             get_cycle_file(empty_tmdata, "TEST_SKAO_2027_Low_AA1_SV")
 
-    def test_raises_when_no_file_has_cycle_number(self, tests_tmdata):
+    def test_raises_when_no_file_has_cycle_id(self, tests_tmdata):
         with pytest.raises(
             FileNotFoundError,
             match="file not found: no cycle file in cycles has id NO_SUCH_CYCLE",

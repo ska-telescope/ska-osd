@@ -383,14 +383,14 @@ class TestCycleFile:
         with pytest.raises(ValidationError, match="timezone"):
             CycleFile.model_validate(data)
 
-    def test_telescope_offering_nothing_is_none(self):
+    def test_telescope_not_offered_is_absent(self):
         """A telescope missing from the file's capabilities is not offered.
         (The PHT view serves it as null: see test_views.py.)"""
         data = load(CYCLE)
 
-        policy = CycleFile.model_validate(data)
+        cycle = CycleFile.model_validate(data)
 
-        assert Telescope.SKA_MID not in policy.capabilities
+        assert Telescope.SKA_MID not in cycle.capabilities
 
     def test_proposals_must_open_before_they_close(self):
         """A proposal window that closes before it opens is rejected."""
