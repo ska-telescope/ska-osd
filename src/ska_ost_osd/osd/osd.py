@@ -15,7 +15,8 @@ from ska_ost_osd.osd.common.osd_validation_messages import (
     CYCLE_ID_ERROR_MESSAGE,
 )
 
-from .adapters.tmdata.storage import get_cycle_paths
+from .adapters.tmdata.repository import merge_capabilities
+from .adapters.tmdata.storage import get_cycle_paths, get_policy_paths
 from .common.constant import (
     RELEASE_FILE_PATH_LATEST,
     Telescope,
@@ -274,19 +275,43 @@ class OSD:
         return {
             "basic_capabilities": basic_capabilities,
             **{
-                name.removesuffix(".json"): self._legacy_capability_set(
-                    telescope_dir, name
-                )
-                for name in sorted(self.tmdata[f"{telescope_dir}/array_assemblies"])
+                name: self._legacy_capability_set(telescope_dir, capability_set)
+                for name, capability_set in self._stored_capability_sets(
+                    telescope_dir
+                ).items()
             },
         }
 
-    def _legacy_capability_set(self, telescope_dir: str, name: str) -> dict[str, Any]:
+    def _stored_capability_sets(self, telescope_dir: str) -> dict[str, dict[str, Any]]:
+        """The telescope's capability sets as stored, by name: each array
+        assembly, and each policy a cycle names, applied to that cycle's
+        array assembly."""
+        directory = f"{telescope_dir}/array_assemblies"
+        array_assemblies = {
+            name.removesuffix(".json"): self.tmdata[f"{directory}/{name}"].get_dict()
+            for name in self.tmdata[directory]
+        }
+        telescope = Telescope(posixpath.basename(telescope_dir))
+        policies = {}
+        for path in get_cycle_paths(self.tmdata).values():
+            offered = self.tmdata[path].get_dict()["capabilities"].get(telescope)
+            if offered is None:
+                continue
+            for policy_id in offered["policies"].values():
+                policy_path = get_policy_paths(self.tmdata, telescope)[policy_id]
+                policy = self.tmdata[policy_path].get_dict()
+                del policy["id"]
+                policies[policy_id] = merge_capabilities(
+                    array_assemblies[offered["array_assembly"]], policy
+                )
+        return dict(sorted((array_assemblies | policies).items()))
+
+    def _legacy_capability_set(
+        self, telescope_dir: str, capability_set: dict[str, Any]
+    ) -> dict[str, Any]:
         """A capability set in its legacy shape: its array assembly as a template
         pattern, or as that array assembly's templates when they are processed."""
-        capability_set = self.tmdata[
-            f"{telescope_dir}/array_assemblies/{name}"
-        ].get_dict()
+        capability_set = dict(capability_set)
         # The legacy response serves the stations or dishes flat, with their
         # IDs as number_station_ids or number_dish_ids
         if "stations" in capability_set:

@@ -33,7 +33,10 @@ Unreleased
   (``science_verification``, ``shared_risk`` or ``standard_operations``). A policy,
   in ``telescopes/<telescope>/policies``, has an ``id`` and sets only what it changes
   of the array assembly a cycle pairs it with; the repository returns the two
-  merged. The
+  merged. Low's ``AA2_SV`` is now the ``AA2_SV`` policy applied to ``AA2``, which the
+  legacy response still serves as ``AA2_SV``.
+  [BREAKING] The ODT view serves only array assemblies, so it no longer lists Low's
+  ``AA2_SV``. The
   legacy response and the PHT view serve a cycle offering one policy type, under the
   old field names: ``cycle_id``, ``cycle_description``, ``cycle_number``, ``type``
   (``Science Verification``, ``Shared Risk`` or ``Proposal``), ``cycle_information``

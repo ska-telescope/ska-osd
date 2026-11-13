@@ -248,10 +248,10 @@ class CycleConfiguration(ConfigurationModel):
 def _subarray_templates(
     repository: OSDRepository,
     telescope: Telescope,
-    capability_set: str,
+    array_assembly: str,
     include_subarray_templates: bool,
 ) -> dict[str, CycleSubarrayTemplate] | None:
-    """The capability set's templates keyed by name, or ``None`` when they
+    """The array assembly's templates keyed by name, or ``None`` when they
     weren't asked for."""
     if not include_subarray_templates:
         return None
@@ -261,7 +261,7 @@ def _subarray_templates(
             custom_stations=",".join(template.custom_stations),
             description=template.description,
         )
-        for template in repository.get_subarray_templates(telescope, capability_set)
+        for template in repository.get_subarray_templates(telescope, array_assembly)
     }
 
 
@@ -310,8 +310,10 @@ def get_cycle_configuration(
     :return: the cycle with, for each telescope it offers, the offered
         capability set and that telescope's basic capabilities.
     :raises CycleNotFoundError: If there is no cycle with that ID.
-    :raises CapabilitySetNotFoundError: If the cycle names a capability set
+    :raises CapabilitySetNotFoundError: If the cycle names an array assembly
         that does not exist.
+    :raises FileNotFoundError: If the cycle names a policy that does not
+        exist.
     :raises ValueError: If the cycle offers more than one policy type.
     """
     cycle = repository.get_cycle(cycle_id)
@@ -340,7 +342,7 @@ def get_cycle_configuration(
                 subarray_templates=_subarray_templates(
                     repository,
                     Telescope.SKA_MID,
-                    mid.name,
+                    cycle.capabilities[Telescope.SKA_MID].array_assembly,
                     include_subarray_templates,
                 ),
             )
@@ -352,7 +354,7 @@ def get_cycle_configuration(
                 subarray_templates=_subarray_templates(
                     repository,
                     Telescope.SKA_LOW,
-                    low.name,
+                    cycle.capabilities[Telescope.SKA_LOW].array_assembly,
                     include_subarray_templates,
                 ),
             )
@@ -372,8 +374,9 @@ def get_cycle_configurations(
     :param include_subarray_templates: whether to serve each offered
         capability set's subarray templates, as ``subarray_templates``.
     :return: the cycle views.
-    :raises CapabilitySetNotFoundError: If a cycle names a capability set
+    :raises CapabilitySetNotFoundError: If a cycle names an array assembly
         that does not exist.
+    :raises FileNotFoundError: If a cycle names a policy that does not exist.
     :raises ValueError: If a cycle offers more than one policy type.
     """
     return [

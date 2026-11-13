@@ -26,7 +26,7 @@ _CAPABILITY_SET_MODELS = {
 }
 
 
-def _merge_capabilities(
+def merge_capabilities(
     capabilities: dict[str, Any], policy: dict[str, Any]
 ) -> dict[str, Any]:
     """The capabilities with each field the policy sets replaced, nested
@@ -34,7 +34,7 @@ def _merge_capabilities(
     merged = dict(capabilities)
     for field, value in policy.items():
         merged[field] = (
-            _merge_capabilities(capabilities[field], value)
+            merge_capabilities(capabilities[field], value)
             if isinstance(value, dict)
             else value
         )
@@ -171,7 +171,7 @@ class TMDataRepository:
         )
         if policy_id is not None:
             policy = storage.get_policy_file(self._tmdata, telescope, policy_id)
-            capabilities = _merge_capabilities(
+            capabilities = merge_capabilities(
                 capabilities, policy.model_dump(exclude={"id"}, exclude_unset=True)
             )
         return _CAPABILITY_SET_MODELS[telescope].model_validate(

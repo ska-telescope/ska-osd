@@ -1,13 +1,9 @@
 """Unit tests for the TMData repository, using the test copy of the tmdata in
 tests/tmdata."""
 
-from pathlib import Path
-
 import pytest
 from pydantic import ValidationError
-from ska_telmodel_client import TMData
 
-from ska_ost_osd.osd.adapters.tmdata import TMDataRepository
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.exceptions import CapabilitySetNotFoundError, CycleNotFoundError
 from ska_ost_osd.osd.models.cycles import Cycle, PolicyType
@@ -31,8 +27,6 @@ from tests.unit.ska_ost_osd.osd.expected import (
     MID_DEFAULTS,
     MID_FULL_AA2_TEMPLATE,
 )
-
-TMDATA = Path(__file__).parents[4] / "tmdata"
 
 
 class TestGetCycleIds:
@@ -290,14 +284,6 @@ class TestGetCapabilitySet:
             test_tmdata_repository.get_capability_set(
                 Telescope.SKA_LOW, "AA2", "NO_SUCH_POLICY"
             )
-
-    def test_low_aa2_with_the_aa2_sv_policy_is_the_aa2_sv_capability_set(self):
-        """In the real tmdata, the AA2_SV policy applied to Low AA2 gives what
-        the AA2_SV capability set file says."""
-        repository = TMDataRepository(TMData([f"file://{TMDATA}"]))
-        assert repository.get_capability_set(
-            Telescope.SKA_LOW, "AA2", "AA2_SV"
-        ) == repository.get_capability_set(Telescope.SKA_LOW, "AA2_SV")
 
     def test_raises_for_unknown_name(self, test_tmdata_repository):
         with pytest.raises(
