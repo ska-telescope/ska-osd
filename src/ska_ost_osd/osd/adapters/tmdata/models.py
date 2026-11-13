@@ -33,7 +33,7 @@ from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplate
 
 
 class MidCapabilitySetFile(OSDBaseModel):
-    """Model for telescopes/ska_mid/capabilities/<name>.json. The file is
+    """Model for telescopes/ska_mid/array_assemblies/<name>.json. The file is
     named after its capability set, so it holds neither the name nor the
     telescope."""
 
@@ -65,7 +65,7 @@ class MidCapabilitySetFile(OSDBaseModel):
 
 
 class LowCapabilitySetFile(OSDBaseModel):
-    """Model for telescopes/ska_low/capabilities/<name>.json. The file is
+    """Model for telescopes/ska_low/array_assemblies/<name>.json. The file is
     named after its capability set, so it holds neither the name nor the
     telescope."""
 

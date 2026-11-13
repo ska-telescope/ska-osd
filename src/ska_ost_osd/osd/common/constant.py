@@ -50,7 +50,7 @@ class TelescopeFiles:
 
     @property
     def capability_sets(self) -> str:
-        return f"{self.directory}/capabilities"
+        return f"{self.directory}/array_assemblies"
 
     @property
     def subarray_templates(self) -> str:

@@ -32,14 +32,14 @@ Folder Structure
     │   └── <cycle>.json
     ├── telescopes
     │   ├── ska_low
-    │   │   ├── capabilities
+    │   │   ├── array_assemblies
     │   │   │   └── <capability set>.json
     │   │   ├── subarray_templates
     │   │   │   └── <array assembly>.json
     │   │   ├── basic_capabilities.json
     │   │   └── defaults.json
     │   └── ska_mid
-    │       ├── capabilities
+    │       ├── array_assemblies
     │       │   └── <capability set>.json
     │       ├── subarray_templates
     │       │   └── <array assembly>.json
@@ -68,8 +68,8 @@ Each telescope's basic capabilities are in its ``basic_capabilities.json``
 file: Mid's receiver bands as ``frequency_bands``, or Low's one ``frequency_band``, and its
 ``elevation_limits``, and for Low its ``coarse_channels`` and the channels each
 of its ``modes`` divides them into. Each of
-its capability sets is in its own file in ``capabilities``, named after the
-capability set, such as ``capabilities/AA2.json``.
+its capability sets is in its own file in ``array_assemblies``, named after the
+capability set, such as ``array_assemblies/AA2.json``.
 
 .. note::
 

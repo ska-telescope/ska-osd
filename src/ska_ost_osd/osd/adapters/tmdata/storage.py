@@ -127,7 +127,7 @@ def get_capability_set_files(
     tmdata: TMData, telescope: Telescope
 ) -> dict[str, MidCapabilitySetFile] | dict[str, LowCapabilitySetFile]:
     """Read each of one telescope's capability set files,
-    ``telescopes/<telescope>/capabilities/<name>.json``.
+    ``telescopes/<telescope>/array_assemblies/<name>.json``.
 
     :param tmdata: TMData to read from.
     :param telescope: the telescope.

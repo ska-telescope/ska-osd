@@ -59,8 +59,8 @@ TMDATA = Path(__file__).parents[4] / "tmdata"
     + [
         (model, f"{directory}/{capability_set.name}")
         for model, directory in [
-            (MidCapabilitySetFile, "telescopes/ska_mid/capabilities"),
-            (LowCapabilitySetFile, "telescopes/ska_low/capabilities"),
+            (MidCapabilitySetFile, "telescopes/ska_mid/array_assemblies"),
+            (LowCapabilitySetFile, "telescopes/ska_low/array_assemblies"),
         ]
         for capability_set in sorted((TMDATA / directory).glob("*.json"))
     ]

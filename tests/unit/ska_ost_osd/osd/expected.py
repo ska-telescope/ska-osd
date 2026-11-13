@@ -214,7 +214,7 @@ CYCLE_1_LEGACY_OBSERVATORY_POLICY = {
     "telescope_capabilities": {"Low": "AA1"},
 }
 
-# tests/tmdata/telescopes/ska_mid/capabilities/AA1.json and AA2.json
+# tests/tmdata/telescopes/ska_mid/array_assemblies/AA1.json and AA2.json
 MID_AA1 = MidCapabilitySet(
     name="AA1",
     available_bandwidth_hz=800_000_000,
@@ -336,7 +336,7 @@ MID_CAPABILITY_SET_FILES = {
     for capability_set in (MID_AA1, MID_AA2)
 }
 
-# tests/tmdata/telescopes/ska_low/capabilities/AA1.json and AA2.json
+# tests/tmdata/telescopes/ska_low/array_assemblies/AA1.json and AA2.json
 LOW_AA1 = LowCapabilitySet(
     name="AA1",
     subarray_beams=LowArrayAssemblySubarrayBeams(

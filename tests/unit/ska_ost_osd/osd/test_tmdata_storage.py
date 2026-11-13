@@ -65,8 +65,8 @@ class TestGetCapabilitySetFiles:
     @pytest.mark.parametrize(
         "telescope, path",
         [
-            (Telescope.SKA_MID, "telescopes/ska_mid/capabilities"),
-            (Telescope.SKA_LOW, "telescopes/ska_low/capabilities"),
+            (Telescope.SKA_MID, "telescopes/ska_mid/array_assemblies"),
+            (Telescope.SKA_LOW, "telescopes/ska_low/array_assemblies"),
         ],
     )
     def test_raises_when_directory_missing(self, empty_tmdata, telescope, path):

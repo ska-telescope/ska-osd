@@ -53,7 +53,8 @@ Unreleased
   coarse channels and channels per mode as fields of its band.
   ``mid_capabilities.json`` and ``low_capabilities.json`` are kept for older releases
   but are no longer read
-* Moved telescope capability sets to standalone tmdata files. Low's stations are in
+* Moved telescope capability sets to standalone tmdata files, one per array assembly,
+  in ``telescopes/<telescope>/array_assemblies``. Low's stations are in
   ``stations``, as ``number_stations``, ``max_baseline_km`` and ``ids``, and Mid's
   dishes in ``dishes``, as ``number_ska_dishes``, ``number_meerkat_dishes``,
   ``number_meerkatplus_dishes``, ``max_baseline_km`` and ``ids``. The legacy response

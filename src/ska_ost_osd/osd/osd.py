@@ -277,14 +277,16 @@ class OSD:
                 name.removesuffix(".json"): self._legacy_capability_set(
                     telescope_dir, name
                 )
-                for name in sorted(self.tmdata[f"{telescope_dir}/capabilities"])
+                for name in sorted(self.tmdata[f"{telescope_dir}/array_assemblies"])
             },
         }
 
     def _legacy_capability_set(self, telescope_dir: str, name: str) -> dict[str, Any]:
         """A capability set in its legacy shape: its array assembly as a template
         pattern, or as that array assembly's templates when they are processed."""
-        capability_set = self.tmdata[f"{telescope_dir}/capabilities/{name}"].get_dict()
+        capability_set = self.tmdata[
+            f"{telescope_dir}/array_assemblies/{name}"
+        ].get_dict()
         # The legacy response serves the stations or dishes flat, with their
         # IDs as number_station_ids or number_dish_ids
         if "stations" in capability_set:

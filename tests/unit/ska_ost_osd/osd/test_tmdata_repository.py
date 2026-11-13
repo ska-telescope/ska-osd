@@ -223,7 +223,8 @@ class TestGetCapabilitySets:
 
     def test_raises_when_file_missing(self, empty_tmdata_repository):
         with pytest.raises(
-            FileNotFoundError, match="file not found: telescopes/ska_mid/capabilities"
+            FileNotFoundError,
+            match="file not found: telescopes/ska_mid/array_assemblies",
         ):
             empty_tmdata_repository.get_capability_sets(Telescope.SKA_MID)
 
@@ -259,7 +260,8 @@ class TestGetCapabilitySet:
 
     def test_raises_when_file_missing(self, empty_tmdata_repository):
         with pytest.raises(
-            FileNotFoundError, match="file not found: telescopes/ska_low/capabilities"
+            FileNotFoundError,
+            match="file not found: telescopes/ska_low/array_assemblies",
         ):
             empty_tmdata_repository.get_capability_set(Telescope.SKA_LOW, "AA1")
 
