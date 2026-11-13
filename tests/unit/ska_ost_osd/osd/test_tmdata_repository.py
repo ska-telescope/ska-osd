@@ -341,6 +341,21 @@ class TestGetCapabilities:
         with pytest.raises(ValidationError, match="cbf_modes must list pst"):
             repository.get_capabilities(Telescope.SKA_LOW, "AA2", "bad")
 
+    def test_rejects_receivers_without_a_frequency_band(self, tmdata_repository_with):
+        repository = tmdata_repository_with(
+            {
+                "telescopes/ska_mid/policies/bad.json": {
+                    "policy": "bad",
+                    "receivers": ["Band_1", "Band_9"],
+                }
+            }
+        )
+        with pytest.raises(
+            ValidationError,
+            match=r"bad: receivers \['Band_9'\] not found in frequency_bands",
+        ):
+            repository.get_capabilities(Telescope.SKA_MID, "AA2", "bad")
+
     def test_raises_for_unknown_policy(self, test_tmdata_repository):
         with pytest.raises(
             PolicyNotFoundError,

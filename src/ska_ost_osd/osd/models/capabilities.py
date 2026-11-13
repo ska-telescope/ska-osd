@@ -198,6 +198,16 @@ class MidCapabilities(OSDBaseModel):
                 )
         return self
 
+    @model_validator(mode="after")
+    def check_receivers(self) -> Self:
+        unknown = set(self.receivers) - {band.rx_id for band in self.frequency_bands}
+        if unknown:
+            raise ValueError(
+                f"{self.policy or self.array_assembly}: "
+                f"receivers {sorted(unknown)} not found in frequency_bands"
+            )
+        return self
+
 
 class LowCBFMode(StrEnum):
     VIS = "vis"
