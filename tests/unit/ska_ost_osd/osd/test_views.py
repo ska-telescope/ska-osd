@@ -17,7 +17,7 @@ from tests.unit.ska_ost_osd.osd.expected import (
     CYCLE_2_CONFIGURATION,
 )
 
-CAPABILITY_SET_KEYS = [
+CAPABILITIES_KEYS = [
     "name",
     "receptors",
     "available_bandwidth_hz",
@@ -50,11 +50,11 @@ class TestGetConfiguration:
             "subarrays",
         ]
         assert list(served["ska_mid"]["subarrays"][0]) == [
-            *CAPABILITY_SET_KEYS,
+            *CAPABILITIES_KEYS,
             "allowed_channel_width_values_hz",
         ]
         assert list(served["ska_low"]["subarrays"][0]) == [
-            *CAPABILITY_SET_KEYS,
+            *CAPABILITIES_KEYS,
             "number_substations",
             "number_subarray_beams",
         ]

@@ -291,7 +291,7 @@ has no template file, offers no templates.
 Reading the templates
 ---------------------
 
-* The repository's ``get_subarray_templates(telescope, capability_set)`` returns
+* The repository's ``get_subarray_templates(telescope, array_assembly)`` returns
   a capability set's templates as a list of ``SubarrayTemplate`` models.
 * The PHT views take ``include_subarray_templates``, ``False`` by default. With
   ``True``, each offered capability set is served with ``subarray_templates``: its

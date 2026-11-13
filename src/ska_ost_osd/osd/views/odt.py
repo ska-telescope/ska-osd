@@ -18,7 +18,7 @@ from ska_ost_osd.osd.views.base import (
 )
 
 
-class MidConfigurationCapabilitySet(ConfigurationModel):
+class MidConfigurationCapabilities(ConfigurationModel):
     name: str
     receptors: list[str | int]
     available_bandwidth_hz: float
@@ -27,7 +27,7 @@ class MidConfigurationCapabilitySet(ConfigurationModel):
     allowed_channel_width_values_hz: list[int]
 
 
-class LowConfigurationCapabilitySet(ConfigurationModel):
+class LowConfigurationCapabilities(ConfigurationModel):
     name: str
     receptors: list[str | int]
     available_bandwidth_hz: float
@@ -48,7 +48,7 @@ class ConfigurationLowQualityAttributeMetrics(ConfigurationModel):
 class MidConfiguration(ConfigurationModel):
     frequency_band: list[MidFrequencyBand]
     constraints: Constraints
-    subarrays: list[MidConfigurationCapabilitySet]
+    subarrays: list[MidConfigurationCapabilities]
     spfrx_defaults: SPFRxParameters
 
 
@@ -56,43 +56,43 @@ class LowConfiguration(ConfigurationModel):
     frequency_band: LowFrequencyBandWithChannels
     constraints: Constraints
     quality_attribute_metrics: ConfigurationLowQualityAttributeMetrics
-    subarrays: list[LowConfigurationCapabilitySet]
+    subarrays: list[LowConfigurationCapabilities]
 
 
 class Configuration(ConfigurationModel):
     """The ODT configuration: both telescopes' bands, constraints, defaults
-    and capability sets."""
+    and capabilities."""
 
     ska_mid: MidConfiguration
     ska_low: LowConfiguration
 
 
-def _mid_capability_set(
-    capability_set: MidCapabilities,
-) -> MidConfigurationCapabilitySet:
-    return MidConfigurationCapabilitySet(
-        name=capability_set.name,
-        receptors=capability_set.dishes.ids,
-        available_bandwidth_hz=capability_set.available_bandwidth_hz,
-        number_pst_beams=capability_set.modes.pst.max_beams,
-        number_fsps=capability_set.number_fsps,
-        allowed_channel_width_values_hz=capability_set.allowed_channel_width_values_hz,
+def _mid_capabilities(
+    capabilities: MidCapabilities,
+) -> MidConfigurationCapabilities:
+    return MidConfigurationCapabilities(
+        name=capabilities.name,
+        receptors=capabilities.dishes.ids,
+        available_bandwidth_hz=capabilities.available_bandwidth_hz,
+        number_pst_beams=capabilities.modes.pst.max_beams,
+        number_fsps=capabilities.number_fsps,
+        allowed_channel_width_values_hz=capabilities.allowed_channel_width_values_hz,
     )
 
 
-def _low_capability_set(
-    capability_set: LowCapabilities,
-) -> LowConfigurationCapabilitySet:
-    return LowConfigurationCapabilitySet(
-        name=capability_set.name,
-        receptors=capability_set.stations.ids,
-        available_bandwidth_hz=capability_set.available_bandwidth_hz,
-        number_pst_beams=capability_set.modes.pst.max_beams,
-        number_fsps=capability_set.number_fsps,
+def _low_capabilities(
+    capabilities: LowCapabilities,
+) -> LowConfigurationCapabilities:
+    return LowConfigurationCapabilities(
+        name=capabilities.name,
+        receptors=capabilities.stations.ids,
+        available_bandwidth_hz=capabilities.available_bandwidth_hz,
+        number_pst_beams=capabilities.modes.pst.max_beams,
+        number_fsps=capabilities.number_fsps,
         number_substations=(
-            capability_set.subarray_beams.max_substations_per_subarray_beam
+            capabilities.subarray_beams.max_substations_per_subarray_beam
         ),
-        number_subarray_beams=capability_set.subarray_beams.max_subarray_beams,
+        number_subarray_beams=capabilities.subarray_beams.max_subarray_beams,
     )
 
 
@@ -111,8 +111,8 @@ def get_configuration(repository: OSDRepository) -> Configuration:
             ).frequency_bands,
             constraints=repository.get_constraints(Telescope.SKA_MID),
             subarrays=[
-                _mid_capability_set(capability_set)
-                for capability_set in repository.get_array_assembly_capabilities(
+                _mid_capabilities(capabilities)
+                for capabilities in repository.get_array_assembly_capabilities(
                     Telescope.SKA_MID
                 )
             ],
@@ -126,8 +126,8 @@ def get_configuration(repository: OSDRepository) -> Configuration:
                 from_attributes=True,
             ),
             subarrays=[
-                _low_capability_set(capability_set)
-                for capability_set in repository.get_array_assembly_capabilities(
+                _low_capabilities(capabilities)
+                for capabilities in repository.get_array_assembly_capabilities(
                     Telescope.SKA_LOW
                 )
             ],

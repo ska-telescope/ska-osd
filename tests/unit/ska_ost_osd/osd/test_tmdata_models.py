@@ -157,21 +157,21 @@ class TestCapabilities:
     """The capabilities models' own logic."""
 
     @pytest.mark.parametrize(
-        "expected, capability_set_model",
+        "expected, capabilities_model",
         [(MID_AA2, MidCapabilities), (LOW_AA2, LowCapabilities)],
     )
     @pytest.mark.parametrize("mode", ["python", "json"])
     def test_capabilities_are_chosen_by_telescope(
-        self, expected, capability_set_model, mode
+        self, expected, capabilities_model, mode
     ):
         """A serialised capability set reads back as the right capability
         set model, chosen by its telescope."""
-        capability_set = TypeAdapter(Capabilities).validate_python(
+        capabilities = TypeAdapter(Capabilities).validate_python(
             expected.model_dump(mode=mode)
         )
 
-        assert type(capability_set) is capability_set_model
-        assert capability_set == expected
+        assert type(capabilities) is capabilities_model
+        assert capabilities == expected
 
     def test_capabilities_reject_another_telescope(self):
         data = load(LOW_ARRAY_ASSEMBLY)

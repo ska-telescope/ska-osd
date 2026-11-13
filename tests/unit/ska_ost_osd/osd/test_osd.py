@@ -299,22 +299,22 @@ def test_get_osd_using_tmdata_serves_low_modes_flat(tests_tmdata):
     legacy names."""
     osd_data = get_osd_using_tmdata(tests_tmdata, telescope=Telescope.SKA_LOW)
 
-    capability_set = osd_data["capabilities"]["low"]["AA2"]
-    assert "modes" not in capability_set
-    assert capability_set["number_zoom_windows"] == 0
-    assert capability_set["number_zoom_channels"] == 0
-    assert capability_set["allowed_zoom_factors"] == [1, 2, 4, 8]
-    assert capability_set["number_pss_beams"] == 0
-    assert capability_set["ps_beam_bandwidth_hz"] == 75_000_000.0
-    assert capability_set["number_pst_beams"] == 1
-    assert capability_set["number_vlbi_beams"] == 0
-    assert "subarray_beams" not in capability_set
-    assert capability_set["number_subarray_beams"] == 8
-    assert capability_set["number_substations"] == 512
-    assert "stations" not in capability_set
-    assert capability_set["number_stations"] == 8
-    assert capability_set["max_baseline_km"] == 6.0
-    assert capability_set["number_station_ids"] == [
+    served = osd_data["capabilities"]["low"]["AA2"]
+    assert "modes" not in served
+    assert served["number_zoom_windows"] == 0
+    assert served["number_zoom_channels"] == 0
+    assert served["allowed_zoom_factors"] == [1, 2, 4, 8]
+    assert served["number_pss_beams"] == 0
+    assert served["ps_beam_bandwidth_hz"] == 75_000_000.0
+    assert served["number_pst_beams"] == 1
+    assert served["number_vlbi_beams"] == 0
+    assert "subarray_beams" not in served
+    assert served["number_subarray_beams"] == 8
+    assert served["number_substations"] == 512
+    assert "stations" not in served
+    assert served["number_stations"] == 8
+    assert served["max_baseline_km"] == 6.0
+    assert served["number_station_ids"] == [
         345,
         346,
         347,
@@ -334,26 +334,26 @@ def test_get_osd_using_tmdata_serves_mid_modes_flat(tests_tmdata):
     )
 
     assert "constraints" not in osd_data["capabilities"]["mid"]
-    capability_set = osd_data["capabilities"]["mid"]["AA2"]
-    assert "modes" not in capability_set
-    assert capability_set["number_pss_beams"] == 0
-    assert capability_set["ps_beam_bandwidth_hz"] == 400_000_000
-    assert capability_set["number_pst_beams"] == 1
-    assert "dishes" not in capability_set
-    assert "receivers" not in capability_set
-    assert capability_set["available_receivers"] == [
+    served = osd_data["capabilities"]["mid"]["AA2"]
+    assert "modes" not in served
+    assert served["number_pss_beams"] == 0
+    assert served["ps_beam_bandwidth_hz"] == 400_000_000
+    assert served["number_pst_beams"] == 1
+    assert "dishes" not in served
+    assert "receivers" not in served
+    assert served["available_receivers"] == [
         "Band_1",
         "Band_2",
         "Band_5a",
         "Band_5b",
     ]
-    assert capability_set["number_ska_dishes"] == 8
-    assert capability_set["number_meerkat_dishes"] == 0
-    assert capability_set["max_baseline_km"] == 1.5
-    assert capability_set["number_dish_ids"][0] == "SKA001"
-    assert capability_set["number_zoom_windows"] == 0
-    assert capability_set["number_zoom_channels"] == 0
-    assert "allowed_zoom_factors" not in capability_set
+    assert served["number_ska_dishes"] == 8
+    assert served["number_meerkat_dishes"] == 0
+    assert served["max_baseline_km"] == 1.5
+    assert served["number_dish_ids"][0] == "SKA001"
+    assert served["number_zoom_windows"] == 0
+    assert served["number_zoom_channels"] == 0
+    assert "allowed_zoom_factors" not in served
 
 
 def test_get_osd_using_tmdata_band_5b_has_sub_bands(tests_tmdata):

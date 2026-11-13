@@ -1,6 +1,6 @@
 """The PHT views: what ska-oso-services serves to the PHT from GET
-/prsls/osd/cycles and GET /prsls/osd/{cycle}: each cycle with the capability
-set each telescope offers and that telescope's basic capabilities. Served
+/prsls/osd/cycles and GET /prsls/osd/{cycle}: each cycle with the
+capabilities each telescope offers and that telescope's basic capabilities. Served
 with aliases, the field names are the ones the PHT UI reads."""
 
 from datetime import datetime
@@ -38,7 +38,7 @@ _TYPE_NAMES = {
 
 
 class CycleTelescopeCapabilities(ConfigurationModel):
-    """The capability set each telescope offers in the cycle, or ``None``.
+    """The capabilities each telescope offers in the cycle, or ``None``.
     Served as ``Mid`` and ``Low``, the names the PHT UI reads."""
 
     ska_mid: str | None = Field(validation_alias="Mid", serialization_alias="Mid")
@@ -94,141 +94,135 @@ class CycleSubarrayTemplate(ConfigurationModel):
 
 
 class CycleCapabilitiesBase(ConfigurationModel):
-    """One telescope's capabilities in a cycle. Served with the capability
-    set keyed by its name, e.g. ``"AA2": {...}``, beside
+    """One telescope's capabilities in a cycle. Served keyed by the name of
+    the policy or array assembly, e.g. ``"AA2": {...}``, beside
     ``basic_capabilities``. When the subarray templates are asked for, they
-    are served in the capability set, keyed by name, as
+    are served in the capabilities, keyed by name, as
     ``subarray_templates``."""
 
-    capability_set: Capabilities
+    capabilities: Capabilities
     subarray_templates: dict[str, CycleSubarrayTemplate] | None = None
 
     @model_validator(mode="before")
     @classmethod
-    def collect_capability_set(cls, data: Any) -> Any:
+    def collect_capabilities(cls, data: Any) -> Any:
         """Read the served form back: the one key that isn't
-        ``basic_capabilities`` is the capability set, which holds the
-        subarray templates if they were served."""
-        if not isinstance(data, dict) or "capability_set" in data:
+        ``basic_capabilities`` holds the capabilities, and the subarray
+        templates if they were served."""
+        if not isinstance(data, dict) or "capabilities" in data:
             return data
         data = data.copy()
         names = [key for key in data if key != "basic_capabilities"]
         if len(names) == 1:
-            capability_set = dict(data.pop(names[0]))
-            if "subarray_templates" in capability_set:
-                data["subarray_templates"] = capability_set.pop("subarray_templates")
-            if "number_pss_beams" in capability_set:
+            capabilities = dict(data.pop(names[0]))
+            if "subarray_templates" in capabilities:
+                data["subarray_templates"] = capabilities.pop("subarray_templates")
+            if "number_pss_beams" in capabilities:
                 modes: dict[str, Any] = {
                     "spectral": {
-                        "max_zoom_windows": capability_set.pop("number_zoom_windows"),
-                        "max_zoom_channels": capability_set.pop("number_zoom_channels"),
+                        "max_zoom_windows": capabilities.pop("number_zoom_windows"),
+                        "max_zoom_channels": capabilities.pop("number_zoom_channels"),
                     },
                     "pss": {
-                        "max_beams": capability_set.pop("number_pss_beams"),
-                        "beam_bandwidth_hz": capability_set.pop("ps_beam_bandwidth_hz"),
+                        "max_beams": capabilities.pop("number_pss_beams"),
+                        "beam_bandwidth_hz": capabilities.pop("ps_beam_bandwidth_hz"),
                     },
-                    "pst": {"max_beams": capability_set.pop("number_pst_beams")},
+                    "pst": {"max_beams": capabilities.pop("number_pst_beams")},
                 }
-                if "allowed_zoom_factors" in capability_set:
-                    modes["spectral"]["zoom_factors"] = capability_set.pop(
+                if "allowed_zoom_factors" in capabilities:
+                    modes["spectral"]["zoom_factors"] = capabilities.pop(
                         "allowed_zoom_factors"
                     )
-                if "number_vlbi_beams" in capability_set:
-                    modes["vlbi"] = {
-                        "max_beams": capability_set.pop("number_vlbi_beams")
-                    }
-                capability_set["modes"] = modes
-            if "available_receivers" in capability_set:
-                capability_set["receivers"] = capability_set.pop("available_receivers")
-            if "number_ska_dishes" in capability_set:
-                capability_set["dishes"] = {
-                    "number_ska_dishes": capability_set.pop("number_ska_dishes"),
-                    "number_meerkat_dishes": capability_set.pop(
-                        "number_meerkat_dishes"
-                    ),
-                    "number_meerkatplus_dishes": capability_set.pop(
+                if "number_vlbi_beams" in capabilities:
+                    modes["vlbi"] = {"max_beams": capabilities.pop("number_vlbi_beams")}
+                capabilities["modes"] = modes
+            if "available_receivers" in capabilities:
+                capabilities["receivers"] = capabilities.pop("available_receivers")
+            if "number_ska_dishes" in capabilities:
+                capabilities["dishes"] = {
+                    "number_ska_dishes": capabilities.pop("number_ska_dishes"),
+                    "number_meerkat_dishes": capabilities.pop("number_meerkat_dishes"),
+                    "number_meerkatplus_dishes": capabilities.pop(
                         "number_meerkatplus_dishes"
                     ),
-                    "max_baseline_km": capability_set.pop("max_baseline_km"),
-                    "ids": capability_set.pop("receptors"),
+                    "max_baseline_km": capabilities.pop("max_baseline_km"),
+                    "ids": capabilities.pop("receptors"),
                 }
-            if "number_stations" in capability_set:
-                capability_set["stations"] = {
-                    "number_stations": capability_set.pop("number_stations"),
-                    "max_baseline_km": capability_set.pop("max_baseline_km"),
-                    "ids": capability_set.pop("receptors"),
+            if "number_stations" in capabilities:
+                capabilities["stations"] = {
+                    "number_stations": capabilities.pop("number_stations"),
+                    "max_baseline_km": capabilities.pop("max_baseline_km"),
+                    "ids": capabilities.pop("receptors"),
                 }
-            if "number_substations" in capability_set:
-                capability_set["subarray_beams"] = {
-                    "max_subarray_beams": capability_set.pop("number_subarray_beams"),
-                    "max_substations_per_subarray_beam": capability_set.pop(
+            if "number_substations" in capabilities:
+                capabilities["subarray_beams"] = {
+                    "max_subarray_beams": capabilities.pop("number_subarray_beams"),
+                    "max_substations_per_subarray_beam": capabilities.pop(
                         "number_substations"
                     ),
                 }
-            data["capability_set"] = capability_set
+            data["capabilities"] = capabilities
         return data
 
     @model_serializer(mode="wrap")
-    def key_capability_set_by_name(
+    def key_capabilities_by_name(
         self, handler: SerializerFunctionWrapHandler
     ) -> dict[str, Any]:
         data = handler(self)
-        capability_set = data.pop("capability_set")
-        if "receivers" in capability_set:
-            capability_set["available_receivers"] = capability_set.pop("receivers")
+        capabilities = data.pop("capabilities")
+        if "receivers" in capabilities:
+            capabilities["available_receivers"] = capabilities.pop("receivers")
         # The PHT UI reads Mid's channel widths without the _hz suffix
-        if "allowed_channel_width_values_hz" in capability_set:
-            capability_set["allowed_channel_width_values"] = capability_set[
+        if "allowed_channel_width_values_hz" in capabilities:
+            capabilities["allowed_channel_width_values"] = capabilities[
                 "allowed_channel_width_values_hz"
             ]
         # The PHT UI reads the modes, the stations or dishes, and Low's
         # subarray beams, flat under their old names
-        modes = capability_set.pop("modes")
-        capability_set["number_zoom_windows"] = modes["spectral"]["max_zoom_windows"]
-        capability_set["number_zoom_channels"] = modes["spectral"]["max_zoom_channels"]
+        modes = capabilities.pop("modes")
+        capabilities["number_zoom_windows"] = modes["spectral"]["max_zoom_windows"]
+        capabilities["number_zoom_channels"] = modes["spectral"]["max_zoom_channels"]
         if "zoom_factors" in modes["spectral"]:
-            capability_set["allowed_zoom_factors"] = modes["spectral"]["zoom_factors"]
-        capability_set["number_pss_beams"] = modes["pss"]["max_beams"]
-        capability_set["ps_beam_bandwidth_hz"] = modes["pss"]["beam_bandwidth_hz"]
-        capability_set["number_pst_beams"] = modes["pst"]["max_beams"]
+            capabilities["allowed_zoom_factors"] = modes["spectral"]["zoom_factors"]
+        capabilities["number_pss_beams"] = modes["pss"]["max_beams"]
+        capabilities["ps_beam_bandwidth_hz"] = modes["pss"]["beam_bandwidth_hz"]
+        capabilities["number_pst_beams"] = modes["pst"]["max_beams"]
         if "vlbi" in modes:
-            capability_set["number_vlbi_beams"] = modes["vlbi"]["max_beams"]
-        if "stations" in capability_set:
-            stations = capability_set.pop("stations")
-            capability_set["receptors"] = stations["ids"]
-            capability_set["number_stations"] = stations["number_stations"]
-            capability_set["max_baseline_km"] = stations["max_baseline_km"]
-        if "dishes" in capability_set:
-            dishes = capability_set.pop("dishes")
-            capability_set["receptors"] = dishes["ids"]
-            capability_set["number_ska_dishes"] = dishes["number_ska_dishes"]
-            capability_set["number_meerkat_dishes"] = dishes["number_meerkat_dishes"]
-            capability_set["number_meerkatplus_dishes"] = dishes[
+            capabilities["number_vlbi_beams"] = modes["vlbi"]["max_beams"]
+        if "stations" in capabilities:
+            stations = capabilities.pop("stations")
+            capabilities["receptors"] = stations["ids"]
+            capabilities["number_stations"] = stations["number_stations"]
+            capabilities["max_baseline_km"] = stations["max_baseline_km"]
+        if "dishes" in capabilities:
+            dishes = capabilities.pop("dishes")
+            capabilities["receptors"] = dishes["ids"]
+            capabilities["number_ska_dishes"] = dishes["number_ska_dishes"]
+            capabilities["number_meerkat_dishes"] = dishes["number_meerkat_dishes"]
+            capabilities["number_meerkatplus_dishes"] = dishes[
                 "number_meerkatplus_dishes"
             ]
-            capability_set["max_baseline_km"] = dishes["max_baseline_km"]
-        if "subarray_beams" in capability_set:
-            subarray_beams = capability_set.pop("subarray_beams")
-            capability_set["number_substations"] = subarray_beams[
+            capabilities["max_baseline_km"] = dishes["max_baseline_km"]
+        if "subarray_beams" in capabilities:
+            subarray_beams = capabilities.pop("subarray_beams")
+            capabilities["number_substations"] = subarray_beams[
                 "max_substations_per_subarray_beam"
             ]
-            capability_set["number_subarray_beams"] = subarray_beams[
-                "max_subarray_beams"
-            ]
-        data[self.capability_set.name] = capability_set
+            capabilities["number_subarray_beams"] = subarray_beams["max_subarray_beams"]
+        data[self.capabilities.name] = capabilities
         if (subarray_templates := data.pop("subarray_templates")) is not None:
-            data[self.capability_set.name]["subarray_templates"] = subarray_templates
+            data[self.capabilities.name]["subarray_templates"] = subarray_templates
         return data
 
 
 class MidCycleCapabilities(CycleCapabilitiesBase):
     basic_capabilities: MidCycleBasicCapabilities
-    capability_set: MidCapabilities
+    capabilities: MidCapabilities
 
 
 class LowCycleCapabilities(CycleCapabilitiesBase):
     basic_capabilities: LowFrequencyBandWithChannels
-    capability_set: LowCapabilities
+    capabilities: LowCapabilities
 
 
 class CycleCapabilities(ConfigurationModel):
@@ -305,10 +299,11 @@ def get_cycle_configuration(
 
     :param repository: the OSD repository to read from.
     :param cycle_id: the ID of the cycle.
-    :param include_subarray_templates: whether to serve each offered
-        capability set's subarray templates, as ``subarray_templates``.
+    :param include_subarray_templates: whether to serve the subarray
+        templates offered with each telescope's capabilities, as
+        ``subarray_templates``.
     :return: the cycle with, for each telescope it offers, the offered
-        capability set and that telescope's basic capabilities.
+        capabilities and that telescope's basic capabilities.
     :raises CycleNotFoundError: If there is no cycle with that ID.
     :raises ArrayAssemblyNotFoundError: If the cycle names an array assembly
         that does not exist.
@@ -317,19 +312,17 @@ def get_cycle_configuration(
     :raises ValueError: If the cycle offers more than one policy type.
     """
     cycle = repository.get_cycle(cycle_id)
-    capability_sets = repository.get_cycle_capabilities(cycle_id)
+    offered = repository.get_cycle_capabilities(cycle_id)
     # The PHT UI handles one policy type per cycle
-    types = {
-        policy_type for by_type in capability_sets.values() for policy_type in by_type
-    }
+    types = {policy_type for by_type in offered.values() for policy_type in by_type}
     if len(types) != 1:
         raise ValueError(
             f"Cycle {cycle_id} offers more than one policy type, which the PHT "
             "view can't serve"
         )
     (policy_type,) = types
-    mid = capability_sets.get(Telescope.SKA_MID, {}).get(policy_type)
-    low = capability_sets.get(Telescope.SKA_LOW, {}).get(policy_type)
+    mid = offered.get(Telescope.SKA_MID, {}).get(policy_type)
+    low = offered.get(Telescope.SKA_LOW, {}).get(policy_type)
     return CycleConfiguration(
         observatory_policy=_observatory_policy(cycle, policy_type, mid, low),
         capabilities=CycleCapabilities(
@@ -338,7 +331,7 @@ def get_cycle_configuration(
                     repository.get_basic_capabilities(Telescope.SKA_MID),
                     from_attributes=True,
                 ),
-                capability_set=mid,
+                capabilities=mid,
                 subarray_templates=_subarray_templates(
                     repository,
                     Telescope.SKA_MID,
@@ -350,7 +343,7 @@ def get_cycle_configuration(
             else None,
             low=LowCycleCapabilities(
                 basic_capabilities=low_frequency_band(repository),
-                capability_set=low,
+                capabilities=low,
                 subarray_templates=_subarray_templates(
                     repository,
                     Telescope.SKA_LOW,
@@ -371,8 +364,9 @@ def get_cycle_configurations(
     ska-oso-services serves from GET /prsls/osd/cycles.
 
     :param repository: the OSD repository to read from.
-    :param include_subarray_templates: whether to serve each offered
-        capability set's subarray templates, as ``subarray_templates``.
+    :param include_subarray_templates: whether to serve the subarray
+        templates offered with each telescope's capabilities, as
+        ``subarray_templates``.
     :return: the cycle views.
     :raises ArrayAssemblyNotFoundError: If a cycle names an array assembly
         that does not exist.

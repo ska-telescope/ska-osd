@@ -69,7 +69,7 @@ class OSD:
         :param telescope: requested telescope, ``Telescope.SKA_MID`` or
             ``Telescope.SKA_LOW``. The legacy names ``"mid"`` and ``"low"``
             are still accepted.
-        :param array_assembly: requested capability-set name, such as ``"AA2"``.
+        :param array_assembly: requested array assembly name, such as ``"AA2"``.
         :param tmdata: TMData, TMData class object.
         :param cycle_id: int, cycle identifier.
         :param process_templates: bool, whether to process template mappings.
@@ -77,7 +77,7 @@ class OSD:
         """
         self.cycle_id = cycle_id
         self.requested_telescope = _LEGACY_TELESCOPE_NAMES.get(telescope, telescope)
-        self.requested_capability_set = array_assembly
+        self.requested_array_assembly = array_assembly
         self.tmdata = tmdata
         self.process_templates = process_templates
 
@@ -128,8 +128,8 @@ class OSD:
                     self.requested_telescope, available
                 )
 
-        # A named capability set can only be queried with a telescope.
-        if self.requested_capability_set and not self.requested_telescope:
+        # Named capabilities can only be queried with a telescope.
+        if self.requested_array_assembly and not self.requested_telescope:
             if self.cycle_id is not None:
                 return CYCLE_ID_ARRAY_ASSEMBLY_ERROR_MESSAGE
             return ARRAY_ASSEMBLY_REQUIRES_CAPABILITY_ERROR_MESSAGE
@@ -180,72 +180,72 @@ class OSD:
         }
         return cycle_definition, None
 
-    def select_telescope_capability_sets(
+    def select_telescope_capabilities(
         self, cycle_definition: dict[str, Any] | None
     ) -> tuple[dict[str, str | None] | None, str | None]:
-        """Select a named capability set for each included telescope."""
+        """Select the named capabilities for each included telescope."""
         if cycle_definition is None:
             # Catalogue mode: select each requested telescope and optionally one
-            # named capability set. No capability-set filter is expanded to all
-            # named sets later in build_osd_data().
+            # array assembly. No array assembly filter is expanded to all
+            # named capabilities later in build_osd_data().
             if self.requested_telescope:
                 return {
-                    self.requested_telescope.lower(): self.requested_capability_set
+                    self.requested_telescope.lower(): self.requested_array_assembly
                 }, None
             return {
-                telescope.lower(): self.requested_capability_set
+                telescope.lower(): self.requested_array_assembly
                 for telescope in self.capability_filepaths
             }, None
 
-        # Cycle mode: each telescope maps to one prescribed capability set.
-        cycle_telescope_capability_sets = cycle_definition["telescope_capabilities"]
+        # Cycle mode: each telescope maps to the capabilities the cycle prescribes.
+        cycle_telescope_capabilities = cycle_definition["telescope_capabilities"]
         if self.requested_telescope is None:
             return {
-                telescope.lower(): capability_set
-                for telescope, capability_set in cycle_telescope_capability_sets.items()
+                telescope.lower(): name
+                for telescope, name in cycle_telescope_capabilities.items()
             }, None
 
         telescope_key = self.requested_telescope.capitalize()
         # A requested telescope must be specified in the requested cycle.
-        if telescope_key not in cycle_telescope_capability_sets:
+        if telescope_key not in cycle_telescope_capabilities:
             available = ", ".join(
                 available_telescope.lower()
-                for available_telescope in cycle_telescope_capability_sets
+                for available_telescope in cycle_telescope_capabilities
             )
             return None, CAPABILITY_DOESNOT_BELONG_TO_CYCLE_ERROR_MESSAGE.format(
                 self.requested_telescope, self.cycle_id, available
             )
 
-        cycle_capability_set = cycle_telescope_capability_sets[telescope_key]
-        if self.requested_capability_set:
-            # A cycle already specifies a capability set for each telescope.
-            # Requesting a capability set is valid only when it matches the cycle.
-            if self.requested_capability_set != cycle_capability_set:
+        cycle_capabilities_name = cycle_telescope_capabilities[telescope_key]
+        if self.requested_array_assembly:
+            # A cycle already specifies the capabilities for each telescope.
+            # Requesting an array assembly is valid only when it matches the cycle.
+            if self.requested_array_assembly != cycle_capabilities_name:
                 return (
                     None,
                     ARRAY_ASSEMBLY_DOESNOT_MATCH_CYCLE_CAPABILITY_ERROR_MESSAGE.format(
-                        self.requested_capability_set,
+                        self.requested_array_assembly,
                         self.requested_telescope,
                         self.cycle_id,
-                        cycle_capability_set,
+                        cycle_capabilities_name,
                     ),
                 )
             LOGGER.warning(
                 "Ignoring redundant array assembly %s for capability %s in cycle %s",
-                self.requested_capability_set,
+                self.requested_array_assembly,
                 self.requested_telescope,
                 self.cycle_id,
             )
 
-        # Join the telescope to the capability set specified in the cycle.
-        return {self.requested_telescope.lower(): cycle_capability_set}, None
+        # Join the telescope to the capabilities specified in the cycle.
+        return {self.requested_telescope.lower(): cycle_capabilities_name}, None
 
     def get_telescope_capability_data(self, telescope: str) -> dict[str, Any]:
         """Load one telescope capability document and optional template mappings.
 
         The document is rebuilt in its legacy shape: the basic capabilities,
         without the elevation limits, as Mid's ``receiver_information`` or
-        Low's one band, and each capability set."""
+        Low's one band, and the capabilities of each array assembly and policy."""
         capability_filepath = self.capability_filepaths[telescope]
         telescope_dir = posixpath.dirname(capability_filepath)
         stored = self.tmdata[capability_filepath].get_dict()
@@ -275,15 +275,15 @@ class OSD:
         return {
             "basic_capabilities": basic_capabilities,
             **{
-                name: self._legacy_capability_set(telescope_dir, capability_set)
-                for name, capability_set in self._stored_capability_sets(
+                name: self._legacy_capabilities(telescope_dir, capabilities)
+                for name, capabilities in self._stored_capabilities(
                     telescope_dir
                 ).items()
             },
         }
 
-    def _stored_capability_sets(self, telescope_dir: str) -> dict[str, dict[str, Any]]:
-        """The telescope's capability sets as stored, by name: each array
+    def _stored_capabilities(self, telescope_dir: str) -> dict[str, dict[str, Any]]:
+        """The telescope's capabilities as stored, by name: each array
         assembly, and each policy a cycle names, applied to that cycle's
         array assembly."""
         directory = f"{telescope_dir}/array_assemblies"
@@ -306,114 +306,108 @@ class OSD:
                 )
         return dict(sorted((array_assemblies | policies).items()))
 
-    def _legacy_capability_set(
-        self, telescope_dir: str, capability_set: dict[str, Any]
+    def _legacy_capabilities(
+        self, telescope_dir: str, capabilities: dict[str, Any]
     ) -> dict[str, Any]:
-        """A capability set in its legacy shape: its array assembly as a template
+        """Capabilities in their legacy shape: the array assembly as a template
         pattern, or as that array assembly's templates when they are processed."""
-        capability_set = dict(capability_set)
+        capabilities = dict(capabilities)
         # The legacy response serves the stations or dishes flat, with their
         # IDs as number_station_ids or number_dish_ids
-        if "stations" in capability_set:
-            stations = capability_set.pop("stations")
-            capability_set["number_stations"] = stations["number_stations"]
-            capability_set["max_baseline_km"] = stations["max_baseline_km"]
-            capability_set["number_station_ids"] = stations["ids"]
-        if "dishes" in capability_set:
-            dishes = capability_set.pop("dishes")
-            capability_set["number_ska_dishes"] = dishes["number_ska_dishes"]
-            capability_set["number_meerkat_dishes"] = dishes["number_meerkat_dishes"]
-            capability_set["number_meerkatplus_dishes"] = dishes[
+        if "stations" in capabilities:
+            stations = capabilities.pop("stations")
+            capabilities["number_stations"] = stations["number_stations"]
+            capabilities["max_baseline_km"] = stations["max_baseline_km"]
+            capabilities["number_station_ids"] = stations["ids"]
+        if "dishes" in capabilities:
+            dishes = capabilities.pop("dishes")
+            capabilities["number_ska_dishes"] = dishes["number_ska_dishes"]
+            capabilities["number_meerkat_dishes"] = dishes["number_meerkat_dishes"]
+            capabilities["number_meerkatplus_dishes"] = dishes[
                 "number_meerkatplus_dishes"
             ]
-            capability_set["max_baseline_km"] = dishes["max_baseline_km"]
-            capability_set["number_dish_ids"] = dishes["ids"]
-        if "receivers" in capability_set:
-            capability_set["available_receivers"] = capability_set.pop("receivers")
+            capabilities["max_baseline_km"] = dishes["max_baseline_km"]
+            capabilities["number_dish_ids"] = dishes["ids"]
+        if "receivers" in capabilities:
+            capabilities["available_receivers"] = capabilities.pop("receivers")
         # Mid's channel widths are also served without the _hz suffix
-        if "allowed_channel_width_values_hz" in capability_set:
-            capability_set["allowed_channel_width_values"] = capability_set[
+        if "allowed_channel_width_values_hz" in capabilities:
+            capabilities["allowed_channel_width_values"] = capabilities[
                 "allowed_channel_width_values_hz"
             ]
         # The modes, and Low's subarray beams, are served flat under
         # their legacy names
-        modes = capability_set.pop("modes")
-        capability_set["number_zoom_windows"] = modes["spectral"]["max_zoom_windows"]
-        capability_set["number_zoom_channels"] = modes["spectral"]["max_zoom_channels"]
+        modes = capabilities.pop("modes")
+        capabilities["number_zoom_windows"] = modes["spectral"]["max_zoom_windows"]
+        capabilities["number_zoom_channels"] = modes["spectral"]["max_zoom_channels"]
         if "zoom_factors" in modes["spectral"]:
-            capability_set["allowed_zoom_factors"] = modes["spectral"]["zoom_factors"]
-        capability_set["number_pss_beams"] = modes["pss"]["max_beams"]
-        capability_set["ps_beam_bandwidth_hz"] = modes["pss"]["beam_bandwidth_hz"]
-        capability_set["number_pst_beams"] = modes["pst"]["max_beams"]
+            capabilities["allowed_zoom_factors"] = modes["spectral"]["zoom_factors"]
+        capabilities["number_pss_beams"] = modes["pss"]["max_beams"]
+        capabilities["ps_beam_bandwidth_hz"] = modes["pss"]["beam_bandwidth_hz"]
+        capabilities["number_pst_beams"] = modes["pst"]["max_beams"]
         if "vlbi" in modes:
-            capability_set["number_vlbi_beams"] = modes["vlbi"]["max_beams"]
-        if "subarray_beams" in capability_set:
-            subarray_beams = capability_set.pop("subarray_beams")
-            capability_set["number_substations"] = subarray_beams[
+            capabilities["number_vlbi_beams"] = modes["vlbi"]["max_beams"]
+        if "subarray_beams" in capabilities:
+            subarray_beams = capabilities.pop("subarray_beams")
+            capabilities["number_substations"] = subarray_beams[
                 "max_substations_per_subarray_beam"
             ]
-            capability_set["number_subarray_beams"] = subarray_beams[
-                "max_subarray_beams"
-            ]
-        array_assembly = capability_set.pop("array_assembly", None)
+            capabilities["number_subarray_beams"] = subarray_beams["max_subarray_beams"]
+        array_assembly = capabilities.pop("array_assembly", None)
         if array_assembly is None:
-            return capability_set
+            return capabilities
         if not self.process_templates:
-            capability_set["subarray_templates"] = [f"*_{array_assembly}"]
-            return capability_set
+            capabilities["subarray_templates"] = [f"*_{array_assembly}"]
+            return capabilities
         templates_dir = f"{telescope_dir}/{osd_file_mapping['subarray_templates']}"
         try:
             templates = self.tmdata[f"{templates_dir}/{array_assembly}.json"].get_dict()
         except KeyError:
-            return capability_set
+            return capabilities
         # Keyed by name, with the stations as one comma-separated string
-        capability_set["subarray_templates"] = {
+        capabilities["subarray_templates"] = {
             template.pop("name"): {
                 **template,
                 "custom_stations": ",".join(template["custom_stations"]),
             }
             for template in templates["templates"]
         }
-        return capability_set
+        return capabilities
 
-    def check_capability_set(
-        self, capability_set: str, telescope_capability_data: dict[str, Any]
+    def check_capabilities(
+        self, name: str, telescope_capability_data: dict[str, Any]
     ) -> str | None:
-        """Return an error when a named capability set is absent from a telescope."""
+        """Return an error when the named capabilities are absent from a
+        telescope."""
         if (
-            capability_set in ("constraints", "basic_capabilities")
-            or capability_set not in telescope_capability_data
+            name in ("constraints", "basic_capabilities")
+            or name not in telescope_capability_data
         ):
             available = ", ".join(
                 key
                 for key in telescope_capability_data
                 if key not in ("telescope", "basic_capabilities", "constraints")
             )
-            return ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE.format(
-                capability_set, available
-            )
+            return ARRAY_ASSEMBLY_DOESNOT_EXIST_ERROR_MESSAGE.format(name, available)
         return None
 
     def build_osd_data(
         self,
-        selected_telescope_capability_sets: dict[str, str | None],
+        selected_names: dict[str, str | None],
         cycle_definition: dict[str, Any] | None,
     ) -> tuple[dict[str, Any] | None, list[str]]:
-        """Materialize the selected telescope capability sets."""
+        """Materialize the selected telescope capabilities."""
         result_data = {"capabilities": {}}
         errors = []
 
-        for (
-            telescope,
-            capability_set,
-        ) in selected_telescope_capability_sets.items():
+        for telescope, name in selected_names.items():
             telescope_capability_data = self.get_telescope_capability_data(telescope)
             selected_data = {
                 "basic_capabilities": telescope_capability_data["basic_capabilities"]
             }
 
-            if capability_set is None:
-                # An unfiltered catalogue response contains all named capability sets.
+            if name is None:
+                # An unfiltered catalogue response contains all named capabilities.
                 selected_data.update(
                     {
                         key: value
@@ -422,15 +416,13 @@ class OSD:
                     }
                 )
             else:
-                capability_set_error = self.check_capability_set(
-                    capability_set, telescope_capability_data
+                capabilities_error = self.check_capabilities(
+                    name, telescope_capability_data
                 )
-                if capability_set_error:
-                    errors.append(capability_set_error)
+                if capabilities_error:
+                    errors.append(capabilities_error)
                     continue
-                selected_data[capability_set] = telescope_capability_data[
-                    capability_set
-                ]
+                selected_data[name] = telescope_capability_data[name]
 
             result_data["capabilities"][telescope] = selected_data
 
@@ -450,13 +442,13 @@ class OSD:
         if cycle_error:
             return None, [cycle_error]
 
-        selected_telescope_capability_sets, selection_error = (
-            self.select_telescope_capability_sets(cycle_definition)
+        selected_names, selection_error = self.select_telescope_capabilities(
+            cycle_definition
         )
         if selection_error:
             return None, [selection_error]
 
-        return self.build_osd_data(selected_telescope_capability_sets, cycle_definition)
+        return self.build_osd_data(selected_names, cycle_definition)
 
 
 def get_available_cycles(tmdata: TMData) -> list[int]:
@@ -489,10 +481,10 @@ def get_osd_data(
     cycle_id: int = None,
     process_templates: bool = False,
 ) -> tuple[dict[str, Any] | None, list[str]]:
-    """Build OSD data for telescope and named-capability-set query filters.
+    """Build OSD data for telescope and named array assembly query filters.
 
     :param telescope: optional telescope name.
-    :param array_assembly: optional name of a capability set.
+    :param array_assembly: optional name of an array assembly.
     :param tmdata: TMData object containing the OSD documents.
     :param cycle_id: optional observing-cycle ID.
     :param process_templates: whether to process template mappings.
@@ -520,7 +512,7 @@ def get_osd_using_tmdata(
 
     :param tm_data: TMData, pre-resolved TMData source for OSD retrieval.
     :param telescope: optional telescope name.
-    :param array_assembly: optional name of a capability set.
+    :param array_assembly: optional name of an array assembly.
     :param cycle_id: int, optional cycle ID.
     :param process_templates: bool, whether to process template mappings.
     :return: Dict[Dict[str, Any]], OSD data.

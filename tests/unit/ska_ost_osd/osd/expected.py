@@ -73,9 +73,9 @@ from ska_ost_osd.osd.views.odt import (
     ConfigurationLowCBFMetrics,
     ConfigurationLowQualityAttributeMetrics,
     LowConfiguration,
-    LowConfigurationCapabilitySet,
+    LowConfigurationCapabilities,
     MidConfiguration,
-    MidConfigurationCapabilitySet,
+    MidConfigurationCapabilities,
 )
 from ska_ost_osd.osd.views.pht import (
     CycleCapabilities,
@@ -330,11 +330,11 @@ MID_BASIC_CAPABILITIES = MidBasicCapabilities(
 # the array assembly that keys their subarray templates (in the test tmdata,
 # the same as the name)
 MID_ARRAY_ASSEMBLY_FILES = {
-    capability_set.name: MidArrayAssemblyFile(
-        array_assembly=capability_set.name,
-        **capability_set.model_dump(exclude={"name", "telescope"}),
+    capabilities.name: MidArrayAssemblyFile(
+        array_assembly=capabilities.name,
+        **capabilities.model_dump(exclude={"name", "telescope"}),
     )
-    for capability_set in (MID_AA1, MID_AA2)
+    for capabilities in (MID_AA1, MID_AA2)
 }
 
 # tests/tmdata/telescopes/ska_low/array_assemblies/AA1.json and AA2.json
@@ -435,11 +435,11 @@ LOW_FREQUENCY_BAND_WITH_CHANNELS = LowFrequencyBandWithChannels(
 )
 
 LOW_ARRAY_ASSEMBLY_FILES = {
-    capability_set.name: LowArrayAssemblyFile(
-        array_assembly=capability_set.name,
-        **capability_set.model_dump(exclude={"name", "telescope"}),
+    capabilities.name: LowArrayAssemblyFile(
+        array_assembly=capabilities.name,
+        **capabilities.model_dump(exclude={"name", "telescope"}),
     )
-    for capability_set in (LOW_AA1, LOW_AA2)
+    for capabilities in (LOW_AA1, LOW_AA2)
 }
 
 # The defaults in tests/tmdata/telescopes/ska_mid/defaults.json
@@ -568,7 +568,7 @@ CONFIGURATION = Configuration(
         frequency_band=MID_BASIC_CAPABILITIES.frequency_bands,
         constraints=MID_CONSTRAINTS,
         subarrays=[
-            MidConfigurationCapabilitySet(
+            MidConfigurationCapabilities(
                 name="AA1",
                 receptors=["SKA001", "SKA002", "SKA003", "SKA004"],
                 available_bandwidth_hz=800_000_000.0,
@@ -576,7 +576,7 @@ CONFIGURATION = Configuration(
                 number_fsps=4,
                 allowed_channel_width_values_hz=[13440],
             ),
-            MidConfigurationCapabilitySet(
+            MidConfigurationCapabilities(
                 name="AA2",
                 receptors=[
                     "SKA001",
@@ -603,7 +603,7 @@ CONFIGURATION = Configuration(
             cbf=ConfigurationLowCBFMetrics(processors_ready_percent=100.0)
         ),
         subarrays=[
-            LowConfigurationCapabilitySet(
+            LowConfigurationCapabilities(
                 name="AA1",
                 receptors=[345, 346, 347, 348],
                 available_bandwidth_hz=75_000_000.0,
@@ -612,7 +612,7 @@ CONFIGURATION = Configuration(
                 number_substations=0,
                 number_subarray_beams=1,
             ),
-            LowConfigurationCapabilitySet(
+            LowConfigurationCapabilities(
                 name="AA2",
                 receptors=[345, 346, 347, 348, 349, 350, 351, 352],
                 available_bandwidth_hz=75_000_000.0,
@@ -650,7 +650,7 @@ CYCLE_1_CONFIGURATION = CycleConfiguration(
         mid=None,
         low=LowCycleCapabilities(
             basic_capabilities=LOW_FREQUENCY_BAND_WITH_CHANNELS,
-            capability_set=LOW_AA1,
+            capabilities=LOW_AA1,
         ),
     ),
 )
@@ -679,11 +679,11 @@ CYCLE_2_CONFIGURATION = CycleConfiguration(
             basic_capabilities=MidCycleBasicCapabilities(
                 frequency_bands=MID_BASIC_CAPABILITIES.frequency_bands
             ),
-            capability_set=MID_AA2,
+            capabilities=MID_AA2,
         ),
         low=LowCycleCapabilities(
             basic_capabilities=LOW_FREQUENCY_BAND_WITH_CHANNELS,
-            capability_set=LOW_AA2,
+            capabilities=LOW_AA2,
         ),
     ),
 )

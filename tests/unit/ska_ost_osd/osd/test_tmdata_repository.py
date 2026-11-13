@@ -310,7 +310,7 @@ class TestGetCapabilities:
 
 class TestGetSubarrayTemplates:
     @pytest.mark.parametrize(
-        "telescope, capability_set, expected",
+        "telescope, array_assembly, expected",
         [
             (Telescope.SKA_MID, "AA1", []),
             (Telescope.SKA_MID, "AA2", [MID_FULL_AA2_TEMPLATE]),
@@ -325,12 +325,12 @@ class TestGetSubarrayTemplates:
         ],
     )
     def test_returns_subarray_templates(
-        self, test_tmdata_repository, telescope, capability_set, expected
+        self, test_tmdata_repository, telescope, array_assembly, expected
     ):
         """The pattern *_AA2 matches templates of both telescopes; only the
         capability set's own telescope's templates are returned."""
         assert (
-            test_tmdata_repository.get_subarray_templates(telescope, capability_set)
+            test_tmdata_repository.get_subarray_templates(telescope, array_assembly)
             == expected
         )
 
