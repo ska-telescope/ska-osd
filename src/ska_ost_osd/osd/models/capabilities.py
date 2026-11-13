@@ -65,6 +65,7 @@ class MidBasicCapabilities(OSDBaseModel):
     """Mid's receiver bands and elevation limits. tmdata:
     ``basic_capabilities``."""
 
+    telescope: Literal[Telescope.SKA_MID]
     frequency_bands: list[MidFrequencyBand]
     elevation_limits: ElevationLimits
 
@@ -166,8 +167,9 @@ class MidCapabilities(OSDBaseModel):
     """Everything Mid offers: its basic capabilities, an array assembly's
     capabilities, and a policy's changes to them if one applies."""
 
-    name: str = Field(examples=["AA0.5"])
-    telescope: Literal[Telescope.SKA_MID] = Telescope.SKA_MID
+    telescope: Literal[Telescope.SKA_MID]
+    array_assembly: str = Field(examples=["AA2"])
+    policy: str | None = Field(default=None, examples=["AA2_SV"])
     frequency_bands: list[MidFrequencyBand]
     elevation_limits: ElevationLimits
     available_bandwidth_hz: float = Field(gt=0)
@@ -188,7 +190,7 @@ class MidCapabilities(OSDBaseModel):
         ):
             if (cbf_mode in self.cbf_modes) != (mode.max_beams > 0):
                 raise ValueError(
-                    f"{self.name}: "
+                    f"{self.policy or self.array_assembly}: "
                     f"cbf_modes must list {cbf_mode} exactly when "
                     f"modes.{cbf_mode}.max_beams is above 0"
                 )
@@ -247,6 +249,7 @@ class LowBasicCapabilities(OSDBaseModel):
     """Low's frequency band, elevation limits, coarse channels and modes.
     tmdata: ``basic_capabilities``."""
 
+    telescope: Literal[Telescope.SKA_LOW]
     frequency_band: FrequencyBand
     elevation_limits: ElevationLimits
     coarse_channels: CoarseChannels
@@ -371,8 +374,9 @@ class LowCapabilities(OSDBaseModel):
     """Everything Low offers: its basic capabilities, an array assembly's
     capabilities, and a policy's changes to them if one applies."""
 
-    name: str = Field(examples=["AA0.5"])
-    telescope: Literal[Telescope.SKA_LOW] = Telescope.SKA_LOW
+    telescope: Literal[Telescope.SKA_LOW]
+    array_assembly: str = Field(examples=["AA2"])
+    policy: str | None = Field(default=None, examples=["AA2_SV"])
     frequency_band: FrequencyBand
     elevation_limits: ElevationLimits
     coarse_channels: CoarseChannels
@@ -393,7 +397,8 @@ class LowCapabilities(OSDBaseModel):
         ):
             if (cbf_mode in self.cbf_modes) != (mode.max_beams > 0):
                 raise ValueError(
-                    f"{self.name}: cbf_modes must list {cbf_mode} exactly "
+                    f"{self.policy or self.array_assembly}: cbf_modes must list "
+                    f"{cbf_mode} exactly "
                     f"when modes.{cbf_mode}.max_beams is above 0"
                 )
         return self

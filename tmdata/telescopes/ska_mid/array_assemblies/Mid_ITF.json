@@ -1,4 +1,5 @@
 {
+  "array_assembly": "Mid_ITF",
   "available_bandwidth_hz": 800000000,
   "receivers": [
     "Band_1",

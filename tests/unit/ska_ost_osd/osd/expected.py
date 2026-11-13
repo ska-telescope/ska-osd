@@ -219,6 +219,7 @@ CYCLE_1_LEGACY_OBSERVATORY_POLICY = {
 
 # tests/tmdata/telescopes/ska_mid/basic_capabilities.json
 MID_BASIC_CAPABILITIES = MidBasicCapabilities(
+    telescope=Telescope.SKA_MID,
     frequency_bands=[
         MidFrequencyBand(
             rx_id="Band_1", min_frequency_hz=350_000_000, max_frequency_hz=1_050_000_000
@@ -276,7 +277,8 @@ MID_BASIC_CAPABILITIES = MidBasicCapabilities(
 # The capabilities of tests/tmdata/telescopes/ska_mid/array_assemblies/AA1.json
 # and AA2.json, with Mid's basic capabilities
 MID_AA1 = MidCapabilities(
-    name="AA1",
+    telescope=Telescope.SKA_MID,
+    array_assembly="AA1",
     frequency_bands=MID_BASIC_CAPABILITIES.frequency_bands,
     elevation_limits=MID_BASIC_CAPABILITIES.elevation_limits,
     available_bandwidth_hz=800_000_000,
@@ -301,7 +303,8 @@ MID_AA1 = MidCapabilities(
 )
 
 MID_AA2 = MidCapabilities(
-    name="AA2",
+    telescope=Telescope.SKA_MID,
+    array_assembly="AA2",
     frequency_bands=MID_BASIC_CAPABILITIES.frequency_bands,
     elevation_limits=MID_BASIC_CAPABILITIES.elevation_limits,
     available_bandwidth_hz=800_000_000,
@@ -338,10 +341,9 @@ MID_AA2 = MidCapabilities(
 # the array assembly that keys their subarray templates (in the test tmdata,
 # the same as the name)
 MID_ARRAY_ASSEMBLY_FILES = {
-    capabilities.name: MidArrayAssemblyFile(
-        array_assembly=capabilities.name,
+    capabilities.array_assembly: MidArrayAssemblyFile(
         **capabilities.model_dump(
-            exclude={"name", "telescope", "frequency_bands", "elevation_limits"}
+            exclude={"telescope", "policy", "frequency_bands", "elevation_limits"}
         ),
     )
     for capabilities in (MID_AA1, MID_AA2)
@@ -355,6 +357,7 @@ LOW_FREQUENCY_BAND = FrequencyBand(
 
 # tests/tmdata/telescopes/ska_low/basic_capabilities.json
 LOW_BASIC_CAPABILITIES = LowBasicCapabilities(
+    telescope=Telescope.SKA_LOW,
     frequency_band=LOW_FREQUENCY_BAND,
     elevation_limits=ElevationLimits(min_elevation_deg=45.0, max_elevation_deg=90.0),
     coarse_channels=CoarseChannels(min=64, max=447, width_hz=781_250.0),
@@ -382,7 +385,8 @@ LOW_FREQUENCY_BAND_WITH_CHANNELS = LowFrequencyBandWithChannels(
 # The capabilities of tests/tmdata/telescopes/ska_low/array_assemblies/AA1.json
 # and AA2.json, with Low's basic capabilities
 LOW_AA1 = LowCapabilities(
-    name="AA1",
+    telescope=Telescope.SKA_LOW,
+    array_assembly="AA1",
     frequency_band=LOW_BASIC_CAPABILITIES.frequency_band,
     elevation_limits=LOW_BASIC_CAPABILITIES.elevation_limits,
     coarse_channels=LOW_BASIC_CAPABILITIES.coarse_channels,
@@ -414,7 +418,8 @@ LOW_AA1 = LowCapabilities(
 )
 
 LOW_AA2 = LowCapabilities(
-    name="AA2",
+    telescope=Telescope.SKA_LOW,
+    array_assembly="AA2",
     frequency_band=LOW_BASIC_CAPABILITIES.frequency_band,
     elevation_limits=LOW_BASIC_CAPABILITIES.elevation_limits,
     coarse_channels=LOW_BASIC_CAPABILITIES.coarse_channels,
@@ -450,7 +455,7 @@ LOW_AA2 = LowCapabilities(
 # LOW_AA2 with tests/tmdata/telescopes/ska_low/policies/AA2_SV.json applied
 LOW_AA2_SV = LOW_AA2.model_copy(
     update={
-        "name": "AA2_SV",
+        "policy": "AA2_SV",
         "cbf_modes": [LowCBFMode.VIS, LowCBFMode.PST],
         "modes": LOW_AA2.modes.model_copy(
             update={
@@ -468,12 +473,11 @@ LOW_AA2_SV = LOW_AA2.model_copy(
 )
 
 LOW_ARRAY_ASSEMBLY_FILES = {
-    capabilities.name: LowArrayAssemblyFile(
-        array_assembly=capabilities.name,
+    capabilities.array_assembly: LowArrayAssemblyFile(
         **capabilities.model_dump(
             exclude={
-                "name",
                 "telescope",
+                "policy",
                 "frequency_band",
                 "elevation_limits",
                 "coarse_channels",
@@ -692,7 +696,7 @@ CYCLE_1_CONFIGURATION = CycleConfiguration(
         low=LowCycleCapabilities(
             basic_capabilities=LOW_FREQUENCY_BAND_WITH_CHANNELS,
             capabilities=LowOfferedCapabilities.model_validate(
-                LOW_AA1, from_attributes=True
+                LOW_AA1.model_dump() | {"name": LOW_AA1.array_assembly}
             ),
         ),
     ),
@@ -723,13 +727,13 @@ CYCLE_2_CONFIGURATION = CycleConfiguration(
                 frequency_bands=MID_BASIC_CAPABILITIES.frequency_bands
             ),
             capabilities=MidOfferedCapabilities.model_validate(
-                MID_AA2, from_attributes=True
+                MID_AA2.model_dump() | {"name": MID_AA2.array_assembly}
             ),
         ),
         low=LowCycleCapabilities(
             basic_capabilities=LOW_FREQUENCY_BAND_WITH_CHANNELS,
             capabilities=LowOfferedCapabilities.model_validate(
-                LOW_AA2, from_attributes=True
+                LOW_AA2.model_dump() | {"name": LOW_AA2.array_assembly}
             ),
         ),
     ),

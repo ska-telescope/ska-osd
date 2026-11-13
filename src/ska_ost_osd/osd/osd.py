@@ -288,8 +288,11 @@ class OSD:
         array assembly."""
         directory = f"{telescope_dir}/array_assemblies"
         array_assemblies = {
-            name.removesuffix(".json"): self.tmdata[f"{directory}/{name}"].get_dict()
-            for name in self.tmdata[directory]
+            array_assembly["array_assembly"]: array_assembly
+            for array_assembly in (
+                self.tmdata[f"{directory}/{name}"].get_dict()
+                for name in self.tmdata[directory]
+            )
         }
         telescope = Telescope(posixpath.basename(telescope_dir))
         policies = {}
@@ -300,7 +303,7 @@ class OSD:
             for policy_id in offered["policies"].values():
                 policy_path = get_policy_paths(self.tmdata, telescope)[policy_id]
                 policy = self.tmdata[policy_path].get_dict()
-                del policy["id"]
+                del policy["policy"]
                 # The legacy response serves the basic capabilities apart
                 policies[policy_id] = merge_capabilities(
                     {}, array_assemblies[offered["array_assembly"]], policy
@@ -354,9 +357,7 @@ class OSD:
                 "max_substations_per_subarray_beam"
             ]
             capabilities["number_subarray_beams"] = subarray_beams["max_subarray_beams"]
-        array_assembly = capabilities.pop("array_assembly", None)
-        if array_assembly is None:
-            return capabilities
+        array_assembly = capabilities.pop("array_assembly")
         if not self.process_templates:
             capabilities["subarray_templates"] = [f"*_{array_assembly}"]
             return capabilities

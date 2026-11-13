@@ -104,7 +104,9 @@ class TestGetCycleConfiguration:
             }
         )
 
-        with pytest.raises(FileNotFoundError, match="no policy file in .* has id AA3"):
+        with pytest.raises(
+            FileNotFoundError, match="no policy file in .* has policy AA3"
+        ):
             get_cycle_configuration(repository, "TEST_SKAO_2027_Low_AA1_SV")
 
     def test_raises_when_cycle_offers_more_than_one_type(self, tmdata_repository_with):

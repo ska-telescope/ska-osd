@@ -55,8 +55,8 @@ class TestGetPolicyFile:
     @pytest.mark.parametrize(
         "telescope, policy_id, expected",
         [
-            (Telescope.SKA_LOW, "AA1", LowPolicyFile(id="AA1")),
-            (Telescope.SKA_MID, "AA2", MidPolicyFile(id="AA2")),
+            (Telescope.SKA_LOW, "AA1", LowPolicyFile(policy="AA1")),
+            (Telescope.SKA_MID, "AA2", MidPolicyFile(policy="AA2")),
         ],
     )
     def test_returns_policy_file(self, tests_tmdata, telescope, policy_id, expected):
@@ -73,14 +73,16 @@ class TestGetPolicyFile:
             FileNotFoundError,
             match=(
                 "file not found: no policy file in telescopes/ska_low/policies "
-                "has id NO_SUCH_POLICY"
+                "has policy NO_SUCH_POLICY"
             ),
         ):
             get_policy_file(tests_tmdata, Telescope.SKA_LOW, "NO_SUCH_POLICY")
 
     def test_raises_when_two_files_share_an_id(self, tmdata_with):
-        tmdata = tmdata_with({"telescopes/ska_low/policies/copy.json": {"id": "AA1"}})
-        with pytest.raises(ValueError, match="id AA1 is in both"):
+        tmdata = tmdata_with(
+            {"telescopes/ska_low/policies/copy.json": {"policy": "AA1"}}
+        )
+        with pytest.raises(ValueError, match="policy AA1 is in both"):
             get_policy_file(tmdata, Telescope.SKA_LOW, "AA1")
 
 
@@ -92,7 +94,7 @@ class TestGetArrayAssemblyFiles:
             (Telescope.SKA_LOW, LOW_ARRAY_ASSEMBLY_FILES),
         ],
     )
-    def test_returns_array_assemblies_named_by_file(
+    def test_returns_array_assemblies_by_their_array_assembly(
         self, tests_tmdata, telescope, expected
     ):
         assert get_array_assembly_files(tests_tmdata, telescope) == expected
@@ -107,6 +109,12 @@ class TestGetArrayAssemblyFiles:
     def test_raises_when_directory_missing(self, empty_tmdata, telescope, path):
         with pytest.raises(FileNotFoundError, match=f"file not found: {path}"):
             get_array_assembly_files(empty_tmdata, telescope)
+
+    def test_raises_when_two_files_share_an_array_assembly(self, tmdata_with):
+        copy = LOW_ARRAY_ASSEMBLY_FILES["AA1"].model_dump(mode="json")
+        tmdata = tmdata_with({"telescopes/ska_low/array_assemblies/copy.json": copy})
+        with pytest.raises(ValueError, match="array_assembly AA1 is in both"):
+            get_array_assembly_files(tmdata, Telescope.SKA_LOW)
 
 
 class TestGetTelescopeBasicCapabilities:

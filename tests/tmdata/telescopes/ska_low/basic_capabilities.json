@@ -1,4 +1,5 @@
 {
+  "telescope": "ska_low",
   "frequency_band": {
     "min_frequency_hz": 50000000.0,
     "max_frequency_hz": 350000000.0

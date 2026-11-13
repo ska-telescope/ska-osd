@@ -121,7 +121,7 @@ def get_cycle_file(tmdata: TMData, cycle_id: str) -> CycleFile:
 def get_policy_paths(tmdata: TMData, telescope: Telescope) -> dict[str, str]:
     """Find each of one telescope's policy files,
     ``telescopes/<telescope>/policies/<name>.json``. A policy file may have
-    any name: the policy's ID is the ``id`` in the file.
+    any name: the policy's ID is the ``policy`` in the file.
 
     :param tmdata: TMData to read from.
     :param telescope: the telescope.
@@ -129,7 +129,7 @@ def get_policy_paths(tmdata: TMData, telescope: Telescope) -> dict[str, str]:
         order.
     :raises FileNotFoundError: If the tmdata has no policies directory for
         the telescope.
-    :raises ValueError: If two policy files have the same ``id``.
+    :raises ValueError: If two policy files have the same ``policy``.
     """
     directory = TELESCOPE_FILES[telescope].policies
     if not any(key.startswith(f"{directory}/") for key in tmdata):
@@ -139,9 +139,11 @@ def get_policy_paths(tmdata: TMData, telescope: Telescope) -> dict[str, str]:
         if not name.endswith(".json"):
             continue
         path = f"{directory}/{name}"
-        policy_id = _read(tmdata, path)["id"]
+        policy_id = _read(tmdata, path)["policy"]
         if policy_id in paths:
-            raise ValueError(f"id {policy_id} is in both {paths[policy_id]} and {path}")
+            raise ValueError(
+                f"policy {policy_id} is in both {paths[policy_id]} and {path}"
+            )
         paths[policy_id] = path
     return dict(sorted(paths.items()))
 
@@ -161,7 +163,8 @@ def get_policy_file(
 def get_policy_file(
     tmdata: TMData, telescope: Telescope, policy_id: str
 ) -> MidPolicyFile | LowPolicyFile:
-    """Read one of a telescope's policy files: the one whose ``id`` is the ID.
+    """Read one of a telescope's policy files: the one whose ``policy`` is the
+    ID.
 
     :param tmdata: TMData to read from.
     :param telescope: the telescope.
@@ -169,13 +172,13 @@ def get_policy_file(
     :return: the policy file, as stored.
     :raises FileNotFoundError: If the tmdata has no policies directory for
         the telescope, or no policy file has the ID.
-    :raises ValueError: If two policy files have the same ``id``.
+    :raises ValueError: If two policy files have the same ``policy``.
     """
     paths = get_policy_paths(tmdata, telescope)
     if policy_id not in paths:
         raise FileNotFoundError(
             f"file not found: no policy file in "
-            f"{TELESCOPE_FILES[telescope].policies} has id {policy_id}"
+            f"{TELESCOPE_FILES[telescope].policies} has policy {policy_id}"
         )
     return _POLICY_FILE_MODELS[telescope].model_validate(
         _read(tmdata, paths[policy_id])
@@ -198,28 +201,35 @@ def get_array_assembly_files(
     tmdata: TMData, telescope: Telescope
 ) -> dict[str, MidArrayAssemblyFile] | dict[str, LowArrayAssemblyFile]:
     """Read each of one telescope's array assembly files,
-    ``telescopes/<telescope>/array_assemblies/<name>.json``.
+    ``telescopes/<telescope>/array_assemblies/<name>.json``. A file may have
+    any name: the array assembly is the ``array_assembly`` in the file.
 
     :param tmdata: TMData to read from.
     :param telescope: the telescope.
-    :return: the telescope's array assembly files keyed by name, the file
-        name without ``.json``, in name order.
+    :return: the telescope's array assembly files keyed by array assembly, in
+        ascending order.
     :raises FileNotFoundError: If the tmdata has no array_assemblies
         directory for the telescope.
+    :raises ValueError: If two files have the same ``array_assembly``.
     """
-    files = TELESCOPE_FILES[telescope]
-    directory = files.array_assemblies
+    directory = TELESCOPE_FILES[telescope].array_assemblies
     if not any(key.startswith(f"{directory}/") for key in tmdata):
         raise FileNotFoundError(f"file not found: {directory}")
-    names = sorted(
-        key.removesuffix(".json") for key in tmdata[directory] if key.endswith(".json")
-    )
-    return {
-        name: _ARRAY_ASSEMBLY_FILE_MODELS[telescope].model_validate(
-            _read(tmdata, files.array_assembly(name))
+    files, paths = {}, {}
+    for name in tmdata[directory]:
+        if not name.endswith(".json"):
+            continue
+        path = f"{directory}/{name}"
+        file = _ARRAY_ASSEMBLY_FILE_MODELS[telescope].model_validate(
+            _read(tmdata, path)
         )
-        for name in names
-    }
+        if file.array_assembly in paths:
+            raise ValueError(
+                f"array_assembly {file.array_assembly} is in both "
+                f"{paths[file.array_assembly]} and {path}"
+            )
+        files[file.array_assembly], paths[file.array_assembly] = file, path
+    return dict(sorted(files.items()))
 
 
 @overload

@@ -68,19 +68,19 @@ class TestPolicyFiles:
         [(MidPolicyFile, MID_ARRAY_ASSEMBLY), (LowPolicyFile, LOW_ARRAY_ASSEMBLY)],
     )
     def test_can_set_everything_an_array_assembly_sets(self, policy, path):
-        """An array assembly file, with an id in place of its array_assembly,
+        """An array assembly file, with a policy in place of its array_assembly,
         validates as a policy and keeps every field: a policy can set
         anything an array assembly does."""
         data = load(path)
         del data["array_assembly"]
-        data["id"] = "cycle_1_science_verification"
+        data["policy"] = "cycle_1_science_verification"
 
         assert policy.model_validate(data).model_dump(exclude_unset=True) == data
 
     @pytest.mark.parametrize("policy", [MidPolicyFile, LowPolicyFile])
     def test_an_empty_policy_is_valid(self, policy):
         """A policy that sets nothing but its id is valid."""
-        data = {"id": "cycle_1_science_verification"}
+        data = {"policy": "cycle_1_science_verification"}
         assert policy.model_validate(data).model_dump(exclude_unset=True) == data
 
     @pytest.mark.parametrize("policy", [MidPolicyFile, LowPolicyFile])
@@ -88,7 +88,7 @@ class TestPolicyFiles:
         """A policy can set one field of a nested group, leaving the rest to
         the array assembly."""
         data = {
-            "id": "cycle_1_science_verification",
+            "policy": "cycle_1_science_verification",
             "modes": {"spectral": {"max_zoom_windows": 1}},
         }
         assert policy.model_validate(data).model_dump(exclude_unset=True) == data

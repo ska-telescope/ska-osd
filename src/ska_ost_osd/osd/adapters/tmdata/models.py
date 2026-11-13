@@ -33,15 +33,13 @@ from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplate
 
 
 class MidArrayAssemblyFile(OSDBaseModel):
-    """Model for telescopes/ska_mid/array_assemblies/<name>.json. The file is
-    named after its array assembly, so it holds neither the name nor the
-    telescope."""
+    """Model for telescopes/ska_mid/array_assemblies/<name>.json: one array
+    assembly, identified by its ``array_assembly``. Its subarray templates are
+    the library of the same name, if there is one."""
 
     available_bandwidth_hz: float = Field(gt=0)
     number_fsps: int = Field(ge=0)
-    # The array assembly whose subarray templates the capability set offers,
-    # e.g. "AA2"; Mid_ITF has none
-    array_assembly: str | None = None
+    array_assembly: str = Field(examples=["AA2"])
     modes: MidArrayAssemblyModes
     allowed_channel_width_values_hz: list[int]
     allowed_channel_count_range_min: list[int]
@@ -65,15 +63,13 @@ class MidArrayAssemblyFile(OSDBaseModel):
 
 
 class LowArrayAssemblyFile(OSDBaseModel):
-    """Model for telescopes/ska_low/array_assemblies/<name>.json. The file is
-    named after its array assembly, so it holds neither the name nor the
-    telescope."""
+    """Model for telescopes/ska_low/array_assemblies/<name>.json: one array
+    assembly, identified by its ``array_assembly``. Its subarray templates are
+    the library of the same name, if there is one."""
 
     available_bandwidth_hz: float = Field(gt=0)
     number_fsps: int = Field(ge=0)
-    # The array assembly whose subarray templates the capability set offers,
-    # e.g. "AA2"; Low_ITF has none
-    array_assembly: str | None = None
+    array_assembly: str = Field(examples=["AA2"])
     subarray_beams: LowArrayAssemblySubarrayBeams
     cbf_modes: list[LowCBFMode]
     modes: LowArrayAssemblyModes
@@ -129,7 +125,7 @@ class MidPolicyFile(OSDBaseModel):
     field optional, and sets only what it changes; the cycle names the array
     assembly it applies to."""
 
-    id: str = Field(examples=["cycle_1_science_verification"])
+    policy: str = Field(examples=["cycle_1_science_verification"])
     available_bandwidth_hz: float | None = Field(default=None, gt=0)
     number_fsps: int | None = Field(default=None, ge=0)
     modes: MidPolicyModes | None = None
@@ -184,7 +180,7 @@ class LowPolicyFile(OSDBaseModel):
     field optional, and sets only what it changes; the cycle names the array
     assembly it applies to."""
 
-    id: str = Field(examples=["cycle_1_science_verification"])
+    policy: str = Field(examples=["cycle_1_science_verification"])
     available_bandwidth_hz: float | None = Field(default=None, gt=0)
     number_fsps: int | None = Field(default=None, ge=0)
     subarray_beams: LowPolicySubarrayBeams | None = None

@@ -60,7 +60,9 @@ Reading the data
      - ``MidCapabilities`` / ``LowCapabilities``: everything a telescope
        offers with one array assembly, e.g. ``"AA2"``: its basic capabilities
        and the array assembly's, with a policy's changes applied if one is
-       given, e.g. ``"AA2_SV"``. Each observing mode's channels, zoom windows
+       given, e.g. ``"AA2_SV"``. It names its ``telescope``,
+       ``array_assembly`` and ``policy`` (``None`` without one). Each
+       observing mode's channels, zoom windows
        and beams are in ``modes``, its receptors in ``stations`` (Low) or
        ``dishes`` (Mid), and Low's subarray beams in ``subarray_beams``
    * - ``get_basic_capabilities(telescope)``

@@ -297,6 +297,12 @@ def _subarray_templates(
     }
 
 
+def _name(capabilities: MidCapabilities | LowCapabilities) -> str:
+    """The name the PHT UI knows capabilities by: the policy's, or the array
+    assembly's if no policy applies."""
+    return capabilities.policy or capabilities.array_assembly
+
+
 def _observatory_policy(
     cycle: Cycle,
     policy_type: PolicyType,
@@ -321,8 +327,8 @@ def _observatory_policy(
             max_data_products=cycle.proposal_policy.max_data_products,
         ),
         telescope_capabilities=CycleTelescopeCapabilities(
-            ska_mid=mid.name if mid is not None else None,
-            ska_low=low.name if low is not None else None,
+            ska_mid=_name(mid) if mid is not None else None,
+            ska_low=_name(low) if low is not None else None,
         ),
     )
 
@@ -370,7 +376,7 @@ def get_cycle_configuration(
                     from_attributes=True,
                 ),
                 capabilities=MidOfferedCapabilities.model_validate(
-                    mid, from_attributes=True
+                    mid.model_dump() | {"name": _name(mid)}
                 ),
                 subarray_templates=_subarray_templates(
                     repository,
@@ -384,7 +390,7 @@ def get_cycle_configuration(
             low=LowCycleCapabilities(
                 basic_capabilities=low_frequency_band(repository),
                 capabilities=LowOfferedCapabilities.model_validate(
-                    low, from_attributes=True
+                    low.model_dump() | {"name": _name(low)}
                 ),
                 subarray_templates=_subarray_templates(
                     repository,

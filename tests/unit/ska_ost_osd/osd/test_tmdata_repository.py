@@ -219,7 +219,7 @@ class TestGetBasicCapabilities:
             Telescope.SKA_MID
         ).model_dump(by_alias=True)
 
-        assert list(served) == ["frequency_bands", "elevation_limits"]
+        assert list(served) == ["telescope", "frequency_bands", "elevation_limits"]
 
     def test_raises_when_file_missing(self, empty_tmdata_repository):
         with pytest.raises(
@@ -303,11 +303,12 @@ class TestGetCapabilities:
             == expected
         )
 
-    def test_an_empty_policy_changes_nothing(self, test_tmdata_repository):
-        assert (
-            test_tmdata_repository.get_capabilities(Telescope.SKA_LOW, "AA2", "AA2")
-            == LOW_AA2
-        )
+    def test_an_empty_policy_changes_nothing_but_the_policy(
+        self, test_tmdata_repository
+    ):
+        assert test_tmdata_repository.get_capabilities(
+            Telescope.SKA_LOW, "AA2", "AA2"
+        ) == LOW_AA2.model_copy(update={"policy": "AA2"})
 
     def test_a_policy_changes_only_what_it_sets(self, test_tmdata_repository):
         assert (
@@ -321,7 +322,7 @@ class TestGetCapabilities:
         repository = tmdata_repository_with(
             {
                 "telescopes/ska_low/policies/bad.json": {
-                    "id": "bad",
+                    "policy": "bad",
                     "cbf_modes": ["vis"],
                 }
             }
@@ -331,7 +332,7 @@ class TestGetCapabilities:
 
     def test_raises_for_unknown_policy(self, test_tmdata_repository):
         with pytest.raises(
-            FileNotFoundError, match="no policy file in .* has id NO_SUCH_POLICY"
+            FileNotFoundError, match="no policy file in .* has policy NO_SUCH_POLICY"
         ):
             test_tmdata_repository.get_capabilities(
                 Telescope.SKA_LOW, "AA2", "NO_SUCH_POLICY"
@@ -396,13 +397,27 @@ class TestGetCycleCapabilities:
         [
             (
                 "TEST_SKAO_2027_Low_AA1_SV",
-                {Telescope.SKA_LOW: {PolicyType.SCIENCE_VERIFICATION: LOW_AA1}},
+                {
+                    Telescope.SKA_LOW: {
+                        PolicyType.SCIENCE_VERIFICATION: LOW_AA1.model_copy(
+                            update={"policy": "AA1"}
+                        )
+                    }
+                },
             ),
             (
                 "TEST_SKAO_2027_AA2_Proposal",
                 {
-                    Telescope.SKA_MID: {PolicyType.STANDARD_OPERATIONS: MID_AA2},
-                    Telescope.SKA_LOW: {PolicyType.STANDARD_OPERATIONS: LOW_AA2},
+                    Telescope.SKA_MID: {
+                        PolicyType.STANDARD_OPERATIONS: MID_AA2.model_copy(
+                            update={"policy": "AA2"}
+                        )
+                    },
+                    Telescope.SKA_LOW: {
+                        PolicyType.STANDARD_OPERATIONS: LOW_AA2.model_copy(
+                            update={"policy": "AA2"}
+                        )
+                    },
                 },
             ),
         ],
@@ -421,7 +436,7 @@ class TestGetCycleCapabilities:
         "array_assembly, policy_id, error, message",
         [
             ("AA3", "AA1", ArrayAssemblyNotFoundError, "Array assembly AA3"),
-            ("AA1", "AA3", FileNotFoundError, "no policy file in .* has id AA3"),
+            ("AA1", "AA3", FileNotFoundError, "no policy file in .* has policy AA3"),
         ],
         ids=["unknown array assembly", "unknown policy"],
     )

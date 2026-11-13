@@ -147,20 +147,19 @@ class TMDataRepository:
             )
         policy = (
             storage.get_policy_file(self._tmdata, telescope, policy_id).model_dump(
-                exclude={"id"}, exclude_unset=True
+                exclude_unset=True
             )
             if policy_id is not None
             else None
         )
-        capabilities = merge_capabilities(
-            storage.get_telescope_basic_capabilities(
-                self._tmdata, telescope
-            ).model_dump(),
-            array_assembly_files[array_assembly].model_dump(exclude={"array_assembly"}),
-            policy,
-        )
         return _CAPABILITIES_MODELS[telescope].model_validate(
-            {"name": policy_id or array_assembly, **capabilities}
+            merge_capabilities(
+                storage.get_telescope_basic_capabilities(
+                    self._tmdata, telescope
+                ).model_dump(),
+                array_assembly_files[array_assembly].model_dump(),
+                policy,
+            )
         )
 
     # Joins
@@ -168,20 +167,16 @@ class TMDataRepository:
     def get_subarray_templates(
         self, telescope: Telescope, array_assembly: str
     ) -> list[SubarrayTemplate]:
-        """The array assembly's file names the template library it offers. An
-        array assembly with none named, or whose library doesn't exist,
-        offers none."""
+        """An array assembly's templates are the library of the same name; one
+        with no library offers none."""
         array_assembly_files = storage.get_array_assembly_files(self._tmdata, telescope)
         if array_assembly not in array_assembly_files:
             raise ArrayAssemblyNotFoundError(
                 telescope, array_assembly, list(array_assembly_files)
             )
-        library_name = array_assembly_files[array_assembly].array_assembly
-        if library_name is None:
-            return []
         try:
             library = storage.get_subarray_template_library(
-                self._tmdata, telescope, library_name
+                self._tmdata, telescope, array_assembly
             )
         except FileNotFoundError:
             return []

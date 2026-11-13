@@ -31,7 +31,8 @@ Unreleased
   a ``proposal_policy`` and ``capabilities``: for each telescope, keyed ``ska_low`` or
   ``ska_mid``, its ``array_assembly`` and the policy offered for each policy type
   (``science_verification``, ``shared_risk`` or ``standard_operations``). A policy,
-  in ``telescopes/<telescope>/policies``, has an ``id`` and sets only what it changes
+  in ``telescopes/<telescope>/policies``, is identified by its ``policy`` and sets only
+  what it changes
   of the array assembly a cycle pairs it with; the repository returns the two
   merged. Low's ``AA2_SV`` is now the ``AA2_SV`` policy applied to ``AA2``, which the
   legacy response still serves as ``AA2_SV``.
@@ -88,6 +89,11 @@ Unreleased
   and ``low_defaults.json``
 * Moved subarray templates to a tmdata file per telescope and array assembly; each
   capability set names its ``array_assembly`` instead of template wildcard patterns
+* Each tmdata file names what it describes: a basic capabilities file its
+  ``telescope``, an array assembly file its ``array_assembly`` and a policy file its
+  ``policy``, so file names don't matter. ``Capabilities`` carry the same three
+  fields. Without ``process_templates``, the legacy response now gives the ITF capability
+  sets a template pattern (``*_Low_ITF``, ``*_Mid_ITF``), which matches no templates
 * [BREAKING] Removed ``ska_ost_osd.osd.template_mapping``; ``get_osd_using_tmdata``
   reads each capability set's templates from its array assembly's file
 * The PHT views take ``include_subarray_templates`` to serve each capability set's
