@@ -33,9 +33,9 @@ from ska_ost_osd.osd.exceptions import (
 )
 from ska_ost_osd.osd.models.capabilities import (
     Band5bSubband,
-    CapabilitySet,
-    LowCapabilitySet,
-    MidCapabilitySet,
+    Capabilities,
+    LowCapabilities,
+    MidCapabilities,
     MidFrequencyBand,
 )
 from ska_ost_osd.osd.models.constraints import Constraints
@@ -158,25 +158,25 @@ class TestCapabilities:
 
     @pytest.mark.parametrize(
         "expected, capability_set_model",
-        [(MID_AA2, MidCapabilitySet), (LOW_AA2, LowCapabilitySet)],
+        [(MID_AA2, MidCapabilities), (LOW_AA2, LowCapabilities)],
     )
     @pytest.mark.parametrize("mode", ["python", "json"])
-    def test_capability_set_is_chosen_by_telescope(
+    def test_capabilities_are_chosen_by_telescope(
         self, expected, capability_set_model, mode
     ):
         """A serialised capability set reads back as the right capability
         set model, chosen by its telescope."""
-        capability_set = TypeAdapter(CapabilitySet).validate_python(
+        capability_set = TypeAdapter(Capabilities).validate_python(
             expected.model_dump(mode=mode)
         )
 
         assert type(capability_set) is capability_set_model
         assert capability_set == expected
 
-    def test_capability_set_rejects_another_telescope(self):
+    def test_capabilities_reject_another_telescope(self):
         data = load(LOW_ARRAY_ASSEMBLY)
         with pytest.raises(ValidationError, match="telescope"):
-            LowCapabilitySet.model_validate(
+            LowCapabilities.model_validate(
                 {"name": "AA2", **data, "telescope": "ska_mid"}
             )
 

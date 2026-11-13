@@ -133,7 +133,7 @@ class MidArrayAssemblyDishes(OSDBaseModel):
         return self
 
 
-class MidCapabilitySet(OSDBaseModel):
+class MidCapabilities(OSDBaseModel):
     name: str = Field(examples=["AA0.5"])
     available_bandwidth_hz: float = Field(gt=0)
     number_fsps: int = Field(ge=0)
@@ -282,7 +282,7 @@ class LowArrayAssemblyStations(OSDBaseModel):
         return self
 
 
-class LowCapabilitySet(OSDBaseModel):
+class LowCapabilities(OSDBaseModel):
     name: str = Field(examples=["AA0.5"])
     available_bandwidth_hz: float = Field(gt=0)
     number_fsps: int = Field(ge=0)
@@ -310,6 +310,6 @@ class LowCapabilitySet(OSDBaseModel):
 
 # A capability set is one array assembly of either telescope; the
 # telescope field picks the model when one is read back.
-CapabilitySet = Annotated[
-    MidCapabilitySet | LowCapabilitySet, Field(discriminator="telescope")
+Capabilities = Annotated[
+    MidCapabilities | LowCapabilities, Field(discriminator="telescope")
 ]

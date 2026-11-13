@@ -11,7 +11,7 @@ Overview
 ~~~~~~~~~
 
 * ``OSDRepository`` (``ska_ost_osd.osd.repository``) is the interface for reading
-  the OSD: cycles, capability sets, basic capabilities, constraints, defaults and
+  the OSD: cycles, capabilities, basic capabilities, constraints, defaults and
   subarray templates, and the links between them. A method named in the plural
   returns all of something; one named in the singular looks one item up by its key
   and raises an error if there is none.
@@ -52,12 +52,12 @@ Reading the data
      - the cycle IDs, in ascending order
    * - ``get_cycles()`` / ``get_cycle(cycle_id)``
      - ``Cycle``: a cycle's description, proposal window and policy, and for
-       each telescope its array assembly and the capability set offered for
-       each policy type
-   * - ``get_capability_sets(telescope)``
+       each telescope its array assembly and the policy offered for each
+       policy type
+   * - ``get_array_assembly_capabilities(telescope)``
      - each of a telescope's array assemblies, as below
-   * - ``get_capability_set(telescope, array_assembly, policy_id=None)``
-     - ``MidCapabilitySet`` / ``LowCapabilitySet``: one array assembly of a
+   * - ``get_capabilities(telescope, array_assembly, policy_id=None)``
+     - ``MidCapabilities`` / ``LowCapabilities``: one array assembly of a
        telescope, e.g. ``"AA2"``, with a policy's changes applied if one is
        given, e.g. ``"AA2_SV"``. Its zoom windows and beams are in its
        ``modes``, its receptors in ``stations`` (Low) or ``dishes`` (Mid), and
@@ -80,7 +80,7 @@ Reading the data
 
     from ska_ost_osd.osd.common.constant import Telescope
 
-    aa2 = repository.get_capability_set(Telescope.SKA_LOW, "AA2")
+    aa2 = repository.get_capabilities(Telescope.SKA_LOW, "AA2")
     aa2.subarray_beams.max_subarray_beams                        # 8
     repository.get_constraints(Telescope.SKA_MID).min_elevation_deg  # 15.0
 
@@ -101,14 +101,13 @@ Joins
 
    * - Method
      - Returns
-   * - ``get_cycle_capability_sets(cycle_id)``
+   * - ``get_cycle_capabilities(cycle_id)``
      - the capabilities the cycle offers for each telescope and policy type,
        as a ``dict`` keyed by ``Telescope`` and then ``PolicyType``: the
        cycle's array assembly for that telescope with the type's policy
        applied. A telescope the cycle does not offer is left out
-   * - ``get_subarray_templates(telescope, capability_set)``
-     - the ``SubarrayTemplate`` objects of a capability set: the templates of
-       the array assembly the capability set names, or none
+   * - ``get_subarray_templates(telescope, array_assembly)``
+     - the ``SubarrayTemplate`` objects an array assembly offers, or none
 
 
 Views
@@ -152,7 +151,7 @@ telescopes, independent of any cycle:
     ska_mid
         frequency_band          the receiver bands, Band 5b with its sub-bands
         constraints             elevation limits and avoidance angles
-        subarrays               each capability set: name, receptors,
+        subarrays               each array assembly: name, receptors,
                                 available_bandwidth_hz, number_pst_beams,
                                 number_fsps, allowed_channel_width_values_hz
         spfrx_defaults          target_spfrx and csp_spfrx
@@ -160,15 +159,15 @@ telescopes, independent of any cycle:
         frequency_band          the band and its channels
         constraints             elevation limits and avoidance angles
         quality_attribute_metrics
-        subarrays               each capability set: name, receptors,
+        subarrays               each array assembly: name, receptors,
                                 available_bandwidth_hz, number_pst_beams,
                                 number_fsps, number_substations,
                                 number_subarray_beams
 
-The capability sets are narrowed to the fields the ODT uses; use
-``repository.get_capability_set`` for all of a capability set's fields. The JSON
+The array assemblies are narrowed to the fields the ODT uses; use
+``repository.get_capabilities`` for all of their capabilities. The JSON
 matches what ska-oso-services serves today, with one addition:
-``allowed_channel_width_values_hz`` on the Mid capability sets, which
+``allowed_channel_width_values_hz`` on the Mid array assemblies, which
 ska-oso-services means to serve but currently drops.
 
 
@@ -216,5 +215,5 @@ Errors
 
 A key with no data raises a subclass of ``OSDQueryError``
 (``ska_ost_osd.osd.exceptions``), which is also a ``LookupError``: for example
-``CycleNotFoundError`` or ``CapabilitySetNotFoundError``. ``TMDataRepository``
+``CycleNotFoundError`` or ``ArrayAssemblyNotFoundError``. ``TMDataRepository``
 raises ``FileNotFoundError`` if a tmdata file is missing.

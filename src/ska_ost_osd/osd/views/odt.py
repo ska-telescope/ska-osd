@@ -4,8 +4,8 @@ serves."""
 
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
-    LowCapabilitySet,
-    MidCapabilitySet,
+    LowCapabilities,
+    MidCapabilities,
     MidFrequencyBand,
 )
 from ska_ost_osd.osd.models.constraints import Constraints
@@ -68,7 +68,7 @@ class Configuration(ConfigurationModel):
 
 
 def _mid_capability_set(
-    capability_set: MidCapabilitySet,
+    capability_set: MidCapabilities,
 ) -> MidConfigurationCapabilitySet:
     return MidConfigurationCapabilitySet(
         name=capability_set.name,
@@ -81,7 +81,7 @@ def _mid_capability_set(
 
 
 def _low_capability_set(
-    capability_set: LowCapabilitySet,
+    capability_set: LowCapabilities,
 ) -> LowConfigurationCapabilitySet:
     return LowConfigurationCapabilitySet(
         name=capability_set.name,
@@ -112,7 +112,9 @@ def get_configuration(repository: OSDRepository) -> Configuration:
             constraints=repository.get_constraints(Telescope.SKA_MID),
             subarrays=[
                 _mid_capability_set(capability_set)
-                for capability_set in repository.get_capability_sets(Telescope.SKA_MID)
+                for capability_set in repository.get_array_assembly_capabilities(
+                    Telescope.SKA_MID
+                )
             ],
             spfrx_defaults=repository.get_defaults(Telescope.SKA_MID).spfrx_defaults,
         ),
@@ -125,7 +127,9 @@ def get_configuration(repository: OSDRepository) -> Configuration:
             ),
             subarrays=[
                 _low_capability_set(capability_set)
-                for capability_set in repository.get_capability_sets(Telescope.SKA_LOW)
+                for capability_set in repository.get_array_assembly_capabilities(
+                    Telescope.SKA_LOW
+                )
             ],
         ),
     )

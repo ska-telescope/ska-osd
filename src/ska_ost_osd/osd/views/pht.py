@@ -15,9 +15,9 @@ from pydantic import (
 
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
-    CapabilitySet,
-    LowCapabilitySet,
-    MidCapabilitySet,
+    Capabilities,
+    LowCapabilities,
+    MidCapabilities,
     MidFrequencyBand,
 )
 from ska_ost_osd.osd.models.cycles import Cycle, PolicyType
@@ -100,7 +100,7 @@ class CycleCapabilitiesBase(ConfigurationModel):
     are served in the capability set, keyed by name, as
     ``subarray_templates``."""
 
-    capability_set: CapabilitySet
+    capability_set: Capabilities
     subarray_templates: dict[str, CycleSubarrayTemplate] | None = None
 
     @model_validator(mode="before")
@@ -223,12 +223,12 @@ class CycleCapabilitiesBase(ConfigurationModel):
 
 class MidCycleCapabilities(CycleCapabilitiesBase):
     basic_capabilities: MidCycleBasicCapabilities
-    capability_set: MidCapabilitySet
+    capability_set: MidCapabilities
 
 
 class LowCycleCapabilities(CycleCapabilitiesBase):
     basic_capabilities: LowFrequencyBandWithChannels
-    capability_set: LowCapabilitySet
+    capability_set: LowCapabilities
 
 
 class CycleCapabilities(ConfigurationModel):
@@ -268,8 +268,8 @@ def _subarray_templates(
 def _observatory_policy(
     cycle: Cycle,
     policy_type: PolicyType,
-    mid: MidCapabilitySet | None,
-    low: LowCapabilitySet | None,
+    mid: MidCapabilities | None,
+    low: LowCapabilities | None,
 ) -> ObservatoryPolicy:
     """The cycle, with the field names the PHT UI reads."""
     return ObservatoryPolicy(
@@ -310,14 +310,14 @@ def get_cycle_configuration(
     :return: the cycle with, for each telescope it offers, the offered
         capability set and that telescope's basic capabilities.
     :raises CycleNotFoundError: If there is no cycle with that ID.
-    :raises CapabilitySetNotFoundError: If the cycle names an array assembly
+    :raises ArrayAssemblyNotFoundError: If the cycle names an array assembly
         that does not exist.
     :raises FileNotFoundError: If the cycle names a policy that does not
         exist.
     :raises ValueError: If the cycle offers more than one policy type.
     """
     cycle = repository.get_cycle(cycle_id)
-    capability_sets = repository.get_cycle_capability_sets(cycle_id)
+    capability_sets = repository.get_cycle_capabilities(cycle_id)
     # The PHT UI handles one policy type per cycle
     types = {
         policy_type for by_type in capability_sets.values() for policy_type in by_type
@@ -374,7 +374,7 @@ def get_cycle_configurations(
     :param include_subarray_templates: whether to serve each offered
         capability set's subarray templates, as ``subarray_templates``.
     :return: the cycle views.
-    :raises CapabilitySetNotFoundError: If a cycle names an array assembly
+    :raises ArrayAssemblyNotFoundError: If a cycle names an array assembly
         that does not exist.
     :raises FileNotFoundError: If a cycle names a policy that does not exist.
     :raises ValueError: If a cycle offers more than one policy type.

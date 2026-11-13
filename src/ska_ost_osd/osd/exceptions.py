@@ -3,8 +3,8 @@ has no data."""
 
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.common.osd_validation_messages import (
+    ARRAY_ASSEMBLY_NOT_FOUND_ERROR_MESSAGE,
     BAND5B_SUBBAND_DOESNOT_EXIST_ERROR_MESSAGE,
-    CAPABILITY_SET_DOESNOT_EXIST_ERROR_MESSAGE,
     CYCLE_ID_ERROR_MESSAGE,
     FREQUENCY_BAND_DOESNOT_EXIST_ERROR_MESSAGE,
 )
@@ -31,12 +31,12 @@ class CycleNotFoundError(OSDQueryError, LookupError):
         )
 
 
-class CapabilitySetNotFoundError(OSDQueryError, LookupError):
-    """The telescope has no capability set with the requested name.
+class ArrayAssemblyNotFoundError(OSDQueryError, LookupError):
+    """The telescope has no array assembly with the requested name.
 
     :param telescope: the telescope searched.
-    :param name: the capability set name requested.
-    :param available_names: the names of the telescope's capability sets.
+    :param name: the array assembly name requested.
+    :param available_names: the names of the telescope's array assemblies.
     """
 
     def __init__(self, telescope: Telescope, name: str, available_names: list[str]):
@@ -44,7 +44,7 @@ class CapabilitySetNotFoundError(OSDQueryError, LookupError):
         self.name = name
         self.available_names = available_names
         super().__init__(
-            CAPABILITY_SET_DOESNOT_EXIST_ERROR_MESSAGE.format(
+            ARRAY_ASSEMBLY_NOT_FOUND_ERROR_MESSAGE.format(
                 name, telescope, ", ".join(available_names)
             )
         )

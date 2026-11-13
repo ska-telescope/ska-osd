@@ -5,7 +5,7 @@ import pytest
 from pydantic import ValidationError
 
 from ska_ost_osd.osd.common.constant import Telescope
-from ska_ost_osd.osd.exceptions import CapabilitySetNotFoundError, CycleNotFoundError
+from ska_ost_osd.osd.exceptions import ArrayAssemblyNotFoundError, CycleNotFoundError
 from ska_ost_osd.osd.models.cycles import Cycle, PolicyType
 from tests.unit.ska_ost_osd.osd.expected import (
     CYCLE_1,
@@ -210,7 +210,7 @@ class TestGetDefaults:
             empty_tmdata_repository.get_defaults(Telescope.SKA_MID)
 
 
-class TestGetCapabilitySets:
+class TestGetArrayAssemblyCapabilities:
     @pytest.mark.parametrize(
         "telescope, expected",
         [
@@ -218,20 +218,23 @@ class TestGetCapabilitySets:
             (Telescope.SKA_LOW, [LOW_AA1, LOW_AA2]),
         ],
     )
-    def test_returns_capability_sets_in_file_order(
+    def test_returns_array_assemblies_in_file_order(
         self, test_tmdata_repository, telescope, expected
     ):
-        assert test_tmdata_repository.get_capability_sets(telescope) == expected
+        assert (
+            test_tmdata_repository.get_array_assembly_capabilities(telescope)
+            == expected
+        )
 
     def test_raises_when_file_missing(self, empty_tmdata_repository):
         with pytest.raises(
             FileNotFoundError,
             match="file not found: telescopes/ska_mid/array_assemblies",
         ):
-            empty_tmdata_repository.get_capability_sets(Telescope.SKA_MID)
+            empty_tmdata_repository.get_array_assembly_capabilities(Telescope.SKA_MID)
 
 
-class TestGetCapabilitySet:
+class TestGetCapabilities:
     @pytest.mark.parametrize(
         "telescope, array_assembly, expected",
         [
@@ -245,21 +248,19 @@ class TestGetCapabilitySet:
         self, test_tmdata_repository, telescope, array_assembly, expected
     ):
         assert (
-            test_tmdata_repository.get_capability_set(telescope, array_assembly)
+            test_tmdata_repository.get_capabilities(telescope, array_assembly)
             == expected
         )
 
     def test_an_empty_policy_changes_nothing(self, test_tmdata_repository):
         assert (
-            test_tmdata_repository.get_capability_set(Telescope.SKA_LOW, "AA2", "AA2")
+            test_tmdata_repository.get_capabilities(Telescope.SKA_LOW, "AA2", "AA2")
             == LOW_AA2
         )
 
     def test_a_policy_changes_only_what_it_sets(self, test_tmdata_repository):
         assert (
-            test_tmdata_repository.get_capability_set(
-                Telescope.SKA_LOW, "AA2", "AA2_SV"
-            )
+            test_tmdata_repository.get_capabilities(Telescope.SKA_LOW, "AA2", "AA2_SV")
             == LOW_AA2_SV
         )
 
@@ -275,25 +276,25 @@ class TestGetCapabilitySet:
             }
         )
         with pytest.raises(ValidationError, match="cbf_modes must list pst"):
-            repository.get_capability_set(Telescope.SKA_LOW, "AA2", "bad")
+            repository.get_capabilities(Telescope.SKA_LOW, "AA2", "bad")
 
     def test_raises_for_unknown_policy(self, test_tmdata_repository):
         with pytest.raises(
             FileNotFoundError, match="no policy file in .* has id NO_SUCH_POLICY"
         ):
-            test_tmdata_repository.get_capability_set(
+            test_tmdata_repository.get_capabilities(
                 Telescope.SKA_LOW, "AA2", "NO_SUCH_POLICY"
             )
 
     def test_raises_for_unknown_name(self, test_tmdata_repository):
         with pytest.raises(
-            CapabilitySetNotFoundError,
+            ArrayAssemblyNotFoundError,
             match=(
-                r"Capability set AA3 is invalid for telescope ska_mid\. "
-                r"Valid capability sets are AA1, AA2\."
+                r"Array assembly AA3 is invalid for telescope ska_mid\. "
+                r"Valid array assemblies are AA1, AA2\."
             ),
         ) as excinfo:
-            test_tmdata_repository.get_capability_set(Telescope.SKA_MID, "AA3")
+            test_tmdata_repository.get_capabilities(Telescope.SKA_MID, "AA3")
 
         assert excinfo.value.telescope == Telescope.SKA_MID
         assert excinfo.value.name == "AA3"
@@ -304,7 +305,7 @@ class TestGetCapabilitySet:
             FileNotFoundError,
             match="file not found: telescopes/ska_low/array_assemblies",
         ):
-            empty_tmdata_repository.get_capability_set(Telescope.SKA_LOW, "AA1")
+            empty_tmdata_repository.get_capabilities(Telescope.SKA_LOW, "AA1")
 
 
 class TestGetSubarrayTemplates:
@@ -333,12 +334,12 @@ class TestGetSubarrayTemplates:
             == expected
         )
 
-    def test_raises_for_unknown_capability_set(self, test_tmdata_repository):
-        with pytest.raises(CapabilitySetNotFoundError):
+    def test_raises_for_unknown_array_assembly(self, test_tmdata_repository):
+        with pytest.raises(ArrayAssemblyNotFoundError):
             test_tmdata_repository.get_subarray_templates(Telescope.SKA_MID, "AA3")
 
 
-class TestGetCycleCapabilitySets:
+class TestGetCycleCapabilities:
     @pytest.mark.parametrize(
         "cycle_id, expected",
         [
@@ -356,19 +357,19 @@ class TestGetCycleCapabilitySets:
         ],
         ids=["low only", "mid and low"],
     )
-    def test_returns_capability_sets_offered(
+    def test_returns_capabilities_offered(
         self, test_tmdata_repository, cycle_id, expected
     ):
-        assert test_tmdata_repository.get_cycle_capability_sets(cycle_id) == expected
+        assert test_tmdata_repository.get_cycle_capabilities(cycle_id) == expected
 
     def test_raises_for_unknown_cycle(self, test_tmdata_repository):
         with pytest.raises(CycleNotFoundError):
-            test_tmdata_repository.get_cycle_capability_sets("NO_SUCH_CYCLE")
+            test_tmdata_repository.get_cycle_capabilities("NO_SUCH_CYCLE")
 
     @pytest.mark.parametrize(
         "array_assembly, policy_id, error, message",
         [
-            ("AA3", "AA1", CapabilitySetNotFoundError, "Capability set AA3"),
+            ("AA3", "AA1", ArrayAssemblyNotFoundError, "Array assembly AA3"),
             ("AA1", "AA3", FileNotFoundError, "no policy file in .* has id AA3"),
         ],
         ids=["unknown array assembly", "unknown policy"],
@@ -393,4 +394,4 @@ class TestGetCycleCapabilitySets:
         )
 
         with pytest.raises(error, match=message):
-            repository.get_cycle_capability_sets("TEST_SKAO_2027_Low_AA1_SV")
+            repository.get_cycle_capabilities("TEST_SKAO_2027_Low_AA1_SV")

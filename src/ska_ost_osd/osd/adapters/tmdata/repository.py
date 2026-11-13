@@ -7,22 +7,22 @@ from ska_telmodel_client import TMData
 from ska_ost_osd.osd.adapters.tmdata import storage
 from ska_ost_osd.osd.adapters.tmdata.models import CycleFile, MidDefaultsFile
 from ska_ost_osd.osd.common.constant import Telescope
-from ska_ost_osd.osd.exceptions import CapabilitySetNotFoundError, CycleNotFoundError
+from ska_ost_osd.osd.exceptions import ArrayAssemblyNotFoundError, CycleNotFoundError
 from ska_ost_osd.osd.models.capabilities import (
-    CapabilitySet,
+    Capabilities,
     LowBasicCapabilities,
-    LowCapabilitySet,
+    LowCapabilities,
     MidBasicCapabilities,
-    MidCapabilitySet,
+    MidCapabilities,
 )
 from ska_ost_osd.osd.models.constraints import Constraints
 from ska_ost_osd.osd.models.cycles import Cycle, PolicyType
 from ska_ost_osd.osd.models.defaults import LowDefaults, MidDefaults, SPFRxParameters
 from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplate
 
-_CAPABILITY_SET_MODELS = {
-    Telescope.SKA_MID: MidCapabilitySet,
-    Telescope.SKA_LOW: LowCapabilitySet,
+_CAPABILITIES_MODELS = {
+    Telescope.SKA_MID: MidCapabilities,
+    Telescope.SKA_LOW: LowCapabilities,
 }
 
 
@@ -118,20 +118,20 @@ class TMDataRepository:
     # Capability sets
 
     @overload
-    def get_capability_sets(
+    def get_array_assembly_capabilities(
         self, telescope: Literal[Telescope.SKA_MID]
-    ) -> list[MidCapabilitySet]: ...
+    ) -> list[MidCapabilities]: ...
 
     @overload
-    def get_capability_sets(
+    def get_array_assembly_capabilities(
         self, telescope: Literal[Telescope.SKA_LOW]
-    ) -> list[LowCapabilitySet]: ...
+    ) -> list[LowCapabilities]: ...
 
-    def get_capability_sets(
+    def get_array_assembly_capabilities(
         self, telescope: Telescope
-    ) -> list[MidCapabilitySet] | list[LowCapabilitySet]:
+    ) -> list[MidCapabilities] | list[LowCapabilities]:
         return [
-            _CAPABILITY_SET_MODELS[telescope].model_validate(
+            _CAPABILITIES_MODELS[telescope].model_validate(
                 {
                     "name": name,
                     **array_assembly_file.model_dump(exclude={"array_assembly"}),
@@ -143,27 +143,27 @@ class TMDataRepository:
         ]
 
     @overload
-    def get_capability_set(
+    def get_capabilities(
         self,
         telescope: Literal[Telescope.SKA_MID],
         array_assembly: str,
         policy_id: str | None = None,
-    ) -> MidCapabilitySet: ...
+    ) -> MidCapabilities: ...
 
     @overload
-    def get_capability_set(
+    def get_capabilities(
         self,
         telescope: Literal[Telescope.SKA_LOW],
         array_assembly: str,
         policy_id: str | None = None,
-    ) -> LowCapabilitySet: ...
+    ) -> LowCapabilities: ...
 
-    def get_capability_set(
+    def get_capabilities(
         self, telescope: Telescope, array_assembly: str, policy_id: str | None = None
-    ) -> CapabilitySet:
+    ) -> Capabilities:
         array_assembly_files = storage.get_array_assembly_files(self._tmdata, telescope)
         if array_assembly not in array_assembly_files:
-            raise CapabilitySetNotFoundError(
+            raise ArrayAssemblyNotFoundError(
                 telescope, array_assembly, list(array_assembly_files)
             )
         capabilities = array_assembly_files[array_assembly].model_dump(
@@ -174,40 +174,40 @@ class TMDataRepository:
             capabilities = merge_capabilities(
                 capabilities, policy.model_dump(exclude={"id"}, exclude_unset=True)
             )
-        return _CAPABILITY_SET_MODELS[telescope].model_validate(
+        return _CAPABILITIES_MODELS[telescope].model_validate(
             {"name": policy_id or array_assembly, **capabilities}
         )
 
     # Joins
 
     def get_subarray_templates(
-        self, telescope: Telescope, capability_set: str
+        self, telescope: Telescope, array_assembly: str
     ) -> list[SubarrayTemplate]:
-        """The capability set's file names the array assembly whose template
-        library it offers. A capability set with no array assembly, or an
-        array assembly with no template library, offers none."""
+        """The array assembly's file names the template library it offers. An
+        array assembly with none named, or whose library doesn't exist,
+        offers none."""
         array_assembly_files = storage.get_array_assembly_files(self._tmdata, telescope)
-        if capability_set not in array_assembly_files:
-            raise CapabilitySetNotFoundError(
-                telescope, capability_set, list(array_assembly_files)
+        if array_assembly not in array_assembly_files:
+            raise ArrayAssemblyNotFoundError(
+                telescope, array_assembly, list(array_assembly_files)
             )
-        array_assembly = array_assembly_files[capability_set].array_assembly
-        if array_assembly is None:
+        library_name = array_assembly_files[array_assembly].array_assembly
+        if library_name is None:
             return []
         try:
             library = storage.get_subarray_template_library(
-                self._tmdata, telescope, array_assembly
+                self._tmdata, telescope, library_name
             )
         except FileNotFoundError:
             return []
         return library.templates
 
-    def get_cycle_capability_sets(
+    def get_cycle_capabilities(
         self, cycle_id: str
-    ) -> dict[Telescope, dict[PolicyType, CapabilitySet]]:
+    ) -> dict[Telescope, dict[PolicyType, Capabilities]]:
         return {
             telescope: {
-                policy_type: self.get_capability_set(
+                policy_type: self.get_capabilities(
                     telescope, offered.array_assembly, policy_id
                 )
                 for policy_type, policy_id in offered.policies.items()

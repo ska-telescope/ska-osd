@@ -33,7 +33,7 @@ from ska_ost_osd.osd.models.capabilities import (
     LowBasicPSSMode,
     LowBasicPSTMode,
     LowBasicSpectralMode,
-    LowCapabilitySet,
+    LowCapabilities,
     LowCBFMode,
     MidArrayAssemblyDishes,
     MidArrayAssemblyModes,
@@ -41,7 +41,7 @@ from ska_ost_osd.osd.models.capabilities import (
     MidArrayAssemblyPSTMode,
     MidArrayAssemblySpectralMode,
     MidBasicCapabilities,
-    MidCapabilitySet,
+    MidCapabilities,
     MidCBFMode,
     MidFrequencyBand,
 )
@@ -215,7 +215,7 @@ CYCLE_1_LEGACY_OBSERVATORY_POLICY = {
 }
 
 # tests/tmdata/telescopes/ska_mid/array_assemblies/AA1.json and AA2.json
-MID_AA1 = MidCapabilitySet(
+MID_AA1 = MidCapabilities(
     name="AA1",
     available_bandwidth_hz=800_000_000,
     number_fsps=4,
@@ -238,7 +238,7 @@ MID_AA1 = MidCapabilitySet(
     ),
 )
 
-MID_AA2 = MidCapabilitySet(
+MID_AA2 = MidCapabilities(
     name="AA2",
     available_bandwidth_hz=800_000_000,
     number_fsps=8,
@@ -338,7 +338,7 @@ MID_ARRAY_ASSEMBLY_FILES = {
 }
 
 # tests/tmdata/telescopes/ska_low/array_assemblies/AA1.json and AA2.json
-LOW_AA1 = LowCapabilitySet(
+LOW_AA1 = LowCapabilities(
     name="AA1",
     subarray_beams=LowArrayAssemblySubarrayBeams(
         max_subarray_beams=1, max_substations_per_subarray_beam=0
@@ -359,7 +359,7 @@ LOW_AA1 = LowCapabilitySet(
     ),
 )
 
-LOW_AA2 = LowCapabilitySet(
+LOW_AA2 = LowCapabilities(
     name="AA2",
     subarray_beams=LowArrayAssemblySubarrayBeams(
         max_subarray_beams=8, max_substations_per_subarray_beam=512
