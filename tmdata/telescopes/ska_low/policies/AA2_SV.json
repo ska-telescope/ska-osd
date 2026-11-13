@@ -1,0 +1,23 @@
+{
+  "id": "AA2_SV",
+  "cbf_modes": [
+    "vis",
+    "pst"
+  ],
+  "modes": {
+    "spectral": {
+      "max_zoom_windows": 1,
+      "max_zoom_channels": 4000
+    },
+    "pss": {
+      "max_beams": 0
+    },
+    "pst": {
+      "max_beams": 1
+    }
+  },
+  "subarray_beams": {
+    "max_subarray_beams": 1,
+    "max_substations_per_subarray_beam": 0
+  }
+}
