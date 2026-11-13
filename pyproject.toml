@@ -28,6 +28,9 @@ dependencies = [
 repository = "https://gitlab.com/ska-telescope/ost/ska-ost-osd"
 documentation = "https://developer.skao.int/projects/ska-ost-osd/en/latest"
 
+[project.scripts]
+osd-validate-tmdata = "ska_ost_osd.osd.adapters.tmdata.validate:main"
+
 [dependency-groups]
 dev = [
     "ruff>=0.16.8,<0.17.0",

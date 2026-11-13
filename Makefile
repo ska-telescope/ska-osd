@@ -15,5 +15,8 @@ DOCS_PYTHON_RUNNER = uv run python3
 # Set python-test make target to run unit tests and not the component tests
 PYTHON_TEST_FILE = tests/unit/
 
+tmdata-validate: ## validate the tmdata files against the OSD storage models
+	$(PYTHON_RUNNER) osd-validate-tmdata $(TMDATA_SRC_DIR)
+
 # include your own private variables for custom configuration
 -include PrivateRules.mak

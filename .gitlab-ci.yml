@@ -16,6 +16,7 @@ variables:
 # non build and test stages hidden https://docs.gitlab.com/ee/ci/yaml/README.html#hide-jobs
 stages:
   - build
+  - validate
   - test
   - lint
   - publish
@@ -45,5 +46,15 @@ include:
   - project: 'ska-telescope/templates-repository'
     file: 'gitlab-ci/includes/sonar-scan.gitlab-ci.yml'
 
+tmdata-validate:
+  stage: validate
+  needs: []
+  script:
+    - make tmdata-validate
+
 tmdata-publish:
   when: manual
+  needs:
+    - tmdata-build
+    - tmdata-validate
+    - python-uv-test
