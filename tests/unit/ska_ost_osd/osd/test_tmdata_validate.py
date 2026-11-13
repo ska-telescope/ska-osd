@@ -47,10 +47,18 @@ def test_missing_file_is_reported(tmdata):
     assert validate_tmdata(tmdata) == [f"{LOW_DEFAULTS}: file not found"]
 
 
-def test_missing_cycle_files_are_reported(tmdata):
-    shutil.rmtree(tmdata / "cycles")
+@pytest.mark.parametrize(
+    "directory",
+    [
+        "telescopes/ska_mid/array_assemblies",
+        "telescopes/ska_low/array_assemblies",
+        "cycles",
+    ],
+)
+def test_missing_required_directory_is_reported(tmdata, directory):
+    shutil.rmtree(tmdata / directory)
 
-    assert validate_tmdata(tmdata) == ["cycles: no cycle files found"]
+    assert validate_tmdata(tmdata) == [f"{directory}: no files found"]
 
 
 def test_invalid_json_is_reported(tmdata):

@@ -52,6 +52,13 @@ DIRECTORY_MODELS: dict[str, type[BaseModel]] = {
     LOW.subarray_templates: SubarrayTemplateLibraryFile,
     OBSERVING_CYCLES_TMDATA_DIR: CycleFile,
 }
+# The directories that must hold at least one file: without them, every
+# query of the telescope or cycles fails
+REQUIRED_DIRECTORIES = (
+    MID.array_assemblies,
+    LOW.array_assemblies,
+    OBSERVING_CYCLES_TMDATA_DIR,
+)
 
 
 def get_file_models(tmdata_dir: Path) -> dict[str, type[BaseModel]]:
@@ -108,9 +115,11 @@ def validate_tmdata(tmdata_dir: Path) -> list[str]:
         tmdata is valid.
     """
     file_models = get_file_models(tmdata_dir)
-    problems = []
-    if CycleFile not in file_models.values():
-        problems.append(f"{OBSERVING_CYCLES_TMDATA_DIR}: no cycle files found")
+    problems = [
+        f"{directory}: no files found"
+        for directory in REQUIRED_DIRECTORIES
+        if not any(name.startswith(f"{directory}/") for name in file_models)
+    ]
     for name, model in file_models.items():
         problems.extend(
             f"{name}: {problem}" for problem in validate_file(tmdata_dir / name, model)
