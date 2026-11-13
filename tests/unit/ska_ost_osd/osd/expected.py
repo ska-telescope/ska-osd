@@ -20,7 +20,7 @@ from ska_ost_osd.osd.models.capabilities import (
     Band5bSubband,
     CoarseChannels,
     FrequencyBand,
-    LowArrayAssemblyStations,
+    LowArrayAssemblyReceptors,
     LowArrayAssemblySubarrayBeams,
     LowBasicCapabilities,
     LowBasicContinuumMode,
@@ -36,7 +36,7 @@ from ska_ost_osd.osd.models.capabilities import (
     LowPSTMode,
     LowSpectralMode,
     LowVLBIMode,
-    MidArrayAssemblyDishes,
+    MidArrayAssemblyReceptors,
     MidBasicCapabilities,
     MidCapabilities,
     MidCBFMode,
@@ -293,7 +293,7 @@ MID_AA1 = MidCapabilities(
     allowed_channel_count_range_max=[58982],
     receivers=["Band_1", "Band_2", "Band_5b"],
     cbf_modes=[MidCBFMode.CORRELATION, MidCBFMode.PST],
-    dishes=MidArrayAssemblyDishes(
+    receptors=MidArrayAssemblyReceptors(
         number_ska_dishes=4,
         number_meerkat_dishes=0,
         number_meerkatplus_dishes=0,
@@ -319,7 +319,7 @@ MID_AA2 = MidCapabilities(
     allowed_channel_count_range_max=[58982],
     receivers=["Band_1", "Band_2", "Band_5a", "Band_5b"],
     cbf_modes=[MidCBFMode.CORRELATION, MidCBFMode.PST],
-    dishes=MidArrayAssemblyDishes(
+    receptors=MidArrayAssemblyReceptors(
         number_ska_dishes=8,
         number_meerkat_dishes=0,
         number_meerkatplus_dishes=0,
@@ -412,7 +412,7 @@ LOW_AA1 = LowCapabilities(
         pst=LowPSTMode(channels_per_coarse_channel=216, max_beams=1),
         vlbi=LowVLBIMode(max_beams=0),
     ),
-    stations=LowArrayAssemblyStations(
+    receptors=LowArrayAssemblyReceptors(
         number_stations=4, max_baseline_km=3.0, ids=[345, 346, 347, 348]
     ),
 )
@@ -445,7 +445,7 @@ LOW_AA2 = LowCapabilities(
         pst=LowPSTMode(channels_per_coarse_channel=216, max_beams=1),
         vlbi=LowVLBIMode(max_beams=0),
     ),
-    stations=LowArrayAssemblyStations(
+    receptors=LowArrayAssemblyReceptors(
         number_stations=8,
         max_baseline_km=6.0,
         ids=[345, 346, 347, 348, 349, 350, 351, 352],

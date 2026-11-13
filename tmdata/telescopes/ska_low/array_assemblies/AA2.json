@@ -33,7 +33,7 @@
     "max_substations_per_subarray_beam": 720
   },
   "number_fsps": 10,
-  "stations": {
+  "receptors": {
     "number_stations": 68,
     "max_baseline_km": 40.0,
     "ids": [

@@ -34,7 +34,7 @@
   "allowed_channel_count_range_max": [
     58982
   ],
-  "dishes": {
+  "receptors": {
     "number_ska_dishes": 8,
     "number_meerkat_dishes": 0,
     "number_meerkatplus_dishes": 0,

@@ -311,7 +311,6 @@ def test_get_osd_using_tmdata_serves_low_modes_flat(tests_tmdata):
     assert "subarray_beams" not in served
     assert served["number_subarray_beams"] == 8
     assert served["number_substations"] == 512
-    assert "stations" not in served
     assert served["number_stations"] == 8
     assert served["max_baseline_km"] == 6.0
     assert served["number_station_ids"] == [
@@ -339,7 +338,6 @@ def test_get_osd_using_tmdata_serves_mid_modes_flat(tests_tmdata):
     assert served["number_pss_beams"] == 0
     assert served["ps_beam_bandwidth_hz"] == 400_000_000
     assert served["number_pst_beams"] == 1
-    assert "dishes" not in served
     assert "receivers" not in served
     assert served["available_receivers"] == [
         "Band_1",

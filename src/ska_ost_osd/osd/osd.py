@@ -316,22 +316,21 @@ class OSD:
         """Capabilities in their legacy shape: the array assembly as a template
         pattern, or as that array assembly's templates when they are processed."""
         capabilities = dict(capabilities)
-        # The legacy response serves the stations or dishes flat, with their
-        # IDs as number_station_ids or number_dish_ids
-        if "stations" in capabilities:
-            stations = capabilities.pop("stations")
-            capabilities["number_stations"] = stations["number_stations"]
-            capabilities["max_baseline_km"] = stations["max_baseline_km"]
-            capabilities["number_station_ids"] = stations["ids"]
-        if "dishes" in capabilities:
-            dishes = capabilities.pop("dishes")
-            capabilities["number_ska_dishes"] = dishes["number_ska_dishes"]
-            capabilities["number_meerkat_dishes"] = dishes["number_meerkat_dishes"]
-            capabilities["number_meerkatplus_dishes"] = dishes[
+        # The legacy response serves the receptors flat, with their IDs as
+        # number_station_ids (Low) or number_dish_ids (Mid)
+        receptors = capabilities.pop("receptors")
+        if "number_stations" in receptors:
+            capabilities["number_stations"] = receptors["number_stations"]
+            capabilities["max_baseline_km"] = receptors["max_baseline_km"]
+            capabilities["number_station_ids"] = receptors["ids"]
+        else:
+            capabilities["number_ska_dishes"] = receptors["number_ska_dishes"]
+            capabilities["number_meerkat_dishes"] = receptors["number_meerkat_dishes"]
+            capabilities["number_meerkatplus_dishes"] = receptors[
                 "number_meerkatplus_dishes"
             ]
-            capabilities["max_baseline_km"] = dishes["max_baseline_km"]
-            capabilities["number_dish_ids"] = dishes["ids"]
+            capabilities["max_baseline_km"] = receptors["max_baseline_km"]
+            capabilities["number_dish_ids"] = receptors["ids"]
         if "receivers" in capabilities:
             capabilities["available_receivers"] = capabilities.pop("receivers")
         # Mid's channel widths are also served without the _hz suffix

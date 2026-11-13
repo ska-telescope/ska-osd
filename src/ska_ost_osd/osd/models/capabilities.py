@@ -113,7 +113,7 @@ class MidArrayAssemblyModes(OSDBaseModel):
     pst: MidArrayAssemblyPSTMode
 
 
-class MidArrayAssemblyDishes(OSDBaseModel):
+class MidArrayAssemblyReceptors(OSDBaseModel):
     """The dishes a Mid array assembly is made of, by ID: SKA dishes
     (``SKA…``) and MeerKAT dishes (``MKT…``)."""
 
@@ -180,7 +180,7 @@ class MidCapabilities(OSDBaseModel):
     allowed_channel_count_range_max: list[int]
     receivers: list[str] = Field(examples=[["Band_1", "Band_2"]])
     cbf_modes: list[MidCBFMode]
-    dishes: MidArrayAssemblyDishes
+    receptors: MidArrayAssemblyReceptors
 
     @model_validator(mode="after")
     def check_cbf_modes(self) -> Self:
@@ -302,7 +302,7 @@ class LowArrayAssemblySubarrayBeams(OSDBaseModel):
     max_substations_per_subarray_beam: int = Field(ge=0, examples=[720])
 
 
-class LowArrayAssemblyStations(OSDBaseModel):
+class LowArrayAssemblyReceptors(OSDBaseModel):
     """The stations a Low array assembly is made of, by ID."""
 
     number_stations: int = Field(ge=0, examples=[68])
@@ -385,7 +385,7 @@ class LowCapabilities(OSDBaseModel):
     subarray_beams: LowArrayAssemblySubarrayBeams
     cbf_modes: list[LowCBFMode]
     modes: LowModes
-    stations: LowArrayAssemblyStations
+    receptors: LowArrayAssemblyReceptors
 
     @model_validator(mode="after")
     def check_cbf_modes(self) -> Self:

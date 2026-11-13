@@ -34,8 +34,8 @@ Unreleased
   matter: ``basic_capabilities.json`` (``telescope``) holds what is fixed for the
   telescope, ``array_assemblies/*.json`` (``array_assembly``) what each array assembly
   offers, and ``policies/*.json`` (``policy``) only what a cycle changes of an array
-  assembly. Each observing mode's limits are under ``modes`` and the receptors under
-  ``stations`` or ``dishes``. Subarray templates and defaults are in
+  assembly. Each observing mode's limits are under ``modes``, and the stations or
+  dishes under ``receptors``. Subarray templates and defaults are in
   ``subarray_templates/<array assembly>.json`` and ``defaults.json``. Low's ``AA2_SV``
   is now a policy on ``AA2``. The legacy files are kept but no longer read
 * [BREAKING] Cycles are files in ``tmdata/cycles`` with a ``cycle_id``,

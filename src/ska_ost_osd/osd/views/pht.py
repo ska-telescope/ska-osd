@@ -16,12 +16,12 @@ from pydantic import (
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
     LowArrayAssemblyModes,
-    LowArrayAssemblyStations,
+    LowArrayAssemblyReceptors,
     LowArrayAssemblySubarrayBeams,
     LowCapabilities,
     LowCBFMode,
-    MidArrayAssemblyDishes,
     MidArrayAssemblyModes,
+    MidArrayAssemblyReceptors,
     MidCapabilities,
     MidCBFMode,
     MidFrequencyBand,
@@ -114,7 +114,7 @@ class MidOfferedCapabilities(OSDBaseModel):
     allowed_channel_count_range_max: list[int]
     receivers: list[str]
     cbf_modes: list[MidCBFMode]
-    dishes: MidArrayAssemblyDishes
+    receptors: MidArrayAssemblyReceptors
 
 
 class LowOfferedCapabilities(OSDBaseModel):
@@ -128,7 +128,7 @@ class LowOfferedCapabilities(OSDBaseModel):
     subarray_beams: LowArrayAssemblySubarrayBeams
     cbf_modes: list[LowCBFMode]
     modes: LowArrayAssemblyModes
-    stations: LowArrayAssemblyStations
+    receptors: LowArrayAssemblyReceptors
 
 
 class CycleCapabilitiesBase(ConfigurationModel):
@@ -177,7 +177,7 @@ class CycleCapabilitiesBase(ConfigurationModel):
             if "available_receivers" in capabilities:
                 capabilities["receivers"] = capabilities.pop("available_receivers")
             if "number_ska_dishes" in capabilities:
-                capabilities["dishes"] = {
+                capabilities["receptors"] = {
                     "number_ska_dishes": capabilities.pop("number_ska_dishes"),
                     "number_meerkat_dishes": capabilities.pop("number_meerkat_dishes"),
                     "number_meerkatplus_dishes": capabilities.pop(
@@ -187,7 +187,7 @@ class CycleCapabilitiesBase(ConfigurationModel):
                     "ids": capabilities.pop("receptors"),
                 }
             if "number_stations" in capabilities:
-                capabilities["stations"] = {
+                capabilities["receptors"] = {
                     "number_stations": capabilities.pop("number_stations"),
                     "max_baseline_km": capabilities.pop("max_baseline_km"),
                     "ids": capabilities.pop("receptors"),
@@ -215,8 +215,8 @@ class CycleCapabilitiesBase(ConfigurationModel):
             capabilities["allowed_channel_width_values"] = capabilities[
                 "allowed_channel_width_values_hz"
             ]
-        # The PHT UI reads the modes, the stations or dishes, and Low's
-        # subarray beams, flat under their old names
+        # The PHT UI reads the modes, the receptors, and Low's subarray beams,
+        # flat under their old names
         modes = capabilities.pop("modes")
         capabilities["number_zoom_windows"] = modes["spectral"]["max_zoom_windows"]
         capabilities["number_zoom_channels"] = modes["spectral"]["max_zoom_channels"]
@@ -227,20 +227,17 @@ class CycleCapabilitiesBase(ConfigurationModel):
         capabilities["number_pst_beams"] = modes["pst"]["max_beams"]
         if "vlbi" in modes:
             capabilities["number_vlbi_beams"] = modes["vlbi"]["max_beams"]
-        if "stations" in capabilities:
-            stations = capabilities.pop("stations")
-            capabilities["receptors"] = stations["ids"]
-            capabilities["number_stations"] = stations["number_stations"]
-            capabilities["max_baseline_km"] = stations["max_baseline_km"]
-        if "dishes" in capabilities:
-            dishes = capabilities.pop("dishes")
-            capabilities["receptors"] = dishes["ids"]
-            capabilities["number_ska_dishes"] = dishes["number_ska_dishes"]
-            capabilities["number_meerkat_dishes"] = dishes["number_meerkat_dishes"]
-            capabilities["number_meerkatplus_dishes"] = dishes[
+        receptors = capabilities.pop("receptors")
+        capabilities["receptors"] = receptors["ids"]
+        if "number_stations" in receptors:
+            capabilities["number_stations"] = receptors["number_stations"]
+        else:
+            capabilities["number_ska_dishes"] = receptors["number_ska_dishes"]
+            capabilities["number_meerkat_dishes"] = receptors["number_meerkat_dishes"]
+            capabilities["number_meerkatplus_dishes"] = receptors[
                 "number_meerkatplus_dishes"
             ]
-            capabilities["max_baseline_km"] = dishes["max_baseline_km"]
+        capabilities["max_baseline_km"] = receptors["max_baseline_km"]
         if "subarray_beams" in capabilities:
             subarray_beams = capabilities.pop("subarray_beams")
             capabilities["number_substations"] = subarray_beams[

@@ -72,7 +72,7 @@ def _mid_capabilities(
 ) -> MidConfigurationCapabilities:
     return MidConfigurationCapabilities(
         name=capabilities.array_assembly,
-        receptors=capabilities.dishes.ids,
+        receptors=capabilities.receptors.ids,
         available_bandwidth_hz=capabilities.available_bandwidth_hz,
         number_pst_beams=capabilities.modes.pst.max_beams,
         number_fsps=capabilities.number_fsps,
@@ -85,7 +85,7 @@ def _low_capabilities(
 ) -> LowConfigurationCapabilities:
     return LowConfigurationCapabilities(
         name=capabilities.array_assembly,
-        receptors=capabilities.stations.ids,
+        receptors=capabilities.receptors.ids,
         available_bandwidth_hz=capabilities.available_bandwidth_hz,
         number_pst_beams=capabilities.modes.pst.max_beams,
         number_fsps=capabilities.number_fsps,

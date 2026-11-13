@@ -65,7 +65,7 @@ Reading the data
        <how-capabilities-are-built>` in the guide). It names its
        ``telescope``, ``array_assembly`` and ``policy`` (``None`` without
        one). Each observing mode's channels, zoom windows and beams are in
-       ``modes``, its receptors in ``stations`` (Low) or ``dishes`` (Mid), and
+       ``modes``, its stations (Low) or dishes (Mid) in ``receptors``, and
        Low's subarray beams in ``subarray_beams``
    * - ``get_basic_capabilities(telescope)``
      - ``MidBasicCapabilities`` / ``LowBasicCapabilities``: what is fixed for

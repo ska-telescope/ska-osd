@@ -215,13 +215,13 @@ class TestCapabilities:
             (
                 MidArrayAssemblyFile,
                 MID_ARRAY_ASSEMBLY,
-                lambda data: data["dishes"]["ids"].pop(),
+                lambda data: data["receptors"]["ids"].pop(),
                 "number_ska_dishes",
             ),
             (
                 LowArrayAssemblyFile,
                 LOW_ARRAY_ASSEMBLY,
-                lambda data: data["stations"]["ids"].pop(),
+                lambda data: data["receptors"]["ids"].pop(),
                 "number_stations",
             ),
             (

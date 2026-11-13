@@ -9,12 +9,12 @@ from pydantic import Field, model_validator
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
     LowArrayAssemblyModes,
-    LowArrayAssemblyStations,
+    LowArrayAssemblyReceptors,
     LowArrayAssemblySubarrayBeams,
     LowBasicCapabilities,
     LowCBFMode,
-    MidArrayAssemblyDishes,
     MidArrayAssemblyModes,
+    MidArrayAssemblyReceptors,
     MidBasicCapabilities,
     MidCBFMode,
 )
@@ -46,7 +46,7 @@ class MidArrayAssemblyFile(OSDBaseModel):
     allowed_channel_count_range_max: list[int]
     receivers: list[str]
     cbf_modes: list[MidCBFMode]
-    dishes: MidArrayAssemblyDishes
+    receptors: MidArrayAssemblyReceptors
 
     @model_validator(mode="after")
     def check_cbf_modes(self) -> Self:
@@ -73,7 +73,7 @@ class LowArrayAssemblyFile(OSDBaseModel):
     subarray_beams: LowArrayAssemblySubarrayBeams
     cbf_modes: list[LowCBFMode]
     modes: LowArrayAssemblyModes
-    stations: LowArrayAssemblyStations
+    receptors: LowArrayAssemblyReceptors
 
     @model_validator(mode="after")
     def check_cbf_modes(self) -> Self:
@@ -111,7 +111,7 @@ class MidPolicyModes(OSDBaseModel):
     pst: MidPolicyPSTMode | None = None
 
 
-class MidPolicyDishes(OSDBaseModel):
+class MidPolicyReceptors(OSDBaseModel):
     number_ska_dishes: int | None = Field(default=None, ge=0)
     number_meerkat_dishes: int | None = Field(default=None, ge=0)
     number_meerkatplus_dishes: int | None = Field(default=None, ge=0)
@@ -134,7 +134,7 @@ class MidPolicyFile(OSDBaseModel):
     allowed_channel_count_range_max: list[int] | None = None
     receivers: list[str] | None = None
     cbf_modes: list[MidCBFMode] | None = None
-    dishes: MidPolicyDishes | None = None
+    receptors: MidPolicyReceptors | None = None
 
 
 class LowPolicySpectralMode(OSDBaseModel):
@@ -168,7 +168,7 @@ class LowPolicySubarrayBeams(OSDBaseModel):
     max_substations_per_subarray_beam: int | None = Field(default=None, ge=0)
 
 
-class LowPolicyStations(OSDBaseModel):
+class LowPolicyReceptors(OSDBaseModel):
     number_stations: int | None = Field(default=None, ge=0)
     max_baseline_km: float | None = Field(default=None, gt=0)
     ids: list[int] | None = None
@@ -186,7 +186,7 @@ class LowPolicyFile(OSDBaseModel):
     subarray_beams: LowPolicySubarrayBeams | None = None
     cbf_modes: list[LowCBFMode] | None = None
     modes: LowPolicyModes | None = None
-    stations: LowPolicyStations | None = None
+    receptors: LowPolicyReceptors | None = None
 
 
 # Basic capabilities file structure matches the reader models

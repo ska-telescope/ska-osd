@@ -159,7 +159,6 @@ class TestGetCycleConfiguration:
         assert mid["AA2"]["number_pss_beams"] == 0
         assert mid["AA2"]["ps_beam_bandwidth_hz"] == 400_000_000
         assert mid["AA2"]["number_pst_beams"] == 1
-        assert "dishes" not in mid["AA2"]
         assert "receivers" not in mid["AA2"]
         assert mid["AA2"]["available_receivers"] == [
             "Band_1",
@@ -193,7 +192,6 @@ class TestGetCycleConfiguration:
         assert "subarray_beams" not in low["AA2"]
         assert low["AA2"]["number_subarray_beams"] == 8
         assert low["AA2"]["number_substations"] == 512
-        assert "stations" not in low["AA2"]
         assert low["AA2"]["number_stations"] == 8
         assert low["AA2"]["max_baseline_km"] == 6.0
         assert low["AA2"]["receptors"] == [345, 346, 347, 348, 349, 350, 351, 352]
