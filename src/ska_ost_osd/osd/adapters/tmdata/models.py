@@ -95,6 +95,104 @@ class LowArrayAssemblyFile(OSDBaseModel):
         return self
 
 
+class MidPolicySpectralMode(OSDBaseModel):
+    max_zoom_windows: int | None = Field(default=None, ge=0)
+    max_zoom_channels: int | None = Field(default=None, ge=0)
+
+
+class MidPolicyPSSMode(OSDBaseModel):
+    max_beams: int | None = Field(default=None, ge=0)
+    beam_bandwidth_hz: float | None = Field(default=None, ge=0)
+
+
+class MidPolicyPSTMode(OSDBaseModel):
+    max_beams: int | None = Field(default=None, ge=0)
+
+
+class MidPolicyModes(OSDBaseModel):
+    spectral: MidPolicySpectralMode | None = None
+    pss: MidPolicyPSSMode | None = None
+    pst: MidPolicyPSTMode | None = None
+
+
+class MidPolicyDishes(OSDBaseModel):
+    number_ska_dishes: int | None = Field(default=None, ge=0)
+    number_meerkat_dishes: int | None = Field(default=None, ge=0)
+    number_meerkatplus_dishes: int | None = Field(default=None, ge=0)
+    max_baseline_km: float | None = Field(default=None, gt=0)
+    ids: list[str] | None = None
+
+
+class MidPolicyFile(OSDBaseModel):
+    """Model for telescopes/ska_mid/policies/<name>.json: what a cycle
+    offers of an array assembly. It mirrors MidArrayAssemblyFile with every
+    field optional, and sets only what it changes; the cycle names the array
+    assembly it applies to."""
+
+    id: str = Field(examples=["cycle_1_science_verification"])
+    available_bandwidth_hz: float | None = Field(default=None, gt=0)
+    number_fsps: int | None = Field(default=None, ge=0)
+    modes: MidPolicyModes | None = None
+    allowed_channel_width_values_hz: list[int] | None = None
+    allowed_channel_count_range_min: list[int] | None = None
+    allowed_channel_count_range_max: list[int] | None = None
+    receivers: list[str] | None = None
+    cbf_modes: list[MidCBFMode] | None = None
+    dishes: MidPolicyDishes | None = None
+
+
+class LowPolicySpectralMode(OSDBaseModel):
+    max_zoom_windows: int | None = Field(default=None, ge=0)
+    max_zoom_channels: int | None = Field(default=None, ge=0)
+    zoom_factors: list[int] | None = None
+
+
+class LowPolicyPSSMode(OSDBaseModel):
+    max_beams: int | None = Field(default=None, ge=0)
+    beam_bandwidth_hz: float | None = Field(default=None, ge=0)
+
+
+class LowPolicyPSTMode(OSDBaseModel):
+    max_beams: int | None = Field(default=None, ge=0)
+
+
+class LowPolicyVLBIMode(OSDBaseModel):
+    max_beams: int | None = Field(default=None, ge=0)
+
+
+class LowPolicyModes(OSDBaseModel):
+    spectral: LowPolicySpectralMode | None = None
+    pss: LowPolicyPSSMode | None = None
+    pst: LowPolicyPSTMode | None = None
+    vlbi: LowPolicyVLBIMode | None = None
+
+
+class LowPolicySubarrayBeams(OSDBaseModel):
+    max_subarray_beams: int | None = Field(default=None, ge=0)
+    max_substations_per_subarray_beam: int | None = Field(default=None, ge=0)
+
+
+class LowPolicyStations(OSDBaseModel):
+    number_stations: int | None = Field(default=None, ge=0)
+    max_baseline_km: float | None = Field(default=None, gt=0)
+    ids: list[int] | None = None
+
+
+class LowPolicyFile(OSDBaseModel):
+    """Model for telescopes/ska_low/policies/<name>.json: what a cycle
+    offers of an array assembly. It mirrors LowArrayAssemblyFile with every
+    field optional, and sets only what it changes; the cycle names the array
+    assembly it applies to."""
+
+    id: str = Field(examples=["cycle_1_science_verification"])
+    available_bandwidth_hz: float | None = Field(default=None, gt=0)
+    number_fsps: int | None = Field(default=None, ge=0)
+    subarray_beams: LowPolicySubarrayBeams | None = None
+    cbf_modes: list[LowCBFMode] | None = None
+    modes: LowPolicyModes | None = None
+    stations: LowPolicyStations | None = None
+
+
 # Basic capabilities file structure matches the reader models
 MidBasicCapabilitiesFile = MidBasicCapabilities
 """Model for telescopes/ska_mid/basic_capabilities.json."""
