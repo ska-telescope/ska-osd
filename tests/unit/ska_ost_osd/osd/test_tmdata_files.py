@@ -15,6 +15,7 @@ from ska_ost_osd.osd.adapters.tmdata.models import (
     LowArrayAssemblyFile,
     LowBasicCapabilitiesFile,
     LowDefaultsFile,
+    LowPolicyFile,
     MidArrayAssemblyFile,
     MidBasicCapabilitiesFile,
     MidDefaultsFile,
@@ -65,8 +66,10 @@ TMDATA = Path(__file__).parents[4] / "tmdata"
         for array_assembly in sorted((TMDATA / directory).glob("*.json"))
     ]
     + [
-        (CycleFile, f"cycles/{cycle.name}")
-        for cycle in sorted((TMDATA / "cycles").glob("cycle_*.json"))
+        (LowPolicyFile, "telescopes/ska_low/policies/AA2.json"),
+        (LowPolicyFile, "telescopes/ska_low/policies/AA2_SV.json"),
+        (CycleFile, "cycles/TEST_SKAO_2027_Low_AA2_Proposal.json"),
+        (CycleFile, "cycles/TEST_SKAO_2027_Low_AA2_SV.json"),
     ],
 )
 def test_tmdata_file_serialises(model, path):

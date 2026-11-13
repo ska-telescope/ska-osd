@@ -3,9 +3,11 @@ its storage model, using the test copy of the tmdata in tests/tmdata."""
 
 import pytest
 
+from ska_ost_osd.osd.adapters.tmdata.models import LowPolicyFile, MidPolicyFile
 from ska_ost_osd.osd.adapters.tmdata.storage import (
     get_array_assembly_files,
     get_cycle_file,
+    get_policy_file,
     get_subarray_template_library,
     get_telescope_basic_capabilities,
     get_telescope_defaults,
@@ -47,6 +49,39 @@ class TestGetCycleFile:
             match="file not found: no cycle file in cycles has id NO_SUCH_CYCLE",
         ):
             get_cycle_file(tests_tmdata, "NO_SUCH_CYCLE")
+
+
+class TestGetPolicyFile:
+    @pytest.mark.parametrize(
+        "telescope, policy_id, expected",
+        [
+            (Telescope.SKA_LOW, "AA1", LowPolicyFile(id="AA1")),
+            (Telescope.SKA_MID, "AA2", MidPolicyFile(id="AA2")),
+        ],
+    )
+    def test_returns_policy_file(self, tests_tmdata, telescope, policy_id, expected):
+        assert get_policy_file(tests_tmdata, telescope, policy_id) == expected
+
+    def test_raises_when_directory_missing(self, empty_tmdata):
+        with pytest.raises(
+            FileNotFoundError, match="file not found: telescopes/ska_low/policies"
+        ):
+            get_policy_file(empty_tmdata, Telescope.SKA_LOW, "AA1")
+
+    def test_raises_when_no_file_has_policy_id(self, tests_tmdata):
+        with pytest.raises(
+            FileNotFoundError,
+            match=(
+                "file not found: no policy file in telescopes/ska_low/policies "
+                "has id NO_SUCH_POLICY"
+            ),
+        ):
+            get_policy_file(tests_tmdata, Telescope.SKA_LOW, "NO_SUCH_POLICY")
+
+    def test_raises_when_two_files_share_an_id(self, tmdata_with):
+        tmdata = tmdata_with({"telescopes/ska_low/policies/copy.json": {"id": "AA1"}})
+        with pytest.raises(ValueError, match="id AA1 is in both"):
+            get_policy_file(tmdata, Telescope.SKA_LOW, "AA1")
 
 
 class TestGetArrayAssemblyFiles:

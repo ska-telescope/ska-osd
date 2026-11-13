@@ -15,9 +15,11 @@ from ska_ost_osd.osd.adapters.tmdata.models import (
     LowArrayAssemblyFile,
     LowBasicCapabilitiesFile,
     LowDefaultsFile,
+    LowPolicyFile,
     MidArrayAssemblyFile,
     MidBasicCapabilitiesFile,
     MidDefaultsFile,
+    MidPolicyFile,
     SubarrayTemplateLibraryFile,
 )
 from ska_ost_osd.osd.common.constant import (
@@ -29,6 +31,11 @@ from ska_ost_osd.osd.common.constant import (
 _ARRAY_ASSEMBLY_FILE_MODELS = {
     Telescope.SKA_MID: MidArrayAssemblyFile,
     Telescope.SKA_LOW: LowArrayAssemblyFile,
+}
+
+_POLICY_FILE_MODELS = {
+    Telescope.SKA_MID: MidPolicyFile,
+    Telescope.SKA_LOW: LowPolicyFile,
 }
 
 _BASIC_CAPABILITIES_FILE_MODELS = {
@@ -109,6 +116,70 @@ def get_cycle_file(tmdata: TMData, cycle_id: str) -> CycleFile:
             f"has id {cycle_id}"
         )
     return CycleFile.model_validate(_read(tmdata, paths[cycle_id]))
+
+
+def get_policy_paths(tmdata: TMData, telescope: Telescope) -> dict[str, str]:
+    """Find each of one telescope's policy files,
+    ``telescopes/<telescope>/policies/<name>.json``. A policy file may have
+    any name: the policy's ID is the ``id`` in the file.
+
+    :param tmdata: TMData to read from.
+    :param telescope: the telescope.
+    :return: the path of each policy's file, keyed by policy ID in ascending
+        order.
+    :raises FileNotFoundError: If the tmdata has no policies directory for
+        the telescope.
+    :raises ValueError: If two policy files have the same ``id``.
+    """
+    directory = TELESCOPE_FILES[telescope].policies
+    if not any(key.startswith(f"{directory}/") for key in tmdata):
+        raise FileNotFoundError(f"file not found: {directory}")
+    paths = {}
+    for name in tmdata[directory]:
+        if not name.endswith(".json"):
+            continue
+        path = f"{directory}/{name}"
+        policy_id = _read(tmdata, path)["id"]
+        if policy_id in paths:
+            raise ValueError(f"id {policy_id} is in both {paths[policy_id]} and {path}")
+        paths[policy_id] = path
+    return dict(sorted(paths.items()))
+
+
+@overload
+def get_policy_file(
+    tmdata: TMData, telescope: Literal[Telescope.SKA_MID], policy_id: str
+) -> MidPolicyFile: ...
+
+
+@overload
+def get_policy_file(
+    tmdata: TMData, telescope: Literal[Telescope.SKA_LOW], policy_id: str
+) -> LowPolicyFile: ...
+
+
+def get_policy_file(
+    tmdata: TMData, telescope: Telescope, policy_id: str
+) -> MidPolicyFile | LowPolicyFile:
+    """Read one of a telescope's policy files: the one whose ``id`` is the ID.
+
+    :param tmdata: TMData to read from.
+    :param telescope: the telescope.
+    :param policy_id: the ID of the policy.
+    :return: the policy file, as stored.
+    :raises FileNotFoundError: If the tmdata has no policies directory for
+        the telescope, or no policy file has the ID.
+    :raises ValueError: If two policy files have the same ``id``.
+    """
+    paths = get_policy_paths(tmdata, telescope)
+    if policy_id not in paths:
+        raise FileNotFoundError(
+            f"file not found: no policy file in "
+            f"{TELESCOPE_FILES[telescope].policies} has id {policy_id}"
+        )
+    return _POLICY_FILE_MODELS[telescope].model_validate(
+        _read(tmdata, paths[policy_id])
+    )
 
 
 @overload

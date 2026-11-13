@@ -53,6 +53,10 @@ class TelescopeFiles:
         return f"{self.directory}/array_assemblies"
 
     @property
+    def policies(self) -> str:
+        return f"{self.directory}/policies"
+
+    @property
     def subarray_templates(self) -> str:
         return f"{self.directory}/{SUBARRAY_TEMPLATES_DIRNAME}"
 
