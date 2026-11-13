@@ -35,7 +35,7 @@ class ProposalPolicy(OSDBaseModel):
 
 class TelescopeCapabilities(OSDBaseModel):
     """What a cycle offers on one telescope: its array assembly, and the
-    policy offered for each type, by capability set name."""
+    policy offered for each type, by policy ID."""
 
     array_assembly: str = Field(examples=["AA2"])
     policies: dict[PolicyType, str] = Field(

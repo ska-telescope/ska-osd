@@ -29,7 +29,8 @@ The storage models are part of the TMData adapter
 (``ska_ost_osd.osd.adapters.tmdata.models``), not of the API.
 
 Create the TMData client, which chooses the source and version, and a repository
-over it once; cache the results if needed:
+over it. Every call reads through the client, so newly published data is seen
+straight away; don't keep results longer than you need them:
 
 .. code-block:: python
 
@@ -60,11 +61,12 @@ Reading the data
      - ``MidCapabilities`` / ``LowCapabilities``: everything a telescope
        offers with one array assembly, e.g. ``"AA2"``: its basic capabilities
        and the array assembly's, with a policy's changes applied if one is
-       given, e.g. ``"AA2_SV"``. It names its ``telescope``,
-       ``array_assembly`` and ``policy`` (``None`` without one). Each
-       observing mode's channels, zoom windows
-       and beams are in ``modes``, its receptors in ``stations`` (Low) or
-       ``dishes`` (Mid), and Low's subarray beams in ``subarray_beams``
+       given, e.g. ``"AA2_SV"`` (see :ref:`how capabilities are built
+       <how-capabilities-are-built>` in the guide). It names its
+       ``telescope``, ``array_assembly`` and ``policy`` (``None`` without
+       one). Each observing mode's channels, zoom windows and beams are in
+       ``modes``, its receptors in ``stations`` (Low) or ``dishes`` (Mid), and
+       Low's subarray beams in ``subarray_beams``
    * - ``get_basic_capabilities(telescope)``
      - ``MidBasicCapabilities`` / ``LowBasicCapabilities``: what is fixed for
        the telescope, whatever the array assembly. For Mid, its receiver
@@ -179,8 +181,8 @@ PHT cycle data
 
 ``get_cycle_configuration(repository, cycle_id)`` returns one cycle with what it
 offers; ``get_cycle_configurations(repository)`` returns every cycle. Both take
-``include_subarray_templates``, ``False`` by default, to serve each offered
-capability set's subarray templates as the legacy API does with
+``include_subarray_templates``, ``False`` by default, to serve the subarray
+templates of each offered array assembly as the legacy API does with
 ``process_templates=True``:
 
 .. code-block:: text
@@ -192,19 +194,21 @@ capability set's subarray templates as the legacy API does with
     capabilities
         mid                     null if the cycle doesn't offer Mid
             basic_capabilities  receiver_information: the receiver bands
-            "AA2"               the offered capability set, keyed by its name;
-                                with include_subarray_templates, its
+            "AA2"               the capabilities offered, keyed by the
+                                policy's name; with
+                                include_subarray_templates, their
                                 subarray_templates keyed by template name
         low                     null if the cycle doesn't offer Low
             basic_capabilities  the band and its channels
-            "AA2"               the offered capability set, keyed by its name
+            "AA2"               the capabilities offered, keyed by the
+                                policy's name
 
 The PHT UI reads the field names of the response it already uses, and the views
 serialise with those names by default, without ``by_alias=True``:
 ``telescope_capabilities`` as ``Mid`` and ``Low``, Mid's receiver bands as
 ``receiver_information``, and Mid's channel widths also as
-``allowed_channel_width_values``. The PHT UI finds the capability set as the first key
-under ``mid`` or ``low`` that isn't ``basic_capabilities``.
+``allowed_channel_width_values``. The PHT UI finds the capabilities as the first
+key under ``mid`` or ``low`` that isn't ``basic_capabilities``.
 
 .. code-block:: python
 
@@ -219,4 +223,6 @@ Errors
 A key with no data raises a subclass of ``OSDQueryError``
 (``ska_ost_osd.osd.exceptions``), which is also a ``LookupError``: for example
 ``CycleNotFoundError`` or ``ArrayAssemblyNotFoundError``. ``TMDataRepository``
-raises ``FileNotFoundError`` if a tmdata file is missing.
+raises ``FileNotFoundError`` if a tmdata file is missing, including a policy
+that a cycle or caller names, and ``ValueError`` if two files claim the same
+cycle, array assembly or policy.

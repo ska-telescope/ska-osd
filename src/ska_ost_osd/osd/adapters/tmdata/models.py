@@ -77,7 +77,7 @@ class LowArrayAssemblyFile(OSDBaseModel):
 
     @model_validator(mode="after")
     def check_cbf_modes(self) -> Self:
-        # vis isn't checked against modes.spectral: some capability sets list
+        # vis isn't checked against modes.spectral: some array assemblies list
         # vis but offer no zoom windows
         for cbf_mode, mode in (
             (LowCBFMode.PSS, self.modes.pss),

@@ -164,8 +164,8 @@ class TestCapabilities:
     def test_capabilities_are_chosen_by_telescope(
         self, expected, capabilities_model, mode
     ):
-        """A serialised capability set reads back as the right capability
-        set model, chosen by its telescope."""
+        """Serialised capabilities read back as the right capabilities
+        model, chosen by their telescope."""
         capabilities = TypeAdapter(Capabilities).validate_python(
             expected.model_dump(mode=mode)
         )

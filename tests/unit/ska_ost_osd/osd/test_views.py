@@ -33,7 +33,7 @@ class TestGetConfiguration:
     def test_serves_the_odt_configuration_fields(self, test_tmdata_repository):
         """The JSON matches what ska-oso-services serves from GET
         /configuration, with allowed_channel_width_values_hz on the Mid
-        capability sets, which ska-oso-services means to serve but drops."""
+        array assemblies, which ska-oso-services means to serve but drops."""
         served = get_configuration(test_tmdata_repository).model_dump(mode="json")
 
         assert list(served) == ["ska_mid", "ska_low"]
@@ -138,8 +138,8 @@ class TestGetCycleConfiguration:
         """The JSON, with aliases as ska-oso-services serves it, has the
         names the PHT UI reads: telescope_capabilities Mid/Low, Mid's
         basic_capabilities.receiver_information, and under each telescope
-        only basic_capabilities and the offered capability set, keyed by
-        its name, with its subarray templates when they are asked for."""
+        only basic_capabilities and the capabilities offered, keyed by
+        their name, with their subarray templates when they are asked for."""
         served = get_cycle_configuration(
             test_tmdata_repository,
             "TEST_SKAO_2027_AA2_Proposal",

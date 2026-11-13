@@ -80,7 +80,7 @@ class OSDRepository(Protocol):
         avoidance angles."""
         ...
 
-    # Capability sets
+    # Capabilities
 
     @overload
     def get_array_assembly_capabilities(

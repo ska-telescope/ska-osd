@@ -131,8 +131,8 @@ def test_get_osd_data_array_assembly_rejects_non_array_assembly_keys(
 ):
     """ "constraints" and "basic_capabilities" are keys of the capabilities
     document, not named array assemblies, so requesting either as one
-    should be rejected rather than returned as if it were a valid
-    capability set.
+    should be rejected rather than returned as if it were valid
+    capabilities.
 
     :param invalid_array_assembly: the non-array-assembly key under test
     :param tests_tmdata: tests_tmdata
@@ -200,8 +200,8 @@ def test_get_osd_data_with_process_templates(tests_tmdata):
 
 
 def test_get_osd_data_processes_templates(tests_tmdata):
-    """With process_templates=True, a capability set's template pattern is
-    replaced by its array assembly's templates."""
+    """With process_templates=True, the template patterns are replaced by
+    each array assembly's templates."""
     result, _ = get_osd_data(
         telescope="mid",
         array_assembly="AA2",

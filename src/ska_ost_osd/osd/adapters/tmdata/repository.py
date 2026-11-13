@@ -101,7 +101,7 @@ class TMDataRepository:
             **defaults.constraints.model_dump(),
         )
 
-    # Capability sets
+    # Capabilities
 
     @overload
     def get_array_assembly_capabilities(

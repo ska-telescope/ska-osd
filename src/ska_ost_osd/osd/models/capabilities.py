@@ -85,7 +85,7 @@ class MidBasicCapabilities(OSDBaseModel):
 
 
 class MidArrayAssemblySpectralMode(OSDBaseModel):
-    """The zoom windows a Mid capability set offers for spectral line
+    """The zoom windows a Mid array assembly offers for spectral line
     observations. ``max_zoom_channels`` is the most channels in one window."""
 
     max_zoom_windows: int = Field(ge=0, examples=[16])
@@ -93,20 +93,20 @@ class MidArrayAssemblySpectralMode(OSDBaseModel):
 
 
 class MidArrayAssemblyPSSMode(OSDBaseModel):
-    """The pulsar search beams a Mid capability set offers."""
+    """The pulsar search beams a Mid array assembly offers."""
 
     max_beams: int = Field(ge=0, examples=[384])
     beam_bandwidth_hz: float = Field(ge=0, examples=[400e6])
 
 
 class MidArrayAssemblyPSTMode(OSDBaseModel):
-    """The pulsar timing beams a Mid capability set offers."""
+    """The pulsar timing beams a Mid array assembly offers."""
 
     max_beams: int = Field(ge=0, examples=[6])
 
 
 class MidArrayAssemblyModes(OSDBaseModel):
-    """What a Mid capability set offers in each observing mode."""
+    """What a Mid array assembly offers in each observing mode."""
 
     spectral: MidArrayAssemblySpectralMode
     pss: MidArrayAssemblyPSSMode
@@ -114,7 +114,7 @@ class MidArrayAssemblyModes(OSDBaseModel):
 
 
 class MidArrayAssemblyDishes(OSDBaseModel):
-    """The dishes a Mid capability set is made of, by ID: SKA dishes
+    """The dishes a Mid array assembly is made of, by ID: SKA dishes
     (``SKA…``) and MeerKAT dishes (``MKT…``)."""
 
     number_ska_dishes: int = Field(ge=0, examples=[64])
@@ -257,7 +257,7 @@ class LowBasicCapabilities(OSDBaseModel):
 
 
 class LowArrayAssemblySpectralMode(OSDBaseModel):
-    """The zoom windows a Low capability set offers for spectral line
+    """The zoom windows a Low array assembly offers for spectral line
     observations. ``max_zoom_channels`` is the most channels in one window."""
 
     max_zoom_windows: int = Field(ge=0, examples=[16])
@@ -266,26 +266,26 @@ class LowArrayAssemblySpectralMode(OSDBaseModel):
 
 
 class LowArrayAssemblyPSSMode(OSDBaseModel):
-    """The pulsar search beams a Low capability set offers."""
+    """The pulsar search beams a Low array assembly offers."""
 
     max_beams: int = Field(ge=0, examples=[30])
     beam_bandwidth_hz: float = Field(ge=0, examples=[118e6])
 
 
 class LowArrayAssemblyPSTMode(OSDBaseModel):
-    """The pulsar timing beams a Low capability set offers."""
+    """The pulsar timing beams a Low array assembly offers."""
 
     max_beams: int = Field(ge=0, examples=[4])
 
 
 class LowArrayAssemblyVLBIMode(OSDBaseModel):
-    """The VLBI beams a Low capability set offers."""
+    """The VLBI beams a Low array assembly offers."""
 
     max_beams: int = Field(ge=0, examples=[0])
 
 
 class LowArrayAssemblyModes(OSDBaseModel):
-    """What a Low capability set offers in each observing mode."""
+    """What a Low array assembly offers in each observing mode."""
 
     spectral: LowArrayAssemblySpectralMode
     pss: LowArrayAssemblyPSSMode
@@ -294,7 +294,7 @@ class LowArrayAssemblyModes(OSDBaseModel):
 
 
 class LowArrayAssemblySubarrayBeams(OSDBaseModel):
-    """The subarray beams a Low capability set offers. Each subarray beam is
+    """The subarray beams a Low array assembly offers. Each subarray beam is
     formed from substations: whole stations (substation 0) or parts of
     stations."""
 
@@ -303,7 +303,7 @@ class LowArrayAssemblySubarrayBeams(OSDBaseModel):
 
 
 class LowArrayAssemblyStations(OSDBaseModel):
-    """The stations a Low capability set is made of, by ID."""
+    """The stations a Low array assembly is made of, by ID."""
 
     number_stations: int = Field(ge=0, examples=[68])
     max_baseline_km: float = Field(gt=0, examples=[40.0])
@@ -389,7 +389,7 @@ class LowCapabilities(OSDBaseModel):
 
     @model_validator(mode="after")
     def check_cbf_modes(self) -> Self:
-        # vis isn't checked against modes.spectral: some capability sets list
+        # vis isn't checked against modes.spectral: some array assemblies list
         # vis but offer no zoom windows
         for cbf_mode, mode in (
             (LowCBFMode.PSS, self.modes.pss),

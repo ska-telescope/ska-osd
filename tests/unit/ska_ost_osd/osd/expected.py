@@ -670,7 +670,7 @@ CONFIGURATION = Configuration(
     ),
 )
 
-# The PHT cycle views of tests/tmdata: each cycle with the capability set
+# The PHT cycle views of tests/tmdata: each cycle with the capabilities
 # each telescope offers and that telescope's basic capabilities
 CYCLE_1_CONFIGURATION = CycleConfiguration(
     observatory_policy=ObservatoryPolicy(

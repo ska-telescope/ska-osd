@@ -380,7 +380,7 @@ class TestGetSubarrayTemplates:
         self, test_tmdata_repository, telescope, array_assembly, expected
     ):
         """The pattern *_AA2 matches templates of both telescopes; only the
-        capability set's own telescope's templates are returned."""
+        array assembly's own telescope's templates are returned."""
         assert (
             test_tmdata_repository.get_subarray_templates(telescope, array_assembly)
             == expected
