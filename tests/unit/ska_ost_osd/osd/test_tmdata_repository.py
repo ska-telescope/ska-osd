@@ -225,7 +225,12 @@ class TestGetBasicCapabilities:
             Telescope.SKA_MID
         ).model_dump(by_alias=True)
 
-        assert list(served) == ["telescope", "frequency_bands", "elevation_limits"]
+        assert list(served) == [
+            "telescope",
+            "frequency_bands",
+            "elevation_limits",
+            "frequency_slice_bandwidth_hz",
+        ]
 
     def test_raises_when_file_missing(self, empty_tmdata_repository):
         with pytest.raises(

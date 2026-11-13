@@ -272,6 +272,7 @@ MID_BASIC_CAPABILITIES = MidBasicCapabilities(
         ),
     ],
     elevation_limits=ElevationLimits(min_elevation_deg=15.0, max_elevation_deg=90.0),
+    frequency_slice_bandwidth_hz=198_180_864,
 )
 
 # The capabilities of tests/tmdata/telescopes/ska_mid/array_assemblies/AA1.json
@@ -281,6 +282,7 @@ MID_AA1 = MidCapabilities(
     array_assembly="AA1",
     frequency_bands=MID_BASIC_CAPABILITIES.frequency_bands,
     elevation_limits=MID_BASIC_CAPABILITIES.elevation_limits,
+    frequency_slice_bandwidth_hz=MID_BASIC_CAPABILITIES.frequency_slice_bandwidth_hz,
     available_bandwidth_hz=800_000_000,
     number_fsps=4,
     modes=MidModes(
@@ -307,6 +309,7 @@ MID_AA2 = MidCapabilities(
     array_assembly="AA2",
     frequency_bands=MID_BASIC_CAPABILITIES.frequency_bands,
     elevation_limits=MID_BASIC_CAPABILITIES.elevation_limits,
+    frequency_slice_bandwidth_hz=MID_BASIC_CAPABILITIES.frequency_slice_bandwidth_hz,
     available_bandwidth_hz=800_000_000,
     number_fsps=8,
     modes=MidModes(
@@ -343,7 +346,13 @@ MID_AA2 = MidCapabilities(
 MID_ARRAY_ASSEMBLY_FILES = {
     capabilities.array_assembly: MidArrayAssemblyFile(
         **capabilities.model_dump(
-            exclude={"telescope", "policy", "frequency_bands", "elevation_limits"}
+            exclude={
+                "telescope",
+                "policy",
+                "frequency_bands",
+                "elevation_limits",
+                "frequency_slice_bandwidth_hz",
+            }
         ),
     )
     for capabilities in (MID_AA1, MID_AA2)

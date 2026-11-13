@@ -62,12 +62,13 @@ class MidFrequencyBand(FrequencyBand):
 
 
 class MidBasicCapabilities(OSDBaseModel):
-    """Mid's receiver bands and elevation limits. tmdata:
-    ``basic_capabilities``."""
+    """Mid's receiver bands, elevation limits and the bandwidth of the
+    frequency slices its FSPs each process. tmdata: ``basic_capabilities``."""
 
     telescope: Literal[Telescope.SKA_MID]
     frequency_bands: list[MidFrequencyBand]
     elevation_limits: ElevationLimits
+    frequency_slice_bandwidth_hz: int = Field(gt=0, examples=[198180864])
 
     def get_frequency_band(self, rx_id: str) -> MidFrequencyBand:
         """Look up one receiver band by its ID.
@@ -172,6 +173,7 @@ class MidCapabilities(OSDBaseModel):
     policy: str | None = Field(default=None, examples=["AA2_SV"])
     frequency_bands: list[MidFrequencyBand]
     elevation_limits: ElevationLimits
+    frequency_slice_bandwidth_hz: int = Field(gt=0)
     available_bandwidth_hz: float = Field(gt=0)
     number_fsps: int = Field(ge=0)
     modes: MidModes

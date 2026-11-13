@@ -80,7 +80,8 @@ Each file names what it describes in a field, so file names don't matter:
      - ``telescope``
      - what is fixed for the telescope: Mid's receiver bands
        (``frequency_bands``) or Low's one ``frequency_band``, the
-       ``elevation_limits``, and for Low its ``coarse_channels`` and, in
+       ``elevation_limits``, for Mid the ``frequency_slice_bandwidth_hz``
+       each FSP processes, and for Low its ``coarse_channels`` and, in
        ``modes``, how each observing mode divides them
    * - ``array_assemblies/*.json``
      - ``array_assembly``
@@ -117,8 +118,9 @@ changed for its own reason:
 
 Basic capabilities
     What the telescope's design fixes, however much of it is built: Mid's
-    receiver bands, Low's frequency band and coarse channels, and the elevation
-    limits. They change only if the design does.
+    receiver bands and frequency slice bandwidth, Low's frequency band and
+    coarse channels, and the elevation limits. They change only if the design
+    does.
 
 Array assemblies
     What has been built at each construction milestone, such as ``AA2``: the

@@ -43,6 +43,8 @@ Unreleased
   ``name``, ``description``, optional ``cycle_number``, ``proposal_window``, ``proposal_policy`` and,
   for each telescope, an ``array_assembly`` and the policy offered for each policy
   type
+* Added Mid's ``frequency_slice_bandwidth_hz`` to its basic capabilities: the
+  bandwidth of the frequency slice each FSP processes, 198180864 Hz
 * Added ``OSDRepository`` and ``TMDataRepository``, which read the OSD as Pydantic
   models. ``get_capabilities(telescope, array_assembly, policy_id=None)`` returns a
   telescope's basic capabilities and array assembly with the policy applied, and
