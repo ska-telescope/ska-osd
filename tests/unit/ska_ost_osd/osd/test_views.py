@@ -3,7 +3,7 @@ tests/tmdata."""
 
 import pytest
 
-from ska_ost_osd.osd.exceptions import CycleNotFoundError
+from ska_ost_osd.osd.exceptions import CycleNotFoundError, PolicyNotFoundError
 from ska_ost_osd.osd.views.odt import Configuration, get_configuration
 from ska_ost_osd.osd.views.pht import (
     CycleConfiguration,
@@ -105,7 +105,7 @@ class TestGetCycleConfiguration:
         )
 
         with pytest.raises(
-            FileNotFoundError, match="no policy file in .* has policy AA3"
+            PolicyNotFoundError, match="Policy AA3 is invalid for telescope ska_low"
         ):
             get_cycle_configuration(repository, "TEST_SKAO_2027_Low_AA1_SV")
 

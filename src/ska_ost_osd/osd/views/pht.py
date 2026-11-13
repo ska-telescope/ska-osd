@@ -348,7 +348,7 @@ def get_cycle_configuration(
     :raises CycleNotFoundError: If there is no cycle with that ID.
     :raises ArrayAssemblyNotFoundError: If the cycle names an array assembly
         that does not exist.
-    :raises FileNotFoundError: If the cycle names a policy that does not
+    :raises PolicyNotFoundError: If the cycle names a policy that does not
         exist.
     :raises ValueError: If the cycle offers more than one policy type.
     """
@@ -415,7 +415,7 @@ def get_cycle_configurations(
     :return: the cycle views.
     :raises ArrayAssemblyNotFoundError: If a cycle names an array assembly
         that does not exist.
-    :raises FileNotFoundError: If a cycle names a policy that does not exist.
+    :raises PolicyNotFoundError: If a cycle names a policy that does not exist.
     :raises ValueError: If a cycle offers more than one policy type.
     """
     return [

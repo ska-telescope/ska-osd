@@ -121,7 +121,7 @@ class OSDRepository(Protocol):
         """An array assembly's capabilities, with a policy's applied if one is
         given, named after the policy or else the array assembly. Raises
         ``ArrayAssemblyNotFoundError`` if there is no such array assembly, and
-        ``FileNotFoundError`` if there is no such policy."""
+        ``PolicyNotFoundError`` if there is no such policy."""
         ...
 
     # Joins
@@ -141,6 +141,6 @@ class OSDRepository(Protocol):
         telescope the cycle does not offer is left out. Raises
         ``CycleNotFoundError`` if there is no such cycle,
         ``ArrayAssemblyNotFoundError`` if the cycle names an array assembly
-        that does not exist, and ``FileNotFoundError`` if it names a policy
+        that does not exist, and ``PolicyNotFoundError`` if it names a policy
         that does not exist."""
         ...

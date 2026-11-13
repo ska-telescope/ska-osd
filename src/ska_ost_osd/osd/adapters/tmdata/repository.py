@@ -7,7 +7,11 @@ from ska_telmodel_client import TMData
 from ska_ost_osd.osd.adapters.tmdata import storage
 from ska_ost_osd.osd.adapters.tmdata.models import CycleFile, MidDefaultsFile
 from ska_ost_osd.osd.common.constant import Telescope
-from ska_ost_osd.osd.exceptions import ArrayAssemblyNotFoundError, CycleNotFoundError
+from ska_ost_osd.osd.exceptions import (
+    ArrayAssemblyNotFoundError,
+    CycleNotFoundError,
+    PolicyNotFoundError,
+)
 from ska_ost_osd.osd.models.capabilities import (
     Capabilities,
     LowBasicCapabilities,
@@ -145,13 +149,17 @@ class TMDataRepository:
             raise ArrayAssemblyNotFoundError(
                 telescope, array_assembly, list(array_assembly_files)
             )
-        policy = (
-            storage.get_policy_file(self._tmdata, telescope, policy_id).model_dump(
-                exclude_unset=True
-            )
-            if policy_id is not None
-            else None
-        )
+        policy = None
+        if policy_id is not None:
+            try:
+                policy_ids = list(storage.get_policy_paths(self._tmdata, telescope))
+            except FileNotFoundError:
+                policy_ids = []
+            if policy_id not in policy_ids:
+                raise PolicyNotFoundError(telescope, policy_id, policy_ids)
+            policy = storage.get_policy_file(
+                self._tmdata, telescope, policy_id
+            ).model_dump(exclude_unset=True)
         return _CAPABILITIES_MODELS[telescope].model_validate(
             merge_capabilities(
                 storage.get_telescope_basic_capabilities(

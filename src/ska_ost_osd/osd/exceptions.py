@@ -7,6 +7,7 @@ from ska_ost_osd.osd.common.osd_validation_messages import (
     BAND5B_SUBBAND_DOESNOT_EXIST_ERROR_MESSAGE,
     CYCLE_ID_ERROR_MESSAGE,
     FREQUENCY_BAND_DOESNOT_EXIST_ERROR_MESSAGE,
+    POLICY_NOT_FOUND_ERROR_MESSAGE,
 )
 
 
@@ -46,6 +47,27 @@ class ArrayAssemblyNotFoundError(OSDQueryError, LookupError):
         super().__init__(
             ARRAY_ASSEMBLY_NOT_FOUND_ERROR_MESSAGE.format(
                 name, telescope, ", ".join(available_names)
+            )
+        )
+
+
+class PolicyNotFoundError(OSDQueryError, LookupError):
+    """The telescope has no policy with the requested ID.
+
+    :param telescope: the telescope searched.
+    :param policy: the policy ID requested.
+    :param available_policies: the IDs of the telescope's policies.
+    """
+
+    def __init__(
+        self, telescope: Telescope, policy: str, available_policies: list[str]
+    ):
+        self.telescope = telescope
+        self.policy = policy
+        self.available_policies = available_policies
+        super().__init__(
+            POLICY_NOT_FOUND_ERROR_MESSAGE.format(
+                policy, telescope, ", ".join(available_policies)
             )
         )
 

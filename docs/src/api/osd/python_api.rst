@@ -222,7 +222,6 @@ Errors
 
 A key with no data raises a subclass of ``OSDQueryError``
 (``ska_ost_osd.osd.exceptions``), which is also a ``LookupError``: for example
-``CycleNotFoundError`` or ``ArrayAssemblyNotFoundError``. ``TMDataRepository``
-raises ``FileNotFoundError`` if a tmdata file is missing, including a policy
-that a cycle or caller names, and ``ValueError`` if two files claim the same
-cycle, array assembly or policy.
+``CycleNotFoundError``, ``ArrayAssemblyNotFoundError`` or ``PolicyNotFoundError``.
+``TMDataRepository`` raises ``FileNotFoundError`` if a tmdata file is missing, and
+``ValueError`` if two files claim the same cycle, array assembly or policy.

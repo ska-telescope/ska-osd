@@ -9,6 +9,7 @@ from ska_ost_osd.osd.exceptions import (
     CycleNotFoundError,
     FrequencyBandNotFoundError,
     OSDQueryError,
+    PolicyNotFoundError,
 )
 
 
@@ -20,6 +21,7 @@ from ska_ost_osd.osd.exceptions import (
             ["TEST_SKAO_2027_Low_AA1_SV", "TEST_SKAO_2027_AA2_Proposal"],
         ),
         ArrayAssemblyNotFoundError(Telescope.SKA_LOW, "AA3", ["AA1", "AA2"]),
+        PolicyNotFoundError(Telescope.SKA_LOW, "AA3", ["AA1", "AA2"]),
         FrequencyBandNotFoundError("Band_9", ["Band_1"]),
         Band5bSubbandNotFoundError("Band_5b", 4, [1, 2, 3]),
     ],

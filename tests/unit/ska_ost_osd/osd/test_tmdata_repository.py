@@ -5,7 +5,11 @@ import pytest
 from pydantic import ValidationError
 
 from ska_ost_osd.osd.common.constant import Telescope
-from ska_ost_osd.osd.exceptions import ArrayAssemblyNotFoundError, CycleNotFoundError
+from ska_ost_osd.osd.exceptions import (
+    ArrayAssemblyNotFoundError,
+    CycleNotFoundError,
+    PolicyNotFoundError,
+)
 from ska_ost_osd.osd.models.capabilities import merge_capabilities
 from ska_ost_osd.osd.models.cycles import Cycle, PolicyType
 from tests.unit.ska_ost_osd.osd.expected import (
@@ -334,11 +338,19 @@ class TestGetCapabilities:
 
     def test_raises_for_unknown_policy(self, test_tmdata_repository):
         with pytest.raises(
-            FileNotFoundError, match="no policy file in .* has policy NO_SUCH_POLICY"
-        ):
+            PolicyNotFoundError,
+            match=(
+                r"Policy NO_SUCH_POLICY is invalid for telescope ska_low\. "
+                r"Valid policies are AA1, AA2, AA2_SV\."
+            ),
+        ) as excinfo:
             test_tmdata_repository.get_capabilities(
                 Telescope.SKA_LOW, "AA2", "NO_SUCH_POLICY"
             )
+
+        assert excinfo.value.telescope == Telescope.SKA_LOW
+        assert excinfo.value.policy == "NO_SUCH_POLICY"
+        assert excinfo.value.available_policies == ["AA1", "AA2", "AA2_SV"]
 
     def test_raises_for_unknown_name(self, test_tmdata_repository):
         with pytest.raises(
@@ -438,7 +450,7 @@ class TestGetCycleCapabilities:
         "array_assembly, policy_id, error, message",
         [
             ("AA3", "AA1", ArrayAssemblyNotFoundError, "Array assembly AA3"),
-            ("AA1", "AA3", FileNotFoundError, "no policy file in .* has policy AA3"),
+            ("AA1", "AA3", PolicyNotFoundError, "Policy AA3 is invalid"),
         ],
         ids=["unknown array assembly", "unknown policy"],
     )
