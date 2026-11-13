@@ -100,17 +100,27 @@ class OSDRepository(Protocol):
 
     @overload
     def get_capability_set(
-        self, telescope: Literal[Telescope.SKA_MID], name: str
+        self,
+        telescope: Literal[Telescope.SKA_MID],
+        array_assembly: str,
+        policy_id: str | None = None,
     ) -> MidCapabilitySet: ...
 
     @overload
     def get_capability_set(
-        self, telescope: Literal[Telescope.SKA_LOW], name: str
+        self,
+        telescope: Literal[Telescope.SKA_LOW],
+        array_assembly: str,
+        policy_id: str | None = None,
     ) -> LowCapabilitySet: ...
 
-    def get_capability_set(self, telescope: Telescope, name: str) -> CapabilitySet:
-        """One capability set, by its telescope and name. Raises
-        ``CapabilitySetNotFoundError`` if there is none."""
+    def get_capability_set(
+        self, telescope: Telescope, array_assembly: str, policy_id: str | None = None
+    ) -> CapabilitySet:
+        """An array assembly's capabilities, with a policy's applied if one is
+        given, named after the policy or else the array assembly. Raises
+        ``CapabilitySetNotFoundError`` if there is no such array assembly, and
+        ``FileNotFoundError`` if there is no such policy."""
         ...
 
     # Joins
@@ -125,9 +135,11 @@ class OSDRepository(Protocol):
     def get_cycle_capability_sets(
         self, cycle_id: str
     ) -> dict[Telescope, dict[PolicyType, CapabilitySet]]:
-        """The capability set a cycle offers for each telescope and policy
-        type; a telescope it does not offer is left out. Raises
-        ``CycleNotFoundError`` if there is no such cycle, and
-        ``CapabilitySetNotFoundError`` if the cycle names a capability set that
-        does not exist."""
+        """The capabilities a cycle offers for each telescope and policy type:
+        the telescope's array assembly with that type's policy applied. A
+        telescope the cycle does not offer is left out. Raises
+        ``CycleNotFoundError`` if there is no such cycle,
+        ``CapabilitySetNotFoundError`` if the cycle names an array assembly
+        that does not exist, and ``FileNotFoundError`` if it names a policy
+        that does not exist."""
         ...

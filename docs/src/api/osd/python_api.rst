@@ -54,9 +54,12 @@ Reading the data
      - ``Cycle``: a cycle's description, proposal window and policy, and for
        each telescope its array assembly and the capability set offered for
        each policy type
-   * - ``get_capability_sets(telescope)`` / ``get_capability_set(telescope, name)``
+   * - ``get_capability_sets(telescope)``
+     - each of a telescope's array assemblies, as below
+   * - ``get_capability_set(telescope, array_assembly, policy_id=None)``
      - ``MidCapabilitySet`` / ``LowCapabilitySet``: one array assembly of a
-       telescope, e.g. ``"AA2"``. Its zoom windows and beams are in its
+       telescope, e.g. ``"AA2"``, with a policy's changes applied if one is
+       given, e.g. ``"AA2_SV"``. Its zoom windows and beams are in its
        ``modes``, its receptors in ``stations`` (Low) or ``dishes`` (Mid), and
        Low's subarray beams in ``subarray_beams``
    * - ``get_basic_capabilities(telescope)``
@@ -99,9 +102,10 @@ Joins
    * - Method
      - Returns
    * - ``get_cycle_capability_sets(cycle_id)``
-     - the capability set the cycle offers for each telescope and policy type,
-       as a ``dict`` keyed by ``Telescope`` and then ``PolicyType``; a telescope
-       the cycle does not offer is left out
+     - the capabilities the cycle offers for each telescope and policy type,
+       as a ``dict`` keyed by ``Telescope`` and then ``PolicyType``: the
+       cycle's array assembly for that telescope with the type's policy
+       applied. A telescope the cycle does not offer is left out
    * - ``get_subarray_templates(telescope, capability_set)``
      - the ``SubarrayTemplate`` objects of a capability set: the templates of
        the array assembly the capability set names, or none

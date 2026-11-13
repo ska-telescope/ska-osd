@@ -1,6 +1,6 @@
 """The OSD repository backed by the tmdata, read through a TMData client."""
 
-from typing import Literal, overload
+from typing import Any, Literal, overload
 
 from ska_telmodel_client import TMData
 
@@ -24,6 +24,21 @@ _CAPABILITY_SET_MODELS = {
     Telescope.SKA_MID: MidCapabilitySet,
     Telescope.SKA_LOW: LowCapabilitySet,
 }
+
+
+def _merge_capabilities(
+    capabilities: dict[str, Any], policy: dict[str, Any]
+) -> dict[str, Any]:
+    """The capabilities with each field the policy sets replaced, nested
+    groups field by field."""
+    merged = dict(capabilities)
+    for field, value in policy.items():
+        merged[field] = (
+            _merge_capabilities(capabilities[field], value)
+            if isinstance(value, dict)
+            else value
+        )
+    return merged
 
 
 class TMDataRepository:
@@ -129,21 +144,38 @@ class TMDataRepository:
 
     @overload
     def get_capability_set(
-        self, telescope: Literal[Telescope.SKA_MID], name: str
+        self,
+        telescope: Literal[Telescope.SKA_MID],
+        array_assembly: str,
+        policy_id: str | None = None,
     ) -> MidCapabilitySet: ...
 
     @overload
     def get_capability_set(
-        self, telescope: Literal[Telescope.SKA_LOW], name: str
+        self,
+        telescope: Literal[Telescope.SKA_LOW],
+        array_assembly: str,
+        policy_id: str | None = None,
     ) -> LowCapabilitySet: ...
 
-    def get_capability_set(self, telescope: Telescope, name: str) -> CapabilitySet:
-        capability_sets = self.get_capability_sets(telescope)
-        for capability_set in capability_sets:
-            if capability_set.name == name:
-                return capability_set
-        raise CapabilitySetNotFoundError(
-            telescope, name, [capability_set.name for capability_set in capability_sets]
+    def get_capability_set(
+        self, telescope: Telescope, array_assembly: str, policy_id: str | None = None
+    ) -> CapabilitySet:
+        array_assembly_files = storage.get_array_assembly_files(self._tmdata, telescope)
+        if array_assembly not in array_assembly_files:
+            raise CapabilitySetNotFoundError(
+                telescope, array_assembly, list(array_assembly_files)
+            )
+        capabilities = array_assembly_files[array_assembly].model_dump(
+            exclude={"array_assembly"}
+        )
+        if policy_id is not None:
+            policy = storage.get_policy_file(self._tmdata, telescope, policy_id)
+            capabilities = _merge_capabilities(
+                capabilities, policy.model_dump(exclude={"id"}, exclude_unset=True)
+            )
+        return _CAPABILITY_SET_MODELS[telescope].model_validate(
+            {"name": policy_id or array_assembly, **capabilities}
         )
 
     # Joins
@@ -175,8 +207,10 @@ class TMDataRepository:
     ) -> dict[Telescope, dict[PolicyType, CapabilitySet]]:
         return {
             telescope: {
-                policy_type: self.get_capability_set(telescope, name)
-                for policy_type, name in offered.policies.items()
+                policy_type: self.get_capability_set(
+                    telescope, offered.array_assembly, policy_id
+                )
+                for policy_type, policy_id in offered.policies.items()
             }
             for telescope, offered in self.get_cycle(cycle_id).capabilities.items()
         }

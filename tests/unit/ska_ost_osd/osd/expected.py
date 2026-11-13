@@ -382,6 +382,26 @@ LOW_AA2 = LowCapabilitySet(
     ),
 )
 
+# LOW_AA2 with tests/tmdata/telescopes/ska_low/policies/AA2_SV.json applied
+LOW_AA2_SV = LOW_AA2.model_copy(
+    update={
+        "name": "AA2_SV",
+        "cbf_modes": [LowCBFMode.VIS, LowCBFMode.PST],
+        "modes": LOW_AA2.modes.model_copy(
+            update={
+                "spectral": LOW_AA2.modes.spectral.model_copy(
+                    update={"max_zoom_windows": 1, "max_zoom_channels": 4000}
+                ),
+                "pss": LOW_AA2.modes.pss.model_copy(update={"max_beams": 0}),
+                "pst": LOW_AA2.modes.pst.model_copy(update={"max_beams": 1}),
+            }
+        ),
+        "subarray_beams": LowArrayAssemblySubarrayBeams(
+            max_subarray_beams=1, max_substations_per_subarray_beam=0
+        ),
+    }
+)
+
 # The band in tests/tmdata/telescopes/ska_low/basic_capabilities.json
 LOW_FREQUENCY_BAND = FrequencyBand(
     min_frequency_hz=50_000_000.0,

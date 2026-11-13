@@ -1,8 +1,13 @@
 """Unit tests for the TMData repository, using the test copy of the tmdata in
 tests/tmdata."""
 
-import pytest
+from pathlib import Path
 
+import pytest
+from pydantic import ValidationError
+from ska_telmodel_client import TMData
+
+from ska_ost_osd.osd.adapters.tmdata import TMDataRepository
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.exceptions import CapabilitySetNotFoundError, CycleNotFoundError
 from ska_ost_osd.osd.models.cycles import Cycle, PolicyType
@@ -12,6 +17,7 @@ from tests.unit.ska_ost_osd.osd.expected import (
     CYCLE_2,
     LOW_AA1,
     LOW_AA2,
+    LOW_AA2_SV,
     LOW_BASIC_CAPABILITIES,
     LOW_CONSTRAINTS,
     LOW_DEFAULTS,
@@ -25,6 +31,8 @@ from tests.unit.ska_ost_osd.osd.expected import (
     MID_DEFAULTS,
     MID_FULL_AA2_TEMPLATE,
 )
+
+TMDATA = Path(__file__).parents[4] / "tmdata"
 
 
 class TestGetCycleIds:
@@ -231,7 +239,7 @@ class TestGetCapabilitySets:
 
 class TestGetCapabilitySet:
     @pytest.mark.parametrize(
-        "telescope, name, expected",
+        "telescope, array_assembly, expected",
         [
             (Telescope.SKA_MID, "AA1", MID_AA1),
             (Telescope.SKA_MID, "AA2", MID_AA2),
@@ -239,10 +247,57 @@ class TestGetCapabilitySet:
             (Telescope.SKA_LOW, "AA2", LOW_AA2),
         ],
     )
-    def test_returns_capability_set(
-        self, test_tmdata_repository, telescope, name, expected
+    def test_returns_array_assembly_without_a_policy(
+        self, test_tmdata_repository, telescope, array_assembly, expected
     ):
-        assert test_tmdata_repository.get_capability_set(telescope, name) == expected
+        assert (
+            test_tmdata_repository.get_capability_set(telescope, array_assembly)
+            == expected
+        )
+
+    def test_an_empty_policy_changes_nothing(self, test_tmdata_repository):
+        assert (
+            test_tmdata_repository.get_capability_set(Telescope.SKA_LOW, "AA2", "AA2")
+            == LOW_AA2
+        )
+
+    def test_a_policy_changes_only_what_it_sets(self, test_tmdata_repository):
+        assert (
+            test_tmdata_repository.get_capability_set(
+                Telescope.SKA_LOW, "AA2", "AA2_SV"
+            )
+            == LOW_AA2_SV
+        )
+
+    def test_the_result_is_validated(self, tmdata_repository_with):
+        """A policy that leaves the result inconsistent is rejected: here pst
+        is dropped from cbf_modes but the pst beams are kept."""
+        repository = tmdata_repository_with(
+            {
+                "telescopes/ska_low/policies/bad.json": {
+                    "id": "bad",
+                    "cbf_modes": ["vis"],
+                }
+            }
+        )
+        with pytest.raises(ValidationError, match="cbf_modes must list pst"):
+            repository.get_capability_set(Telescope.SKA_LOW, "AA2", "bad")
+
+    def test_raises_for_unknown_policy(self, test_tmdata_repository):
+        with pytest.raises(
+            FileNotFoundError, match="no policy file in .* has id NO_SUCH_POLICY"
+        ):
+            test_tmdata_repository.get_capability_set(
+                Telescope.SKA_LOW, "AA2", "NO_SUCH_POLICY"
+            )
+
+    def test_low_aa2_with_the_aa2_sv_policy_is_the_aa2_sv_capability_set(self):
+        """In the real tmdata, the AA2_SV policy applied to Low AA2 gives what
+        the AA2_SV capability set file says."""
+        repository = TMDataRepository(TMData([f"file://{TMDATA}"]))
+        assert repository.get_capability_set(
+            Telescope.SKA_LOW, "AA2", "AA2_SV"
+        ) == repository.get_capability_set(Telescope.SKA_LOW, "AA2_SV")
 
     def test_raises_for_unknown_name(self, test_tmdata_repository):
         with pytest.raises(
@@ -324,24 +379,32 @@ class TestGetCycleCapabilitySets:
         with pytest.raises(CycleNotFoundError):
             test_tmdata_repository.get_cycle_capability_sets("NO_SUCH_CYCLE")
 
-    def test_raises_when_cycle_names_unknown_capability_set(
-        self, tmdata_repository_with
+    @pytest.mark.parametrize(
+        "array_assembly, policy_id, error, message",
+        [
+            ("AA3", "AA1", CapabilitySetNotFoundError, "Capability set AA3"),
+            ("AA1", "AA3", FileNotFoundError, "no policy file in .* has id AA3"),
+        ],
+        ids=["unknown array assembly", "unknown policy"],
+    )
+    def test_raises_when_cycle_names_unknown_array_assembly_or_policy(
+        self, tmdata_repository_with, array_assembly, policy_id, error, message
     ):
-        """The cycle refers to a capability set by name; a name with no
-        capability set is an error rather than being skipped."""
+        """An array assembly or policy the cycle names but that doesn't exist
+        is an error rather than being skipped."""
         repository = tmdata_repository_with(
             {
                 "cycles/TEST_SKAO_2027_Low_AA1_SV.json": {
                     **CYCLE_1_FILE.model_dump(mode="json", by_alias=True),
                     "capabilities": {
                         "ska_low": {
-                            "array_assembly": "AA1",
-                            "policies": {"science_verification": "AA3"},
+                            "array_assembly": array_assembly,
+                            "policies": {"science_verification": policy_id},
                         }
                     },
                 }
             }
         )
 
-        with pytest.raises(CapabilitySetNotFoundError, match="Capability set AA3"):
+        with pytest.raises(error, match=message):
             repository.get_cycle_capability_sets("TEST_SKAO_2027_Low_AA1_SV")

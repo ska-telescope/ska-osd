@@ -29,8 +29,11 @@ Unreleased
 * Each cycle file in ``tmdata/cycles`` may have any name. A cycle has a unique ``id``,
   a ``name``, a ``description``, an optional unique ``number``, a ``proposal_window``,
   a ``proposal_policy`` and ``capabilities``: for each telescope, keyed ``ska_low`` or
-  ``ska_mid``, its ``array_assembly`` and the capability set offered for each policy
-  type (``science_verification``, ``shared_risk`` or ``standard_operations``). The
+  ``ska_mid``, its ``array_assembly`` and the policy offered for each policy type
+  (``science_verification``, ``shared_risk`` or ``standard_operations``). A policy,
+  in ``telescopes/<telescope>/policies``, has an ``id`` and sets only what it changes
+  of the array assembly a cycle pairs it with; the repository returns the two
+  merged. The
   legacy response and the PHT view serve a cycle offering one policy type, under the
   old field names: ``cycle_id``, ``cycle_description``, ``cycle_number``, ``type``
   (``Science Verification``, ``Shared Risk`` or ``Proposal``), ``cycle_information``

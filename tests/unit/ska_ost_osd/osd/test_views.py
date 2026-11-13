@@ -3,7 +3,7 @@ tests/tmdata."""
 
 import pytest
 
-from ska_ost_osd.osd.exceptions import CapabilitySetNotFoundError, CycleNotFoundError
+from ska_ost_osd.osd.exceptions import CycleNotFoundError
 from ska_ost_osd.osd.views.odt import Configuration, get_configuration
 from ska_ost_osd.osd.views.pht import (
     CycleConfiguration,
@@ -89,9 +89,7 @@ class TestGetCycleConfiguration:
         with pytest.raises(CycleNotFoundError):
             get_cycle_configuration(test_tmdata_repository, "NO_SUCH_CYCLE")
 
-    def test_raises_when_cycle_names_unknown_capability_set(
-        self, tmdata_repository_with
-    ):
+    def test_raises_when_cycle_names_unknown_policy(self, tmdata_repository_with):
         repository = tmdata_repository_with(
             {
                 "cycles/TEST_SKAO_2027_Low_AA1_SV.json": {
@@ -106,7 +104,7 @@ class TestGetCycleConfiguration:
             }
         )
 
-        with pytest.raises(CapabilitySetNotFoundError, match="Capability set AA3"):
+        with pytest.raises(FileNotFoundError, match="no policy file in .* has id AA3"):
             get_cycle_configuration(repository, "TEST_SKAO_2027_Low_AA1_SV")
 
     def test_raises_when_cycle_offers_more_than_one_type(self, tmdata_repository_with):
