@@ -60,7 +60,7 @@ def get_cycle_paths(tmdata: TMData) -> dict[str, str]:
     :raises ValueError: If two cycle files have the same ``cycle_id`` or the
         same ``cycle_number``.
     """
-    if not any(key.startswith(OBSERVING_CYCLES_TMDATA_DIR) for key in tmdata):
+    if not any(key.startswith(f"{OBSERVING_CYCLES_TMDATA_DIR}/") for key in tmdata):
         raise FileNotFoundError(f"file not found: {OBSERVING_CYCLES_TMDATA_DIR}")
     paths = {}
     paths_by_number = {}
