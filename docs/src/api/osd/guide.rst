@@ -99,8 +99,9 @@ don't matter:
        whose file is ``AASTAR.json``
    * - ``cycles/*.json``
      - ``cycle_id``
-     - a cycle: its proposal window and policy, and for each telescope its
-       array assembly and the policy offered for each policy type
+     - a cycle: its proposal window and policy, and in ``telescopes``, for
+       each telescope, its array assembly and the policy offered for each
+       policy type
 
 .. note::
 

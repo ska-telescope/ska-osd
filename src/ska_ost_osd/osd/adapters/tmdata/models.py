@@ -19,9 +19,9 @@ from ska_ost_osd.osd.models.capabilities import (
     MidCBFMode,
 )
 from ska_ost_osd.osd.models.cycles import (
+    CycleTelescope,
     ProposalPolicy,
     ProposalWindow,
-    TelescopeCapabilities,
 )
 from ska_ost_osd.osd.models.defaults import (
     CSPSPFRx,
@@ -243,7 +243,7 @@ class CycleFile(OSDBaseModel):
     cycle_number: int | None = Field(default=None, ge=0, examples=[1])
     proposal_window: ProposalWindow
     proposal_policy: ProposalPolicy
-    capabilities: dict[Telescope, TelescopeCapabilities] = Field(min_length=1)
+    telescopes: dict[Telescope, CycleTelescope] = Field(min_length=1)
 
 
 class SubarrayTemplateLibraryFile(OSDBaseModel):

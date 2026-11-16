@@ -13,7 +13,7 @@
     "max_observation_setups": 1,
     "max_data_products": 1
   },
-  "capabilities": {
+  "telescopes": {
     "ska_low": {
       "array_assembly": "AA2",
       "policies": {

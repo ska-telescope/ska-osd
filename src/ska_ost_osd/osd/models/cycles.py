@@ -33,7 +33,7 @@ class ProposalPolicy(OSDBaseModel):
     max_data_products: int | None = Field(default=None, ge=0)
 
 
-class TelescopeCapabilities(OSDBaseModel):
+class CycleTelescope(OSDBaseModel):
     """What a cycle offers on one telescope: its array assembly, and the
     policy offered for each type, by policy ID."""
 
@@ -53,4 +53,4 @@ class Cycle(OSDBaseModel):
     cycle_number: int | None = Field(default=None, ge=0, examples=[1])
     proposal_window: ProposalWindow
     proposal_policy: ProposalPolicy
-    capabilities: dict[Telescope, TelescopeCapabilities] = Field(min_length=1)
+    telescopes: dict[Telescope, CycleTelescope] = Field(min_length=1)

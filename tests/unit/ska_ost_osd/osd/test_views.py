@@ -94,7 +94,7 @@ class TestGetCycleConfiguration:
             {
                 "cycles/TEST_SKAO_2027_Low_AA1_SV.json": {
                     **CYCLE_1_FILE.model_dump(mode="json", by_alias=True),
-                    "capabilities": {
+                    "telescopes": {
                         "ska_low": {
                             "array_assembly": "AA1",
                             "policies": {"science_verification": "AA3"},
@@ -115,7 +115,7 @@ class TestGetCycleConfiguration:
             {
                 "cycles/TEST_SKAO_2027_Low_AA1_SV.json": {
                     **CYCLE_1_FILE.model_dump(mode="json", by_alias=True),
-                    "capabilities": {
+                    "telescopes": {
                         "ska_low": {
                             "array_assembly": "AA1",
                             "policies": {

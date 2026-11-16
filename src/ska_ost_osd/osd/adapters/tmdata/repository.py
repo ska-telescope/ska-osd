@@ -201,7 +201,7 @@ class TMDataRepository:
                 )
                 for policy_type, policy_id in offered.policies.items()
             }
-            for telescope, offered in self.get_cycle(cycle_id).capabilities.items()
+            for telescope, offered in self.get_cycle(cycle_id).telescopes.items()
         }
 
     # Storage to reader models

@@ -157,7 +157,7 @@ class TestGetCycle:
             "TEST_SKAO_2027_Low_AA1_SV"
         ).model_dump(by_alias=True)
 
-        assert served["capabilities"] == {
+        assert served["telescopes"] == {
             "ska_low": {
                 "array_assembly": "AA1",
                 "policies": {"science_verification": "AA1"},
@@ -484,7 +484,7 @@ class TestGetCycleCapabilities:
             {
                 "cycles/TEST_SKAO_2027_Low_AA1_SV.json": {
                     **CYCLE_1_FILE.model_dump(mode="json", by_alias=True),
-                    "capabilities": {
+                    "telescopes": {
                         "ska_low": {
                             "array_assembly": array_assembly,
                             "policies": {"science_verification": policy_id},

@@ -52,9 +52,9 @@ Reading the data
    * - ``get_cycle_ids()``
      - the cycle IDs, in ascending order
    * - ``get_cycles()`` / ``get_cycle(cycle_id)``
-     - ``Cycle``: a cycle's description, proposal window and policy, and for
-       each telescope its array assembly and the policy offered for each
-       policy type
+     - ``Cycle``: a cycle's description, proposal window and policy, and in
+       ``telescopes``, a ``CycleTelescope`` for each telescope: its array
+       assembly and the policy offered for each policy type
    * - ``get_array_assembly_capabilities(telescope)``
      - each of a telescope's array assemblies, as below
    * - ``get_capabilities(telescope, array_assembly, policy_id=None)``

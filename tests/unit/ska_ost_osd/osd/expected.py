@@ -49,10 +49,10 @@ from ska_ost_osd.osd.models.capabilities import (
 from ska_ost_osd.osd.models.constraints import Constraints, ElevationLimits
 from ska_ost_osd.osd.models.cycles import (
     Cycle,
+    CycleTelescope,
     PolicyType,
     ProposalPolicy,
     ProposalWindow,
-    TelescopeCapabilities,
 )
 from ska_ost_osd.osd.models.defaults import (
     CSPSPFRx,
@@ -108,8 +108,8 @@ CYCLE_1 = Cycle(
         max_observation_setups=1,
         max_data_products=1,
     ),
-    capabilities={
-        Telescope.SKA_LOW: TelescopeCapabilities(
+    telescopes={
+        Telescope.SKA_LOW: CycleTelescope(
             array_assembly="AA1",
             policies={PolicyType.SCIENCE_VERIFICATION: "AA1"},
         )
@@ -132,12 +132,12 @@ CYCLE_2 = Cycle(
         max_observation_setups=2,
         max_data_products=2,
     ),
-    capabilities={
-        Telescope.SKA_LOW: TelescopeCapabilities(
+    telescopes={
+        Telescope.SKA_LOW: CycleTelescope(
             array_assembly="AA2",
             policies={PolicyType.STANDARD_OPERATIONS: "AA2"},
         ),
-        Telescope.SKA_MID: TelescopeCapabilities(
+        Telescope.SKA_MID: CycleTelescope(
             array_assembly="AA2",
             policies={PolicyType.STANDARD_OPERATIONS: "AA2"},
         ),
@@ -160,8 +160,8 @@ CYCLE_1_FILE = CycleFile(
         max_observation_setups=1,
         max_data_products=1,
     ),
-    capabilities={
-        Telescope.SKA_LOW: TelescopeCapabilities(
+    telescopes={
+        Telescope.SKA_LOW: CycleTelescope(
             array_assembly="AA1",
             policies={PolicyType.SCIENCE_VERIFICATION: "AA1"},
         )
@@ -184,12 +184,12 @@ CYCLE_2_FILE = CycleFile(
         max_observation_setups=2,
         max_data_products=2,
     ),
-    capabilities={
-        Telescope.SKA_LOW: TelescopeCapabilities(
+    telescopes={
+        Telescope.SKA_LOW: CycleTelescope(
             array_assembly="AA2",
             policies={PolicyType.STANDARD_OPERATIONS: "AA2"},
         ),
-        Telescope.SKA_MID: TelescopeCapabilities(
+        Telescope.SKA_MID: CycleTelescope(
             array_assembly="AA2",
             policies={PolicyType.STANDARD_OPERATIONS: "AA2"},
         ),

@@ -418,13 +418,13 @@ class TestCycleFile:
             CycleFile.model_validate(data)
 
     def test_telescope_not_offered_is_absent(self):
-        """A telescope missing from the file's capabilities is not offered.
+        """A telescope missing from the file's telescopes is not offered.
         (The PHT view serves it as null: see test_views.py.)"""
         data = load(CYCLE)
 
         cycle = CycleFile.model_validate(data)
 
-        assert Telescope.SKA_MID not in cycle.capabilities
+        assert Telescope.SKA_MID not in cycle.telescopes
 
     def test_proposals_must_open_before_they_close(self):
         """A proposal window that closes before it opens is rejected."""

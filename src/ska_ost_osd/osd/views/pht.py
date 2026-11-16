@@ -383,7 +383,7 @@ def get_cycle_configuration(
                 subarray_templates=_subarray_templates(
                     repository,
                     Telescope.SKA_MID,
-                    cycle.capabilities[Telescope.SKA_MID].array_assembly,
+                    cycle.telescopes[Telescope.SKA_MID].array_assembly,
                     include_subarray_templates,
                 ),
             )
@@ -397,7 +397,7 @@ def get_cycle_configuration(
                 subarray_templates=_subarray_templates(
                     repository,
                     Telescope.SKA_LOW,
-                    cycle.capabilities[Telescope.SKA_LOW].array_assembly,
+                    cycle.telescopes[Telescope.SKA_LOW].array_assembly,
                     include_subarray_templates,
                 ),
             )

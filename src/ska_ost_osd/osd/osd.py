@@ -45,7 +45,7 @@ _LEGACY_CYCLE_FIELD_NAMES = {
     "description": "cycle_description",
     "proposal_window": "cycle_information",
     "proposal_policy": "cycle_policies",
-    "capabilities": "telescope_capabilities",
+    "telescopes": "telescope_capabilities",
 }
 
 # A frozen copy of the PHT view's type names, which will change when the PHT
@@ -160,7 +160,7 @@ class OSD:
         # The legacy response has one type for the whole cycle
         types = {
             policy_type
-            for offered in cycle["capabilities"].values()
+            for offered in cycle["telescopes"].values()
             for policy_type in offered["policies"]
         }
         if len(types) != 1:
@@ -311,7 +311,7 @@ class OSD:
         telescope = Telescope(posixpath.basename(telescope_dir))
         policies = {}
         for path in get_cycle_paths(self.tmdata).values():
-            offered = self.tmdata[path].get_dict()["capabilities"].get(telescope)
+            offered = self.tmdata[path].get_dict()["telescopes"].get(telescope)
             if offered is None:
                 continue
             for policy_id in offered["policies"].values():
