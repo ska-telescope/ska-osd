@@ -63,11 +63,6 @@ The current files are in ``cycles`` and ``telescopes``. The legacy files are
 kept for older releases of the OSD and for consumers that read them directly;
 the current code does not read them.
 
-
-* `mid_capabilities.json <https://confluence.skatelescope.org/pages/viewpage.action?spaceKey=SWSI&title=Observatory+Static+Data>`_
-
-* `low_capabilities.json <https://confluence.skatelescope.org/pages/viewpage.action?spaceKey=SWSI&title=Observatory+Static+Data>`_
-
 Each of these files names what it describes in a field, so their file names
 don't matter:
 
@@ -91,8 +86,8 @@ don't matter:
        zoom windows
    * - ``policies/*.json``
      - ``policy``
-     - what a cycle holds back of an array assembly: only the fields it
-       changes, such as ``AA2_SV``
+     - the rules a cycle applies to an array assembly, such as ``AA2_SV``:
+       only the fields it changes
    * - ``subarray_templates/*.json``
      - ``array_assembly``
      - the subarray templates an array assembly offers, such as ``AA*``,
@@ -171,7 +166,7 @@ Pydantic models.
     from ska_ost_osd.osd.osd import get_osd_using_tmdata
 
     tmdata = TMData(["car:ost/ska-ost-osd?<version>"], update=True)
-    osd_data = get_osd_using_tmdata(tmdata, telescope=Telescope.SKA_LOW, cycle_id=1)
+    osd_data = get_osd_using_tmdata(tmdata, telescope=Telescope.SKA_LOW, cycle_id=2)
 
 ===================    ============================================================
 Parameters             Description
@@ -181,7 +176,9 @@ cycle_id               the cycle's ``cycle_number``, an integer such as 0, 1, 2;
                        without a number can't be selected
 telescope              ``Telescope.SKA_MID`` or ``Telescope.SKA_LOW``; ``"mid"``
                        and ``"low"`` are still accepted
-array_assembly         AA0.5, AA1 or any Array Assembly
+array_assembly         the name of an array assembly, e.g. ``AA2``, or of a policy
+                       a cycle offers, e.g. ``AA2_SV``; with ``cycle_id``, the
+                       name the cycle offers on the telescope
 process_templates      whether to replace the ``subarray_templates`` patterns with
                        the templates, see `Subarray Template Support`_
 ===================    ============================================================
@@ -194,7 +191,7 @@ Response
 
     {
       "observatory_policy": {
-        "cycle_number": 1,
+        "cycle_number": 2,
         "telescope_capabilities": {"Low": "AA2"}
       },
       "capabilities": {
@@ -218,14 +215,15 @@ Scenarios
 ~~~~~~~~~~
 
 1. With no filters, it returns the complete OSD catalogue: every telescope's
-   ``basic_capabilities`` together with all of its named array assemblies. No
-   ``observatory_policy`` is included, since no ``cycle_id`` was selected.
+   ``basic_capabilities`` together with all of its array assemblies and the
+   policies the cycles offer, by name. No ``observatory_policy`` is included,
+   since no ``cycle_id`` was selected.
 
 2. With ``cycle_id``, it checks that a file in ``cycles`` has that ``cycle_number``, then selects
    what the cycle offers on each telescope. The cycle file is returned as ``observatory_policy``.
 
 3. With ``telescope``, it returns only that telescope; with ``array_assembly`` as
-   well, only that array assembly.
+   well, only the array assembly or policy of that name.
 
 
 Error Handling
@@ -381,7 +379,7 @@ With ``process_templates=True``, the templates are included in the OSD data:
 .. code-block:: python
 
     get_osd_using_tmdata(
-        tmdata, telescope=Telescope.SKA_LOW, cycle_id=1, process_templates=True
+        tmdata, telescope=Telescope.SKA_LOW, cycle_id=2, process_templates=True
     )
 
 * Complete response structure with processed templates:
@@ -390,7 +388,7 @@ With ``process_templates=True``, the templates are included in the OSD data:
 
     {
         "observatory_policy": {
-            "cycle_number": 1,
+            "cycle_number": 2,
             "telescope_capabilities": {
                 "Low": "AA2"
             }

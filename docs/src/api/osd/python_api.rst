@@ -215,7 +215,9 @@ key under ``mid`` or ``low`` that isn't ``basic_capabilities``.
 
     from ska_ost_osd.osd.views.pht import get_cycle_configuration
 
-    get_cycle_configuration(repository, "SKAO_2027_1").model_dump(mode="json")
+    get_cycle_configuration(repository, "TEST_SKAO_2027_Low_AA2_SV").model_dump(
+        mode="json"
+    )
 
 
 Errors
