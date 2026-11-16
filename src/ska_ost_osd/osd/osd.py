@@ -116,7 +116,8 @@ class OSD:
         return dict(sorted(paths.items()))
 
     def get_available_cycles(self) -> list[int]:
-        """List available cycle IDs from the observing-cycle files."""
+        """List the cycle numbers in the cycle files: the legacy API's cycle
+        IDs."""
         return list(self.cycle_filepaths())
 
     def check_cycle_id(self) -> str | None:
@@ -476,7 +477,8 @@ class OSD:
 
 
 def get_available_cycles(tmdata: TMData) -> list[int]:
-    """List available cycle IDs from observing-cycle file names."""
+    """List the cycle numbers in the cycle files: the legacy API's cycle
+    IDs."""
     return OSD(
         telescope=None,
         array_assembly=None,
