@@ -6,6 +6,7 @@ Each function takes the TMData to read from, so the caller chooses the
 source and version and handles any caching.
 """
 
+from collections.abc import Iterator
 from typing import Literal, overload
 
 from ska_telmodel_client import TMData
@@ -57,35 +58,9 @@ def get_cycle_paths(tmdata: TMData) -> dict[str, str]:
     :return: the path of each cycle's file, keyed by cycle ID in ascending
         order.
     :raises FileNotFoundError: If the tmdata has no cycles directory.
-    :raises ValueError: If two cycle files have the same ``cycle_id`` or the
-        same ``cycle_number``.
+    :raises ValueError: If two cycle files have the same ``cycle_id``.
     """
-    if not any(key.startswith(f"{OBSERVING_CYCLES_TMDATA_DIR}/") for key in tmdata):
-        raise FileNotFoundError(f"file not found: {OBSERVING_CYCLES_TMDATA_DIR}")
-    paths = {}
-    paths_by_number = {}
-    for name in tmdata[OBSERVING_CYCLES_TMDATA_DIR]:
-        if not name.endswith(".json"):
-            continue
-        path = f"{OBSERVING_CYCLES_TMDATA_DIR}/{name}"
-        cycle = _read(tmdata, path)
-        cycle_id, cycle_number = cycle["cycle_id"], cycle.get("cycle_number")
-        # The ID identifies the cycle, so no two files may share one; nor may
-        # two cycles with numbers share one, as the legacy OSD API looks cycles
-        # up by number
-        if cycle_id in paths:
-            raise ValueError(
-                f"cycle_id {cycle_id} is in both {paths[cycle_id]} and {path}"
-            )
-        if cycle_number is not None:
-            if cycle_number in paths_by_number:
-                raise ValueError(
-                    f"cycle_number {cycle_number} is in both "
-                    f"{paths_by_number[cycle_number]} and {path}"
-                )
-            paths_by_number[cycle_number] = path
-        paths[cycle_id] = path
-    return dict(sorted(paths.items()))
+    return _paths_by_id(tmdata, OBSERVING_CYCLES_TMDATA_DIR, "cycle_id")
 
 
 def get_cycle_ids(tmdata: TMData) -> list[str]:
@@ -94,8 +69,7 @@ def get_cycle_ids(tmdata: TMData) -> list[str]:
     :param tmdata: TMData to read from.
     :return: the cycle IDs in ascending order.
     :raises FileNotFoundError: If the tmdata has no cycles directory.
-    :raises ValueError: If two cycle files have the same ``cycle_id`` or the
-        same ``cycle_number``.
+    :raises ValueError: If two cycle files have the same ``cycle_id``.
     """
     return list(get_cycle_paths(tmdata))
 
@@ -108,16 +82,11 @@ def get_cycle_file(tmdata: TMData, cycle_id: str) -> CycleFile:
     :return: the cycle file, as stored.
     :raises FileNotFoundError: If the tmdata has no cycles directory, or no
         cycle file has the ID.
-    :raises ValueError: If two cycle files have the same ``cycle_id`` or the
-        same ``cycle_number``.
+    :raises ValueError: If two cycle files have the same ``cycle_id``.
     """
-    paths = get_cycle_paths(tmdata)
-    if cycle_id not in paths:
-        raise FileNotFoundError(
-            f"file not found: no cycle file in {OBSERVING_CYCLES_TMDATA_DIR} "
-            f"has cycle_id {cycle_id}"
-        )
-    return CycleFile.model_validate(_read(tmdata, paths[cycle_id]))
+    return CycleFile.model_validate(
+        _contents_with_id(tmdata, OBSERVING_CYCLES_TMDATA_DIR, "cycle_id", cycle_id)
+    )
 
 
 def get_policy_paths(tmdata: TMData, telescope: Telescope) -> dict[str, str]:
@@ -133,21 +102,7 @@ def get_policy_paths(tmdata: TMData, telescope: Telescope) -> dict[str, str]:
         the telescope.
     :raises ValueError: If two policy files have the same ``policy``.
     """
-    directory = TELESCOPE_FILES[telescope].policies
-    if not any(key.startswith(f"{directory}/") for key in tmdata):
-        raise FileNotFoundError(f"file not found: {directory}")
-    paths = {}
-    for name in tmdata[directory]:
-        if not name.endswith(".json"):
-            continue
-        path = f"{directory}/{name}"
-        policy_id = _read(tmdata, path)["policy"]
-        if policy_id in paths:
-            raise ValueError(
-                f"policy {policy_id} is in both {paths[policy_id]} and {path}"
-            )
-        paths[policy_id] = path
-    return dict(sorted(paths.items()))
+    return _paths_by_id(tmdata, TELESCOPE_FILES[telescope].policies, "policy")
 
 
 @overload
@@ -176,14 +131,10 @@ def get_policy_file(
         the telescope, or no policy file has the ID.
     :raises ValueError: If two policy files have the same ``policy``.
     """
-    paths = get_policy_paths(tmdata, telescope)
-    if policy_id not in paths:
-        raise FileNotFoundError(
-            f"file not found: no policy file in "
-            f"{TELESCOPE_FILES[telescope].policies} has policy {policy_id}"
-        )
     return _POLICY_FILE_MODELS[telescope].model_validate(
-        _read(tmdata, paths[policy_id])
+        _contents_with_id(
+            tmdata, TELESCOPE_FILES[telescope].policies, "policy", policy_id
+        )
     )
 
 
@@ -214,24 +165,13 @@ def get_array_assembly_files(
         directory for the telescope.
     :raises ValueError: If two files have the same ``array_assembly``.
     """
-    directory = TELESCOPE_FILES[telescope].array_assemblies
-    if not any(key.startswith(f"{directory}/") for key in tmdata):
-        raise FileNotFoundError(f"file not found: {directory}")
-    files, paths = {}, {}
-    for name in tmdata[directory]:
-        if not name.endswith(".json"):
-            continue
-        path = f"{directory}/{name}"
-        file = _ARRAY_ASSEMBLY_FILE_MODELS[telescope].model_validate(
-            _read(tmdata, path)
-        )
-        if file.array_assembly in paths:
-            raise ValueError(
-                f"array_assembly {file.array_assembly} is in both "
-                f"{paths[file.array_assembly]} and {path}"
-            )
-        files[file.array_assembly], paths[file.array_assembly] = file, path
-    return dict(sorted(files.items()))
+    contents = _contents_by_id(
+        tmdata, TELESCOPE_FILES[telescope].array_assemblies, "array_assembly"
+    )
+    return {
+        array_assembly: _ARRAY_ASSEMBLY_FILE_MODELS[telescope].model_validate(data)
+        for array_assembly, data in contents.items()
+    }
 
 
 @overload
@@ -292,40 +232,6 @@ def get_telescope_defaults(
     )
 
 
-def get_subarray_template_library_paths(
-    tmdata: TMData, telescope: Telescope
-) -> dict[str, str]:
-    """Find each of one telescope's subarray template library files,
-    ``telescopes/<telescope>/subarray_templates/<name>.json``. A library file
-    may have any name: its array assembly is the ``array_assembly`` in the
-    file.
-
-    :param tmdata: TMData to read from.
-    :param telescope: the telescope.
-    :return: the path of each library file, keyed by array assembly in
-        ascending order.
-    :raises FileNotFoundError: If the tmdata has no subarray_templates
-        directory for the telescope.
-    :raises ValueError: If two library files have the same ``array_assembly``.
-    """
-    directory = TELESCOPE_FILES[telescope].subarray_templates
-    if not any(key.startswith(f"{directory}/") for key in tmdata):
-        raise FileNotFoundError(f"file not found: {directory}")
-    paths = {}
-    for name in tmdata[directory]:
-        if not name.endswith(".json"):
-            continue
-        path = f"{directory}/{name}"
-        array_assembly = _read(tmdata, path)["array_assembly"]
-        if array_assembly in paths:
-            raise ValueError(
-                f"array_assembly {array_assembly} is in both "
-                f"{paths[array_assembly]} and {path}"
-            )
-        paths[array_assembly] = path
-    return dict(sorted(paths.items()))
-
-
 def get_subarray_template_library(
     tmdata: TMData, telescope: Telescope, array_assembly: str
 ) -> SubarrayTemplateLibraryFile:
@@ -341,16 +247,75 @@ def get_subarray_template_library(
         assembly.
     :raises ValueError: If two library files have the same ``array_assembly``.
     """
-    paths = get_subarray_template_library_paths(tmdata, telescope)
-    if array_assembly not in paths:
-        raise FileNotFoundError(
-            f"file not found: no subarray template library in "
-            f"{TELESCOPE_FILES[telescope].subarray_templates} has array_assembly "
-            f"{array_assembly}"
-        )
     return SubarrayTemplateLibraryFile.model_validate(
-        _read(tmdata, paths[array_assembly])
+        _contents_with_id(
+            tmdata,
+            TELESCOPE_FILES[telescope].subarray_templates,
+            "array_assembly",
+            array_assembly,
+        )
     )
+
+
+def _iterate_files_by_id(
+    tmdata: TMData, directory: str, field: str
+) -> Iterator[tuple[str, str, dict]]:
+    """Read each file in a directory, whatever its name, with the ID it has in
+    the field that names what it describes.
+
+    :return: an iterator of each file's ID, path and contents.
+    :raises FileNotFoundError: If the tmdata has no such directory.
+    :raises ValueError: If two files have the same ID.
+    """
+    if not any(key.startswith(f"{directory}/") for key in tmdata):
+        raise FileNotFoundError(f"file not found: {directory}")
+    paths = {}
+    for name in tmdata[directory]:
+        if not name.endswith(".json"):
+            continue
+        path = f"{directory}/{name}"
+        contents = _read(tmdata, path)
+        file_id = contents[field]
+        if file_id in paths:
+            raise ValueError(
+                f"{field} {file_id} is in both {paths[file_id]} and {path}"
+            )
+        paths[file_id] = path
+        yield file_id, path, contents
+
+
+def _paths_by_id(tmdata: TMData, directory: str, field: str) -> dict[str, str]:
+    """Each file's path in a directory, by ID in ascending order."""
+    return dict(
+        sorted(
+            (file_id, path)
+            for file_id, path, _ in _iterate_files_by_id(tmdata, directory, field)
+        )
+    )
+
+
+def _contents_by_id(tmdata: TMData, directory: str, field: str) -> dict[str, dict]:
+    """Each file's contents in a directory, by ID in ascending order."""
+    return dict(
+        sorted(
+            (file_id, contents)
+            for file_id, _, contents in _iterate_files_by_id(tmdata, directory, field)
+        )
+    )
+
+
+def _contents_with_id(tmdata: TMData, directory: str, field: str, file_id: str) -> dict:
+    """The contents of the file in a directory with the ID.
+
+    :raises FileNotFoundError: If the tmdata has no such directory, or no
+        file has the ID.
+    """
+    contents = _contents_by_id(tmdata, directory, field)
+    if file_id not in contents:
+        raise FileNotFoundError(
+            f"file not found: no file in {directory} has {field} {file_id}"
+        )
+    return contents[file_id]
 
 
 def _read(tmdata: TMData, path: str) -> dict:

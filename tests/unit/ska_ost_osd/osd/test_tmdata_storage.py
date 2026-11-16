@@ -50,7 +50,7 @@ class TestGetCycleFile:
     def test_raises_when_no_file_has_cycle_id(self, tests_tmdata):
         with pytest.raises(
             FileNotFoundError,
-            match="file not found: no cycle file in cycles has cycle_id NO_SUCH_CYCLE",
+            match="file not found: no file in cycles has cycle_id NO_SUCH_CYCLE",
         ):
             get_cycle_file(tests_tmdata, "NO_SUCH_CYCLE")
 
@@ -76,7 +76,7 @@ class TestGetPolicyFile:
         with pytest.raises(
             FileNotFoundError,
             match=(
-                "file not found: no policy file in telescopes/ska_low/policies "
+                "file not found: no file in telescopes/ska_low/policies "
                 "has policy NO_SUCH_POLICY"
             ),
         ):
@@ -199,7 +199,7 @@ class TestGetSubarrayTemplateLibrary:
         with pytest.raises(
             FileNotFoundError,
             match=(
-                "file not found: no subarray template library in "
+                "file not found: no file in "
                 "telescopes/ska_mid/subarray_templates has array_assembly AA1"
             ),
         ):

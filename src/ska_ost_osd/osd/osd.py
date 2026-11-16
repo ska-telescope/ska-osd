@@ -98,12 +98,22 @@ class OSD:
     def cycle_filepaths(self) -> dict[int, str]:
         """Return the TMData cycle file paths keyed by the ``cycle_number`` in each
         file, which the legacy OSD API looks cycles up by. A cycle without a
-        number can't be selected."""
-        numbers = (
-            (self.tmdata[path].get_dict().get("cycle_number"), path)
-            for path in get_cycle_paths(self.tmdata).values()
-        )
-        return dict(sorted((n, path) for n, path in numbers if n is not None))
+        number can't be selected.
+
+        :raises ValueError: If two cycle files have the same ``cycle_number``.
+        """
+        paths = {}
+        for path in get_cycle_paths(self.tmdata).values():
+            cycle_number = self.tmdata[path].get_dict().get("cycle_number")
+            if cycle_number is None:
+                continue
+            if cycle_number in paths:
+                raise ValueError(
+                    f"cycle_number {cycle_number} is in both "
+                    f"{paths[cycle_number]} and {path}"
+                )
+            paths[cycle_number] = path
+        return dict(sorted(paths.items()))
 
     def get_available_cycles(self) -> list[int]:
         """List available cycle IDs from the observing-cycle files."""

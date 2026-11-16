@@ -5,7 +5,10 @@ from ska_telmodel_client import TMData
 
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.osd import get_osd_data, get_osd_using_tmdata
-from tests.unit.ska_ost_osd.osd.expected import CYCLE_1_LEGACY_OBSERVATORY_POLICY
+from tests.unit.ska_ost_osd.osd.expected import (
+    CYCLE_1_FILE,
+    CYCLE_1_LEGACY_OBSERVATORY_POLICY,
+)
 
 
 @pytest.mark.parametrize(
@@ -464,3 +467,18 @@ def test_get_osd_using_tmdata_treats_a_null_in_a_policy_as_left_out(
     assert get_osd_using_tmdata(with_nulls, cycle_id=2) == get_osd_using_tmdata(
         tests_tmdata, cycle_id=2
     )
+
+
+def test_get_osd_using_tmdata_raises_when_two_cycle_files_share_a_number(tmdata_with):
+    """The legacy API looks cycles up by number, so each must be unique."""
+    tmdata = tmdata_with(
+        {
+            "cycles/another_cycle_1.json": {
+                **CYCLE_1_FILE.model_dump(mode="json", by_alias=True),
+                "cycle_id": "ANOTHER_CYCLE",
+            }
+        }
+    )
+
+    with pytest.raises(ValueError, match="cycle_number 1 is in both"):
+        get_osd_using_tmdata(tmdata, cycle_id=1)

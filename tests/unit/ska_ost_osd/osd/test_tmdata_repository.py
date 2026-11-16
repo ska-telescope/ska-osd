@@ -95,19 +95,6 @@ class TestGetCycleIds:
         with pytest.raises(FileNotFoundError, match="file not found: cycles"):
             empty_tmdata_repository.get_cycle_ids()
 
-    def test_raises_when_two_cycle_files_share_a_number(self, tmdata_repository_with):
-        repository = tmdata_repository_with(
-            {
-                "cycles/another_cycle_1.json": {
-                    **CYCLE_1_FILE.model_dump(mode="json", by_alias=True),
-                    "cycle_id": "ANOTHER_CYCLE",
-                }
-            }
-        )
-
-        with pytest.raises(ValueError, match="cycle_number 1 is in both"):
-            repository.get_cycle_ids()
-
     def test_cycles_without_a_number_are_listed(self, tmdata_repository_with):
         """Cycles without a number, such as science verification before
         Cycle 0, don't clash with each other."""
