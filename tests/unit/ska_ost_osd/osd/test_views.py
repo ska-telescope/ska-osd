@@ -249,6 +249,21 @@ class TestGetCycleConfiguration:
         mid = served["capabilities"]["mid"]["AA2"]
         assert ("subarray_templates" in mid) == include_subarray_templates
 
+    def test_served_without_nulls_validates(self, tmdata_repository_with):
+        """A cycle offering one telescope, with no cycle number or optional
+        proposal limits, reads back from its JSON without nulls."""
+        cycle = CYCLE_1_FILE.model_dump(mode="json", by_alias=True)
+        del cycle["cycle_number"]
+        cycle["proposal_policy"] = {"max_observing_hours": 100.0}
+        repository = tmdata_repository_with(
+            {"cycles/TEST_SKAO_2027_Low_AA1_SV.json": cycle}
+        )
+        configuration = get_cycle_configuration(repository, "TEST_SKAO_2027_Low_AA1_SV")
+
+        served = configuration.model_dump(mode="json", exclude_none=True)
+
+        assert CycleConfiguration.model_validate(served) == configuration
+
 
 class TestGetCycleConfigurations:
     def test_returns_every_cycle_in_id_order(self, test_tmdata_repository):

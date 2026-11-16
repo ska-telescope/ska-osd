@@ -48,8 +48,12 @@ class CycleTelescopeCapabilities(ConfigurationModel):
     """The capabilities each telescope offers in the cycle, or ``None``.
     Served as ``Mid`` and ``Low``, the names the PHT UI reads."""
 
-    ska_mid: str | None = Field(validation_alias="Mid", serialization_alias="Mid")
-    ska_low: str | None = Field(validation_alias="Low", serialization_alias="Low")
+    ska_mid: str | None = Field(
+        default=None, validation_alias="Mid", serialization_alias="Mid"
+    )
+    ska_low: str | None = Field(
+        default=None, validation_alias="Low", serialization_alias="Low"
+    )
 
 
 class CycleInformation(ConfigurationModel):
@@ -64,15 +68,15 @@ class CyclePolicies(ConfigurationModel):
     """The cycle's proposal policy, as the PHT UI reads it."""
 
     normal_max_hours: float
-    max_targets: int | None
-    max_observation_setups: int | None
-    max_data_products: int | None
+    max_targets: int | None = None
+    max_observation_setups: int | None = None
+    max_data_products: int | None = None
 
 
 class ObservatoryPolicy(ConfigurationModel):
     """The cycle, as the PHT UI reads it."""
 
-    cycle_number: int | None
+    cycle_number: int | None = None
     cycle_id: str
     type: str
     cycle_description: str
