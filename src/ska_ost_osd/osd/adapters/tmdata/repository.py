@@ -176,8 +176,8 @@ class TMDataRepository:
     def get_subarray_templates(
         self, telescope: Telescope, array_assembly: str
     ) -> list[SubarrayTemplate]:
-        """An array assembly's templates are the library of the same name; one
-        with no library offers none."""
+        """An array assembly's templates are in the library that names it;
+        one with no library offers none."""
         array_assembly_files = storage.get_array_assembly_files(self._tmdata, telescope)
         if array_assembly not in array_assembly_files:
             raise ArrayAssemblyNotFoundError(

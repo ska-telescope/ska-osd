@@ -247,9 +247,10 @@ class CycleFile(OSDBaseModel):
 
 
 class SubarrayTemplateLibraryFile(OSDBaseModel):
-    """Top-level model for telescopes/<telescope>/subarray_templates/<array
-    assembly>.json: one array assembly's templates."""
+    """Model for telescopes/<telescope>/subarray_templates/<name>.json: the
+    templates of the array assembly the file names."""
 
+    array_assembly: str = Field(examples=["AA2"])
     templates: list[SubarrayTemplate]
 
     @model_validator(mode="after")

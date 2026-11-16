@@ -68,7 +68,8 @@ the current code does not read them.
 
 * `low_capabilities.json <https://confluence.skatelescope.org/pages/viewpage.action?spaceKey=SWSI&title=Observatory+Static+Data>`_
 
-Each file names what it describes in a field, so file names don't matter:
+Each of these files names what it describes in a field, so their file names
+don't matter:
 
 .. list-table::
    :header-rows: 1
@@ -92,6 +93,10 @@ Each file names what it describes in a field, so file names don't matter:
      - ``policy``
      - what a cycle holds back of an array assembly: only the fields it
        changes, such as ``AA2_SV``
+   * - ``subarray_templates/*.json``
+     - ``array_assembly``
+     - the subarray templates an array assembly offers, such as ``AA*``,
+       whose file is ``AASTAR.json``
    * - ``cycles/*.json``
      - ``cycle_id``
      - a cycle: its proposal window and policy, and for each telescope its
@@ -330,12 +335,14 @@ Subarray Template Support
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 A subarray template is a named set of receptors from an array assembly. Each
-telescope's templates are stored by array assembly, in
-``telescopes/<telescope>/subarray_templates/<array assembly>.json``, as a list:
+telescope's templates are stored by array assembly, one file in
+``telescopes/<telescope>/subarray_templates`` for each, naming its
+``array_assembly`` and listing its templates:
 
 .. code-block:: json
 
     {
+        "array_assembly": "AA2",
         "templates": [
             {
                 "name": "SKA_LOW_FULL_AA2",
@@ -346,8 +353,8 @@ telescope's templates are stored by array assembly, in
         ]
     }
 
-An array assembly offers the templates in the file of the same name; one with
-no template file, such as the ITFs, offers none.
+An array assembly offers the templates in the file that names it; one with no
+template file, such as the ITFs, offers none.
 
 Reading the templates
 ---------------------

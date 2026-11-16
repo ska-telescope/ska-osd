@@ -33,12 +33,12 @@ Unreleased
   ``telescopes/ska_mid``. Each file names what it describes, so file names don't
   matter: ``basic_capabilities.json`` (``telescope``) holds what is fixed for the
   telescope, ``array_assemblies/*.json`` (``array_assembly``) what each array assembly
-  offers, and ``policies/*.json`` (``policy``) only what a cycle changes of an array
-  assembly. Each observing mode's limits are under ``modes``, and the stations or
-  dishes under ``receptors``. Subarray templates, each listing its
-  ``receptor_ids``, and defaults are in ``subarray_templates/<array assembly>.json``
-  and ``defaults.json``. Low's ``AA2_SV``
-  is now a policy on ``AA2``. The legacy files are kept but no longer read
+  offers, ``policies/*.json`` (``policy``) only what a cycle changes of an array
+  assembly, and ``subarray_templates/*.json`` (``array_assembly``) the subarray
+  templates an array assembly offers, each listing its ``receptor_ids``. Each
+  observing mode's limits are under ``modes``, and the stations or dishes under
+  ``receptors``. The defaults are in ``defaults.json``. Low's ``AA2_SV`` is now a
+  policy on ``AA2``. The legacy files are kept but no longer read
 * [BREAKING] Cycles are files in ``tmdata/cycles`` with a ``cycle_id``,
   ``name``, ``description``, optional ``cycle_number``, ``proposal_window``, ``proposal_policy`` and,
   for each telescope, an ``array_assembly`` and the policy offered for each policy

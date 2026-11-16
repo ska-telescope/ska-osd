@@ -15,7 +15,11 @@ from ska_ost_osd.osd.common.osd_validation_messages import (
     CYCLE_ID_ERROR_MESSAGE,
 )
 
-from .adapters.tmdata.storage import get_cycle_paths, get_policy_file
+from .adapters.tmdata.storage import (
+    get_cycle_paths,
+    get_policy_file,
+    get_subarray_template_library,
+)
 from .common.constant import (
     RELEASE_FILE_PATH_LATEST,
     Telescope,
@@ -364,10 +368,13 @@ class OSD:
         if not self.process_templates:
             capabilities["subarray_templates"] = [f"*_{array_assembly}"]
             return capabilities
-        templates_dir = f"{telescope_dir}/{osd_file_mapping['subarray_templates']}"
         try:
-            templates = self.tmdata[f"{templates_dir}/{array_assembly}.json"].get_dict()
-        except KeyError:
+            templates = get_subarray_template_library(
+                self.tmdata,
+                Telescope(posixpath.basename(telescope_dir)),
+                array_assembly,
+            ).model_dump(mode="json")
+        except FileNotFoundError:
             return capabilities
         # Keyed by name, with the receptor IDs as custom_stations, one
         # comma-separated string

@@ -20,7 +20,6 @@ osd_file_mapping = {
     "low": LOW_CONSTANT_JSON_FILE_PATH,
     "mid": MID_CONSTANT_JSON_FILE_PATH,
     "observatory_policies": POLICIES_CONSTANT_JSON_FILE_PATH,
-    "subarray_templates": SUBARRAY_TEMPLATES_DIRNAME,
 }
 
 
@@ -62,9 +61,6 @@ class TelescopeFiles:
 
     def array_assembly(self, name: str) -> str:
         return f"{self.array_assemblies}/{name}.json"
-
-    def subarray_template_library(self, array_assembly: str) -> str:
-        return f"{self.subarray_templates}/{array_assembly}.json"
 
 
 # Each telescope's directory is named by its Telescope value, so a new

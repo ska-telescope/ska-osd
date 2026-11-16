@@ -604,15 +604,15 @@ LOW_TEST_AA2_TEMPLATE = SubarrayTemplate(
 )
 
 MID_AA2_SUBARRAY_TEMPLATE_LIBRARY_FILE = SubarrayTemplateLibraryFile(
-    templates=[MID_FULL_AA2_TEMPLATE]
+    array_assembly="AA2", templates=[MID_FULL_AA2_TEMPLATE]
 )
 
 LOW_AA1_SUBARRAY_TEMPLATE_LIBRARY_FILE = SubarrayTemplateLibraryFile(
-    templates=[LOW_TEST_AA1_TEMPLATE]
+    array_assembly="AA1", templates=[LOW_TEST_AA1_TEMPLATE]
 )
 
 LOW_AA2_SUBARRAY_TEMPLATE_LIBRARY_FILE = SubarrayTemplateLibraryFile(
-    templates=[LOW_FULL_AA2_TEMPLATE, LOW_TEST_AA2_TEMPLATE]
+    array_assembly="AA2", templates=[LOW_FULL_AA2_TEMPLATE, LOW_TEST_AA2_TEMPLATE]
 )
 
 # The ODT configuration view of tests/tmdata: what ska-oso-services serves

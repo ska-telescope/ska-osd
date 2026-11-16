@@ -292,23 +292,64 @@ def get_telescope_defaults(
     )
 
 
-def get_subarray_template_library(
-    tmdata: TMData, telescope: Telescope, array_assembly: str
-) -> SubarrayTemplateLibraryFile:
-    """Read one array assembly's subarray template library file,
-    ``telescopes/<telescope>/subarray_templates/<array_assembly>.json``.
+def get_subarray_template_library_paths(
+    tmdata: TMData, telescope: Telescope
+) -> dict[str, str]:
+    """Find each of one telescope's subarray template library files,
+    ``telescopes/<telescope>/subarray_templates/<name>.json``. A library file
+    may have any name: its array assembly is the ``array_assembly`` in the
+    file.
 
     :param tmdata: TMData to read from.
     :param telescope: the telescope.
-    :param array_assembly: the array assembly, e.g. ``"AA2"``.
-    :return: the array assembly's template library.
-    :raises FileNotFoundError: If the tmdata has no template library file
-        for the array assembly.
+    :return: the path of each library file, keyed by array assembly in
+        ascending order.
+    :raises FileNotFoundError: If the tmdata has no subarray_templates
+        directory for the telescope.
+    :raises ValueError: If two library files have the same ``array_assembly``.
     """
-    return SubarrayTemplateLibraryFile.model_validate(
-        _read(
-            tmdata, TELESCOPE_FILES[telescope].subarray_template_library(array_assembly)
+    directory = TELESCOPE_FILES[telescope].subarray_templates
+    if not any(key.startswith(f"{directory}/") for key in tmdata):
+        raise FileNotFoundError(f"file not found: {directory}")
+    paths = {}
+    for name in tmdata[directory]:
+        if not name.endswith(".json"):
+            continue
+        path = f"{directory}/{name}"
+        array_assembly = _read(tmdata, path)["array_assembly"]
+        if array_assembly in paths:
+            raise ValueError(
+                f"array_assembly {array_assembly} is in both "
+                f"{paths[array_assembly]} and {path}"
+            )
+        paths[array_assembly] = path
+    return dict(sorted(paths.items()))
+
+
+def get_subarray_template_library(
+    tmdata: TMData, telescope: Telescope, array_assembly: str
+) -> SubarrayTemplateLibraryFile:
+    """Read one array assembly's subarray template library file: the one
+    whose ``array_assembly`` is the array assembly.
+
+    :param tmdata: TMData to read from.
+    :param telescope: the telescope.
+    :param array_assembly: the array assembly, e.g. ``"AA2"`` or ``"AA*"``.
+    :return: the array assembly's template library.
+    :raises FileNotFoundError: If the tmdata has no subarray_templates
+        directory for the telescope, or no library file for the array
+        assembly.
+    :raises ValueError: If two library files have the same ``array_assembly``.
+    """
+    paths = get_subarray_template_library_paths(tmdata, telescope)
+    if array_assembly not in paths:
+        raise FileNotFoundError(
+            f"file not found: no subarray template library in "
+            f"{TELESCOPE_FILES[telescope].subarray_templates} has array_assembly "
+            f"{array_assembly}"
         )
+    return SubarrayTemplateLibraryFile.model_validate(
+        _read(tmdata, paths[array_assembly])
     )
 
 

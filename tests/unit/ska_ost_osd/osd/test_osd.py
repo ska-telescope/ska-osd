@@ -3,7 +3,7 @@ import logging
 import pytest
 from ska_telmodel_client import TMData
 
-from ska_ost_osd.osd.common.constant import Telescope, osd_file_mapping
+from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.osd import get_osd_data, get_osd_using_tmdata
 from tests.unit.ska_ost_osd.osd.expected import CYCLE_1_LEGACY_OBSERVATORY_POLICY
 
@@ -152,17 +152,11 @@ def test_get_osd_data_array_assembly_rejects_non_array_assembly_keys(
 
 
 def test_get_osd_data_missing_subarray_templates_falls_back_to_empty(
-    tests_tmdata, monkeypatch
+    tests_tmdata,
 ):
-    """When process_templates is requested but the TMData source has no
-    subarray_templates file, get_osd_data should fall back to treating the
-    template data as empty rather than raising.
-
-    :param tests_tmdata: tests_tmdata
-    :param monkeypatch: pytest monkeypatch fixture
-    """
-    monkeypatch.setitem(osd_file_mapping, "subarray_templates", "missing")
-
+    """With process_templates, an array assembly with no template library
+    (Mid AA1 in the test tmdata) is served without subarray_templates rather
+    than raising."""
     osd_data, error_msgs = get_osd_data(
         telescope="mid",
         array_assembly="AA1",
@@ -171,7 +165,7 @@ def test_get_osd_data_missing_subarray_templates_falls_back_to_empty(
     )
 
     assert error_msgs == []
-    assert "AA1" in osd_data["capabilities"]["mid"]
+    assert "subarray_templates" not in osd_data["capabilities"]["mid"]["AA1"]
 
 
 def test_get_osd_data_with_process_templates(tests_tmdata):

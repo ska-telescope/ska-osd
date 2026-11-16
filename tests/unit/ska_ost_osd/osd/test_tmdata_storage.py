@@ -3,7 +3,11 @@ its storage model, using the test copy of the tmdata in tests/tmdata."""
 
 import pytest
 
-from ska_ost_osd.osd.adapters.tmdata.models import LowPolicyFile, MidPolicyFile
+from ska_ost_osd.osd.adapters.tmdata.models import (
+    LowPolicyFile,
+    MidPolicyFile,
+    SubarrayTemplateLibraryFile,
+)
 from ska_ost_osd.osd.adapters.tmdata.storage import (
     get_array_assembly_files,
     get_cycle_file,
@@ -183,10 +187,42 @@ class TestGetSubarrayTemplateLibrary:
     @pytest.mark.parametrize(
         "telescope, path",
         [
-            (Telescope.SKA_MID, "telescopes/ska_mid/subarray_templates/AA2.json"),
-            (Telescope.SKA_LOW, "telescopes/ska_low/subarray_templates/AA2.json"),
+            (Telescope.SKA_MID, "telescopes/ska_mid/subarray_templates"),
+            (Telescope.SKA_LOW, "telescopes/ska_low/subarray_templates"),
         ],
     )
-    def test_raises_when_file_missing(self, empty_tmdata, telescope, path):
+    def test_raises_when_directory_missing(self, empty_tmdata, telescope, path):
         with pytest.raises(FileNotFoundError, match=f"file not found: {path}"):
             get_subarray_template_library(empty_tmdata, telescope, "AA2")
+
+    def test_raises_when_no_file_has_array_assembly(self, tests_tmdata):
+        with pytest.raises(
+            FileNotFoundError,
+            match=(
+                "file not found: no subarray template library in "
+                "telescopes/ska_mid/subarray_templates has array_assembly AA1"
+            ),
+        ):
+            get_subarray_template_library(tests_tmdata, Telescope.SKA_MID, "AA1")
+
+    def test_finds_library_by_its_array_assembly(self, tmdata_with):
+        """AA* can't be a file name, so its library is in AASTAR.json."""
+        library = {"array_assembly": "AA*", "templates": []}
+        tmdata = tmdata_with(
+            {"telescopes/ska_low/subarray_templates/AASTAR.json": library}
+        )
+        assert get_subarray_template_library(
+            tmdata, Telescope.SKA_LOW, "AA*"
+        ) == SubarrayTemplateLibraryFile.model_validate(library)
+
+    def test_raises_when_two_files_share_an_array_assembly(self, tmdata_with):
+        tmdata = tmdata_with(
+            {
+                "telescopes/ska_low/subarray_templates/copy.json": {
+                    "array_assembly": "AA1",
+                    "templates": [],
+                }
+            }
+        )
+        with pytest.raises(ValueError, match="array_assembly AA1 is in both"):
+            get_subarray_template_library(tmdata, Telescope.SKA_LOW, "AA1")
