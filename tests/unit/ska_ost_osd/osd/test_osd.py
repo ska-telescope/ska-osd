@@ -452,3 +452,21 @@ def test_get_osd_using_tmdata_surfaces_tmdata_read_errors(failing_tmdata):
     """An error reading the TMData source is raised to the caller."""
     with pytest.raises(ValueError, match="not found in SKA CAR"):
         get_osd_using_tmdata(failing_tmdata, cycle_id=1)
+
+
+@pytest.mark.parametrize(
+    "nulls",
+    [{"modes": None}, {"modes": {"pst": {"max_beams": None}}}],
+    ids=["group", "field"],
+)
+def test_get_osd_using_tmdata_treats_a_null_in_a_policy_as_left_out(
+    tests_tmdata, tmdata_with, nulls
+):
+    """Cycle 2 offers Low AA2 with the AA2 policy; nulls in it change nothing."""
+    with_nulls = tmdata_with(
+        {"telescopes/ska_low/policies/AA2.json": {"policy": "AA2", **nulls}}
+    )
+
+    assert get_osd_using_tmdata(with_nulls, cycle_id=2) == get_osd_using_tmdata(
+        tests_tmdata, cycle_id=2
+    )

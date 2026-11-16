@@ -341,6 +341,20 @@ class TestGetCapabilities:
         with pytest.raises(ValidationError, match="cbf_modes must list pst"):
             repository.get_capabilities(Telescope.SKA_LOW, "AA2", "bad")
 
+    @pytest.mark.parametrize(
+        "nulls",
+        [{"modes": None}, {"modes": {"pst": {"max_beams": None}}}],
+        ids=["group", "field"],
+    )
+    def test_a_null_in_a_policy_changes_nothing(self, tmdata_repository_with, nulls):
+        """A field set to null is treated as left out."""
+        repository = tmdata_repository_with(
+            {"telescopes/ska_low/policies/nulls.json": {"policy": "nulls", **nulls}}
+        )
+        assert repository.get_capabilities(
+            Telescope.SKA_LOW, "AA2", "nulls"
+        ) == LOW_AA2.model_copy(update={"policy": "nulls"})
+
     def test_rejects_receivers_without_a_frequency_band(self, tmdata_repository_with):
         repository = tmdata_repository_with(
             {

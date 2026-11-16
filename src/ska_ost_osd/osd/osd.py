@@ -15,7 +15,7 @@ from ska_ost_osd.osd.common.osd_validation_messages import (
     CYCLE_ID_ERROR_MESSAGE,
 )
 
-from .adapters.tmdata.storage import get_cycle_paths, get_policy_paths
+from .adapters.tmdata.storage import get_cycle_paths, get_policy_file
 from .common.constant import (
     RELEASE_FILE_PATH_LATEST,
     Telescope,
@@ -301,9 +301,13 @@ class OSD:
             if offered is None:
                 continue
             for policy_id in offered["policies"].values():
-                policy_path = get_policy_paths(self.tmdata, telescope)[policy_id]
-                policy = self.tmdata[policy_path].get_dict()
-                del policy["policy"]
+                # A field set to null is treated as left out
+                policy = get_policy_file(self.tmdata, telescope, policy_id).model_dump(
+                    mode="json",
+                    exclude={"policy"},
+                    exclude_unset=True,
+                    exclude_none=True,
+                )
                 # The legacy response serves the basic capabilities apart
                 policies[policy_id] = merge_capabilities(
                     {}, array_assemblies[offered["array_assembly"]], policy

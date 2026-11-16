@@ -157,9 +157,10 @@ class TMDataRepository:
                 policy_ids = []
             if policy_id not in policy_ids:
                 raise PolicyNotFoundError(telescope, policy_id, policy_ids)
+            # A field set to null is treated as left out
             policy = storage.get_policy_file(
                 self._tmdata, telescope, policy_id
-            ).model_dump(exclude_unset=True)
+            ).model_dump(exclude_unset=True, exclude_none=True)
         return _CAPABILITIES_MODELS[telescope].model_validate(
             merge_capabilities(
                 storage.get_telescope_basic_capabilities(
