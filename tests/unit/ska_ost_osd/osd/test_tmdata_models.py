@@ -89,7 +89,7 @@ class TestPolicyFiles:
         the array assembly."""
         data = {
             "policy": "cycle_1_science_verification",
-            "modes": {"spectral": {"max_zoom_windows": 1}},
+            "observing_modes": {"spectral": {"max_zoom_windows": 1}},
         }
         assert policy.model_validate(data).model_dump(exclude_unset=True) == data
 
@@ -227,7 +227,7 @@ class TestCapabilities:
             (
                 LowArrayAssemblyFile,
                 LOW_ARRAY_ASSEMBLY,
-                lambda data: data["modes"]["pss"].update(max_beams=1),
+                lambda data: data["observing_modes"]["pss"].update(max_beams=1),
                 "cbf_modes must list pss",
             ),
             (
@@ -239,7 +239,7 @@ class TestCapabilities:
             (
                 MidArrayAssemblyFile,
                 MID_ARRAY_ASSEMBLY,
-                lambda data: data["modes"]["pss"].update(max_beams=1),
+                lambda data: data["observing_modes"]["pss"].update(max_beams=1),
                 "cbf_modes must list pss",
             ),
             (

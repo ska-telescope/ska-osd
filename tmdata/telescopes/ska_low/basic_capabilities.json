@@ -13,7 +13,7 @@
     "max": 447,
     "width_hz": 781250.0
   },
-  "modes": {
+  "observing_modes": {
     "continuum": {
       "channels_per_coarse_channel": 144
     },

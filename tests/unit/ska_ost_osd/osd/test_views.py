@@ -155,7 +155,7 @@ class TestGetCycleConfiguration:
         assert list(mid) == ["basic_capabilities", "AA2"]
         assert list(mid["basic_capabilities"]) == ["receiver_information"]
         assert mid["AA2"]["name"] == "AA2"
-        assert "modes" not in mid["AA2"]
+        assert "observing_modes" not in mid["AA2"]
         assert mid["AA2"]["number_pss_beams"] == 0
         assert mid["AA2"]["ps_beam_bandwidth_hz"] == 400_000_000
         assert mid["AA2"]["number_pst_beams"] == 1
@@ -181,7 +181,7 @@ class TestGetCycleConfiguration:
             assert "subarray_templates" not in mid["AA2"]
         low = served["capabilities"]["low"]
         assert list(low) == ["basic_capabilities", "AA2"]
-        assert "modes" not in low["AA2"]
+        assert "observing_modes" not in low["AA2"]
         assert low["AA2"]["number_zoom_windows"] == 0
         assert low["AA2"]["number_zoom_channels"] == 0
         assert low["AA2"]["allowed_zoom_factors"] == [1, 2, 4, 8]

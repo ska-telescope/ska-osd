@@ -15,12 +15,12 @@ from pydantic import (
 
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
-    LowArrayAssemblyModes,
+    LowArrayAssemblyObservingModes,
     LowArrayAssemblyReceptors,
     LowArrayAssemblySubarrayBeams,
     LowCapabilities,
     LowCBFMode,
-    MidArrayAssemblyModes,
+    MidArrayAssemblyObservingModes,
     MidArrayAssemblyReceptors,
     MidCapabilities,
     MidCBFMode,
@@ -112,7 +112,7 @@ class MidOfferedCapabilities(OSDBaseModel):
     available_bandwidth_hz: float
     number_fsps: int
     telescope: Literal[Telescope.SKA_MID] = Telescope.SKA_MID
-    modes: MidArrayAssemblyModes
+    observing_modes: MidArrayAssemblyObservingModes
     allowed_channel_width_values_hz: list[int]
     allowed_channel_count_range_min: list[int]
     allowed_channel_count_range_max: list[int]
@@ -131,7 +131,7 @@ class LowOfferedCapabilities(OSDBaseModel):
     telescope: Literal[Telescope.SKA_LOW] = Telescope.SKA_LOW
     subarray_beams: LowArrayAssemblySubarrayBeams
     cbf_modes: list[LowCBFMode]
-    modes: LowArrayAssemblyModes
+    observing_modes: LowArrayAssemblyObservingModes
     receptors: LowArrayAssemblyReceptors
 
 
@@ -177,7 +177,7 @@ class CycleCapabilitiesBase(ConfigurationModel):
                     )
                 if "number_vlbi_beams" in capabilities:
                     modes["vlbi"] = {"max_beams": capabilities.pop("number_vlbi_beams")}
-                capabilities["modes"] = modes
+                capabilities["observing_modes"] = modes
             if "available_receivers" in capabilities:
                 capabilities["receivers"] = capabilities.pop("available_receivers")
             if "number_ska_dishes" in capabilities:
@@ -220,9 +220,9 @@ class CycleCapabilitiesBase(ConfigurationModel):
             capabilities["allowed_channel_width_values"] = capabilities[
                 "allowed_channel_width_values_hz"
             ]
-        # The PHT UI reads the modes, the receptors, and Low's subarray beams,
+        # The PHT UI reads the observing modes, the receptors, and Low's subarray beams,
         # flat under their old names
-        modes = capabilities.pop("modes")
+        modes = capabilities.pop("observing_modes")
         capabilities["number_zoom_windows"] = modes["spectral"]["max_zoom_windows"]
         capabilities["number_zoom_channels"] = modes["spectral"]["max_zoom_channels"]
         if "zoom_factors" in modes["spectral"]:

@@ -65,7 +65,7 @@ Reading the data
        <how-capabilities-are-built>` in the guide). It names its
        ``telescope``, ``array_assembly`` and ``policy`` (``None`` without
        one). Each observing mode's channels, zoom windows and beams are in
-       ``modes``, its stations (Low) or dishes (Mid) in ``receptors``, and
+       ``observing_modes``, its stations (Low) or dishes (Mid) in ``receptors``, and
        Low's subarray beams in ``subarray_beams``
    * - ``get_basic_capabilities(telescope)``
      - ``MidBasicCapabilities`` / ``LowBasicCapabilities``: what is fixed for
@@ -73,7 +73,7 @@ Reading the data
        bands as ``frequency_bands``, its ``elevation_limits`` and the
        ``frequency_slice_bandwidth_hz`` each FSP processes; for Low, its
        one ``frequency_band``, its ``elevation_limits``, its
-       ``coarse_channels`` and, in ``modes``, how each observing mode divides
+       ``coarse_channels`` and, in ``observing_modes``, how each observing mode divides
        a coarse channel
    * - ``get_constraints(telescope)``
      - ``Constraints``: the elevation limits and the sun, moon and Jupiter

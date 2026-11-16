@@ -24,14 +24,14 @@ from ska_ost_osd.osd.models.capabilities import (
     LowArrayAssemblySubarrayBeams,
     LowBasicCapabilities,
     LowBasicContinuumMode,
-    LowBasicModes,
+    LowBasicObservingModes,
     LowBasicPSSMode,
     LowBasicPSTMode,
     LowBasicSpectralMode,
     LowCapabilities,
     LowCBFMode,
     LowContinuumMode,
-    LowModes,
+    LowObservingModes,
     LowPSSMode,
     LowPSTMode,
     LowSpectralMode,
@@ -41,7 +41,7 @@ from ska_ost_osd.osd.models.capabilities import (
     MidCapabilities,
     MidCBFMode,
     MidFrequencyBand,
-    MidModes,
+    MidObservingModes,
     MidPSSMode,
     MidPSTMode,
     MidSpectralMode,
@@ -285,7 +285,7 @@ MID_AA1 = MidCapabilities(
     frequency_slice_bandwidth_hz=MID_BASIC_CAPABILITIES.frequency_slice_bandwidth_hz,
     available_bandwidth_hz=800_000_000,
     number_fsps=4,
-    modes=MidModes(
+    observing_modes=MidObservingModes(
         spectral=MidSpectralMode(max_zoom_windows=0, max_zoom_channels=0),
         pss=MidPSSMode(max_beams=0, beam_bandwidth_hz=400_000_000),
         pst=MidPSTMode(max_beams=1),
@@ -312,7 +312,7 @@ MID_AA2 = MidCapabilities(
     frequency_slice_bandwidth_hz=MID_BASIC_CAPABILITIES.frequency_slice_bandwidth_hz,
     available_bandwidth_hz=800_000_000,
     number_fsps=8,
-    modes=MidModes(
+    observing_modes=MidObservingModes(
         spectral=MidSpectralMode(max_zoom_windows=0, max_zoom_channels=0),
         pss=MidPSSMode(max_beams=0, beam_bandwidth_hz=400_000_000),
         pst=MidPSTMode(max_beams=1),
@@ -370,7 +370,7 @@ LOW_BASIC_CAPABILITIES = LowBasicCapabilities(
     frequency_band=LOW_FREQUENCY_BAND,
     elevation_limits=ElevationLimits(min_elevation_deg=45.0, max_elevation_deg=90.0),
     coarse_channels=CoarseChannels(min=64, max=447, width_hz=781_250.0),
-    modes=LowBasicModes(
+    observing_modes=LowBasicObservingModes(
         continuum=LowBasicContinuumMode(channels_per_coarse_channel=144),
         spectral=LowBasicSpectralMode(channels_per_coarse_channel=432),
         pss=LowBasicPSSMode(channels_per_coarse_channel=54),
@@ -405,7 +405,7 @@ LOW_AA1 = LowCapabilities(
     available_bandwidth_hz=75_000_000.0,
     cbf_modes=[LowCBFMode.VIS, LowCBFMode.PST],
     number_fsps=6,
-    modes=LowModes(
+    observing_modes=LowObservingModes(
         continuum=LowContinuumMode(channels_per_coarse_channel=144),
         spectral=LowSpectralMode(
             channels_per_coarse_channel=432,
@@ -438,7 +438,7 @@ LOW_AA2 = LowCapabilities(
     available_bandwidth_hz=75_000_000.0,
     cbf_modes=[LowCBFMode.VIS, LowCBFMode.PST],
     number_fsps=6,
-    modes=LowModes(
+    observing_modes=LowObservingModes(
         continuum=LowContinuumMode(channels_per_coarse_channel=144),
         spectral=LowSpectralMode(
             channels_per_coarse_channel=432,
@@ -466,13 +466,13 @@ LOW_AA2_SV = LOW_AA2.model_copy(
     update={
         "policy": "AA2_SV",
         "cbf_modes": [LowCBFMode.VIS, LowCBFMode.PST],
-        "modes": LOW_AA2.modes.model_copy(
+        "observing_modes": LOW_AA2.observing_modes.model_copy(
             update={
-                "spectral": LOW_AA2.modes.spectral.model_copy(
+                "spectral": LOW_AA2.observing_modes.spectral.model_copy(
                     update={"max_zoom_windows": 1, "max_zoom_channels": 4000}
                 ),
-                "pss": LOW_AA2.modes.pss.model_copy(update={"max_beams": 0}),
-                "pst": LOW_AA2.modes.pst.model_copy(update={"max_beams": 1}),
+                "pss": LOW_AA2.observing_modes.pss.model_copy(update={"max_beams": 0}),
+                "pst": LOW_AA2.observing_modes.pst.model_copy(update={"max_beams": 1}),
             }
         ),
         "subarray_beams": LowArrayAssemblySubarrayBeams(

@@ -106,7 +106,7 @@ class MidArrayAssemblyPSTMode(OSDBaseModel):
     max_beams: int = Field(ge=0, examples=[6])
 
 
-class MidArrayAssemblyModes(OSDBaseModel):
+class MidArrayAssemblyObservingModes(OSDBaseModel):
     """What a Mid array assembly offers in each observing mode."""
 
     spectral: MidArrayAssemblySpectralMode
@@ -156,7 +156,7 @@ class MidPSTMode(OSDBaseModel):
     max_beams: int = Field(ge=0, examples=[6])
 
 
-class MidModes(OSDBaseModel):
+class MidObservingModes(OSDBaseModel):
     """What Mid offers in each observing mode."""
 
     spectral: MidSpectralMode
@@ -176,7 +176,7 @@ class MidCapabilities(OSDBaseModel):
     frequency_slice_bandwidth_hz: int = Field(gt=0)
     available_bandwidth_hz: float = Field(gt=0)
     number_fsps: int = Field(ge=0)
-    modes: MidModes
+    observing_modes: MidObservingModes
     allowed_channel_width_values_hz: list[int]
     allowed_channel_count_range_min: list[int]
     allowed_channel_count_range_max: list[int]
@@ -187,14 +187,14 @@ class MidCapabilities(OSDBaseModel):
     @model_validator(mode="after")
     def check_cbf_modes(self) -> Self:
         for cbf_mode, mode in (
-            (MidCBFMode.PSS, self.modes.pss),
-            (MidCBFMode.PST, self.modes.pst),
+            (MidCBFMode.PSS, self.observing_modes.pss),
+            (MidCBFMode.PST, self.observing_modes.pst),
         ):
             if (cbf_mode in self.cbf_modes) != (mode.max_beams > 0):
                 raise ValueError(
                     f"{self.policy or self.array_assembly}: "
                     f"cbf_modes must list {cbf_mode} exactly when "
-                    f"modes.{cbf_mode}.max_beams is above 0"
+                    f"observing_modes.{cbf_mode}.max_beams is above 0"
                 )
         return self
 
@@ -248,8 +248,8 @@ class LowBasicPSTMode(OSDBaseModel):
     channels_per_coarse_channel: int = Field(ge=0, examples=[216])
 
 
-class LowBasicModes(OSDBaseModel):
-    """Low's observing modes. tmdata: ``basic_capabilities.modes``."""
+class LowBasicObservingModes(OSDBaseModel):
+    """Low's observing modes. tmdata: ``basic_capabilities.observing_modes``."""
 
     continuum: LowBasicContinuumMode
     spectral: LowBasicSpectralMode
@@ -258,14 +258,14 @@ class LowBasicModes(OSDBaseModel):
 
 
 class LowBasicCapabilities(OSDBaseModel):
-    """Low's frequency band, elevation limits, coarse channels and modes.
+    """Low's frequency band, elevation limits, coarse channels and observing modes.
     tmdata: ``basic_capabilities``."""
 
     telescope: Literal[Telescope.SKA_LOW]
     frequency_band: FrequencyBand
     elevation_limits: ElevationLimits
     coarse_channels: CoarseChannels
-    modes: LowBasicModes
+    observing_modes: LowBasicObservingModes
 
 
 class LowArrayAssemblySpectralMode(OSDBaseModel):
@@ -296,7 +296,7 @@ class LowArrayAssemblyVLBIMode(OSDBaseModel):
     max_beams: int = Field(ge=0, examples=[0])
 
 
-class LowArrayAssemblyModes(OSDBaseModel):
+class LowArrayAssemblyObservingModes(OSDBaseModel):
     """What a Low array assembly offers in each observing mode."""
 
     spectral: LowArrayAssemblySpectralMode
@@ -372,7 +372,7 @@ class LowVLBIMode(OSDBaseModel):
     max_beams: int = Field(ge=0, examples=[0])
 
 
-class LowModes(OSDBaseModel):
+class LowObservingModes(OSDBaseModel):
     """What Low offers in each observing mode."""
 
     continuum: LowContinuumMode
@@ -396,22 +396,22 @@ class LowCapabilities(OSDBaseModel):
     number_fsps: int = Field(ge=0)
     subarray_beams: LowArrayAssemblySubarrayBeams
     cbf_modes: list[LowCBFMode]
-    modes: LowModes
+    observing_modes: LowObservingModes
     receptors: LowArrayAssemblyReceptors
 
     @model_validator(mode="after")
     def check_cbf_modes(self) -> Self:
-        # vis isn't checked against modes.spectral: some array assemblies list
+        # vis isn't checked against observing_modes.spectral: some array assemblies list
         # vis but offer no zoom windows
         for cbf_mode, mode in (
-            (LowCBFMode.PSS, self.modes.pss),
-            (LowCBFMode.PST, self.modes.pst),
+            (LowCBFMode.PSS, self.observing_modes.pss),
+            (LowCBFMode.PST, self.observing_modes.pst),
         ):
             if (cbf_mode in self.cbf_modes) != (mode.max_beams > 0):
                 raise ValueError(
                     f"{self.policy or self.array_assembly}: cbf_modes must list "
                     f"{cbf_mode} exactly "
-                    f"when modes.{cbf_mode}.max_beams is above 0"
+                    f"when observing_modes.{cbf_mode}.max_beams is above 0"
                 )
         return self
 

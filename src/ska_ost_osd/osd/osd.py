@@ -269,7 +269,10 @@ class OSD:
         else:
             # Low's band is also served with its coarse channels and the
             # channels each mode divides them into
-            coarse_channels, modes = stored["coarse_channels"], stored["modes"]
+            coarse_channels, modes = (
+                stored["coarse_channels"],
+                stored["observing_modes"],
+            )
             basic_capabilities = stored["frequency_band"] | {
                 "min_coarse_channel": coarse_channels["min"],
                 "max_coarse_channel": coarse_channels["max"],
@@ -357,9 +360,9 @@ class OSD:
             capabilities["allowed_channel_width_values"] = capabilities[
                 "allowed_channel_width_values_hz"
             ]
-        # The modes, and Low's subarray beams, are served flat under
+        # The observing modes, and Low's subarray beams, are served flat under
         # their legacy names
-        modes = capabilities.pop("modes")
+        modes = capabilities.pop("observing_modes")
         capabilities["number_zoom_windows"] = modes["spectral"]["max_zoom_windows"]
         capabilities["number_zoom_channels"] = modes["spectral"]["max_zoom_channels"]
         if "zoom_factors" in modes["spectral"]:

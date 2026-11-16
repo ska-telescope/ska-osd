@@ -8,12 +8,12 @@ from pydantic import Field, model_validator
 
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
-    LowArrayAssemblyModes,
+    LowArrayAssemblyObservingModes,
     LowArrayAssemblyReceptors,
     LowArrayAssemblySubarrayBeams,
     LowBasicCapabilities,
     LowCBFMode,
-    MidArrayAssemblyModes,
+    MidArrayAssemblyObservingModes,
     MidArrayAssemblyReceptors,
     MidBasicCapabilities,
     MidCBFMode,
@@ -40,7 +40,7 @@ class MidArrayAssemblyFile(OSDBaseModel):
     array_assembly: str = Field(examples=["AA2"])
     available_bandwidth_hz: float = Field(gt=0)
     number_fsps: int = Field(ge=0)
-    modes: MidArrayAssemblyModes
+    observing_modes: MidArrayAssemblyObservingModes
     allowed_channel_width_values_hz: list[int]
     allowed_channel_count_range_min: list[int]
     allowed_channel_count_range_max: list[int]
@@ -51,13 +51,13 @@ class MidArrayAssemblyFile(OSDBaseModel):
     @model_validator(mode="after")
     def check_cbf_modes(self) -> Self:
         for cbf_mode, mode in (
-            (MidCBFMode.PSS, self.modes.pss),
-            (MidCBFMode.PST, self.modes.pst),
+            (MidCBFMode.PSS, self.observing_modes.pss),
+            (MidCBFMode.PST, self.observing_modes.pst),
         ):
             if (cbf_mode in self.cbf_modes) != (mode.max_beams > 0):
                 raise ValueError(
                     f"cbf_modes must list {cbf_mode} exactly when "
-                    f"modes.{cbf_mode}.max_beams is above 0"
+                    f"observing_modes.{cbf_mode}.max_beams is above 0"
                 )
         return self
 
@@ -72,21 +72,21 @@ class LowArrayAssemblyFile(OSDBaseModel):
     number_fsps: int = Field(ge=0)
     subarray_beams: LowArrayAssemblySubarrayBeams
     cbf_modes: list[LowCBFMode]
-    modes: LowArrayAssemblyModes
+    observing_modes: LowArrayAssemblyObservingModes
     receptors: LowArrayAssemblyReceptors
 
     @model_validator(mode="after")
     def check_cbf_modes(self) -> Self:
-        # vis isn't checked against modes.spectral: some array assemblies list
+        # vis isn't checked against observing_modes.spectral: some array assemblies list
         # vis but offer no zoom windows
         for cbf_mode, mode in (
-            (LowCBFMode.PSS, self.modes.pss),
-            (LowCBFMode.PST, self.modes.pst),
+            (LowCBFMode.PSS, self.observing_modes.pss),
+            (LowCBFMode.PST, self.observing_modes.pst),
         ):
             if (cbf_mode in self.cbf_modes) != (mode.max_beams > 0):
                 raise ValueError(
                     f"cbf_modes must list {cbf_mode} exactly when "
-                    f"modes.{cbf_mode}.max_beams is above 0"
+                    f"observing_modes.{cbf_mode}.max_beams is above 0"
                 )
         return self
 
@@ -105,7 +105,7 @@ class MidPolicyPSTMode(OSDBaseModel):
     max_beams: int | None = Field(default=None, ge=0)
 
 
-class MidPolicyModes(OSDBaseModel):
+class MidPolicyObservingModes(OSDBaseModel):
     spectral: MidPolicySpectralMode | None = None
     pss: MidPolicyPSSMode | None = None
     pst: MidPolicyPSTMode | None = None
@@ -128,7 +128,7 @@ class MidPolicyFile(OSDBaseModel):
     policy: str = Field(examples=["AA2_SV"])
     available_bandwidth_hz: float | None = Field(default=None, gt=0)
     number_fsps: int | None = Field(default=None, ge=0)
-    modes: MidPolicyModes | None = None
+    observing_modes: MidPolicyObservingModes | None = None
     allowed_channel_width_values_hz: list[int] | None = None
     allowed_channel_count_range_min: list[int] | None = None
     allowed_channel_count_range_max: list[int] | None = None
@@ -156,7 +156,7 @@ class LowPolicyVLBIMode(OSDBaseModel):
     max_beams: int | None = Field(default=None, ge=0)
 
 
-class LowPolicyModes(OSDBaseModel):
+class LowPolicyObservingModes(OSDBaseModel):
     spectral: LowPolicySpectralMode | None = None
     pss: LowPolicyPSSMode | None = None
     pst: LowPolicyPSTMode | None = None
@@ -185,7 +185,7 @@ class LowPolicyFile(OSDBaseModel):
     number_fsps: int | None = Field(default=None, ge=0)
     subarray_beams: LowPolicySubarrayBeams | None = None
     cbf_modes: list[LowCBFMode] | None = None
-    modes: LowPolicyModes | None = None
+    observing_modes: LowPolicyObservingModes | None = None
     receptors: LowPolicyReceptors | None = None
 
 

@@ -316,12 +316,12 @@ def test_get_osd_using_tmdata_catalogue_filter(
 
 
 def test_get_osd_using_tmdata_serves_low_modes_flat(tests_tmdata):
-    """Low's modes, stations and subarray beams are served under their
+    """Low's observing modes, stations and subarray beams are served under their
     legacy names."""
     osd_data = get_osd_using_tmdata(tests_tmdata, telescope=Telescope.SKA_LOW)
 
     served = osd_data["capabilities"]["low"]["AA2"]
-    assert "modes" not in served
+    assert "observing_modes" not in served
     assert served["number_zoom_windows"] == 0
     assert served["number_zoom_channels"] == 0
     assert served["allowed_zoom_factors"] == [1, 2, 4, 8]
@@ -347,7 +347,7 @@ def test_get_osd_using_tmdata_serves_low_modes_flat(tests_tmdata):
 
 
 def test_get_osd_using_tmdata_serves_mid_modes_flat(tests_tmdata):
-    """Mid's modes are served under their legacy names, and its capability
+    """Mid's observing modes are served under their legacy names, and its capability
     sets with templates processed have no constraints."""
     osd_data = get_osd_using_tmdata(
         tests_tmdata, telescope=Telescope.SKA_MID, process_templates=True
@@ -355,7 +355,7 @@ def test_get_osd_using_tmdata_serves_mid_modes_flat(tests_tmdata):
 
     assert "constraints" not in osd_data["capabilities"]["mid"]
     served = osd_data["capabilities"]["mid"]["AA2"]
-    assert "modes" not in served
+    assert "observing_modes" not in served
     assert served["number_pss_beams"] == 0
     assert served["ps_beam_bandwidth_hz"] == 400_000_000
     assert served["number_pst_beams"] == 1
@@ -453,7 +453,7 @@ def test_get_osd_using_tmdata_surfaces_tmdata_read_errors(failing_tmdata):
 
 @pytest.mark.parametrize(
     "nulls",
-    [{"modes": None}, {"modes": {"pst": {"max_beams": None}}}],
+    [{"observing_modes": None}, {"observing_modes": {"pst": {"max_beams": None}}}],
     ids=["group", "field"],
 )
 def test_get_osd_using_tmdata_treats_a_null_in_a_policy_as_left_out(

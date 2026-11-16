@@ -78,11 +78,11 @@ don't matter:
        (``frequency_bands``) or Low's one ``frequency_band``, the
        ``elevation_limits``, for Mid the ``frequency_slice_bandwidth_hz``
        each FSP processes, and for Low its ``coarse_channels`` and, in
-       ``modes``, how each observing mode divides them
+       ``observing_modes``, how each observing mode divides them
    * - ``array_assemblies/*.json``
      - ``array_assembly``
      - what one array assembly offers, such as ``AA2``: its receptors,
-       bandwidth, CBF modes and, in ``modes``, each observing mode's beams and
+       bandwidth, CBF modes and, in ``observing_modes``, each observing mode's beams and
        zoom windows
    * - ``policies/*.json``
      - ``policy``
@@ -141,7 +141,7 @@ How the layers combine:
   the array assembly. An empty policy offers the whole array assembly.
 * The basic capabilities and the array assembly set different fields, and
   neither an array assembly nor a policy may set a basic field. They can share
-  a group: ``modes.spectral`` takes its channels per coarse channel from Low's
+  a group: ``observing_modes.spectral`` takes its channels per coarse channel from Low's
   basic capabilities and its zoom windows from the array assembly.
 * The result names its ``telescope``, ``array_assembly`` and ``policy``.
 

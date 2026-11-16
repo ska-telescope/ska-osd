@@ -74,7 +74,7 @@ def _mid_capabilities(
         name=capabilities.array_assembly,
         receptors=capabilities.receptors.receptor_ids,
         available_bandwidth_hz=capabilities.available_bandwidth_hz,
-        number_pst_beams=capabilities.modes.pst.max_beams,
+        number_pst_beams=capabilities.observing_modes.pst.max_beams,
         number_fsps=capabilities.number_fsps,
         allowed_channel_width_values_hz=capabilities.allowed_channel_width_values_hz,
     )
@@ -87,7 +87,7 @@ def _low_capabilities(
         name=capabilities.array_assembly,
         receptors=capabilities.receptors.receptor_ids,
         available_bandwidth_hz=capabilities.available_bandwidth_hz,
-        number_pst_beams=capabilities.modes.pst.max_beams,
+        number_pst_beams=capabilities.observing_modes.pst.max_beams,
         number_fsps=capabilities.number_fsps,
         number_substations=(
             capabilities.subarray_beams.max_substations_per_subarray_beam

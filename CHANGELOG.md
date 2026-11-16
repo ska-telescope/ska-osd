@@ -40,7 +40,7 @@ Unreleased
   ``policies`` (the rules a cycle applies to an array assembly, only the fields
   they change) and ``subarray_templates``. Their files can have any name: each
   names what it describes in its ``array_assembly`` or ``policy``. Each observing
-  mode's limits are under ``modes``, and the stations or dishes under
+  mode's limits are under ``observing_modes``, and the stations or dishes under
   ``receptors``. Low's ``AA2_SV`` is now a policy on ``AA2``. The legacy files are
   kept but no longer read
 * Added Mid's ``frequency_slice_bandwidth_hz``, the bandwidth of the frequency

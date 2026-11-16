@@ -11,7 +11,7 @@
     "correlation",
     "pst"
   ],
-  "modes": {
+  "observing_modes": {
     "spectral": {
       "max_zoom_windows": 0,
       "max_zoom_channels": 0

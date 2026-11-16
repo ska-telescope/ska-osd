@@ -12,7 +12,7 @@
     "pst",
     "pss"
   ],
-  "modes": {
+  "observing_modes": {
     "spectral": {
       "max_zoom_windows": 16,
       "max_zoom_channels": 14880

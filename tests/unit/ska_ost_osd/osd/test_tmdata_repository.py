@@ -40,14 +40,19 @@ class TestMergeCapabilities:
         are kept."""
         assert merge_capabilities(
             {
-                "modes": {
+                "observing_modes": {
                     "continuum": {"channels_per_coarse_channel": 144},
                     "spectral": {"channels_per_coarse_channel": 432},
                 }
             },
-            {"modes": {"spectral": {"max_zoom_windows": 16}, "vlbi": {"max_beams": 0}}},
+            {
+                "observing_modes": {
+                    "spectral": {"max_zoom_windows": 16},
+                    "vlbi": {"max_beams": 0},
+                }
+            },
         ) == {
-            "modes": {
+            "observing_modes": {
                 "continuum": {"channels_per_coarse_channel": 144},
                 "spectral": {
                     "channels_per_coarse_channel": 432,
@@ -60,25 +65,28 @@ class TestMergeCapabilities:
     def test_a_policy_replaces_array_assembly_fields(self):
         assert merge_capabilities(
             {},
-            {"cbf_modes": ["vis", "pst"], "modes": {"pst": {"max_beams": 4}}},
-            {"cbf_modes": ["vis"], "modes": {"pst": {"max_beams": 0}}},
-        ) == {"cbf_modes": ["vis"], "modes": {"pst": {"max_beams": 0}}}
+            {"cbf_modes": ["vis", "pst"], "observing_modes": {"pst": {"max_beams": 4}}},
+            {"cbf_modes": ["vis"], "observing_modes": {"pst": {"max_beams": 0}}},
+        ) == {"cbf_modes": ["vis"], "observing_modes": {"pst": {"max_beams": 0}}}
 
     @pytest.mark.parametrize(
         "array_assembly, policy",
         [
-            ({"modes": {"spectral": {"channels_per_coarse_channel": 1}}}, None),
-            ({}, {"modes": {"spectral": {"channels_per_coarse_channel": 1}}}),
+            (
+                {"observing_modes": {"spectral": {"channels_per_coarse_channel": 1}}},
+                None,
+            ),
+            ({}, {"observing_modes": {"spectral": {"channels_per_coarse_channel": 1}}}),
         ],
         ids=["array assembly", "policy"],
     )
     def test_basic_capabilities_cant_be_changed(self, array_assembly, policy):
         with pytest.raises(
             ValueError,
-            match="modes.spectral.channels_per_coarse_channel is set by both",
+            match="observing_modes.spectral.channels_per_coarse_channel is set by both",
         ):
             merge_capabilities(
-                {"modes": {"spectral": {"channels_per_coarse_channel": 432}}},
+                {"observing_modes": {"spectral": {"channels_per_coarse_channel": 432}}},
                 array_assembly,
                 policy,
             )
@@ -330,7 +338,7 @@ class TestGetCapabilities:
 
     @pytest.mark.parametrize(
         "nulls",
-        [{"modes": None}, {"modes": {"pst": {"max_beams": None}}}],
+        [{"observing_modes": None}, {"observing_modes": {"pst": {"max_beams": None}}}],
         ids=["group", "field"],
     )
     def test_a_null_in_a_policy_changes_nothing(self, tmdata_repository_with, nulls):

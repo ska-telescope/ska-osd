@@ -37,16 +37,16 @@ def low_frequency_band(repository: OSDRepository) -> LowFrequencyBandWithChannel
     """Low's one frequency band, with its channels."""
     basic_capabilities = repository.get_basic_capabilities(Telescope.SKA_LOW)
     coarse_channels = basic_capabilities.coarse_channels
-    modes = basic_capabilities.modes
+    observing_modes = basic_capabilities.observing_modes
     return LowFrequencyBandWithChannels(
         **basic_capabilities.frequency_band.model_dump(),
         min_coarse_channel=coarse_channels.min,
         max_coarse_channel=coarse_channels.max,
         coarse_channel_width_hz=coarse_channels.width_hz,
         number_continuum_channels_per_coarse_channel=(
-            modes.continuum.channels_per_coarse_channel
+            observing_modes.continuum.channels_per_coarse_channel
         ),
-        number_zoom_channels_per_coarse_channel=modes.spectral.channels_per_coarse_channel,
-        number_pst_channels_per_coarse_channel=modes.pst.channels_per_coarse_channel,
-        number_pss_channels_per_coarse_channel=modes.pss.channels_per_coarse_channel,
+        number_zoom_channels_per_coarse_channel=observing_modes.spectral.channels_per_coarse_channel,
+        number_pst_channels_per_coarse_channel=observing_modes.pst.channels_per_coarse_channel,
+        number_pss_channels_per_coarse_channel=observing_modes.pss.channels_per_coarse_channel,
     )
