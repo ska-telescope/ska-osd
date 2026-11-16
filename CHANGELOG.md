@@ -7,10 +7,10 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 Unreleased
 **********
-* Added the ``osd-validate-tmdata`` command, which validates a tmdata directory
-  against the storage models, by default ``tmdata`` in the directory it is run in, and
-  the ``tmdata-validate`` make target and pipeline job that run it. ``tmdata-publish``
-  can only be run once it passes
+* Added the ``osd-validate-tmdata`` command, which validates the current (not
+  legacy) files of a tmdata directory against the storage models, by default
+  ``tmdata`` in the directory it is run in, and the ``tmdata-validate`` make target
+  and pipeline job that run it. ``tmdata-publish`` can only be run once it passes
 * [BREAKING] Removed the REST API: the FastAPI app, its Helm charts and OCI image, and
   the ``/osd``, ``/cycle``, ``/osd_release`` and ``/semantic_validation`` endpoints.
   The OSD is now a Python library only
@@ -23,44 +23,66 @@ Unreleased
 * [BREAKING] Removed ``ska_ost_osd.common``, including the FastAPI
   ``generic_exception_handler``
 * Removed the ``fastapi``, ``astropy`` and ``simpleeval`` dependencies
-* [BREAKING] Renamed the ``Telescope`` members to ``SKA_MID`` and ``SKA_LOW``, with
-  the values ``ska_mid`` and ``ska_low`` of the PDM's ``TelescopeType``. The
-  ``telescope`` the PHT view serves with each telescope's capabilities changes to
-  match. ``get_osd_using_tmdata`` still accepts ``"mid"`` and ``"low"``
-* [BREAKING] Users pass a TMData client to public API functions instead of OSD creating
-  one from ``tmdata/version_mapping``
-* [BREAKING] Restructured the tmdata under ``telescopes/ska_low`` and
-  ``telescopes/ska_mid``. Each file names what it describes, so file names don't
-  matter: ``basic_capabilities.json`` (``telescope``) holds what is fixed for the
-  telescope, ``array_assemblies/*.json`` (``array_assembly``) what each array assembly
-  offers, ``policies/*.json`` (``policy``) only what a cycle changes of an array
-  assembly, and ``subarray_templates/*.json`` (``array_assembly``) the subarray
-  templates an array assembly offers, each listing its ``receptor_ids``. Each
-  observing mode's limits are under ``modes``, and the stations or dishes under
-  ``receptors``. The defaults are in ``defaults.json``. Low's ``AA2_SV`` is now a
-  policy on ``AA2``. The legacy files are kept but no longer read
-* [BREAKING] Cycles are files in ``tmdata/cycles`` with a ``cycle_id``, ``name``,
+* [BREAKING] ``get_osd_using_tmdata`` takes a ``telescope`` instead of the
+  ``capabilities`` string: a ``Telescope``, ``SKA_MID`` or ``SKA_LOW``, with the
+  values ``ska_mid`` and ``ska_low`` of the PDM's ``TelescopeType``. ``"mid"`` and
+  ``"low"`` are still accepted
+* [BREAKING] Renamed the subarray templates to start with ``SKA_MID_`` and
+  ``SKA_LOW_``
+* [BREAKING] Define multiple cycles through a single TelModel backend in
+  ``tmdata/cycles``: one file per cycle, with a ``cycle_id``, ``name``,
   ``description``, optional ``cycle_number``, ``proposal_window``,
-  ``proposal_policy`` and ``telescopes``: for each telescope, an
-  ``array_assembly`` and the policy offered for each policy type
-* Added Mid's ``frequency_slice_bandwidth_hz`` to its basic capabilities: the
-  bandwidth of the frequency slice each FSP processes, 198180864 Hz
-* Added ``OSDRepository`` and ``TMDataRepository``, which read the OSD as Pydantic
-  models. ``get_capabilities(telescope, array_assembly, policy_id=None)`` returns a
-  telescope's basic capabilities and array assembly with the policy applied, and
-  ``get_cycle_capabilities(cycle_id)`` what a cycle offers
-* Added ``ska_ost_osd.osd.views``, the ODT and PHT responses served by
-  ska-oso-services. [BREAKING] The ODT view lists array assemblies only, so no longer
-  includes Low's ``AA2_SV``
-* ``get_osd_using_tmdata`` keeps its response format, serving each cycle's policy as a
-  capability set named after it, and returns the complete catalogue for a query
-  without a cycle. [BREAKING] Removed Low's ``number_beams`` and
-  ``coarse_channel_width``, the avoidance angles from the capabilities, and
-  ``ska_ost_osd.osd.template_mapping``. The ITFs now have a template pattern that
-  matches no templates
+  ``proposal_policy`` and ``telescopes``: for each telescope, an ``array_assembly``
+  and the policy offered for each policy type
+* [BREAKING] Restructured the tmdata under ``telescopes/ska_low`` and
+  ``telescopes/ska_mid``: ``basic_capabilities.json`` with what is fixed for the
+  telescope, ``defaults.json``, and directories of ``array_assemblies``,
+  ``policies`` (the rules a cycle applies to an array assembly, only the fields
+  they change) and ``subarray_templates``. Their files can have any name: each
+  names what it describes in its ``array_assembly`` or ``policy``. Each observing
+  mode's limits are under ``modes``, and the stations or dishes under
+  ``receptors``. Low's ``AA2_SV`` is now a policy on ``AA2``. The legacy files are
+  kept but no longer read
+* Added Mid's ``frequency_slice_bandwidth_hz``, the bandwidth of the frequency
+  slice each FSP processes, to its basic capabilities
+* [BREAKING] Users pass a TMData client to public API functions instead of OSD creating one from ``tmdata/version_mapping``
+* [BREAKING] Removed ``number_beams`` from the SKA-Low array assemblies in
+  ``low_capabilities.json``; use ``number_subarray_beams``
+* [BREAKING] Removed the duplicate ``coarse_channel_width`` from
+  ``low_capabilities.json``; use ``coarse_channel_width_hz``
+* [BREAKING] Removed the sun, moon and Jupiter avoidance angles from the capabilities
+  files; they are defined in ``mid_defaults.json`` and ``low_defaults.json``
 * Removed the unused semantic validation constants from ``tmdata/instrument``
+* ``get_osd_using_tmdata`` queries without a cycle now return the complete capability
+  catalogue, including each policy a cycle offers, applied to its array assembly,
+  under the policy's name
+* [BREAKING] ``get_osd_using_tmdata`` selects a cycle by the ``cycle_number`` in its
+  file, no longer serves Low's ``quality_attribute_metrics`` in the catalogue (it
+  is in Low's ``defaults.json``, served by the ODT view), and the ITFs' template
+  pattern matches no templates. Removed ``ska_ost_osd.osd.template_mapping``
 * Removed ``osd-pre-release``, ``osd-tmdata-publish`` and ``release.sh``
 * Added proposal cycle data to the release-cycle version mapping.
+* Added Pydantic storage models for the tmdata files, in
+  ``ska_ost_osd.osd.adapters.tmdata.models``: ``MidBasicCapabilitiesFile``,
+  ``MidArrayAssemblyFile``, ``MidPolicyFile`` and ``MidDefaultsFile``, their Low
+  equivalents, ``CycleFile`` and ``SubarrayTemplateLibraryFile``
+* ``Cycle`` reads its ``proposal_window`` ``opens`` and ``closes`` as
+  timezone-aware datetimes; a time without a timezone is rejected
+* Added a test that validates the real tmdata files against these models
+* Added ``OSDRepository`` (``ska_ost_osd.osd.repository``), the interface for
+  reading cycles, capabilities, basic capabilities, constraints, defaults and
+  subarray templates as Pydantic models, and ``TMDataRepository``
+  (``ska_ost_osd.osd.adapters.tmdata``), which implements it over a TMData client.
+  ``get_capabilities(telescope, array_assembly, policy_id=None)`` returns a
+  telescope's basic capabilities and array assembly with a policy's changes applied,
+  and ``get_cycle_capabilities(cycle_id)`` what a cycle offers. A key with no data
+  raises an ``OSDQueryError``, such as ``CycleNotFoundError`` or
+  ``PolicyNotFoundError``
+* Added ``ska_ost_osd.osd.views``: the configuration ska-oso-services serves to the
+  ODT (``views.odt``) and the cycle data it serves to the PHT (``views.pht``), built
+  from an ``OSDRepository``. The views serialise with the names their consumers
+  read by default, without ``by_alias=True``. The ODT configuration lists array
+  assemblies only, so not policies such as Low's ``AA2_SV``
 * Raised the minimum pydantic version to 2.11, for ``serialize_by_alias``
 * Bump the build and runtime base images to ``ska-build-python-ubuntu26:1.1.2`` and
   ``ska-python-ubuntu26:1.1.2`` to pick up the OpenSSL DTLS retransmission fix
