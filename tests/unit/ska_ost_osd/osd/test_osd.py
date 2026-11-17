@@ -324,7 +324,7 @@ def test_get_osd_using_tmdata_serves_low_modes_flat(tests_tmdata):
     assert "observing_modes" not in served
     assert served["number_zoom_windows"] == 0
     assert served["number_zoom_channels"] == 0
-    assert served["allowed_zoom_factors"] == [1, 2, 4, 8]
+    assert served["allowed_zoom_factors"] == [1, 2, 3]
     assert served["number_pss_beams"] == 0
     assert served["ps_beam_bandwidth_hz"] == 75_000_000.0
     assert served["number_pst_beams"] == 1

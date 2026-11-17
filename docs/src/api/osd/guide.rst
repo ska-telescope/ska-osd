@@ -87,8 +87,8 @@ don't matter:
        bandwidth, its FSPs, CBF function modes and (Mid) channel limit in
        ``cbf``, for Low its
        subarray beams in ``sps``, and, in
-       ``observing_modes``, each observing mode's beams and zoom windows and,
-       for Mid, its zoom and channel averaging factors
+       ``observing_modes``, each observing mode's beams, zoom windows and
+       zoom factors and, for Mid, its channel averaging factors
    * - ``policies/*.json``
      - ``policy``
      - the rules a cycle applies to an array assembly, such as ``AA2_SV``:
@@ -171,8 +171,10 @@ provides them, or by observing mode:
 
 ``observing_modes``
     What each observing mode offers, whichever part of the telescope provides
-    it: channels, zoom windows, Mid's zoom and channel averaging factors, and
-    beams.
+    it: channels, zoom windows, zoom factors, Mid's channel averaging factors,
+    and beams. Zoom factors are the PDM's: zoom factor *z* narrows a spectral
+    window's channels by 2**z, and 0, which means no zoom (continuum), is never
+    listed, so ``[]`` means no zoom is offered.
 
 A cycle pairs each telescope's array assembly with the policy offered for each
 policy type. Low AA2 Science Verification, for example, is the ``AA2`` array

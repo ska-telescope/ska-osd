@@ -23,6 +23,12 @@ class FrequencyBand(OSDBaseModel):
         return self
 
 
+# PDM zoom factors: zoom factor z narrows a spectral window's channels by
+# 2**z. Zoom factor 0 means no zoom, i.e. continuum, so is never listed.
+MidZoomFactor = Annotated[int, Field(ge=1, le=6)]
+LowZoomFactor = Annotated[int, Field(ge=1, le=7)]
+
+
 class MidCBFMode(StrEnum):
     CORRELATION = "correlation"
     PST = "pst"
@@ -105,11 +111,12 @@ class MidArrayAssemblyContinuumMode(OSDBaseModel):
 class MidArrayAssemblySpectralMode(OSDBaseModel):
     """The zoom windows a Mid array assembly offers for spectral line
     observations. ``max_zoom_channels`` is the most channels in one window,
-    and zoom factor *z* divides the fine channel width by 2**z."""
+    and ``zoom_factors`` are the PDM's zoom factors offered, ``[]`` for none:
+    zoom factor *z* divides the fine channel width by 2**z."""
 
     max_zoom_windows: int = Field(ge=0, examples=[16])
     max_zoom_channels: int = Field(ge=0, examples=[14880])
-    zoom_factors: list[int] = Field(examples=[[1, 2, 3, 4, 5, 6]])
+    zoom_factors: list[MidZoomFactor] = Field(examples=[[1, 2, 3, 4, 5, 6]])
 
 
 class MidArrayAssemblyPSSMode(OSDBaseModel):
@@ -195,7 +202,7 @@ class MidSpectralMode(OSDBaseModel):
 
     max_zoom_windows: int = Field(ge=0, examples=[16])
     max_zoom_channels: int = Field(ge=0, examples=[14880])
-    zoom_factors: list[int] = Field(examples=[[1, 2, 3, 4, 5, 6]])
+    zoom_factors: list[MidZoomFactor] = Field(examples=[[1, 2, 3, 4, 5, 6]])
 
 
 class MidPSSMode(OSDBaseModel):
@@ -362,11 +369,12 @@ class LowBasicCapabilities(OSDBaseModel):
 
 class LowArrayAssemblySpectralMode(OSDBaseModel):
     """The zoom windows a Low array assembly offers for spectral line
-    observations. ``max_zoom_channels`` is the most channels in one window."""
+    observations. ``max_zoom_channels`` is the most channels in one window,
+    and ``zoom_factors`` are the PDM's zoom factors offered, ``[]`` for none."""
 
     max_zoom_windows: int = Field(ge=0, examples=[16])
     max_zoom_channels: int = Field(ge=0, examples=[1800])
-    zoom_factors: list[int] = Field(examples=[[1, 2, 4, 8]])
+    zoom_factors: list[LowZoomFactor] = Field(examples=[[1, 2, 3]])
 
 
 class LowArrayAssemblyPSSMode(OSDBaseModel):
@@ -459,7 +467,7 @@ class LowSpectralMode(OSDBaseModel):
     channels_per_coarse_channel: int = Field(ge=0, examples=[432])
     max_zoom_windows: int = Field(ge=0, examples=[16])
     max_zoom_channels: int = Field(ge=0, examples=[1800])
-    zoom_factors: list[int] = Field(examples=[[1, 2, 4, 8]])
+    zoom_factors: list[LowZoomFactor] = Field(examples=[[1, 2, 3]])
 
 
 class LowPSSMode(OSDBaseModel):

@@ -5,9 +5,7 @@
     "spectral": {
       "max_zoom_windows": 0,
       "max_zoom_channels": 0,
-      "zoom_factors": [
-        0
-      ]
+      "zoom_factors": []
     },
     "pss": {
       "max_beams": 0,

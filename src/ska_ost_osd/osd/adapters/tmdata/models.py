@@ -14,11 +14,13 @@ from ska_ost_osd.osd.models.capabilities import (
     LowArrayAssemblySPS,
     LowBasicCapabilities,
     LowCBFMode,
+    LowZoomFactor,
     MidArrayAssemblyCBF,
     MidArrayAssemblyObservingModes,
     MidArrayAssemblyReceptors,
     MidBasicCapabilities,
     MidCBFMode,
+    MidZoomFactor,
 )
 from ska_ost_osd.osd.models.cycles import (
     CycleTelescope,
@@ -101,7 +103,7 @@ class MidPolicyContinuumMode(OSDBaseModel):
 class MidPolicySpectralMode(OSDBaseModel):
     max_zoom_windows: int | None = Field(default=None, ge=0)
     max_zoom_channels: int | None = Field(default=None, ge=0)
-    zoom_factors: list[int] | None = None
+    zoom_factors: list[MidZoomFactor] | None = None
 
 
 class MidPolicyPSSMode(OSDBaseModel):
@@ -150,7 +152,7 @@ class LowPolicyCBF(OSDBaseModel):
 class LowPolicySpectralMode(OSDBaseModel):
     max_zoom_windows: int | None = Field(default=None, ge=0)
     max_zoom_channels: int | None = Field(default=None, ge=0)
-    zoom_factors: list[int] | None = None
+    zoom_factors: list[LowZoomFactor] | None = None
 
 
 class LowPolicyPSSMode(OSDBaseModel):

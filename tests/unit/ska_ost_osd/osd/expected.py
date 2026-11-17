@@ -432,7 +432,7 @@ LOW_AA1 = LowCapabilities(
             channels_per_coarse_channel=432,
             max_zoom_windows=0,
             max_zoom_channels=0,
-            zoom_factors=[0],
+            zoom_factors=[],
         ),
         pss=LowPSSMode(
             channels_per_coarse_channel=54,
@@ -468,7 +468,7 @@ LOW_AA2 = LowCapabilities(
             channels_per_coarse_channel=432,
             max_zoom_windows=0,
             max_zoom_channels=0,
-            zoom_factors=[1, 2, 4, 8],
+            zoom_factors=[1, 2, 3],
         ),
         pss=LowPSSMode(
             channels_per_coarse_channel=54,

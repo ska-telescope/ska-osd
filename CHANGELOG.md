@@ -43,15 +43,21 @@ Unreleased
   mode's limits are under ``observing_modes``, the stations or dishes under
   ``receptors``, the frequency slice processors and function modes under
   ``cbf``, the correlator-beamformer, and Low's coarse channels and subarray beams
-  under ``sps``, its stations' signal processing. Mid's channel widths are stored
-  as zoom factors (``observing_modes.spectral.zoom_factors``) and channel averaging
-  factors (``observing_modes.continuum.channel_averaging_factors``), from which
+  under ``sps``, its stations' signal processing. Both telescopes' zoom factors
+  (``observing_modes.spectral.zoom_factors``) are the PDM's: zoom factor *z*
+  narrows a window's channels by 2**z, and 0 (no zoom, i.e. continuum) is never
+  listed, so ``[]`` means no zoom. Mid's channel widths are stored as its zoom
+  factors and channel averaging factors
+  (``observing_modes.continuum.channel_averaging_factors``), from which
   ``allowed_channel_width_values_hz`` is worked out, and its limit on correlated
   channels over all spectral windows as ``cbf.max_channels``, ``null`` where the
   OSD sets none, in place of ``allowed_channel_count_range_min`` and ``_max``; the
   minimum, always one channel per spectral window, is no longer stored.
   Low's ``AA2_SV`` is now a policy on ``AA2``. The legacy files are kept but no
   longer read
+* [BREAKING] ``get_osd_using_tmdata`` and the PHT view serve Low's
+  ``allowed_zoom_factors`` as PDM zoom factors: ``[1, 2, 3]`` where it was
+  ``[1, 2, 4, 8]``, and ``[]`` where it was ``[0]``
 * [BUGFIX] ``get_osd_using_tmdata`` serves Mid AA2's
   ``allowed_channel_count_range_max`` as 2147483647, the largest 32-bit signed
   integer, which clients read as no limit; it was mistyped as 214748647

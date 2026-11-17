@@ -113,6 +113,20 @@ class TestBreakingChanges:
                 lambda data: data["cbf"].pop("max_channels"),
             ),
             (
+                MidArrayAssemblyFile,
+                MID_ARRAY_ASSEMBLY,
+                lambda data: data["observing_modes"]["spectral"].update(
+                    zoom_factors=[0, 1]
+                ),
+            ),
+            (
+                LowArrayAssemblyFile,
+                LOW_ARRAY_ASSEMBLY,
+                lambda data: data["observing_modes"]["spectral"].update(
+                    zoom_factors=[1, 8]
+                ),
+            ),
+            (
                 LowBasicCapabilitiesFile,
                 LOW_BASIC_CAPABILITIES_FILE,
                 lambda data: data["sps"]["coarse_channels"].update(
@@ -145,6 +159,8 @@ class TestBreakingChanges:
         ids=[
             "field removed",
             "nullable field left out",
+            "zoom factor 0 (continuum) listed",
+            "zoom factor outside the PDM's range",
             "key renamed",
             "section removed",
             "type changed",
