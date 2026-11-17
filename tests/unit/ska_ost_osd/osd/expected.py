@@ -277,7 +277,9 @@ MID_BASIC_CAPABILITIES = MidBasicCapabilities(
         ),
     ],
     elevation_limits=ElevationLimits(min_elevation_deg=15.0, max_elevation_deg=90.0),
-    cbf=MidBasicCBF(frequency_slice_bandwidth_hz=198_180_864),
+    cbf=MidBasicCBF(
+        frequency_slice_bandwidth_hz=198_180_864, fine_channel_width_hz=13_440
+    ),
 )
 
 # The capabilities of tests/tmdata/telescopes/ska_mid/array_assemblies/AA1.json
@@ -289,6 +291,7 @@ MID_AA1 = MidCapabilities(
     elevation_limits=MID_BASIC_CAPABILITIES.elevation_limits,
     cbf=MidCBF(
         frequency_slice_bandwidth_hz=MID_BASIC_CAPABILITIES.cbf.frequency_slice_bandwidth_hz,
+        fine_channel_width_hz=MID_BASIC_CAPABILITIES.cbf.fine_channel_width_hz,
         number_fsps=4,
         function_modes=[MidCBFMode.CORRELATION, MidCBFMode.PST],
     ),
@@ -318,6 +321,7 @@ MID_AA2 = MidCapabilities(
     elevation_limits=MID_BASIC_CAPABILITIES.elevation_limits,
     cbf=MidCBF(
         frequency_slice_bandwidth_hz=MID_BASIC_CAPABILITIES.cbf.frequency_slice_bandwidth_hz,
+        fine_channel_width_hz=MID_BASIC_CAPABILITIES.cbf.fine_channel_width_hz,
         number_fsps=8,
         function_modes=[MidCBFMode.CORRELATION, MidCBFMode.PST],
     ),
@@ -360,7 +364,7 @@ MID_ARRAY_ASSEMBLY_FILES = {
                 "policy": True,
                 "frequency_bands": True,
                 "elevation_limits": True,
-                "cbf": {"frequency_slice_bandwidth_hz"},
+                "cbf": {"frequency_slice_bandwidth_hz", "fine_channel_width_hz"},
             }
         ),
     )

@@ -45,8 +45,9 @@ Unreleased
   ``cbf``, the correlator-beamformer, and Low's coarse channels and subarray beams under
   ``sps``, its stations' signal processing. Low's ``AA2_SV`` is now a policy on
   ``AA2``. The legacy files are kept but no longer read
-* Added Mid's ``cbf.frequency_slice_bandwidth_hz``, the bandwidth of the frequency
-  slice each FSP processes, to its basic capabilities
+* Added Mid's ``cbf.frequency_slice_bandwidth_hz`` and ``cbf.fine_channel_width_hz``
+  to its basic capabilities: the bandwidth of the frequency slice each FSP
+  processes, and the width of the fine channels it divides a slice into
 * [BREAKING] Users pass a TMData client to public API functions instead of OSD creating one from ``tmdata/version_mapping``
 * [BREAKING] Removed ``number_beams`` from the SKA-Low array assemblies in
   ``low_capabilities.json``; use ``number_subarray_beams``

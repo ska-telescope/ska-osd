@@ -66,6 +66,7 @@ class MidBasicCBF(OSDBaseModel):
     tmdata: ``basic_capabilities.cbf``."""
 
     frequency_slice_bandwidth_hz: int = Field(gt=0, examples=[198180864])
+    fine_channel_width_hz: int = Field(gt=0, examples=[13440])
 
 
 class MidBasicCapabilities(OSDBaseModel):
@@ -130,10 +131,12 @@ class MidArrayAssemblyCBF(OSDBaseModel):
 
 class MidCBF(OSDBaseModel):
     """Mid's correlator-beamformer (CBF): the bandwidth of each frequency
-    slice, how many frequency slice processors (FSPs) process them, and the
-    function modes it runs."""
+    slice, the width of the fine channels the FSPs divide them into, how many
+    frequency slice processors (FSPs) there are, and the function modes it
+    runs."""
 
     frequency_slice_bandwidth_hz: int = Field(gt=0, examples=[198180864])
+    fine_channel_width_hz: int = Field(gt=0, examples=[13440])
     number_fsps: int = Field(ge=0, examples=[26])
     function_modes: list[MidCBFMode]
 

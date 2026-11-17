@@ -71,8 +71,9 @@ Reading the data
    * - ``get_basic_capabilities(telescope)``
      - ``MidBasicCapabilities`` / ``LowBasicCapabilities``: what is fixed for
        the telescope, whatever the array assembly. For Mid, its receiver
-       bands as ``frequency_bands``, its ``elevation_limits`` and the
-       ``cbf.frequency_slice_bandwidth_hz`` each FSP processes; for Low, its
+       bands as ``frequency_bands``, its ``elevation_limits``, and in ``cbf``
+       the ``frequency_slice_bandwidth_hz`` each FSP processes and the
+       ``fine_channel_width_hz`` it divides a slice into; for Low, its
        one ``frequency_band``, its ``elevation_limits``, its
        ``sps.coarse_channels`` and, in ``observing_modes``, how each observing mode
        divides a coarse channel

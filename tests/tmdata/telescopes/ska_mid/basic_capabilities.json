@@ -60,6 +60,7 @@
     "max_elevation_deg": 90.0
   },
   "cbf": {
-    "frequency_slice_bandwidth_hz": 198180864
+    "frequency_slice_bandwidth_hz": 198180864,
+    "fine_channel_width_hz": 13440
   }
 }

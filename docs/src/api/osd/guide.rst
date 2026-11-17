@@ -77,9 +77,10 @@ don't matter:
      - what is fixed for the telescope: Mid's receiver bands
        (``frequency_bands``) or Low's one ``frequency_band``, the
        ``elevation_limits``, for Mid, in ``cbf``, the
-       ``frequency_slice_bandwidth_hz`` each FSP processes, and for Low, in
-       ``sps``, its ``coarse_channels``
-       and, in ``observing_modes``, how each observing mode divides them
+       ``frequency_slice_bandwidth_hz`` each FSP processes and the
+       ``fine_channel_width_hz`` it divides a slice into, and for Low, in
+       ``sps``, its ``coarse_channels`` and, in ``observing_modes``, how each
+       observing mode divides them
    * - ``array_assemblies/*.json``
      - ``array_assembly``
      - what one array assembly offers, such as ``AA2``: its receptors,
@@ -121,9 +122,9 @@ changed for its own reason:
 
 Basic capabilities
     What the telescope's design fixes, however much of it is built: Mid's
-    receiver bands and frequency slice bandwidth, Low's frequency band and
-    coarse channels, and the elevation limits. They change only if the design
-    does.
+    receiver bands, frequency slice bandwidth and fine channel width, Low's
+    frequency band and coarse channels, and the elevation limits. They change
+    only if the design does.
 
 Array assemblies
     What has been built at each construction milestone, such as ``AA2``: the
@@ -151,7 +152,8 @@ Within the files, fields are grouped by the part of the telescope that
 provides them, or by observing mode:
 
 ``cbf``
-    The correlator-beamformer (CBF): Mid's frequency slice bandwidth, and for
+    The correlator-beamformer (CBF): Mid's frequency slice bandwidth and fine
+    channel width, and for
     each array assembly its frequency slice processors (FSPs) and the function
     modes it runs. In a scheduling block, it limits the ``csp_configuration``'s
     ``midcbf`` or ``lowcbf``.
