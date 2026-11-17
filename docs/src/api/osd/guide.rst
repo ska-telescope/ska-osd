@@ -179,7 +179,10 @@ provides them, or by observing mode:
 A cycle pairs each telescope's array assembly with the policy offered for each
 policy type. Low AA2 Science Verification, for example, is the ``AA2`` array
 assembly with the ``AA2_SV`` policy, which offers one zoom window, one PST beam
-and no PSS beams.
+and no PSS beams. The cycles, the three policy types (science verification,
+shared risk and standard operations) and what each offers as the telescopes are
+built follow SKAO's `Timeline to Science
+<https://www.skao.int/en/science-users/647/timeline-science>`_.
 
 Querying the OSD
 ~~~~~~~~~~~~~~~~~
