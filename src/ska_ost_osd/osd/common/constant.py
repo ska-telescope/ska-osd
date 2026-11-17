@@ -59,9 +59,6 @@ class TelescopeFiles:
     def subarray_templates(self) -> str:
         return f"{self.directory}/{SUBARRAY_TEMPLATES_DIRNAME}"
 
-    def array_assembly(self, name: str) -> str:
-        return f"{self.array_assemblies}/{name}.json"
-
 
 # Each telescope's directory is named by its Telescope value, so a new
 # telescope needs only a new Telescope member
