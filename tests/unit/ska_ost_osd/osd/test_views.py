@@ -177,6 +177,8 @@ class TestGetCycleConfiguration:
             == [3360, 6720, 13440, 26880]
         )
         assert "allowed_zoom_factors" not in mid["AA2"]
+        assert mid["AA2"]["allowed_channel_count_range_min"] == [1]
+        assert mid["AA2"]["allowed_channel_count_range_max"] == [2147483647]
         if include_subarray_templates:
             assert "SKA_MID_FULL_AA2" in mid["AA2"]["subarray_templates"]
         else:

@@ -50,14 +50,9 @@
       "correlation",
       "pst",
       "pss"
-    ]
+    ],
+    "max_channels": null
   },
-  "allowed_channel_count_range_min": [
-    1
-  ],
-  "allowed_channel_count_range_max": [
-    214748647
-  ],
   "receptors": {
     "number_ska_dishes": 64,
     "number_meerkat_dishes": 4,

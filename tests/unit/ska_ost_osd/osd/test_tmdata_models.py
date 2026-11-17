@@ -108,6 +108,11 @@ class TestBreakingChanges:
                 lambda data: data.pop("cbf"),
             ),
             (
+                MidArrayAssemblyFile,
+                MID_ARRAY_ASSEMBLY,
+                lambda data: data["cbf"].pop("max_channels"),
+            ),
+            (
                 LowBasicCapabilitiesFile,
                 LOW_BASIC_CAPABILITIES_FILE,
                 lambda data: data["sps"]["coarse_channels"].update(
@@ -139,6 +144,7 @@ class TestBreakingChanges:
         ],
         ids=[
             "field removed",
+            "nullable field left out",
             "key renamed",
             "section removed",
             "type changed",

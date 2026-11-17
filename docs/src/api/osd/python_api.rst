@@ -66,10 +66,11 @@ Reading the data
        ``telescope``, ``array_assembly`` and ``policy`` (``None`` without
        one). Each observing mode's channels, zoom windows and beams are in
        ``observing_modes``, its stations (Low) or dishes (Mid) in ``receptors``,
-       its frequency slice processors and function modes in ``cbf``, and Low's
-       coarse channels and subarray beams in ``sps``. Mid's
-       ``allowed_channel_width_values_hz`` lists the channel widths its zoom
-       and channel averaging factors give
+       its frequency slice processors, function modes and (Mid) channel limit
+       in ``cbf``, and Low's coarse channels and subarray beams in ``sps``.
+       Mid's ``allowed_channel_width_values_hz`` lists the channel widths its
+       zoom and channel averaging factors give. Its ``cbf.max_channels`` is
+       ``None`` when the OSD sets no channel limit
    * - ``get_basic_capabilities(telescope)``
      - ``MidBasicCapabilities`` / ``LowBasicCapabilities``: what is fixed for
        the telescope, whatever the array assembly. For Mid, its receiver

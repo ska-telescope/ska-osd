@@ -27,6 +27,7 @@ from .common.constant import (
 )
 from .models.capabilities import merge_capabilities, mid_channel_width_values_hz
 from .models.cycles import PolicyType
+from .views.base import NO_CHANNEL_LIMIT
 
 LOGGER = logging.getLogger(__name__)
 
@@ -346,8 +347,12 @@ class OSD:
         capabilities["number_fsps"] = cbf["number_fsps"]
         capabilities["cbf_modes"] = cbf["function_modes"]
         # Mid's zoom and averaging factors are served as one list of channel
-        # widths
+        # widths, and its channel limit as a range
         if telescope == Telescope.SKA_MID:
+            capabilities["allowed_channel_count_range_min"] = [1]
+            capabilities["allowed_channel_count_range_max"] = [
+                NO_CHANNEL_LIMIT if cbf["max_channels"] is None else cbf["max_channels"]
+            ]
             modes = capabilities["observing_modes"]
             capabilities["allowed_channel_width_values_hz"] = (
                 mid_channel_width_values_hz(

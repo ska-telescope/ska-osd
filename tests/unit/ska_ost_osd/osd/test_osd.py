@@ -358,6 +358,11 @@ def test_get_osd_using_tmdata_serves_mid_modes_flat(tests_tmdata):
     assert "observing_modes" not in served
     assert served["allowed_channel_width_values_hz"] == [3360, 6720, 13440, 26880]
     assert "allowed_zoom_factors" not in served
+    assert served["allowed_channel_count_range_min"] == [1]
+    assert served["allowed_channel_count_range_max"] == [2147483647]
+    assert osd_data["capabilities"]["mid"]["AA1"][
+        "allowed_channel_count_range_max"
+    ] == [58982]
     assert served["number_pss_beams"] == 0
     assert served["ps_beam_bandwidth_hz"] == 400_000_000
     assert served["number_pst_beams"] == 1

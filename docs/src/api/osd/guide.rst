@@ -84,7 +84,8 @@ don't matter:
    * - ``array_assemblies/*.json``
      - ``array_assembly``
      - what one array assembly offers, such as ``AA2``: its receptors,
-       bandwidth, its FSPs and CBF function modes in ``cbf``, for Low its
+       bandwidth, its FSPs, CBF function modes and (Mid) channel limit in
+       ``cbf``, for Low its
        subarray beams in ``sps``, and, in
        ``observing_modes``, each observing mode's beams and zoom windows and,
        for Mid, its zoom and channel averaging factors
@@ -154,9 +155,11 @@ provides them, or by observing mode:
 
 ``cbf``
     The correlator-beamformer (CBF): Mid's frequency slice bandwidth and fine
-    channel width, and for
-    each array assembly its frequency slice processors (FSPs) and the function
-    modes it runs. In a scheduling block, it limits the ``csp_configuration``'s
+    channel width, and for each array assembly its frequency slice processors
+    (FSPs), the function modes it runs and, for Mid, ``max_channels``: the most
+    correlated channels over all spectral windows, or ``null`` if the OSD sets
+    no limit (each spectral window has at least one channel, so there is no
+    minimum). In a scheduling block, it limits the ``csp_configuration``'s
     ``midcbf`` or ``lowcbf``.
 
 ``sps`` (Low only)

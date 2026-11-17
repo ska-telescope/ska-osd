@@ -20,9 +20,9 @@ from ska_ost_osd.osd.models.capabilities import (
     LowArrayAssemblyReceptors,
     LowArrayAssemblySPS,
     LowCapabilities,
-    MidArrayAssemblyCBF,
     MidArrayAssemblyReceptors,
     MidCapabilities,
+    MidCBFMode,
     MidFrequencyBand,
     MidPSSMode,
     MidPSTMode,
@@ -32,6 +32,7 @@ from ska_ost_osd.osd.models.defaults import OSDBaseModel
 from ska_ost_osd.osd.models.subarray_templates import SubarrayType
 from ska_ost_osd.osd.repository import OSDRepository
 from ska_ost_osd.osd.views.base import (
+    NO_CHANNEL_LIMIT,
     ConfigurationModel,
     LowFrequencyBandWithChannels,
     low_frequency_band,
@@ -121,13 +122,21 @@ class MidOfferedObservingModes(OSDBaseModel):
     pst: MidPSTMode
 
 
+class MidOfferedCBF(OSDBaseModel):
+    """Mid's correlator-beamformer, as the PHT view serves it: its channel
+    limit is served as ``allowed_channel_count_range_max``."""
+
+    number_fsps: int
+    function_modes: list[MidCBFMode]
+
+
 class MidOfferedCapabilities(OSDBaseModel):
     """What the PHT view serves of Mid's capabilities in a cycle: all but the
     basic capabilities, which it serves beside them."""
 
     name: str
     available_bandwidth_hz: float
-    cbf: MidArrayAssemblyCBF
+    cbf: MidOfferedCBF
     telescope: Literal[Telescope.SKA_MID] = Telescope.SKA_MID
     observing_modes: MidOfferedObservingModes
     allowed_channel_width_values_hz: list[int]
@@ -403,7 +412,16 @@ def get_cycle_configuration(
                     from_attributes=True,
                 ),
                 capabilities=MidOfferedCapabilities.model_validate(
-                    mid.model_dump() | {"name": _name(mid)}
+                    mid.model_dump()
+                    | {
+                        "name": _name(mid),
+                        "allowed_channel_count_range_min": [1],
+                        "allowed_channel_count_range_max": [
+                            NO_CHANNEL_LIMIT
+                            if mid.cbf.max_channels is None
+                            else mid.cbf.max_channels
+                        ],
+                    }
                 ),
                 subarray_templates=_subarray_templates(
                     repository,

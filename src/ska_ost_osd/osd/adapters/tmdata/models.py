@@ -43,8 +43,6 @@ class MidArrayAssemblyFile(OSDBaseModel):
     available_bandwidth_hz: float = Field(gt=0)
     cbf: MidArrayAssemblyCBF
     observing_modes: MidArrayAssemblyObservingModes
-    allowed_channel_count_range_min: list[int]
-    allowed_channel_count_range_max: list[int]
     receivers: list[str]
     receptors: MidArrayAssemblyReceptors
 
@@ -93,6 +91,7 @@ class LowArrayAssemblyFile(OSDBaseModel):
 class MidPolicyCBF(OSDBaseModel):
     number_fsps: int | None = Field(default=None, ge=0)
     function_modes: list[MidCBFMode] | None = None
+    max_channels: int | None = Field(default=None, ge=1)
 
 
 class MidPolicyContinuumMode(OSDBaseModel):
@@ -139,8 +138,6 @@ class MidPolicyFile(OSDBaseModel):
     available_bandwidth_hz: float | None = Field(default=None, gt=0)
     cbf: MidPolicyCBF | None = None
     observing_modes: MidPolicyObservingModes | None = None
-    allowed_channel_count_range_min: list[int] | None = None
-    allowed_channel_count_range_max: list[int] | None = None
     receivers: list[str] | None = None
     receptors: MidPolicyReceptors | None = None
 

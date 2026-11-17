@@ -135,22 +135,27 @@ class MidArrayAssemblyObservingModes(OSDBaseModel):
 
 
 class MidArrayAssemblyCBF(OSDBaseModel):
-    """What a Mid array assembly's correlator-beamformer (CBF) offers."""
+    """What a Mid array assembly's correlator-beamformer (CBF) offers.
+    ``max_channels`` is the most correlated channels over all spectral
+    windows, or ``None`` if the OSD sets no limit."""
 
     number_fsps: int = Field(ge=0, examples=[26])
     function_modes: list[MidCBFMode]
+    max_channels: Annotated[int, Field(ge=1)] | None = Field(examples=[58982])
 
 
 class MidCBF(OSDBaseModel):
     """Mid's correlator-beamformer (CBF): the bandwidth of each frequency
     slice, the width of the fine channels the FSPs divide them into, how many
-    frequency slice processors (FSPs) there are, and the function modes it
-    runs."""
+    frequency slice processors (FSPs) there are, the function modes it runs,
+    and the most correlated channels over all spectral windows (``None`` if
+    the OSD sets no limit)."""
 
     frequency_slice_bandwidth_hz: int = Field(gt=0, examples=[198180864])
     fine_channel_width_hz: int = Field(gt=0, examples=[13440])
     number_fsps: int = Field(ge=0, examples=[26])
     function_modes: list[MidCBFMode]
+    max_channels: Annotated[int, Field(ge=1)] | None = Field(examples=[58982])
 
 
 class MidArrayAssemblyReceptors(OSDBaseModel):
@@ -247,8 +252,6 @@ class MidCapabilities(OSDBaseModel):
     cbf: MidCBF
     available_bandwidth_hz: float = Field(gt=0)
     observing_modes: MidObservingModes
-    allowed_channel_count_range_min: list[int]
-    allowed_channel_count_range_max: list[int]
     receivers: list[str] = Field(examples=[["Band_1", "Band_2"]])
     receptors: MidArrayAssemblyReceptors
 

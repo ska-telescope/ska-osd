@@ -7,6 +7,11 @@ from ska_ost_osd.osd.models.capabilities import FrequencyBand
 from ska_ost_osd.osd.models.defaults import OSDBaseModel
 from ska_ost_osd.osd.repository import OSDRepository
 
+# The largest 32-bit signed integer: served as Mid's
+# allowed_channel_count_range_max when the OSD sets no channel limit, which is
+# how clients read it
+NO_CHANNEL_LIMIT = 2147483647
+
 
 class ConfigurationModel(OSDBaseModel):
     # serialize_by_alias: a view serialises with the names its consumer

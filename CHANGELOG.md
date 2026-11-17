@@ -46,8 +46,15 @@ Unreleased
   under ``sps``, its stations' signal processing. Mid's channel widths are stored
   as zoom factors (``observing_modes.spectral.zoom_factors``) and channel averaging
   factors (``observing_modes.continuum.channel_averaging_factors``), from which
-  ``allowed_channel_width_values_hz`` is worked out. Low's ``AA2_SV`` is now a
-  policy on ``AA2``. The legacy files are kept but no longer read
+  ``allowed_channel_width_values_hz`` is worked out, and its limit on correlated
+  channels over all spectral windows as ``cbf.max_channels``, ``null`` where the
+  OSD sets none, in place of ``allowed_channel_count_range_min`` and ``_max``; the
+  minimum, always one channel per spectral window, is no longer stored.
+  Low's ``AA2_SV`` is now a policy on ``AA2``. The legacy files are kept but no
+  longer read
+* [BUGFIX] ``get_osd_using_tmdata`` serves Mid AA2's
+  ``allowed_channel_count_range_max`` as 2147483647, the largest 32-bit signed
+  integer, which clients read as no limit; it was mistyped as 214748647
 * Added Mid's ``cbf.frequency_slice_bandwidth_hz`` and ``cbf.fine_channel_width_hz``
   to its basic capabilities: the bandwidth of the frequency slice each FSP
   processes, and the width of the fine channels it divides a slice into

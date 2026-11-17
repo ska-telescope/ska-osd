@@ -295,6 +295,7 @@ MID_AA1 = MidCapabilities(
         fine_channel_width_hz=MID_BASIC_CAPABILITIES.cbf.fine_channel_width_hz,
         number_fsps=4,
         function_modes=[MidCBFMode.CORRELATION, MidCBFMode.PST],
+        max_channels=58982,
     ),
     available_bandwidth_hz=800_000_000,
     observing_modes=MidObservingModes(
@@ -305,8 +306,6 @@ MID_AA1 = MidCapabilities(
         pss=MidPSSMode(max_beams=0, beam_bandwidth_hz=400_000_000),
         pst=MidPSTMode(max_beams=1),
     ),
-    allowed_channel_count_range_min=[1],
-    allowed_channel_count_range_max=[58982],
     receivers=["Band_1", "Band_2", "Band_5b"],
     receptors=MidArrayAssemblyReceptors(
         number_ska_dishes=4,
@@ -327,6 +326,7 @@ MID_AA2 = MidCapabilities(
         fine_channel_width_hz=MID_BASIC_CAPABILITIES.cbf.fine_channel_width_hz,
         number_fsps=8,
         function_modes=[MidCBFMode.CORRELATION, MidCBFMode.PST],
+        max_channels=None,
     ),
     available_bandwidth_hz=800_000_000,
     observing_modes=MidObservingModes(
@@ -337,8 +337,6 @@ MID_AA2 = MidCapabilities(
         pss=MidPSSMode(max_beams=0, beam_bandwidth_hz=400_000_000),
         pst=MidPSTMode(max_beams=1),
     ),
-    allowed_channel_count_range_min=[1],
-    allowed_channel_count_range_max=[58982],
     receivers=["Band_1", "Band_2", "Band_5a", "Band_5b"],
     receptors=MidArrayAssemblyReceptors(
         number_ska_dishes=8,
@@ -768,7 +766,14 @@ CYCLE_2_CONFIGURATION = CycleConfiguration(
                 frequency_bands=MID_BASIC_CAPABILITIES.frequency_bands
             ),
             capabilities=MidOfferedCapabilities.model_validate(
-                MID_AA2.model_dump() | {"name": MID_AA2.array_assembly}
+                MID_AA2.model_dump()
+                | {
+                    "name": MID_AA2.array_assembly,
+                    # AA2 sets no channel limit, served as the largest 32-bit
+                    # signed integer
+                    "allowed_channel_count_range_min": [1],
+                    "allowed_channel_count_range_max": [2147483647],
+                }
             ),
         ),
         low=LowCycleCapabilities(
