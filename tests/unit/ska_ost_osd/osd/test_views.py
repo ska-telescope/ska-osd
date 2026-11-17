@@ -4,6 +4,10 @@ tests/tmdata."""
 import pytest
 
 from ska_ost_osd.osd.exceptions import CycleNotFoundError, PolicyNotFoundError
+from ska_ost_osd.osd.views.base import (
+    legacy_zoom_factors,
+    zoom_factors_from_legacy,
+)
 from ska_ost_osd.osd.views.odt import Configuration, get_configuration
 from ska_ost_osd.osd.views.pht import (
     CycleConfiguration,
@@ -188,7 +192,7 @@ class TestGetCycleConfiguration:
         assert "observing_modes" not in low["AA2"]
         assert low["AA2"]["number_zoom_windows"] == 0
         assert low["AA2"]["number_zoom_channels"] == 0
-        assert low["AA2"]["allowed_zoom_factors"] == [1, 2, 3]
+        assert low["AA2"]["allowed_zoom_factors"] == [1, 2, 4, 8]
         assert low["AA2"]["number_pss_beams"] == 0
         assert low["AA2"]["ps_beam_bandwidth_hz"] == 75_000_000.0
         assert low["AA2"]["number_pst_beams"] == 1
@@ -279,3 +283,17 @@ class TestGetCycleConfigurations:
     def test_raises_when_cycles_directory_missing(self, empty_tmdata_repository):
         with pytest.raises(FileNotFoundError):
             get_cycle_configurations(empty_tmdata_repository)
+
+
+class TestLegacyZoomFactors:
+    """The pre-8.0 responses served Low's zoom factors as the multipliers
+    2**z, with 1 for no zoom, or [0] when no zoom is offered."""
+
+    @pytest.mark.parametrize(
+        "zoom_factors, served",
+        [([], [0]), ([1, 2, 3], [1, 2, 4, 8])],
+        ids=["no zoom", "zoom"],
+    )
+    def test_served_as_multipliers_and_read_back(self, zoom_factors, served):
+        assert legacy_zoom_factors(zoom_factors) == served
+        assert zoom_factors_from_legacy(served) == zoom_factors

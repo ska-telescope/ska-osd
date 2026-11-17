@@ -27,7 +27,7 @@ from .common.constant import (
 )
 from .models.capabilities import merge_capabilities, mid_channel_width_values_hz
 from .models.cycles import PolicyType
-from .views.base import NO_CHANNEL_LIMIT
+from .views.base import NO_CHANNEL_LIMIT, legacy_zoom_factors
 
 LOGGER = logging.getLogger(__name__)
 
@@ -389,7 +389,9 @@ class OSD:
         capabilities["number_zoom_windows"] = modes["spectral"]["max_zoom_windows"]
         capabilities["number_zoom_channels"] = modes["spectral"]["max_zoom_channels"]
         if telescope == Telescope.SKA_LOW and "zoom_factors" in modes["spectral"]:
-            capabilities["allowed_zoom_factors"] = modes["spectral"]["zoom_factors"]
+            capabilities["allowed_zoom_factors"] = legacy_zoom_factors(
+                modes["spectral"]["zoom_factors"]
+            )
         capabilities["number_pss_beams"] = modes["pss"]["max_beams"]
         capabilities["ps_beam_bandwidth_hz"] = modes["pss"]["beam_bandwidth_hz"]
         capabilities["number_pst_beams"] = modes["pst"]["max_beams"]

@@ -13,6 +13,22 @@ from ska_ost_osd.osd.repository import OSDRepository
 NO_CHANNEL_LIMIT = 2147483647
 
 
+def legacy_zoom_factors(zoom_factors: list[int]) -> list[int]:
+    """Zoom factors as the pre-8.0 responses served them: the multipliers
+    2**z, with 1 for no zoom, or ``[0]`` when no zoom is offered.
+
+    :param zoom_factors: the PDM's zoom factors offered, e.g. ``[1, 2, 3]``.
+    :return: the served zoom factors, e.g. ``[1, 2, 4, 8]``.
+    """
+    return [1, *(2**zoom for zoom in zoom_factors)] if zoom_factors else [0]
+
+
+def zoom_factors_from_legacy(served: list[int]) -> list[int]:
+    """The PDM's zoom factors from the served ones: the reverse of
+    :func:`legacy_zoom_factors`."""
+    return [factor.bit_length() - 1 for factor in served if factor > 1]
+
+
 class ConfigurationModel(OSDBaseModel):
     # serialize_by_alias: a view serialises with the names its consumer
     # reads (e.g. the PHT's Mid and Low) without the caller passing

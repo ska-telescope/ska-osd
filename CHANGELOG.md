@@ -55,9 +55,6 @@ Unreleased
   minimum, always one channel per spectral window, is no longer stored.
   Low's ``AA2_SV`` is now a policy on ``AA2``. The legacy files are kept but no
   longer read
-* [BREAKING] ``get_osd_using_tmdata`` and the PHT view serve Low's
-  ``allowed_zoom_factors`` as PDM zoom factors: ``[1, 2, 3]`` where it was
-  ``[1, 2, 4, 8]``, and ``[]`` where it was ``[0]``
 * [BUGFIX] ``get_osd_using_tmdata`` serves Mid AA2's
   ``allowed_channel_count_range_max`` as 2147483647, the largest 32-bit signed
   integer, which clients read as no limit; it was mistyped as 214748647

@@ -35,7 +35,9 @@ from ska_ost_osd.osd.views.base import (
     NO_CHANNEL_LIMIT,
     ConfigurationModel,
     LowFrequencyBandWithChannels,
+    legacy_zoom_factors,
     low_frequency_band,
+    zoom_factors_from_legacy,
 )
 
 # The PHT UI recognises science verification by its name
@@ -201,8 +203,8 @@ class CycleCapabilitiesBase(ConfigurationModel):
                     "pst": {"max_beams": capabilities.pop("number_pst_beams")},
                 }
                 if "allowed_zoom_factors" in capabilities:
-                    modes["spectral"]["zoom_factors"] = capabilities.pop(
-                        "allowed_zoom_factors"
+                    modes["spectral"]["zoom_factors"] = zoom_factors_from_legacy(
+                        capabilities.pop("allowed_zoom_factors")
                     )
                 if "number_vlbi_beams" in capabilities:
                     modes["vlbi"] = {"max_beams": capabilities.pop("number_vlbi_beams")}
@@ -260,7 +262,9 @@ class CycleCapabilitiesBase(ConfigurationModel):
         capabilities["number_zoom_windows"] = modes["spectral"]["max_zoom_windows"]
         capabilities["number_zoom_channels"] = modes["spectral"]["max_zoom_channels"]
         if "zoom_factors" in modes["spectral"]:
-            capabilities["allowed_zoom_factors"] = modes["spectral"]["zoom_factors"]
+            capabilities["allowed_zoom_factors"] = legacy_zoom_factors(
+                modes["spectral"]["zoom_factors"]
+            )
         capabilities["number_pss_beams"] = modes["pss"]["max_beams"]
         capabilities["ps_beam_bandwidth_hz"] = modes["pss"]["beam_bandwidth_hz"]
         capabilities["number_pst_beams"] = modes["pst"]["max_beams"]
