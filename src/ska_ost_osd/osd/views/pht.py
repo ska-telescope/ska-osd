@@ -182,7 +182,7 @@ class CycleCapabilitiesBase(ConfigurationModel):
         data = data.copy()
         names = [key for key in data if key != "basic_capabilities"]
         if len(names) == 1:
-            capabilities = dict(data.pop(names[0]))
+            capabilities = data.pop(names[0]).copy()
             if "number_fsps" in capabilities:
                 capabilities["cbf"] = {
                     "number_fsps": capabilities.pop("number_fsps"),

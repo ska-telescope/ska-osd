@@ -552,7 +552,7 @@ def merge_capabilities(
 def _apply(capabilities: dict[str, Any], changes: dict[str, Any]) -> dict[str, Any]:
     """The capabilities with each field the changes set replaced, groups field
     by field."""
-    applied = dict(capabilities)
+    applied = capabilities.copy()
     for field, value in changes.items():
         applied[field] = (
             _apply(applied[field], value)
@@ -567,7 +567,7 @@ def _combine(
 ) -> dict[str, Any]:
     """The basic capabilities with the offered ones added. A group in both
     is combined field by field; any other field in both is an error."""
-    combined = dict(basic)
+    combined = basic.copy()
     for field, value in offered.items():
         if field not in combined:
             combined[field] = value

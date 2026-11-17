@@ -342,7 +342,7 @@ class OSD:
         """Capabilities in their legacy shape: the array assembly as a template
         pattern, or as that array assembly's templates when they are processed."""
         telescope = Telescope(posixpath.basename(telescope_dir))
-        capabilities = dict(capabilities)
+        capabilities = capabilities.copy()
         cbf = capabilities.pop("cbf")
         capabilities["number_fsps"] = cbf["number_fsps"]
         capabilities["cbf_modes"] = cbf["function_modes"]
