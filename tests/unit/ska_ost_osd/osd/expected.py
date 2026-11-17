@@ -330,9 +330,9 @@ MID_AA2 = MidCapabilities(
     ),
     available_bandwidth_hz=800_000_000,
     observing_modes=MidObservingModes(
-        continuum=MidContinuumMode(channel_averaging_factors=[1]),
+        continuum=MidContinuumMode(channel_averaging_factors=[1, 2]),
         spectral=MidSpectralMode(
-            max_zoom_windows=0, max_zoom_channels=0, zoom_factors=[]
+            max_zoom_windows=0, max_zoom_channels=0, zoom_factors=[1, 2]
         ),
         pss=MidPSSMode(max_beams=0, beam_bandwidth_hz=400_000_000),
         pst=MidPSTMode(max_beams=1),
@@ -677,7 +677,7 @@ CONFIGURATION = Configuration(
                 available_bandwidth_hz=800_000_000.0,
                 number_pst_beams=1,
                 number_fsps=8,
-                allowed_channel_width_values_hz=[13440],
+                allowed_channel_width_values_hz=[3360, 6720, 13440, 26880],
             ),
         ],
         spfrx_defaults=MID_DEFAULTS.spfrx_defaults,

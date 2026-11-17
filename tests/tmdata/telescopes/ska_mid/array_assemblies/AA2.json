@@ -10,13 +10,17 @@
   "observing_modes": {
     "continuum": {
       "channel_averaging_factors": [
-        1
+        1,
+        2
       ]
     },
     "spectral": {
       "max_zoom_windows": 0,
       "max_zoom_channels": 0,
-      "zoom_factors": []
+      "zoom_factors": [
+        1,
+        2
+      ]
     },
     "pss": {
       "max_beams": 0,
