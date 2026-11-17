@@ -189,8 +189,10 @@ def get_telescope_basic_capabilities(
 def get_telescope_basic_capabilities(
     tmdata: TMData, telescope: Telescope
 ) -> MidBasicCapabilitiesFile | LowBasicCapabilitiesFile:
-    """Read one telescope's basic capabilities file: Mid's receiver bands,
-    or Low's frequency band and how it is divided into channels.
+    """Read one telescope's basic capabilities file: its elevation limits
+    and, for Mid, its receiver bands and CBF frequency slice bandwidth and fine
+    channel width or, for Low, its frequency band and how it is divided into
+    channels.
 
     :param tmdata: TMData to read from.
     :param telescope: the telescope.

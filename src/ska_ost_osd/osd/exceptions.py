@@ -67,7 +67,7 @@ class PolicyNotFoundError(OSDQueryError, LookupError):
         self.available_policies = available_policies
         super().__init__(
             POLICY_NOT_FOUND_ERROR_MESSAGE.format(
-                policy, telescope, ", ".join(available_policies)
+                policy, telescope, ", ".join(available_policies) or "none"
             )
         )
 

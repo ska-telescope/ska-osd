@@ -70,9 +70,10 @@ class OSDRepository(Protocol):
     def get_basic_capabilities(
         self, telescope: Telescope
     ) -> MidBasicCapabilities | LowBasicCapabilities:
-        """A telescope's basic capabilities: Mid's receiver bands, or Low's
-        frequency band and how it is divided into channels, and the
-        telescope's elevation limits."""
+        """A telescope's basic capabilities: its elevation limits and, for
+        Mid, its receiver bands and CBF frequency slice bandwidth and fine
+        channel width or, for Low, its frequency band and how it is divided
+        into channels."""
         ...
 
     def get_constraints(self, telescope: Telescope) -> Constraints:
@@ -118,8 +119,8 @@ class OSDRepository(Protocol):
     def get_capabilities(
         self, telescope: Telescope, array_assembly: str, policy_id: str | None = None
     ) -> Capabilities:
-        """An array assembly's capabilities, with a policy's applied if one is
-        given, named after the policy or else the array assembly. Raises
+        """An array assembly's capabilities, with the telescope's basic
+        capabilities and, if one is given, a policy's applied. Raises
         ``ArrayAssemblyNotFoundError`` if there is no such array assembly, and
         ``PolicyNotFoundError`` if there is no such policy."""
         ...

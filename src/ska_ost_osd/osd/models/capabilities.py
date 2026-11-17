@@ -76,8 +76,9 @@ class MidBasicCBF(OSDBaseModel):
 
 
 class MidBasicCapabilities(OSDBaseModel):
-    """Mid's receiver bands, elevation limits and the bandwidth of the
-    frequency slices its FSPs each process. tmdata: ``basic_capabilities``."""
+    """Mid's receiver bands, elevation limits, and the bandwidth of the
+    frequency slices its FSPs each process and the width of the fine channels
+    they divide them into. tmdata: ``basic_capabilities``."""
 
     telescope: Literal[Telescope.SKA_MID]
     frequency_bands: list[MidFrequencyBand]
