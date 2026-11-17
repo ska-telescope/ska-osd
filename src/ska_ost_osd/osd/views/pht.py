@@ -17,7 +17,7 @@ from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
     LowArrayAssemblyObservingModes,
     LowArrayAssemblyReceptors,
-    LowArrayAssemblySubarrayBeams,
+    LowArrayAssemblySPS,
     LowCapabilities,
     LowCBFMode,
     MidArrayAssemblyObservingModes,
@@ -129,7 +129,7 @@ class LowOfferedCapabilities(OSDBaseModel):
     available_bandwidth_hz: float
     number_fsps: int
     telescope: Literal[Telescope.SKA_LOW] = Telescope.SKA_LOW
-    subarray_beams: LowArrayAssemblySubarrayBeams
+    sps: LowArrayAssemblySPS
     cbf_modes: list[LowCBFMode]
     observing_modes: LowArrayAssemblyObservingModes
     receptors: LowArrayAssemblyReceptors
@@ -197,11 +197,13 @@ class CycleCapabilitiesBase(ConfigurationModel):
                     "receptor_ids": capabilities.pop("receptors"),
                 }
             if "number_substations" in capabilities:
-                capabilities["subarray_beams"] = {
-                    "max_subarray_beams": capabilities.pop("number_subarray_beams"),
-                    "max_substations_per_subarray_beam": capabilities.pop(
-                        "number_substations"
-                    ),
+                capabilities["sps"] = {
+                    "subarray_beams": {
+                        "max_subarray_beams": capabilities.pop("number_subarray_beams"),
+                        "max_substations_per_subarray_beam": capabilities.pop(
+                            "number_substations"
+                        ),
+                    }
                 }
             data["capabilities"] = capabilities
         return data
@@ -243,8 +245,8 @@ class CycleCapabilitiesBase(ConfigurationModel):
                 "number_meerkatplus_dishes"
             ]
         capabilities["max_baseline_km"] = receptors["max_baseline_km"]
-        if "subarray_beams" in capabilities:
-            subarray_beams = capabilities.pop("subarray_beams")
+        if "sps" in capabilities:
+            subarray_beams = capabilities.pop("sps")["subarray_beams"]
             capabilities["number_substations"] = subarray_beams[
                 "max_substations_per_subarray_beam"
             ]

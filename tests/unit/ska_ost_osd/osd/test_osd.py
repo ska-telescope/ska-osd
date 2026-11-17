@@ -329,7 +329,7 @@ def test_get_osd_using_tmdata_serves_low_modes_flat(tests_tmdata):
     assert served["ps_beam_bandwidth_hz"] == 75_000_000.0
     assert served["number_pst_beams"] == 1
     assert served["number_vlbi_beams"] == 0
-    assert "subarray_beams" not in served
+    assert "sps" not in served
     assert served["number_subarray_beams"] == 8
     assert served["number_substations"] == 512
     assert served["number_stations"] == 8

@@ -270,7 +270,7 @@ class OSD:
             # Low's band is also served with its coarse channels and the
             # channels each mode divides them into
             coarse_channels, modes = (
-                stored["coarse_channels"],
+                stored["sps"]["coarse_channels"],
                 stored["observing_modes"],
             )
             basic_capabilities = stored["frequency_band"] | {
@@ -372,8 +372,8 @@ class OSD:
         capabilities["number_pst_beams"] = modes["pst"]["max_beams"]
         if "vlbi" in modes:
             capabilities["number_vlbi_beams"] = modes["vlbi"]["max_beams"]
-        if "subarray_beams" in capabilities:
-            subarray_beams = capabilities.pop("subarray_beams")
+        if "sps" in capabilities:
+            subarray_beams = capabilities.pop("sps")["subarray_beams"]
             capabilities["number_substations"] = subarray_beams[
                 "max_substations_per_subarray_beam"
             ]

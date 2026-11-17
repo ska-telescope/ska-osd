@@ -36,7 +36,7 @@ class LowFrequencyBandWithChannels(FrequencyBand):
 def low_frequency_band(repository: OSDRepository) -> LowFrequencyBandWithChannels:
     """Low's one frequency band, with its channels."""
     basic_capabilities = repository.get_basic_capabilities(Telescope.SKA_LOW)
-    coarse_channels = basic_capabilities.coarse_channels
+    coarse_channels = basic_capabilities.sps.coarse_channels
     observing_modes = basic_capabilities.observing_modes
     return LowFrequencyBandWithChannels(
         **basic_capabilities.frequency_band.model_dump(),

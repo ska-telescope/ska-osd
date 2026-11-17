@@ -90,9 +90,9 @@ def _low_capabilities(
         number_pst_beams=capabilities.observing_modes.pst.max_beams,
         number_fsps=capabilities.number_fsps,
         number_substations=(
-            capabilities.subarray_beams.max_substations_per_subarray_beam
+            capabilities.sps.subarray_beams.max_substations_per_subarray_beam
         ),
-        number_subarray_beams=capabilities.subarray_beams.max_subarray_beams,
+        number_subarray_beams=capabilities.sps.subarray_beams.max_subarray_beams,
     )
 
 

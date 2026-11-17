@@ -66,15 +66,15 @@ Reading the data
        ``telescope``, ``array_assembly`` and ``policy`` (``None`` without
        one). Each observing mode's channels, zoom windows and beams are in
        ``observing_modes``, its stations (Low) or dishes (Mid) in ``receptors``, and
-       Low's subarray beams in ``subarray_beams``
+       Low's coarse channels and subarray beams in ``sps``
    * - ``get_basic_capabilities(telescope)``
      - ``MidBasicCapabilities`` / ``LowBasicCapabilities``: what is fixed for
        the telescope, whatever the array assembly. For Mid, its receiver
        bands as ``frequency_bands``, its ``elevation_limits`` and the
        ``frequency_slice_bandwidth_hz`` each FSP processes; for Low, its
        one ``frequency_band``, its ``elevation_limits``, its
-       ``coarse_channels`` and, in ``observing_modes``, how each observing mode divides
-       a coarse channel
+       ``sps.coarse_channels`` and, in ``observing_modes``, how each observing mode
+       divides a coarse channel
    * - ``get_constraints(telescope)``
      - ``Constraints``: the elevation limits and the sun, moon and Jupiter
        avoidance angles
@@ -87,7 +87,7 @@ Reading the data
     from ska_ost_osd.osd.common.constant import Telescope
 
     aa2 = repository.get_capabilities(Telescope.SKA_LOW, "AA2")
-    aa2.subarray_beams.max_subarray_beams                        # 8
+    aa2.sps.subarray_beams.max_subarray_beams                    # 8
     repository.get_constraints(Telescope.SKA_MID).min_elevation_deg  # 15.0
 
 Mid's receiver bands are looked up on its basic capabilities:

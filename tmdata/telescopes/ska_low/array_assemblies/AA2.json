@@ -28,9 +28,11 @@
       "max_beams": 0
     }
   },
-  "subarray_beams": {
-    "max_subarray_beams": 8,
-    "max_substations_per_subarray_beam": 720
+  "sps": {
+    "subarray_beams": {
+      "max_subarray_beams": 8,
+      "max_substations_per_subarray_beam": 720
+    }
   },
   "number_fsps": 10,
   "receptors": {

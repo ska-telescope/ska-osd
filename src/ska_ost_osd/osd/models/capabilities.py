@@ -216,12 +216,20 @@ class LowCBFMode(StrEnum):
 
 
 class CoarseChannels(OSDBaseModel):
-    """The coarse channels Low's station beamformer divides its band into.
-    tmdata: ``basic_capabilities.coarse_channels``."""
+    """The coarse channels Low's stations divide the band into. ``min`` and
+    ``max`` are the lowest and highest coarse channel numbers, not counts.
+    tmdata: ``basic_capabilities.sps.coarse_channels``."""
 
     min: int = Field(ge=0, examples=[64])
     max: int = Field(ge=0, examples=[447])
     width_hz: float = Field(gt=0, examples=[781.25e3])
+
+
+class LowBasicSPS(OSDBaseModel):
+    """What Low's station signal processing (SPS) is designed to provide.
+    tmdata: ``basic_capabilities.sps``."""
+
+    coarse_channels: CoarseChannels
 
 
 class LowBasicContinuumMode(OSDBaseModel):
@@ -264,7 +272,7 @@ class LowBasicCapabilities(OSDBaseModel):
     telescope: Literal[Telescope.SKA_LOW]
     frequency_band: FrequencyBand
     elevation_limits: ElevationLimits
-    coarse_channels: CoarseChannels
+    sps: LowBasicSPS
     observing_modes: LowBasicObservingModes
 
 
@@ -312,6 +320,20 @@ class LowArrayAssemblySubarrayBeams(OSDBaseModel):
 
     max_subarray_beams: int = Field(ge=0, examples=[8])
     max_substations_per_subarray_beam: int = Field(ge=0, examples=[720])
+
+
+class LowArrayAssemblySPS(OSDBaseModel):
+    """What a Low array assembly's station signal processing (SPS) offers."""
+
+    subarray_beams: LowArrayAssemblySubarrayBeams
+
+
+class LowSPS(OSDBaseModel):
+    """Low's station signal processing (SPS): the coarse channels its
+    stations make, and the subarray beams they form. MCCS configures it."""
+
+    coarse_channels: CoarseChannels
+    subarray_beams: LowArrayAssemblySubarrayBeams
 
 
 class LowArrayAssemblyReceptors(OSDBaseModel):
@@ -391,10 +413,9 @@ class LowCapabilities(OSDBaseModel):
     policy: str | None = Field(default=None, examples=["AA2_SV"])
     frequency_band: FrequencyBand
     elevation_limits: ElevationLimits
-    coarse_channels: CoarseChannels
+    sps: LowSPS
     available_bandwidth_hz: float = Field(gt=0)
     number_fsps: int = Field(ge=0)
-    subarray_beams: LowArrayAssemblySubarrayBeams
     cbf_modes: list[LowCBFMode]
     observing_modes: LowObservingModes
     receptors: LowArrayAssemblyReceptors

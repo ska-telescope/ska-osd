@@ -16,8 +16,10 @@
       "max_beams": 1
     }
   },
-  "subarray_beams": {
-    "max_subarray_beams": 1,
-    "max_substations_per_subarray_beam": 0
+  "sps": {
+    "subarray_beams": {
+      "max_subarray_beams": 1,
+      "max_substations_per_subarray_beam": 0
+    }
   }
 }

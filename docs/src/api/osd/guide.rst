@@ -77,13 +77,13 @@ don't matter:
      - what is fixed for the telescope: Mid's receiver bands
        (``frequency_bands``) or Low's one ``frequency_band``, the
        ``elevation_limits``, for Mid the ``frequency_slice_bandwidth_hz``
-       each FSP processes, and for Low its ``coarse_channels`` and, in
-       ``observing_modes``, how each observing mode divides them
+       each FSP processes, and for Low, in ``sps``, its ``coarse_channels``
+       and, in ``observing_modes``, how each observing mode divides them
    * - ``array_assemblies/*.json``
      - ``array_assembly``
      - what one array assembly offers, such as ``AA2``: its receptors,
-       bandwidth, CBF modes and, in ``observing_modes``, each observing mode's beams and
-       zoom windows
+       bandwidth, CBF modes, for Low its subarray beams in ``sps``, and, in
+       ``observing_modes``, each observing mode's beams and zoom windows
    * - ``policies/*.json``
      - ``policy``
      - the rules a cycle applies to an array assembly, such as ``AA2_SV``:
@@ -128,6 +128,12 @@ Array assemblies
     receptors, bandwidth, CBF modes, and each observing mode's beams and zoom
     windows. They follow the construction rollout; each milestone is its own
     array assembly.
+
+Low's ``sps`` group, in both, describes its stations' signal processing
+(SPS): the coarse channels the stations divide the band into, and the subarray
+beams they form. MCCS configures it: in a scheduling block, the subarray beams
+are in the ``mccs_allocation``, and the spectral windows the coarse channels
+carry are in the ``csp_configuration``.
 
 Policies
     The rules Science Operations sets for what can be used of an array assembly

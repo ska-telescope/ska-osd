@@ -8,10 +8,12 @@
     "min_elevation_deg": 45.0,
     "max_elevation_deg": 90.0
   },
-  "coarse_channels": {
-    "min": 64,
-    "max": 447,
-    "width_hz": 781250.0
+  "sps": {
+    "coarse_channels": {
+      "min": 64,
+      "max": 447,
+      "width_hz": 781250.0
+    }
   },
   "observing_modes": {
     "continuum": {

@@ -28,6 +28,7 @@ from ska_ost_osd.osd.models.capabilities import (
     LowBasicPSSMode,
     LowBasicPSTMode,
     LowBasicSpectralMode,
+    LowBasicSPS,
     LowCapabilities,
     LowCBFMode,
     LowContinuumMode,
@@ -35,6 +36,7 @@ from ska_ost_osd.osd.models.capabilities import (
     LowPSSMode,
     LowPSTMode,
     LowSpectralMode,
+    LowSPS,
     LowVLBIMode,
     MidArrayAssemblyReceptors,
     MidBasicCapabilities,
@@ -369,7 +371,9 @@ LOW_BASIC_CAPABILITIES = LowBasicCapabilities(
     telescope=Telescope.SKA_LOW,
     frequency_band=LOW_FREQUENCY_BAND,
     elevation_limits=ElevationLimits(min_elevation_deg=45.0, max_elevation_deg=90.0),
-    coarse_channels=CoarseChannels(min=64, max=447, width_hz=781_250.0),
+    sps=LowBasicSPS(
+        coarse_channels=CoarseChannels(min=64, max=447, width_hz=781_250.0)
+    ),
     observing_modes=LowBasicObservingModes(
         continuum=LowBasicContinuumMode(channels_per_coarse_channel=144),
         spectral=LowBasicSpectralMode(channels_per_coarse_channel=432),
@@ -398,9 +402,11 @@ LOW_AA1 = LowCapabilities(
     array_assembly="AA1",
     frequency_band=LOW_BASIC_CAPABILITIES.frequency_band,
     elevation_limits=LOW_BASIC_CAPABILITIES.elevation_limits,
-    coarse_channels=LOW_BASIC_CAPABILITIES.coarse_channels,
-    subarray_beams=LowArrayAssemblySubarrayBeams(
-        max_subarray_beams=1, max_substations_per_subarray_beam=0
+    sps=LowSPS(
+        coarse_channels=LOW_BASIC_CAPABILITIES.sps.coarse_channels,
+        subarray_beams=LowArrayAssemblySubarrayBeams(
+            max_subarray_beams=1, max_substations_per_subarray_beam=0
+        ),
     ),
     available_bandwidth_hz=75_000_000.0,
     cbf_modes=[LowCBFMode.VIS, LowCBFMode.PST],
@@ -431,9 +437,11 @@ LOW_AA2 = LowCapabilities(
     array_assembly="AA2",
     frequency_band=LOW_BASIC_CAPABILITIES.frequency_band,
     elevation_limits=LOW_BASIC_CAPABILITIES.elevation_limits,
-    coarse_channels=LOW_BASIC_CAPABILITIES.coarse_channels,
-    subarray_beams=LowArrayAssemblySubarrayBeams(
-        max_subarray_beams=8, max_substations_per_subarray_beam=512
+    sps=LowSPS(
+        coarse_channels=LOW_BASIC_CAPABILITIES.sps.coarse_channels,
+        subarray_beams=LowArrayAssemblySubarrayBeams(
+            max_subarray_beams=8, max_substations_per_subarray_beam=512
+        ),
     ),
     available_bandwidth_hz=75_000_000.0,
     cbf_modes=[LowCBFMode.VIS, LowCBFMode.PST],
@@ -475,8 +483,12 @@ LOW_AA2_SV = LOW_AA2.model_copy(
                 "pst": LOW_AA2.observing_modes.pst.model_copy(update={"max_beams": 1}),
             }
         ),
-        "subarray_beams": LowArrayAssemblySubarrayBeams(
-            max_subarray_beams=1, max_substations_per_subarray_beam=0
+        "sps": LOW_AA2.sps.model_copy(
+            update={
+                "subarray_beams": LowArrayAssemblySubarrayBeams(
+                    max_subarray_beams=1, max_substations_per_subarray_beam=0
+                )
+            }
         ),
     }
 )
@@ -485,11 +497,11 @@ LOW_ARRAY_ASSEMBLY_FILES = {
     capabilities.array_assembly: LowArrayAssemblyFile(
         **capabilities.model_dump(
             exclude={
-                "telescope",
-                "policy",
-                "frequency_band",
-                "elevation_limits",
-                "coarse_channels",
+                "telescope": True,
+                "policy": True,
+                "frequency_band": True,
+                "elevation_limits": True,
+                "sps": {"coarse_channels"},
             }
         ),
     )

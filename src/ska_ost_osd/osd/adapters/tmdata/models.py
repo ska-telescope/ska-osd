@@ -10,7 +10,7 @@ from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
     LowArrayAssemblyObservingModes,
     LowArrayAssemblyReceptors,
-    LowArrayAssemblySubarrayBeams,
+    LowArrayAssemblySPS,
     LowBasicCapabilities,
     LowCBFMode,
     MidArrayAssemblyObservingModes,
@@ -70,7 +70,7 @@ class LowArrayAssemblyFile(OSDBaseModel):
     array_assembly: str = Field(examples=["AA2"])
     available_bandwidth_hz: float = Field(gt=0)
     number_fsps: int = Field(ge=0)
-    subarray_beams: LowArrayAssemblySubarrayBeams
+    sps: LowArrayAssemblySPS
     cbf_modes: list[LowCBFMode]
     observing_modes: LowArrayAssemblyObservingModes
     receptors: LowArrayAssemblyReceptors
@@ -168,6 +168,10 @@ class LowPolicySubarrayBeams(OSDBaseModel):
     max_substations_per_subarray_beam: int | None = Field(default=None, ge=0)
 
 
+class LowPolicySPS(OSDBaseModel):
+    subarray_beams: LowPolicySubarrayBeams | None = None
+
+
 class LowPolicyReceptors(OSDBaseModel):
     number_stations: int | None = Field(default=None, ge=0)
     max_baseline_km: float | None = Field(default=None, gt=0)
@@ -183,7 +187,7 @@ class LowPolicyFile(OSDBaseModel):
     policy: str = Field(examples=["AA2_SV"])
     available_bandwidth_hz: float | None = Field(default=None, gt=0)
     number_fsps: int | None = Field(default=None, ge=0)
-    subarray_beams: LowPolicySubarrayBeams | None = None
+    sps: LowPolicySPS | None = None
     cbf_modes: list[LowCBFMode] | None = None
     observing_modes: LowPolicyObservingModes | None = None
     receptors: LowPolicyReceptors | None = None
