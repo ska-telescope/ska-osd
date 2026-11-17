@@ -87,12 +87,14 @@ Reading the data
      - ``MidDefaults`` (the SPFRx defaults) / ``LowDefaults`` (the quality
        attribute metrics)
 
+For Low AA2 with the ``AA2_SV`` policy, and Mid AA2 with no policy:
+
 .. code-block:: python
 
     from ska_ost_osd.osd.common.constant import Telescope
 
-    aa2 = repository.get_capabilities(Telescope.SKA_LOW, "AA2")
-    aa2.sps.subarray_beams.max_subarray_beams                    # 8
+    low = repository.get_capabilities(Telescope.SKA_LOW, "AA2", "AA2_SV")
+    mid = repository.get_capabilities(Telescope.SKA_MID, "AA2")
     repository.get_constraints(Telescope.SKA_MID).min_elevation_deg  # 15.0
 
 Mid's receiver bands are looked up on its basic capabilities:
@@ -102,6 +104,137 @@ Mid's receiver bands are looked up on its basic capabilities:
     bands = repository.get_basic_capabilities(Telescope.SKA_MID)
     bands.get_frequency_band("Band_2").max_frequency_hz
     bands.get_frequency_band("Band_5b").get_band5b_subband(2).lo_frequency_hz
+
+.. _example-low-aa2-sv:
+
+Example: Low AA2 with the AA2_SV policy
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+``low`` above, as JSON, with long lists shortened:
+
+.. code-block:: json
+
+    {
+      "telescope": "ska_low",
+      "array_assembly": "AA2",
+      "policy": "AA2_SV",
+      "frequency_band": {
+        "max_frequency_hz": 350000000.0,
+        "min_frequency_hz": 50000000.0
+      },
+      "elevation_limits": {
+        "min_elevation_deg": 45.0,
+        "max_elevation_deg": 90.0
+      },
+      "sps": {
+        "coarse_channels": {
+          "min": 64,
+          "max": 447,
+          "width_hz": 781250.0
+        },
+        "subarray_beams": {
+          "max_subarray_beams": 1,
+          "max_substations_per_subarray_beam": 0
+        }
+      },
+      "available_bandwidth_hz": 150000000.0,
+      "cbf": {
+        "number_fsps": 10,
+        "function_modes": ["vis", "pst"]
+      },
+      "observing_modes": {
+        "continuum": {
+          "channels_per_coarse_channel": 144
+        },
+        "spectral": {
+          "channels_per_coarse_channel": 432,
+          "max_zoom_windows": 1,
+          "max_zoom_channels": 4000,
+          "zoom_factors": [1, 2, 3]
+        },
+        "pss": {
+          "channels_per_coarse_channel": 54,
+          "max_beams": 0,
+          "beam_bandwidth_hz": 118000000.0
+        },
+        "pst": {
+          "channels_per_coarse_channel": 216,
+          "max_beams": 1
+        },
+        "vlbi": {
+          "max_beams": 0
+        }
+      },
+      "receptors": {
+        "number_stations": 68,
+        "max_baseline_km": 40.0,
+        "receptor_ids": [315, 316, 317, "..."]
+      }
+    }
+
+.. _example-mid-aa2:
+
+Example: Mid AA2
+^^^^^^^^^^^^^^^^^
+
+``mid`` above, as JSON, with long lists shortened. Its
+``allowed_channel_width_values_hz`` is worked out from the zoom and averaging
+factors, not stored:
+
+.. code-block:: json
+
+    {
+      "telescope": "ska_mid",
+      "array_assembly": "AA2",
+      "policy": null,
+      "frequency_bands": [
+        {
+          "max_frequency_hz": 1050000000.0,
+          "min_frequency_hz": 350000000.0,
+          "rx_id": "Band_1",
+          "band5b_subbands": null
+        },
+        "..."
+      ],
+      "elevation_limits": {
+        "min_elevation_deg": 15.0,
+        "max_elevation_deg": 85.0
+      },
+      "cbf": {
+        "frequency_slice_bandwidth_hz": 198180864,
+        "fine_channel_width_hz": 13440,
+        "number_fsps": 26,
+        "function_modes": ["correlation", "pst", "pss"],
+        "max_channels": null
+      },
+      "available_bandwidth_hz": 800000000.0,
+      "observing_modes": {
+        "continuum": {
+          "channel_averaging_factors": [1, 2, 3, 4, 6, 8, 12, 16, 24, 31, 32, 48]
+        },
+        "spectral": {
+          "max_zoom_windows": 16,
+          "max_zoom_channels": 14880,
+          "zoom_factors": [1, 2, 3, 4, 5, 6]
+        },
+        "pss": {
+          "max_beams": 384,
+          "beam_bandwidth_hz": 800000000.0
+        },
+        "pst": {
+          "max_beams": 6
+        }
+      },
+      "receivers": ["Band_1", "Band_2", "Band_5a", "Band_5b"],
+      "receptors": {
+        "number_ska_dishes": 64,
+        "number_meerkat_dishes": 4,
+        "number_meerkatplus_dishes": 0,
+        "max_baseline_km": 110.0,
+        "receptor_ids": ["SKA001", "SKA008", "SKA013", "..."]
+      },
+      "allowed_channel_width_values_hz": [210, 420, 840, "..."]
+    }
 
 
 Joins
