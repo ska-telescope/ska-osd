@@ -61,6 +61,13 @@ class MidFrequencyBand(FrequencyBand):
         )
 
 
+class MidBasicCBF(OSDBaseModel):
+    """What Mid's correlator-beamformer (CBF) is designed to provide.
+    tmdata: ``basic_capabilities.cbf``."""
+
+    frequency_slice_bandwidth_hz: int = Field(gt=0, examples=[198180864])
+
+
 class MidBasicCapabilities(OSDBaseModel):
     """Mid's receiver bands, elevation limits and the bandwidth of the
     frequency slices its FSPs each process. tmdata: ``basic_capabilities``."""
@@ -68,7 +75,7 @@ class MidBasicCapabilities(OSDBaseModel):
     telescope: Literal[Telescope.SKA_MID]
     frequency_bands: list[MidFrequencyBand]
     elevation_limits: ElevationLimits
-    frequency_slice_bandwidth_hz: int = Field(gt=0, examples=[198180864])
+    cbf: MidBasicCBF
 
     def get_frequency_band(self, rx_id: str) -> MidFrequencyBand:
         """Look up one receiver band by its ID.
@@ -112,6 +119,20 @@ class MidArrayAssemblyObservingModes(OSDBaseModel):
     spectral: MidArrayAssemblySpectralMode
     pss: MidArrayAssemblyPSSMode
     pst: MidArrayAssemblyPSTMode
+
+
+class MidArrayAssemblyCBF(OSDBaseModel):
+    """What a Mid array assembly's correlator-beamformer (CBF) offers."""
+
+    number_fsps: int = Field(ge=0, examples=[26])
+
+
+class MidCBF(OSDBaseModel):
+    """Mid's correlator-beamformer (CBF): the bandwidth of each frequency
+    slice, and how many frequency slice processors (FSPs) process them."""
+
+    frequency_slice_bandwidth_hz: int = Field(gt=0, examples=[198180864])
+    number_fsps: int = Field(ge=0, examples=[26])
 
 
 class MidArrayAssemblyReceptors(OSDBaseModel):
@@ -173,9 +194,8 @@ class MidCapabilities(OSDBaseModel):
     policy: str | None = Field(default=None, examples=["AA2_SV"])
     frequency_bands: list[MidFrequencyBand]
     elevation_limits: ElevationLimits
-    frequency_slice_bandwidth_hz: int = Field(gt=0)
+    cbf: MidCBF
     available_bandwidth_hz: float = Field(gt=0)
-    number_fsps: int = Field(ge=0)
     observing_modes: MidObservingModes
     allowed_channel_width_values_hz: list[int]
     allowed_channel_count_range_min: list[int]
@@ -322,6 +342,12 @@ class LowArrayAssemblySubarrayBeams(OSDBaseModel):
     max_substations_per_subarray_beam: int = Field(ge=0, examples=[720])
 
 
+class LowArrayAssemblyCBF(OSDBaseModel):
+    """What a Low array assembly's correlator-beamformer (CBF) offers."""
+
+    number_fsps: int = Field(ge=0, examples=[10])
+
+
 class LowArrayAssemblySPS(OSDBaseModel):
     """What a Low array assembly's station signal processing (SPS) offers."""
 
@@ -415,7 +441,7 @@ class LowCapabilities(OSDBaseModel):
     elevation_limits: ElevationLimits
     sps: LowSPS
     available_bandwidth_hz: float = Field(gt=0)
-    number_fsps: int = Field(ge=0)
+    cbf: LowArrayAssemblyCBF
     cbf_modes: list[LowCBFMode]
     observing_modes: LowObservingModes
     receptors: LowArrayAssemblyReceptors

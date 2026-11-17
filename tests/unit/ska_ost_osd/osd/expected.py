@@ -20,6 +20,7 @@ from ska_ost_osd.osd.models.capabilities import (
     Band5bSubband,
     CoarseChannels,
     FrequencyBand,
+    LowArrayAssemblyCBF,
     LowArrayAssemblyReceptors,
     LowArrayAssemblySubarrayBeams,
     LowBasicCapabilities,
@@ -40,7 +41,9 @@ from ska_ost_osd.osd.models.capabilities import (
     LowVLBIMode,
     MidArrayAssemblyReceptors,
     MidBasicCapabilities,
+    MidBasicCBF,
     MidCapabilities,
+    MidCBF,
     MidCBFMode,
     MidFrequencyBand,
     MidObservingModes,
@@ -274,7 +277,7 @@ MID_BASIC_CAPABILITIES = MidBasicCapabilities(
         ),
     ],
     elevation_limits=ElevationLimits(min_elevation_deg=15.0, max_elevation_deg=90.0),
-    frequency_slice_bandwidth_hz=198_180_864,
+    cbf=MidBasicCBF(frequency_slice_bandwidth_hz=198_180_864),
 )
 
 # The capabilities of tests/tmdata/telescopes/ska_mid/array_assemblies/AA1.json
@@ -284,9 +287,11 @@ MID_AA1 = MidCapabilities(
     array_assembly="AA1",
     frequency_bands=MID_BASIC_CAPABILITIES.frequency_bands,
     elevation_limits=MID_BASIC_CAPABILITIES.elevation_limits,
-    frequency_slice_bandwidth_hz=MID_BASIC_CAPABILITIES.frequency_slice_bandwidth_hz,
+    cbf=MidCBF(
+        frequency_slice_bandwidth_hz=MID_BASIC_CAPABILITIES.cbf.frequency_slice_bandwidth_hz,
+        number_fsps=4,
+    ),
     available_bandwidth_hz=800_000_000,
-    number_fsps=4,
     observing_modes=MidObservingModes(
         spectral=MidSpectralMode(max_zoom_windows=0, max_zoom_channels=0),
         pss=MidPSSMode(max_beams=0, beam_bandwidth_hz=400_000_000),
@@ -311,9 +316,11 @@ MID_AA2 = MidCapabilities(
     array_assembly="AA2",
     frequency_bands=MID_BASIC_CAPABILITIES.frequency_bands,
     elevation_limits=MID_BASIC_CAPABILITIES.elevation_limits,
-    frequency_slice_bandwidth_hz=MID_BASIC_CAPABILITIES.frequency_slice_bandwidth_hz,
+    cbf=MidCBF(
+        frequency_slice_bandwidth_hz=MID_BASIC_CAPABILITIES.cbf.frequency_slice_bandwidth_hz,
+        number_fsps=8,
+    ),
     available_bandwidth_hz=800_000_000,
-    number_fsps=8,
     observing_modes=MidObservingModes(
         spectral=MidSpectralMode(max_zoom_windows=0, max_zoom_channels=0),
         pss=MidPSSMode(max_beams=0, beam_bandwidth_hz=400_000_000),
@@ -349,11 +356,11 @@ MID_ARRAY_ASSEMBLY_FILES = {
     capabilities.array_assembly: MidArrayAssemblyFile(
         **capabilities.model_dump(
             exclude={
-                "telescope",
-                "policy",
-                "frequency_bands",
-                "elevation_limits",
-                "frequency_slice_bandwidth_hz",
+                "telescope": True,
+                "policy": True,
+                "frequency_bands": True,
+                "elevation_limits": True,
+                "cbf": {"frequency_slice_bandwidth_hz"},
             }
         ),
     )
@@ -410,7 +417,7 @@ LOW_AA1 = LowCapabilities(
     ),
     available_bandwidth_hz=75_000_000.0,
     cbf_modes=[LowCBFMode.VIS, LowCBFMode.PST],
-    number_fsps=6,
+    cbf=LowArrayAssemblyCBF(number_fsps=6),
     observing_modes=LowObservingModes(
         continuum=LowContinuumMode(channels_per_coarse_channel=144),
         spectral=LowSpectralMode(
@@ -445,7 +452,7 @@ LOW_AA2 = LowCapabilities(
     ),
     available_bandwidth_hz=75_000_000.0,
     cbf_modes=[LowCBFMode.VIS, LowCBFMode.PST],
-    number_fsps=6,
+    cbf=LowArrayAssemblyCBF(number_fsps=6),
     observing_modes=LowObservingModes(
         continuum=LowContinuumMode(channels_per_coarse_channel=144),
         spectral=LowSpectralMode(

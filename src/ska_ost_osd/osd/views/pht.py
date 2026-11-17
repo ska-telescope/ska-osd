@@ -15,11 +15,13 @@ from pydantic import (
 
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
+    LowArrayAssemblyCBF,
     LowArrayAssemblyObservingModes,
     LowArrayAssemblyReceptors,
     LowArrayAssemblySPS,
     LowCapabilities,
     LowCBFMode,
+    MidArrayAssemblyCBF,
     MidArrayAssemblyObservingModes,
     MidArrayAssemblyReceptors,
     MidCapabilities,
@@ -110,7 +112,7 @@ class MidOfferedCapabilities(OSDBaseModel):
 
     name: str
     available_bandwidth_hz: float
-    number_fsps: int
+    cbf: MidArrayAssemblyCBF
     telescope: Literal[Telescope.SKA_MID] = Telescope.SKA_MID
     observing_modes: MidArrayAssemblyObservingModes
     allowed_channel_width_values_hz: list[int]
@@ -127,7 +129,7 @@ class LowOfferedCapabilities(OSDBaseModel):
 
     name: str
     available_bandwidth_hz: float
-    number_fsps: int
+    cbf: LowArrayAssemblyCBF
     telescope: Literal[Telescope.SKA_LOW] = Telescope.SKA_LOW
     sps: LowArrayAssemblySPS
     cbf_modes: list[LowCBFMode]
@@ -157,6 +159,8 @@ class CycleCapabilitiesBase(ConfigurationModel):
         names = [key for key in data if key != "basic_capabilities"]
         if len(names) == 1:
             capabilities = dict(data.pop(names[0]))
+            if "number_fsps" in capabilities:
+                capabilities["cbf"] = {"number_fsps": capabilities.pop("number_fsps")}
             if "subarray_templates" in capabilities:
                 data["subarray_templates"] = capabilities.pop("subarray_templates")
             if "number_pss_beams" in capabilities:
@@ -214,6 +218,7 @@ class CycleCapabilitiesBase(ConfigurationModel):
     ) -> dict[str, Any]:
         data = handler(self)
         capabilities = data.pop("capabilities")
+        capabilities["number_fsps"] = capabilities.pop("cbf")["number_fsps"]
         if "receivers" in capabilities:
             capabilities["available_receivers"] = capabilities.pop("receivers")
         # The PHT UI reads Mid's channel widths without the _hz suffix; the

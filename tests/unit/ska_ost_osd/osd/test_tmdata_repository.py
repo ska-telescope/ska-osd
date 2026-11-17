@@ -224,7 +224,7 @@ class TestGetBasicCapabilities:
             "telescope",
             "frequency_bands",
             "elevation_limits",
-            "frequency_slice_bandwidth_hz",
+            "cbf",
         ]
 
     def test_raises_when_file_missing(self, empty_tmdata_repository):

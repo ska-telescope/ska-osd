@@ -104,7 +104,7 @@ class TestBreakingChanges:
             (
                 MidArrayAssemblyFile,
                 MID_ARRAY_ASSEMBLY,
-                lambda data: data.pop("number_fsps"),
+                lambda data: data.pop("cbf"),
             ),
             (
                 LowBasicCapabilitiesFile,

@@ -8,11 +8,13 @@ from pydantic import Field, model_validator
 
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
+    LowArrayAssemblyCBF,
     LowArrayAssemblyObservingModes,
     LowArrayAssemblyReceptors,
     LowArrayAssemblySPS,
     LowBasicCapabilities,
     LowCBFMode,
+    MidArrayAssemblyCBF,
     MidArrayAssemblyObservingModes,
     MidArrayAssemblyReceptors,
     MidBasicCapabilities,
@@ -39,7 +41,7 @@ class MidArrayAssemblyFile(OSDBaseModel):
 
     array_assembly: str = Field(examples=["AA2"])
     available_bandwidth_hz: float = Field(gt=0)
-    number_fsps: int = Field(ge=0)
+    cbf: MidArrayAssemblyCBF
     observing_modes: MidArrayAssemblyObservingModes
     allowed_channel_width_values_hz: list[int]
     allowed_channel_count_range_min: list[int]
@@ -69,7 +71,7 @@ class LowArrayAssemblyFile(OSDBaseModel):
 
     array_assembly: str = Field(examples=["AA2"])
     available_bandwidth_hz: float = Field(gt=0)
-    number_fsps: int = Field(ge=0)
+    cbf: LowArrayAssemblyCBF
     sps: LowArrayAssemblySPS
     cbf_modes: list[LowCBFMode]
     observing_modes: LowArrayAssemblyObservingModes
@@ -89,6 +91,10 @@ class LowArrayAssemblyFile(OSDBaseModel):
                     f"observing_modes.{cbf_mode}.max_beams is above 0"
                 )
         return self
+
+
+class MidPolicyCBF(OSDBaseModel):
+    number_fsps: int | None = Field(default=None, ge=0)
 
 
 class MidPolicySpectralMode(OSDBaseModel):
@@ -127,7 +133,7 @@ class MidPolicyFile(OSDBaseModel):
 
     policy: str = Field(examples=["AA2_SV"])
     available_bandwidth_hz: float | None = Field(default=None, gt=0)
-    number_fsps: int | None = Field(default=None, ge=0)
+    cbf: MidPolicyCBF | None = None
     observing_modes: MidPolicyObservingModes | None = None
     allowed_channel_width_values_hz: list[int] | None = None
     allowed_channel_count_range_min: list[int] | None = None
@@ -135,6 +141,10 @@ class MidPolicyFile(OSDBaseModel):
     receivers: list[str] | None = None
     cbf_modes: list[MidCBFMode] | None = None
     receptors: MidPolicyReceptors | None = None
+
+
+class LowPolicyCBF(OSDBaseModel):
+    number_fsps: int | None = Field(default=None, ge=0)
 
 
 class LowPolicySpectralMode(OSDBaseModel):
@@ -186,7 +196,7 @@ class LowPolicyFile(OSDBaseModel):
 
     policy: str = Field(examples=["AA2_SV"])
     available_bandwidth_hz: float | None = Field(default=None, gt=0)
-    number_fsps: int | None = Field(default=None, ge=0)
+    cbf: LowPolicyCBF | None = None
     sps: LowPolicySPS | None = None
     cbf_modes: list[LowCBFMode] | None = None
     observing_modes: LowPolicyObservingModes | None = None

@@ -24,7 +24,9 @@
       "max_beams": 1
     }
   },
-  "number_fsps": 8,
+  "cbf": {
+    "number_fsps": 8
+  },
   "allowed_channel_width_values_hz": [
     13440
   ],

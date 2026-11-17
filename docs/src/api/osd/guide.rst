@@ -76,13 +76,15 @@ don't matter:
      - ``telescope``
      - what is fixed for the telescope: Mid's receiver bands
        (``frequency_bands``) or Low's one ``frequency_band``, the
-       ``elevation_limits``, for Mid the ``frequency_slice_bandwidth_hz``
-       each FSP processes, and for Low, in ``sps``, its ``coarse_channels``
+       ``elevation_limits``, for Mid, in ``cbf``, the
+       ``frequency_slice_bandwidth_hz`` each FSP processes, and for Low, in
+       ``sps``, its ``coarse_channels``
        and, in ``observing_modes``, how each observing mode divides them
    * - ``array_assemblies/*.json``
      - ``array_assembly``
      - what one array assembly offers, such as ``AA2``: its receptors,
-       bandwidth, CBF modes, for Low its subarray beams in ``sps``, and, in
+       bandwidth, CBF modes, its ``number_fsps`` in ``cbf``, for Low its
+       subarray beams in ``sps``, and, in
        ``observing_modes``, each observing mode's beams and zoom windows
    * - ``policies/*.json``
      - ``policy``
@@ -134,6 +136,11 @@ Low's ``sps`` group, in both, describes its stations' signal processing
 beams they form. MCCS configures it: in a scheduling block, the subarray beams
 are in the ``mccs_allocation``, and the spectral windows the coarse channels
 carry are in the ``csp_configuration``.
+
+The ``cbf`` group, in both, describes the correlator-beamformer (CBF): for
+Mid, the bandwidth of each frequency slice, and for each array assembly, how
+many frequency slice processors (FSPs) it has. In a scheduling block, it limits
+the ``csp_configuration``'s ``midcbf`` or ``lowcbf``.
 
 Policies
     The rules Science Operations sets for what can be used of an array assembly
