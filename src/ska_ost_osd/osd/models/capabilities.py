@@ -1,7 +1,7 @@
 from enum import StrEnum
 from typing import Annotated, Any, Literal, Self
 
-from pydantic import AliasChoices, Field, model_validator
+from pydantic import AliasChoices, Field, computed_field, model_validator
 
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.exceptions import (
@@ -93,12 +93,23 @@ class MidBasicCapabilities(OSDBaseModel):
         )
 
 
+class MidArrayAssemblyContinuumMode(OSDBaseModel):
+    """What a Mid array assembly offers for continuum observations: the
+    factors it can average its unzoomed fine channels by."""
+
+    channel_averaging_factors: list[Annotated[int, Field(ge=1)]] = Field(
+        examples=[[1, 2, 3, 4]]
+    )
+
+
 class MidArrayAssemblySpectralMode(OSDBaseModel):
     """The zoom windows a Mid array assembly offers for spectral line
-    observations. ``max_zoom_channels`` is the most channels in one window."""
+    observations. ``max_zoom_channels`` is the most channels in one window,
+    and zoom factor *z* divides the fine channel width by 2**z."""
 
     max_zoom_windows: int = Field(ge=0, examples=[16])
     max_zoom_channels: int = Field(ge=0, examples=[14880])
+    zoom_factors: list[int] = Field(examples=[[1, 2, 3, 4, 5, 6]])
 
 
 class MidArrayAssemblyPSSMode(OSDBaseModel):
@@ -117,6 +128,7 @@ class MidArrayAssemblyPSTMode(OSDBaseModel):
 class MidArrayAssemblyObservingModes(OSDBaseModel):
     """What a Mid array assembly offers in each observing mode."""
 
+    continuum: MidArrayAssemblyContinuumMode
     spectral: MidArrayAssemblySpectralMode
     pss: MidArrayAssemblyPSSMode
     pst: MidArrayAssemblyPSTMode
@@ -162,12 +174,23 @@ class MidArrayAssemblyReceptors(OSDBaseModel):
         return self
 
 
+class MidContinuumMode(OSDBaseModel):
+    """What Mid offers for continuum observations: the factors it can average
+    its unzoomed fine channels by."""
+
+    channel_averaging_factors: list[Annotated[int, Field(ge=1)]] = Field(
+        examples=[[1, 2, 3, 4]]
+    )
+
+
 class MidSpectralMode(OSDBaseModel):
     """What Mid offers for spectral line observations: its zoom windows.
-    ``max_zoom_channels`` is the most channels in one window."""
+    ``max_zoom_channels`` is the most channels in one window, and zoom factor
+    *z* divides the fine channel width by 2**z."""
 
     max_zoom_windows: int = Field(ge=0, examples=[16])
     max_zoom_channels: int = Field(ge=0, examples=[14880])
+    zoom_factors: list[int] = Field(examples=[[1, 2, 3, 4, 5, 6]])
 
 
 class MidPSSMode(OSDBaseModel):
@@ -186,9 +209,30 @@ class MidPSTMode(OSDBaseModel):
 class MidObservingModes(OSDBaseModel):
     """What Mid offers in each observing mode."""
 
+    continuum: MidContinuumMode
     spectral: MidSpectralMode
     pss: MidPSSMode
     pst: MidPSTMode
+
+
+def mid_channel_width_values_hz(
+    fine_channel_width_hz: int,
+    zoom_factors: list[int],
+    channel_averaging_factors: list[int],
+) -> list[int]:
+    """The channel widths a Mid spectral window can have, in ascending order.
+
+    :param fine_channel_width_hz: the width of Mid's unzoomed fine channels.
+    :param zoom_factors: the zoom factors offered; zoom factor *z* divides the
+        fine channel width by 2**z.
+    :param channel_averaging_factors: the factors the unzoomed fine channels
+        can be averaged by.
+    :return: the widths, each once.
+    """
+    return sorted(
+        {fine_channel_width_hz // 2**zoom for zoom in zoom_factors}
+        | {fine_channel_width_hz * factor for factor in channel_averaging_factors}
+    )
 
 
 class MidCapabilities(OSDBaseModel):
@@ -203,11 +247,23 @@ class MidCapabilities(OSDBaseModel):
     cbf: MidCBF
     available_bandwidth_hz: float = Field(gt=0)
     observing_modes: MidObservingModes
-    allowed_channel_width_values_hz: list[int]
     allowed_channel_count_range_min: list[int]
     allowed_channel_count_range_max: list[int]
     receivers: list[str] = Field(examples=[["Band_1", "Band_2"]])
     receptors: MidArrayAssemblyReceptors
+
+    @computed_field
+    @property
+    def allowed_channel_width_values_hz(self) -> list[int]:
+        """Every channel width a spectral window can have, in ascending
+        order: the fine channel width divided by 2**z for each zoom factor,
+        or multiplied by each averaging factor. Averaging only applies to
+        unzoomed channels."""
+        return mid_channel_width_values_hz(
+            self.cbf.fine_channel_width_hz,
+            self.observing_modes.spectral.zoom_factors,
+            self.observing_modes.continuum.channel_averaging_factors,
+        )
 
     @model_validator(mode="after")
     def check_function_modes(self) -> Self:

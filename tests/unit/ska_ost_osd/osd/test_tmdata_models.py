@@ -37,6 +37,7 @@ from ska_ost_osd.osd.models.capabilities import (
     LowCapabilities,
     MidCapabilities,
     MidFrequencyBand,
+    mid_channel_width_values_hz,
 )
 from ska_ost_osd.osd.models.constraints import Constraints
 from tests.unit.ska_ost_osd.osd.expected import (
@@ -329,6 +330,49 @@ class TestMidBasicCapabilities:
             match=r"Sub-band 1 is invalid for Band_1\. Valid sub-bands are none\.",
         ):
             band.get_band5b_subband(1)
+
+
+class TestMidChannelWidths:
+    @pytest.mark.parametrize(
+        "zoom_factors, channel_averaging_factors, expected",
+        [
+            ([], [1], [13440]),
+            (
+                [1, 2, 3, 4, 5, 6],
+                [1, 2, 3, 4, 6, 8, 12, 16, 24, 31, 32, 48],
+                [
+                    210,
+                    420,
+                    840,
+                    1680,
+                    3360,
+                    6720,
+                    13440,
+                    26880,
+                    40320,
+                    53760,
+                    80640,
+                    107520,
+                    161280,
+                    215040,
+                    322560,
+                    416640,
+                    430080,
+                    645120,
+                ],
+            ),
+        ],
+        ids=["unzoomed only", "Mid AA2"],
+    )
+    def test_widths_from_zoom_and_averaging_factors(
+        self, zoom_factors, channel_averaging_factors, expected
+    ):
+        """Mid AA2's are the widths its file listed before the factors
+        replaced them."""
+        assert (
+            mid_channel_width_values_hz(13440, zoom_factors, channel_averaging_factors)
+            == expected
+        )
 
 
 class TestDefaults:

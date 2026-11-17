@@ -25,7 +25,7 @@ from .common.constant import (
     Telescope,
     osd_file_mapping,
 )
-from .models.capabilities import merge_capabilities
+from .models.capabilities import merge_capabilities, mid_channel_width_values_hz
 from .models.cycles import PolicyType
 
 LOGGER = logging.getLogger(__name__)
@@ -293,7 +293,7 @@ class OSD:
         return {
             "basic_capabilities": basic_capabilities,
             **{
-                name: self._legacy_capabilities(telescope_dir, capabilities)
+                name: self._legacy_capabilities(telescope_dir, stored, capabilities)
                 for name, capabilities in self._stored_capabilities(
                     telescope_dir
                 ).items()
@@ -333,14 +333,29 @@ class OSD:
         return dict(sorted((array_assemblies | policies).items()))
 
     def _legacy_capabilities(
-        self, telescope_dir: str, capabilities: dict[str, Any]
+        self,
+        telescope_dir: str,
+        basic_capabilities: dict[str, Any],
+        capabilities: dict[str, Any],
     ) -> dict[str, Any]:
         """Capabilities in their legacy shape: the array assembly as a template
         pattern, or as that array assembly's templates when they are processed."""
+        telescope = Telescope(posixpath.basename(telescope_dir))
         capabilities = dict(capabilities)
         cbf = capabilities.pop("cbf")
         capabilities["number_fsps"] = cbf["number_fsps"]
         capabilities["cbf_modes"] = cbf["function_modes"]
+        # Mid's zoom and averaging factors are served as one list of channel
+        # widths
+        if telescope == Telescope.SKA_MID:
+            modes = capabilities["observing_modes"]
+            capabilities["allowed_channel_width_values_hz"] = (
+                mid_channel_width_values_hz(
+                    basic_capabilities["cbf"]["fine_channel_width_hz"],
+                    modes["spectral"]["zoom_factors"],
+                    modes["continuum"]["channel_averaging_factors"],
+                )
+            )
         # The legacy response serves the receptors flat, with their IDs as
         # number_station_ids (Low) or number_dish_ids (Mid)
         receptors = capabilities.pop("receptors")
@@ -368,7 +383,7 @@ class OSD:
         modes = capabilities.pop("observing_modes")
         capabilities["number_zoom_windows"] = modes["spectral"]["max_zoom_windows"]
         capabilities["number_zoom_channels"] = modes["spectral"]["max_zoom_channels"]
-        if "zoom_factors" in modes["spectral"]:
+        if telescope == Telescope.SKA_LOW and "zoom_factors" in modes["spectral"]:
             capabilities["allowed_zoom_factors"] = modes["spectral"]["zoom_factors"]
         capabilities["number_pss_beams"] = modes["pss"]["max_beams"]
         capabilities["ps_beam_bandwidth_hz"] = modes["pss"]["beam_bandwidth_hz"]

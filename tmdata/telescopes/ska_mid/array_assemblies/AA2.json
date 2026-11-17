@@ -8,9 +8,33 @@
     "Band_5b"
   ],
   "observing_modes": {
+    "continuum": {
+      "channel_averaging_factors": [
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16,
+        24,
+        31,
+        32,
+        48
+      ]
+    },
     "spectral": {
       "max_zoom_windows": 16,
-      "max_zoom_channels": 14880
+      "max_zoom_channels": 14880,
+      "zoom_factors": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
     },
     "pss": {
       "max_beams": 384,
@@ -28,26 +52,6 @@
       "pss"
     ]
   },
-  "allowed_channel_width_values_hz": [
-    210,
-    420,
-    840,
-    1680,
-    3360,
-    6720,
-    13440,
-    26880,
-    40320,
-    53760,
-    80640,
-    107520,
-    161280,
-    215040,
-    322560,
-    416640,
-    430080,
-    645120
-  ],
   "allowed_channel_count_range_min": [
     1
   ],

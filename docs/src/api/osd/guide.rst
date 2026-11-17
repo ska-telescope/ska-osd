@@ -86,7 +86,8 @@ don't matter:
      - what one array assembly offers, such as ``AA2``: its receptors,
        bandwidth, its FSPs and CBF function modes in ``cbf``, for Low its
        subarray beams in ``sps``, and, in
-       ``observing_modes``, each observing mode's beams and zoom windows
+       ``observing_modes``, each observing mode's beams and zoom windows and,
+       for Mid, its zoom and channel averaging factors
    * - ``policies/*.json``
      - ``policy``
      - the rules a cycle applies to an array assembly, such as ``AA2_SV``:
@@ -167,7 +168,8 @@ provides them, or by observing mode:
 
 ``observing_modes``
     What each observing mode offers, whichever part of the telescope provides
-    it: channels, zoom windows and beams.
+    it: channels, zoom windows, Mid's zoom and channel averaging factors, and
+    beams.
 
 A cycle pairs each telescope's array assembly with the policy offered for each
 policy type. Low AA2 Science Verification, for example, is the ``AA2`` array

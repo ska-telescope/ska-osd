@@ -42,9 +42,12 @@ Unreleased
   names what it describes in its ``array_assembly`` or ``policy``. Each observing
   mode's limits are under ``observing_modes``, the stations or dishes under
   ``receptors``, the frequency slice processors and function modes under
-  ``cbf``, the correlator-beamformer, and Low's coarse channels and subarray beams under
-  ``sps``, its stations' signal processing. Low's ``AA2_SV`` is now a policy on
-  ``AA2``. The legacy files are kept but no longer read
+  ``cbf``, the correlator-beamformer, and Low's coarse channels and subarray beams
+  under ``sps``, its stations' signal processing. Mid's channel widths are stored
+  as zoom factors (``observing_modes.spectral.zoom_factors``) and channel averaging
+  factors (``observing_modes.continuum.channel_averaging_factors``), from which
+  ``allowed_channel_width_values_hz`` is worked out. Low's ``AA2_SV`` is now a
+  policy on ``AA2``. The legacy files are kept but no longer read
 * Added Mid's ``cbf.frequency_slice_bandwidth_hz`` and ``cbf.fine_channel_width_hz``
   to its basic capabilities: the bandwidth of the frequency slice each FSP
   processes, and the width of the fine channels it divides a slice into

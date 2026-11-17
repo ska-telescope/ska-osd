@@ -45,6 +45,7 @@ from ska_ost_osd.osd.models.capabilities import (
     MidCapabilities,
     MidCBF,
     MidCBFMode,
+    MidContinuumMode,
     MidFrequencyBand,
     MidObservingModes,
     MidPSSMode,
@@ -297,11 +298,13 @@ MID_AA1 = MidCapabilities(
     ),
     available_bandwidth_hz=800_000_000,
     observing_modes=MidObservingModes(
-        spectral=MidSpectralMode(max_zoom_windows=0, max_zoom_channels=0),
+        continuum=MidContinuumMode(channel_averaging_factors=[1]),
+        spectral=MidSpectralMode(
+            max_zoom_windows=0, max_zoom_channels=0, zoom_factors=[]
+        ),
         pss=MidPSSMode(max_beams=0, beam_bandwidth_hz=400_000_000),
         pst=MidPSTMode(max_beams=1),
     ),
-    allowed_channel_width_values_hz=[13440],
     allowed_channel_count_range_min=[1],
     allowed_channel_count_range_max=[58982],
     receivers=["Band_1", "Band_2", "Band_5b"],
@@ -327,11 +330,13 @@ MID_AA2 = MidCapabilities(
     ),
     available_bandwidth_hz=800_000_000,
     observing_modes=MidObservingModes(
-        spectral=MidSpectralMode(max_zoom_windows=0, max_zoom_channels=0),
+        continuum=MidContinuumMode(channel_averaging_factors=[1]),
+        spectral=MidSpectralMode(
+            max_zoom_windows=0, max_zoom_channels=0, zoom_factors=[]
+        ),
         pss=MidPSSMode(max_beams=0, beam_bandwidth_hz=400_000_000),
         pst=MidPSTMode(max_beams=1),
     ),
-    allowed_channel_width_values_hz=[13440],
     allowed_channel_count_range_min=[1],
     allowed_channel_count_range_max=[58982],
     receivers=["Band_1", "Band_2", "Band_5a", "Band_5b"],

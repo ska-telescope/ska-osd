@@ -21,10 +21,11 @@ from ska_ost_osd.osd.models.capabilities import (
     LowArrayAssemblySPS,
     LowCapabilities,
     MidArrayAssemblyCBF,
-    MidArrayAssemblyObservingModes,
     MidArrayAssemblyReceptors,
     MidCapabilities,
     MidFrequencyBand,
+    MidPSSMode,
+    MidPSTMode,
 )
 from ska_ost_osd.osd.models.cycles import Cycle, PolicyType
 from ska_ost_osd.osd.models.defaults import OSDBaseModel
@@ -104,6 +105,22 @@ class CycleSubarrayTemplate(ConfigurationModel):
     description: str
 
 
+class MidOfferedSpectralMode(OSDBaseModel):
+    """Mid's zoom windows, as the PHT view serves them: its zoom factors are
+    served as channel widths, in ``allowed_channel_width_values_hz``."""
+
+    max_zoom_windows: int
+    max_zoom_channels: int
+
+
+class MidOfferedObservingModes(OSDBaseModel):
+    """Mid's observing modes, as the PHT view serves them."""
+
+    spectral: MidOfferedSpectralMode
+    pss: MidPSSMode
+    pst: MidPSTMode
+
+
 class MidOfferedCapabilities(OSDBaseModel):
     """What the PHT view serves of Mid's capabilities in a cycle: all but the
     basic capabilities, which it serves beside them."""
@@ -112,7 +129,7 @@ class MidOfferedCapabilities(OSDBaseModel):
     available_bandwidth_hz: float
     cbf: MidArrayAssemblyCBF
     telescope: Literal[Telescope.SKA_MID] = Telescope.SKA_MID
-    observing_modes: MidArrayAssemblyObservingModes
+    observing_modes: MidOfferedObservingModes
     allowed_channel_width_values_hz: list[int]
     allowed_channel_count_range_min: list[int]
     allowed_channel_count_range_max: list[int]

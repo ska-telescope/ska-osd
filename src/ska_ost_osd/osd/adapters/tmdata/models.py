@@ -2,7 +2,7 @@
 whole. ``storage`` reads the files into these, and ``TMDataRepository`` maps
 them to the reader models."""
 
-from typing import Self
+from typing import Annotated, Self
 
 from pydantic import Field, model_validator
 
@@ -43,7 +43,6 @@ class MidArrayAssemblyFile(OSDBaseModel):
     available_bandwidth_hz: float = Field(gt=0)
     cbf: MidArrayAssemblyCBF
     observing_modes: MidArrayAssemblyObservingModes
-    allowed_channel_width_values_hz: list[int]
     allowed_channel_count_range_min: list[int]
     allowed_channel_count_range_max: list[int]
     receivers: list[str]
@@ -96,9 +95,14 @@ class MidPolicyCBF(OSDBaseModel):
     function_modes: list[MidCBFMode] | None = None
 
 
+class MidPolicyContinuumMode(OSDBaseModel):
+    channel_averaging_factors: list[Annotated[int, Field(ge=1)]] | None = None
+
+
 class MidPolicySpectralMode(OSDBaseModel):
     max_zoom_windows: int | None = Field(default=None, ge=0)
     max_zoom_channels: int | None = Field(default=None, ge=0)
+    zoom_factors: list[int] | None = None
 
 
 class MidPolicyPSSMode(OSDBaseModel):
@@ -111,6 +115,7 @@ class MidPolicyPSTMode(OSDBaseModel):
 
 
 class MidPolicyObservingModes(OSDBaseModel):
+    continuum: MidPolicyContinuumMode | None = None
     spectral: MidPolicySpectralMode | None = None
     pss: MidPolicyPSSMode | None = None
     pst: MidPolicyPSTMode | None = None
@@ -134,7 +139,6 @@ class MidPolicyFile(OSDBaseModel):
     available_bandwidth_hz: float | None = Field(default=None, gt=0)
     cbf: MidPolicyCBF | None = None
     observing_modes: MidPolicyObservingModes | None = None
-    allowed_channel_width_values_hz: list[int] | None = None
     allowed_channel_count_range_min: list[int] | None = None
     allowed_channel_count_range_max: list[int] | None = None
     receivers: list[str] | None = None

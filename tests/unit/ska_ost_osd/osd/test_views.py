@@ -174,7 +174,9 @@ class TestGetCycleConfiguration:
         assert (
             mid["AA2"]["allowed_channel_width_values"]
             == mid["AA2"]["allowed_channel_width_values_hz"]
+            == [13440]
         )
+        assert "allowed_zoom_factors" not in mid["AA2"]
         if include_subarray_templates:
             assert "SKA_MID_FULL_AA2" in mid["AA2"]["subarray_templates"]
         else:
