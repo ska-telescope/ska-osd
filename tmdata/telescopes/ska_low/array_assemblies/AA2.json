@@ -1,11 +1,6 @@
 {
   "array_assembly": "AA2",
   "available_bandwidth_hz": 150000000.0,
-  "cbf_modes": [
-    "vis",
-    "pst",
-    "pss"
-  ],
   "observing_modes": {
     "spectral": {
       "max_zoom_windows": 16,
@@ -35,7 +30,12 @@
     }
   },
   "cbf": {
-    "number_fsps": 10
+    "number_fsps": 10,
+    "function_modes": [
+      "vis",
+      "pst",
+      "pss"
+    ]
   },
   "receptors": {
     "number_stations": 68,

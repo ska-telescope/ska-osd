@@ -47,18 +47,17 @@ class MidArrayAssemblyFile(OSDBaseModel):
     allowed_channel_count_range_min: list[int]
     allowed_channel_count_range_max: list[int]
     receivers: list[str]
-    cbf_modes: list[MidCBFMode]
     receptors: MidArrayAssemblyReceptors
 
     @model_validator(mode="after")
-    def check_cbf_modes(self) -> Self:
+    def check_function_modes(self) -> Self:
         for cbf_mode, mode in (
             (MidCBFMode.PSS, self.observing_modes.pss),
             (MidCBFMode.PST, self.observing_modes.pst),
         ):
-            if (cbf_mode in self.cbf_modes) != (mode.max_beams > 0):
+            if (cbf_mode in self.cbf.function_modes) != (mode.max_beams > 0):
                 raise ValueError(
-                    f"cbf_modes must list {cbf_mode} exactly when "
+                    f"cbf.function_modes must list {cbf_mode} exactly when "
                     f"observing_modes.{cbf_mode}.max_beams is above 0"
                 )
         return self
@@ -73,21 +72,20 @@ class LowArrayAssemblyFile(OSDBaseModel):
     available_bandwidth_hz: float = Field(gt=0)
     cbf: LowArrayAssemblyCBF
     sps: LowArrayAssemblySPS
-    cbf_modes: list[LowCBFMode]
     observing_modes: LowArrayAssemblyObservingModes
     receptors: LowArrayAssemblyReceptors
 
     @model_validator(mode="after")
-    def check_cbf_modes(self) -> Self:
+    def check_function_modes(self) -> Self:
         # vis isn't checked against observing_modes.spectral: some array assemblies list
         # vis but offer no zoom windows
         for cbf_mode, mode in (
             (LowCBFMode.PSS, self.observing_modes.pss),
             (LowCBFMode.PST, self.observing_modes.pst),
         ):
-            if (cbf_mode in self.cbf_modes) != (mode.max_beams > 0):
+            if (cbf_mode in self.cbf.function_modes) != (mode.max_beams > 0):
                 raise ValueError(
-                    f"cbf_modes must list {cbf_mode} exactly when "
+                    f"cbf.function_modes must list {cbf_mode} exactly when "
                     f"observing_modes.{cbf_mode}.max_beams is above 0"
                 )
         return self
@@ -95,6 +93,7 @@ class LowArrayAssemblyFile(OSDBaseModel):
 
 class MidPolicyCBF(OSDBaseModel):
     number_fsps: int | None = Field(default=None, ge=0)
+    function_modes: list[MidCBFMode] | None = None
 
 
 class MidPolicySpectralMode(OSDBaseModel):
@@ -139,12 +138,12 @@ class MidPolicyFile(OSDBaseModel):
     allowed_channel_count_range_min: list[int] | None = None
     allowed_channel_count_range_max: list[int] | None = None
     receivers: list[str] | None = None
-    cbf_modes: list[MidCBFMode] | None = None
     receptors: MidPolicyReceptors | None = None
 
 
 class LowPolicyCBF(OSDBaseModel):
     number_fsps: int | None = Field(default=None, ge=0)
+    function_modes: list[LowCBFMode] | None = None
 
 
 class LowPolicySpectralMode(OSDBaseModel):
@@ -198,7 +197,6 @@ class LowPolicyFile(OSDBaseModel):
     available_bandwidth_hz: float | None = Field(default=None, gt=0)
     cbf: LowPolicyCBF | None = None
     sps: LowPolicySPS | None = None
-    cbf_modes: list[LowCBFMode] | None = None
     observing_modes: LowPolicyObservingModes | None = None
     receptors: LowPolicyReceptors | None = None
 

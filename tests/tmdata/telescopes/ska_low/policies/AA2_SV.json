@@ -1,9 +1,11 @@
 {
   "policy": "AA2_SV",
-  "cbf_modes": [
-    "vis",
-    "pst"
-  ],
+  "cbf": {
+    "function_modes": [
+      "vis",
+      "pst"
+    ]
+  },
   "observing_modes": {
     "spectral": {
       "max_zoom_windows": 1,

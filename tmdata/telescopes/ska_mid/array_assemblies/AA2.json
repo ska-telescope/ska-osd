@@ -7,11 +7,6 @@
     "Band_5a",
     "Band_5b"
   ],
-  "cbf_modes": [
-    "correlation",
-    "pst",
-    "pss"
-  ],
   "observing_modes": {
     "spectral": {
       "max_zoom_windows": 16,
@@ -26,7 +21,12 @@
     }
   },
   "cbf": {
-    "number_fsps": 26
+    "number_fsps": 26,
+    "function_modes": [
+      "correlation",
+      "pst",
+      "pss"
+    ]
   },
   "allowed_channel_width_values_hz": [
     210,

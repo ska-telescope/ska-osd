@@ -1,10 +1,6 @@
 {
   "array_assembly": "Low_ITF",
   "available_bandwidth_hz": 75000000.0,
-  "cbf_modes": [
-    "vis",
-    "pst"
-  ],
   "observing_modes": {
     "spectral": {
       "max_zoom_windows": 0,
@@ -34,7 +30,11 @@
     }
   },
   "cbf": {
-    "number_fsps": 6
+    "number_fsps": 6,
+    "function_modes": [
+      "vis",
+      "pst"
+    ]
   },
   "receptors": {
     "number_stations": 16,

@@ -20,12 +20,10 @@ from ska_ost_osd.osd.models.capabilities import (
     LowArrayAssemblyReceptors,
     LowArrayAssemblySPS,
     LowCapabilities,
-    LowCBFMode,
     MidArrayAssemblyCBF,
     MidArrayAssemblyObservingModes,
     MidArrayAssemblyReceptors,
     MidCapabilities,
-    MidCBFMode,
     MidFrequencyBand,
 )
 from ska_ost_osd.osd.models.cycles import Cycle, PolicyType
@@ -119,7 +117,6 @@ class MidOfferedCapabilities(OSDBaseModel):
     allowed_channel_count_range_min: list[int]
     allowed_channel_count_range_max: list[int]
     receivers: list[str]
-    cbf_modes: list[MidCBFMode]
     receptors: MidArrayAssemblyReceptors
 
 
@@ -132,7 +129,6 @@ class LowOfferedCapabilities(OSDBaseModel):
     cbf: LowArrayAssemblyCBF
     telescope: Literal[Telescope.SKA_LOW] = Telescope.SKA_LOW
     sps: LowArrayAssemblySPS
-    cbf_modes: list[LowCBFMode]
     observing_modes: LowArrayAssemblyObservingModes
     receptors: LowArrayAssemblyReceptors
 
@@ -160,7 +156,10 @@ class CycleCapabilitiesBase(ConfigurationModel):
         if len(names) == 1:
             capabilities = dict(data.pop(names[0]))
             if "number_fsps" in capabilities:
-                capabilities["cbf"] = {"number_fsps": capabilities.pop("number_fsps")}
+                capabilities["cbf"] = {
+                    "number_fsps": capabilities.pop("number_fsps"),
+                    "function_modes": capabilities.pop("cbf_modes"),
+                }
             if "subarray_templates" in capabilities:
                 data["subarray_templates"] = capabilities.pop("subarray_templates")
             if "number_pss_beams" in capabilities:
@@ -218,7 +217,9 @@ class CycleCapabilitiesBase(ConfigurationModel):
     ) -> dict[str, Any]:
         data = handler(self)
         capabilities = data.pop("capabilities")
-        capabilities["number_fsps"] = capabilities.pop("cbf")["number_fsps"]
+        cbf = capabilities.pop("cbf")
+        capabilities["number_fsps"] = cbf["number_fsps"]
+        capabilities["cbf_modes"] = cbf["function_modes"]
         if "receivers" in capabilities:
             capabilities["available_receivers"] = capabilities.pop("receivers")
         # The PHT UI reads Mid's channel widths without the _hz suffix; the

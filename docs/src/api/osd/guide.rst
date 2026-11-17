@@ -83,7 +83,7 @@ don't matter:
    * - ``array_assemblies/*.json``
      - ``array_assembly``
      - what one array assembly offers, such as ``AA2``: its receptors,
-       bandwidth, CBF modes, its ``number_fsps`` in ``cbf``, for Low its
+       bandwidth, its FSPs and CBF function modes in ``cbf``, for Low its
        subarray beams in ``sps``, and, in
        ``observing_modes``, each observing mode's beams and zoom windows
    * - ``policies/*.json``
@@ -131,17 +131,6 @@ Array assemblies
     windows. They follow the construction rollout; each milestone is its own
     array assembly.
 
-Low's ``sps`` group, in both, describes its stations' signal processing
-(SPS): the coarse channels the stations divide the band into, and the subarray
-beams they form. MCCS configures it: in a scheduling block, the subarray beams
-are in the ``mccs_allocation``, and the spectral windows the coarse channels
-carry are in the ``csp_configuration``.
-
-The ``cbf`` group, in both, describes the correlator-beamformer (CBF): for
-Mid, the bandwidth of each frequency slice, and for each array assembly, how
-many frequency slice processors (FSPs) it has. In a scheduling block, it limits
-the ``csp_configuration``'s ``midcbf`` or ``lowcbf``.
-
 Policies
     The rules Science Operations sets for what can be used of an array assembly
     in a cycle, such as fewer zoom windows and beams during Science
@@ -157,6 +146,26 @@ How the layers combine:
   a group: ``observing_modes.spectral`` takes its channels per coarse channel from Low's
   basic capabilities and its zoom windows from the array assembly.
 * The result names its ``telescope``, ``array_assembly`` and ``policy``.
+
+Within the files, fields are grouped by the part of the telescope that
+provides them, or by observing mode:
+
+``cbf``
+    The correlator-beamformer (CBF): Mid's frequency slice bandwidth, and for
+    each array assembly its frequency slice processors (FSPs) and the function
+    modes it runs. In a scheduling block, it limits the ``csp_configuration``'s
+    ``midcbf`` or ``lowcbf``.
+
+``sps`` (Low only)
+    The stations' signal processing (SPS): the coarse channels the stations
+    divide the band into, and the subarray beams they form. MCCS configures
+    it: in a scheduling block, the subarray beams are in the
+    ``mccs_allocation``, and the spectral windows the coarse channels carry
+    are in the ``csp_configuration``.
+
+``observing_modes``
+    What each observing mode offers, whichever part of the telescope provides
+    it: channels, zoom windows and beams.
 
 A cycle pairs each telescope's array assembly with the policy offered for each
 policy type. Low AA2 Science Verification, for example, is the ``AA2`` array

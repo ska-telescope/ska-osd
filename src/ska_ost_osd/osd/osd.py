@@ -338,7 +338,9 @@ class OSD:
         """Capabilities in their legacy shape: the array assembly as a template
         pattern, or as that array assembly's templates when they are processed."""
         capabilities = dict(capabilities)
-        capabilities["number_fsps"] = capabilities.pop("cbf")["number_fsps"]
+        cbf = capabilities.pop("cbf")
+        capabilities["number_fsps"] = cbf["number_fsps"]
+        capabilities["cbf_modes"] = cbf["function_modes"]
         # The legacy response serves the receptors flat, with their IDs as
         # number_station_ids (Low) or number_dish_ids (Mid)
         receptors = capabilities.pop("receptors")

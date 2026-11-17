@@ -66,8 +66,8 @@ Reading the data
        ``telescope``, ``array_assembly`` and ``policy`` (``None`` without
        one). Each observing mode's channels, zoom windows and beams are in
        ``observing_modes``, its stations (Low) or dishes (Mid) in ``receptors``,
-       its frequency slice processors in ``cbf``, and Low's coarse channels
-       and subarray beams in ``sps``
+       its frequency slice processors and function modes in ``cbf``, and Low's
+       coarse channels and subarray beams in ``sps``
    * - ``get_basic_capabilities(telescope)``
      - ``MidBasicCapabilities`` / ``LowBasicCapabilities``: what is fixed for
        the telescope, whatever the array assembly. For Mid, its receiver

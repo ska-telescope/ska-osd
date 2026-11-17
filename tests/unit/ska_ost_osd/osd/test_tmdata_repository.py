@@ -65,9 +65,18 @@ class TestMergeCapabilities:
     def test_a_policy_replaces_array_assembly_fields(self):
         assert merge_capabilities(
             {},
-            {"cbf_modes": ["vis", "pst"], "observing_modes": {"pst": {"max_beams": 4}}},
-            {"cbf_modes": ["vis"], "observing_modes": {"pst": {"max_beams": 0}}},
-        ) == {"cbf_modes": ["vis"], "observing_modes": {"pst": {"max_beams": 0}}}
+            {
+                "cbf": {"function_modes": ["vis", "pst"]},
+                "observing_modes": {"pst": {"max_beams": 4}},
+            },
+            {
+                "cbf": {"function_modes": ["vis"]},
+                "observing_modes": {"pst": {"max_beams": 0}},
+            },
+        ) == {
+            "cbf": {"function_modes": ["vis"]},
+            "observing_modes": {"pst": {"max_beams": 0}},
+        }
 
     @pytest.mark.parametrize(
         "array_assembly, policy",
@@ -324,16 +333,16 @@ class TestGetCapabilities:
 
     def test_the_result_is_validated(self, tmdata_repository_with):
         """A policy that leaves the result inconsistent is rejected: here pst
-        is dropped from cbf_modes but the pst beams are kept."""
+        is dropped from cbf.function_modes but the pst beams are kept."""
         repository = tmdata_repository_with(
             {
                 "telescopes/ska_low/policies/bad.json": {
                     "policy": "bad",
-                    "cbf_modes": ["vis"],
+                    "cbf": {"function_modes": ["vis"]},
                 }
             }
         )
-        with pytest.raises(ValidationError, match="cbf_modes must list pst"):
+        with pytest.raises(ValidationError, match="cbf.function_modes must list pst"):
             repository.get_capabilities(Telescope.SKA_LOW, "AA2", "bad")
 
     @pytest.mark.parametrize(

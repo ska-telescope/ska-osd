@@ -41,8 +41,8 @@ Unreleased
   they change) and ``subarray_templates``. Their files can have any name: each
   names what it describes in its ``array_assembly`` or ``policy``. Each observing
   mode's limits are under ``observing_modes``, the stations or dishes under
-  ``receptors``, the frequency slice processors under ``cbf``, the
-  correlator-beamformer, and Low's coarse channels and subarray beams under
+  ``receptors``, the frequency slice processors and function modes under
+  ``cbf``, the correlator-beamformer, and Low's coarse channels and subarray beams under
   ``sps``, its stations' signal processing. Low's ``AA2_SV`` is now a policy on
   ``AA2``. The legacy files are kept but no longer read
 * Added Mid's ``cbf.frequency_slice_bandwidth_hz``, the bandwidth of the frequency

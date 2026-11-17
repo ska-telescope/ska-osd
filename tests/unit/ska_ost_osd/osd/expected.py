@@ -290,6 +290,7 @@ MID_AA1 = MidCapabilities(
     cbf=MidCBF(
         frequency_slice_bandwidth_hz=MID_BASIC_CAPABILITIES.cbf.frequency_slice_bandwidth_hz,
         number_fsps=4,
+        function_modes=[MidCBFMode.CORRELATION, MidCBFMode.PST],
     ),
     available_bandwidth_hz=800_000_000,
     observing_modes=MidObservingModes(
@@ -301,7 +302,6 @@ MID_AA1 = MidCapabilities(
     allowed_channel_count_range_min=[1],
     allowed_channel_count_range_max=[58982],
     receivers=["Band_1", "Band_2", "Band_5b"],
-    cbf_modes=[MidCBFMode.CORRELATION, MidCBFMode.PST],
     receptors=MidArrayAssemblyReceptors(
         number_ska_dishes=4,
         number_meerkat_dishes=0,
@@ -319,6 +319,7 @@ MID_AA2 = MidCapabilities(
     cbf=MidCBF(
         frequency_slice_bandwidth_hz=MID_BASIC_CAPABILITIES.cbf.frequency_slice_bandwidth_hz,
         number_fsps=8,
+        function_modes=[MidCBFMode.CORRELATION, MidCBFMode.PST],
     ),
     available_bandwidth_hz=800_000_000,
     observing_modes=MidObservingModes(
@@ -330,7 +331,6 @@ MID_AA2 = MidCapabilities(
     allowed_channel_count_range_min=[1],
     allowed_channel_count_range_max=[58982],
     receivers=["Band_1", "Band_2", "Band_5a", "Band_5b"],
-    cbf_modes=[MidCBFMode.CORRELATION, MidCBFMode.PST],
     receptors=MidArrayAssemblyReceptors(
         number_ska_dishes=8,
         number_meerkat_dishes=0,
@@ -416,8 +416,9 @@ LOW_AA1 = LowCapabilities(
         ),
     ),
     available_bandwidth_hz=75_000_000.0,
-    cbf_modes=[LowCBFMode.VIS, LowCBFMode.PST],
-    cbf=LowArrayAssemblyCBF(number_fsps=6),
+    cbf=LowArrayAssemblyCBF(
+        number_fsps=6, function_modes=[LowCBFMode.VIS, LowCBFMode.PST]
+    ),
     observing_modes=LowObservingModes(
         continuum=LowContinuumMode(channels_per_coarse_channel=144),
         spectral=LowSpectralMode(
@@ -451,8 +452,9 @@ LOW_AA2 = LowCapabilities(
         ),
     ),
     available_bandwidth_hz=75_000_000.0,
-    cbf_modes=[LowCBFMode.VIS, LowCBFMode.PST],
-    cbf=LowArrayAssemblyCBF(number_fsps=6),
+    cbf=LowArrayAssemblyCBF(
+        number_fsps=6, function_modes=[LowCBFMode.VIS, LowCBFMode.PST]
+    ),
     observing_modes=LowObservingModes(
         continuum=LowContinuumMode(channels_per_coarse_channel=144),
         spectral=LowSpectralMode(
@@ -480,7 +482,9 @@ LOW_AA2 = LowCapabilities(
 LOW_AA2_SV = LOW_AA2.model_copy(
     update={
         "policy": "AA2_SV",
-        "cbf_modes": [LowCBFMode.VIS, LowCBFMode.PST],
+        "cbf": LOW_AA2.cbf.model_copy(
+            update={"function_modes": [LowCBFMode.VIS, LowCBFMode.PST]}
+        ),
         "observing_modes": LOW_AA2.observing_modes.model_copy(
             update={
                 "spectral": LOW_AA2.observing_modes.spectral.model_copy(
