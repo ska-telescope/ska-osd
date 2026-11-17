@@ -10,7 +10,6 @@ from pydantic import (
     Field,
     SerializerFunctionWrapHandler,
     model_serializer,
-    model_validator,
 )
 
 from ska_ost_osd.osd.common.constant import Telescope
@@ -37,7 +36,6 @@ from ska_ost_osd.osd.views.base import (
     LowFrequencyBandWithChannels,
     legacy_zoom_factors,
     low_frequency_band,
-    zoom_factors_from_legacy,
 )
 
 # The PHT UI recognises science verification by its name
@@ -170,74 +168,6 @@ class CycleCapabilitiesBase(ConfigurationModel):
 
     capabilities: MidOfferedCapabilities | LowOfferedCapabilities
     subarray_templates: dict[str, CycleSubarrayTemplate] | None = None
-
-    @model_validator(mode="before")
-    @classmethod
-    def collect_capabilities(cls, data: Any) -> Any:
-        """Read the served form back: the one key that isn't
-        ``basic_capabilities`` holds the capabilities, and the subarray
-        templates if they were served."""
-        if not isinstance(data, dict) or "capabilities" in data:
-            return data
-        data = data.copy()
-        names = [key for key in data if key != "basic_capabilities"]
-        if len(names) == 1:
-            capabilities = data.pop(names[0]).copy()
-            if "number_fsps" in capabilities:
-                capabilities["cbf"] = {
-                    "number_fsps": capabilities.pop("number_fsps"),
-                    "function_modes": capabilities.pop("cbf_modes"),
-                }
-            if "subarray_templates" in capabilities:
-                data["subarray_templates"] = capabilities.pop("subarray_templates")
-            if "number_pss_beams" in capabilities:
-                modes: dict[str, Any] = {
-                    "spectral": {
-                        "max_zoom_windows": capabilities.pop("number_zoom_windows"),
-                        "max_zoom_channels": capabilities.pop("number_zoom_channels"),
-                    },
-                    "pss": {
-                        "max_beams": capabilities.pop("number_pss_beams"),
-                        "beam_bandwidth_hz": capabilities.pop("ps_beam_bandwidth_hz"),
-                    },
-                    "pst": {"max_beams": capabilities.pop("number_pst_beams")},
-                }
-                if "allowed_zoom_factors" in capabilities:
-                    modes["spectral"]["zoom_factors"] = zoom_factors_from_legacy(
-                        capabilities.pop("allowed_zoom_factors")
-                    )
-                if "number_vlbi_beams" in capabilities:
-                    modes["vlbi"] = {"max_beams": capabilities.pop("number_vlbi_beams")}
-                capabilities["observing_modes"] = modes
-            if "available_receivers" in capabilities:
-                capabilities["receivers"] = capabilities.pop("available_receivers")
-            if "number_ska_dishes" in capabilities:
-                capabilities["receptors"] = {
-                    "number_ska_dishes": capabilities.pop("number_ska_dishes"),
-                    "number_meerkat_dishes": capabilities.pop("number_meerkat_dishes"),
-                    "number_meerkatplus_dishes": capabilities.pop(
-                        "number_meerkatplus_dishes"
-                    ),
-                    "max_baseline_km": capabilities.pop("max_baseline_km"),
-                    "receptor_ids": capabilities.pop("receptors"),
-                }
-            if "number_stations" in capabilities:
-                capabilities["receptors"] = {
-                    "number_stations": capabilities.pop("number_stations"),
-                    "max_baseline_km": capabilities.pop("max_baseline_km"),
-                    "receptor_ids": capabilities.pop("receptors"),
-                }
-            if "number_substations" in capabilities:
-                capabilities["sps"] = {
-                    "subarray_beams": {
-                        "max_subarray_beams": capabilities.pop("number_subarray_beams"),
-                        "max_substations_per_subarray_beam": capabilities.pop(
-                            "number_substations"
-                        ),
-                    }
-                }
-            data["capabilities"] = capabilities
-        return data
 
     @model_serializer(mode="wrap")
     def key_capabilities_by_name(

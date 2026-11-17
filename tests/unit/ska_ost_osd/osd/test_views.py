@@ -4,13 +4,9 @@ tests/tmdata."""
 import pytest
 
 from ska_ost_osd.osd.exceptions import CycleNotFoundError, PolicyNotFoundError
-from ska_ost_osd.osd.views.base import (
-    legacy_zoom_factors,
-    zoom_factors_from_legacy,
-)
-from ska_ost_osd.osd.views.odt import Configuration, get_configuration
+from ska_ost_osd.osd.views.base import legacy_zoom_factors
+from ska_ost_osd.osd.views.odt import get_configuration
 from ska_ost_osd.osd.views.pht import (
-    CycleConfiguration,
     get_cycle_configuration,
     get_cycle_configurations,
 )
@@ -65,10 +61,6 @@ class TestGetConfiguration:
         assert served["ska_low"]["quality_attribute_metrics"] == {
             "cbf": {"processors_ready_percent": 100.0}
         }
-
-    def test_serialised_configuration_validates(self, test_tmdata_repository):
-        configuration = get_configuration(test_tmdata_repository)
-        assert Configuration.model_validate(configuration.model_dump()) == configuration
 
     def test_raises_when_files_missing(self, empty_tmdata_repository):
         with pytest.raises(FileNotFoundError):
@@ -232,19 +224,6 @@ class TestGetCycleConfiguration:
         assert served["capabilities"]["mid"] is None
 
     @pytest.mark.parametrize("include_subarray_templates", [False, True])
-    @pytest.mark.parametrize(
-        "cycle_id", ["TEST_SKAO_2027_Low_AA1_SV", "TEST_SKAO_2027_AA2_Proposal"]
-    )
-    def test_served_cycle_configuration_validates(
-        self, test_tmdata_repository, cycle_id, include_subarray_templates
-    ):
-        configuration = get_cycle_configuration(
-            test_tmdata_repository, cycle_id, include_subarray_templates
-        )
-        served = configuration.model_dump(mode="json", by_alias=True)
-        assert CycleConfiguration.model_validate(served) == configuration
-
-    @pytest.mark.parametrize("include_subarray_templates", [False, True])
     def test_serves_without_nulls(
         self, test_tmdata_repository, include_subarray_templates
     ):
@@ -256,21 +235,6 @@ class TestGetCycleConfiguration:
 
         mid = served["capabilities"]["mid"]["AA2"]
         assert ("subarray_templates" in mid) == include_subarray_templates
-
-    def test_served_without_nulls_validates(self, tmdata_repository_with):
-        """A cycle offering one telescope, with no cycle number or optional
-        proposal limits, reads back from its JSON without nulls."""
-        cycle = CYCLE_1_FILE.model_dump(mode="json", by_alias=True)
-        del cycle["cycle_number"]
-        cycle["proposal_policy"] = {"max_observing_hours": 100.0}
-        repository = tmdata_repository_with(
-            {"cycles/TEST_SKAO_2027_Low_AA1_SV.json": cycle}
-        )
-        configuration = get_cycle_configuration(repository, "TEST_SKAO_2027_Low_AA1_SV")
-
-        served = configuration.model_dump(mode="json", exclude_none=True)
-
-        assert CycleConfiguration.model_validate(served) == configuration
 
 
 class TestGetCycleConfigurations:
@@ -294,6 +258,5 @@ class TestLegacyZoomFactors:
         [([], [0]), ([1, 2, 3], [1, 2, 4, 8])],
         ids=["no zoom", "zoom"],
     )
-    def test_served_as_multipliers_and_read_back(self, zoom_factors, served):
+    def test_served_as_multipliers(self, zoom_factors, served):
         assert legacy_zoom_factors(zoom_factors) == served
-        assert zoom_factors_from_legacy(served) == zoom_factors
