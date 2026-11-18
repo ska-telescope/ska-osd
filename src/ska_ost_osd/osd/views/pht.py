@@ -56,7 +56,7 @@ class TelescopeCapabilities(ConfigurationModel):
 class ObservatoryPolicy(ConfigurationModel):
     """The cycle, as the PHT UI reads it."""
 
-    cycle_number: int
+    cycle_number: int | None = None
     cycle_id: str | None = None
     type: str | None = None
     cycle_description: str

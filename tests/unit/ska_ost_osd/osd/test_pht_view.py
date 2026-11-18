@@ -10,6 +10,7 @@ from ska_ost_osd.osd.exceptions import (
     PolicyNotFoundError,
 )
 from ska_ost_osd.osd.views import pht
+from ska_ost_osd.osd.views.pht import CyclePolicies
 from tests.unit.ska_ost_osd.osd.expected import (
     CYCLE_1_FILE,
     PHT_CYCLE_1_OBSERVATORY_POLICY,
@@ -34,6 +35,27 @@ from tests.unit.ska_ost_osd.osd.expected import (
 )
 def test_get_observatory_policy(test_tmdata_repository, cycle_id, expected):
     assert pht.get_observatory_policy(test_tmdata_repository, cycle_id) == expected
+
+
+def test_get_observatory_policy_without_cycle_number_or_optional_limits(
+    tmdata_repository_with,
+):
+    """A cycle's number and its proposal policy's limits are optional."""
+    cycle = CYCLE_1_FILE.model_dump(mode="json", by_alias=True)
+    del cycle["cycle_number"]
+    cycle["proposal_policy"] = {"max_observing_hours": 100.0}
+    repository = tmdata_repository_with(
+        {"cycles/TEST_SKAO_2027_Low_AA1_SV.json": cycle}
+    )
+
+    assert pht.get_observatory_policy(
+        repository, "TEST_SKAO_2027_Low_AA1_SV"
+    ) == PHT_CYCLE_1_OBSERVATORY_POLICY.model_copy(
+        update={
+            "cycle_number": None,
+            "cycle_policies": CyclePolicies(normal_max_hours=100.0),
+        }
+    )
 
 
 def test_get_observatory_policy_raises_for_unknown_cycle(test_tmdata_repository):
