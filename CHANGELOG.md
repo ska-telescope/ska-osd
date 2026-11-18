@@ -5,8 +5,8 @@ Change Log
 All notable changes to this project will be documented in this file.
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
-Unreleased
-**********
+8.0.0
+*****
 * [DEPRECATED] The legacy API, ``ska_ost_osd.osd.osd``: ``get_osd_using_tmdata``,
   ``get_osd_data``, ``get_available_cycles`` and ``get_osd_latest_version`` raise a
   ``DeprecationWarning``. It will be removed in a future release; read the OSD
