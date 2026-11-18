@@ -2,10 +2,7 @@
 
 from pydantic import ConfigDict
 
-from ska_ost_osd.osd.common.constant import Telescope
-from ska_ost_osd.osd.models.capabilities import FrequencyBand
 from ska_ost_osd.osd.models.defaults import OSDBaseModel
-from ska_ost_osd.osd.repository import OSDRepository
 
 # The largest 32-bit signed integer: served as Mid's
 # allowed_channel_count_range_max when the OSD sets no channel limit, which is
@@ -32,36 +29,4 @@ class ConfigurationModel(OSDBaseModel):
         validate_default=True,
         validate_assignment=True,
         serialize_by_alias=True,
-    )
-
-
-class LowFrequencyBandWithChannels(FrequencyBand):
-    """Low's band with its coarse channels and the channels each mode divides
-    them into, as the ODT and PHT read it."""
-
-    min_coarse_channel: int
-    max_coarse_channel: int
-    coarse_channel_width_hz: float
-    number_continuum_channels_per_coarse_channel: int
-    number_zoom_channels_per_coarse_channel: int
-    number_pst_channels_per_coarse_channel: int
-    number_pss_channels_per_coarse_channel: int
-
-
-def low_frequency_band(repository: OSDRepository) -> LowFrequencyBandWithChannels:
-    """Low's one frequency band, with its channels."""
-    basic_capabilities = repository.get_basic_capabilities(Telescope.SKA_LOW)
-    coarse_channels = basic_capabilities.sps.coarse_channels
-    observing_modes = basic_capabilities.observing_modes
-    return LowFrequencyBandWithChannels(
-        **basic_capabilities.frequency_band.model_dump(),
-        min_coarse_channel=coarse_channels.min,
-        max_coarse_channel=coarse_channels.max,
-        coarse_channel_width_hz=coarse_channels.width_hz,
-        number_continuum_channels_per_coarse_channel=(
-            observing_modes.continuum.channels_per_coarse_channel
-        ),
-        number_zoom_channels_per_coarse_channel=observing_modes.spectral.channels_per_coarse_channel,
-        number_pst_channels_per_coarse_channel=observing_modes.pst.channels_per_coarse_channel,
-        number_pss_channels_per_coarse_channel=observing_modes.pss.channels_per_coarse_channel,
     )

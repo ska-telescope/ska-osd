@@ -74,16 +74,7 @@ from ska_ost_osd.osd.models.defaults import (
     TargetSPFRx,
 )
 from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplate, SubarrayType
-from ska_ost_osd.osd.views.base import LowFrequencyBandWithChannels
-from ska_ost_osd.osd.views.odt import (
-    Configuration,
-    ConfigurationLowCBFMetrics,
-    ConfigurationLowQualityAttributeMetrics,
-    LowConfiguration,
-    LowConfigurationCapabilities,
-    MidConfiguration,
-    MidConfigurationCapabilities,
-)
+from ska_ost_osd.osd.views import odt
 from ska_ost_osd.osd.views.pht import (
     CycleCapabilities,
     CycleConfiguration,
@@ -397,7 +388,7 @@ LOW_BASIC_CAPABILITIES = LowBasicCapabilities(
 )
 
 # Low's band with its channels, as the ODT and PHT views serve it
-LOW_FREQUENCY_BAND_WITH_CHANNELS = LowFrequencyBandWithChannels(
+LOW_FREQUENCY_BAND_WITH_CHANNELS = odt.LowFrequencyBand(
     min_frequency_hz=50_000_000.0,
     max_frequency_hz=350_000_000.0,
     min_coarse_channel=64,
@@ -647,12 +638,12 @@ LOW_AA2_SUBARRAY_TEMPLATE_LIBRARY_FILE = SubarrayTemplateLibraryFile(
 
 # The ODT configuration view of tests/tmdata: what ska-oso-services serves
 # from GET /configuration
-CONFIGURATION = Configuration(
-    ska_mid=MidConfiguration(
+CONFIGURATION = odt.Configuration(
+    ska_mid=odt.MidConfiguration(
         frequency_band=MID_BASIC_CAPABILITIES.frequency_bands,
         constraints=MID_CONSTRAINTS,
         subarrays=[
-            MidConfigurationCapabilities(
+            odt.MidSubarray(
                 name="AA1",
                 receptors=["SKA001", "SKA002", "SKA003", "SKA004"],
                 available_bandwidth_hz=800_000_000.0,
@@ -660,7 +651,7 @@ CONFIGURATION = Configuration(
                 number_fsps=4,
                 allowed_channel_width_values_hz=[13440],
             ),
-            MidConfigurationCapabilities(
+            odt.MidSubarray(
                 name="AA2",
                 receptors=[
                     "SKA001",
@@ -680,14 +671,14 @@ CONFIGURATION = Configuration(
         ],
         spfrx_defaults=MID_DEFAULTS.spfrx_defaults,
     ),
-    ska_low=LowConfiguration(
+    ska_low=odt.LowConfiguration(
         frequency_band=LOW_FREQUENCY_BAND_WITH_CHANNELS,
         constraints=LOW_CONSTRAINTS,
-        quality_attribute_metrics=ConfigurationLowQualityAttributeMetrics(
-            cbf=ConfigurationLowCBFMetrics(processors_ready_percent=100.0)
+        quality_attribute_metrics=odt.LowQualityAttributeMetrics(
+            cbf=odt.LowCBFMetrics(processors_ready_percent=100.0)
         ),
         subarrays=[
-            LowConfigurationCapabilities(
+            odt.LowSubarray(
                 name="AA1",
                 receptors=[345, 346, 347, 348],
                 available_bandwidth_hz=75_000_000.0,
@@ -696,7 +687,7 @@ CONFIGURATION = Configuration(
                 number_substations=0,
                 number_subarray_beams=1,
             ),
-            LowConfigurationCapabilities(
+            odt.LowSubarray(
                 name="AA2",
                 receptors=[345, 346, 347, 348, 349, 350, 351, 352],
                 available_bandwidth_hz=75_000_000.0,
