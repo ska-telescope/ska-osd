@@ -5,7 +5,7 @@ models are its own, named and shaped as ska-oso-services' response models, so
 the response doesn't change with the domain models."""
 
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Literal, overload
 
 from pydantic import (
     Field,
@@ -14,7 +14,11 @@ from pydantic import (
 )
 
 from ska_ost_osd.osd.common.constant import Telescope
-from ska_ost_osd.osd.models.capabilities import LowCapabilities, MidCapabilities
+from ska_ost_osd.osd.models.capabilities import (
+    LowCapabilities,
+    MidBasicCapabilities,
+    MidCapabilities,
+)
 from ska_ost_osd.osd.models.cycles import Cycle, PolicyType
 from ska_ost_osd.osd.repository import OSDRepository
 from ska_ost_osd.osd.views.base import (
@@ -169,12 +173,6 @@ class CycleConfiguration(ConfigurationModel):
     capabilities: CycleCapabilities
 
 
-def _name(capabilities: MidCapabilities | LowCapabilities) -> str:
-    """The name the PHT UI knows capabilities by: the policy's, or the array
-    assembly's if no policy applies."""
-    return capabilities.policy or capabilities.array_assembly
-
-
 # Any Mid capabilities, in ska-oso-services' AA2_MID model
 def _aa2_mid(capabilities: MidCapabilities) -> AA2_MID:
     observing_modes = capabilities.observing_modes
@@ -224,26 +222,6 @@ def _aa2_low(capabilities: LowCapabilities) -> AA2_LOW:
     )
 
 
-def _basic_capabilities_mid(repository: OSDRepository) -> BasicCapabilitiesMid:
-    basic_capabilities = repository.get_basic_capabilities(Telescope.SKA_MID)
-    return BasicCapabilitiesMid(
-        dish_elevation_limit_deg=basic_capabilities.elevation_limits.min_elevation_deg,
-        receiver_information=[
-            ReceiverInformation(
-                rx_id=band.rx_id,
-                min_frequency_hz=band.min_frequency_hz,
-                max_frequency_hz=band.max_frequency_hz,
-                sub_bands=(
-                    None
-                    if band.band5b_subbands is None
-                    else [sub_band.model_dump() for sub_band in band.band5b_subbands]
-                ),
-            )
-            for band in basic_capabilities.frequency_bands
-        ],
-    )
-
-
 def _timestamp(moment: datetime) -> str:
     """A UTC time as the tmdata stores it, e.g. ``"2026-03-27T12:00:00.000Z"``."""
     return (
@@ -253,13 +231,42 @@ def _timestamp(moment: datetime) -> str:
     )
 
 
-def _observatory_policy(
-    cycle: Cycle,
-    policy_type: PolicyType,
-    mid: MidCapabilities | None,
-    low: LowCapabilities | None,
+def _policy_type(cycle: Cycle) -> PolicyType:
+    """The one policy type the cycle offers; the PHT UI handles one per
+    cycle."""
+    types = {
+        policy_type
+        for offered in cycle.telescopes.values()
+        for policy_type in offered.policies
+    }
+    if len(types) != 1:
+        raise ValueError(
+            f"Cycle {cycle.cycle_id} offers more than one policy type, which the "
+            "PHT view can't serve"
+        )
+    (policy_type,) = types
+    return policy_type
+
+
+def get_observatory_policy(
+    repository: OSDRepository, cycle_id: str
 ) -> ObservatoryPolicy:
-    """The cycle, with the field names the PHT UI reads."""
+    """A cycle, as the PHT reads it. Its telescope_capabilities name the
+    policy each telescope offers, which ska-oso-services serves the
+    capabilities under.
+
+    :param repository: the OSD repository to read from.
+    :param cycle_id: the ID of the cycle.
+    :return: the cycle.
+    :raises CycleNotFoundError: If there is no cycle with that ID.
+    :raises ValueError: If the cycle offers more than one policy type.
+    """
+    cycle = repository.get_cycle(cycle_id)
+    policy_type = _policy_type(cycle)
+    names = {
+        telescope: offered.policies.get(policy_type)
+        for telescope, offered in cycle.telescopes.items()
+    }
     return ObservatoryPolicy(
         cycle_number=cycle.cycle_number,
         cycle_id=cycle.cycle_id,
@@ -277,10 +284,97 @@ def _observatory_policy(
             max_data_products=cycle.proposal_policy.max_data_products,
         ),
         telescope_capabilities=TelescopeCapabilities(
-            Mid=_name(mid) if mid is not None else None,
-            Low=_name(low) if low is not None else None,
+            Mid=names.get(Telescope.SKA_MID), Low=names.get(Telescope.SKA_LOW)
         ),
     )
+
+
+@overload
+def get_basic_capabilities(
+    repository: OSDRepository, telescope: Literal[Telescope.SKA_MID]
+) -> BasicCapabilitiesMid: ...
+
+
+@overload
+def get_basic_capabilities(
+    repository: OSDRepository, telescope: Literal[Telescope.SKA_LOW]
+) -> BasicCapabilitiesLow: ...
+
+
+def get_basic_capabilities(
+    repository: OSDRepository, telescope: Telescope
+) -> BasicCapabilitiesMid | BasicCapabilitiesLow:
+    """A telescope's basic capabilities, as the PHT reads them: Mid's dish
+    elevation limit and receiver bands, or Low's frequency range.
+
+    :param repository: the OSD repository to read from.
+    :param telescope: the telescope.
+    :return: the telescope's basic capabilities.
+    """
+    basic_capabilities = repository.get_basic_capabilities(telescope)
+    if isinstance(basic_capabilities, MidBasicCapabilities):
+        return BasicCapabilitiesMid(
+            dish_elevation_limit_deg=basic_capabilities.elevation_limits.min_elevation_deg,
+            receiver_information=[
+                ReceiverInformation(
+                    rx_id=band.rx_id,
+                    min_frequency_hz=band.min_frequency_hz,
+                    max_frequency_hz=band.max_frequency_hz,
+                    sub_bands=(
+                        None
+                        if band.band5b_subbands is None
+                        else [
+                            sub_band.model_dump() for sub_band in band.band5b_subbands
+                        ]
+                    ),
+                )
+                for band in basic_capabilities.frequency_bands
+            ],
+        )
+    return BasicCapabilitiesLow.model_validate(
+        basic_capabilities.frequency_band, from_attributes=True
+    )
+
+
+@overload
+def get_capabilities(
+    repository: OSDRepository,
+    telescope: Literal[Telescope.SKA_MID],
+    array_assembly: str,
+    policy_id: str | None = None,
+) -> AA2_MID: ...
+
+
+@overload
+def get_capabilities(
+    repository: OSDRepository,
+    telescope: Literal[Telescope.SKA_LOW],
+    array_assembly: str,
+    policy_id: str | None = None,
+) -> AA2_LOW: ...
+
+
+def get_capabilities(
+    repository: OSDRepository,
+    telescope: Telescope,
+    array_assembly: str,
+    policy_id: str | None = None,
+) -> AA2_MID | AA2_LOW:
+    """An array assembly's capabilities, with a policy's applied if one is
+    given, as the PHT reads them.
+
+    :param repository: the OSD repository to read from.
+    :param telescope: the telescope.
+    :param array_assembly: the array assembly, e.g. ``"AA2"``.
+    :param policy_id: the ID of a policy to apply, e.g. ``"AA2_SV"``.
+    :return: the capabilities.
+    :raises ArrayAssemblyNotFoundError: If there is no such array assembly.
+    :raises PolicyNotFoundError: If there is no such policy.
+    """
+    capabilities = repository.get_capabilities(telescope, array_assembly, policy_id)
+    if isinstance(capabilities, MidCapabilities):
+        return _aa2_mid(capabilities)
+    return _aa2_low(capabilities)
 
 
 def get_cycle_configuration(
@@ -300,37 +394,39 @@ def get_cycle_configuration(
         exist.
     :raises ValueError: If the cycle offers more than one policy type.
     """
-    cycle = repository.get_cycle(cycle_id)
-    offered = repository.get_cycle_capabilities(cycle_id)
-    # The PHT UI handles one policy type per cycle
-    types = {policy_type for by_type in offered.values() for policy_type in by_type}
-    if len(types) != 1:
-        raise ValueError(
-            f"Cycle {cycle_id} offers more than one policy type, which the PHT "
-            "view can't serve"
-        )
-    (policy_type,) = types
-    mid = offered.get(Telescope.SKA_MID, {}).get(policy_type)
-    low = offered.get(Telescope.SKA_LOW, {}).get(policy_type)
+    observatory_policy = get_observatory_policy(repository, cycle_id)
+    names = observatory_policy.telescope_capabilities
+    telescopes = repository.get_cycle(cycle_id).telescopes
     return CycleConfiguration(
-        observatory_policy=_observatory_policy(cycle, policy_type, mid, low),
+        observatory_policy=observatory_policy,
         capabilities=CycleCapabilities(
             mid=MidCycleCapabilities(
-                basic_capabilities=_basic_capabilities_mid(repository),
-                name=_name(mid),
-                capabilities=_aa2_mid(mid),
+                basic_capabilities=get_basic_capabilities(
+                    repository, Telescope.SKA_MID
+                ),
+                name=names.Mid,
+                capabilities=get_capabilities(
+                    repository,
+                    Telescope.SKA_MID,
+                    telescopes[Telescope.SKA_MID].array_assembly,
+                    names.Mid,
+                ),
             )
-            if mid is not None
+            if names.Mid is not None
             else None,
             low=LowCycleCapabilities(
-                basic_capabilities=BasicCapabilitiesLow.model_validate(
-                    repository.get_basic_capabilities(Telescope.SKA_LOW).frequency_band,
-                    from_attributes=True,
+                basic_capabilities=get_basic_capabilities(
+                    repository, Telescope.SKA_LOW
                 ),
-                name=_name(low),
-                capabilities=_aa2_low(low),
+                name=names.Low,
+                capabilities=get_capabilities(
+                    repository,
+                    Telescope.SKA_LOW,
+                    telescopes[Telescope.SKA_LOW].array_assembly,
+                    names.Low,
+                ),
             )
-            if low is not None
+            if names.Low is not None
             else None,
         ),
     )

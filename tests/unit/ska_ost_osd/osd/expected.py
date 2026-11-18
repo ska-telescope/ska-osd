@@ -849,6 +849,27 @@ PHT_LOW_BASIC_CAPABILITIES = BasicCapabilitiesLow(
     min_frequency_hz=50_000_000, max_frequency_hz=350_000_000
 )
 
+PHT_MID_AA1 = AA2_MID(
+    allowed_channel_count_range_max=[58982],
+    allowed_channel_count_range_min=[1],
+    allowed_channel_width_values=[13440],
+    allowed_channel_width_values_hz=[13440],
+    available_receivers=["Band_1", "Band_2", "Band_5b"],
+    number_ska_dishes=4,
+    number_meerkat_dishes=0,
+    number_meerkatplus_dishes=0,
+    max_baseline_km=1.5,
+    available_bandwidth_hz=800_000_000,
+    number_channels=None,
+    cbf_modes=["correlation", "pst"],
+    number_zoom_windows=0,
+    number_zoom_channels=0,
+    number_pss_beams=0,
+    number_pst_beams=1,
+    ps_beam_bandwidth_hz=400_000_000,
+    number_fsps=4,
+)
+
 # AA2 sets no channel limit, served as the largest 32-bit signed integer
 PHT_MID_AA2 = AA2_MID(
     allowed_channel_count_range_max=[2147483647],
@@ -905,27 +926,47 @@ PHT_LOW_AA2 = AA2_LOW(
     number_fsps=6,
 )
 
+# Low AA2 with tests/tmdata/telescopes/ska_low/policies/AA2_SV.json applied
+PHT_LOW_AA2_SV = AA2_LOW(
+    number_stations=8,
+    number_substations=0,
+    number_beams=1,
+    max_baseline_km=6.0,
+    available_bandwidth_hz=75_000_000,
+    channel_width_hz=None,
+    cbf_modes=["vis", "pst"],
+    number_zoom_windows=1,
+    number_zoom_channels=4000,
+    number_pss_beams=0,
+    number_pst_beams=1,
+    number_vlbi_beams=0,
+    ps_beam_bandwidth_hz=75_000_000,
+    number_fsps=6,
+)
+
 # The PHT cycle views of tests/tmdata: each cycle with the capabilities
 # each telescope offers and that telescope's basic capabilities
-CYCLE_1_CONFIGURATION = CycleConfiguration(
-    observatory_policy=ObservatoryPolicy(
-        cycle_number=1,
+PHT_CYCLE_1_OBSERVATORY_POLICY = ObservatoryPolicy(
+    cycle_number=1,
+    cycle_id="TEST_SKAO_2027_Low_AA1_SV",
+    type="Science Verification",
+    cycle_description="TEST Low AA1 Science Verification",
+    cycle_information=CycleInformation(
         cycle_id="TEST_SKAO_2027_Low_AA1_SV",
-        type="Science Verification",
-        cycle_description="TEST Low AA1 Science Verification",
-        cycle_information=CycleInformation(
-            cycle_id="TEST_SKAO_2027_Low_AA1_SV",
-            proposal_open="2026-03-27T12:00:00.000Z",
-            proposal_close="2027-04-01T15:00:00.000Z",
-        ),
-        cycle_policies=CyclePolicies(
-            normal_max_hours=100.0,
-            max_targets=1,
-            max_observation_setups=1,
-            max_data_products=1,
-        ),
-        telescope_capabilities=TelescopeCapabilities(Mid=None, Low="AA1"),
+        proposal_open="2026-03-27T12:00:00.000Z",
+        proposal_close="2027-04-01T15:00:00.000Z",
     ),
+    cycle_policies=CyclePolicies(
+        normal_max_hours=100.0,
+        max_targets=1,
+        max_observation_setups=1,
+        max_data_products=1,
+    ),
+    telescope_capabilities=TelescopeCapabilities(Mid=None, Low="AA1"),
+)
+
+CYCLE_1_CONFIGURATION = CycleConfiguration(
+    observatory_policy=PHT_CYCLE_1_OBSERVATORY_POLICY,
     capabilities=CycleCapabilities(
         mid=None,
         low=LowCycleCapabilities(
@@ -936,25 +977,27 @@ CYCLE_1_CONFIGURATION = CycleConfiguration(
     ),
 )
 
-CYCLE_2_CONFIGURATION = CycleConfiguration(
-    observatory_policy=ObservatoryPolicy(
-        cycle_number=2,
+PHT_CYCLE_2_OBSERVATORY_POLICY = ObservatoryPolicy(
+    cycle_number=2,
+    cycle_id="TEST_SKAO_2027_AA2_Proposal",
+    type="Proposal",
+    cycle_description="TEST AA2 Proposal",
+    cycle_information=CycleInformation(
         cycle_id="TEST_SKAO_2027_AA2_Proposal",
-        type="Proposal",
-        cycle_description="TEST AA2 Proposal",
-        cycle_information=CycleInformation(
-            cycle_id="TEST_SKAO_2027_AA2_Proposal",
-            proposal_open="2026-03-27T12:00:00.000Z",
-            proposal_close="2027-04-01T15:00:00.000Z",
-        ),
-        cycle_policies=CyclePolicies(
-            normal_max_hours=100.0,
-            max_targets=3,
-            max_observation_setups=2,
-            max_data_products=2,
-        ),
-        telescope_capabilities=TelescopeCapabilities(Mid="AA2", Low="AA2"),
+        proposal_open="2026-03-27T12:00:00.000Z",
+        proposal_close="2027-04-01T15:00:00.000Z",
     ),
+    cycle_policies=CyclePolicies(
+        normal_max_hours=100.0,
+        max_targets=3,
+        max_observation_setups=2,
+        max_data_products=2,
+    ),
+    telescope_capabilities=TelescopeCapabilities(Mid="AA2", Low="AA2"),
+)
+
+CYCLE_2_CONFIGURATION = CycleConfiguration(
+    observatory_policy=PHT_CYCLE_2_OBSERVATORY_POLICY,
     capabilities=CycleCapabilities(
         mid=MidCycleCapabilities(
             basic_capabilities=PHT_MID_BASIC_CAPABILITIES,
