@@ -1,12 +1,19 @@
-############
+##########
 Change Log
-############
+##########
 
 All notable changes to this project will be documented in this file.
 This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 Unreleased
 **********
+
+8.0.0
+*****
+* [DEPRECATED] The legacy API, ``ska_ost_osd.osd.osd``: ``get_osd_using_tmdata``,
+  ``get_osd_data``, ``get_available_cycles`` and ``get_osd_latest_version`` raise a
+  ``DeprecationWarning``. It will be removed in a future release; read the OSD
+  through an ``OSDRepository`` and the views in ``ska_ost_osd.osd.views``
 * Added the ``osd-validate-tmdata`` command, which validates the current (not
   legacy) files of a tmdata directory against the storage models, by default
   ``tmdata`` in the directory it is run in, and the ``tmdata-validate`` make target
@@ -61,7 +68,8 @@ Unreleased
 * Added Mid's ``cbf.frequency_slice_bandwidth_hz`` and ``cbf.fine_channel_width_hz``
   to its basic capabilities: the bandwidth of the frequency slice each FSP
   processes, and the width of the fine channels it divides a slice into
-* [BREAKING] Users pass a TMData client to public API functions instead of OSD creating one from ``tmdata/version_mapping``
+* [BREAKING] Users pass a TMData client to public API functions instead of OSD
+  creating one from ``tmdata/version_mapping``
 * [BREAKING] Removed ``number_beams`` from the SKA-Low array assemblies in
   ``low_capabilities.json``; use ``number_subarray_beams``
 * [BREAKING] Removed the duplicate ``coarse_channel_width`` from
@@ -77,14 +85,13 @@ Unreleased
   is in Low's ``defaults.json``, served by the ODT view), and the ITFs' template
   pattern matches no templates. Removed ``ska_ost_osd.osd.template_mapping``
 * Removed ``osd-pre-release``, ``osd-tmdata-publish`` and ``release.sh``
-* Added proposal cycle data to the release-cycle version mapping.
+* Added proposal cycle data to the release-cycle version mapping
 * Added Pydantic storage models for the tmdata files, in
   ``ska_ost_osd.osd.adapters.tmdata.models``: ``MidBasicCapabilitiesFile``,
   ``MidArrayAssemblyFile``, ``MidPolicyFile`` and ``MidDefaultsFile``, their Low
   equivalents, ``CycleFile`` and ``SubarrayTemplateLibraryFile``
 * ``Cycle`` reads its ``proposal_window`` ``opens`` and ``closes`` as
   timezone-aware datetimes; a time without a timezone is rejected
-* Added a test that validates the real tmdata files against these models
 * Added ``OSDRepository`` (``ska_ost_osd.osd.repository``), the interface for
   reading cycles, capabilities, basic capabilities, constraints, defaults and
   subarray templates as Pydantic models, and ``TMDataRepository``
@@ -103,11 +110,9 @@ Unreleased
   ``get_observatory_policy``, ``get_basic_capabilities`` and ``get_capabilities``.
   ska-oso-services chooses which array assemblies and policies to serve, and
   assembles its responses
-* Bump the build and runtime base images to ``ska-build-python-ubuntu26:1.1.2`` and
-  ``ska-python-ubuntu26:1.1.2`` to pick up the OpenSSL DTLS retransmission fix
 
 7.0.0
-**********
+*****
 * [BREAKING] Change Mid's SPFRx sync_pps default from false to unset
 * Migrated build and developer tooling from Poetry to uv, and from
   black/isort/flake8/pylint to ruff.
@@ -117,47 +122,47 @@ Unreleased
 * [BUGFIX] Fix number_zoom_windows for AA2_SV to be 1 instead of 16
 
 6.0.9
-**********
+*****
 * Update version_mapping (missing from 6.0.8)
 
 6.0.8
-**********
+*****
 * Updated OSDModel validator for case where cycle_id=0 and array_assembly
 * Removed upper bound version constraint on FastAPI and ska-ser-logging to unblock upgrades for downstream projects.
 
 6.0.7
-**********
+*****
 * Fix client to accept 0 as a valid cycle number/ID
 * Change LOW SV cycle number to 1 to be forwards compatible
 
 6.0.6
-**********
+*****
 * Use ISO 8601 format for cycle proposal_open and proposal_close timestamps
 * Update LOW SV cycle 0 policy data for PHT testing; drop unused cycle 1
 
 6.0.5
-**********
+*****
 * Updated MID and LOW capabilities TMData for better integration with other OSO applications
 * Migrated secret management from Secrets Store CSI Driver to Vault Secrets Operator (VaultStaticSecret) for improved reliability and consistency with other OSO services.
 
 6.0.4
-**********
+*****
 * Fixed RTD Docs issue.
 
 6.0.3
-**********
+*****
 * Made `tmdata-publish` and `osd-tmdata-publish` jobs manual for now.
 
 6.0.2
-**********
+*****
 * Mock autodoc import for ska-telmodel-client
 
 6.0.1
-**********
+*****
 * Fixed release
 
 6.0.0
-**********
+*****
 * Added constraints to both MID and LOW capabilities
 * Updated the available dishes for MID AA0.5 and AA1
 * Updated dependencies to use ska-telmodel-client
@@ -165,21 +170,21 @@ Unreleased
 * Added SonarQube for static analysis of code quality
 
 5.2.1
-**********
+*****
 * Fixed Get cycle list API.
 * Fixed get_cycle_list() method to use it from when we installed OSD as library.
 
 5.2.0
-**********
+*****
 * Added capabilities for LOW Science Verification AA2_SV
 * Updated basic capabilities for LOW telescope
 
 5.1.0
-***********
+*****
 * Created a new cycle policy for Low telescope for science verification.
 
 5.0.0
-***********
+*****
 * Added AA1 and AA2 rule support.
 * Created new Mid_ITF and Low_ITF from MID AA0.5 and LOW AA1.
 * Modified GET PUT /OSD API to fetch and modify the newly added Mid_ITF and Low_ITF values.
@@ -188,16 +193,16 @@ Unreleased
 * [BREAKING] Added subarray template support for MID / LOW capabilities.
 
 4.2.2
-***********
+*****
 * NAK-1352 Refactor handling of TelModel data sources including default
 * Added band 5b to the available receivers for Mid AA0.5
 
 4.2.1
-***********
+*****
 * Fix issue due to now running `make osd-pre-release`
 
 4.2.0
-***********
+*****
 * Added support for `array_assembly` in `semantic_validation` API
 * Updated doc strings to sphinx style format
 * Refactoring of test cases
@@ -211,25 +216,25 @@ Unreleased
 * NAK-1300 Update to ska-telmodel 1.23.2 for key aliasing
 
 4.0.0
-**********
+*****
 * Migrated APIs from Flask to FastAPI
 * [BREAKING] Refactored folder structure
 * [BREAKING] Separated OSD and TelValidation modules
 * [BREAKING] Introduced a generalized response format
 
 3.1.1
-**********
+*****
 * Fixed version mapping file path issue while checking cycle_id present or not.
 
 3.1.0
-**********
+*****
 * Decoupled Release process of TMData from `ska-ost-osd` source code.
 * Now OSD User can publish TMData automatically from OSD UI Editor.
 * Introduced new APIs to automate TMData release process.
 * Updated OSD User guide.
 
 3.0.0
-**********
+*****
 * [BREAKING] Added `number_dish_ids` in Mid Capabilities.
 * [BREAKING] Removed `number_channel` key.
 * [BREAKING] Converted `allowed_channel_count_range_min` and `allowed_channel_count_range_max` string type to list.
@@ -238,27 +243,27 @@ Unreleased
 * Refactored Test cases and restructured Test folder.
 
 2.3.1
-**********
+*****
 * Updated to deepdiff version 7.0.0.
 * Updated to pydantic version 2.10.3
 
 2.3.0
-********
+*****
 * Upgraded astropy version to 6.1 from 5.1.
 
 2.2.1
-********
+*****
 * Fixed Semantic Validation error message bug.
 * Fixed OSD document issue.
   - Changelog was not reflecting earlier so fixed that.
   - RTD build was failing on pipeline.
 
 2.2.0
-*******
+*****
 * Added VALIDATION_STRICTNESS environment variable to enable the functionality of semantic validation to turn on/off.
 
 2.1.0
-**************
+*****
 * Verify OSD version mapping behaviour along with remove hard coded error messages checks from OSD code.
 * Combined osd and semantic API input validations.
 * Updated the telmodel tag to 0.19.4
@@ -281,22 +286,20 @@ Unreleased
 * MID and Low capabilities enhancement to support validation.
 
 1.0.3
-******
+*****
 * Improve API level validation for OSD API's
 
 1.0.2
-******
+*****
 * Removed requirement.txt file from docs folder.
 
 1.0.1
-******
+*****
 * Fixed pipeline issue after release tag for 1.0.0 version.
 * Fixed RTD documentation issue.
 * Fixed minor variable names.
 
-
 1.0.0
-******
-
+*****
 * Decoupled and added of Semantic Validation and OSD functionalities from ska-telmodel
 * The functionalities have been exposed as a service

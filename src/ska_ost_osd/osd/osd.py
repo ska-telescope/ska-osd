@@ -1,6 +1,15 @@
+"""The legacy API, which serves the OSD as dictionaries in the pre-8.0 shape.
+
+.. deprecated:: 8.0.0
+    It will be removed in a future release. Read the OSD through an
+    ``OSDRepository`` (``ska_ost_osd.osd.repository``) and the views
+    (``ska_ost_osd.osd.views``) instead.
+"""
+
 import logging
 import posixpath
-from functools import cached_property
+import warnings
+from functools import cached_property, wraps
 from typing import Any, Dict, Optional
 
 from ska_telmodel_client import TMData
@@ -30,6 +39,22 @@ from .models.cycles import PolicyType
 from .views.base import NO_CHANNEL_LIMIT
 
 LOGGER = logging.getLogger(__name__)
+
+
+def _deprecated(function):
+    @wraps(function)
+    def wrapper(*args, **kwargs):
+        warnings.warn(
+            f"ska_ost_osd.osd.osd.{function.__name__} is deprecated and will be "
+            "removed in a future release; use an OSDRepository and the views in "
+            "ska_ost_osd.osd.views",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return function(*args, **kwargs)
+
+    return wrapper
+
 
 # The telescope names the capability documents and responses use
 _LEGACY_TELESCOPE_NAMES = {
@@ -529,6 +554,7 @@ class OSD:
         return self.build_osd_data(selected_names, cycle_definition)
 
 
+@_deprecated
 def get_available_cycles(tmdata: TMData) -> list[int]:
     """List the cycle numbers in the cycle files: the legacy API's cycle
     IDs."""
@@ -540,6 +566,7 @@ def get_available_cycles(tmdata: TMData) -> list[int]:
     ).get_available_cycles()
 
 
+@_deprecated
 def get_osd_latest_version(tmdata_version: TMData) -> str:
     """Read the latest_release.txt file and retrieve the latest OSD version.
 
@@ -553,6 +580,25 @@ def get_osd_latest_version(tmdata_version: TMData) -> str:
     return osd_version
 
 
+def _get_osd_data(
+    telescope: Telescope | None = None,
+    array_assembly: str = None,
+    tmdata: TMData = None,
+    cycle_id: int = None,
+    process_templates: bool = False,
+) -> tuple[dict[str, Any] | None, list[str]]:
+    osd_data, data_error_msg_list = OSD(
+        telescope=telescope,
+        array_assembly=array_assembly,
+        tmdata=tmdata,
+        cycle_id=cycle_id,
+        process_templates=process_templates,
+    ).get_osd_data()
+
+    return osd_data, data_error_msg_list
+
+
+@_deprecated
 def get_osd_data(
     telescope: Telescope | None = None,
     array_assembly: str = None,
@@ -569,17 +615,16 @@ def get_osd_data(
     :param process_templates: whether to process template mappings.
     :return: OSD data and any validation errors.
     """
-    osd_data, data_error_msg_list = OSD(
+    return _get_osd_data(
         telescope=telescope,
         array_assembly=array_assembly,
         tmdata=tmdata,
         cycle_id=cycle_id,
         process_templates=process_templates,
-    ).get_osd_data()
-
-    return osd_data, data_error_msg_list
+    )
 
 
+@_deprecated
 def get_osd_using_tmdata(
     tm_data: TMData,
     telescope: Telescope | None = None,
@@ -599,7 +644,7 @@ def get_osd_using_tmdata(
     """
     errors = []
 
-    osd_data, osd_errors = get_osd_data(
+    osd_data, osd_errors = _get_osd_data(
         telescope=telescope,
         tmdata=tm_data,
         array_assembly=array_assembly,

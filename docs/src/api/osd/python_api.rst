@@ -1,5 +1,5 @@
 Python API
--------------------
+----------
 
 The OSD is a Python library: its data is read through a *repository* that returns
 the data as Pydantic models.
@@ -8,7 +8,7 @@ the data as Pydantic models.
 
 
 Overview
-~~~~~~~~~
+~~~~~~~~
 
 * ``OSDRepository`` (``ska_ost_osd.osd.repository``) is the interface for reading
   the OSD: cycles, capabilities, basic capabilities, constraints, defaults and
@@ -42,7 +42,7 @@ straight away; don't keep results longer than you need them:
 
 
 Reading the data
-~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
 .. list-table::
    :header-rows: 1
@@ -108,7 +108,7 @@ Mid's receiver bands are looked up on its basic capabilities:
 .. _example-low-aa2-sv:
 
 Example: Low AA2 with the AA2_SV policy
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ``low`` above, as JSON, with long lists shortened:
 
@@ -175,7 +175,7 @@ Example: Low AA2 with the AA2_SV policy
 .. _example-mid-aa2:
 
 Example: Mid AA2
-^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^
 
 ``mid`` above, as JSON, with long lists shortened. Its
 ``allowed_channel_width_values_hz`` is worked out from the zoom and averaging
@@ -238,7 +238,7 @@ factors, not stored:
 
 
 Joins
-~~~~~~
+~~~~~
 
 .. list-table::
    :header-rows: 1
@@ -255,7 +255,7 @@ Joins
 
 
 Views
-~~~~~~
+~~~~~
 
 The views in ``ska_ost_osd.osd.views`` build what ska-oso-services serves to its
 UIs, as Pydantic models. Each consumer's views and models are in its own module:
@@ -306,7 +306,7 @@ UIs, as Pydantic models. Each consumer's views and models are in its own module:
 
 
 ODT configuration
-^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^
 
 ska-oso-services builds ``GET /configuration`` from the ODT view's functions,
 choosing which array assemblies and policies to serve:
@@ -349,7 +349,7 @@ models, so the response doesn't change with the OSD's domain models.
 
 
 PHT cycle data
-^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^
 
 ska-oso-services builds ``GET /prsls/osd/{cycle}`` from the PHT view's
 functions; ``GET /prsls/osd/cycles`` is a list of the same, one for each cycle:
@@ -399,7 +399,7 @@ are the view's own, named and shaped as ska-oso-services' response models.
 
 
 Errors
-~~~~~~~
+~~~~~~
 
 A key with no data raises a subclass of ``OSDQueryError``
 (``ska_ost_osd.osd.exceptions``), which is also a ``LookupError``: for example
