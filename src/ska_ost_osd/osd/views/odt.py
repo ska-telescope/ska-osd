@@ -3,9 +3,15 @@
 response models, so the response doesn't change with the domain models."""
 
 from enum import StrEnum
+from typing import Literal, overload
 
 from ska_ost_osd.osd.common.constant import Telescope
-from ska_ost_osd.osd.models.capabilities import LowCapabilities, MidCapabilities
+from ska_ost_osd.osd.models.capabilities import (
+    LowCapabilities,
+    MidBasicCapabilities,
+    MidCapabilities,
+)
+from ska_ost_osd.osd.models.defaults import MidDefaults
 from ska_ost_osd.osd.repository import OSDRepository
 from ska_ost_osd.osd.views.base import ConfigurationModel
 
@@ -135,9 +141,60 @@ class Configuration(ConfigurationModel):
     ska_low: LowConfiguration
 
 
-def _low_frequency_band(repository: OSDRepository) -> LowFrequencyBand:
-    """Low's one frequency band, with its channels."""
-    basic_capabilities = repository.get_basic_capabilities(Telescope.SKA_LOW)
+def _mid_capabilities(capabilities: MidCapabilities) -> MidSubarray:
+    return MidSubarray(
+        name=capabilities.policy or capabilities.array_assembly,
+        receptors=capabilities.receptors.receptor_ids,
+        available_bandwidth_hz=capabilities.available_bandwidth_hz,
+        number_pst_beams=capabilities.observing_modes.pst.max_beams,
+        number_fsps=capabilities.cbf.number_fsps,
+        allowed_channel_width_values_hz=capabilities.allowed_channel_width_values_hz,
+    )
+
+
+def _low_capabilities(capabilities: LowCapabilities) -> LowSubarray:
+    return LowSubarray(
+        name=capabilities.policy or capabilities.array_assembly,
+        receptors=capabilities.receptors.receptor_ids,
+        available_bandwidth_hz=capabilities.available_bandwidth_hz,
+        number_pst_beams=capabilities.observing_modes.pst.max_beams,
+        number_fsps=capabilities.cbf.number_fsps,
+        number_substations=(
+            capabilities.sps.subarray_beams.max_substations_per_subarray_beam
+        ),
+        number_subarray_beams=capabilities.sps.subarray_beams.max_subarray_beams,
+    )
+
+
+@overload
+def get_basic_capabilities(
+    repository: OSDRepository, telescope: Literal[Telescope.SKA_MID]
+) -> list[MidFrequencyBand]: ...
+
+
+@overload
+def get_basic_capabilities(
+    repository: OSDRepository, telescope: Literal[Telescope.SKA_LOW]
+) -> LowFrequencyBand: ...
+
+
+def get_basic_capabilities(
+    repository: OSDRepository, telescope: Telescope
+) -> list[MidFrequencyBand] | LowFrequencyBand:
+    """A telescope's basic capabilities, as the ODT reads them: Mid's receiver
+    bands, or Low's band with its coarse channels and the channels each mode
+    divides them into.
+
+    :param repository: the OSD repository to read from.
+    :param telescope: the telescope.
+    :return: Mid's frequency bands, or Low's frequency band.
+    """
+    basic_capabilities = repository.get_basic_capabilities(telescope)
+    if isinstance(basic_capabilities, MidBasicCapabilities):
+        return [
+            MidFrequencyBand.model_validate(band, from_attributes=True)
+            for band in basic_capabilities.frequency_bands
+        ]
     coarse_channels = basic_capabilities.sps.coarse_channels
     observing_modes = basic_capabilities.observing_modes
     return LowFrequencyBand(
@@ -155,33 +212,90 @@ def _low_frequency_band(repository: OSDRepository) -> LowFrequencyBand:
     )
 
 
-def _mid_capabilities(
-    capabilities: MidCapabilities,
-) -> MidSubarray:
-    return MidSubarray(
-        name=capabilities.array_assembly,
-        receptors=capabilities.receptors.receptor_ids,
-        available_bandwidth_hz=capabilities.available_bandwidth_hz,
-        number_pst_beams=capabilities.observing_modes.pst.max_beams,
-        number_fsps=capabilities.cbf.number_fsps,
-        allowed_channel_width_values_hz=capabilities.allowed_channel_width_values_hz,
+def get_constraints(repository: OSDRepository, telescope: Telescope) -> Constraints:
+    """A telescope's elevation limits and sun, moon and Jupiter avoidance
+    angles.
+
+    :param repository: the OSD repository to read from.
+    :param telescope: the telescope.
+    :return: the telescope's constraints.
+    """
+    return Constraints.model_validate(
+        repository.get_constraints(telescope), from_attributes=True
     )
 
 
-def _low_capabilities(
-    capabilities: LowCapabilities,
-) -> LowSubarray:
-    return LowSubarray(
-        name=capabilities.array_assembly,
-        receptors=capabilities.receptors.receptor_ids,
-        available_bandwidth_hz=capabilities.available_bandwidth_hz,
-        number_pst_beams=capabilities.observing_modes.pst.max_beams,
-        number_fsps=capabilities.cbf.number_fsps,
-        number_substations=(
-            capabilities.sps.subarray_beams.max_substations_per_subarray_beam
-        ),
-        number_subarray_beams=capabilities.sps.subarray_beams.max_subarray_beams,
+@overload
+def get_defaults(
+    repository: OSDRepository, telescope: Literal[Telescope.SKA_MID]
+) -> SPFRxParameters: ...
+
+
+@overload
+def get_defaults(
+    repository: OSDRepository, telescope: Literal[Telescope.SKA_LOW]
+) -> LowQualityAttributeMetrics: ...
+
+
+def get_defaults(
+    repository: OSDRepository, telescope: Telescope
+) -> SPFRxParameters | LowQualityAttributeMetrics:
+    """A telescope's defaults, as the ODT reads them.
+
+    :param repository: the OSD repository to read from.
+    :param telescope: the telescope.
+    :return: Mid's SPFRx defaults, or Low's quality attribute metrics.
+    """
+    defaults = repository.get_defaults(telescope)
+    if isinstance(defaults, MidDefaults):
+        return SPFRxParameters.model_validate(
+            defaults.spfrx_defaults, from_attributes=True
+        )
+    return LowQualityAttributeMetrics.model_validate(
+        defaults.quality_attribute_metrics, from_attributes=True
     )
+
+
+@overload
+def get_capabilities(
+    repository: OSDRepository,
+    telescope: Literal[Telescope.SKA_MID],
+    array_assembly: str,
+    policy_id: str | None = None,
+) -> MidSubarray: ...
+
+
+@overload
+def get_capabilities(
+    repository: OSDRepository,
+    telescope: Literal[Telescope.SKA_LOW],
+    array_assembly: str,
+    policy_id: str | None = None,
+) -> LowSubarray: ...
+
+
+def get_capabilities(
+    repository: OSDRepository,
+    telescope: Telescope,
+    array_assembly: str,
+    policy_id: str | None = None,
+) -> MidSubarray | LowSubarray:
+    """An array assembly's capabilities, with a policy's applied if one is
+    given, as the ODT reads them.
+
+    :param repository: the OSD repository to read from.
+    :param telescope: the telescope.
+    :param array_assembly: the array assembly, e.g. ``"AA2"``.
+    :param policy_id: the ID of a policy to apply, e.g. ``"AA2_SV"``.
+    :return: the capabilities, named after the policy, or else the array
+        assembly.
+    :raises ArrayAssemblyNotFoundError: If there is no such array assembly.
+    :raises PolicyNotFoundError: If there is no such policy.
+    """
+    capabilities = repository.get_capabilities(telescope, array_assembly, policy_id)
+    if isinstance(capabilities, MidCapabilities):
+        return _mid_capabilities(capabilities)
+    return _low_capabilities(capabilities)
 
 
 def get_configuration(repository: OSDRepository) -> Configuration:
@@ -194,35 +308,20 @@ def get_configuration(repository: OSDRepository) -> Configuration:
     """
     return Configuration(
         ska_mid=MidConfiguration(
-            frequency_band=[
-                MidFrequencyBand.model_validate(band, from_attributes=True)
-                for band in repository.get_basic_capabilities(
-                    Telescope.SKA_MID
-                ).frequency_bands
-            ],
-            constraints=Constraints.model_validate(
-                repository.get_constraints(Telescope.SKA_MID), from_attributes=True
-            ),
+            frequency_band=get_basic_capabilities(repository, Telescope.SKA_MID),
+            constraints=get_constraints(repository, Telescope.SKA_MID),
             subarrays=[
                 _mid_capabilities(capabilities)
                 for capabilities in repository.get_array_assembly_capabilities(
                     Telescope.SKA_MID
                 )
             ],
-            spfrx_defaults=SPFRxParameters.model_validate(
-                repository.get_defaults(Telescope.SKA_MID).spfrx_defaults,
-                from_attributes=True,
-            ),
+            spfrx_defaults=get_defaults(repository, Telescope.SKA_MID),
         ),
         ska_low=LowConfiguration(
-            frequency_band=_low_frequency_band(repository),
-            constraints=Constraints.model_validate(
-                repository.get_constraints(Telescope.SKA_LOW), from_attributes=True
-            ),
-            quality_attribute_metrics=LowQualityAttributeMetrics.model_validate(
-                repository.get_defaults(Telescope.SKA_LOW).quality_attribute_metrics,
-                from_attributes=True,
-            ),
+            frequency_band=get_basic_capabilities(repository, Telescope.SKA_LOW),
+            constraints=get_constraints(repository, Telescope.SKA_LOW),
+            quality_attribute_metrics=get_defaults(repository, Telescope.SKA_LOW),
             subarrays=[
                 _low_capabilities(capabilities)
                 for capabilities in repository.get_array_assembly_capabilities(

@@ -723,65 +723,80 @@ ODT_MID_SPFRX_DEFAULTS = odt.SPFRxParameters(
     csp_spfrx=odt.CSPSPFRx(sync_pps=odt.SyncPPS.UNSET, saturation_threshold=0.2),
 )
 
+ODT_LOW_QUALITY_ATTRIBUTE_METRICS = odt.LowQualityAttributeMetrics(
+    cbf=odt.LowCBFMetrics(processors_ready_percent=100.0)
+)
+
+ODT_MID_AA1 = odt.MidSubarray(
+    name="AA1",
+    receptors=["SKA001", "SKA002", "SKA003", "SKA004"],
+    available_bandwidth_hz=800_000_000.0,
+    number_pst_beams=1,
+    number_fsps=4,
+    allowed_channel_width_values_hz=[13440],
+)
+
+ODT_MID_AA2 = odt.MidSubarray(
+    name="AA2",
+    receptors=[
+        "SKA001",
+        "SKA002",
+        "SKA003",
+        "SKA004",
+        "SKA005",
+        "SKA006",
+        "SKA007",
+        "SKA008",
+    ],  # fmt: skip
+    available_bandwidth_hz=800_000_000.0,
+    number_pst_beams=1,
+    number_fsps=8,
+    allowed_channel_width_values_hz=[3360, 6720, 13440, 26880],
+)
+
+ODT_LOW_AA1 = odt.LowSubarray(
+    name="AA1",
+    receptors=[345, 346, 347, 348],
+    available_bandwidth_hz=75_000_000.0,
+    number_pst_beams=1,
+    number_fsps=6,
+    number_substations=0,
+    number_subarray_beams=1,
+)
+
+ODT_LOW_AA2 = odt.LowSubarray(
+    name="AA2",
+    receptors=[345, 346, 347, 348, 349, 350, 351, 352],
+    available_bandwidth_hz=75_000_000.0,
+    number_pst_beams=1,
+    number_fsps=6,
+    number_substations=512,
+    number_subarray_beams=8,
+)
+
+# Low AA2 with tests/tmdata/telescopes/ska_low/policies/AA2_SV.json applied
+ODT_LOW_AA2_SV = odt.LowSubarray(
+    name="AA2_SV",
+    receptors=[345, 346, 347, 348, 349, 350, 351, 352],
+    available_bandwidth_hz=75_000_000.0,
+    number_pst_beams=1,
+    number_fsps=6,
+    number_substations=0,
+    number_subarray_beams=1,
+)
+
 CONFIGURATION = odt.Configuration(
     ska_mid=odt.MidConfiguration(
         frequency_band=ODT_MID_FREQUENCY_BANDS,
         constraints=ODT_MID_CONSTRAINTS,
-        subarrays=[
-            odt.MidSubarray(
-                name="AA1",
-                receptors=["SKA001", "SKA002", "SKA003", "SKA004"],
-                available_bandwidth_hz=800_000_000.0,
-                number_pst_beams=1,
-                number_fsps=4,
-                allowed_channel_width_values_hz=[13440],
-            ),
-            odt.MidSubarray(
-                name="AA2",
-                receptors=[
-                    "SKA001",
-                    "SKA002",
-                    "SKA003",
-                    "SKA004",
-                    "SKA005",
-                    "SKA006",
-                    "SKA007",
-                    "SKA008",
-                ],  # fmt: skip
-                available_bandwidth_hz=800_000_000.0,
-                number_pst_beams=1,
-                number_fsps=8,
-                allowed_channel_width_values_hz=[3360, 6720, 13440, 26880],
-            ),
-        ],
+        subarrays=[ODT_MID_AA1, ODT_MID_AA2],
         spfrx_defaults=ODT_MID_SPFRX_DEFAULTS,
     ),
     ska_low=odt.LowConfiguration(
         frequency_band=ODT_LOW_FREQUENCY_BAND,
         constraints=ODT_LOW_CONSTRAINTS,
-        quality_attribute_metrics=odt.LowQualityAttributeMetrics(
-            cbf=odt.LowCBFMetrics(processors_ready_percent=100.0)
-        ),
-        subarrays=[
-            odt.LowSubarray(
-                name="AA1",
-                receptors=[345, 346, 347, 348],
-                available_bandwidth_hz=75_000_000.0,
-                number_pst_beams=1,
-                number_fsps=6,
-                number_substations=0,
-                number_subarray_beams=1,
-            ),
-            odt.LowSubarray(
-                name="AA2",
-                receptors=[345, 346, 347, 348, 349, 350, 351, 352],
-                available_bandwidth_hz=75_000_000.0,
-                number_pst_beams=1,
-                number_fsps=6,
-                number_substations=512,
-                number_subarray_beams=8,
-            ),
-        ],
+        quality_attribute_metrics=ODT_LOW_QUALITY_ATTRIBUTE_METRICS,
+        subarrays=[ODT_LOW_AA1, ODT_LOW_AA2],
     ),
 )
 
