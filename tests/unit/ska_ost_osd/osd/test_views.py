@@ -93,7 +93,10 @@ class TestGetCycleConfiguration:
         }
         mid = served["capabilities"]["mid"]
         assert list(mid) == ["basic_capabilities", "AA2"]
-        assert list(mid["basic_capabilities"]) == ["receiver_information"]
+        assert list(mid["basic_capabilities"]) == [
+            "dish_elevation_limit_deg",
+            "receiver_information",
+        ]
         assert not any(key in mid["AA2"] for key in ("name", "telescope", "receptors"))
         assert "observing_modes" not in mid["AA2"]
         assert mid["AA2"]["number_pss_beams"] == 0
@@ -145,21 +148,6 @@ class TestGetCycleConfiguration:
         assert low["AA2"]["number_substations"] == 512
         assert low["AA2"]["number_stations"] == 8
         assert low["AA2"]["max_baseline_km"] == 6.0
-
-    def test_serves_the_pht_names_without_by_alias(self, test_tmdata_repository):
-        """The view serialises with the PHT's names by default, so a caller
-        doesn't need to remember by_alias=True."""
-        served = get_cycle_configuration(
-            test_tmdata_repository, "TEST_SKAO_2027_AA2_Proposal"
-        ).model_dump(mode="json")
-
-        assert served["observatory_policy"]["telescope_capabilities"] == {
-            "Mid": "AA2",
-            "Low": "AA2",
-        }
-        assert list(served["capabilities"]["mid"]["basic_capabilities"]) == [
-            "receiver_information"
-        ]
 
     def test_telescope_not_offered_is_null(self, test_tmdata_repository):
         """The PHT UI checks for null, so a telescope the cycle doesn't offer

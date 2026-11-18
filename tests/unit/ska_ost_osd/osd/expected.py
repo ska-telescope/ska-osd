@@ -76,16 +76,18 @@ from ska_ost_osd.osd.models.defaults import (
 from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplate, SubarrayType
 from ska_ost_osd.osd.views import odt
 from ska_ost_osd.osd.views.pht import (
+    BasicCapabilitiesLow,
+    BasicCapabilitiesMid,
     CycleCapabilities,
     CycleConfiguration,
     CycleInformation,
     CyclePolicies,
     LowCycleCapabilities,
     LowOfferedCapabilities,
-    MidCycleBasicCapabilities,
     MidCycleCapabilities,
     MidOfferedCapabilities,
     ObservatoryPolicy,
+    ReceiverInformation,
     TelescopeCapabilities,
 )
 
@@ -785,6 +787,68 @@ ODT_LOW_AA2_SV = odt.LowSubarray(
     number_subarray_beams=1,
 )
 
+# The PHT view of tests/tmdata: the parts ska-oso-services builds GET
+# /prsls/osd/{cycle} from
+
+PHT_MID_BASIC_CAPABILITIES = BasicCapabilitiesMid(
+    dish_elevation_limit_deg=15.0,
+    receiver_information=[
+        ReceiverInformation(
+            rx_id="Band_1", min_frequency_hz=350_000_000, max_frequency_hz=1_050_000_000
+        ),
+        ReceiverInformation(
+            rx_id="Band_2", min_frequency_hz=950_000_000, max_frequency_hz=1_760_000_000
+        ),
+        ReceiverInformation(
+            rx_id="Band_3",
+            min_frequency_hz=1_650_000_000,
+            max_frequency_hz=3_050_000_000,
+        ),
+        ReceiverInformation(
+            rx_id="Band_4",
+            min_frequency_hz=2_800_000_000,
+            max_frequency_hz=5_180_000_000,
+        ),
+        ReceiverInformation(
+            rx_id="Band_5a",
+            min_frequency_hz=4_600_000_000,
+            max_frequency_hz=8_500_000_000,
+        ),
+        ReceiverInformation(
+            rx_id="Band_5b",
+            min_frequency_hz=11_450_000_000,
+            max_frequency_hz=13_510_000_000,
+            sub_bands=[
+                {
+                    "sub_band": 1,
+                    "min_frequency_hz": 11_450_000_000,
+                    "max_frequency_hz": 12_150_000_000,
+                    "lo_frequency_hz": 11_100_000_000,
+                    "sideband": "high",
+                },
+                {
+                    "sub_band": 2,
+                    "min_frequency_hz": 12_810_000_000,
+                    "max_frequency_hz": 13_510_000_000,
+                    "lo_frequency_hz": 13_860_000_000,
+                    "sideband": "low",
+                },
+                {
+                    "sub_band": 3,
+                    "min_frequency_hz": 12_150_000_000,
+                    "max_frequency_hz": 12_850_000_000,
+                    "lo_frequency_hz": 11_100_000_000,
+                    "sideband": "low",
+                },
+            ],
+        ),
+    ],
+)
+
+PHT_LOW_BASIC_CAPABILITIES = BasicCapabilitiesLow(
+    min_frequency_hz=50_000_000, max_frequency_hz=350_000_000
+)
+
 # The PHT cycle views of tests/tmdata: each cycle with the capabilities
 # each telescope offers and that telescope's basic capabilities
 CYCLE_1_CONFIGURATION = CycleConfiguration(
@@ -809,7 +873,7 @@ CYCLE_1_CONFIGURATION = CycleConfiguration(
     capabilities=CycleCapabilities(
         mid=None,
         low=LowCycleCapabilities(
-            basic_capabilities=LOW_FREQUENCY_BAND,
+            basic_capabilities=PHT_LOW_BASIC_CAPABILITIES,
             capabilities=LowOfferedCapabilities.model_validate(
                 LOW_AA1.model_dump() | {"name": LOW_AA1.array_assembly}
             ),
@@ -838,9 +902,7 @@ CYCLE_2_CONFIGURATION = CycleConfiguration(
     ),
     capabilities=CycleCapabilities(
         mid=MidCycleCapabilities(
-            basic_capabilities=MidCycleBasicCapabilities(
-                frequency_bands=MID_BASIC_CAPABILITIES.frequency_bands
-            ),
+            basic_capabilities=PHT_MID_BASIC_CAPABILITIES,
             capabilities=MidOfferedCapabilities.model_validate(
                 MID_AA2.model_dump()
                 | {
@@ -853,7 +915,7 @@ CYCLE_2_CONFIGURATION = CycleConfiguration(
             ),
         ),
         low=LowCycleCapabilities(
-            basic_capabilities=LOW_FREQUENCY_BAND,
+            basic_capabilities=PHT_LOW_BASIC_CAPABILITIES,
             capabilities=LowOfferedCapabilities.model_validate(
                 LOW_AA2.model_dump() | {"name": LOW_AA2.array_assembly}
             ),

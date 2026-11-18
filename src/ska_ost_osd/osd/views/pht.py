@@ -14,7 +14,6 @@ from pydantic import (
 
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
-    FrequencyBand,
     LowArrayAssemblyCBF,
     LowArrayAssemblyObservingModes,
     LowArrayAssemblyReceptors,
@@ -23,7 +22,6 @@ from ska_ost_osd.osd.models.capabilities import (
     MidArrayAssemblyReceptors,
     MidCapabilities,
     MidCBFMode,
-    MidFrequencyBand,
     MidPSSMode,
     MidPSTMode,
 )
@@ -80,14 +78,21 @@ class ObservatoryPolicy(ConfigurationModel):
     telescope_capabilities: TelescopeCapabilities
 
 
-class MidCycleBasicCapabilities(ConfigurationModel):
-    """Mid's receiver bands, served as ``receiver_information``, the name the
-    PHT UI reads."""
+class ReceiverInformation(ConfigurationModel):
+    rx_id: str
+    min_frequency_hz: float
+    max_frequency_hz: float
+    sub_bands: list[dict] | None = None
 
-    frequency_bands: list[MidFrequencyBand] = Field(
-        validation_alias="receiver_information",
-        serialization_alias="receiver_information",
-    )
+
+class BasicCapabilitiesMid(ConfigurationModel):
+    dish_elevation_limit_deg: float
+    receiver_information: list[ReceiverInformation]
+
+
+class BasicCapabilitiesLow(ConfigurationModel):
+    min_frequency_hz: float
+    max_frequency_hz: float
 
 
 class MidOfferedSpectralMode(OSDBaseModel):
@@ -194,12 +199,12 @@ class CycleCapabilitiesBase(ConfigurationModel):
 
 
 class MidCycleCapabilities(CycleCapabilitiesBase):
-    basic_capabilities: MidCycleBasicCapabilities
+    basic_capabilities: BasicCapabilitiesMid
     capabilities: MidOfferedCapabilities
 
 
 class LowCycleCapabilities(CycleCapabilitiesBase):
-    basic_capabilities: FrequencyBand
+    basic_capabilities: BasicCapabilitiesLow
     capabilities: LowOfferedCapabilities
 
 
@@ -221,6 +226,26 @@ def _name(capabilities: MidCapabilities | LowCapabilities) -> str:
     """The name the PHT UI knows capabilities by: the policy's, or the array
     assembly's if no policy applies."""
     return capabilities.policy or capabilities.array_assembly
+
+
+def _basic_capabilities_mid(repository: OSDRepository) -> BasicCapabilitiesMid:
+    basic_capabilities = repository.get_basic_capabilities(Telescope.SKA_MID)
+    return BasicCapabilitiesMid(
+        dish_elevation_limit_deg=basic_capabilities.elevation_limits.min_elevation_deg,
+        receiver_information=[
+            ReceiverInformation(
+                rx_id=band.rx_id,
+                min_frequency_hz=band.min_frequency_hz,
+                max_frequency_hz=band.max_frequency_hz,
+                sub_bands=(
+                    None
+                    if band.band5b_subbands is None
+                    else [sub_band.model_dump() for sub_band in band.band5b_subbands]
+                ),
+            )
+            for band in basic_capabilities.frequency_bands
+        ],
+    )
 
 
 def _timestamp(moment: datetime) -> str:
@@ -295,10 +320,7 @@ def get_cycle_configuration(
         observatory_policy=_observatory_policy(cycle, policy_type, mid, low),
         capabilities=CycleCapabilities(
             mid=MidCycleCapabilities(
-                basic_capabilities=MidCycleBasicCapabilities.model_validate(
-                    repository.get_basic_capabilities(Telescope.SKA_MID),
-                    from_attributes=True,
-                ),
+                basic_capabilities=_basic_capabilities_mid(repository),
                 capabilities=MidOfferedCapabilities.model_validate(
                     mid.model_dump()
                     | {
@@ -315,9 +337,10 @@ def get_cycle_configuration(
             if mid is not None
             else None,
             low=LowCycleCapabilities(
-                basic_capabilities=repository.get_basic_capabilities(
-                    Telescope.SKA_LOW
-                ).frequency_band,
+                basic_capabilities=BasicCapabilitiesLow.model_validate(
+                    repository.get_basic_capabilities(Telescope.SKA_LOW).frequency_band,
+                    from_attributes=True,
+                ),
                 capabilities=LowOfferedCapabilities.model_validate(
                     low.model_dump() | {"name": _name(low)}
                 ),

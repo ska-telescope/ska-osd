@@ -357,7 +357,9 @@ offers; ``get_cycle_configurations(repository)`` returns every cycle:
                                 (the proposal policy), telescope_capabilities
     capabilities
         mid                     null if the cycle doesn't offer Mid
-            basic_capabilities  receiver_information: the receiver bands
+            basic_capabilities  dish_elevation_limit_deg, and
+                                receiver_information: the receiver bands,
+                                Band 5b with its sub_bands
             "AA2"               the capabilities offered, keyed by the
                                 policy's name
         low                     null if the cycle doesn't offer Low
@@ -365,10 +367,9 @@ offers; ``get_cycle_configurations(repository)`` returns every cycle:
             "AA2"               the capabilities offered, keyed by the
                                 policy's name
 
-The PHT UI reads the field names of the response it already uses, and the views
-serialise with those names by default, without ``by_alias=True``: Mid's
-receiver bands as ``receiver_information``, and Mid's channel widths also as
-``allowed_channel_width_values``. The PHT UI finds the capabilities as the first
+The PHT UI reads the field names of the response it already uses, including Mid's
+channel widths as ``allowed_channel_width_values``, which the views also serve
+as ``allowed_channel_width_values_hz``. The PHT UI finds the capabilities as the first
 key under ``mid`` or ``low`` that isn't ``basic_capabilities``.
 
 .. code-block:: python
