@@ -94,12 +94,15 @@ Unreleased
   and ``get_cycle_capabilities(cycle_id)`` what a cycle offers. A key with no data
   raises an ``OSDQueryError``, such as ``CycleNotFoundError`` or
   ``PolicyNotFoundError``
-* Added ``ska_ost_osd.osd.views``: the configuration ska-oso-services serves to the
-  ODT (``views.odt``) and the cycle data it serves to the PHT (``views.pht``), built
-  from an ``OSDRepository``. The views serialise with the names their consumers
-  read by default, without ``by_alias=True``. The ODT configuration lists array
-  assemblies only, so not policies such as Low's ``AA2_SV``
-* Raised the minimum pydantic version to 2.11, for ``serialize_by_alias``
+* Added ``ska_ost_osd.osd.views``: functions that build, from an ``OSDRepository``,
+  the parts ska-oso-services' responses to its UIs are made of, in the models those
+  responses use. ``views.odt`` supplies ``GET /configuration``:
+  ``get_frequency_band``, ``get_constraints``, ``get_spfrx_defaults``,
+  ``get_quality_attribute_metrics`` and ``get_subarray``. ``views.pht`` supplies
+  ``GET /prsls/osd/{cycle}`` and ``GET /prsls/osd/cycles``:
+  ``get_observatory_policy``, ``get_basic_capabilities`` and ``get_capabilities``.
+  ska-oso-services chooses which array assemblies and policies to serve, and
+  assembles its responses
 * Bump the build and runtime base images to ``ska-build-python-ubuntu26:1.1.2`` and
   ``ska-python-ubuntu26:1.1.2`` to pick up the OpenSSL DTLS retransmission fix
 

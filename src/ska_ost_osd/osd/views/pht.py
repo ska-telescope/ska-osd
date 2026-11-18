@@ -1,43 +1,23 @@
-"""The PHT views: what ska-oso-services serves to the PHT from GET
-/prsls/osd/cycles and GET /prsls/osd/{cycle}: each cycle with the
-capabilities each telescope offers and that telescope's basic capabilities. Served
-with aliases, the field names are the ones the PHT UI reads."""
+"""The PHT view: the parts of what ska-oso-services serves to the PHT from GET
+/prsls/osd/cycles and GET /prsls/osd/{cycle}. ska-oso-services chooses which
+array assemblies and policies to serve, and assembles its response. The models
+are the view's own, named and shaped as ska-oso-services' response models, so
+the response doesn't change with the domain models."""
 
-from datetime import datetime
-from typing import Any, Literal
-
-from pydantic import (
-    Field,
-    SerializerFunctionWrapHandler,
-    model_serializer,
-    model_validator,
-)
+from datetime import datetime, timezone
+from typing import Literal, overload
 
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
-    LowArrayAssemblyCBF,
-    LowArrayAssemblyObservingModes,
-    LowArrayAssemblyReceptors,
-    LowArrayAssemblySPS,
     LowCapabilities,
-    MidArrayAssemblyReceptors,
+    MidBasicCapabilities,
     MidCapabilities,
-    MidCBFMode,
-    MidFrequencyBand,
-    MidPSSMode,
-    MidPSTMode,
 )
 from ska_ost_osd.osd.models.cycles import Cycle, PolicyType
-from ska_ost_osd.osd.models.defaults import OSDBaseModel
-from ska_ost_osd.osd.models.subarray_templates import SubarrayType
 from ska_ost_osd.osd.repository import OSDRepository
 from ska_ost_osd.osd.views.base import (
     NO_CHANNEL_LIMIT,
     ConfigurationModel,
-    LowFrequencyBandWithChannels,
-    legacy_zoom_factors,
-    low_frequency_band,
-    zoom_factors_from_legacy,
 )
 
 # The PHT UI recognises science verification by its name
@@ -48,24 +28,12 @@ _TYPE_NAMES = {
 }
 
 
-class CycleTelescopeCapabilities(ConfigurationModel):
-    """The capabilities each telescope offers in the cycle, or ``None``.
-    Served as ``Mid`` and ``Low``, the names the PHT UI reads."""
-
-    ska_mid: str | None = Field(
-        default=None, validation_alias="Mid", serialization_alias="Mid"
-    )
-    ska_low: str | None = Field(
-        default=None, validation_alias="Low", serialization_alias="Low"
-    )
-
-
 class CycleInformation(ConfigurationModel):
     """The cycle's ID and proposal window, as the PHT UI reads them."""
 
     cycle_id: str
-    proposal_open: datetime
-    proposal_close: datetime
+    proposal_open: str
+    proposal_close: str
 
 
 class CyclePolicies(ConfigurationModel):
@@ -77,279 +45,181 @@ class CyclePolicies(ConfigurationModel):
     max_data_products: int | None = None
 
 
+class TelescopeCapabilities(ConfigurationModel):
+    """The name of the capabilities each telescope offers in the cycle, or
+    ``None``."""
+
+    Mid: str | None = None
+    Low: str | None = None
+
+
 class ObservatoryPolicy(ConfigurationModel):
     """The cycle, as the PHT UI reads it."""
 
     cycle_number: int | None = None
-    cycle_id: str
-    type: str
+    cycle_id: str | None = None
+    type: str | None = None
     cycle_description: str
     cycle_information: CycleInformation
     cycle_policies: CyclePolicies
-    telescope_capabilities: CycleTelescopeCapabilities
+    telescope_capabilities: TelescopeCapabilities
 
 
-class MidCycleBasicCapabilities(ConfigurationModel):
-    """Mid's receiver bands, served as ``receiver_information``, the name the
-    PHT UI reads."""
+class ReceiverInformation(ConfigurationModel):
+    rx_id: str
+    min_frequency_hz: float
+    max_frequency_hz: float
+    sub_bands: list[dict] | None = None
 
-    frequency_bands: list[MidFrequencyBand] = Field(
-        validation_alias="receiver_information",
-        serialization_alias="receiver_information",
+
+class BasicCapabilitiesMid(ConfigurationModel):
+    dish_elevation_limit_deg: float
+    receiver_information: list[ReceiverInformation]
+
+
+class BasicCapabilitiesLow(ConfigurationModel):
+    min_frequency_hz: float
+    max_frequency_hz: float
+
+
+class AA2_MID(ConfigurationModel):
+    """Any one of Mid's array assemblies, with a policy's applied if one is
+    given; ska-oso-services named the model after the first it served."""
+
+    allowed_channel_count_range_max: list[int]
+    allowed_channel_count_range_min: list[int]
+    allowed_channel_width_values: list[int]
+    allowed_channel_width_values_hz: list[int]
+    available_receivers: list[str]
+    number_ska_dishes: int
+    number_meerkat_dishes: int
+    number_meerkatplus_dishes: int
+    max_baseline_km: float
+    available_bandwidth_hz: float
+    number_channels: int | None = None
+    cbf_modes: list[str]
+    number_zoom_windows: int
+    number_zoom_channels: int
+    number_pss_beams: int
+    number_pst_beams: int
+    ps_beam_bandwidth_hz: float
+    number_fsps: int
+
+
+class AA2_LOW(ConfigurationModel):
+    """Any one of Low's array assemblies, with a policy's applied if one is
+    given; ska-oso-services named the model after the first it served."""
+
+    number_stations: int
+    number_substations: int
+    number_beams: int
+    max_baseline_km: float
+    available_bandwidth_hz: float
+    channel_width_hz: float | None = None
+    cbf_modes: list[str]
+    number_zoom_windows: int
+    number_zoom_channels: int
+    number_pss_beams: int
+    number_pst_beams: int
+    number_vlbi_beams: int
+    ps_beam_bandwidth_hz: float
+    number_fsps: int
+
+
+# Any Mid capabilities, in ska-oso-services' AA2_MID model
+def _aa2_mid(capabilities: MidCapabilities) -> AA2_MID:
+    observing_modes = capabilities.observing_modes
+    receptors = capabilities.receptors
+    max_channels = capabilities.cbf.max_channels
+    return AA2_MID(
+        allowed_channel_count_range_max=[
+            NO_CHANNEL_LIMIT if max_channels is None else max_channels
+        ],
+        allowed_channel_count_range_min=[1],
+        allowed_channel_width_values=capabilities.allowed_channel_width_values_hz,
+        allowed_channel_width_values_hz=capabilities.allowed_channel_width_values_hz,
+        available_receivers=capabilities.receivers,
+        number_ska_dishes=receptors.number_ska_dishes,
+        number_meerkat_dishes=receptors.number_meerkat_dishes,
+        number_meerkatplus_dishes=receptors.number_meerkatplus_dishes,
+        max_baseline_km=receptors.max_baseline_km,
+        available_bandwidth_hz=capabilities.available_bandwidth_hz,
+        cbf_modes=capabilities.cbf.function_modes,
+        number_zoom_windows=observing_modes.spectral.max_zoom_windows,
+        number_zoom_channels=observing_modes.spectral.max_zoom_channels,
+        number_pss_beams=observing_modes.pss.max_beams,
+        number_pst_beams=observing_modes.pst.max_beams,
+        ps_beam_bandwidth_hz=observing_modes.pss.beam_bandwidth_hz,
+        number_fsps=capabilities.cbf.number_fsps,
     )
 
 
-class CycleSubarrayTemplate(ConfigurationModel):
-    """One subarray template, as the legacy OSD API serves it: keyed by its
-    name, with its stations as one comma-separated string."""
-
-    subarray_type: SubarrayType
-    custom_stations: str
-    description: str
-
-
-class MidOfferedSpectralMode(OSDBaseModel):
-    """Mid's zoom windows, as the PHT view serves them: its zoom factors are
-    served as channel widths, in ``allowed_channel_width_values_hz``."""
-
-    max_zoom_windows: int
-    max_zoom_channels: int
-
-
-class MidOfferedObservingModes(OSDBaseModel):
-    """Mid's observing modes, as the PHT view serves them."""
-
-    spectral: MidOfferedSpectralMode
-    pss: MidPSSMode
-    pst: MidPSTMode
+# Any Low capabilities, in ska-oso-services' AA2_LOW model
+def _aa2_low(capabilities: LowCapabilities) -> AA2_LOW:
+    observing_modes = capabilities.observing_modes
+    subarray_beams = capabilities.sps.subarray_beams
+    return AA2_LOW(
+        number_stations=capabilities.receptors.number_stations,
+        number_substations=subarray_beams.max_substations_per_subarray_beam,
+        number_beams=subarray_beams.max_subarray_beams,
+        max_baseline_km=capabilities.receptors.max_baseline_km,
+        available_bandwidth_hz=capabilities.available_bandwidth_hz,
+        cbf_modes=capabilities.cbf.function_modes,
+        number_zoom_windows=observing_modes.spectral.max_zoom_windows,
+        number_zoom_channels=observing_modes.spectral.max_zoom_channels,
+        number_pss_beams=observing_modes.pss.max_beams,
+        number_pst_beams=observing_modes.pst.max_beams,
+        number_vlbi_beams=observing_modes.vlbi.max_beams,
+        ps_beam_bandwidth_hz=observing_modes.pss.beam_bandwidth_hz,
+        number_fsps=capabilities.cbf.number_fsps,
+    )
 
 
-class MidOfferedCBF(OSDBaseModel):
-    """Mid's correlator-beamformer, as the PHT view serves it: its channel
-    limit is served as ``allowed_channel_count_range_max``."""
-
-    number_fsps: int
-    function_modes: list[MidCBFMode]
-
-
-class MidOfferedCapabilities(OSDBaseModel):
-    """What the PHT view serves of Mid's capabilities in a cycle: all but the
-    basic capabilities, which it serves beside them."""
-
-    name: str
-    available_bandwidth_hz: float
-    cbf: MidOfferedCBF
-    telescope: Literal[Telescope.SKA_MID] = Telescope.SKA_MID
-    observing_modes: MidOfferedObservingModes
-    allowed_channel_width_values_hz: list[int]
-    allowed_channel_count_range_min: list[int]
-    allowed_channel_count_range_max: list[int]
-    receivers: list[str]
-    receptors: MidArrayAssemblyReceptors
+def _timestamp(moment: datetime) -> str:
+    """A UTC time as the tmdata stores it, e.g. ``"2026-03-27T12:00:00.000Z"``."""
+    return (
+        moment.astimezone(timezone.utc)
+        .isoformat(timespec="milliseconds")
+        .replace("+00:00", "Z")
+    )
 
 
-class LowOfferedCapabilities(OSDBaseModel):
-    """What the PHT view serves of Low's capabilities in a cycle: all but the
-    basic capabilities, which it serves beside them."""
-
-    name: str
-    available_bandwidth_hz: float
-    cbf: LowArrayAssemblyCBF
-    telescope: Literal[Telescope.SKA_LOW] = Telescope.SKA_LOW
-    sps: LowArrayAssemblySPS
-    observing_modes: LowArrayAssemblyObservingModes
-    receptors: LowArrayAssemblyReceptors
-
-
-class CycleCapabilitiesBase(ConfigurationModel):
-    """One telescope's capabilities in a cycle. Served keyed by the name of
-    the policy or array assembly, e.g. ``"AA2": {...}``, beside
-    ``basic_capabilities``. When the subarray templates are asked for, they
-    are served in the capabilities, keyed by name, as
-    ``subarray_templates``."""
-
-    capabilities: MidOfferedCapabilities | LowOfferedCapabilities
-    subarray_templates: dict[str, CycleSubarrayTemplate] | None = None
-
-    @model_validator(mode="before")
-    @classmethod
-    def collect_capabilities(cls, data: Any) -> Any:
-        """Read the served form back: the one key that isn't
-        ``basic_capabilities`` holds the capabilities, and the subarray
-        templates if they were served."""
-        if not isinstance(data, dict) or "capabilities" in data:
-            return data
-        data = data.copy()
-        names = [key for key in data if key != "basic_capabilities"]
-        if len(names) == 1:
-            capabilities = data.pop(names[0]).copy()
-            if "number_fsps" in capabilities:
-                capabilities["cbf"] = {
-                    "number_fsps": capabilities.pop("number_fsps"),
-                    "function_modes": capabilities.pop("cbf_modes"),
-                }
-            if "subarray_templates" in capabilities:
-                data["subarray_templates"] = capabilities.pop("subarray_templates")
-            if "number_pss_beams" in capabilities:
-                modes: dict[str, Any] = {
-                    "spectral": {
-                        "max_zoom_windows": capabilities.pop("number_zoom_windows"),
-                        "max_zoom_channels": capabilities.pop("number_zoom_channels"),
-                    },
-                    "pss": {
-                        "max_beams": capabilities.pop("number_pss_beams"),
-                        "beam_bandwidth_hz": capabilities.pop("ps_beam_bandwidth_hz"),
-                    },
-                    "pst": {"max_beams": capabilities.pop("number_pst_beams")},
-                }
-                if "allowed_zoom_factors" in capabilities:
-                    modes["spectral"]["zoom_factors"] = zoom_factors_from_legacy(
-                        capabilities.pop("allowed_zoom_factors")
-                    )
-                if "number_vlbi_beams" in capabilities:
-                    modes["vlbi"] = {"max_beams": capabilities.pop("number_vlbi_beams")}
-                capabilities["observing_modes"] = modes
-            if "available_receivers" in capabilities:
-                capabilities["receivers"] = capabilities.pop("available_receivers")
-            if "number_ska_dishes" in capabilities:
-                capabilities["receptors"] = {
-                    "number_ska_dishes": capabilities.pop("number_ska_dishes"),
-                    "number_meerkat_dishes": capabilities.pop("number_meerkat_dishes"),
-                    "number_meerkatplus_dishes": capabilities.pop(
-                        "number_meerkatplus_dishes"
-                    ),
-                    "max_baseline_km": capabilities.pop("max_baseline_km"),
-                    "receptor_ids": capabilities.pop("receptors"),
-                }
-            if "number_stations" in capabilities:
-                capabilities["receptors"] = {
-                    "number_stations": capabilities.pop("number_stations"),
-                    "max_baseline_km": capabilities.pop("max_baseline_km"),
-                    "receptor_ids": capabilities.pop("receptors"),
-                }
-            if "number_substations" in capabilities:
-                capabilities["sps"] = {
-                    "subarray_beams": {
-                        "max_subarray_beams": capabilities.pop("number_subarray_beams"),
-                        "max_substations_per_subarray_beam": capabilities.pop(
-                            "number_substations"
-                        ),
-                    }
-                }
-            data["capabilities"] = capabilities
-        return data
-
-    @model_serializer(mode="wrap")
-    def key_capabilities_by_name(
-        self, handler: SerializerFunctionWrapHandler
-    ) -> dict[str, Any]:
-        data = handler(self)
-        capabilities = data.pop("capabilities")
-        cbf = capabilities.pop("cbf")
-        capabilities["number_fsps"] = cbf["number_fsps"]
-        capabilities["cbf_modes"] = cbf["function_modes"]
-        if "receivers" in capabilities:
-            capabilities["available_receivers"] = capabilities.pop("receivers")
-        # The PHT UI reads Mid's channel widths without the _hz suffix; the
-        # _hz name is served too, so it can switch to the new name
-        if "allowed_channel_width_values_hz" in capabilities:
-            capabilities["allowed_channel_width_values"] = capabilities[
-                "allowed_channel_width_values_hz"
-            ]
-        # The PHT UI reads the observing modes, the receptors, and Low's subarray beams,
-        # flat under their old names
-        modes = capabilities.pop("observing_modes")
-        capabilities["number_zoom_windows"] = modes["spectral"]["max_zoom_windows"]
-        capabilities["number_zoom_channels"] = modes["spectral"]["max_zoom_channels"]
-        if "zoom_factors" in modes["spectral"]:
-            capabilities["allowed_zoom_factors"] = legacy_zoom_factors(
-                modes["spectral"]["zoom_factors"]
-            )
-        capabilities["number_pss_beams"] = modes["pss"]["max_beams"]
-        capabilities["ps_beam_bandwidth_hz"] = modes["pss"]["beam_bandwidth_hz"]
-        capabilities["number_pst_beams"] = modes["pst"]["max_beams"]
-        if "vlbi" in modes:
-            capabilities["number_vlbi_beams"] = modes["vlbi"]["max_beams"]
-        receptors = capabilities.pop("receptors")
-        capabilities["receptors"] = receptors["receptor_ids"]
-        if "number_stations" in receptors:
-            capabilities["number_stations"] = receptors["number_stations"]
-        else:
-            capabilities["number_ska_dishes"] = receptors["number_ska_dishes"]
-            capabilities["number_meerkat_dishes"] = receptors["number_meerkat_dishes"]
-            capabilities["number_meerkatplus_dishes"] = receptors[
-                "number_meerkatplus_dishes"
-            ]
-        capabilities["max_baseline_km"] = receptors["max_baseline_km"]
-        if "sps" in capabilities:
-            subarray_beams = capabilities.pop("sps")["subarray_beams"]
-            capabilities["number_substations"] = subarray_beams[
-                "max_substations_per_subarray_beam"
-            ]
-            capabilities["number_subarray_beams"] = subarray_beams["max_subarray_beams"]
-        data[self.capabilities.name] = capabilities
-        if (subarray_templates := data.pop("subarray_templates", None)) is not None:
-            data[self.capabilities.name]["subarray_templates"] = subarray_templates
-        return data
-
-
-class MidCycleCapabilities(CycleCapabilitiesBase):
-    basic_capabilities: MidCycleBasicCapabilities
-    capabilities: MidOfferedCapabilities
-
-
-class LowCycleCapabilities(CycleCapabilitiesBase):
-    basic_capabilities: LowFrequencyBandWithChannels
-    capabilities: LowOfferedCapabilities
-
-
-class CycleCapabilities(ConfigurationModel):
-    """The telescopes a cycle offers; ``None`` for one it does not."""
-
-    mid: MidCycleCapabilities | None = None
-    low: LowCycleCapabilities | None = None
-
-
-class CycleConfiguration(ConfigurationModel):
-    """One cycle joined with what it offers."""
-
-    observatory_policy: ObservatoryPolicy
-    capabilities: CycleCapabilities
-
-
-def _subarray_templates(
-    repository: OSDRepository,
-    telescope: Telescope,
-    array_assembly: str,
-    include_subarray_templates: bool,
-) -> dict[str, CycleSubarrayTemplate] | None:
-    """The array assembly's templates keyed by name, or ``None`` when they
-    weren't asked for."""
-    if not include_subarray_templates:
-        return None
-    return {
-        template.name: CycleSubarrayTemplate(
-            subarray_type=template.subarray_type,
-            custom_stations=",".join(template.receptor_ids),
-            description=template.description,
-        )
-        for template in repository.get_subarray_templates(telescope, array_assembly)
+def _policy_type(cycle: Cycle) -> PolicyType:
+    """The one policy type the cycle offers; the PHT UI handles one per
+    cycle."""
+    types = {
+        policy_type
+        for offered in cycle.telescopes.values()
+        for policy_type in offered.policies
     }
+    if len(types) != 1:
+        raise ValueError(
+            f"Cycle {cycle.cycle_id} offers more than one policy type, which the "
+            "PHT view can't serve"
+        )
+    (policy_type,) = types
+    return policy_type
 
 
-def _name(capabilities: MidCapabilities | LowCapabilities) -> str:
-    """The name the PHT UI knows capabilities by: the policy's, or the array
-    assembly's if no policy applies."""
-    return capabilities.policy or capabilities.array_assembly
-
-
-def _observatory_policy(
-    cycle: Cycle,
-    policy_type: PolicyType,
-    mid: MidCapabilities | None,
-    low: LowCapabilities | None,
+def get_observatory_policy(
+    repository: OSDRepository, cycle_id: str
 ) -> ObservatoryPolicy:
-    """The cycle, with the field names the PHT UI reads."""
+    """A cycle, as the PHT reads it. Its telescope_capabilities name the
+    policy each telescope offers, which ska-oso-services serves the
+    capabilities under.
+
+    :param repository: the OSD repository to read from.
+    :param cycle_id: the ID of the cycle.
+    :return: the cycle.
+    :raises CycleNotFoundError: If there is no cycle with that ID.
+    :raises ValueError: If the cycle offers more than one policy type.
+    """
+    cycle = repository.get_cycle(cycle_id)
+    policy_type = _policy_type(cycle)
+    names = {
+        telescope: offered.policies.get(policy_type)
+        for telescope, offered in cycle.telescopes.items()
+    }
     return ObservatoryPolicy(
         cycle_number=cycle.cycle_number,
         cycle_id=cycle.cycle_id,
@@ -357,8 +227,8 @@ def _observatory_policy(
         cycle_description=cycle.description,
         cycle_information=CycleInformation(
             cycle_id=cycle.cycle_id,
-            proposal_open=cycle.proposal_window.opens,
-            proposal_close=cycle.proposal_window.closes,
+            proposal_open=_timestamp(cycle.proposal_window.opens),
+            proposal_close=_timestamp(cycle.proposal_window.closes),
         ),
         cycle_policies=CyclePolicies(
             normal_max_hours=cycle.proposal_policy.max_observing_hours,
@@ -366,111 +236,95 @@ def _observatory_policy(
             max_observation_setups=cycle.proposal_policy.max_observation_setups,
             max_data_products=cycle.proposal_policy.max_data_products,
         ),
-        telescope_capabilities=CycleTelescopeCapabilities(
-            ska_mid=_name(mid) if mid is not None else None,
-            ska_low=_name(low) if low is not None else None,
+        telescope_capabilities=TelescopeCapabilities(
+            Mid=names.get(Telescope.SKA_MID), Low=names.get(Telescope.SKA_LOW)
         ),
     )
 
 
-def get_cycle_configuration(
-    repository: OSDRepository,
-    cycle_id: str,
-    include_subarray_templates: bool = False,
-) -> CycleConfiguration:
-    """Build one cycle's view for the PHT: what ska-oso-services serves from
-    GET /prsls/osd/{cycle}.
+@overload
+def get_basic_capabilities(
+    repository: OSDRepository, telescope: Literal[Telescope.SKA_MID]
+) -> BasicCapabilitiesMid: ...
+
+
+@overload
+def get_basic_capabilities(
+    repository: OSDRepository, telescope: Literal[Telescope.SKA_LOW]
+) -> BasicCapabilitiesLow: ...
+
+
+def get_basic_capabilities(
+    repository: OSDRepository, telescope: Telescope
+) -> BasicCapabilitiesMid | BasicCapabilitiesLow:
+    """A telescope's basic capabilities, as the PHT reads them: Mid's dish
+    elevation limit and receiver bands, or Low's frequency range.
 
     :param repository: the OSD repository to read from.
-    :param cycle_id: the ID of the cycle.
-    :param include_subarray_templates: whether to serve the subarray
-        templates offered with each telescope's capabilities, as
-        ``subarray_templates``.
-    :return: the cycle with, for each telescope it offers, the offered
-        capabilities and that telescope's basic capabilities.
-    :raises CycleNotFoundError: If there is no cycle with that ID.
-    :raises ArrayAssemblyNotFoundError: If the cycle names an array assembly
-        that does not exist.
-    :raises PolicyNotFoundError: If the cycle names a policy that does not
-        exist.
-    :raises ValueError: If the cycle offers more than one policy type.
+    :param telescope: the telescope.
+    :return: the telescope's basic capabilities.
     """
-    cycle = repository.get_cycle(cycle_id)
-    offered = repository.get_cycle_capabilities(cycle_id)
-    # The PHT UI handles one policy type per cycle
-    types = {policy_type for by_type in offered.values() for policy_type in by_type}
-    if len(types) != 1:
-        raise ValueError(
-            f"Cycle {cycle_id} offers more than one policy type, which the PHT "
-            "view can't serve"
+    basic_capabilities = repository.get_basic_capabilities(telescope)
+    if isinstance(basic_capabilities, MidBasicCapabilities):
+        return BasicCapabilitiesMid(
+            dish_elevation_limit_deg=basic_capabilities.elevation_limits.min_elevation_deg,
+            receiver_information=[
+                ReceiverInformation(
+                    rx_id=band.rx_id,
+                    min_frequency_hz=band.min_frequency_hz,
+                    max_frequency_hz=band.max_frequency_hz,
+                    sub_bands=(
+                        None
+                        if band.band5b_subbands is None
+                        else [
+                            sub_band.model_dump() for sub_band in band.band5b_subbands
+                        ]
+                    ),
+                )
+                for band in basic_capabilities.frequency_bands
+            ],
         )
-    (policy_type,) = types
-    mid = offered.get(Telescope.SKA_MID, {}).get(policy_type)
-    low = offered.get(Telescope.SKA_LOW, {}).get(policy_type)
-    return CycleConfiguration(
-        observatory_policy=_observatory_policy(cycle, policy_type, mid, low),
-        capabilities=CycleCapabilities(
-            mid=MidCycleCapabilities(
-                basic_capabilities=MidCycleBasicCapabilities.model_validate(
-                    repository.get_basic_capabilities(Telescope.SKA_MID),
-                    from_attributes=True,
-                ),
-                capabilities=MidOfferedCapabilities.model_validate(
-                    mid.model_dump()
-                    | {
-                        "name": _name(mid),
-                        "allowed_channel_count_range_min": [1],
-                        "allowed_channel_count_range_max": [
-                            NO_CHANNEL_LIMIT
-                            if mid.cbf.max_channels is None
-                            else mid.cbf.max_channels
-                        ],
-                    }
-                ),
-                subarray_templates=_subarray_templates(
-                    repository,
-                    Telescope.SKA_MID,
-                    cycle.telescopes[Telescope.SKA_MID].array_assembly,
-                    include_subarray_templates,
-                ),
-            )
-            if mid is not None
-            else None,
-            low=LowCycleCapabilities(
-                basic_capabilities=low_frequency_band(repository),
-                capabilities=LowOfferedCapabilities.model_validate(
-                    low.model_dump() | {"name": _name(low)}
-                ),
-                subarray_templates=_subarray_templates(
-                    repository,
-                    Telescope.SKA_LOW,
-                    cycle.telescopes[Telescope.SKA_LOW].array_assembly,
-                    include_subarray_templates,
-                ),
-            )
-            if low is not None
-            else None,
-        ),
+    return BasicCapabilitiesLow.model_validate(
+        basic_capabilities.frequency_band, from_attributes=True
     )
 
 
-def get_cycle_configurations(
-    repository: OSDRepository, include_subarray_templates: bool = False
-) -> list[CycleConfiguration]:
-    """Build every cycle's view for the PHT, in ascending order of ID: what
-    ska-oso-services serves from GET /prsls/osd/cycles.
+@overload
+def get_capabilities(
+    repository: OSDRepository,
+    telescope: Literal[Telescope.SKA_MID],
+    array_assembly: str,
+    policy_id: str | None = None,
+) -> AA2_MID: ...
+
+
+@overload
+def get_capabilities(
+    repository: OSDRepository,
+    telescope: Literal[Telescope.SKA_LOW],
+    array_assembly: str,
+    policy_id: str | None = None,
+) -> AA2_LOW: ...
+
+
+def get_capabilities(
+    repository: OSDRepository,
+    telescope: Telescope,
+    array_assembly: str,
+    policy_id: str | None = None,
+) -> AA2_MID | AA2_LOW:
+    """An array assembly's capabilities, with a policy's applied if one is
+    given, as the PHT reads them.
 
     :param repository: the OSD repository to read from.
-    :param include_subarray_templates: whether to serve the subarray
-        templates offered with each telescope's capabilities, as
-        ``subarray_templates``.
-    :return: the cycle views.
-    :raises ArrayAssemblyNotFoundError: If a cycle names an array assembly
-        that does not exist.
-    :raises PolicyNotFoundError: If a cycle names a policy that does not exist.
-    :raises ValueError: If a cycle offers more than one policy type.
+    :param telescope: the telescope.
+    :param array_assembly: the array assembly, e.g. ``"AA2"``.
+    :param policy_id: the ID of a policy to apply, e.g. ``"AA2_SV"``.
+    :return: the capabilities.
+    :raises ArrayAssemblyNotFoundError: If there is no such array assembly.
+    :raises PolicyNotFoundError: If there is no such policy.
     """
-    return [
-        get_cycle_configuration(repository, cycle_id, include_subarray_templates)
-        for cycle_id in repository.get_cycle_ids()
-    ]
+    capabilities = repository.get_capabilities(telescope, array_assembly, policy_id)
+    if isinstance(capabilities, MidCapabilities):
+        return _aa2_mid(capabilities)
+    return _aa2_low(capabilities)

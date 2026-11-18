@@ -27,7 +27,7 @@ from .common.constant import (
 )
 from .models.capabilities import merge_capabilities, mid_channel_width_values_hz
 from .models.cycles import PolicyType
-from .views.base import NO_CHANNEL_LIMIT, legacy_zoom_factors
+from .views.base import NO_CHANNEL_LIMIT
 
 LOGGER = logging.getLogger(__name__)
 
@@ -56,6 +56,16 @@ _LEGACY_TYPE_NAMES = {
     PolicyType.SHARED_RISK: "Shared Risk",
     PolicyType.STANDARD_OPERATIONS: "Proposal",
 }
+
+
+def _legacy_zoom_factors(zoom_factors: list[int]) -> list[int]:
+    """Zoom factors as the pre-8.0 responses served them: the multipliers
+    2**z, with 1 for no zoom, or ``[0]`` when no zoom is offered.
+
+    :param zoom_factors: the PDM's zoom factors offered, e.g. ``[1, 2, 3]``.
+    :return: the served zoom factors, e.g. ``[1, 2, 4, 8]``.
+    """
+    return [1, *(2**zoom for zoom in zoom_factors)] if zoom_factors else [0]
 
 
 class OSD:
@@ -404,7 +414,7 @@ class OSD:
         capabilities["number_zoom_windows"] = modes["spectral"]["max_zoom_windows"]
         capabilities["number_zoom_channels"] = modes["spectral"]["max_zoom_channels"]
         if telescope == Telescope.SKA_LOW and "zoom_factors" in modes["spectral"]:
-            capabilities["allowed_zoom_factors"] = legacy_zoom_factors(
+            capabilities["allowed_zoom_factors"] = _legacy_zoom_factors(
                 modes["spectral"]["zoom_factors"]
             )
         capabilities["number_pss_beams"] = modes["pss"]["max_beams"]

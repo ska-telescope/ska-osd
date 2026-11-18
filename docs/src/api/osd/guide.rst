@@ -394,11 +394,6 @@ Reading the templates
 
 * The repository's ``get_subarray_templates(telescope, array_assembly)`` returns
   an array assembly's templates as a list of ``SubarrayTemplate`` models.
-* The PHT views take ``include_subarray_templates``, ``False`` by default. With
-  ``True``, the capabilities each telescope offers are served with
-  ``subarray_templates``: the templates of the cycle's array assembly keyed by
-  name, as the legacy API serves them, or ``{}`` if it has none. With ``False``
-  the key is left out.
 * The legacy ``get_osd_using_tmdata`` takes ``process_templates``, ``False`` by
   default. With ``False``, the capabilities are returned with the template
   pattern of their array assembly, e.g. ``"subarray_templates": ["*_AA2"]``, as
