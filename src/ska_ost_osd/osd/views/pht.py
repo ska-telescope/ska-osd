@@ -1,17 +1,11 @@
-"""The PHT views: what ska-oso-services serves to the PHT from GET
-/prsls/osd/cycles and GET /prsls/osd/{cycle}: each cycle with the
-capabilities each telescope offers and that telescope's basic capabilities. Its
-models are its own, named and shaped as ska-oso-services' response models, so
+"""The PHT view: the parts of what ska-oso-services serves to the PHT from GET
+/prsls/osd/cycles and GET /prsls/osd/{cycle}. ska-oso-services chooses which
+array assemblies and policies to serve, and assembles its response. The models
+are the view's own, named and shaped as ska-oso-services' response models, so
 the response doesn't change with the domain models."""
 
 from datetime import datetime, timezone
-from typing import Any, Literal, overload
-
-from pydantic import (
-    Field,
-    SerializerFunctionWrapHandler,
-    model_serializer,
-)
+from typing import Literal, overload
 
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
@@ -130,47 +124,6 @@ class AA2_LOW(ConfigurationModel):
     number_vlbi_beams: int
     ps_beam_bandwidth_hz: float
     number_fsps: int
-
-
-class CycleCapabilitiesBase(ConfigurationModel):
-    """One telescope's capabilities in a cycle. Served keyed by the name of
-    the policy or array assembly, e.g. ``"AA2": {...}``, beside
-    ``basic_capabilities``."""
-
-    name: str = Field(exclude=True)
-    capabilities: AA2_MID | AA2_LOW
-
-    @model_serializer(mode="wrap")
-    def key_capabilities_by_name(
-        self, handler: SerializerFunctionWrapHandler
-    ) -> dict[str, Any]:
-        data = handler(self)
-        data[self.name] = data.pop("capabilities")
-        return data
-
-
-class MidCycleCapabilities(CycleCapabilitiesBase):
-    basic_capabilities: BasicCapabilitiesMid
-    capabilities: AA2_MID
-
-
-class LowCycleCapabilities(CycleCapabilitiesBase):
-    basic_capabilities: BasicCapabilitiesLow
-    capabilities: AA2_LOW
-
-
-class CycleCapabilities(ConfigurationModel):
-    """The telescopes a cycle offers; ``None`` for one it does not."""
-
-    mid: MidCycleCapabilities | None = None
-    low: LowCycleCapabilities | None = None
-
-
-class CycleConfiguration(ConfigurationModel):
-    """One cycle joined with what it offers."""
-
-    observatory_policy: ObservatoryPolicy
-    capabilities: CycleCapabilities
 
 
 # Any Mid capabilities, in ska-oso-services' AA2_MID model
@@ -375,75 +328,3 @@ def get_capabilities(
     if isinstance(capabilities, MidCapabilities):
         return _aa2_mid(capabilities)
     return _aa2_low(capabilities)
-
-
-def get_cycle_configuration(
-    repository: OSDRepository, cycle_id: str
-) -> CycleConfiguration:
-    """Build one cycle's view for the PHT: what ska-oso-services serves from
-    GET /prsls/osd/{cycle}.
-
-    :param repository: the OSD repository to read from.
-    :param cycle_id: the ID of the cycle.
-    :return: the cycle with, for each telescope it offers, the offered
-        capabilities and that telescope's basic capabilities.
-    :raises CycleNotFoundError: If there is no cycle with that ID.
-    :raises ArrayAssemblyNotFoundError: If the cycle names an array assembly
-        that does not exist.
-    :raises PolicyNotFoundError: If the cycle names a policy that does not
-        exist.
-    :raises ValueError: If the cycle offers more than one policy type.
-    """
-    observatory_policy = get_observatory_policy(repository, cycle_id)
-    names = observatory_policy.telescope_capabilities
-    telescopes = repository.get_cycle(cycle_id).telescopes
-    return CycleConfiguration(
-        observatory_policy=observatory_policy,
-        capabilities=CycleCapabilities(
-            mid=MidCycleCapabilities(
-                basic_capabilities=get_basic_capabilities(
-                    repository, Telescope.SKA_MID
-                ),
-                name=names.Mid,
-                capabilities=get_capabilities(
-                    repository,
-                    Telescope.SKA_MID,
-                    telescopes[Telescope.SKA_MID].array_assembly,
-                    names.Mid,
-                ),
-            )
-            if names.Mid is not None
-            else None,
-            low=LowCycleCapabilities(
-                basic_capabilities=get_basic_capabilities(
-                    repository, Telescope.SKA_LOW
-                ),
-                name=names.Low,
-                capabilities=get_capabilities(
-                    repository,
-                    Telescope.SKA_LOW,
-                    telescopes[Telescope.SKA_LOW].array_assembly,
-                    names.Low,
-                ),
-            )
-            if names.Low is not None
-            else None,
-        ),
-    )
-
-
-def get_cycle_configurations(repository: OSDRepository) -> list[CycleConfiguration]:
-    """Build every cycle's view for the PHT, in ascending order of ID: what
-    ska-oso-services serves from GET /prsls/osd/cycles.
-
-    :param repository: the OSD repository to read from.
-    :return: the cycle views.
-    :raises ArrayAssemblyNotFoundError: If a cycle names an array assembly
-        that does not exist.
-    :raises PolicyNotFoundError: If a cycle names a policy that does not exist.
-    :raises ValueError: If a cycle offers more than one policy type.
-    """
-    return [
-        get_cycle_configuration(repository, cycle_id)
-        for cycle_id in repository.get_cycle_ids()
-    ]

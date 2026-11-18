@@ -80,12 +80,8 @@ from ska_ost_osd.osd.views.pht import (
     AA2_MID,
     BasicCapabilitiesLow,
     BasicCapabilitiesMid,
-    CycleCapabilities,
-    CycleConfiguration,
     CycleInformation,
     CyclePolicies,
-    LowCycleCapabilities,
-    MidCycleCapabilities,
     ObservatoryPolicy,
     ReceiverInformation,
     TelescopeCapabilities,
@@ -944,8 +940,6 @@ PHT_LOW_AA2_SV = AA2_LOW(
     number_fsps=6,
 )
 
-# The PHT cycle views of tests/tmdata: each cycle with the capabilities
-# each telescope offers and that telescope's basic capabilities
 PHT_CYCLE_1_OBSERVATORY_POLICY = ObservatoryPolicy(
     cycle_number=1,
     cycle_id="TEST_SKAO_2027_Low_AA1_SV",
@@ -965,18 +959,6 @@ PHT_CYCLE_1_OBSERVATORY_POLICY = ObservatoryPolicy(
     telescope_capabilities=TelescopeCapabilities(Mid=None, Low="AA1"),
 )
 
-CYCLE_1_CONFIGURATION = CycleConfiguration(
-    observatory_policy=PHT_CYCLE_1_OBSERVATORY_POLICY,
-    capabilities=CycleCapabilities(
-        mid=None,
-        low=LowCycleCapabilities(
-            basic_capabilities=PHT_LOW_BASIC_CAPABILITIES,
-            name="AA1",
-            capabilities=PHT_LOW_AA1,
-        ),
-    ),
-)
-
 PHT_CYCLE_2_OBSERVATORY_POLICY = ObservatoryPolicy(
     cycle_number=2,
     cycle_id="TEST_SKAO_2027_AA2_Proposal",
@@ -994,20 +976,4 @@ PHT_CYCLE_2_OBSERVATORY_POLICY = ObservatoryPolicy(
         max_data_products=2,
     ),
     telescope_capabilities=TelescopeCapabilities(Mid="AA2", Low="AA2"),
-)
-
-CYCLE_2_CONFIGURATION = CycleConfiguration(
-    observatory_policy=PHT_CYCLE_2_OBSERVATORY_POLICY,
-    capabilities=CycleCapabilities(
-        mid=MidCycleCapabilities(
-            basic_capabilities=PHT_MID_BASIC_CAPABILITIES,
-            name="AA2",
-            capabilities=PHT_MID_AA2,
-        ),
-        low=LowCycleCapabilities(
-            basic_capabilities=PHT_LOW_BASIC_CAPABILITIES,
-            name="AA2",
-            capabilities=PHT_LOW_AA2,
-        ),
-    ),
 )

@@ -290,13 +290,18 @@ UIs, as Pydantic models. Each consumer's views and models are in its own module:
      - Mid: ``MidSubarray``; Low: ``LowSubarray``
      - each of the ``subarrays`` in ``GET /configuration``
      - ODT UI
-   * - ``pht.get_cycle_configuration(repository, cycle_id)``
-     - ``CycleConfiguration``
-     - ``GET /prsls/osd/{cycle}``
+   * - ``pht.get_observatory_policy(repository, cycle_id)``
+     - ``ObservatoryPolicy``
+     - ``observatory_policy`` in ``GET /prsls/osd/{cycle}``
      - PHT UI
-   * - ``pht.get_cycle_configurations(repository)``
-     - ``list[CycleConfiguration]``, in ascending order of cycle ID
-     - ``GET /prsls/osd/cycles``
+   * - ``pht.get_basic_capabilities(repository, telescope)``
+     - Mid: ``BasicCapabilitiesMid``; Low: ``BasicCapabilitiesLow``
+     - each telescope's ``basic_capabilities`` in ``GET /prsls/osd/{cycle}``
+     - PHT UI
+   * - ``pht.get_capabilities(repository, telescope, array_assembly,
+       policy_id=None)``
+     - Mid: ``AA2_MID``; Low: ``AA2_LOW``
+     - the capabilities each telescope offers in ``GET /prsls/osd/{cycle}``
      - PHT UI
 
 
@@ -346,39 +351,51 @@ models, so the response doesn't change with the OSD's domain models.
 PHT cycle data
 ^^^^^^^^^^^^^^^
 
-``get_cycle_configuration(repository, cycle_id)`` returns one cycle with what it
-offers; ``get_cycle_configurations(repository)`` returns every cycle:
+ska-oso-services builds ``GET /prsls/osd/{cycle}`` from the PHT view's
+functions; ``GET /prsls/osd/cycles`` is a list of the same, one for each cycle:
 
 .. code-block:: text
 
-    observatory_policy          the cycle: cycle_number, cycle_id, type,
+    observatory_policy          get_observatory_policy: the cycle's
+                                cycle_number, cycle_id, type,
                                 cycle_description, cycle_information (the
                                 cycle ID and proposal dates), cycle_policies
-                                (the proposal policy), telescope_capabilities
+                                (the proposal policy), and
+                                telescope_capabilities: the name of the
+                                policy each telescope offers
     capabilities
         mid                     null if the cycle doesn't offer Mid
-            basic_capabilities  dish_elevation_limit_deg, and
-                                receiver_information: the receiver bands,
+            basic_capabilities  get_basic_capabilities: dish_elevation_limit_deg,
+                                and receiver_information: the receiver bands,
                                 Band 5b with its sub_bands
-            "AA2"               the capabilities offered, keyed by the
-                                policy's name
+            "AA2"               get_capabilities, keyed by the name in
+                                telescope_capabilities
         low                     null if the cycle doesn't offer Low
-            basic_capabilities  min_frequency_hz and max_frequency_hz
-            "AA2"               the capabilities offered, keyed by the
-                                policy's name
+            basic_capabilities  get_basic_capabilities: min_frequency_hz and
+                                max_frequency_hz
+            "AA2_SV"            get_capabilities, keyed by the name in
+                                telescope_capabilities
 
-The PHT UI reads the field names of the response it already uses, including Mid's
-channel widths as ``allowed_channel_width_values``, which the views also serve
-as ``allowed_channel_width_values_hz``. The PHT UI finds the capabilities as the first
-key under ``mid`` or ``low`` that isn't ``basic_capabilities``.
+``get_observatory_policy`` raises a ``ValueError`` if the cycle offers more than
+one policy type, which the PHT UI can't handle. The cycle names the array
+assembly each policy applies to:
 
 .. code-block:: python
 
-    from ska_ost_osd.osd.views.pht import get_cycle_configuration
+    from ska_ost_osd.osd.views import pht
 
-    get_cycle_configuration(repository, "TEST_SKAO_2027_Low_AA2_SV").model_dump(
-        mode="json"
+    observatory_policy = pht.get_observatory_policy(
+        repository, "TEST_SKAO_2027_Low_AA2_SV"
     )
+    pht.get_capabilities(
+        repository, Telescope.SKA_LOW, "AA2", observatory_policy.telescope_capabilities.Low
+    )
+
+The PHT UI reads the field names of the response it already uses, including Mid's
+channel widths as ``allowed_channel_width_values``, which the view also serves
+as ``allowed_channel_width_values_hz``. The PHT UI finds the capabilities as the
+first key under ``mid`` or ``low`` that isn't ``basic_capabilities``. The models
+are the view's own, named and shaped as ska-oso-services' response models.
 
 
 Errors
