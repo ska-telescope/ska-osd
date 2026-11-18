@@ -11,6 +11,8 @@ from tests.unit.ska_ost_osd.osd.expected import (
     CYCLE_2_FILE,
 )
 
+pytestmark = pytest.mark.filterwarnings("ignore::DeprecationWarning")
+
 
 @pytest.mark.parametrize(
     "telescope, array_assembly, expected_telescopes",

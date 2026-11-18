@@ -7,6 +7,10 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 Unreleased
 **********
+* [DEPRECATED] The legacy API, ``ska_ost_osd.osd.osd``: ``get_osd_using_tmdata``,
+  ``get_osd_data``, ``get_available_cycles`` and ``get_osd_latest_version`` raise a
+  ``DeprecationWarning``. It will be removed in a future release; read the OSD
+  through an ``OSDRepository`` and the views in ``ska_ost_osd.osd.views``
 * Added the ``osd-validate-tmdata`` command, which validates the current (not
   legacy) files of a tmdata directory against the storage models, by default
   ``tmdata`` in the directory it is run in, and the ``tmdata-validate`` make target
