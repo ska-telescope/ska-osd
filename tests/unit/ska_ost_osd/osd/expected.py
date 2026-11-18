@@ -80,13 +80,13 @@ from ska_ost_osd.osd.views.pht import (
     CycleConfiguration,
     CycleInformation,
     CyclePolicies,
-    CycleTelescopeCapabilities,
     LowCycleCapabilities,
     LowOfferedCapabilities,
     MidCycleBasicCapabilities,
     MidCycleCapabilities,
     MidOfferedCapabilities,
     ObservatoryPolicy,
+    TelescopeCapabilities,
 )
 
 # tests/tmdata/cycles/TEST_SKAO_2027_Low_AA1_SV.json
@@ -795,8 +795,8 @@ CYCLE_1_CONFIGURATION = CycleConfiguration(
         cycle_description="TEST Low AA1 Science Verification",
         cycle_information=CycleInformation(
             cycle_id="TEST_SKAO_2027_Low_AA1_SV",
-            proposal_open=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
-            proposal_close=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
+            proposal_open="2026-03-27T12:00:00.000Z",
+            proposal_close="2027-04-01T15:00:00.000Z",
         ),
         cycle_policies=CyclePolicies(
             normal_max_hours=100.0,
@@ -804,7 +804,7 @@ CYCLE_1_CONFIGURATION = CycleConfiguration(
             max_observation_setups=1,
             max_data_products=1,
         ),
-        telescope_capabilities=CycleTelescopeCapabilities(ska_mid=None, ska_low="AA1"),
+        telescope_capabilities=TelescopeCapabilities(Mid=None, Low="AA1"),
     ),
     capabilities=CycleCapabilities(
         mid=None,
@@ -825,8 +825,8 @@ CYCLE_2_CONFIGURATION = CycleConfiguration(
         cycle_description="TEST AA2 Proposal",
         cycle_information=CycleInformation(
             cycle_id="TEST_SKAO_2027_AA2_Proposal",
-            proposal_open=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
-            proposal_close=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
+            proposal_open="2026-03-27T12:00:00.000Z",
+            proposal_close="2027-04-01T15:00:00.000Z",
         ),
         cycle_policies=CyclePolicies(
             normal_max_hours=100.0,
@@ -834,7 +834,7 @@ CYCLE_2_CONFIGURATION = CycleConfiguration(
             max_observation_setups=2,
             max_data_products=2,
         ),
-        telescope_capabilities=CycleTelescopeCapabilities(ska_mid="AA2", ska_low="AA2"),
+        telescope_capabilities=TelescopeCapabilities(Mid="AA2", Low="AA2"),
     ),
     capabilities=CycleCapabilities(
         mid=MidCycleCapabilities(

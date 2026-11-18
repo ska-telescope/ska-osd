@@ -366,9 +366,8 @@ offers; ``get_cycle_configurations(repository)`` returns every cycle:
                                 policy's name
 
 The PHT UI reads the field names of the response it already uses, and the views
-serialise with those names by default, without ``by_alias=True``:
-``telescope_capabilities`` as ``Mid`` and ``Low``, Mid's receiver bands as
-``receiver_information``, and Mid's channel widths also as
+serialise with those names by default, without ``by_alias=True``: Mid's
+receiver bands as ``receiver_information``, and Mid's channel widths also as
 ``allowed_channel_width_values``. The PHT UI finds the capabilities as the first
 key under ``mid`` or ``low`` that isn't ``basic_capabilities``.
 

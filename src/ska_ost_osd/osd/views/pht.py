@@ -3,7 +3,7 @@
 capabilities each telescope offers and that telescope's basic capabilities. Served
 with aliases, the field names are the ones the PHT UI reads."""
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 from pydantic import (
@@ -43,24 +43,12 @@ _TYPE_NAMES = {
 }
 
 
-class CycleTelescopeCapabilities(ConfigurationModel):
-    """The capabilities each telescope offers in the cycle, or ``None``.
-    Served as ``Mid`` and ``Low``, the names the PHT UI reads."""
-
-    ska_mid: str | None = Field(
-        default=None, validation_alias="Mid", serialization_alias="Mid"
-    )
-    ska_low: str | None = Field(
-        default=None, validation_alias="Low", serialization_alias="Low"
-    )
-
-
 class CycleInformation(ConfigurationModel):
     """The cycle's ID and proposal window, as the PHT UI reads them."""
 
     cycle_id: str
-    proposal_open: datetime
-    proposal_close: datetime
+    proposal_open: str
+    proposal_close: str
 
 
 class CyclePolicies(ConfigurationModel):
@@ -72,16 +60,24 @@ class CyclePolicies(ConfigurationModel):
     max_data_products: int | None = None
 
 
+class TelescopeCapabilities(ConfigurationModel):
+    """The name of the capabilities each telescope offers in the cycle, or
+    ``None``."""
+
+    Mid: str | None = None
+    Low: str | None = None
+
+
 class ObservatoryPolicy(ConfigurationModel):
     """The cycle, as the PHT UI reads it."""
 
-    cycle_number: int | None = None
-    cycle_id: str
-    type: str
+    cycle_number: int
+    cycle_id: str | None = None
+    type: str | None = None
     cycle_description: str
     cycle_information: CycleInformation
     cycle_policies: CyclePolicies
-    telescope_capabilities: CycleTelescopeCapabilities
+    telescope_capabilities: TelescopeCapabilities
 
 
 class MidCycleBasicCapabilities(ConfigurationModel):
@@ -227,6 +223,15 @@ def _name(capabilities: MidCapabilities | LowCapabilities) -> str:
     return capabilities.policy or capabilities.array_assembly
 
 
+def _timestamp(moment: datetime) -> str:
+    """A UTC time as the tmdata stores it, e.g. ``"2026-03-27T12:00:00.000Z"``."""
+    return (
+        moment.astimezone(timezone.utc)
+        .isoformat(timespec="milliseconds")
+        .replace("+00:00", "Z")
+    )
+
+
 def _observatory_policy(
     cycle: Cycle,
     policy_type: PolicyType,
@@ -241,8 +246,8 @@ def _observatory_policy(
         cycle_description=cycle.description,
         cycle_information=CycleInformation(
             cycle_id=cycle.cycle_id,
-            proposal_open=cycle.proposal_window.opens,
-            proposal_close=cycle.proposal_window.closes,
+            proposal_open=_timestamp(cycle.proposal_window.opens),
+            proposal_close=_timestamp(cycle.proposal_window.closes),
         ),
         cycle_policies=CyclePolicies(
             normal_max_hours=cycle.proposal_policy.max_observing_hours,
@@ -250,9 +255,9 @@ def _observatory_policy(
             max_observation_setups=cycle.proposal_policy.max_observation_setups,
             max_data_products=cycle.proposal_policy.max_data_products,
         ),
-        telescope_capabilities=CycleTelescopeCapabilities(
-            ska_mid=_name(mid) if mid is not None else None,
-            ska_low=_name(low) if low is not None else None,
+        telescope_capabilities=TelescopeCapabilities(
+            Mid=_name(mid) if mid is not None else None,
+            Low=_name(low) if low is not None else None,
         ),
     )
 
