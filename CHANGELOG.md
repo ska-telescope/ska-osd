@@ -88,7 +88,6 @@ Unreleased
   equivalents, ``CycleFile`` and ``SubarrayTemplateLibraryFile``
 * ``Cycle`` reads its ``proposal_window`` ``opens`` and ``closes`` as
   timezone-aware datetimes; a time without a timezone is rejected
-* Added a test that validates the real tmdata files against these models
 * Added ``OSDRepository`` (``ska_ost_osd.osd.repository``), the interface for
   reading cycles, capabilities, basic capabilities, constraints, defaults and
   subarray templates as Pydantic models, and ``TMDataRepository``
@@ -107,8 +106,6 @@ Unreleased
   ``get_observatory_policy``, ``get_basic_capabilities`` and ``get_capabilities``.
   ska-oso-services chooses which array assemblies and policies to serve, and
   assembles its responses
-* Bump the build and runtime base images to ``ska-build-python-ubuntu26:1.1.2`` and
-  ``ska-python-ubuntu26:1.1.2`` to pick up the OpenSSL DTLS retransmission fix
 
 7.0.0
 **********
