@@ -10,16 +10,6 @@ from ska_ost_osd.osd.models.defaults import OSDBaseModel
 NO_CHANNEL_LIMIT = 2147483647
 
 
-def legacy_zoom_factors(zoom_factors: list[int]) -> list[int]:
-    """Zoom factors as the pre-8.0 responses served them: the multipliers
-    2**z, with 1 for no zoom, or ``[0]`` when no zoom is offered.
-
-    :param zoom_factors: the PDM's zoom factors offered, e.g. ``[1, 2, 3]``.
-    :return: the served zoom factors, e.g. ``[1, 2, 4, 8]``.
-    """
-    return [1, *(2**zoom for zoom in zoom_factors)] if zoom_factors else [0]
-
-
 class ConfigurationModel(OSDBaseModel):
     model_config = ConfigDict(
         extra="forbid", validate_default=True, validate_assignment=True
