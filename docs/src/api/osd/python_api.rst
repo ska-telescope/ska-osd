@@ -319,10 +319,7 @@ PHT cycle data
 ^^^^^^^^^^^^^^^
 
 ``get_cycle_configuration(repository, cycle_id)`` returns one cycle with what it
-offers; ``get_cycle_configurations(repository)`` returns every cycle. Both take
-``include_subarray_templates``, ``False`` by default, to serve the subarray
-templates of each offered array assembly as the legacy API does with
-``process_templates=True``:
+offers; ``get_cycle_configurations(repository)`` returns every cycle:
 
 .. code-block:: text
 
@@ -334,9 +331,7 @@ templates of each offered array assembly as the legacy API does with
         mid                     null if the cycle doesn't offer Mid
             basic_capabilities  receiver_information: the receiver bands
             "AA2"               the capabilities offered, keyed by the
-                                policy's name; with
-                                include_subarray_templates, their
-                                subarray_templates keyed by template name
+                                policy's name
         low                     null if the cycle doesn't offer Low
             basic_capabilities  min_frequency_hz and max_frequency_hz
             "AA2"               the capabilities offered, keyed by the

@@ -29,7 +29,6 @@ from ska_ost_osd.osd.models.capabilities import (
 )
 from ska_ost_osd.osd.models.cycles import Cycle, PolicyType
 from ska_ost_osd.osd.models.defaults import OSDBaseModel
-from ska_ost_osd.osd.models.subarray_templates import SubarrayType
 from ska_ost_osd.osd.repository import OSDRepository
 from ska_ost_osd.osd.views.base import (
     NO_CHANNEL_LIMIT,
@@ -95,15 +94,6 @@ class MidCycleBasicCapabilities(ConfigurationModel):
     )
 
 
-class CycleSubarrayTemplate(ConfigurationModel):
-    """One subarray template, as the legacy OSD API serves it: keyed by its
-    name, with its stations as one comma-separated string."""
-
-    subarray_type: SubarrayType
-    custom_stations: str
-    description: str
-
-
 class MidOfferedSpectralMode(OSDBaseModel):
     """Mid's zoom windows, as the PHT view serves them: its zoom factors are
     served as channel widths, in ``allowed_channel_width_values_hz``."""
@@ -158,12 +148,9 @@ class LowOfferedCapabilities(OSDBaseModel):
 class CycleCapabilitiesBase(ConfigurationModel):
     """One telescope's capabilities in a cycle. Served keyed by the name of
     the policy or array assembly, e.g. ``"AA2": {...}``, beside
-    ``basic_capabilities``. When the subarray templates are asked for, they
-    are served in the capabilities, keyed by name, as
-    ``subarray_templates``."""
+    ``basic_capabilities``."""
 
     capabilities: MidOfferedCapabilities | LowOfferedCapabilities
-    subarray_templates: dict[str, CycleSubarrayTemplate] | None = None
 
     @model_serializer(mode="wrap")
     def key_capabilities_by_name(
@@ -207,8 +194,6 @@ class CycleCapabilitiesBase(ConfigurationModel):
                 "subarray_beams"
             ]["max_substations_per_subarray_beam"]
         data[self.capabilities.name] = capabilities
-        if (subarray_templates := data.pop("subarray_templates", None)) is not None:
-            data[self.capabilities.name]["subarray_templates"] = subarray_templates
         return data
 
 
@@ -234,26 +219,6 @@ class CycleConfiguration(ConfigurationModel):
 
     observatory_policy: ObservatoryPolicy
     capabilities: CycleCapabilities
-
-
-def _subarray_templates(
-    repository: OSDRepository,
-    telescope: Telescope,
-    array_assembly: str,
-    include_subarray_templates: bool,
-) -> dict[str, CycleSubarrayTemplate] | None:
-    """The array assembly's templates keyed by name, or ``None`` when they
-    weren't asked for."""
-    if not include_subarray_templates:
-        return None
-    return {
-        template.name: CycleSubarrayTemplate(
-            subarray_type=template.subarray_type,
-            custom_stations=",".join(template.receptor_ids),
-            description=template.description,
-        )
-        for template in repository.get_subarray_templates(telescope, array_assembly)
-    }
 
 
 def _name(capabilities: MidCapabilities | LowCapabilities) -> str:
@@ -293,18 +258,13 @@ def _observatory_policy(
 
 
 def get_cycle_configuration(
-    repository: OSDRepository,
-    cycle_id: str,
-    include_subarray_templates: bool = False,
+    repository: OSDRepository, cycle_id: str
 ) -> CycleConfiguration:
     """Build one cycle's view for the PHT: what ska-oso-services serves from
     GET /prsls/osd/{cycle}.
 
     :param repository: the OSD repository to read from.
     :param cycle_id: the ID of the cycle.
-    :param include_subarray_templates: whether to serve the subarray
-        templates offered with each telescope's capabilities, as
-        ``subarray_templates``.
     :return: the cycle with, for each telescope it offers, the offered
         capabilities and that telescope's basic capabilities.
     :raises CycleNotFoundError: If there is no cycle with that ID.
@@ -346,12 +306,6 @@ def get_cycle_configuration(
                         ],
                     }
                 ),
-                subarray_templates=_subarray_templates(
-                    repository,
-                    Telescope.SKA_MID,
-                    cycle.telescopes[Telescope.SKA_MID].array_assembly,
-                    include_subarray_templates,
-                ),
             )
             if mid is not None
             else None,
@@ -362,12 +316,6 @@ def get_cycle_configuration(
                 capabilities=LowOfferedCapabilities.model_validate(
                     low.model_dump() | {"name": _name(low)}
                 ),
-                subarray_templates=_subarray_templates(
-                    repository,
-                    Telescope.SKA_LOW,
-                    cycle.telescopes[Telescope.SKA_LOW].array_assembly,
-                    include_subarray_templates,
-                ),
             )
             if low is not None
             else None,
@@ -375,16 +323,11 @@ def get_cycle_configuration(
     )
 
 
-def get_cycle_configurations(
-    repository: OSDRepository, include_subarray_templates: bool = False
-) -> list[CycleConfiguration]:
+def get_cycle_configurations(repository: OSDRepository) -> list[CycleConfiguration]:
     """Build every cycle's view for the PHT, in ascending order of ID: what
     ska-oso-services serves from GET /prsls/osd/cycles.
 
     :param repository: the OSD repository to read from.
-    :param include_subarray_templates: whether to serve the subarray
-        templates offered with each telescope's capabilities, as
-        ``subarray_templates``.
     :return: the cycle views.
     :raises ArrayAssemblyNotFoundError: If a cycle names an array assembly
         that does not exist.
@@ -392,6 +335,6 @@ def get_cycle_configurations(
     :raises ValueError: If a cycle offers more than one policy type.
     """
     return [
-        get_cycle_configuration(repository, cycle_id, include_subarray_templates)
+        get_cycle_configuration(repository, cycle_id)
         for cycle_id in repository.get_cycle_ids()
     ]

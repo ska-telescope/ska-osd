@@ -127,19 +127,14 @@ class TestGetCycleConfiguration:
         with pytest.raises(ValueError, match="more than one policy type"):
             get_cycle_configuration(repository, "TEST_SKAO_2027_Low_AA1_SV")
 
-    @pytest.mark.parametrize("include_subarray_templates", [False, True])
-    def test_serves_the_pht_cycle_fields(
-        self, test_tmdata_repository, include_subarray_templates
-    ):
+    def test_serves_the_pht_cycle_fields(self, test_tmdata_repository):
         """The JSON, with aliases as ska-oso-services serves it, has the
         names the PHT UI reads: telescope_capabilities Mid/Low, Mid's
         basic_capabilities.receiver_information, and under each telescope
         only basic_capabilities and the capabilities offered, keyed by
-        their name, with their subarray templates when they are asked for."""
+        their name."""
         served = get_cycle_configuration(
-            test_tmdata_repository,
-            "TEST_SKAO_2027_AA2_Proposal",
-            include_subarray_templates,
+            test_tmdata_repository, "TEST_SKAO_2027_AA2_Proposal"
         ).model_dump(mode="json", by_alias=True)
 
         assert list(served) == ["observatory_policy", "capabilities"]
@@ -174,10 +169,6 @@ class TestGetCycleConfiguration:
         assert "allowed_zoom_factors" not in mid["AA2"]
         assert mid["AA2"]["allowed_channel_count_range_min"] == [1]
         assert mid["AA2"]["allowed_channel_count_range_max"] == [2147483647]
-        if include_subarray_templates:
-            assert "SKA_MID_FULL_AA2" in mid["AA2"]["subarray_templates"]
-        else:
-            assert "subarray_templates" not in mid["AA2"]
         low = served["capabilities"]["low"]
         assert list(low) == ["basic_capabilities", "AA2"]
         assert low["basic_capabilities"].keys() == {
@@ -232,19 +223,6 @@ class TestGetCycleConfiguration:
             "Low": "AA1",
         }
         assert served["capabilities"]["mid"] is None
-
-    @pytest.mark.parametrize("include_subarray_templates", [False, True])
-    def test_serves_without_nulls(
-        self, test_tmdata_repository, include_subarray_templates
-    ):
-        served = get_cycle_configuration(
-            test_tmdata_repository,
-            "TEST_SKAO_2027_AA2_Proposal",
-            include_subarray_templates,
-        ).model_dump(mode="json", exclude_none=True)
-
-        mid = served["capabilities"]["mid"]["AA2"]
-        assert ("subarray_templates" in mid) == include_subarray_templates
 
 
 class TestGetCycleConfigurations:
