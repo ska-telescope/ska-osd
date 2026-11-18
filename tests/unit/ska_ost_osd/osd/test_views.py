@@ -150,7 +150,7 @@ class TestGetCycleConfiguration:
         mid = served["capabilities"]["mid"]
         assert list(mid) == ["basic_capabilities", "AA2"]
         assert list(mid["basic_capabilities"]) == ["receiver_information"]
-        assert mid["AA2"]["name"] == "AA2"
+        assert not any(key in mid["AA2"] for key in ("name", "telescope", "receptors"))
         assert "observing_modes" not in mid["AA2"]
         assert mid["AA2"]["number_pss_beams"] == 0
         assert mid["AA2"]["ps_beam_bandwidth_hz"] == 400_000_000
@@ -164,7 +164,6 @@ class TestGetCycleConfiguration:
         ]
         assert mid["AA2"]["number_ska_dishes"] == 8
         assert mid["AA2"]["max_baseline_km"] == 1.5
-        assert mid["AA2"]["receptors"][0] == "SKA001"
         assert mid["AA2"]["number_zoom_windows"] == 0
         assert mid["AA2"]["number_zoom_channels"] == 0
         assert (
@@ -181,20 +180,31 @@ class TestGetCycleConfiguration:
             assert "subarray_templates" not in mid["AA2"]
         low = served["capabilities"]["low"]
         assert list(low) == ["basic_capabilities", "AA2"]
+        assert low["basic_capabilities"].keys() == {
+            "min_frequency_hz",
+            "max_frequency_hz",
+        }
+        assert not any(
+            key in low["AA2"]
+            for key in (
+                "name",
+                "telescope",
+                "receptors",
+                "allowed_zoom_factors",
+                "number_subarray_beams",
+            )
+        )
         assert "observing_modes" not in low["AA2"]
         assert low["AA2"]["number_zoom_windows"] == 0
         assert low["AA2"]["number_zoom_channels"] == 0
-        assert low["AA2"]["allowed_zoom_factors"] == [1, 2, 4, 8]
         assert low["AA2"]["number_pss_beams"] == 0
         assert low["AA2"]["ps_beam_bandwidth_hz"] == 75_000_000.0
         assert low["AA2"]["number_pst_beams"] == 1
         assert low["AA2"]["number_vlbi_beams"] == 0
         assert "sps" not in low["AA2"]
-        assert low["AA2"]["number_subarray_beams"] == 8
         assert low["AA2"]["number_substations"] == 512
         assert low["AA2"]["number_stations"] == 8
         assert low["AA2"]["max_baseline_km"] == 6.0
-        assert low["AA2"]["receptors"] == [345, 346, 347, 348, 349, 350, 351, 352]
 
     def test_serves_the_pht_names_without_by_alias(self, test_tmdata_repository):
         """The view serialises with the PHT's names by default, so a caller

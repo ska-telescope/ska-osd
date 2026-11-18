@@ -108,8 +108,8 @@ some under different names, as given.
      - Both
      - ``array_assembly`` and ``policy``
      - Changed: named by fields; ``policy`` is ``None`` without one. The ODT
-       and PHT views serve it as a ``name`` field: the policy's name, or else
-       the array assembly's
+       view serves it as a ``name`` field, and the PHT view as the key of the
+       capabilities: the policy's name, or else the array assembly's
    * - ``available_bandwidth_hz``
      - Both
      - ``available_bandwidth_hz``
@@ -129,7 +129,7 @@ some under different names, as given.
    * - ``number_dish_ids`` (Mid), ``number_station_ids`` (Low)
      - Both
      - ``receptors.receptor_ids``
-     - Renamed. The ODT and PHT views call it ``receptors``
+     - Renamed. The ODT view calls it ``receptors``
    * - ``number_zoom_windows``
      - Both
      - ``observing_modes.spectral.max_zoom_windows``

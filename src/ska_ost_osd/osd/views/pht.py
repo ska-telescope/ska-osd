@@ -4,7 +4,7 @@ capabilities each telescope offers and that telescope's basic capabilities. Serv
 with aliases, the field names are the ones the PHT UI reads."""
 
 from datetime import datetime
-from typing import Any, Literal
+from typing import Any
 
 from pydantic import (
     Field,
@@ -14,6 +14,7 @@ from pydantic import (
 
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
+    FrequencyBand,
     LowArrayAssemblyCBF,
     LowArrayAssemblyObservingModes,
     LowArrayAssemblyReceptors,
@@ -33,9 +34,6 @@ from ska_ost_osd.osd.repository import OSDRepository
 from ska_ost_osd.osd.views.base import (
     NO_CHANNEL_LIMIT,
     ConfigurationModel,
-    LowFrequencyBandWithChannels,
-    legacy_zoom_factors,
-    low_frequency_band,
 )
 
 # The PHT UI recognises science verification by its name
@@ -134,10 +132,9 @@ class MidOfferedCapabilities(OSDBaseModel):
     """What the PHT view serves of Mid's capabilities in a cycle: all but the
     basic capabilities, which it serves beside them."""
 
-    name: str
+    name: str = Field(exclude=True)
     available_bandwidth_hz: float
     cbf: MidOfferedCBF
-    telescope: Literal[Telescope.SKA_MID] = Telescope.SKA_MID
     observing_modes: MidOfferedObservingModes
     allowed_channel_width_values_hz: list[int]
     allowed_channel_count_range_min: list[int]
@@ -150,10 +147,9 @@ class LowOfferedCapabilities(OSDBaseModel):
     """What the PHT view serves of Low's capabilities in a cycle: all but the
     basic capabilities, which it serves beside them."""
 
-    name: str
+    name: str = Field(exclude=True)
     available_bandwidth_hz: float
     cbf: LowArrayAssemblyCBF
-    telescope: Literal[Telescope.SKA_LOW] = Telescope.SKA_LOW
     sps: LowArrayAssemblySPS
     observing_modes: LowArrayAssemblyObservingModes
     receptors: LowArrayAssemblyReceptors
@@ -191,17 +187,12 @@ class CycleCapabilitiesBase(ConfigurationModel):
         modes = capabilities.pop("observing_modes")
         capabilities["number_zoom_windows"] = modes["spectral"]["max_zoom_windows"]
         capabilities["number_zoom_channels"] = modes["spectral"]["max_zoom_channels"]
-        if "zoom_factors" in modes["spectral"]:
-            capabilities["allowed_zoom_factors"] = legacy_zoom_factors(
-                modes["spectral"]["zoom_factors"]
-            )
         capabilities["number_pss_beams"] = modes["pss"]["max_beams"]
         capabilities["ps_beam_bandwidth_hz"] = modes["pss"]["beam_bandwidth_hz"]
         capabilities["number_pst_beams"] = modes["pst"]["max_beams"]
         if "vlbi" in modes:
             capabilities["number_vlbi_beams"] = modes["vlbi"]["max_beams"]
         receptors = capabilities.pop("receptors")
-        capabilities["receptors"] = receptors["receptor_ids"]
         if "number_stations" in receptors:
             capabilities["number_stations"] = receptors["number_stations"]
         else:
@@ -212,11 +203,9 @@ class CycleCapabilitiesBase(ConfigurationModel):
             ]
         capabilities["max_baseline_km"] = receptors["max_baseline_km"]
         if "sps" in capabilities:
-            subarray_beams = capabilities.pop("sps")["subarray_beams"]
-            capabilities["number_substations"] = subarray_beams[
-                "max_substations_per_subarray_beam"
-            ]
-            capabilities["number_subarray_beams"] = subarray_beams["max_subarray_beams"]
+            capabilities["number_substations"] = capabilities.pop("sps")[
+                "subarray_beams"
+            ]["max_substations_per_subarray_beam"]
         data[self.capabilities.name] = capabilities
         if (subarray_templates := data.pop("subarray_templates", None)) is not None:
             data[self.capabilities.name]["subarray_templates"] = subarray_templates
@@ -229,7 +218,7 @@ class MidCycleCapabilities(CycleCapabilitiesBase):
 
 
 class LowCycleCapabilities(CycleCapabilitiesBase):
-    basic_capabilities: LowFrequencyBandWithChannels
+    basic_capabilities: FrequencyBand
     capabilities: LowOfferedCapabilities
 
 
@@ -367,7 +356,9 @@ def get_cycle_configuration(
             if mid is not None
             else None,
             low=LowCycleCapabilities(
-                basic_capabilities=low_frequency_band(repository),
+                basic_capabilities=repository.get_basic_capabilities(
+                    Telescope.SKA_LOW
+                ).frequency_band,
                 capabilities=LowOfferedCapabilities.model_validate(
                     low.model_dump() | {"name": _name(low)}
                 ),

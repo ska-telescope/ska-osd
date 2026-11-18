@@ -338,7 +338,7 @@ templates of each offered array assembly as the legacy API does with
                                 include_subarray_templates, their
                                 subarray_templates keyed by template name
         low                     null if the cycle doesn't offer Low
-            basic_capabilities  the band and its channels
+            basic_capabilities  min_frequency_hz and max_frequency_hz
             "AA2"               the capabilities offered, keyed by the
                                 policy's name
 

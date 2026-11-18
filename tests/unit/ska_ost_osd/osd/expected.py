@@ -733,7 +733,7 @@ CYCLE_1_CONFIGURATION = CycleConfiguration(
     capabilities=CycleCapabilities(
         mid=None,
         low=LowCycleCapabilities(
-            basic_capabilities=LOW_FREQUENCY_BAND_WITH_CHANNELS,
+            basic_capabilities=LOW_FREQUENCY_BAND,
             capabilities=LowOfferedCapabilities.model_validate(
                 LOW_AA1.model_dump() | {"name": LOW_AA1.array_assembly}
             ),
@@ -777,7 +777,7 @@ CYCLE_2_CONFIGURATION = CycleConfiguration(
             ),
         ),
         low=LowCycleCapabilities(
-            basic_capabilities=LOW_FREQUENCY_BAND_WITH_CHANNELS,
+            basic_capabilities=LOW_FREQUENCY_BAND,
             capabilities=LowOfferedCapabilities.model_validate(
                 LOW_AA2.model_dump() | {"name": LOW_AA2.array_assembly}
             ),
