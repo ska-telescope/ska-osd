@@ -1,7 +1,8 @@
 """The PHT views: what ska-oso-services serves to the PHT from GET
 /prsls/osd/cycles and GET /prsls/osd/{cycle}: each cycle with the
-capabilities each telescope offers and that telescope's basic capabilities. Served
-with aliases, the field names are the ones the PHT UI reads."""
+capabilities each telescope offers and that telescope's basic capabilities. Its
+models are its own, named and shaped as ska-oso-services' response models, so
+the response doesn't change with the domain models."""
 
 from datetime import datetime, timezone
 from typing import Any
@@ -13,20 +14,8 @@ from pydantic import (
 )
 
 from ska_ost_osd.osd.common.constant import Telescope
-from ska_ost_osd.osd.models.capabilities import (
-    LowArrayAssemblyCBF,
-    LowArrayAssemblyObservingModes,
-    LowArrayAssemblyReceptors,
-    LowArrayAssemblySPS,
-    LowCapabilities,
-    MidArrayAssemblyReceptors,
-    MidCapabilities,
-    MidCBFMode,
-    MidPSSMode,
-    MidPSTMode,
-)
+from ska_ost_osd.osd.models.capabilities import LowCapabilities, MidCapabilities
 from ska_ost_osd.osd.models.cycles import Cycle, PolicyType
-from ska_ost_osd.osd.models.defaults import OSDBaseModel
 from ska_ost_osd.osd.repository import OSDRepository
 from ska_ost_osd.osd.views.base import (
     NO_CHANNEL_LIMIT,
@@ -95,55 +84,48 @@ class BasicCapabilitiesLow(ConfigurationModel):
     max_frequency_hz: float
 
 
-class MidOfferedSpectralMode(OSDBaseModel):
-    """Mid's zoom windows, as the PHT view serves them: its zoom factors are
-    served as channel widths, in ``allowed_channel_width_values_hz``."""
+class AA2_MID(ConfigurationModel):
+    """Any one of Mid's array assemblies, with a policy's applied if one is
+    given; ska-oso-services named the model after the first it served."""
 
-    max_zoom_windows: int
-    max_zoom_channels: int
-
-
-class MidOfferedObservingModes(OSDBaseModel):
-    """Mid's observing modes, as the PHT view serves them."""
-
-    spectral: MidOfferedSpectralMode
-    pss: MidPSSMode
-    pst: MidPSTMode
-
-
-class MidOfferedCBF(OSDBaseModel):
-    """Mid's correlator-beamformer, as the PHT view serves it: its channel
-    limit is served as ``allowed_channel_count_range_max``."""
-
-    number_fsps: int
-    function_modes: list[MidCBFMode]
-
-
-class MidOfferedCapabilities(OSDBaseModel):
-    """What the PHT view serves of Mid's capabilities in a cycle: all but the
-    basic capabilities, which it serves beside them."""
-
-    name: str = Field(exclude=True)
-    available_bandwidth_hz: float
-    cbf: MidOfferedCBF
-    observing_modes: MidOfferedObservingModes
-    allowed_channel_width_values_hz: list[int]
-    allowed_channel_count_range_min: list[int]
     allowed_channel_count_range_max: list[int]
-    receivers: list[str]
-    receptors: MidArrayAssemblyReceptors
-
-
-class LowOfferedCapabilities(OSDBaseModel):
-    """What the PHT view serves of Low's capabilities in a cycle: all but the
-    basic capabilities, which it serves beside them."""
-
-    name: str = Field(exclude=True)
+    allowed_channel_count_range_min: list[int]
+    allowed_channel_width_values: list[int]
+    allowed_channel_width_values_hz: list[int]
+    available_receivers: list[str]
+    number_ska_dishes: int
+    number_meerkat_dishes: int
+    number_meerkatplus_dishes: int
+    max_baseline_km: float
     available_bandwidth_hz: float
-    cbf: LowArrayAssemblyCBF
-    sps: LowArrayAssemblySPS
-    observing_modes: LowArrayAssemblyObservingModes
-    receptors: LowArrayAssemblyReceptors
+    number_channels: int | None = None
+    cbf_modes: list[str]
+    number_zoom_windows: int
+    number_zoom_channels: int
+    number_pss_beams: int
+    number_pst_beams: int
+    ps_beam_bandwidth_hz: float
+    number_fsps: int
+
+
+class AA2_LOW(ConfigurationModel):
+    """Any one of Low's array assemblies, with a policy's applied if one is
+    given; ska-oso-services named the model after the first it served."""
+
+    number_stations: int
+    number_substations: int
+    number_beams: int
+    max_baseline_km: float
+    available_bandwidth_hz: float
+    channel_width_hz: float | None = None
+    cbf_modes: list[str]
+    number_zoom_windows: int
+    number_zoom_channels: int
+    number_pss_beams: int
+    number_pst_beams: int
+    number_vlbi_beams: int
+    ps_beam_bandwidth_hz: float
+    number_fsps: int
 
 
 class CycleCapabilitiesBase(ConfigurationModel):
@@ -151,61 +133,26 @@ class CycleCapabilitiesBase(ConfigurationModel):
     the policy or array assembly, e.g. ``"AA2": {...}``, beside
     ``basic_capabilities``."""
 
-    capabilities: MidOfferedCapabilities | LowOfferedCapabilities
+    name: str = Field(exclude=True)
+    capabilities: AA2_MID | AA2_LOW
 
     @model_serializer(mode="wrap")
     def key_capabilities_by_name(
         self, handler: SerializerFunctionWrapHandler
     ) -> dict[str, Any]:
         data = handler(self)
-        capabilities = data.pop("capabilities")
-        cbf = capabilities.pop("cbf")
-        capabilities["number_fsps"] = cbf["number_fsps"]
-        capabilities["cbf_modes"] = cbf["function_modes"]
-        if "receivers" in capabilities:
-            capabilities["available_receivers"] = capabilities.pop("receivers")
-        # The PHT UI reads Mid's channel widths without the _hz suffix; the
-        # _hz name is served too, so it can switch to the new name
-        if "allowed_channel_width_values_hz" in capabilities:
-            capabilities["allowed_channel_width_values"] = capabilities[
-                "allowed_channel_width_values_hz"
-            ]
-        # The PHT UI reads the observing modes, the receptors, and Low's subarray beams,
-        # flat under their old names
-        modes = capabilities.pop("observing_modes")
-        capabilities["number_zoom_windows"] = modes["spectral"]["max_zoom_windows"]
-        capabilities["number_zoom_channels"] = modes["spectral"]["max_zoom_channels"]
-        capabilities["number_pss_beams"] = modes["pss"]["max_beams"]
-        capabilities["ps_beam_bandwidth_hz"] = modes["pss"]["beam_bandwidth_hz"]
-        capabilities["number_pst_beams"] = modes["pst"]["max_beams"]
-        if "vlbi" in modes:
-            capabilities["number_vlbi_beams"] = modes["vlbi"]["max_beams"]
-        receptors = capabilities.pop("receptors")
-        if "number_stations" in receptors:
-            capabilities["number_stations"] = receptors["number_stations"]
-        else:
-            capabilities["number_ska_dishes"] = receptors["number_ska_dishes"]
-            capabilities["number_meerkat_dishes"] = receptors["number_meerkat_dishes"]
-            capabilities["number_meerkatplus_dishes"] = receptors[
-                "number_meerkatplus_dishes"
-            ]
-        capabilities["max_baseline_km"] = receptors["max_baseline_km"]
-        if "sps" in capabilities:
-            capabilities["number_substations"] = capabilities.pop("sps")[
-                "subarray_beams"
-            ]["max_substations_per_subarray_beam"]
-        data[self.capabilities.name] = capabilities
+        data[self.name] = data.pop("capabilities")
         return data
 
 
 class MidCycleCapabilities(CycleCapabilitiesBase):
     basic_capabilities: BasicCapabilitiesMid
-    capabilities: MidOfferedCapabilities
+    capabilities: AA2_MID
 
 
 class LowCycleCapabilities(CycleCapabilitiesBase):
     basic_capabilities: BasicCapabilitiesLow
-    capabilities: LowOfferedCapabilities
+    capabilities: AA2_LOW
 
 
 class CycleCapabilities(ConfigurationModel):
@@ -226,6 +173,55 @@ def _name(capabilities: MidCapabilities | LowCapabilities) -> str:
     """The name the PHT UI knows capabilities by: the policy's, or the array
     assembly's if no policy applies."""
     return capabilities.policy or capabilities.array_assembly
+
+
+# Any Mid capabilities, in ska-oso-services' AA2_MID model
+def _aa2_mid(capabilities: MidCapabilities) -> AA2_MID:
+    observing_modes = capabilities.observing_modes
+    receptors = capabilities.receptors
+    max_channels = capabilities.cbf.max_channels
+    return AA2_MID(
+        allowed_channel_count_range_max=[
+            NO_CHANNEL_LIMIT if max_channels is None else max_channels
+        ],
+        allowed_channel_count_range_min=[1],
+        allowed_channel_width_values=capabilities.allowed_channel_width_values_hz,
+        allowed_channel_width_values_hz=capabilities.allowed_channel_width_values_hz,
+        available_receivers=capabilities.receivers,
+        number_ska_dishes=receptors.number_ska_dishes,
+        number_meerkat_dishes=receptors.number_meerkat_dishes,
+        number_meerkatplus_dishes=receptors.number_meerkatplus_dishes,
+        max_baseline_km=receptors.max_baseline_km,
+        available_bandwidth_hz=capabilities.available_bandwidth_hz,
+        cbf_modes=capabilities.cbf.function_modes,
+        number_zoom_windows=observing_modes.spectral.max_zoom_windows,
+        number_zoom_channels=observing_modes.spectral.max_zoom_channels,
+        number_pss_beams=observing_modes.pss.max_beams,
+        number_pst_beams=observing_modes.pst.max_beams,
+        ps_beam_bandwidth_hz=observing_modes.pss.beam_bandwidth_hz,
+        number_fsps=capabilities.cbf.number_fsps,
+    )
+
+
+# Any Low capabilities, in ska-oso-services' AA2_LOW model
+def _aa2_low(capabilities: LowCapabilities) -> AA2_LOW:
+    observing_modes = capabilities.observing_modes
+    subarray_beams = capabilities.sps.subarray_beams
+    return AA2_LOW(
+        number_stations=capabilities.receptors.number_stations,
+        number_substations=subarray_beams.max_substations_per_subarray_beam,
+        number_beams=subarray_beams.max_subarray_beams,
+        max_baseline_km=capabilities.receptors.max_baseline_km,
+        available_bandwidth_hz=capabilities.available_bandwidth_hz,
+        cbf_modes=capabilities.cbf.function_modes,
+        number_zoom_windows=observing_modes.spectral.max_zoom_windows,
+        number_zoom_channels=observing_modes.spectral.max_zoom_channels,
+        number_pss_beams=observing_modes.pss.max_beams,
+        number_pst_beams=observing_modes.pst.max_beams,
+        number_vlbi_beams=observing_modes.vlbi.max_beams,
+        ps_beam_bandwidth_hz=observing_modes.pss.beam_bandwidth_hz,
+        number_fsps=capabilities.cbf.number_fsps,
+    )
 
 
 def _basic_capabilities_mid(repository: OSDRepository) -> BasicCapabilitiesMid:
@@ -321,18 +317,8 @@ def get_cycle_configuration(
         capabilities=CycleCapabilities(
             mid=MidCycleCapabilities(
                 basic_capabilities=_basic_capabilities_mid(repository),
-                capabilities=MidOfferedCapabilities.model_validate(
-                    mid.model_dump()
-                    | {
-                        "name": _name(mid),
-                        "allowed_channel_count_range_min": [1],
-                        "allowed_channel_count_range_max": [
-                            NO_CHANNEL_LIMIT
-                            if mid.cbf.max_channels is None
-                            else mid.cbf.max_channels
-                        ],
-                    }
-                ),
+                name=_name(mid),
+                capabilities=_aa2_mid(mid),
             )
             if mid is not None
             else None,
@@ -341,9 +327,8 @@ def get_cycle_configuration(
                     repository.get_basic_capabilities(Telescope.SKA_LOW).frequency_band,
                     from_attributes=True,
                 ),
-                capabilities=LowOfferedCapabilities.model_validate(
-                    low.model_dump() | {"name": _name(low)}
-                ),
+                name=_name(low),
+                capabilities=_aa2_low(low),
             )
             if low is not None
             else None,

@@ -76,6 +76,8 @@ from ska_ost_osd.osd.models.defaults import (
 from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplate, SubarrayType
 from ska_ost_osd.osd.views import odt
 from ska_ost_osd.osd.views.pht import (
+    AA2_LOW,
+    AA2_MID,
     BasicCapabilitiesLow,
     BasicCapabilitiesMid,
     CycleCapabilities,
@@ -83,9 +85,7 @@ from ska_ost_osd.osd.views.pht import (
     CycleInformation,
     CyclePolicies,
     LowCycleCapabilities,
-    LowOfferedCapabilities,
     MidCycleCapabilities,
-    MidOfferedCapabilities,
     ObservatoryPolicy,
     ReceiverInformation,
     TelescopeCapabilities,
@@ -849,6 +849,62 @@ PHT_LOW_BASIC_CAPABILITIES = BasicCapabilitiesLow(
     min_frequency_hz=50_000_000, max_frequency_hz=350_000_000
 )
 
+# AA2 sets no channel limit, served as the largest 32-bit signed integer
+PHT_MID_AA2 = AA2_MID(
+    allowed_channel_count_range_max=[2147483647],
+    allowed_channel_count_range_min=[1],
+    allowed_channel_width_values=[3360, 6720, 13440, 26880],
+    allowed_channel_width_values_hz=[3360, 6720, 13440, 26880],
+    available_receivers=["Band_1", "Band_2", "Band_5a", "Band_5b"],
+    number_ska_dishes=8,
+    number_meerkat_dishes=0,
+    number_meerkatplus_dishes=0,
+    max_baseline_km=1.5,
+    available_bandwidth_hz=800_000_000,
+    number_channels=None,
+    cbf_modes=["correlation", "pst"],
+    number_zoom_windows=0,
+    number_zoom_channels=0,
+    number_pss_beams=0,
+    number_pst_beams=1,
+    ps_beam_bandwidth_hz=400_000_000,
+    number_fsps=8,
+)
+
+PHT_LOW_AA1 = AA2_LOW(
+    number_stations=4,
+    number_substations=0,
+    number_beams=1,
+    max_baseline_km=3.0,
+    available_bandwidth_hz=75_000_000,
+    channel_width_hz=None,
+    cbf_modes=["vis", "pst"],
+    number_zoom_windows=0,
+    number_zoom_channels=0,
+    number_pss_beams=0,
+    number_pst_beams=1,
+    number_vlbi_beams=0,
+    ps_beam_bandwidth_hz=75_000_000,
+    number_fsps=6,
+)
+
+PHT_LOW_AA2 = AA2_LOW(
+    number_stations=8,
+    number_substations=512,
+    number_beams=8,
+    max_baseline_km=6.0,
+    available_bandwidth_hz=75_000_000,
+    channel_width_hz=None,
+    cbf_modes=["vis", "pst"],
+    number_zoom_windows=0,
+    number_zoom_channels=0,
+    number_pss_beams=0,
+    number_pst_beams=1,
+    number_vlbi_beams=0,
+    ps_beam_bandwidth_hz=75_000_000,
+    number_fsps=6,
+)
+
 # The PHT cycle views of tests/tmdata: each cycle with the capabilities
 # each telescope offers and that telescope's basic capabilities
 CYCLE_1_CONFIGURATION = CycleConfiguration(
@@ -874,9 +930,8 @@ CYCLE_1_CONFIGURATION = CycleConfiguration(
         mid=None,
         low=LowCycleCapabilities(
             basic_capabilities=PHT_LOW_BASIC_CAPABILITIES,
-            capabilities=LowOfferedCapabilities.model_validate(
-                LOW_AA1.model_dump() | {"name": LOW_AA1.array_assembly}
-            ),
+            name="AA1",
+            capabilities=PHT_LOW_AA1,
         ),
     ),
 )
@@ -903,22 +958,13 @@ CYCLE_2_CONFIGURATION = CycleConfiguration(
     capabilities=CycleCapabilities(
         mid=MidCycleCapabilities(
             basic_capabilities=PHT_MID_BASIC_CAPABILITIES,
-            capabilities=MidOfferedCapabilities.model_validate(
-                MID_AA2.model_dump()
-                | {
-                    "name": MID_AA2.array_assembly,
-                    # AA2 sets no channel limit, served as the largest 32-bit
-                    # signed integer
-                    "allowed_channel_count_range_min": [1],
-                    "allowed_channel_count_range_max": [2147483647],
-                }
-            ),
+            name="AA2",
+            capabilities=PHT_MID_AA2,
         ),
         low=LowCycleCapabilities(
             basic_capabilities=PHT_LOW_BASIC_CAPABILITIES,
-            capabilities=LowOfferedCapabilities.model_validate(
-                LOW_AA2.model_dump() | {"name": LOW_AA2.array_assembly}
-            ),
+            name="AA2",
+            capabilities=PHT_LOW_AA2,
         ),
     ),
 )
