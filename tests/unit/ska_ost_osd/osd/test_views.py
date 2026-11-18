@@ -5,66 +5,15 @@ import pytest
 
 from ska_ost_osd.osd.exceptions import CycleNotFoundError, PolicyNotFoundError
 from ska_ost_osd.osd.views.base import legacy_zoom_factors
-from ska_ost_osd.osd.views.odt import get_configuration
 from ska_ost_osd.osd.views.pht import (
     get_cycle_configuration,
     get_cycle_configurations,
 )
 from tests.unit.ska_ost_osd.osd.expected import (
-    CONFIGURATION,
     CYCLE_1_CONFIGURATION,
     CYCLE_1_FILE,
     CYCLE_2_CONFIGURATION,
 )
-
-CAPABILITIES_KEYS = [
-    "name",
-    "receptors",
-    "available_bandwidth_hz",
-    "number_pst_beams",
-    "number_fsps",
-]
-
-
-class TestGetConfiguration:
-    def test_returns_configuration(self, test_tmdata_repository):
-        assert get_configuration(test_tmdata_repository) == CONFIGURATION
-
-    def test_serves_the_odt_configuration_fields(self, test_tmdata_repository):
-        """The JSON matches what ska-oso-services serves from GET
-        /configuration, with allowed_channel_width_values_hz on the Mid
-        array assemblies, which ska-oso-services means to serve but drops."""
-        served = get_configuration(test_tmdata_repository).model_dump(mode="json")
-
-        assert list(served) == ["ska_mid", "ska_low"]
-        assert list(served["ska_mid"]) == [
-            "frequency_band",
-            "constraints",
-            "subarrays",
-            "spfrx_defaults",
-        ]
-        assert list(served["ska_low"]) == [
-            "frequency_band",
-            "constraints",
-            "quality_attribute_metrics",
-            "subarrays",
-        ]
-        assert list(served["ska_mid"]["subarrays"][0]) == [
-            *CAPABILITIES_KEYS,
-            "allowed_channel_width_values_hz",
-        ]
-        assert list(served["ska_low"]["subarrays"][0]) == [
-            *CAPABILITIES_KEYS,
-            "number_substations",
-            "number_subarray_beams",
-        ]
-        assert served["ska_low"]["quality_attribute_metrics"] == {
-            "cbf": {"processors_ready_percent": 100.0}
-        }
-
-    def test_raises_when_files_missing(self, empty_tmdata_repository):
-        with pytest.raises(FileNotFoundError):
-            get_configuration(empty_tmdata_repository)
 
 
 class TestGetCycleConfiguration:

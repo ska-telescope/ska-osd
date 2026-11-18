@@ -623,8 +623,8 @@ LOW_AA2_SUBARRAY_TEMPLATE_LIBRARY_FILE = SubarrayTemplateLibraryFile(
     array_assembly="AA2", templates=[LOW_FULL_AA2_TEMPLATE, LOW_TEST_AA2_TEMPLATE]
 )
 
-# The ODT configuration view of tests/tmdata: what ska-oso-services serves
-# from GET /configuration
+# The ODT view of tests/tmdata: the parts ska-oso-services builds GET
+# /configuration from
 
 ODT_MID_FREQUENCY_BANDS = [
     odt.MidFrequencyBand(
@@ -783,21 +783,6 @@ ODT_LOW_AA2_SV = odt.LowSubarray(
     number_fsps=6,
     number_substations=0,
     number_subarray_beams=1,
-)
-
-CONFIGURATION = odt.Configuration(
-    ska_mid=odt.MidConfiguration(
-        frequency_band=ODT_MID_FREQUENCY_BANDS,
-        constraints=ODT_MID_CONSTRAINTS,
-        subarrays=[ODT_MID_AA1, ODT_MID_AA2],
-        spfrx_defaults=ODT_MID_SPFRX_DEFAULTS,
-    ),
-    ska_low=odt.LowConfiguration(
-        frequency_band=ODT_LOW_FREQUENCY_BAND,
-        constraints=ODT_LOW_CONSTRAINTS,
-        quality_attribute_metrics=ODT_LOW_QUALITY_ATTRIBUTE_METRICS,
-        subarrays=[ODT_LOW_AA1, ODT_LOW_AA2],
-    ),
 )
 
 # The PHT cycle views of tests/tmdata: each cycle with the capabilities

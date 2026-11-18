@@ -33,6 +33,11 @@ def test_get_basic_capabilities(test_tmdata_repository, telescope, expected):
     assert odt.get_basic_capabilities(test_tmdata_repository, telescope) == expected
 
 
+def test_get_basic_capabilities_raises_when_files_missing(empty_tmdata_repository):
+    with pytest.raises(FileNotFoundError):
+        odt.get_basic_capabilities(empty_tmdata_repository, Telescope.SKA_MID)
+
+
 @pytest.mark.parametrize(
     "telescope, expected",
     [

@@ -119,28 +119,6 @@ class LowQualityAttributeMetrics(ConfigurationModel):
     cbf: LowCBFMetrics
 
 
-class MidConfiguration(ConfigurationModel):
-    frequency_band: list[MidFrequencyBand]
-    constraints: Constraints
-    subarrays: list[MidSubarray]
-    spfrx_defaults: SPFRxParameters
-
-
-class LowConfiguration(ConfigurationModel):
-    frequency_band: LowFrequencyBand
-    constraints: Constraints
-    quality_attribute_metrics: LowQualityAttributeMetrics
-    subarrays: list[LowSubarray]
-
-
-class Configuration(ConfigurationModel):
-    """The ODT configuration: both telescopes' bands, constraints, defaults
-    and capabilities."""
-
-    ska_mid: MidConfiguration
-    ska_low: LowConfiguration
-
-
 def _mid_capabilities(capabilities: MidCapabilities) -> MidSubarray:
     return MidSubarray(
         name=capabilities.policy or capabilities.array_assembly,
@@ -296,37 +274,3 @@ def get_capabilities(
     if isinstance(capabilities, MidCapabilities):
         return _mid_capabilities(capabilities)
     return _low_capabilities(capabilities)
-
-
-def get_configuration(repository: OSDRepository) -> Configuration:
-    """Build the ODT configuration: what ska-oso-services serves from GET
-    /configuration.
-
-    :param repository: the OSD repository to read from.
-    :return: both telescopes' bands, constraints, defaults and capability
-        sets.
-    """
-    return Configuration(
-        ska_mid=MidConfiguration(
-            frequency_band=get_basic_capabilities(repository, Telescope.SKA_MID),
-            constraints=get_constraints(repository, Telescope.SKA_MID),
-            subarrays=[
-                _mid_capabilities(capabilities)
-                for capabilities in repository.get_array_assembly_capabilities(
-                    Telescope.SKA_MID
-                )
-            ],
-            spfrx_defaults=get_defaults(repository, Telescope.SKA_MID),
-        ),
-        ska_low=LowConfiguration(
-            frequency_band=get_basic_capabilities(repository, Telescope.SKA_LOW),
-            constraints=get_constraints(repository, Telescope.SKA_LOW),
-            quality_attribute_metrics=get_defaults(repository, Telescope.SKA_LOW),
-            subarrays=[
-                _low_capabilities(capabilities)
-                for capabilities in repository.get_array_assembly_capabilities(
-                    Telescope.SKA_LOW
-                )
-            ],
-        ),
-    )

@@ -257,11 +257,10 @@ Joins
 Views
 ~~~~~~
 
-The views in ``ska_ost_osd.osd.views`` build the responses ska-oso-services serves
-to its UIs. Each consumer's views and response models are in its own module:
-``views.odt`` for the ODT and ``views.pht`` for the PHT. Each takes an ``OSDRepository``, so it works with any repository, and
-returns a Pydantic model that ska-oso-services can use directly as the FastAPI
-response model of the endpoint.
+The views in ``ska_ost_osd.osd.views`` build what ska-oso-services serves to its
+UIs, as Pydantic models. Each consumer's views and models are in its own module:
+``views.odt`` for the ODT and ``views.pht`` for the PHT. Each view takes an
+``OSDRepository``, so it works with any repository.
 
 .. list-table::
    :header-rows: 1
@@ -270,9 +269,23 @@ response model of the endpoint.
      - Returns
      - Served by ska-oso-services
      - Used by
-   * - ``odt.get_configuration(repository)``
-     - ``Configuration``
-     - ``GET /configuration``
+   * - ``odt.get_basic_capabilities(repository, telescope)``
+     - Mid: ``list[MidFrequencyBand]``; Low: ``LowFrequencyBand``
+     - ``frequency_band`` in ``GET /configuration``
+     - ODT UI
+   * - ``odt.get_constraints(repository, telescope)``
+     - ``Constraints``
+     - ``constraints`` in ``GET /configuration``
+     - ODT UI
+   * - ``odt.get_defaults(repository, telescope)``
+     - Mid: ``SPFRxParameters``; Low: ``LowQualityAttributeMetrics``
+     - ``spfrx_defaults`` and ``quality_attribute_metrics`` in
+       ``GET /configuration``
+     - ODT UI
+   * - ``odt.get_capabilities(repository, telescope, array_assembly,
+       policy_id=None)``
+     - Mid: ``MidSubarray``; Low: ``LowSubarray``
+     - each of the ``subarrays`` in ``GET /configuration``
      - ODT UI
    * - ``pht.get_cycle_configuration(repository, cycle_id)``
      - ``CycleConfiguration``
@@ -287,32 +300,43 @@ response model of the endpoint.
 ODT configuration
 ^^^^^^^^^^^^^^^^^^
 
-``get_configuration(repository)`` returns everything the ODT needs about both
-telescopes, independent of any cycle:
+ska-oso-services builds ``GET /configuration`` from the ODT view's functions,
+choosing which array assemblies and policies to serve:
 
 .. code-block:: text
 
     ska_mid
-        frequency_band          the receiver bands, Band 5b with its sub-bands
-        constraints             elevation limits and avoidance angles
-        subarrays               each array assembly: name, receptors,
-                                available_bandwidth_hz, number_pst_beams,
-                                number_fsps, allowed_channel_width_values_hz
-        spfrx_defaults          target_spfrx and csp_spfrx
+        frequency_band              get_basic_capabilities: the receiver bands,
+                                    Band 5b with its sub-bands
+        constraints                 get_constraints: elevation limits and
+                                    avoidance angles
+        subarrays                   get_capabilities, for each array assembly
+                                    or policy
+        spfrx_defaults              get_defaults: target_spfrx and csp_spfrx
     ska_low
-        frequency_band          the band and its channels
-        constraints             elevation limits and avoidance angles
-        quality_attribute_metrics
-        subarrays               each array assembly: name, receptors,
-                                available_bandwidth_hz, number_pst_beams,
-                                number_fsps, number_substations,
-                                number_subarray_beams
+        frequency_band              get_basic_capabilities: the band and its
+                                    channels
+        constraints                 get_constraints
+        quality_attribute_metrics   get_defaults
+        subarrays                   get_capabilities, for each array assembly
+                                    or policy
 
-The array assemblies are narrowed to the fields the ODT uses; use
-``repository.get_capabilities`` for all of their capabilities. The JSON
-matches what ska-oso-services serves today, with one addition:
-``allowed_channel_width_values_hz`` on the Mid array assemblies, which
-ska-oso-services means to serve but currently drops.
+``get_capabilities`` returns an array assembly's capabilities, with a policy's
+applied if one is given, named after the policy or else the array assembly. Its
+fields are the ones the ODT uses: ``name``, ``receptors``,
+``available_bandwidth_hz``, ``number_pst_beams`` and ``number_fsps``, with Mid's
+``allowed_channel_width_values_hz`` and Low's ``number_substations`` and
+``number_subarray_beams``. Use ``repository.get_capabilities`` for all of their
+capabilities.
+
+.. code-block:: python
+
+    from ska_ost_osd.osd.views import odt
+
+    odt.get_capabilities(repository, Telescope.SKA_LOW, "AA2", "AA2_SV")
+
+The models are the view's own, named and shaped as ska-oso-services' response
+models, so the response doesn't change with the OSD's domain models.
 
 
 PHT cycle data
