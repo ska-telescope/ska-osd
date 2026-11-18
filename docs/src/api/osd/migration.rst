@@ -1,5 +1,5 @@
 Migrating to version 8.0
--------------------------
+------------------------
 
 ``get_osd_using_tmdata`` and the views serve each telescope's capabilities in
 the pre-8.0 legacy shape: ``basic_capabilities`` alongside one entry per array
@@ -21,7 +21,7 @@ if its path differs, and *changed* if its value is represented differently.
 
 
 Basic capabilities
-~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~
 
 The fields under ``basic_capabilities``. In the Python API they are part of
 every ``MidCapabilities`` or ``LowCapabilities``, and
@@ -91,7 +91,7 @@ every ``MidCapabilities`` or ``LowCapabilities``, and
 
 
 Array assembly capabilities
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The fields under each array assembly or policy, e.g. ``"AA2"``. The views serve
 some under different names, as given.
@@ -221,7 +221,7 @@ some under different names, as given.
 
 
 Other fields
-~~~~~~~~~~~~~
+~~~~~~~~~~~~
 
 Fields the legacy capabilities files held beside the capabilities:
 
@@ -235,7 +235,7 @@ Fields the legacy capabilities files held beside the capabilities:
 
 
 Cycles
-~~~~~~~
+~~~~~~
 
 ``get_osd_using_tmdata`` serves a cycle as ``observatory_policy``;
 ``repository.get_cycle(cycle_id)`` returns it as a ``Cycle``:
