@@ -14,6 +14,7 @@ Welcome to ska-ost-osd's documentation!
 
    api/osd/guide
    api/osd/python_api
+   api/osd/migration
 
 Indices and tables
 ==================

@@ -4,20 +4,24 @@ import pytest
 
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.exceptions import (
+    ArrayAssemblyNotFoundError,
     Band5bSubbandNotFoundError,
-    CapabilitySetNotFoundError,
     CycleNotFoundError,
     FrequencyBandNotFoundError,
     OSDQueryError,
+    PolicyNotFoundError,
 )
-from ska_ost_osd.osd.models.cycles import CycleID
 
 
 @pytest.mark.parametrize(
     "error",
     [
-        CycleNotFoundError(CycleID(3), [CycleID(1), CycleID(2)]),
-        CapabilitySetNotFoundError(Telescope.SKA_LOW, "AA3", ["AA1", "AA2"]),
+        CycleNotFoundError(
+            "NO_SUCH_CYCLE",
+            ["TEST_SKAO_2027_Low_AA1_SV", "TEST_SKAO_2027_AA2_Proposal"],
+        ),
+        ArrayAssemblyNotFoundError(Telescope.SKA_LOW, "AA3", ["AA1", "AA2"]),
+        PolicyNotFoundError(Telescope.SKA_LOW, "AA3", ["AA1", "AA2"]),
         FrequencyBandNotFoundError("Band_9", ["Band_1"]),
         Band5bSubbandNotFoundError("Band_5b", 4, [1, 2, 3]),
     ],

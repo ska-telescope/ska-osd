@@ -1,50 +1,56 @@
-from typing import Annotated, Self
+from enum import StrEnum
+from typing import Self
 
 from pydantic import AwareDatetime, Field, model_validator
 
+from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.defaults import OSDBaseModel
 
-# The key that identifies a cycle: currently the number N in cycles/cycle_<N>.json
-CycleID = Annotated[int, Field(gt=0, examples=[1])]
+
+class PolicyType(StrEnum):
+    SCIENCE_VERIFICATION = "science_verification"
+    SHARED_RISK = "shared_risk"
+    STANDARD_OPERATIONS = "standard_operations"
 
 
-class CycleInformation(OSDBaseModel):
-    cycle_id: str = Field(examples=["SKAO_2027_1"])
-    proposal_open: AwareDatetime = Field(examples=["2026-03-27T12:00:00.000Z"])
-    proposal_close: AwareDatetime = Field(examples=["2027-04-01T15:00:00.000Z"])
+class ProposalWindow(OSDBaseModel):
+    opens: AwareDatetime = Field(examples=["2026-03-27T12:00:00.000Z"])
+    closes: AwareDatetime = Field(examples=["2027-04-01T15:00:00.000Z"])
 
     @model_validator(mode="after")
-    def check_proposal_window(self) -> Self:
-        if self.proposal_open >= self.proposal_close:
-            raise ValueError("proposal_open must be before proposal_close")
+    def check_opens_before_closes(self) -> Self:
+        if self.opens >= self.closes:
+            raise ValueError("the proposal window must open before it closes")
         return self
 
 
-class CyclePolicies(OSDBaseModel):
-    normal_max_hours: float = Field(ge=0, examples=[100.0])
+class ProposalPolicy(OSDBaseModel):
+    """What one proposal in the cycle may ask for."""
+
+    max_observing_hours: float = Field(ge=0, examples=[100.0])
     max_targets: int | None = Field(default=None, ge=0)
     max_observation_setups: int | None = Field(default=None, ge=0)
     max_data_products: int | None = Field(default=None, ge=0)
 
 
-class TelescopeCapabilities(OSDBaseModel):
-    """The array assembly each telescope offers in the cycle, or ``None``."""
+class CycleTelescope(OSDBaseModel):
+    """What a cycle offers on one telescope: its array assembly, and the
+    policy offered for each type, by policy ID."""
 
-    # Read from the tmdata keys Mid and Low
-    ska_mid: str | None = Field(default=None, validation_alias="Mid", examples=["AA2"])
-    ska_low: str | None = Field(
-        default=None, validation_alias="Low", examples=["AA2_SV"]
+    array_assembly: str = Field(examples=["AA2"])
+    policies: dict[PolicyType, str] = Field(
+        min_length=1, examples=[{"science_verification": "AA2_SV"}]
     )
 
 
 class Cycle(OSDBaseModel):
-    """One cycle: its metadata, proposal dates, policies and the capability
-    set each telescope offers."""
+    """One cycle: its metadata, proposal window and policy, and what it offers
+    on each telescope."""
 
-    cycle_number: CycleID
-    cycle_id: str | None = None
-    type: str | None = Field(default=None, examples=["Science Verification"])
-    cycle_description: str
-    cycle_information: CycleInformation
-    cycle_policies: CyclePolicies
-    telescope_capabilities: TelescopeCapabilities
+    cycle_id: str
+    name: str
+    description: str
+    cycle_number: int | None = Field(default=None, ge=0, examples=[1])
+    proposal_window: ProposalWindow
+    proposal_policy: ProposalPolicy
+    telescopes: dict[Telescope, CycleTelescope] = Field(min_length=1)

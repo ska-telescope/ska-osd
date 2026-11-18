@@ -3,12 +3,12 @@ has no data."""
 
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.common.osd_validation_messages import (
+    ARRAY_ASSEMBLY_NOT_FOUND_ERROR_MESSAGE,
     BAND5B_SUBBAND_DOESNOT_EXIST_ERROR_MESSAGE,
-    CAPABILITY_SET_DOESNOT_EXIST_ERROR_MESSAGE,
     CYCLE_ID_ERROR_MESSAGE,
     FREQUENCY_BAND_DOESNOT_EXIST_ERROR_MESSAGE,
+    POLICY_NOT_FOUND_ERROR_MESSAGE,
 )
-from ska_ost_osd.osd.models.cycles import CycleID
 
 
 class OSDQueryError(Exception):
@@ -22,7 +22,7 @@ class CycleNotFoundError(OSDQueryError, LookupError):
     :param available_cycle_ids: the cycle IDs that do exist.
     """
 
-    def __init__(self, cycle_id: CycleID, available_cycle_ids: list[CycleID]):
+    def __init__(self, cycle_id: str, available_cycle_ids: list[str]):
         self.cycle_id = cycle_id
         self.available_cycle_ids = available_cycle_ids
         super().__init__(
@@ -32,12 +32,12 @@ class CycleNotFoundError(OSDQueryError, LookupError):
         )
 
 
-class CapabilitySetNotFoundError(OSDQueryError, LookupError):
-    """The telescope has no capability set with the requested name.
+class ArrayAssemblyNotFoundError(OSDQueryError, LookupError):
+    """The telescope has no array assembly with the requested name.
 
     :param telescope: the telescope searched.
-    :param name: the capability set name requested.
-    :param available_names: the names of the telescope's capability sets.
+    :param name: the array assembly name requested.
+    :param available_names: the names of the telescope's array assemblies.
     """
 
     def __init__(self, telescope: Telescope, name: str, available_names: list[str]):
@@ -45,8 +45,29 @@ class CapabilitySetNotFoundError(OSDQueryError, LookupError):
         self.name = name
         self.available_names = available_names
         super().__init__(
-            CAPABILITY_SET_DOESNOT_EXIST_ERROR_MESSAGE.format(
+            ARRAY_ASSEMBLY_NOT_FOUND_ERROR_MESSAGE.format(
                 name, telescope, ", ".join(available_names)
+            )
+        )
+
+
+class PolicyNotFoundError(OSDQueryError, LookupError):
+    """The telescope has no policy with the requested ID.
+
+    :param telescope: the telescope searched.
+    :param policy: the policy ID requested.
+    :param available_policies: the IDs of the telescope's policies.
+    """
+
+    def __init__(
+        self, telescope: Telescope, policy: str, available_policies: list[str]
+    ):
+        self.telescope = telescope
+        self.policy = policy
+        self.available_policies = available_policies
+        super().__init__(
+            POLICY_NOT_FOUND_ERROR_MESSAGE.format(
+                policy, telescope, ", ".join(available_policies) or "none"
             )
         )
 

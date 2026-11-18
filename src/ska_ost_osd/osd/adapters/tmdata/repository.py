@@ -1,35 +1,33 @@
 """The OSD repository backed by the tmdata, read through a TMData client."""
 
-from fnmatch import fnmatchcase
 from typing import Literal, overload
 
 from ska_telmodel_client import TMData
 
 from ska_ost_osd.osd.adapters.tmdata import storage
-from ska_ost_osd.osd.adapters.tmdata.models import CycleFile
+from ska_ost_osd.osd.adapters.tmdata.models import CycleFile, MidDefaultsFile
 from ska_ost_osd.osd.common.constant import Telescope
-from ska_ost_osd.osd.exceptions import CapabilitySetNotFoundError, CycleNotFoundError
+from ska_ost_osd.osd.exceptions import (
+    ArrayAssemblyNotFoundError,
+    CycleNotFoundError,
+    PolicyNotFoundError,
+)
 from ska_ost_osd.osd.models.capabilities import (
-    CapabilitySet,
+    Capabilities,
     LowBasicCapabilities,
-    LowCapabilitySet,
+    LowCapabilities,
     MidBasicCapabilities,
-    MidCapabilitySet,
+    MidCapabilities,
+    merge_capabilities,
 )
 from ska_ost_osd.osd.models.constraints import Constraints
-from ska_ost_osd.osd.models.cycles import Cycle, CycleID
-from ska_ost_osd.osd.models.defaults import LowDefaults, MidDefaults
+from ska_ost_osd.osd.models.cycles import Cycle, PolicyType
+from ska_ost_osd.osd.models.defaults import LowDefaults, MidDefaults, SPFRxParameters
 from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplate
 
-_DEFAULTS_MODELS = {
-    Telescope.SKA_MID: MidDefaults,
-    Telescope.SKA_LOW: LowDefaults,
-}
-
-# The fields of a cycle's telescope_capabilities, by telescope
-_CYCLE_TELESCOPE_FIELDS = {
-    Telescope.SKA_MID: "ska_mid",
-    Telescope.SKA_LOW: "ska_low",
+_CAPABILITIES_MODELS = {
+    Telescope.SKA_MID: MidCapabilities,
+    Telescope.SKA_LOW: LowCapabilities,
 }
 
 
@@ -45,10 +43,10 @@ class TMDataRepository:
 
     # Cycles
 
-    def get_cycle_ids(self) -> list[CycleID]:
+    def get_cycle_ids(self) -> list[str]:
         return storage.get_cycle_ids(self._tmdata)
 
-    def get_cycle(self, cycle_id: CycleID) -> Cycle:
+    def get_cycle(self, cycle_id: str) -> Cycle:
         cycle_ids = self.get_cycle_ids()
         if cycle_id not in cycle_ids:
             raise CycleNotFoundError(cycle_id, cycle_ids)
@@ -69,10 +67,15 @@ class TMDataRepository:
     def get_defaults(self, telescope: Literal[Telescope.SKA_LOW]) -> LowDefaults: ...
 
     def get_defaults(self, telescope: Telescope) -> MidDefaults | LowDefaults:
-        return _DEFAULTS_MODELS[telescope].model_validate(
-            storage.get_telescope_defaults(self._tmdata, telescope),
-            from_attributes=True,
-        )
+        defaults = storage.get_telescope_defaults(self._tmdata, telescope)
+        if isinstance(defaults, MidDefaultsFile):
+            return MidDefaults(
+                spfrx_defaults=SPFRxParameters(
+                    target_spfrx=defaults.target.dish_spfrx_params,
+                    csp_spfrx=defaults.csp_configuration.spfrx,
+                )
+            )
+        return LowDefaults(quality_attribute_metrics=defaults.quality_attribute_metrics)
 
     @overload
     def get_basic_capabilities(
@@ -87,87 +90,118 @@ class TMDataRepository:
     def get_basic_capabilities(
         self, telescope: Telescope
     ) -> MidBasicCapabilities | LowBasicCapabilities:
-        return storage.get_telescope_capabilities(
-            self._tmdata, telescope
-        ).basic_capabilities
+        return storage.get_telescope_basic_capabilities(self._tmdata, telescope)
 
     def get_constraints(self, telescope: Telescope) -> Constraints:
         """tmdata stores the constraints in two files: the elevation limits
-        in the capabilities file, and the sun, moon and Jupiter avoidance
-        angles in the defaults file."""
-        capabilities = storage.get_telescope_capabilities(self._tmdata, telescope)
+        in the basic capabilities file, and the sun, moon and Jupiter
+        avoidance angles in the defaults file."""
+        basic_capabilities = storage.get_telescope_basic_capabilities(
+            self._tmdata, telescope
+        )
         defaults = storage.get_telescope_defaults(self._tmdata, telescope)
         return Constraints(
-            **capabilities.constraints.model_dump(),
+            **basic_capabilities.elevation_limits.model_dump(),
             **defaults.constraints.model_dump(),
         )
 
-    # Capability sets
+    # Capabilities
 
     @overload
-    def get_capability_sets(
+    def get_array_assembly_capabilities(
         self, telescope: Literal[Telescope.SKA_MID]
-    ) -> list[MidCapabilitySet]: ...
+    ) -> list[MidCapabilities]: ...
 
     @overload
-    def get_capability_sets(
+    def get_array_assembly_capabilities(
         self, telescope: Literal[Telescope.SKA_LOW]
-    ) -> list[LowCapabilitySet]: ...
+    ) -> list[LowCapabilities]: ...
 
-    def get_capability_sets(
+    def get_array_assembly_capabilities(
         self, telescope: Telescope
-    ) -> list[MidCapabilitySet] | list[LowCapabilitySet]:
-        return storage.get_telescope_capabilities(self._tmdata, telescope).subarrays
+    ) -> list[MidCapabilities] | list[LowCapabilities]:
+        return [
+            self.get_capabilities(telescope, name)
+            for name in storage.get_array_assembly_files(self._tmdata, telescope)
+        ]
 
     @overload
-    def get_capability_set(
-        self, telescope: Literal[Telescope.SKA_MID], name: str
-    ) -> MidCapabilitySet: ...
+    def get_capabilities(
+        self,
+        telescope: Literal[Telescope.SKA_MID],
+        array_assembly: str,
+        policy_id: str | None = None,
+    ) -> MidCapabilities: ...
 
     @overload
-    def get_capability_set(
-        self, telescope: Literal[Telescope.SKA_LOW], name: str
-    ) -> LowCapabilitySet: ...
+    def get_capabilities(
+        self,
+        telescope: Literal[Telescope.SKA_LOW],
+        array_assembly: str,
+        policy_id: str | None = None,
+    ) -> LowCapabilities: ...
 
-    def get_capability_set(self, telescope: Telescope, name: str) -> CapabilitySet:
-        capability_sets = self.get_capability_sets(telescope)
-        for capability_set in capability_sets:
-            if capability_set.name == name:
-                return capability_set
-        raise CapabilitySetNotFoundError(
-            telescope, name, [capability_set.name for capability_set in capability_sets]
+    def get_capabilities(
+        self, telescope: Telescope, array_assembly: str, policy_id: str | None = None
+    ) -> Capabilities:
+        array_assembly_files = storage.get_array_assembly_files(self._tmdata, telescope)
+        if array_assembly not in array_assembly_files:
+            raise ArrayAssemblyNotFoundError(
+                telescope, array_assembly, list(array_assembly_files)
+            )
+        policy = None
+        if policy_id is not None:
+            try:
+                policy_ids = list(storage.get_policy_paths(self._tmdata, telescope))
+            except FileNotFoundError:
+                policy_ids = []
+            if policy_id not in policy_ids:
+                raise PolicyNotFoundError(telescope, policy_id, policy_ids)
+            # A field set to null is treated as left out
+            policy = storage.get_policy_file(
+                self._tmdata, telescope, policy_id
+            ).model_dump(exclude_unset=True, exclude_none=True)
+        return _CAPABILITIES_MODELS[telescope].model_validate(
+            merge_capabilities(
+                storage.get_telescope_basic_capabilities(
+                    self._tmdata, telescope
+                ).model_dump(),
+                array_assembly_files[array_assembly].model_dump(),
+                policy,
+            )
         )
 
     # Joins
 
     def get_subarray_templates(
-        self, telescope: Telescope, capability_set: str
+        self, telescope: Telescope, array_assembly: str
     ) -> list[SubarrayTemplate]:
-        """A template belongs to the capability set when its name matches one
-        of the set's ``subarray_templates`` patterns (e.g. ``"*_AA2"``) and
-        starts with the set's telescope (e.g. ``"SKA_MID_"``). A pattern alone is
-        not enough: ``"*_AA2"`` matches both telescopes' AA2 templates."""
-        patterns = (
-            self.get_capability_set(telescope, capability_set).subarray_templates or []
-        )
-        prefix = f"{telescope.value.upper()}_"
-        return [
-            template
-            for template in storage.get_subarray_template_library(
-                self._tmdata
-            ).templates
-            if template.name.startswith(prefix)
-            and any(fnmatchcase(template.name, pattern) for pattern in patterns)
-        ]
+        """An array assembly's templates are in the library that names it;
+        one with no library offers none."""
+        array_assembly_files = storage.get_array_assembly_files(self._tmdata, telescope)
+        if array_assembly not in array_assembly_files:
+            raise ArrayAssemblyNotFoundError(
+                telescope, array_assembly, list(array_assembly_files)
+            )
+        try:
+            library = storage.get_subarray_template_library(
+                self._tmdata, telescope, array_assembly
+            )
+        except FileNotFoundError:
+            return []
+        return library.templates
 
-    def get_cycle_capability_sets(
-        self, cycle_id: CycleID
-    ) -> dict[Telescope, CapabilitySet]:
-        offered = self.get_cycle(cycle_id).telescope_capabilities
+    def get_cycle_capabilities(
+        self, cycle_id: str
+    ) -> dict[Telescope, dict[PolicyType, Capabilities]]:
         return {
-            telescope: self.get_capability_set(telescope, name)
-            for telescope, field in _CYCLE_TELESCOPE_FIELDS.items()
-            if (name := getattr(offered, field)) is not None
+            telescope: {
+                policy_type: self.get_capabilities(
+                    telescope, offered.array_assembly, policy_id
+                )
+                for policy_type, policy_id in offered.policies.items()
+            }
+            for telescope, offered in self.get_cycle(cycle_id).telescopes.items()
         }
 
     # Storage to reader models

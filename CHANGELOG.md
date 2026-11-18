@@ -7,10 +7,10 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 Unreleased
 **********
-* Added the ``osd-validate-tmdata`` command, which validates a tmdata directory
-  against the storage models, by default ``tmdata`` in the directory it is run in, and
-  the ``tmdata-validate`` make target and pipeline job that run it. ``tmdata-publish``
-  can only be run once it passes
+* Added the ``osd-validate-tmdata`` command, which validates the current (not
+  legacy) files of a tmdata directory against the storage models, by default
+  ``tmdata`` in the directory it is run in, and the ``tmdata-validate`` make target
+  and pipeline job that run it. ``tmdata-publish`` can only be run once it passes
 * [BREAKING] Removed the REST API: the FastAPI app, its Helm charts and OCI image, and
   the ``/osd``, ``/cycle``, ``/osd_release`` and ``/semantic_validation`` endpoints.
   The OSD is now a Python library only
@@ -23,13 +23,44 @@ Unreleased
 * [BREAKING] Removed ``ska_ost_osd.common``, including the FastAPI
   ``generic_exception_handler``
 * Removed the ``fastapi``, ``astropy`` and ``simpleeval`` dependencies
-* [BREAKING] Renamed the ``Telescope`` members to ``SKA_MID`` and ``SKA_LOW``, with
-  the values ``ska_mid`` and ``ska_low`` of the PDM's ``TelescopeType``. The
-  ``telescope`` of a capability set in the PHT view changes to match.
-  ``get_osd_using_tmdata`` still accepts ``"mid"`` and ``"low"``
-* [BREAKING] Renamed the subarray templates in ``subarray_template_library.json``
-  to start with ``SKA_MID_`` and ``SKA_LOW_``
-* [BREAKING] Define multiple cycles through a single TelModel backend in ``tmdata/cycles``
+* [BREAKING] ``get_osd_using_tmdata`` takes a ``telescope`` instead of the
+  ``capabilities`` string: a ``Telescope``, ``SKA_MID`` or ``SKA_LOW``, with the
+  values ``ska_mid`` and ``ska_low`` of the PDM's ``TelescopeType``. ``"mid"`` and
+  ``"low"`` are still accepted
+* [BREAKING] Renamed the subarray templates to start with ``SKA_MID_`` and
+  ``SKA_LOW_``
+* [BREAKING] Define multiple cycles through a single TelModel backend in
+  ``tmdata/cycles``: one file per cycle, with a ``cycle_id``, ``name``,
+  ``description``, optional ``cycle_number``, ``proposal_window``,
+  ``proposal_policy`` and ``telescopes``: for each telescope, an ``array_assembly``
+  and the policy offered for each policy type
+* [BREAKING] Restructured the tmdata under ``telescopes/ska_low`` and
+  ``telescopes/ska_mid``: ``basic_capabilities.json`` with what is fixed for the
+  telescope, ``defaults.json``, and directories of ``array_assemblies``,
+  ``policies`` (the rules a cycle applies to an array assembly, only the fields
+  they change) and ``subarray_templates``. Their files can have any name: each
+  names what it describes in its ``array_assembly`` or ``policy``. Each observing
+  mode's limits are under ``observing_modes``, the stations or dishes under
+  ``receptors``, the frequency slice processors and function modes under
+  ``cbf``, the correlator-beamformer, and Low's coarse channels and subarray beams
+  under ``sps``, its stations' signal processing. Both telescopes' zoom factors
+  (``observing_modes.spectral.zoom_factors``) are the PDM's: zoom factor *z*
+  narrows a window's channels by 2**z, and 0 (no zoom, i.e. continuum) is never
+  listed, so ``[]`` means no zoom. Mid's channel widths are stored as its zoom
+  factors and channel averaging factors
+  (``observing_modes.continuum.channel_averaging_factors``), from which
+  ``allowed_channel_width_values_hz`` is worked out, and its limit on correlated
+  channels over all spectral windows as ``cbf.max_channels``, ``null`` where the
+  OSD sets none, in place of ``allowed_channel_count_range_min`` and ``_max``; the
+  minimum, always one channel per spectral window, is no longer stored.
+  Low's ``AA2_SV`` is now a policy on ``AA2``. The legacy files are kept but no
+  longer read
+* [BUGFIX] ``get_osd_using_tmdata`` serves Mid AA2's
+  ``allowed_channel_count_range_max`` as 2147483647, the largest 32-bit signed
+  integer, which clients read as no limit; it was mistyped as 214748647
+* Added Mid's ``cbf.frequency_slice_bandwidth_hz`` and ``cbf.fine_channel_width_hz``
+  to its basic capabilities: the bandwidth of the frequency slice each FSP
+  processes, and the width of the fine channels it divides a slice into
 * [BREAKING] Users pass a TMData client to public API functions instead of OSD creating one from ``tmdata/version_mapping``
 * [BREAKING] Removed ``number_beams`` from the SKA-Low array assemblies in
   ``low_capabilities.json``; use ``number_subarray_beams``
@@ -39,24 +70,35 @@ Unreleased
   files; they are defined in ``mid_defaults.json`` and ``low_defaults.json``
 * Removed the unused semantic validation constants from ``tmdata/instrument``
 * ``get_osd_using_tmdata`` queries without a cycle now return the complete capability
-  catalogue
+  catalogue, including each policy a cycle offers, applied to its array assembly,
+  under the policy's name
+* [BREAKING] ``get_osd_using_tmdata`` selects a cycle by the ``cycle_number`` in its
+  file, no longer serves Low's ``quality_attribute_metrics`` in the catalogue (it
+  is in Low's ``defaults.json``, served by the ODT view), and the ITFs' template
+  pattern matches no templates. Removed ``ska_ost_osd.osd.template_mapping``
 * Removed ``osd-pre-release``, ``osd-tmdata-publish`` and ``release.sh``
 * Added proposal cycle data to the release-cycle version mapping.
-* Added Pydantic storage models for the tmdata files: ``MidCapabilitiesFile`` and
-  ``LowCapabilitiesFile``, ``MidDefaultsFile`` and ``LowDefaultsFile``, ``CycleFile``
-  (``cycles/cycle_*.json``) and ``SubarrayTemplateLibraryFile``, in
-  ``ska_ost_osd.osd.adapters.tmdata.models``
-* ``Cycle`` reads ``proposal_open`` and ``proposal_close`` as timezone-aware
-  datetimes, a date without a timezone is rejected.
+* Added Pydantic storage models for the tmdata files, in
+  ``ska_ost_osd.osd.adapters.tmdata.models``: ``MidBasicCapabilitiesFile``,
+  ``MidArrayAssemblyFile``, ``MidPolicyFile`` and ``MidDefaultsFile``, their Low
+  equivalents, ``CycleFile`` and ``SubarrayTemplateLibraryFile``
+* ``Cycle`` reads its ``proposal_window`` ``opens`` and ``closes`` as
+  timezone-aware datetimes; a time without a timezone is rejected
 * Added a test that validates the real tmdata files against these models
 * Added ``OSDRepository`` (``ska_ost_osd.osd.repository``), the interface for
-  reading cycles, capability sets, basic capabilities, constraints, defaults and
+  reading cycles, capabilities, basic capabilities, constraints, defaults and
   subarray templates as Pydantic models, and ``TMDataRepository``
-  (``ska_ost_osd.osd.adapters.tmdata``), which implements it over a TMData client
+  (``ska_ost_osd.osd.adapters.tmdata``), which implements it over a TMData client.
+  ``get_capabilities(telescope, array_assembly, policy_id=None)`` returns a
+  telescope's basic capabilities and array assembly with a policy's changes applied,
+  and ``get_cycle_capabilities(cycle_id)`` what a cycle offers. A key with no data
+  raises an ``OSDQueryError``, such as ``CycleNotFoundError`` or
+  ``PolicyNotFoundError``
 * Added ``ska_ost_osd.osd.views``: the configuration ska-oso-services serves to the
   ODT (``views.odt``) and the cycle data it serves to the PHT (``views.pht``), built
   from an ``OSDRepository``. The views serialise with the names their consumers
-  read by default, without ``by_alias=True``
+  read by default, without ``by_alias=True``. The ODT configuration lists array
+  assemblies only, so not policies such as Low's ``AA2_SV``
 * Raised the minimum pydantic version to 2.11, for ``serialize_by_alias``
 * Bump the build and runtime base images to ``ska-build-python-ubuntu26:1.1.2`` and
   ``ska-python-ubuntu26:1.1.2`` to pick up the OpenSSL DTLS retransmission fix

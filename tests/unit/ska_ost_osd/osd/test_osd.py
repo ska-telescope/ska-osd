@@ -1,11 +1,15 @@
 import logging
-from unittest.mock import patch
 
 import pytest
 from ska_telmodel_client import TMData
 
-from ska_ost_osd.osd.common.constant import Telescope, osd_file_mapping
+from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.osd import get_osd_data, get_osd_using_tmdata
+from tests.unit.ska_ost_osd.osd.expected import (
+    CYCLE_1_FILE,
+    CYCLE_1_LEGACY_OBSERVATORY_POLICY,
+    CYCLE_2_FILE,
+)
 
 
 @pytest.mark.parametrize(
@@ -54,10 +58,10 @@ def test_get_osd_data_without_cycle_returns_complete_catalogue(tests_tmdata):
     assert set(result["capabilities"]) == {"mid", "low"}
 
     for capability in ("mid", "low"):
-        source_data = tests_tmdata[osd_file_mapping[capability]].get_dict()
-        assert set(result["capabilities"][capability]) == set(source_data) - {
-            "telescope",
-            "constraints",
+        assert set(result["capabilities"][capability]) == {
+            "basic_capabilities",
+            "AA1",
+            "AA2",
         }
 
 
@@ -131,8 +135,8 @@ def test_get_osd_data_array_assembly_rejects_non_array_assembly_keys(
 ):
     """ "constraints" and "basic_capabilities" are keys of the capabilities
     document, not named array assemblies, so requesting either as one
-    should be rejected rather than returned as if it were a valid
-    capability set.
+    should be rejected rather than returned as if it were valid
+    capabilities.
 
     :param invalid_array_assembly: the non-array-assembly key under test
     :param tests_tmdata: tests_tmdata
@@ -152,19 +156,11 @@ def test_get_osd_data_array_assembly_rejects_non_array_assembly_keys(
 
 
 def test_get_osd_data_missing_subarray_templates_falls_back_to_empty(
-    tests_tmdata, monkeypatch
+    tests_tmdata,
 ):
-    """When process_templates is requested but the TMData source has no
-    subarray_templates file, get_osd_data should fall back to treating the
-    template data as empty rather than raising.
-
-    :param tests_tmdata: tests_tmdata
-    :param monkeypatch: pytest monkeypatch fixture
-    """
-    monkeypatch.setitem(
-        osd_file_mapping, "subarray_templates", "missing/templates.json"
-    )
-
+    """With process_templates, an array assembly with no template library
+    (Mid AA1 in the test tmdata) is served without subarray_templates rather
+    than raising."""
     osd_data, error_msgs = get_osd_data(
         telescope="mid",
         array_assembly="AA1",
@@ -173,7 +169,7 @@ def test_get_osd_data_missing_subarray_templates_falls_back_to_empty(
     )
 
     assert error_msgs == []
-    assert "AA1" in osd_data["capabilities"]["mid"]
+    assert "subarray_templates" not in osd_data["capabilities"]["mid"]["AA1"]
 
 
 def test_get_osd_data_with_process_templates(tests_tmdata):
@@ -201,41 +197,44 @@ def test_get_osd_data_with_process_templates(tests_tmdata):
     assert "mid" in result_true["capabilities"]
 
 
-@patch("ska_ost_osd.osd.osd.process_template_mappings")
-def test_get_osd_data_template_processing_called(mock_process_templates, tests_tmdata):
-    """Test that process_template_mappings is called when process_templates=True."""
-
-    # Mock the template processing function to return modified data
-    def mock_template_processing(data, _capability, _template_data):
-        # Add mock subarray_templates to the data
-        modified_data = data.copy()
-        if "AA1" in modified_data:
-            modified_data["AA1"]["subarray_templates"] = {
-                "mid_template_1": {"config": "test"}
-            }
-        return modified_data
-
-    mock_process_templates.side_effect = mock_template_processing
-
-    # Test with process_templates=True
+def test_get_osd_data_processes_templates(tests_tmdata):
+    """With process_templates=True, the template patterns are replaced by
+    each array assembly's templates."""
     result, _ = get_osd_data(
         telescope="mid",
-        array_assembly="AA1",
+        array_assembly="AA2",
         tmdata=tests_tmdata,
         process_templates=True,
     )
 
-    # Verify that process_template_mappings was called
-    assert mock_process_templates.called
-
-    # Verify the result contains the mocked template data
-    assert "capabilities" in result
-    assert "mid" in result["capabilities"]
-    assert "AA1" in result["capabilities"]["mid"]
-    assert "subarray_templates" in result["capabilities"]["mid"]["AA1"]
+    assert "subarray_templates" in result["capabilities"]["mid"]["AA2"]
     assert (
-        "mid_template_1" in result["capabilities"]["mid"]["AA1"]["subarray_templates"]
+        "SKA_MID_FULL_AA2" in result["capabilities"]["mid"]["AA2"]["subarray_templates"]
     )
+
+
+def test_get_osd_using_tmdata_serves_templates_in_legacy_shape(tests_tmdata):
+    """Processed templates are keyed by name, with their receptor IDs served
+    as custom_stations, one comma-separated string."""
+    osd_data = get_osd_using_tmdata(
+        tests_tmdata,
+        telescope=Telescope.SKA_LOW,
+        array_assembly="AA2",
+        process_templates=True,
+    )
+
+    assert osd_data["capabilities"]["low"]["AA2"]["subarray_templates"] == {
+        "SKA_LOW_FULL_AA2": {
+            "subarray_type": "AA2",
+            "custom_stations": "",
+            "description": "TEST full Low AA2 array.",
+        },
+        "SKA_LOW_TEST_AA2": {
+            "subarray_type": "custom",
+            "custom_stations": "S8-1,S8-2,S8-3,S8-4",
+            "description": "TEST Low AA2 subset of stations.",
+        },
+    }
 
 
 @pytest.fixture
@@ -262,6 +261,14 @@ def test_get_osd_using_tmdata_cycle_uses_selected_cycle_file(tests_tmdata):
     assert set(osd_data["capabilities"]) == {"mid", "low"}
 
 
+def test_get_osd_using_tmdata_cycle_observatory_policy(tests_tmdata):
+    """The legacy response serves the cycle as observatory_policy, with the
+    telescopes keyed Mid and Low."""
+    osd_data = get_osd_using_tmdata(tests_tmdata, cycle_id=1)
+
+    assert osd_data["observatory_policy"] == CYCLE_1_LEGACY_OBSERVATORY_POLICY
+
+
 def test_get_osd_using_tmdata_cycle_capability_uses_cycle_array_assembly(
     tests_tmdata,
 ):
@@ -279,14 +286,10 @@ def test_get_osd_using_tmdata_capability_only_returns_complete_catalogue(
 ):
     """A capability-only query returns all of that capability's assemblies."""
     osd_data = get_osd_using_tmdata(tests_tmdata, telescope=Telescope.SKA_MID)
-    source_data = tests_tmdata[osd_file_mapping["mid"]].get_dict()
 
     assert "observatory_policy" not in osd_data
     assert set(osd_data["capabilities"]) == {"mid"}
-    assert set(osd_data["capabilities"]["mid"]) == set(source_data) - {
-        "telescope",
-        "constraints",
-    }
+    assert set(osd_data["capabilities"]["mid"]) == {"basic_capabilities", "AA1", "AA2"}
 
 
 @pytest.mark.parametrize(
@@ -311,6 +314,74 @@ def test_get_osd_using_tmdata_catalogue_filter(
     assert "observatory_policy" not in osd_data
     assert list(osd_data["capabilities"]) == [key]
     assert array_assembly in osd_data["capabilities"][key]
+
+
+def test_get_osd_using_tmdata_serves_low_modes_flat(tests_tmdata):
+    """Low's observing modes, stations and subarray beams are served under their
+    legacy names."""
+    osd_data = get_osd_using_tmdata(tests_tmdata, telescope=Telescope.SKA_LOW)
+
+    served = osd_data["capabilities"]["low"]["AA2"]
+    assert "observing_modes" not in served
+    assert served["number_zoom_windows"] == 0
+    assert served["number_zoom_channels"] == 0
+    assert served["allowed_zoom_factors"] == [1, 2, 4, 8]
+    assert osd_data["capabilities"]["low"]["AA1"]["allowed_zoom_factors"] == [0]
+    assert served["number_pss_beams"] == 0
+    assert served["ps_beam_bandwidth_hz"] == 75_000_000.0
+    assert served["number_pst_beams"] == 1
+    assert served["number_vlbi_beams"] == 0
+    assert "sps" not in served
+    assert served["number_subarray_beams"] == 8
+    assert served["number_substations"] == 512
+    assert served["number_stations"] == 8
+    assert served["max_baseline_km"] == 6.0
+    assert served["number_station_ids"] == [
+        345,
+        346,
+        347,
+        348,
+        349,
+        350,
+        351,
+        352,
+    ]
+
+
+def test_get_osd_using_tmdata_serves_mid_modes_flat(tests_tmdata):
+    """Mid's observing modes are served under their legacy names, and its capability
+    sets with templates processed have no constraints."""
+    osd_data = get_osd_using_tmdata(
+        tests_tmdata, telescope=Telescope.SKA_MID, process_templates=True
+    )
+
+    assert "constraints" not in osd_data["capabilities"]["mid"]
+    served = osd_data["capabilities"]["mid"]["AA2"]
+    assert "observing_modes" not in served
+    assert served["allowed_channel_width_values_hz"] == [3360, 6720, 13440, 26880]
+    assert "allowed_zoom_factors" not in served
+    assert served["allowed_channel_count_range_min"] == [1]
+    assert served["allowed_channel_count_range_max"] == [2147483647]
+    assert osd_data["capabilities"]["mid"]["AA1"][
+        "allowed_channel_count_range_max"
+    ] == [58982]
+    assert served["number_pss_beams"] == 0
+    assert served["ps_beam_bandwidth_hz"] == 400_000_000
+    assert served["number_pst_beams"] == 1
+    assert "receivers" not in served
+    assert served["available_receivers"] == [
+        "Band_1",
+        "Band_2",
+        "Band_5a",
+        "Band_5b",
+    ]
+    assert served["number_ska_dishes"] == 8
+    assert served["number_meerkat_dishes"] == 0
+    assert served["max_baseline_km"] == 1.5
+    assert served["number_dish_ids"][0] == "SKA001"
+    assert served["number_zoom_windows"] == 0
+    assert served["number_zoom_channels"] == 0
+    assert "allowed_zoom_factors" not in served
 
 
 def test_get_osd_using_tmdata_band_5b_has_sub_bands(tests_tmdata):
@@ -387,3 +458,61 @@ def test_get_osd_using_tmdata_surfaces_tmdata_read_errors(failing_tmdata):
     """An error reading the TMData source is raised to the caller."""
     with pytest.raises(ValueError, match="not found in SKA CAR"):
         get_osd_using_tmdata(failing_tmdata, cycle_id=1)
+
+
+@pytest.mark.parametrize(
+    "nulls",
+    [{"observing_modes": None}, {"observing_modes": {"pst": {"max_beams": None}}}],
+    ids=["group", "field"],
+)
+def test_get_osd_using_tmdata_treats_a_null_in_a_policy_as_left_out(
+    tests_tmdata, tmdata_with, nulls
+):
+    """Cycle 2 offers Low AA2 with the AA2 policy; nulls in it change nothing."""
+    with_nulls = tmdata_with(
+        {"telescopes/ska_low/policies/AA2.json": {"policy": "AA2", **nulls}}
+    )
+
+    assert get_osd_using_tmdata(with_nulls, cycle_id=2) == get_osd_using_tmdata(
+        tests_tmdata, cycle_id=2
+    )
+
+
+def test_get_osd_using_tmdata_raises_when_two_cycle_files_share_a_number(tmdata_with):
+    """The legacy API looks cycles up by number, so each must be unique."""
+    tmdata = tmdata_with(
+        {
+            "cycles/another_cycle_1.json": {
+                **CYCLE_1_FILE.model_dump(mode="json", by_alias=True),
+                "cycle_id": "ANOTHER_CYCLE",
+            }
+        }
+    )
+
+    with pytest.raises(ValueError, match="cycle_number 1 is in both"):
+        get_osd_using_tmdata(tmdata, cycle_id=1)
+
+
+def test_get_osd_using_tmdata_raises_when_cycles_apply_a_policy_to_different_array_assemblies(
+    tmdata_with,
+):
+    """The legacy catalogue keys policies by name alone, so it can't serve a
+    policy that two cycles apply to different array assemblies."""
+    tmdata = tmdata_with(
+        {
+            "cycles/another_cycle.json": {
+                **CYCLE_2_FILE.model_dump(mode="json", by_alias=True),
+                "cycle_id": "ANOTHER_CYCLE",
+                "cycle_number": 3,
+                "telescopes": {
+                    "ska_low": {
+                        "array_assembly": "AA1",
+                        "policies": {"standard_operations": "AA2"},
+                    }
+                },
+            }
+        }
+    )
+
+    with pytest.raises(ValueError, match="policy AA2 is applied to array assembly"):
+        get_osd_using_tmdata(tmdata, telescope=Telescope.SKA_LOW)

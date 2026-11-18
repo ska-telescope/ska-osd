@@ -1,0 +1,24 @@
+{
+  "cycle_id": "TEST_SKAO_2027_Low_AA1_SV",
+  "name": "TEST SKAO 2027 Low AA1 SV",
+  "description": "TEST Low AA1 Science Verification",
+  "cycle_number": 1,
+  "proposal_window": {
+    "opens": "2026-03-27T12:00:00.000Z",
+    "closes": "2027-04-01T15:00:00.000Z"
+  },
+  "proposal_policy": {
+    "max_observing_hours": 100.0,
+    "max_targets": 1,
+    "max_observation_setups": 1,
+    "max_data_products": 1
+  },
+  "telescopes": {
+    "ska_low": {
+      "array_assembly": "AA1",
+      "policies": {
+        "science_verification": "AA1"
+      }
+    }
+  }
+}

@@ -1,8 +1,7 @@
 """Unit tests for the osd-validate-tmdata command.
 
 These use the test copy of the tmdata in tests/tmdata, copied so each test can
-break it. The copy has no observatory_policies.json, so a cycle file stands in
-for it.
+break it.
 """
 
 import json
@@ -20,7 +19,7 @@ from ska_ost_osd.osd.adapters.tmdata.validate import (
 
 TESTS_TMDATA = Path(__file__).parents[3] / "tmdata"
 
-LOW_DEFAULTS = "ska1_low/low_defaults.json"
+LOW_DEFAULTS = "telescopes/ska_low/defaults.json"
 
 
 class Value(BaseModel):
@@ -31,7 +30,6 @@ class Value(BaseModel):
 def tmdata_fixture(tmp_path: Path) -> Path:
     tmdata = tmp_path / "tmdata"
     shutil.copytree(TESTS_TMDATA, tmdata)
-    shutil.copy(tmdata / "cycles/cycle_1.json", tmdata / "observatory_policies.json")
     return tmdata
 
 
@@ -49,10 +47,18 @@ def test_missing_file_is_reported(tmdata):
     assert validate_tmdata(tmdata) == [f"{LOW_DEFAULTS}: file not found"]
 
 
-def test_missing_cycle_files_are_reported(tmdata):
-    shutil.rmtree(tmdata / "cycles")
+@pytest.mark.parametrize(
+    "directory",
+    [
+        "telescopes/ska_mid/array_assemblies",
+        "telescopes/ska_low/array_assemblies",
+        "cycles",
+    ],
+)
+def test_missing_required_directory_is_reported(tmdata, directory):
+    shutil.rmtree(tmdata / directory)
 
-    assert validate_tmdata(tmdata) == ["cycles/cycle_*.json: no cycle files found"]
+    assert validate_tmdata(tmdata) == [f"{directory}: no files found"]
 
 
 def test_invalid_json_is_reported(tmdata):
@@ -126,14 +132,14 @@ def test_different_serialisation_is_reported(tmp_path):
 
 def test_main_passes_valid_tmdata(tmdata, capsys):
     assert main([str(tmdata)]) == 0
-    assert capsys.readouterr().out == "8 tmdata files are valid\n"
+    assert capsys.readouterr().out == "17 tmdata files are valid\n"
 
 
 def test_main_defaults_to_tmdata_where_it_is_run(tmdata, monkeypatch, capsys):
     monkeypatch.chdir(tmdata.parent)
 
     assert main([]) == 0
-    assert capsys.readouterr().out == "8 tmdata files are valid\n"
+    assert capsys.readouterr().out == "17 tmdata files are valid\n"
 
 
 def test_main_fails_invalid_tmdata(tmdata, capsys):

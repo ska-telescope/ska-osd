@@ -10,20 +10,20 @@ from typing import Literal, Protocol, overload
 
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
-    CapabilitySet,
+    Capabilities,
     LowBasicCapabilities,
-    LowCapabilitySet,
+    LowCapabilities,
     MidBasicCapabilities,
-    MidCapabilitySet,
+    MidCapabilities,
 )
 from ska_ost_osd.osd.models.constraints import Constraints
-from ska_ost_osd.osd.models.cycles import Cycle, CycleID
+from ska_ost_osd.osd.models.cycles import Cycle, PolicyType
 from ska_ost_osd.osd.models.defaults import LowDefaults, MidDefaults
 from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplate
 
 
 class OSDRepository(Protocol):
-    """Reads the OSD's cycles, capability sets, basic capabilities,
+    """Reads the OSD's cycles, capabilities, basic capabilities,
     constraints, defaults and subarray templates, and the links between them.
 
     A method that looks up one item by its key raises a subclass of
@@ -32,11 +32,11 @@ class OSDRepository(Protocol):
 
     # Cycles
 
-    def get_cycle_ids(self) -> list[CycleID]:
+    def get_cycle_ids(self) -> list[str]:
         """The cycle IDs, in ascending order."""
         ...
 
-    def get_cycle(self, cycle_id: CycleID) -> Cycle:
+    def get_cycle(self, cycle_id: str) -> Cycle:
         """One cycle. Raises ``CycleNotFoundError`` if there is none."""
         ...
 
@@ -70,8 +70,10 @@ class OSDRepository(Protocol):
     def get_basic_capabilities(
         self, telescope: Telescope
     ) -> MidBasicCapabilities | LowBasicCapabilities:
-        """A telescope's basic capabilities: Mid's receiver bands, or Low's
-        frequency band and how it is divided into channels."""
+        """A telescope's basic capabilities: its elevation limits and, for
+        Mid, its receiver bands and CBF frequency slice bandwidth and fine
+        channel width or, for Low, its frequency band and how it is divided
+        into channels."""
         ...
 
     def get_constraints(self, telescope: Telescope) -> Constraints:
@@ -79,53 +81,67 @@ class OSDRepository(Protocol):
         avoidance angles."""
         ...
 
-    # Capability sets
+    # Capabilities
 
     @overload
-    def get_capability_sets(
+    def get_array_assembly_capabilities(
         self, telescope: Literal[Telescope.SKA_MID]
-    ) -> list[MidCapabilitySet]: ...
+    ) -> list[MidCapabilities]: ...
 
     @overload
-    def get_capability_sets(
+    def get_array_assembly_capabilities(
         self, telescope: Literal[Telescope.SKA_LOW]
-    ) -> list[LowCapabilitySet]: ...
+    ) -> list[LowCapabilities]: ...
 
-    def get_capability_sets(
+    def get_array_assembly_capabilities(
         self, telescope: Telescope
-    ) -> list[MidCapabilitySet] | list[LowCapabilitySet]:
-        """All of a telescope's capability sets."""
+    ) -> list[MidCapabilities] | list[LowCapabilities]:
+        """The capabilities of each of a telescope's array assemblies, with no
+        policy applied."""
         ...
 
     @overload
-    def get_capability_set(
-        self, telescope: Literal[Telescope.SKA_MID], name: str
-    ) -> MidCapabilitySet: ...
+    def get_capabilities(
+        self,
+        telescope: Literal[Telescope.SKA_MID],
+        array_assembly: str,
+        policy_id: str | None = None,
+    ) -> MidCapabilities: ...
 
     @overload
-    def get_capability_set(
-        self, telescope: Literal[Telescope.SKA_LOW], name: str
-    ) -> LowCapabilitySet: ...
+    def get_capabilities(
+        self,
+        telescope: Literal[Telescope.SKA_LOW],
+        array_assembly: str,
+        policy_id: str | None = None,
+    ) -> LowCapabilities: ...
 
-    def get_capability_set(self, telescope: Telescope, name: str) -> CapabilitySet:
-        """One capability set, by its telescope and name. Raises
-        ``CapabilitySetNotFoundError`` if there is none."""
+    def get_capabilities(
+        self, telescope: Telescope, array_assembly: str, policy_id: str | None = None
+    ) -> Capabilities:
+        """An array assembly's capabilities, with the telescope's basic
+        capabilities and, if one is given, a policy's applied. Raises
+        ``ArrayAssemblyNotFoundError`` if there is no such array assembly, and
+        ``PolicyNotFoundError`` if there is no such policy."""
         ...
 
     # Joins
 
     def get_subarray_templates(
-        self, telescope: Telescope, capability_set: str
+        self, telescope: Telescope, array_assembly: str
     ) -> list[SubarrayTemplate]:
-        """The subarray templates a capability set offers. Raises
-        ``CapabilitySetNotFoundError`` if there is no such capability set."""
+        """The subarray templates an array assembly offers. Raises
+        ``ArrayAssemblyNotFoundError`` if there is no such array assembly."""
         ...
 
-    def get_cycle_capability_sets(
-        self, cycle_id: CycleID
-    ) -> dict[Telescope, CapabilitySet]:
-        """The capability set a cycle offers for each telescope; a telescope
-        it does not offer is left out. Raises ``CycleNotFoundError`` if there
-        is no such cycle, and ``CapabilitySetNotFoundError`` if the cycle
-        names a capability set that does not exist."""
+    def get_cycle_capabilities(
+        self, cycle_id: str
+    ) -> dict[Telescope, dict[PolicyType, Capabilities]]:
+        """The capabilities a cycle offers for each telescope and policy type:
+        the telescope's array assembly with that type's policy applied. A
+        telescope the cycle does not offer is left out. Raises
+        ``CycleNotFoundError`` if there is no such cycle,
+        ``ArrayAssemblyNotFoundError`` if the cycle names an array assembly
+        that does not exist, and ``PolicyNotFoundError`` if it names a policy
+        that does not exist."""
         ...

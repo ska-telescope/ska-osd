@@ -1,0 +1,53 @@
+{
+  "array_assembly": "AA1",
+  "available_bandwidth_hz": 800000000,
+  "receivers": [
+    "Band_1",
+    "Band_2",
+    "Band_5a",
+    "Band_5b"
+  ],
+  "observing_modes": {
+    "continuum": {
+      "channel_averaging_factors": [
+        1
+      ]
+    },
+    "spectral": {
+      "max_zoom_windows": 0,
+      "max_zoom_channels": 0,
+      "zoom_factors": []
+    },
+    "pss": {
+      "max_beams": 0,
+      "beam_bandwidth_hz": 400000000
+    },
+    "pst": {
+      "max_beams": 1
+    }
+  },
+  "cbf": {
+    "number_fsps": 8,
+    "function_modes": [
+      "correlation",
+      "pst"
+    ],
+    "max_channels": 58982
+  },
+  "receptors": {
+    "number_ska_dishes": 8,
+    "number_meerkat_dishes": 0,
+    "number_meerkatplus_dishes": 0,
+    "max_baseline_km": 1.5,
+    "receptor_ids": [
+      "SKA036",
+      "SKA040",
+      "SKA045",
+      "SKA046",
+      "SKA048",
+      "SKA077",
+      "SKA081",
+      "SKA101"
+    ]
+  }
+}

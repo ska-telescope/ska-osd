@@ -2,96 +2,214 @@
 whole. ``storage`` reads the files into these, and ``TMDataRepository`` maps
 them to the reader models."""
 
-import re
-from typing import Any, Literal, Self
+from typing import Annotated, Self
 
-from pydantic import AliasChoices, Field, model_validator
+from pydantic import Field, model_validator
 
-from ska_ost_osd.osd.common.constant import ARRAY_ASSEMBLY_PATTERN
+from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
+    LowArrayAssemblyCBF,
+    LowArrayAssemblyObservingModes,
+    LowArrayAssemblyReceptors,
+    LowArrayAssemblySPS,
     LowBasicCapabilities,
-    LowCapabilitySet,
+    LowCBFMode,
+    LowZoomFactor,
+    MidArrayAssemblyCBF,
+    MidArrayAssemblyObservingModes,
+    MidArrayAssemblyReceptors,
     MidBasicCapabilities,
-    MidCapabilitySet,
+    MidCBFMode,
+    MidZoomFactor,
 )
 from ska_ost_osd.osd.models.cycles import (
-    CycleID,
-    CycleInformation,
-    CyclePolicies,
-    TelescopeCapabilities,
+    CycleTelescope,
+    ProposalPolicy,
+    ProposalWindow,
 )
 from ska_ost_osd.osd.models.defaults import (
+    CSPSPFRx,
     LowQualityAttributeMetrics,
     OSDBaseModel,
-    SPFRxParameters,
+    TargetSPFRx,
 )
 from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplate
 
 
-class ElevationConstraints(OSDBaseModel):
-    min_elevation_deg: float = Field(ge=0, le=90, examples=[45.0])
-    max_elevation_deg: float = Field(ge=0, le=90, examples=[90.0])
+class MidArrayAssemblyFile(OSDBaseModel):
+    """Model for telescopes/ska_mid/array_assemblies/<name>.json: one array
+    assembly, identified by its ``array_assembly``. Its subarray templates are
+    in the library that names it, if there is one."""
+
+    array_assembly: str = Field(examples=["AA2"])
+    available_bandwidth_hz: float = Field(gt=0)
+    cbf: MidArrayAssemblyCBF
+    observing_modes: MidArrayAssemblyObservingModes
+    receivers: list[str]
+    receptors: MidArrayAssemblyReceptors
 
     @model_validator(mode="after")
-    def check_elevation_range(self) -> Self:
-        if self.min_elevation_deg > self.max_elevation_deg:
-            raise ValueError("min_elevation_deg must not exceed max_elevation_deg")
-        return self
-
-
-class TelescopeCapabilitiesFileBase(OSDBaseModel):
-    """Base for the Mid and Low capabilities file models."""
-
-    constraints: ElevationConstraints
-
-    @model_validator(mode="before")
-    @classmethod
-    def collect_subarrays(cls, data: Any) -> Any:
-        """
-        In the tmdata file each array assembly is a top-level key;
-        gather the keys matching ``ARRAY_ASSEMBLY_PATTERN`` into
-        ``subarrays``, using the key as the subarray name.
-
-        The pattern separates the array assemblies from the file's other
-        top-level keys.
-        """
-        if not isinstance(data, dict) or "subarrays" in data:
-            return data
-        data = data.copy()
-        data["subarrays"] = [
-            {"name": key, **data.pop(key)}
-            for key in list(data)
-            if re.match(ARRAY_ASSEMBLY_PATTERN, key)
-        ]
-        return data
-
-
-class MidCapabilitiesFile(TelescopeCapabilitiesFileBase):
-    """Top-level model for mid_capabilities.json."""
-
-    telescope: Literal["Mid"] = "Mid"
-    basic_capabilities: MidBasicCapabilities
-    subarrays: list[MidCapabilitySet]
-
-    @model_validator(mode="after")
-    def check_available_receivers(self) -> Self:
-        rx_ids = {band.rx_id for band in self.basic_capabilities.frequency_bands}
-        for subarray in self.subarrays:
-            unknown = set(subarray.available_receivers) - rx_ids
-            if unknown:
+    def check_function_modes(self) -> Self:
+        for cbf_mode, mode in (
+            (MidCBFMode.PSS, self.observing_modes.pss),
+            (MidCBFMode.PST, self.observing_modes.pst),
+        ):
+            if (cbf_mode in self.cbf.function_modes) != (mode.max_beams > 0):
                 raise ValueError(
-                    f"{subarray.name}: available_receivers {sorted(unknown)} "
-                    "not found in frequency_bands"
+                    f"cbf.function_modes must list {cbf_mode} exactly when "
+                    f"observing_modes.{cbf_mode}.max_beams is above 0"
                 )
         return self
 
 
-class LowCapabilitiesFile(TelescopeCapabilitiesFileBase):
-    """Top-level model for low_capabilities.json."""
+class LowArrayAssemblyFile(OSDBaseModel):
+    """Model for telescopes/ska_low/array_assemblies/<name>.json: one array
+    assembly, identified by its ``array_assembly``. Its subarray templates are
+    in the library that names it, if there is one."""
 
-    telescope: Literal["Low"] = "Low"
-    basic_capabilities: LowBasicCapabilities
-    subarrays: list[LowCapabilitySet]
+    array_assembly: str = Field(examples=["AA2"])
+    available_bandwidth_hz: float = Field(gt=0)
+    cbf: LowArrayAssemblyCBF
+    sps: LowArrayAssemblySPS
+    observing_modes: LowArrayAssemblyObservingModes
+    receptors: LowArrayAssemblyReceptors
+
+    @model_validator(mode="after")
+    def check_function_modes(self) -> Self:
+        # vis isn't checked against observing_modes.spectral: some array assemblies list
+        # vis but offer no zoom windows
+        for cbf_mode, mode in (
+            (LowCBFMode.PSS, self.observing_modes.pss),
+            (LowCBFMode.PST, self.observing_modes.pst),
+        ):
+            if (cbf_mode in self.cbf.function_modes) != (mode.max_beams > 0):
+                raise ValueError(
+                    f"cbf.function_modes must list {cbf_mode} exactly when "
+                    f"observing_modes.{cbf_mode}.max_beams is above 0"
+                )
+        return self
+
+
+class MidPolicyCBF(OSDBaseModel):
+    number_fsps: int | None = Field(default=None, ge=0)
+    function_modes: list[MidCBFMode] | None = None
+    max_channels: int | None = Field(default=None, ge=1)
+
+
+class MidPolicyContinuumMode(OSDBaseModel):
+    channel_averaging_factors: list[Annotated[int, Field(ge=1)]] | None = None
+
+
+class MidPolicySpectralMode(OSDBaseModel):
+    max_zoom_windows: int | None = Field(default=None, ge=0)
+    max_zoom_channels: int | None = Field(default=None, ge=0)
+    zoom_factors: list[MidZoomFactor] | None = None
+
+
+class MidPolicyPSSMode(OSDBaseModel):
+    max_beams: int | None = Field(default=None, ge=0)
+    beam_bandwidth_hz: float | None = Field(default=None, ge=0)
+
+
+class MidPolicyPSTMode(OSDBaseModel):
+    max_beams: int | None = Field(default=None, ge=0)
+
+
+class MidPolicyObservingModes(OSDBaseModel):
+    continuum: MidPolicyContinuumMode | None = None
+    spectral: MidPolicySpectralMode | None = None
+    pss: MidPolicyPSSMode | None = None
+    pst: MidPolicyPSTMode | None = None
+
+
+class MidPolicyReceptors(OSDBaseModel):
+    number_ska_dishes: int | None = Field(default=None, ge=0)
+    number_meerkat_dishes: int | None = Field(default=None, ge=0)
+    number_meerkatplus_dishes: int | None = Field(default=None, ge=0)
+    max_baseline_km: float | None = Field(default=None, gt=0)
+    receptor_ids: list[str] | None = None
+
+
+class MidPolicyFile(OSDBaseModel):
+    """Model for telescopes/ska_mid/policies/<name>.json: what a cycle
+    offers of an array assembly. It mirrors MidArrayAssemblyFile with every
+    field optional, and sets only what it changes; the cycle names the array
+    assembly it applies to."""
+
+    policy: str = Field(examples=["AA2_SV"])
+    available_bandwidth_hz: float | None = Field(default=None, gt=0)
+    cbf: MidPolicyCBF | None = None
+    observing_modes: MidPolicyObservingModes | None = None
+    receivers: list[str] | None = None
+    receptors: MidPolicyReceptors | None = None
+
+
+class LowPolicyCBF(OSDBaseModel):
+    number_fsps: int | None = Field(default=None, ge=0)
+    function_modes: list[LowCBFMode] | None = None
+
+
+class LowPolicySpectralMode(OSDBaseModel):
+    max_zoom_windows: int | None = Field(default=None, ge=0)
+    max_zoom_channels: int | None = Field(default=None, ge=0)
+    zoom_factors: list[LowZoomFactor] | None = None
+
+
+class LowPolicyPSSMode(OSDBaseModel):
+    max_beams: int | None = Field(default=None, ge=0)
+    beam_bandwidth_hz: float | None = Field(default=None, ge=0)
+
+
+class LowPolicyPSTMode(OSDBaseModel):
+    max_beams: int | None = Field(default=None, ge=0)
+
+
+class LowPolicyVLBIMode(OSDBaseModel):
+    max_beams: int | None = Field(default=None, ge=0)
+
+
+class LowPolicyObservingModes(OSDBaseModel):
+    spectral: LowPolicySpectralMode | None = None
+    pss: LowPolicyPSSMode | None = None
+    pst: LowPolicyPSTMode | None = None
+    vlbi: LowPolicyVLBIMode | None = None
+
+
+class LowPolicySubarrayBeams(OSDBaseModel):
+    max_subarray_beams: int | None = Field(default=None, ge=0)
+    max_substations_per_subarray_beam: int | None = Field(default=None, ge=0)
+
+
+class LowPolicySPS(OSDBaseModel):
+    subarray_beams: LowPolicySubarrayBeams | None = None
+
+
+class LowPolicyReceptors(OSDBaseModel):
+    number_stations: int | None = Field(default=None, ge=0)
+    max_baseline_km: float | None = Field(default=None, gt=0)
+    receptor_ids: list[int] | None = None
+
+
+class LowPolicyFile(OSDBaseModel):
+    """Model for telescopes/ska_low/policies/<name>.json: what a cycle
+    offers of an array assembly. It mirrors LowArrayAssemblyFile with every
+    field optional, and sets only what it changes; the cycle names the array
+    assembly it applies to."""
+
+    policy: str = Field(examples=["AA2_SV"])
+    available_bandwidth_hz: float | None = Field(default=None, gt=0)
+    cbf: LowPolicyCBF | None = None
+    sps: LowPolicySPS | None = None
+    observing_modes: LowPolicyObservingModes | None = None
+    receptors: LowPolicyReceptors | None = None
+
+
+# Basic capabilities file structure matches the reader models
+MidBasicCapabilitiesFile = MidBasicCapabilities
+"""Model for telescopes/ska_mid/basic_capabilities.json."""
+
+LowBasicCapabilitiesFile = LowBasicCapabilities
+"""Model for telescopes/ska_low/basic_capabilities.json."""
 
 
 class AvoidanceConstraints(OSDBaseModel):
@@ -104,53 +222,54 @@ class AvoidanceConstraints(OSDBaseModel):
     jupiter_avoidance_angle_deg: float = Field(examples=[10.0])
 
 
-class TelescopeDefaultsFileBase(OSDBaseModel):
-    """Base for the Mid and Low defaults file models."""
+class MidTargetDefaults(OSDBaseModel):
+    """The SPFRx parameters each Mid target starts with."""
+
+    dish_spfrx_params: TargetSPFRx
+
+
+class MidCSPConfigurationDefaults(OSDBaseModel):
+    """The SPFRx settings Mid's CSP configuration starts with."""
+
+    spfrx: CSPSPFRx
+
+
+class MidDefaultsFile(OSDBaseModel):
+    """Top-level model for telescopes/ska_mid/defaults.json."""
 
     constraints: AvoidanceConstraints
+    target: MidTargetDefaults
+    csp_configuration: MidCSPConfigurationDefaults
 
 
-class MidDefaultsFile(TelescopeDefaultsFileBase):
-    """Top-level model for mid_defaults.json."""
+class LowDefaultsFile(OSDBaseModel):
+    """Top-level model for telescopes/ska_low/defaults.json."""
 
-    telescope: Literal["Mid"] = "Mid"
-    spfrx_defaults: SPFRxParameters = Field(
-        validation_alias=AliasChoices("spfrx_defaults", "defaults")
-    )
-
-
-class LowDefaultsFile(TelescopeDefaultsFileBase):
-    """Top-level model for low_defaults.json."""
-
-    telescope: Literal["Low"] = "Low"
+    constraints: AvoidanceConstraints
     quality_attribute_metrics: LowQualityAttributeMetrics
 
 
 class CycleFile(OSDBaseModel):
-    """Top-level model for cycles/cycle_<N>.json, and for the legacy
-    observatory_policies.json."""
+    """Top-level model for a cycle file, cycles/<name>.json."""
 
-    cycle_number: CycleID
-    cycle_id: str | None = None
-    type: str | None = Field(default=None, examples=["Science Verification"])
-    cycle_description: str
-    cycle_information: CycleInformation
-    cycle_policies: CyclePolicies
-    telescope_capabilities: TelescopeCapabilities
+    cycle_id: str
+    name: str
+    description: str
+    cycle_number: int | None = Field(default=None, ge=0, examples=[1])
+    proposal_window: ProposalWindow
+    proposal_policy: ProposalPolicy
+    telescopes: dict[Telescope, CycleTelescope] = Field(min_length=1)
 
 
 class SubarrayTemplateLibraryFile(OSDBaseModel):
-    """Top-level model for subarray_template_library.json."""
+    """Model for telescopes/<telescope>/subarray_templates/<name>.json: the
+    templates of the array assembly the file names."""
 
+    array_assembly: str = Field(examples=["AA2"])
     templates: list[SubarrayTemplate]
 
-    @model_validator(mode="before")
-    @classmethod
-    def collect_templates(cls, data: Any) -> Any:
-        """In tmdata each template is a top-level key; gather them into
-        ``templates``, using the key as the template name."""
-        if not isinstance(data, dict) or "templates" in data:
-            return data
-        return {
-            "templates": [{"name": name, **template} for name, template in data.items()]
-        }
+    @model_validator(mode="after")
+    def check_unique_names(self) -> Self:
+        if len({template.name for template in self.templates}) != len(self.templates):
+            raise ValueError("template names are not unique")
+        return self

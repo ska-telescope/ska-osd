@@ -1,0 +1,24 @@
+{
+  "cycle_id": "TEST_SKAO_2027_Low_AA2_Proposal",
+  "name": "TEST SKAO 2027 Low AA2 Proposal",
+  "description": "TEST Low AA2 Proposal",
+  "cycle_number": 2,
+  "proposal_window": {
+    "opens": "2026-03-27T12:00:00.000Z",
+    "closes": "2027-04-01T15:00:00.000Z"
+  },
+  "proposal_policy": {
+    "max_observing_hours": 100.0,
+    "max_targets": 3,
+    "max_observation_setups": 2,
+    "max_data_products": 2
+  },
+  "telescopes": {
+    "ska_low": {
+      "array_assembly": "AA2",
+      "policies": {
+        "standard_operations": "AA2"
+      }
+    }
+  }
+}

@@ -7,30 +7,58 @@ from datetime import datetime, timezone
 from ska_ost_osd.osd.adapters.tmdata.models import (
     AvoidanceConstraints,
     CycleFile,
-    ElevationConstraints,
-    LowCapabilitiesFile,
+    LowArrayAssemblyFile,
     LowDefaultsFile,
-    MidCapabilitiesFile,
+    MidArrayAssemblyFile,
+    MidCSPConfigurationDefaults,
     MidDefaultsFile,
+    MidTargetDefaults,
     SubarrayTemplateLibraryFile,
 )
+from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
     Band5bSubband,
+    CoarseChannels,
+    FrequencyBand,
+    LowArrayAssemblyCBF,
+    LowArrayAssemblyReceptors,
+    LowArrayAssemblySubarrayBeams,
     LowBasicCapabilities,
-    LowCapabilitySet,
+    LowBasicContinuumMode,
+    LowBasicObservingModes,
+    LowBasicPSSMode,
+    LowBasicPSTMode,
+    LowBasicSpectralMode,
+    LowBasicSPS,
+    LowCapabilities,
     LowCBFMode,
+    LowContinuumMode,
+    LowObservingModes,
+    LowPSSMode,
+    LowPSTMode,
+    LowSpectralMode,
+    LowSPS,
+    LowVLBIMode,
+    MidArrayAssemblyReceptors,
     MidBasicCapabilities,
-    MidCapabilitySet,
+    MidBasicCBF,
+    MidCapabilities,
+    MidCBF,
     MidCBFMode,
+    MidContinuumMode,
     MidFrequencyBand,
+    MidObservingModes,
+    MidPSSMode,
+    MidPSTMode,
+    MidSpectralMode,
 )
-from ska_ost_osd.osd.models.constraints import Constraints
+from ska_ost_osd.osd.models.constraints import Constraints, ElevationLimits
 from ska_ost_osd.osd.models.cycles import (
     Cycle,
-    CycleID,
-    CycleInformation,
-    CyclePolicies,
-    TelescopeCapabilities,
+    CycleTelescope,
+    PolicyType,
+    ProposalPolicy,
+    ProposalWindow,
 )
 from ska_ost_osd.osd.models.defaults import (
     CSPSPFRx,
@@ -46,160 +74,158 @@ from ska_ost_osd.osd.models.defaults import (
     TargetSPFRx,
 )
 from ska_ost_osd.osd.models.subarray_templates import SubarrayTemplate, SubarrayType
+from ska_ost_osd.osd.views.base import LowFrequencyBandWithChannels
 from ska_ost_osd.osd.views.odt import (
     Configuration,
     ConfigurationLowCBFMetrics,
     ConfigurationLowQualityAttributeMetrics,
     LowConfiguration,
-    LowConfigurationCapabilitySet,
+    LowConfigurationCapabilities,
     MidConfiguration,
-    MidConfigurationCapabilitySet,
+    MidConfigurationCapabilities,
 )
 from ska_ost_osd.osd.views.pht import (
     CycleCapabilities,
     CycleConfiguration,
+    CycleInformation,
+    CyclePolicies,
     CycleTelescopeCapabilities,
     LowCycleCapabilities,
+    LowOfferedCapabilities,
     MidCycleBasicCapabilities,
     MidCycleCapabilities,
+    MidOfferedCapabilities,
     ObservatoryPolicy,
 )
 
-# tests/tmdata/cycles/cycle_1.json
+# tests/tmdata/cycles/TEST_SKAO_2027_Low_AA1_SV.json
 CYCLE_1 = Cycle(
-    cycle_number=CycleID(1),
     cycle_id="TEST_SKAO_2027_Low_AA1_SV",
-    type="Science Verification",
-    cycle_description="TEST Low AA1 Science Verification",
-    cycle_information=CycleInformation(
-        cycle_id="TEST_SKAO_2027_1",
-        proposal_open=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
-        proposal_close=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
+    name="TEST SKAO 2027 Low AA1 SV",
+    description="TEST Low AA1 Science Verification",
+    cycle_number=1,
+    proposal_window=ProposalWindow(
+        opens=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
+        closes=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
     ),
-    cycle_policies=CyclePolicies(
-        normal_max_hours=100.0,
+    proposal_policy=ProposalPolicy(
+        max_observing_hours=100.0,
         max_targets=1,
         max_observation_setups=1,
         max_data_products=1,
     ),
-    telescope_capabilities=TelescopeCapabilities(ska_mid=None, ska_low="AA1"),
+    telescopes={
+        Telescope.SKA_LOW: CycleTelescope(
+            array_assembly="AA1",
+            policies={PolicyType.SCIENCE_VERIFICATION: "AA1"},
+        )
+    },
 )
 
-# tests/tmdata/cycles/cycle_2.json
+# tests/tmdata/cycles/TEST_SKAO_2027_AA2_Proposal.json
 CYCLE_2 = Cycle(
-    cycle_number=CycleID(2),
     cycle_id="TEST_SKAO_2027_AA2_Proposal",
-    type="Proposal",
-    cycle_description="TEST AA2 Proposal",
-    cycle_information=CycleInformation(
-        cycle_id="TEST_SKAO_2027_2",
-        proposal_open=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
-        proposal_close=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
+    name="TEST SKAO 2027 AA2 Proposal",
+    description="TEST AA2 Proposal",
+    cycle_number=2,
+    proposal_window=ProposalWindow(
+        opens=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
+        closes=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
     ),
-    cycle_policies=CyclePolicies(
-        normal_max_hours=100.0,
+    proposal_policy=ProposalPolicy(
+        max_observing_hours=100.0,
         max_targets=3,
         max_observation_setups=2,
         max_data_products=2,
     ),
-    telescope_capabilities=TelescopeCapabilities(ska_mid="AA2", ska_low="AA2"),
+    telescopes={
+        Telescope.SKA_LOW: CycleTelescope(
+            array_assembly="AA2",
+            policies={PolicyType.STANDARD_OPERATIONS: "AA2"},
+        ),
+        Telescope.SKA_MID: CycleTelescope(
+            array_assembly="AA2",
+            policies={PolicyType.STANDARD_OPERATIONS: "AA2"},
+        ),
+    },
 )
 
-# tests/tmdata/cycles/cycle_1.json, as stored
+# tests/tmdata/cycles/TEST_SKAO_2027_Low_AA1_SV.json, as stored
 CYCLE_1_FILE = CycleFile(
-    cycle_number=CycleID(1),
     cycle_id="TEST_SKAO_2027_Low_AA1_SV",
-    type="Science Verification",
-    cycle_description="TEST Low AA1 Science Verification",
-    cycle_information=CycleInformation(
-        cycle_id="TEST_SKAO_2027_1",
-        proposal_open=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
-        proposal_close=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
+    name="TEST SKAO 2027 Low AA1 SV",
+    description="TEST Low AA1 Science Verification",
+    cycle_number=1,
+    proposal_window=ProposalWindow(
+        opens=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
+        closes=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
     ),
-    cycle_policies=CyclePolicies(
-        normal_max_hours=100.0,
+    proposal_policy=ProposalPolicy(
+        max_observing_hours=100.0,
         max_targets=1,
         max_observation_setups=1,
         max_data_products=1,
     ),
-    telescope_capabilities=TelescopeCapabilities(ska_mid=None, ska_low="AA1"),
+    telescopes={
+        Telescope.SKA_LOW: CycleTelescope(
+            array_assembly="AA1",
+            policies={PolicyType.SCIENCE_VERIFICATION: "AA1"},
+        )
+    },
 )
 
-# tests/tmdata/cycles/cycle_2.json, as stored
+# tests/tmdata/cycles/TEST_SKAO_2027_AA2_Proposal.json, as stored
 CYCLE_2_FILE = CycleFile(
-    cycle_number=CycleID(2),
     cycle_id="TEST_SKAO_2027_AA2_Proposal",
-    type="Proposal",
-    cycle_description="TEST AA2 Proposal",
-    cycle_information=CycleInformation(
-        cycle_id="TEST_SKAO_2027_2",
-        proposal_open=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
-        proposal_close=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
+    name="TEST SKAO 2027 AA2 Proposal",
+    description="TEST AA2 Proposal",
+    cycle_number=2,
+    proposal_window=ProposalWindow(
+        opens=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
+        closes=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
     ),
-    cycle_policies=CyclePolicies(
-        normal_max_hours=100.0,
+    proposal_policy=ProposalPolicy(
+        max_observing_hours=100.0,
         max_targets=3,
         max_observation_setups=2,
         max_data_products=2,
     ),
-    telescope_capabilities=TelescopeCapabilities(ska_mid="AA2", ska_low="AA2"),
+    telescopes={
+        Telescope.SKA_LOW: CycleTelescope(
+            array_assembly="AA2",
+            policies={PolicyType.STANDARD_OPERATIONS: "AA2"},
+        ),
+        Telescope.SKA_MID: CycleTelescope(
+            array_assembly="AA2",
+            policies={PolicyType.STANDARD_OPERATIONS: "AA2"},
+        ),
+    },
 )
 
-# tests/tmdata/ska1_mid/mid_capabilities.json
-MID_AA1 = MidCapabilitySet(
-    name="AA1",
-    receptors=["SKA001", "SKA002", "SKA003", "SKA004"],
-    available_bandwidth_hz=800_000_000,
-    number_pst_beams=1,
-    number_fsps=4,
-    max_baseline_km=1.5,
-    number_zoom_windows=0,
-    number_zoom_channels=0,
-    number_pss_beams=0,
-    ps_beam_bandwidth_hz=400_000_000,
-    subarray_templates=["*_AA1"],
-    allowed_channel_width_values_hz=[13440],
-    allowed_channel_count_range_min=[1],
-    allowed_channel_count_range_max=[58982],
-    available_receivers=["Band_1", "Band_2", "Band_5b"],
-    cbf_modes=[MidCBFMode.CORRELATION, MidCBFMode.PST],
-    number_ska_dishes=4,
-    number_meerkat_dishes=0,
-    number_meerkatplus_dishes=0,
-)
+# The policy in the legacy response for cycle 1: tests/tmdata/cycles/TEST_SKAO_2027_Low_AA1_SV.json
+# with the legacy field names, and the telescopes keyed Mid and Low
+CYCLE_1_LEGACY_OBSERVATORY_POLICY = {
+    "cycle_number": 1,
+    "cycle_id": "TEST_SKAO_2027_Low_AA1_SV",
+    "type": "Science Verification",
+    "cycle_description": "TEST Low AA1 Science Verification",
+    "cycle_information": {
+        "cycle_id": "TEST_SKAO_2027_Low_AA1_SV",
+        "proposal_open": "2026-03-27T12:00:00.000Z",
+        "proposal_close": "2027-04-01T15:00:00.000Z",
+    },
+    "cycle_policies": {
+        "normal_max_hours": 100.0,
+        "max_targets": 1,
+        "max_observation_setups": 1,
+        "max_data_products": 1,
+    },
+    "telescope_capabilities": {"Low": "AA1"},
+}
 
-MID_AA2 = MidCapabilitySet(
-    name="AA2",
-    receptors=[
-        "SKA001",
-        "SKA002",
-        "SKA003",
-        "SKA004",
-        "SKA005",
-        "SKA006",
-        "SKA007",
-        "SKA008",
-    ],  # fmt: skip
-    available_bandwidth_hz=800_000_000,
-    number_pst_beams=1,
-    number_fsps=8,
-    max_baseline_km=1.5,
-    number_zoom_windows=0,
-    number_zoom_channels=0,
-    number_pss_beams=0,
-    ps_beam_bandwidth_hz=400_000_000,
-    subarray_templates=["*_AA2"],
-    allowed_channel_width_values_hz=[13440],
-    allowed_channel_count_range_min=[1],
-    allowed_channel_count_range_max=[58982],
-    available_receivers=["Band_1", "Band_2", "Band_5a", "Band_5b"],
-    cbf_modes=[MidCBFMode.CORRELATION, MidCBFMode.PST],
-    number_ska_dishes=8,
-    number_meerkat_dishes=0,
-    number_meerkatplus_dishes=0,
-)
-
+# tests/tmdata/telescopes/ska_mid/basic_capabilities.json
 MID_BASIC_CAPABILITIES = MidBasicCapabilities(
+    telescope=Telescope.SKA_MID,
     frequency_bands=[
         MidFrequencyBand(
             rx_id="Band_1", min_frequency_hz=350_000_000, max_frequency_hz=1_050_000_000
@@ -251,56 +277,127 @@ MID_BASIC_CAPABILITIES = MidBasicCapabilities(
             ],
         ),
     ],
+    elevation_limits=ElevationLimits(min_elevation_deg=15.0, max_elevation_deg=90.0),
+    cbf=MidBasicCBF(
+        frequency_slice_bandwidth_hz=198_180_864, fine_channel_width_hz=13_440
+    ),
 )
 
-MID_CAPABILITIES_FILE = MidCapabilitiesFile(
-    constraints=ElevationConstraints(min_elevation_deg=15.0, max_elevation_deg=90.0),
-    basic_capabilities=MID_BASIC_CAPABILITIES,
-    subarrays=[MID_AA1, MID_AA2],
+# The capabilities of tests/tmdata/telescopes/ska_mid/array_assemblies/AA1.json
+# and AA2.json, with Mid's basic capabilities
+MID_AA1 = MidCapabilities(
+    telescope=Telescope.SKA_MID,
+    array_assembly="AA1",
+    frequency_bands=MID_BASIC_CAPABILITIES.frequency_bands,
+    elevation_limits=MID_BASIC_CAPABILITIES.elevation_limits,
+    cbf=MidCBF(
+        frequency_slice_bandwidth_hz=MID_BASIC_CAPABILITIES.cbf.frequency_slice_bandwidth_hz,
+        fine_channel_width_hz=MID_BASIC_CAPABILITIES.cbf.fine_channel_width_hz,
+        number_fsps=4,
+        function_modes=[MidCBFMode.CORRELATION, MidCBFMode.PST],
+        max_channels=58982,
+    ),
+    available_bandwidth_hz=800_000_000,
+    observing_modes=MidObservingModes(
+        continuum=MidContinuumMode(channel_averaging_factors=[1]),
+        spectral=MidSpectralMode(
+            max_zoom_windows=0, max_zoom_channels=0, zoom_factors=[]
+        ),
+        pss=MidPSSMode(max_beams=0, beam_bandwidth_hz=400_000_000),
+        pst=MidPSTMode(max_beams=1),
+    ),
+    receivers=["Band_1", "Band_2", "Band_5b"],
+    receptors=MidArrayAssemblyReceptors(
+        number_ska_dishes=4,
+        number_meerkat_dishes=0,
+        number_meerkatplus_dishes=0,
+        max_baseline_km=1.5,
+        receptor_ids=["SKA001", "SKA002", "SKA003", "SKA004"],
+    ),
 )
 
-# tests/tmdata/ska1_low/low_capabilities.json
-LOW_AA1 = LowCapabilitySet(
-    name="AA1",
-    receptors=[345, 346, 347, 348],
-    number_stations=4,
-    number_substations=0,
-    number_subarray_beams=1,
-    max_baseline_km=3.0,
-    available_bandwidth_hz=75_000_000.0,
-    cbf_modes=[LowCBFMode.VIS, LowCBFMode.PST],
-    number_zoom_windows=0,
-    number_zoom_channels=0,
-    number_pss_beams=0,
-    number_pst_beams=1,
-    number_vlbi_beams=0,
-    ps_beam_bandwidth_hz=75_000_000.0,
-    number_fsps=6,
-    subarray_templates=["*_AA1"],
-    allowed_zoom_factors=[0],
+MID_AA2 = MidCapabilities(
+    telescope=Telescope.SKA_MID,
+    array_assembly="AA2",
+    frequency_bands=MID_BASIC_CAPABILITIES.frequency_bands,
+    elevation_limits=MID_BASIC_CAPABILITIES.elevation_limits,
+    cbf=MidCBF(
+        frequency_slice_bandwidth_hz=MID_BASIC_CAPABILITIES.cbf.frequency_slice_bandwidth_hz,
+        fine_channel_width_hz=MID_BASIC_CAPABILITIES.cbf.fine_channel_width_hz,
+        number_fsps=8,
+        function_modes=[MidCBFMode.CORRELATION, MidCBFMode.PST],
+        max_channels=None,
+    ),
+    available_bandwidth_hz=800_000_000,
+    observing_modes=MidObservingModes(
+        continuum=MidContinuumMode(channel_averaging_factors=[1, 2]),
+        spectral=MidSpectralMode(
+            max_zoom_windows=0, max_zoom_channels=0, zoom_factors=[1, 2]
+        ),
+        pss=MidPSSMode(max_beams=0, beam_bandwidth_hz=400_000_000),
+        pst=MidPSTMode(max_beams=1),
+    ),
+    receivers=["Band_1", "Band_2", "Band_5a", "Band_5b"],
+    receptors=MidArrayAssemblyReceptors(
+        number_ska_dishes=8,
+        number_meerkat_dishes=0,
+        number_meerkatplus_dishes=0,
+        max_baseline_km=1.5,
+        receptor_ids=[
+            "SKA001",
+            "SKA002",
+            "SKA003",
+            "SKA004",
+            "SKA005",
+            "SKA006",
+            "SKA007",
+            "SKA008",
+        ],  # fmt: skip
+    ),
 )
 
-LOW_AA2 = LowCapabilitySet(
-    name="AA2",
-    receptors=[345, 346, 347, 348, 349, 350, 351, 352],
-    number_stations=8,
-    number_substations=512,
-    number_subarray_beams=8,
-    max_baseline_km=6.0,
-    available_bandwidth_hz=75_000_000.0,
-    cbf_modes=[LowCBFMode.VIS, LowCBFMode.PST],
-    number_zoom_windows=0,
-    number_zoom_channels=0,
-    number_pss_beams=0,
-    number_pst_beams=1,
-    number_vlbi_beams=0,
-    ps_beam_bandwidth_hz=75_000_000.0,
-    number_fsps=6,
-    subarray_templates=["*_AA2"],
-    allowed_zoom_factors=[1, 2, 4, 8],
+# The array assembly files as stored: keyed by name, with no telescope, and
+# the array assembly that keys their subarray templates (in the test tmdata,
+# the same as the name)
+MID_ARRAY_ASSEMBLY_FILES = {
+    capabilities.array_assembly: MidArrayAssemblyFile(
+        **capabilities.model_dump(
+            exclude={
+                "telescope": True,
+                "policy": True,
+                "frequency_bands": True,
+                "elevation_limits": True,
+                "cbf": {"frequency_slice_bandwidth_hz", "fine_channel_width_hz"},
+            }
+        ),
+    )
+    for capabilities in (MID_AA1, MID_AA2)
+}
+
+# The band in tests/tmdata/telescopes/ska_low/basic_capabilities.json
+LOW_FREQUENCY_BAND = FrequencyBand(
+    min_frequency_hz=50_000_000.0,
+    max_frequency_hz=350_000_000.0,
 )
 
+# tests/tmdata/telescopes/ska_low/basic_capabilities.json
 LOW_BASIC_CAPABILITIES = LowBasicCapabilities(
+    telescope=Telescope.SKA_LOW,
+    frequency_band=LOW_FREQUENCY_BAND,
+    elevation_limits=ElevationLimits(min_elevation_deg=45.0, max_elevation_deg=90.0),
+    sps=LowBasicSPS(
+        coarse_channels=CoarseChannels(min=64, max=447, width_hz=781_250.0)
+    ),
+    observing_modes=LowBasicObservingModes(
+        continuum=LowBasicContinuumMode(channels_per_coarse_channel=144),
+        spectral=LowBasicSpectralMode(channels_per_coarse_channel=432),
+        pss=LowBasicPSSMode(channels_per_coarse_channel=54),
+        pst=LowBasicPSTMode(channels_per_coarse_channel=216),
+    ),
+)
+
+# Low's band with its channels, as the ODT and PHT views serve it
+LOW_FREQUENCY_BAND_WITH_CHANNELS = LowFrequencyBandWithChannels(
     min_frequency_hz=50_000_000.0,
     max_frequency_hz=350_000_000.0,
     min_coarse_channel=64,
@@ -312,13 +409,124 @@ LOW_BASIC_CAPABILITIES = LowBasicCapabilities(
     number_pss_channels_per_coarse_channel=54,
 )
 
-LOW_CAPABILITIES_FILE = LowCapabilitiesFile(
-    constraints=ElevationConstraints(min_elevation_deg=45.0, max_elevation_deg=90.0),
-    basic_capabilities=LOW_BASIC_CAPABILITIES,
-    subarrays=[LOW_AA1, LOW_AA2],
+# The capabilities of tests/tmdata/telescopes/ska_low/array_assemblies/AA1.json
+# and AA2.json, with Low's basic capabilities
+LOW_AA1 = LowCapabilities(
+    telescope=Telescope.SKA_LOW,
+    array_assembly="AA1",
+    frequency_band=LOW_BASIC_CAPABILITIES.frequency_band,
+    elevation_limits=LOW_BASIC_CAPABILITIES.elevation_limits,
+    sps=LowSPS(
+        coarse_channels=LOW_BASIC_CAPABILITIES.sps.coarse_channels,
+        subarray_beams=LowArrayAssemblySubarrayBeams(
+            max_subarray_beams=1, max_substations_per_subarray_beam=0
+        ),
+    ),
+    available_bandwidth_hz=75_000_000.0,
+    cbf=LowArrayAssemblyCBF(
+        number_fsps=6, function_modes=[LowCBFMode.VIS, LowCBFMode.PST]
+    ),
+    observing_modes=LowObservingModes(
+        continuum=LowContinuumMode(channels_per_coarse_channel=144),
+        spectral=LowSpectralMode(
+            channels_per_coarse_channel=432,
+            max_zoom_windows=0,
+            max_zoom_channels=0,
+            zoom_factors=[],
+        ),
+        pss=LowPSSMode(
+            channels_per_coarse_channel=54,
+            max_beams=0,
+            beam_bandwidth_hz=75_000_000.0,
+        ),
+        pst=LowPSTMode(channels_per_coarse_channel=216, max_beams=1),
+        vlbi=LowVLBIMode(max_beams=0),
+    ),
+    receptors=LowArrayAssemblyReceptors(
+        number_stations=4, max_baseline_km=3.0, receptor_ids=[345, 346, 347, 348]
+    ),
 )
 
-# The defaults in tests/tmdata/ska1_mid/mid_defaults.json
+LOW_AA2 = LowCapabilities(
+    telescope=Telescope.SKA_LOW,
+    array_assembly="AA2",
+    frequency_band=LOW_BASIC_CAPABILITIES.frequency_band,
+    elevation_limits=LOW_BASIC_CAPABILITIES.elevation_limits,
+    sps=LowSPS(
+        coarse_channels=LOW_BASIC_CAPABILITIES.sps.coarse_channels,
+        subarray_beams=LowArrayAssemblySubarrayBeams(
+            max_subarray_beams=8, max_substations_per_subarray_beam=512
+        ),
+    ),
+    available_bandwidth_hz=75_000_000.0,
+    cbf=LowArrayAssemblyCBF(
+        number_fsps=6, function_modes=[LowCBFMode.VIS, LowCBFMode.PST]
+    ),
+    observing_modes=LowObservingModes(
+        continuum=LowContinuumMode(channels_per_coarse_channel=144),
+        spectral=LowSpectralMode(
+            channels_per_coarse_channel=432,
+            max_zoom_windows=0,
+            max_zoom_channels=0,
+            zoom_factors=[1, 2, 3],
+        ),
+        pss=LowPSSMode(
+            channels_per_coarse_channel=54,
+            max_beams=0,
+            beam_bandwidth_hz=75_000_000.0,
+        ),
+        pst=LowPSTMode(channels_per_coarse_channel=216, max_beams=1),
+        vlbi=LowVLBIMode(max_beams=0),
+    ),
+    receptors=LowArrayAssemblyReceptors(
+        number_stations=8,
+        max_baseline_km=6.0,
+        receptor_ids=[345, 346, 347, 348, 349, 350, 351, 352],
+    ),
+)
+
+# LOW_AA2 with tests/tmdata/telescopes/ska_low/policies/AA2_SV.json applied
+LOW_AA2_SV = LOW_AA2.model_copy(
+    update={
+        "policy": "AA2_SV",
+        "cbf": LOW_AA2.cbf.model_copy(
+            update={"function_modes": [LowCBFMode.VIS, LowCBFMode.PST]}
+        ),
+        "observing_modes": LOW_AA2.observing_modes.model_copy(
+            update={
+                "spectral": LOW_AA2.observing_modes.spectral.model_copy(
+                    update={"max_zoom_windows": 1, "max_zoom_channels": 4000}
+                ),
+                "pss": LOW_AA2.observing_modes.pss.model_copy(update={"max_beams": 0}),
+                "pst": LOW_AA2.observing_modes.pst.model_copy(update={"max_beams": 1}),
+            }
+        ),
+        "sps": LOW_AA2.sps.model_copy(
+            update={
+                "subarray_beams": LowArrayAssemblySubarrayBeams(
+                    max_subarray_beams=1, max_substations_per_subarray_beam=0
+                )
+            }
+        ),
+    }
+)
+
+LOW_ARRAY_ASSEMBLY_FILES = {
+    capabilities.array_assembly: LowArrayAssemblyFile(
+        **capabilities.model_dump(
+            exclude={
+                "telescope": True,
+                "policy": True,
+                "frequency_band": True,
+                "elevation_limits": True,
+                "sps": {"coarse_channels"},
+            }
+        ),
+    )
+    for capabilities in (LOW_AA1, LOW_AA2)
+}
+
+# The defaults in tests/tmdata/telescopes/ska_mid/defaults.json
 MID_DEFAULTS = MidDefaults(
     spfrx_defaults=SPFRxParameters(
         target_spfrx=TargetSPFRx(
@@ -338,24 +546,29 @@ MID_DEFAULTS = MidDefaults(
     ),
 )
 
-# The whole of tests/tmdata/ska1_mid/mid_defaults.json
+# The whole of tests/tmdata/telescopes/ska_mid/defaults.json
 MID_DEFAULTS_FILE = MidDefaultsFile(
     constraints=AvoidanceConstraints(
         sun_avoidance_angle_deg=30.0,
         moon_avoidance_angle_deg=10.0,
         jupiter_avoidance_angle_deg=10.0,
     ),
-    spfrx_defaults=MID_DEFAULTS.spfrx_defaults,
+    target=MidTargetDefaults(
+        dish_spfrx_params=MID_DEFAULTS.spfrx_defaults.target_spfrx
+    ),
+    csp_configuration=MidCSPConfigurationDefaults(
+        spfrx=MID_DEFAULTS.spfrx_defaults.csp_spfrx
+    ),
 )
 
-# The defaults in tests/tmdata/ska1_low/low_defaults.json
+# The defaults in tests/tmdata/telescopes/ska_low/defaults.json
 LOW_DEFAULTS = LowDefaults(
     quality_attribute_metrics=LowQualityAttributeMetrics(
         cbf=LowCBFMetrics(processors_ready_percent=100, alveo_configured_percent=100)
     ),
 )
 
-# The whole of tests/tmdata/ska1_low/low_defaults.json
+# The whole of tests/tmdata/telescopes/ska_low/defaults.json
 LOW_DEFAULTS_FILE = LowDefaultsFile(
     constraints=AvoidanceConstraints(
         sun_avoidance_angle_deg=30.0,
@@ -365,8 +578,8 @@ LOW_DEFAULTS_FILE = LowDefaultsFile(
     quality_attribute_metrics=LOW_DEFAULTS.quality_attribute_metrics,
 )
 
-# Elevation limits from tests/tmdata/ska1_mid/mid_capabilities.json and
-# avoidance angles from mid_defaults.json
+# Elevation limits from tests/tmdata/telescopes/ska_mid/basic_capabilities.json and
+# avoidance angles from defaults.json
 MID_CONSTRAINTS = Constraints(
     min_elevation_deg=15.0,
     max_elevation_deg=90.0,
@@ -375,8 +588,8 @@ MID_CONSTRAINTS = Constraints(
     jupiter_avoidance_angle_deg=10.0,
 )
 
-# Elevation limits from tests/tmdata/ska1_low/low_capabilities.json and
-# avoidance angles from low_defaults.json
+# Elevation limits from tests/tmdata/telescopes/ska_low/basic_capabilities.json and
+# avoidance angles from defaults.json
 LOW_CONSTRAINTS = Constraints(
     min_elevation_deg=45.0,
     max_elevation_deg=90.0,
@@ -385,11 +598,11 @@ LOW_CONSTRAINTS = Constraints(
     jupiter_avoidance_angle_deg=10.0,
 )
 
-# tests/tmdata/subarray_templates/subarray_template_library.json
+# tests/tmdata/telescopes/<telescope>/subarray_templates/<array assembly>.json
 MID_FULL_AA2_TEMPLATE = SubarrayTemplate(
     name="SKA_MID_FULL_AA2",
     subarray_type=SubarrayType.CUSTOM,
-    custom_stations=[
+    receptor_ids=[
         "SKA001",
         "SKA002",
         "SKA003",
@@ -404,29 +617,32 @@ MID_FULL_AA2_TEMPLATE = SubarrayTemplate(
 LOW_TEST_AA1_TEMPLATE = SubarrayTemplate(
     name="SKA_LOW_TEST_AA1",
     subarray_type=SubarrayType.CUSTOM,
-    custom_stations=["S8-1", "S8-2"],
+    receptor_ids=["S8-1", "S8-2"],
     description="TEST Low AA1 subset of stations.",
 )
 LOW_FULL_AA2_TEMPLATE = SubarrayTemplate(
     name="SKA_LOW_FULL_AA2",
     subarray_type=SubarrayType.AA2,
-    custom_stations=[],
+    receptor_ids=[],
     description="TEST full Low AA2 array.",
 )
 LOW_TEST_AA2_TEMPLATE = SubarrayTemplate(
     name="SKA_LOW_TEST_AA2",
     subarray_type=SubarrayType.CUSTOM,
-    custom_stations=["S8-1", "S8-2", "S8-3", "S8-4"],
+    receptor_ids=["S8-1", "S8-2", "S8-3", "S8-4"],
     description="TEST Low AA2 subset of stations.",
 )
 
-SUBARRAY_TEMPLATE_LIBRARY_FILE = SubarrayTemplateLibraryFile(
-    templates=[
-        MID_FULL_AA2_TEMPLATE,
-        LOW_TEST_AA1_TEMPLATE,
-        LOW_FULL_AA2_TEMPLATE,
-        LOW_TEST_AA2_TEMPLATE,
-    ]
+MID_AA2_SUBARRAY_TEMPLATE_LIBRARY_FILE = SubarrayTemplateLibraryFile(
+    array_assembly="AA2", templates=[MID_FULL_AA2_TEMPLATE]
+)
+
+LOW_AA1_SUBARRAY_TEMPLATE_LIBRARY_FILE = SubarrayTemplateLibraryFile(
+    array_assembly="AA1", templates=[LOW_TEST_AA1_TEMPLATE]
+)
+
+LOW_AA2_SUBARRAY_TEMPLATE_LIBRARY_FILE = SubarrayTemplateLibraryFile(
+    array_assembly="AA2", templates=[LOW_FULL_AA2_TEMPLATE, LOW_TEST_AA2_TEMPLATE]
 )
 
 # The ODT configuration view of tests/tmdata: what ska-oso-services serves
@@ -436,7 +652,7 @@ CONFIGURATION = Configuration(
         frequency_band=MID_BASIC_CAPABILITIES.frequency_bands,
         constraints=MID_CONSTRAINTS,
         subarrays=[
-            MidConfigurationCapabilitySet(
+            MidConfigurationCapabilities(
                 name="AA1",
                 receptors=["SKA001", "SKA002", "SKA003", "SKA004"],
                 available_bandwidth_hz=800_000_000.0,
@@ -444,7 +660,7 @@ CONFIGURATION = Configuration(
                 number_fsps=4,
                 allowed_channel_width_values_hz=[13440],
             ),
-            MidConfigurationCapabilitySet(
+            MidConfigurationCapabilities(
                 name="AA2",
                 receptors=[
                     "SKA001",
@@ -459,19 +675,19 @@ CONFIGURATION = Configuration(
                 available_bandwidth_hz=800_000_000.0,
                 number_pst_beams=1,
                 number_fsps=8,
-                allowed_channel_width_values_hz=[13440],
+                allowed_channel_width_values_hz=[3360, 6720, 13440, 26880],
             ),
         ],
         spfrx_defaults=MID_DEFAULTS.spfrx_defaults,
     ),
     ska_low=LowConfiguration(
-        frequency_band=LOW_BASIC_CAPABILITIES,
+        frequency_band=LOW_FREQUENCY_BAND_WITH_CHANNELS,
         constraints=LOW_CONSTRAINTS,
         quality_attribute_metrics=ConfigurationLowQualityAttributeMetrics(
             cbf=ConfigurationLowCBFMetrics(processors_ready_percent=100.0)
         ),
         subarrays=[
-            LowConfigurationCapabilitySet(
+            LowConfigurationCapabilities(
                 name="AA1",
                 receptors=[345, 346, 347, 348],
                 available_bandwidth_hz=75_000_000.0,
@@ -480,7 +696,7 @@ CONFIGURATION = Configuration(
                 number_substations=0,
                 number_subarray_beams=1,
             ),
-            LowConfigurationCapabilitySet(
+            LowConfigurationCapabilities(
                 name="AA2",
                 receptors=[345, 346, 347, 348, 349, 350, 351, 352],
                 available_bandwidth_hz=75_000_000.0,
@@ -493,34 +709,55 @@ CONFIGURATION = Configuration(
     ),
 )
 
-# The PHT cycle views of tests/tmdata: each cycle with the capability set
+# The PHT cycle views of tests/tmdata: each cycle with the capabilities
 # each telescope offers and that telescope's basic capabilities
 CYCLE_1_CONFIGURATION = CycleConfiguration(
     observatory_policy=ObservatoryPolicy(
-        cycle_number=CycleID(1),
+        cycle_number=1,
         cycle_id="TEST_SKAO_2027_Low_AA1_SV",
         type="Science Verification",
         cycle_description="TEST Low AA1 Science Verification",
-        cycle_information=CYCLE_1.cycle_information,
-        cycle_policies=CYCLE_1.cycle_policies,
+        cycle_information=CycleInformation(
+            cycle_id="TEST_SKAO_2027_Low_AA1_SV",
+            proposal_open=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
+            proposal_close=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
+        ),
+        cycle_policies=CyclePolicies(
+            normal_max_hours=100.0,
+            max_targets=1,
+            max_observation_setups=1,
+            max_data_products=1,
+        ),
         telescope_capabilities=CycleTelescopeCapabilities(ska_mid=None, ska_low="AA1"),
     ),
     capabilities=CycleCapabilities(
         mid=None,
         low=LowCycleCapabilities(
-            basic_capabilities=LOW_BASIC_CAPABILITIES, capability_set=LOW_AA1
+            basic_capabilities=LOW_FREQUENCY_BAND_WITH_CHANNELS,
+            capabilities=LowOfferedCapabilities.model_validate(
+                LOW_AA1.model_dump() | {"name": LOW_AA1.array_assembly}
+            ),
         ),
     ),
 )
 
 CYCLE_2_CONFIGURATION = CycleConfiguration(
     observatory_policy=ObservatoryPolicy(
-        cycle_number=CycleID(2),
+        cycle_number=2,
         cycle_id="TEST_SKAO_2027_AA2_Proposal",
         type="Proposal",
         cycle_description="TEST AA2 Proposal",
-        cycle_information=CYCLE_2.cycle_information,
-        cycle_policies=CYCLE_2.cycle_policies,
+        cycle_information=CycleInformation(
+            cycle_id="TEST_SKAO_2027_AA2_Proposal",
+            proposal_open=datetime(2026, 3, 27, 12, 0, tzinfo=timezone.utc),
+            proposal_close=datetime(2027, 4, 1, 15, 0, tzinfo=timezone.utc),
+        ),
+        cycle_policies=CyclePolicies(
+            normal_max_hours=100.0,
+            max_targets=3,
+            max_observation_setups=2,
+            max_data_products=2,
+        ),
         telescope_capabilities=CycleTelescopeCapabilities(ska_mid="AA2", ska_low="AA2"),
     ),
     capabilities=CycleCapabilities(
@@ -528,10 +765,22 @@ CYCLE_2_CONFIGURATION = CycleConfiguration(
             basic_capabilities=MidCycleBasicCapabilities(
                 frequency_bands=MID_BASIC_CAPABILITIES.frequency_bands
             ),
-            capability_set=MID_AA2,
+            capabilities=MidOfferedCapabilities.model_validate(
+                MID_AA2.model_dump()
+                | {
+                    "name": MID_AA2.array_assembly,
+                    # AA2 sets no channel limit, served as the largest 32-bit
+                    # signed integer
+                    "allowed_channel_count_range_min": [1],
+                    "allowed_channel_count_range_max": [2147483647],
+                }
+            ),
         ),
         low=LowCycleCapabilities(
-            basic_capabilities=LOW_BASIC_CAPABILITIES, capability_set=LOW_AA2
+            basic_capabilities=LOW_FREQUENCY_BAND_WITH_CHANNELS,
+            capabilities=LowOfferedCapabilities.model_validate(
+                LOW_AA2.model_dump() | {"name": LOW_AA2.array_assembly}
+            ),
         ),
     ),
 )

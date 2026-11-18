@@ -4,31 +4,35 @@ serves."""
 
 from ska_ost_osd.osd.common.constant import Telescope
 from ska_ost_osd.osd.models.capabilities import (
-    LowBasicCapabilities,
+    LowCapabilities,
+    MidCapabilities,
     MidFrequencyBand,
 )
 from ska_ost_osd.osd.models.constraints import Constraints
 from ska_ost_osd.osd.models.defaults import SPFRxParameters
 from ska_ost_osd.osd.repository import OSDRepository
-from ska_ost_osd.osd.views.base import ConfigurationModel
+from ska_ost_osd.osd.views.base import (
+    ConfigurationModel,
+    LowFrequencyBandWithChannels,
+    low_frequency_band,
+)
 
 
-class ConfigurationCapabilitySetBase(ConfigurationModel):
-    """The fields of a capability set the configuration serves for both
-    telescopes."""
-
+class MidConfigurationCapabilities(ConfigurationModel):
     name: str
     receptors: list[str | int]
     available_bandwidth_hz: float
     number_pst_beams: int
     number_fsps: int
-
-
-class MidConfigurationCapabilitySet(ConfigurationCapabilitySetBase):
     allowed_channel_width_values_hz: list[int]
 
 
-class LowConfigurationCapabilitySet(ConfigurationCapabilitySetBase):
+class LowConfigurationCapabilities(ConfigurationModel):
+    name: str
+    receptors: list[str | int]
+    available_bandwidth_hz: float
+    number_pst_beams: int
+    number_fsps: int
     number_substations: int
     number_subarray_beams: int
 
@@ -44,23 +48,52 @@ class ConfigurationLowQualityAttributeMetrics(ConfigurationModel):
 class MidConfiguration(ConfigurationModel):
     frequency_band: list[MidFrequencyBand]
     constraints: Constraints
-    subarrays: list[MidConfigurationCapabilitySet]
+    subarrays: list[MidConfigurationCapabilities]
     spfrx_defaults: SPFRxParameters
 
 
 class LowConfiguration(ConfigurationModel):
-    frequency_band: LowBasicCapabilities
+    frequency_band: LowFrequencyBandWithChannels
     constraints: Constraints
     quality_attribute_metrics: ConfigurationLowQualityAttributeMetrics
-    subarrays: list[LowConfigurationCapabilitySet]
+    subarrays: list[LowConfigurationCapabilities]
 
 
 class Configuration(ConfigurationModel):
     """The ODT configuration: both telescopes' bands, constraints, defaults
-    and capability sets."""
+    and capabilities."""
 
     ska_mid: MidConfiguration
     ska_low: LowConfiguration
+
+
+def _mid_capabilities(
+    capabilities: MidCapabilities,
+) -> MidConfigurationCapabilities:
+    return MidConfigurationCapabilities(
+        name=capabilities.array_assembly,
+        receptors=capabilities.receptors.receptor_ids,
+        available_bandwidth_hz=capabilities.available_bandwidth_hz,
+        number_pst_beams=capabilities.observing_modes.pst.max_beams,
+        number_fsps=capabilities.cbf.number_fsps,
+        allowed_channel_width_values_hz=capabilities.allowed_channel_width_values_hz,
+    )
+
+
+def _low_capabilities(
+    capabilities: LowCapabilities,
+) -> LowConfigurationCapabilities:
+    return LowConfigurationCapabilities(
+        name=capabilities.array_assembly,
+        receptors=capabilities.receptors.receptor_ids,
+        available_bandwidth_hz=capabilities.available_bandwidth_hz,
+        number_pst_beams=capabilities.observing_modes.pst.max_beams,
+        number_fsps=capabilities.cbf.number_fsps,
+        number_substations=(
+            capabilities.sps.subarray_beams.max_substations_per_subarray_beam
+        ),
+        number_subarray_beams=capabilities.sps.subarray_beams.max_subarray_beams,
+    )
 
 
 def get_configuration(repository: OSDRepository) -> Configuration:
@@ -78,25 +111,25 @@ def get_configuration(repository: OSDRepository) -> Configuration:
             ).frequency_bands,
             constraints=repository.get_constraints(Telescope.SKA_MID),
             subarrays=[
-                MidConfigurationCapabilitySet.model_validate(
-                    capability_set, from_attributes=True
+                _mid_capabilities(capabilities)
+                for capabilities in repository.get_array_assembly_capabilities(
+                    Telescope.SKA_MID
                 )
-                for capability_set in repository.get_capability_sets(Telescope.SKA_MID)
             ],
             spfrx_defaults=repository.get_defaults(Telescope.SKA_MID).spfrx_defaults,
         ),
         ska_low=LowConfiguration(
-            frequency_band=repository.get_basic_capabilities(Telescope.SKA_LOW),
+            frequency_band=low_frequency_band(repository),
             constraints=repository.get_constraints(Telescope.SKA_LOW),
             quality_attribute_metrics=ConfigurationLowQualityAttributeMetrics.model_validate(
                 repository.get_defaults(Telescope.SKA_LOW).quality_attribute_metrics,
                 from_attributes=True,
             ),
             subarrays=[
-                LowConfigurationCapabilitySet.model_validate(
-                    capability_set, from_attributes=True
+                _low_capabilities(capabilities)
+                for capabilities in repository.get_array_assembly_capabilities(
+                    Telescope.SKA_LOW
                 )
-                for capability_set in repository.get_capability_sets(Telescope.SKA_LOW)
             ],
         ),
     )

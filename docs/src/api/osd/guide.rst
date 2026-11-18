@@ -28,24 +28,161 @@ Folder Structure
 
     tmdata
     ├── cycles
-    │   ├── cycle_1.json
-    │   └── cycle_<id>.json
-    ├── ska1_low
-    │   └── low_capabilities.json
-    └── ska1_mid
-        └── mid_capabilities.json
+    │   ├── TEST_SKAO_2027_Low_AA2_SV.json
+    │   └── <cycle>.json
+    ├── telescopes
+    │   ├── ska_low
+    │   │   ├── array_assemblies
+    │   │   │   └── <array assembly>.json
+    │   │   ├── policies
+    │   │   │   └── <policy>.json
+    │   │   ├── subarray_templates
+    │   │   │   └── <array assembly>.json
+    │   │   ├── basic_capabilities.json
+    │   │   └── defaults.json
+    │   └── ska_mid
+    │       ├── array_assemblies
+    │       │   └── <array assembly>.json
+    │       ├── policies
+    │       │   └── <policy>.json
+    │       ├── subarray_templates
+    │       │   └── <array assembly>.json
+    │       ├── basic_capabilities.json
+    │       └── defaults.json
+    ├── ska1_low                             (legacy)
+    │   ├── low_capabilities.json
+    │   └── low_defaults.json
+    ├── ska1_mid                             (legacy)
+    │   ├── mid_capabilities.json
+    │   └── mid_defaults.json
+    ├── subarray_templates                   (legacy)
+    │   └── subarray_template_library.json
+    └── observatory_policies.json            (legacy)
 
+The current files are in ``cycles`` and ``telescopes``. The legacy files are
+kept for older releases of the OSD and for consumers that read them directly;
+the current code does not read them.
 
-* `mid_capabilities.json <https://confluence.skatelescope.org/pages/viewpage.action?spaceKey=SWSI&title=Observatory+Static+Data>`_
+Each of these files names what it describes in a field, so their file names
+don't matter:
 
-* `low_capabilities.json <https://confluence.skatelescope.org/pages/viewpage.action?spaceKey=SWSI&title=Observatory+Static+Data>`_
+.. list-table::
+   :header-rows: 1
+
+   * - File
+     - Identified by
+     - Holds
+   * - ``basic_capabilities.json``
+     - ``telescope``
+     - what is fixed for the telescope: Mid's receiver bands
+       (``frequency_bands``) or Low's one ``frequency_band``, the
+       ``elevation_limits``, for Mid, in ``cbf``, the
+       ``frequency_slice_bandwidth_hz`` each FSP processes and the
+       ``fine_channel_width_hz`` it divides a slice into, and for Low, in
+       ``sps``, its ``coarse_channels`` and, in ``observing_modes``, how each
+       observing mode divides them
+   * - ``array_assemblies/*.json``
+     - ``array_assembly``
+     - what one array assembly offers, such as ``AA2``: its receptors,
+       bandwidth, its FSPs, CBF function modes and (Mid) channel limit in
+       ``cbf``, for Low its
+       subarray beams in ``sps``, and, in
+       ``observing_modes``, each observing mode's beams, zoom windows and
+       zoom factors and, for Mid, its channel averaging factors
+   * - ``policies/*.json``
+     - ``policy``
+     - the rules a cycle applies to an array assembly, such as ``AA2_SV``:
+       only the fields it changes
+   * - ``subarray_templates/*.json``
+     - ``array_assembly``
+     - the subarray templates an array assembly offers, such as ``AA*``,
+       whose file is ``AASTAR.json``
+   * - ``cycles/*.json``
+     - ``cycle_id``
+     - a cycle: its proposal window and policy, and in ``telescopes``, for
+       each telescope, its array assembly and the policy offered for each
+       policy type
 
 .. note::
 
-    Each observing cycle is stored in its own
-    ``cycles/cycle_<id>.json`` file. The legacy ``observatory_policies.json``
-    file remains at the root on main for backward compatibility with the old
-    legacy version mapper.
+    The legacy ``observatory_policies.json`` file remains at the root on main
+    for backward compatibility with the old legacy version mapper.
+
+.. _how-capabilities-are-built:
+
+How capabilities are built
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+What a telescope offers, its *capabilities*, is built from three layers, each
+changed for its own reason:
+
+.. code-block:: text
+
+    capabilities = basic capabilities           fixed for the telescope
+                 + array assembly               a construction milestone
+                 with a policy's changes        SciOps' access rules, if a policy applies
+
+Basic capabilities
+    What the telescope's design fixes, however much of it is built: Mid's
+    receiver bands, frequency slice bandwidth and fine channel width, Low's
+    frequency band and coarse channels, and the elevation limits. They change
+    only if the design does.
+
+Array assemblies
+    What has been built at each construction milestone, such as ``AA2``: the
+    receptors, bandwidth, CBF modes, and each observing mode's beams and zoom
+    windows. They follow the construction rollout; each milestone is its own
+    array assembly.
+
+Policies
+    The rules Science Operations sets for what can be used of an array assembly
+    in a cycle, such as fewer zoom windows and beams during Science
+    Verification. A cycle names the policy it offers for each policy type, so
+    SciOps can change what is offered without changing what is built.
+
+How the layers combine:
+
+* A policy replaces only the fields it sets; anything it doesn't set comes from
+  the array assembly. An empty policy offers the whole array assembly.
+* The basic capabilities and the array assembly set different fields, and
+  neither an array assembly nor a policy may set a basic field. They can share
+  a group: ``observing_modes.spectral`` takes its channels per coarse channel from Low's
+  basic capabilities and its zoom windows from the array assembly.
+* The result names its ``telescope``, ``array_assembly`` and ``policy``.
+
+Within the files, fields are grouped by the part of the telescope that
+provides them, or by observing mode:
+
+``cbf``
+    The correlator-beamformer (CBF): Mid's frequency slice bandwidth and fine
+    channel width, and for each array assembly its frequency slice processors
+    (FSPs), the function modes it runs and, for Mid, ``max_channels``: the most
+    correlated channels over all spectral windows, or ``null`` if the OSD sets
+    no limit (each spectral window has at least one channel, so there is no
+    minimum). In a scheduling block, it limits the ``csp_configuration``'s
+    ``midcbf`` or ``lowcbf``.
+
+``sps`` (Low only)
+    The stations' signal processing (SPS): the coarse channels the stations
+    divide the band into, and the subarray beams they form. MCCS configures
+    it: in a scheduling block, the subarray beams are in the
+    ``mccs_allocation``, and the spectral windows the coarse channels carry
+    are in the ``csp_configuration``.
+
+``observing_modes``
+    What each observing mode offers, whichever part of the telescope provides
+    it: channels, zoom windows, zoom factors, Mid's channel averaging factors,
+    and beams. Zoom factors are the PDM's: zoom factor *z* narrows a spectral
+    window's channels by 2**z, and 0, which means no zoom (continuum), is never
+    listed, so ``[]`` means no zoom is offered.
+
+A cycle pairs each telescope's array assembly with the policy offered for each
+policy type. Low AA2 Science Verification, for example, is the ``AA2`` array
+assembly with the ``AA2_SV`` policy, which offers one zoom window, one PST beam
+and no PSS beams. The cycles, the three policy types (science verification,
+shared risk and standard operations) and what each offers as the telescopes are
+built follow SKAO's `Timeline to Science
+<https://www.skao.int/en/science-users/647/timeline-science>`_.
 
 Querying the OSD
 ~~~~~~~~~~~~~~~~~
@@ -63,16 +200,19 @@ Pydantic models.
     from ska_ost_osd.osd.osd import get_osd_using_tmdata
 
     tmdata = TMData(["car:ost/ska-ost-osd?<version>"], update=True)
-    osd_data = get_osd_using_tmdata(tmdata, telescope=Telescope.SKA_LOW, cycle_id=1)
+    osd_data = get_osd_using_tmdata(tmdata, telescope=Telescope.SKA_LOW, cycle_id=2)
 
 ===================    ============================================================
 Parameters             Description
 ===================    ============================================================
 tm_data                the TMData client to read the tmdata from
-cycle_id               Cycle Id a integer value 1, 2, 3
+cycle_id               the cycle's ``cycle_number``, an integer such as 0, 1, 2; a cycle
+                       without a number can't be selected
 telescope              ``Telescope.SKA_MID`` or ``Telescope.SKA_LOW``; ``"mid"``
                        and ``"low"`` are still accepted
-array_assembly         AA0.5, AA1 or any Array Assembly
+array_assembly         the name of an array assembly, e.g. ``AA2``, or of a policy
+                       a cycle offers, e.g. ``AA2_SV``; with ``cycle_id``, the
+                       name the cycle offers on the telescope
 process_templates      whether to replace the ``subarray_templates`` patterns with
                        the templates, see `Subarray Template Support`_
 ===================    ============================================================
@@ -85,11 +225,11 @@ Response
 
     {
       "observatory_policy": {
-        "cycle_number": 1,
-        "telescope_capabilities": {"Low": "AA2_SV"}
+        "cycle_number": 2,
+        "telescope_capabilities": {"Low": "AA2"}
       },
       "capabilities": {
-        "low": {"basic_capabilities": {}, "AA2_SV": {}}
+        "low": {"basic_capabilities": {}, "AA2": {}}
       }
     }
 
@@ -97,11 +237,11 @@ Response
 ======================    ============================================================================================================
 Keys                      Description
 ======================    ============================================================================================================
-observatory_policy        file content of the selected ``cycles/cycle_<id>.json`` file
-telescope_capabilities    value of ``telescope_capabilities`` in the selected cycle file
+observatory_policy        the cycle file whose ``cycle_number`` is ``cycle_id``, with the legacy field names
+telescope_capabilities    the name of what the selected cycle offers on each telescope (its policy), keyed ``Mid`` and ``Low``
 capabilities              key value pair of mid and low
-Mid                       file content of ``mid_capabilities.json`` with ``basic_capabilities`` and ``Array Assembly`` AA0.5, AA1 etc
-Low                       file content of ``low_capabilities.json`` with ``basic_capabilities`` and ``Array Assembly`` AA0.5, AA1 etc
+Mid                       ``basic_capabilities``, and the capabilities of each array assembly (AA0.5, AA1 etc) and policy a cycle offers, by name, of SKA-Mid
+Low                       ``basic_capabilities``, and the capabilities of each array assembly (AA0.5, AA1 etc) and policy a cycle offers, by name, of SKA-Low
 ======================    ============================================================================================================
 
 
@@ -109,15 +249,15 @@ Scenarios
 ~~~~~~~~~~
 
 1. With no filters, it returns the complete OSD catalogue: every telescope's
-   ``basic_capabilities`` together with all of its named array assemblies. No
-   ``observatory_policy`` is included, since no ``cycle_id`` was selected.
+   ``basic_capabilities`` together with all of its array assemblies and the
+   policies the cycles offer, by name. No ``observatory_policy`` is included,
+   since no ``cycle_id`` was selected.
 
-2. With ``cycle_id``, it checks that the corresponding ``cycles/cycle_<id>.json``
-   file exists, then uses that file's ``telescope_capabilities`` to select the array
-   assembly of each telescope. The cycle file is returned as ``observatory_policy``.
+2. With ``cycle_id``, it checks that a file in ``cycles`` has that ``cycle_number``, then selects
+   what the cycle offers on each telescope. The cycle file is returned as ``observatory_policy``.
 
 3. With ``telescope``, it returns only that telescope; with ``array_assembly`` as
-   well, only that array assembly.
+   well, only the array assembly or policy of that name.
 
 
 Error Handling
@@ -227,76 +367,43 @@ See :doc:`python_api` for reading the OSD through the repository and the views.
 Subarray Template Support
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-OSD now supports subarray templates through the ``subarray_templates`` field in array assembly configurations. This feature enables dynamic template loading and processing for different telescope configurations.
-
-Configuration
--------------
-
-Each array assembly (AA0.5, AA1, AA2) can specify subarray templates using wildcard patterns:
+A subarray template is a named set of receptors from an array assembly. Each
+telescope's templates are stored by array assembly, one file in
+``telescopes/<telescope>/subarray_templates`` for each, naming its
+``array_assembly`` and listing its templates:
 
 .. code-block:: json
 
     {
-        "AA0.5": {
-            "subarray_templates": ["*_AA0.5"],
-            "other_config": "..."
-        },
-        "AA1": {
-            "subarray_templates": ["*_AA1"],
-            "other_config": "..."
-        },
-        "AA2": {
-            "subarray_templates": ["*_AA2"],
-            "other_config": "..."
-        }
+        "array_assembly": "AA2",
+        "templates": [
+            {
+                "name": "SKA_LOW_FULL_AA2",
+                "subarray_type": "AA2",
+                "receptor_ids": [],
+                "description": "Full SKA-Low array, AA2 release."
+            }
+        ]
     }
 
-Template Processing
--------------------
+An array assembly offers the templates in the file that names it; one with no
+template file, such as the ITFs, offers none.
 
-The template mapping system processes subarray templates through:
+Reading the templates
+---------------------
 
-1. **Pattern Matching**: Uses fnmatch patterns to find matching templates
-2. **Telescope Filtering**: Automatically filters templates based on telescope type (``SKA_MID_``/``SKA_LOW_`` prefix)
-3. **Dynamic Loading**: Templates are loaded from JSON files and merged into capabilities
-4. **Key Normalization**: Template keys are converted to lowercase for consistency
-
-Template Processing Flag
---------------------------------
-
-``get_osd_using_tmdata`` takes a ``process_templates`` flag, ``False`` by default:
-
-* ``False``: the array assemblies are returned as stored, with their
-  ``subarray_templates`` patterns.
-* ``True``: each array assembly's ``subarray_templates`` patterns are replaced by
-  the templates they match.
-
-The repository's ``get_subarray_templates(telescope, capability_set)`` returns the
-matching templates as ``SubarrayTemplate`` models.
-
-Template File Structure
------------------------
-
-Template files should contain telescope-specific templates:
-
-.. code-block:: json
-
-    {
-        "SKA_MID_Template_AA0.5": {
-            "frequency_band": "1",
-            "config": {
-                "beam_id": 1,
-                "channels": [[0, 1], [744, 8191]]
-            }
-        },
-        "SKA_LOW_Template_AA1": {
-            "frequency_band": "low1",
-            "config": {
-                "beam_id": 1,
-                "stations": [[0, 1], [2, 3]]
-            }
-        }
-    }
+* The repository's ``get_subarray_templates(telescope, array_assembly)`` returns
+  an array assembly's templates as a list of ``SubarrayTemplate`` models.
+* The PHT views take ``include_subarray_templates``, ``False`` by default. With
+  ``True``, the capabilities each telescope offers are served with
+  ``subarray_templates``: the templates of the cycle's array assembly keyed by
+  name, as the legacy API serves them, or ``{}`` if it has none. With ``False``
+  the key is left out.
+* The legacy ``get_osd_using_tmdata`` takes ``process_templates``, ``False`` by
+  default. With ``False``, the capabilities are returned with the template
+  pattern of their array assembly, e.g. ``"subarray_templates": ["*_AA2"]``, as
+  before. With ``True``, the pattern is replaced by the array assembly's
+  templates, as below.
 
 Processed Templates
 -------------------
@@ -306,7 +413,7 @@ With ``process_templates=True``, the templates are included in the OSD data:
 .. code-block:: python
 
     get_osd_using_tmdata(
-        tmdata, telescope=Telescope.SKA_LOW, cycle_id=1, process_templates=True
+        tmdata, telescope=Telescope.SKA_LOW, cycle_id=2, process_templates=True
     )
 
 * Complete response structure with processed templates:
@@ -315,9 +422,9 @@ With ``process_templates=True``, the templates are included in the OSD data:
 
     {
         "observatory_policy": {
-            "cycle_number": 1,
+            "cycle_number": 2,
             "telescope_capabilities": {
-                "Low": "AA2_SV"
+                "Low": "AA2"
             }
         },
         "capabilities": {
@@ -326,7 +433,7 @@ With ``process_templates=True``, the templates are included in the OSD data:
                     "min_frequency_hz": 50000000.0,
                     "max_frequency_hz": 350000000.0
                 },
-                "AA2_SV": {
+                "AA2": {
                     "number_stations": 68,
                     "cbf_modes": ["vis", "pst"],
                     "subarray_templates": {

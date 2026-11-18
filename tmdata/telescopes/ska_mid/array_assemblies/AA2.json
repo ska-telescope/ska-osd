@@ -1,0 +1,128 @@
+{
+  "array_assembly": "AA2",
+  "available_bandwidth_hz": 800000000,
+  "receivers": [
+    "Band_1",
+    "Band_2",
+    "Band_5a",
+    "Band_5b"
+  ],
+  "observing_modes": {
+    "continuum": {
+      "channel_averaging_factors": [
+        1,
+        2,
+        3,
+        4,
+        6,
+        8,
+        12,
+        16,
+        24,
+        31,
+        32,
+        48
+      ]
+    },
+    "spectral": {
+      "max_zoom_windows": 16,
+      "max_zoom_channels": 14880,
+      "zoom_factors": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    "pss": {
+      "max_beams": 384,
+      "beam_bandwidth_hz": 800000000
+    },
+    "pst": {
+      "max_beams": 6
+    }
+  },
+  "cbf": {
+    "number_fsps": 26,
+    "function_modes": [
+      "correlation",
+      "pst",
+      "pss"
+    ],
+    "max_channels": null
+  },
+  "receptors": {
+    "number_ska_dishes": 64,
+    "number_meerkat_dishes": 4,
+    "number_meerkatplus_dishes": 0,
+    "max_baseline_km": 110,
+    "receptor_ids": [
+      "SKA001",
+      "SKA008",
+      "SKA013",
+      "SKA014",
+      "SKA015",
+      "SKA016",
+      "SKA019",
+      "SKA024",
+      "SKA025",
+      "SKA027",
+      "SKA028",
+      "SKA030",
+      "SKA031",
+      "SKA032",
+      "SKA033",
+      "SKA034",
+      "SKA035",
+      "SKA036",
+      "SKA037",
+      "SKA038",
+      "SKA039",
+      "SKA040",
+      "SKA041",
+      "SKA042",
+      "SKA043",
+      "SKA045",
+      "SKA046",
+      "SKA048",
+      "SKA049",
+      "SKA050",
+      "SKA051",
+      "SKA055",
+      "SKA061",
+      "SKA063",
+      "SKA067",
+      "SKA068",
+      "SKA070",
+      "SKA075",
+      "SKA077",
+      "SKA079",
+      "SKA081",
+      "SKA082",
+      "SKA083",
+      "SKA089",
+      "SKA091",
+      "SKA092",
+      "SKA095",
+      "SKA096",
+      "SKA097",
+      "SKA098",
+      "SKA099",
+      "SKA100",
+      "SKA101",
+      "SKA102",
+      "SKA103",
+      "SKA104",
+      "SKA106",
+      "SKA108",
+      "SKA109",
+      "SKA113",
+      "SKA114",
+      "SKA123",
+      "SKA125",
+      "SKA126"
+    ]
+  }
+}

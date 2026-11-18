@@ -16,10 +16,14 @@ from pydantic import TypeAdapter, ValidationError
 
 from ska_ost_osd.osd.adapters.tmdata.models import (
     CycleFile,
-    LowCapabilitiesFile,
+    LowArrayAssemblyFile,
+    LowBasicCapabilitiesFile,
     LowDefaultsFile,
-    MidCapabilitiesFile,
+    LowPolicyFile,
+    MidArrayAssemblyFile,
+    MidBasicCapabilitiesFile,
     MidDefaultsFile,
+    MidPolicyFile,
     SubarrayTemplateLibraryFile,
 )
 from ska_ost_osd.osd.common.constant import Telescope
@@ -29,23 +33,29 @@ from ska_ost_osd.osd.exceptions import (
 )
 from ska_ost_osd.osd.models.capabilities import (
     Band5bSubband,
-    CapabilitySet,
-    LowCapabilitySet,
-    MidCapabilitySet,
+    Capabilities,
+    LowCapabilities,
+    MidCapabilities,
     MidFrequencyBand,
+    mid_channel_width_values_hz,
 )
 from ska_ost_osd.osd.models.constraints import Constraints
-from ska_ost_osd.osd.osd import get_osd_using_tmdata
-from tests.unit.ska_ost_osd.osd.expected import MID_BASIC_CAPABILITIES
+from tests.unit.ska_ost_osd.osd.expected import (
+    LOW_AA2,
+    MID_AA2,
+    MID_BASIC_CAPABILITIES,
+)
 
 TESTS_TMDATA = Path(__file__).parents[3] / "tmdata"
 
-MID_CAPABILITIES = "ska1_mid/mid_capabilities.json"
-LOW_CAPABILITIES = "ska1_low/low_capabilities.json"
-MID_DEFAULTS = "ska1_mid/mid_defaults.json"
-LOW_DEFAULTS = "ska1_low/low_defaults.json"
-CYCLE = "cycles/cycle_1.json"
-SUBARRAY_TEMPLATES = "subarray_templates/subarray_template_library.json"
+MID_BASIC_CAPABILITIES_FILE = "telescopes/ska_mid/basic_capabilities.json"
+LOW_BASIC_CAPABILITIES_FILE = "telescopes/ska_low/basic_capabilities.json"
+MID_ARRAY_ASSEMBLY = "telescopes/ska_mid/array_assemblies/AA2.json"
+LOW_ARRAY_ASSEMBLY = "telescopes/ska_low/array_assemblies/AA2.json"
+MID_DEFAULTS = "telescopes/ska_mid/defaults.json"
+LOW_DEFAULTS = "telescopes/ska_low/defaults.json"
+CYCLE = "cycles/TEST_SKAO_2027_Low_AA1_SV.json"
+SUBARRAY_TEMPLATES = "telescopes/ska_low/subarray_templates/AA2.json"
 
 
 def load(path: str) -> dict:
@@ -53,29 +63,36 @@ def load(path: str) -> dict:
         return json.load(json_file)
 
 
-class TestOsdOutput:
-    """What the OSD serves from the tmdata validates against the models."""
-
+class TestPolicyFiles:
     @pytest.mark.parametrize(
-        "model, telescope, key, path",
-        [
-            (MidCapabilitiesFile, Telescope.SKA_MID, "mid", MID_CAPABILITIES),
-            (LowCapabilitiesFile, Telescope.SKA_LOW, "low", LOW_CAPABILITIES),
-        ],
+        "policy, path",
+        [(MidPolicyFile, MID_ARRAY_ASSEMBLY), (LowPolicyFile, LOW_ARRAY_ASSEMBLY)],
     )
-    def test_template_processed_output_validates(
-        self, model, telescope, key, path, tests_tmdata
-    ):
-        """The OSD's output with subarray templates resolved, as
-        ska-oso-services fetches it, validates once the constraints, which
-        the OSD no longer returns, are added from the capabilities file."""
-        osd_data = get_osd_using_tmdata(
-            tests_tmdata, telescope=telescope, process_templates=True
-        )
-        served = osd_data["capabilities"][key]
-        assert "constraints" not in served
+    def test_can_set_everything_an_array_assembly_sets(self, policy, path):
+        """An array assembly file, with a policy in place of its array_assembly,
+        validates as a policy and keeps every field: a policy can set
+        anything an array assembly does."""
+        data = load(path)
+        del data["array_assembly"]
+        data["policy"] = "cycle_1_science_verification"
 
-        model.model_validate({**served, "constraints": load(path)["constraints"]})
+        assert policy.model_validate(data).model_dump(exclude_unset=True) == data
+
+    @pytest.mark.parametrize("policy", [MidPolicyFile, LowPolicyFile])
+    def test_an_empty_policy_is_valid(self, policy):
+        """A policy that sets nothing but its id is valid."""
+        data = {"policy": "cycle_1_science_verification"}
+        assert policy.model_validate(data).model_dump(exclude_unset=True) == data
+
+    @pytest.mark.parametrize("policy", [MidPolicyFile, LowPolicyFile])
+    def test_can_set_part_of_a_group(self, policy):
+        """A policy can set one field of a nested group, leaving the rest to
+        the array assembly."""
+        data = {
+            "policy": "cycle_1_science_verification",
+            "observing_modes": {"spectral": {"max_zoom_windows": 1}},
+        }
+        assert policy.model_validate(data).model_dump(exclude_unset=True) == data
 
 
 class TestBreakingChanges:
@@ -86,19 +103,40 @@ class TestBreakingChanges:
         "model, path, break_file",
         [
             (
-                MidCapabilitiesFile,
-                MID_CAPABILITIES,
-                lambda data: data["AA2"].pop("number_fsps"),
+                MidArrayAssemblyFile,
+                MID_ARRAY_ASSEMBLY,
+                lambda data: data.pop("cbf"),
             ),
             (
-                LowCapabilitiesFile,
-                LOW_CAPABILITIES,
-                lambda data: data.update(frequency=data.pop("basic_capabilities")),
+                MidArrayAssemblyFile,
+                MID_ARRAY_ASSEMBLY,
+                lambda data: data["cbf"].pop("max_channels"),
+            ),
+            (
+                MidArrayAssemblyFile,
+                MID_ARRAY_ASSEMBLY,
+                lambda data: data["observing_modes"]["spectral"].update(
+                    zoom_factors=[0, 1]
+                ),
+            ),
+            (
+                LowArrayAssemblyFile,
+                LOW_ARRAY_ASSEMBLY,
+                lambda data: data["observing_modes"]["spectral"].update(
+                    zoom_factors=[1, 8]
+                ),
+            ),
+            (
+                LowBasicCapabilitiesFile,
+                LOW_BASIC_CAPABILITIES_FILE,
+                lambda data: data["sps"]["coarse_channels"].update(
+                    width=data["sps"]["coarse_channels"].pop("width_hz")
+                ),
             ),
             (
                 MidDefaultsFile,
                 MID_DEFAULTS,
-                lambda data: data["defaults"].pop("csp_configuration"),
+                lambda data: data.pop("csp_configuration"),
             ),
             (
                 LowDefaultsFile,
@@ -110,16 +148,19 @@ class TestBreakingChanges:
             (
                 CycleFile,
                 CYCLE,
-                lambda data: data.update(cycle=data.pop("cycle_number")),
+                lambda data: data.update(id=data.pop("cycle_id")),
             ),
             (
                 SubarrayTemplateLibraryFile,
                 SUBARRAY_TEMPLATES,
-                lambda data: next(iter(data.values())).update(subarray_type="AA9"),
+                lambda data: data["templates"][0].update(subarray_type="AA9"),
             ),
         ],
         ids=[
             "field removed",
+            "nullable field left out",
+            "zoom factor 0 (continuum) listed",
+            "zoom factor outside the PDM's range",
             "key renamed",
             "section removed",
             "type changed",
@@ -138,75 +179,35 @@ class TestBreakingChanges:
 class TestCapabilities:
     """The capabilities models' own logic."""
 
-    def test_array_assemblies_are_found_by_name(self):
-        """Every top-level key matching the array assembly pattern, whether
-        an AA name or a telescope-prefixed one such as Low_ITF, becomes a
-        capability set, so a new one is picked up and other keys are
-        ignored. A capability set need not list subarray templates."""
-        data = load(LOW_CAPABILITIES)
-        names = {s.name for s in LowCapabilitiesFile.model_validate(data).subarrays}
-        data["AA3"] = data["AA2"]
-        data["Low_ITF"] = {
-            key: value
-            for key, value in data["AA2"].items()
-            if key != "subarray_templates"
-        }
-        data["version"] = "1.0"
-
-        capabilities = LowCapabilitiesFile.model_validate(data)
-
-        subarrays = {subarray.name: subarray for subarray in capabilities.subarrays}
-        assert set(subarrays) == names | {"AA3", "Low_ITF"}
-        assert subarrays["AA1"].receptors == data["AA1"]["number_station_ids"]
-        assert subarrays["Low_ITF"].subarray_templates is None
-
     @pytest.mark.parametrize(
-        "model, path, telescope",
-        [
-            (MidCapabilitiesFile, MID_CAPABILITIES, Telescope.SKA_MID),
-            (LowCapabilitiesFile, LOW_CAPABILITIES, Telescope.SKA_LOW),
-        ],
-    )
-    def test_capability_sets_know_their_telescope(self, model, path, telescope):
-        """tmdata doesn't repeat the telescope on each array assembly; the
-        capability set models fill it in."""
-        capabilities = model.model_validate(load(path))
-        assert {cs.telescope for cs in capabilities.subarrays} == {telescope}
-
-    @pytest.mark.parametrize(
-        "model, path, capability_set_model",
-        [
-            (MidCapabilitiesFile, MID_CAPABILITIES, MidCapabilitySet),
-            (LowCapabilitiesFile, LOW_CAPABILITIES, LowCapabilitySet),
-        ],
+        "expected, capabilities_model",
+        [(MID_AA2, MidCapabilities), (LOW_AA2, LowCapabilities)],
     )
     @pytest.mark.parametrize("mode", ["python", "json"])
-    def test_capability_set_is_chosen_by_telescope(
-        self, model, path, capability_set_model, mode
+    def test_capabilities_are_chosen_by_telescope(
+        self, expected, capabilities_model, mode
     ):
-        """A serialised capability set reads back as the right capability
-        set model, chosen by its telescope."""
-        expected = model.model_validate(load(path)).subarrays[0]
-
-        capability_set = TypeAdapter(CapabilitySet).validate_python(
+        """Serialised capabilities read back as the right capabilities
+        model, chosen by their telescope."""
+        capabilities = TypeAdapter(Capabilities).validate_python(
             expected.model_dump(mode=mode)
         )
 
-        assert type(capability_set) is capability_set_model
-        assert capability_set == expected
+        assert type(capabilities) is capabilities_model
+        assert capabilities == expected
 
-    def test_capability_set_rejects_another_telescope(self):
-        data = load(LOW_CAPABILITIES)["AA1"]
+    def test_capabilities_reject_another_telescope(self):
+        data = load(LOW_ARRAY_ASSEMBLY)
         with pytest.raises(ValidationError, match="telescope"):
-            LowCapabilitySet.model_validate(
-                {"name": "AA1", **data, "telescope": "ska_mid"}
+            LowCapabilities.model_validate(
+                {"name": "AA2", **data, "telescope": "ska_mid"}
             )
 
     @pytest.mark.parametrize(
         "model, path",
         [
-            (MidCapabilitiesFile, MID_CAPABILITIES),
-            (LowCapabilitiesFile, LOW_CAPABILITIES),
+            (MidArrayAssemblyFile, MID_ARRAY_ASSEMBLY),
+            (LowArrayAssemblyFile, LOW_ARRAY_ASSEMBLY),
         ],
     )
     def test_serialised_capabilities_validate(self, model, path):
@@ -215,58 +216,71 @@ class TestCapabilities:
         capabilities = model.model_validate(load(path))
         assert model.model_validate(capabilities.model_dump()) == capabilities
 
-    def test_quality_attribute_metrics_not_needed(self):
-        """Low's quality attribute metrics now live only in the defaults
-        file, so the capabilities file validates without them."""
-        data = load(LOW_CAPABILITIES)
-        data.pop("quality_attribute_metrics", None)
-
-        LowCapabilitiesFile.model_validate(data)
-
     @pytest.mark.parametrize(
         "model, path, break_file, message",
         [
             (
-                MidCapabilitiesFile,
-                MID_CAPABILITIES,
-                lambda data: data["constraints"].update(
+                MidBasicCapabilitiesFile,
+                MID_BASIC_CAPABILITIES_FILE,
+                lambda data: data["elevation_limits"].update(
                     min_elevation_deg=90.0, max_elevation_deg=10.0
                 ),
                 "min_elevation_deg must not exceed max_elevation_deg",
             ),
             (
-                MidCapabilitiesFile,
-                MID_CAPABILITIES,
-                lambda data: data["basic_capabilities"]["receiver_information"][
-                    0
-                ].update(min_frequency_hz=2e9, max_frequency_hz=1e9),
+                MidBasicCapabilitiesFile,
+                MID_BASIC_CAPABILITIES_FILE,
+                lambda data: data["frequency_bands"][0].update(
+                    min_frequency_hz=2e9, max_frequency_hz=1e9
+                ),
                 "min_frequency_hz must not exceed max_frequency_hz",
             ),
             (
-                MidCapabilitiesFile,
-                MID_CAPABILITIES,
-                lambda data: data["AA2"]["number_dish_ids"].pop(),
+                MidArrayAssemblyFile,
+                MID_ARRAY_ASSEMBLY,
+                lambda data: data["receptors"]["receptor_ids"].pop(),
                 "number_ska_dishes",
             ),
             (
-                MidCapabilitiesFile,
-                MID_CAPABILITIES,
-                lambda data: data["AA2"]["available_receivers"].append("Band_9"),
-                "available_receivers",
+                LowArrayAssemblyFile,
+                LOW_ARRAY_ASSEMBLY,
+                lambda data: data["receptors"]["receptor_ids"].pop(),
+                "number_stations",
             ),
             (
-                LowCapabilitiesFile,
-                LOW_CAPABILITIES,
-                lambda data: data["AA2"]["number_station_ids"].pop(),
-                "number_stations",
+                LowArrayAssemblyFile,
+                LOW_ARRAY_ASSEMBLY,
+                lambda data: data["observing_modes"]["pss"].update(max_beams=1),
+                "cbf.function_modes must list pss",
+            ),
+            (
+                LowArrayAssemblyFile,
+                LOW_ARRAY_ASSEMBLY,
+                lambda data: data["cbf"]["function_modes"].remove("pst"),
+                "cbf.function_modes must list pst",
+            ),
+            (
+                MidArrayAssemblyFile,
+                MID_ARRAY_ASSEMBLY,
+                lambda data: data["observing_modes"]["pss"].update(max_beams=1),
+                "cbf.function_modes must list pss",
+            ),
+            (
+                MidArrayAssemblyFile,
+                MID_ARRAY_ASSEMBLY,
+                lambda data: data["cbf"]["function_modes"].remove("pst"),
+                "cbf.function_modes must list pst",
             ),
         ],
         ids=[
             "elevation range",
             "frequency range",
             "dish count",
-            "unknown receiver",
             "station count",
+            "pss beams without the pss CBF mode",
+            "pst CBF mode without pst beams",
+            "Mid pss beams without the pss CBF mode",
+            "Mid pst CBF mode without pst beams",
         ],
     )
     def test_consistency_checks(self, model, path, break_file, message):
@@ -340,6 +354,49 @@ class TestMidBasicCapabilities:
             band.get_band5b_subband(1)
 
 
+class TestMidChannelWidths:
+    @pytest.mark.parametrize(
+        "zoom_factors, channel_averaging_factors, expected",
+        [
+            ([], [1], [13440]),
+            (
+                [1, 2, 3, 4, 5, 6],
+                [1, 2, 3, 4, 6, 8, 12, 16, 24, 31, 32, 48],
+                [
+                    210,
+                    420,
+                    840,
+                    1680,
+                    3360,
+                    6720,
+                    13440,
+                    26880,
+                    40320,
+                    53760,
+                    80640,
+                    107520,
+                    161280,
+                    215040,
+                    322560,
+                    416640,
+                    430080,
+                    645120,
+                ],
+            ),
+        ],
+        ids=["unzoomed only", "Mid AA2"],
+    )
+    def test_widths_from_zoom_and_averaging_factors(
+        self, zoom_factors, channel_averaging_factors, expected
+    ):
+        """Mid AA2's are the widths its file listed before the factors
+        replaced them."""
+        assert (
+            mid_channel_width_values_hz(13440, zoom_factors, channel_averaging_factors)
+            == expected
+        )
+
+
 class TestDefaults:
     """The defaults models' own logic."""
 
@@ -347,9 +404,9 @@ class TestDefaults:
         """tmdata keys the noise diode options by mode under ``noise_diode``;
         the model lists them, with the default mode alongside."""
         data = load(MID_DEFAULTS)
-        noise_diode = data["defaults"]["target"]["dish_spfrx_params"]["noise_diode"]
+        noise_diode = data["target"]["dish_spfrx_params"]["noise_diode"]
 
-        target_spfrx = MidDefaultsFile.model_validate(data).spfrx_defaults.target_spfrx
+        target_spfrx = MidDefaultsFile.model_validate(data).target.dish_spfrx_params
 
         options = {option.mode: option for option in target_spfrx.noise_diode_options}
         assert target_spfrx.default_noise_diode_mode == noise_diode["mode"]
@@ -359,7 +416,7 @@ class TestDefaults:
     def test_default_noise_diode_mode_needs_an_option(self):
         """The default mode must be one of the options."""
         data = load(MID_DEFAULTS)
-        noise_diode = data["defaults"]["target"]["dish_spfrx_params"]["noise_diode"]
+        noise_diode = data["target"]["dish_spfrx_params"]["noise_diode"]
         noise_diode["mode"] = "periodic"
         noise_diode.pop("periodic")
 
@@ -370,16 +427,16 @@ class TestDefaults:
     def test_boolean_sync_pps_is_read(self, old, new):
         """Releases up to 6.0.9 have a boolean sync_pps; it still reads."""
         data = load(MID_DEFAULTS)
-        data["defaults"]["csp_configuration"]["spfrx"]["sync_pps"] = old
+        data["csp_configuration"]["spfrx"]["sync_pps"] = old
 
         defaults = MidDefaultsFile.model_validate(data)
 
-        assert defaults.spfrx_defaults.csp_spfrx.sync_pps == new
+        assert defaults.csp_configuration.spfrx.sync_pps == new
 
     def test_noise_diode_off_needs_no_option(self):
         """Switching the noise diode off doesn't need an option for it."""
         data = load(MID_DEFAULTS)
-        noise_diode = data["defaults"]["target"]["dish_spfrx_params"]["noise_diode"]
+        noise_diode = data["target"]["dish_spfrx_params"]["noise_diode"]
         noise_diode["mode"] = "off"
         noise_diode.pop("periodic")
 
@@ -399,90 +456,77 @@ class TestDefaults:
 class TestCycleFile:
     """The cycle file model's own logic."""
 
-    def test_cycle_response_policy_validates(self, tests_tmdata):
-        """The policy in the OSD's response for the cycle, as the PHT
-        endpoints fetch it, validates."""
-        cycle = load(CYCLE)["cycle_number"]
-        osd_data = get_osd_using_tmdata(
-            tests_tmdata, cycle_id=cycle, process_templates=True
-        )
-        CycleFile.model_validate(osd_data["observatory_policy"])
-
     def test_proposal_dates_are_served_as_the_same_time(self):
         """The dates are parsed, so ``.000Z`` is served as ``Z``, but the
         time is unchanged."""
         data = load(CYCLE)
         policy = CycleFile.model_validate(data).model_dump(mode="json")
-        for key in ("proposal_open", "proposal_close"):
+        for key in ("opens", "closes"):
             assert datetime.fromisoformat(
-                policy["cycle_information"][key]
-            ) == datetime.fromisoformat(data["cycle_information"][key])
+                policy["proposal_window"][key]
+            ) == datetime.fromisoformat(data["proposal_window"][key])
+
+    def test_cycle_number_can_be_zero(self):
+        """Cycle 0 is the first numbered cycle."""
+        data = load(CYCLE)
+        data["cycle_number"] = 0
+        assert CycleFile.model_validate(data).cycle_number == 0
+
+    def test_cycle_number_is_optional(self):
+        data = load(CYCLE)
+        del data["cycle_number"]
+        assert CycleFile.model_validate(data).cycle_number is None
 
     def test_proposal_dates_need_a_timezone(self):
         data = load(CYCLE)
-        data["cycle_information"]["proposal_open"] = "2026-03-27T12:00:00"
+        data["proposal_window"]["opens"] = "2026-03-27T12:00:00"
         with pytest.raises(ValidationError, match="timezone"):
             CycleFile.model_validate(data)
 
-    def test_telescope_offering_nothing_is_none(self):
-        """A telescope missing from the file's telescope_capabilities is read
-        as None. (The PHT view serves it as null: see test_views.py.)"""
+    def test_telescope_not_offered_is_absent(self):
+        """A telescope missing from the file's telescopes is not offered.
+        (The PHT view serves it as null: see test_views.py.)"""
         data = load(CYCLE)
-        data["telescope_capabilities"] = {"Low": "AA2_SV"}
 
-        policy = CycleFile.model_validate(data)
+        cycle = CycleFile.model_validate(data)
 
-        assert policy.telescope_capabilities.ska_mid is None
-        assert policy.telescope_capabilities.ska_low == "AA2_SV"
+        assert Telescope.SKA_MID not in cycle.telescopes
 
     def test_proposals_must_open_before_they_close(self):
         """A proposal window that closes before it opens is rejected."""
         data = load(CYCLE)
-        information = data["cycle_information"]
-        information["proposal_open"], information["proposal_close"] = (
-            information["proposal_close"],
-            information["proposal_open"],
-        )
-        with pytest.raises(ValidationError, match="proposal_open must be before"):
+        window = data["proposal_window"]
+        window["opens"], window["closes"] = window["closes"], window["opens"]
+        with pytest.raises(ValidationError, match="must open before it closes"):
             CycleFile.model_validate(data)
 
 
 class TestSubarrayTemplates:
     """The subarray template models' own logic."""
 
-    def test_templates_are_named_by_key(self):
-        """Each top-level key becomes a template, named after the key."""
+    def test_template_names_are_unique(self):
+        """A library listing two templates with the same name is rejected."""
         data = load(SUBARRAY_TEMPLATES)
+        data["templates"].append(data["templates"][0])
 
-        library = SubarrayTemplateLibraryFile.model_validate(data)
-
-        assert [template.name for template in library.templates] == list(data)
-
-    def test_custom_stations_are_split(self):
-        """tmdata's comma-separated stations become a list."""
-        data = load(SUBARRAY_TEMPLATES)
-        name = next(n for n, t in data.items() if t["subarray_type"] == "custom")
-
-        library = SubarrayTemplateLibraryFile.model_validate(data)
-
-        template = next(t for t in library.templates if t.name == name)
-        assert template.custom_stations == data[name]["custom_stations"].split(",")
+        with pytest.raises(ValidationError, match="template names are not unique"):
+            SubarrayTemplateLibraryFile.model_validate(data)
 
     @pytest.mark.parametrize(
-        "custom, stations, message",
+        "custom, receptor_ids, message",
         [
-            (True, "", "lists no custom_stations"),
-            (False, "SKA001", "only custom templates list custom_stations"),
+            (True, [], "lists no receptor_ids"),
+            (False, ["SKA001"], "only custom templates list receptor_ids"),
         ],
-        ids=["custom without stations", "stations on a non-custom template"],
+        ids=["custom without receptors", "receptors on a non-custom template"],
     )
-    def test_only_custom_templates_list_stations(self, custom, stations, message):
-        """Custom templates, and only those, list their stations."""
+    def test_only_custom_templates_list_receptors(self, custom, receptor_ids, message):
+        """Custom templates, and only those, list their receptors."""
         data = load(SUBARRAY_TEMPLATES)
-        name = next(
-            n for n, t in data.items() if (t["subarray_type"] == "custom") == custom
+        stored = next(
+            t for t in data["templates"] if (t["subarray_type"] == "custom") == custom
         )
-        data[name]["custom_stations"] = stations
+        stored["receptor_ids"] = receptor_ids
 
         with pytest.raises(ValidationError, match=message):
             SubarrayTemplateLibraryFile.model_validate(data)

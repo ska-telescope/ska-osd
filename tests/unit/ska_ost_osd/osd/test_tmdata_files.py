@@ -12,9 +12,12 @@ import pytest
 
 from ska_ost_osd.osd.adapters.tmdata.models import (
     CycleFile,
-    LowCapabilitiesFile,
+    LowArrayAssemblyFile,
+    LowBasicCapabilitiesFile,
     LowDefaultsFile,
-    MidCapabilitiesFile,
+    LowPolicyFile,
+    MidArrayAssemblyFile,
+    MidBasicCapabilitiesFile,
     MidDefaultsFile,
     SubarrayTemplateLibraryFile,
 )
@@ -25,19 +28,48 @@ TMDATA = Path(__file__).parents[4] / "tmdata"
 @pytest.mark.parametrize(
     "model, path",
     [
-        (MidCapabilitiesFile, "ska1_mid/mid_capabilities.json"),
-        (LowCapabilitiesFile, "ska1_low/low_capabilities.json"),
-        (MidDefaultsFile, "ska1_mid/mid_defaults.json"),
-        (LowDefaultsFile, "ska1_low/low_defaults.json"),
-        (CycleFile, "observatory_policies.json"),
+        (MidBasicCapabilitiesFile, "telescopes/ska_mid/basic_capabilities.json"),
+        (LowBasicCapabilitiesFile, "telescopes/ska_low/basic_capabilities.json"),
+        (MidDefaultsFile, "telescopes/ska_mid/defaults.json"),
+        (LowDefaultsFile, "telescopes/ska_low/defaults.json"),
         (
             SubarrayTemplateLibraryFile,
-            "subarray_templates/subarray_template_library.json",
+            "telescopes/ska_mid/subarray_templates/AA2.json",
+        ),
+        (
+            SubarrayTemplateLibraryFile,
+            "telescopes/ska_mid/subarray_templates/AA4.json",
+        ),
+        (
+            SubarrayTemplateLibraryFile,
+            "telescopes/ska_mid/subarray_templates/AASTAR.json",
+        ),
+        (
+            SubarrayTemplateLibraryFile,
+            "telescopes/ska_low/subarray_templates/AA2.json",
+        ),
+        (
+            SubarrayTemplateLibraryFile,
+            "telescopes/ska_low/subarray_templates/AA4.json",
+        ),
+        (
+            SubarrayTemplateLibraryFile,
+            "telescopes/ska_low/subarray_templates/AASTAR.json",
         ),
     ]
     + [
-        (CycleFile, f"cycles/{cycle.name}")
-        for cycle in sorted((TMDATA / "cycles").glob("cycle_*.json"))
+        (model, f"{directory}/{array_assembly.name}")
+        for model, directory in [
+            (MidArrayAssemblyFile, "telescopes/ska_mid/array_assemblies"),
+            (LowArrayAssemblyFile, "telescopes/ska_low/array_assemblies"),
+        ]
+        for array_assembly in sorted((TMDATA / directory).glob("*.json"))
+    ]
+    + [
+        (LowPolicyFile, "telescopes/ska_low/policies/AA2.json"),
+        (LowPolicyFile, "telescopes/ska_low/policies/AA2_SV.json"),
+        (CycleFile, "cycles/TEST_SKAO_2027_Low_AA2_Proposal.json"),
+        (CycleFile, "cycles/TEST_SKAO_2027_Low_AA2_SV.json"),
     ],
 )
 def test_tmdata_file_serialises(model, path):

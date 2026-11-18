@@ -1,0 +1,32 @@
+{
+  "telescope": "ska_low",
+  "frequency_band": {
+    "min_frequency_hz": 50000000.0,
+    "max_frequency_hz": 350000000.0
+  },
+  "elevation_limits": {
+    "min_elevation_deg": 45.0,
+    "max_elevation_deg": 90.0
+  },
+  "sps": {
+    "coarse_channels": {
+      "min": 64,
+      "max": 447,
+      "width_hz": 781250.0
+    }
+  },
+  "observing_modes": {
+    "continuum": {
+      "channels_per_coarse_channel": 144
+    },
+    "spectral": {
+      "channels_per_coarse_channel": 432
+    },
+    "pss": {
+      "channels_per_coarse_channel": 54
+    },
+    "pst": {
+      "channels_per_coarse_channel": 216
+    }
+  }
+}
