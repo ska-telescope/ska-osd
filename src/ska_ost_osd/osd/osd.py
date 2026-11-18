@@ -304,7 +304,11 @@ class OSD:
     def _stored_capabilities(self, telescope_dir: str) -> dict[str, dict[str, Any]]:
         """The telescope's capabilities as stored, by name: each array
         assembly, and each policy a cycle names, applied to that cycle's
-        array assembly."""
+        array assembly.
+
+        :raises ValueError: If cycles apply one policy to different array
+            assemblies, which the legacy catalogue can't serve apart.
+        """
         directory = f"{telescope_dir}/array_assemblies"
         array_assemblies = {
             array_assembly["array_assembly"]: array_assembly
@@ -315,11 +319,22 @@ class OSD:
         }
         telescope = Telescope(posixpath.basename(telescope_dir))
         policies = {}
+        applied_in = {}
         for path in get_cycle_paths(self.tmdata).values():
             offered = self.tmdata[path].get_dict()["telescopes"].get(telescope)
             if offered is None:
                 continue
+            array_assembly = offered["array_assembly"]
             for policy_id in offered["policies"].values():
+                if policy_id in applied_in:
+                    applied_to, applied_path = applied_in[policy_id]
+                    if applied_to != array_assembly:
+                        raise ValueError(
+                            f"policy {policy_id} is applied to array assembly "
+                            f"{applied_to} in {applied_path} and {array_assembly} "
+                            f"in {path}"
+                        )
+                applied_in[policy_id] = (array_assembly, path)
                 # A field set to null is treated as left out
                 policy = get_policy_file(self.tmdata, telescope, policy_id).model_dump(
                     mode="json",
@@ -329,7 +344,7 @@ class OSD:
                 )
                 # The legacy response serves the basic capabilities apart
                 policies[policy_id] = merge_capabilities(
-                    {}, array_assemblies[offered["array_assembly"]], policy
+                    {}, array_assemblies[array_assembly], policy
                 )
         return dict(sorted((array_assemblies | policies).items()))
 

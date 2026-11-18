@@ -8,6 +8,7 @@ from ska_ost_osd.osd.osd import get_osd_data, get_osd_using_tmdata
 from tests.unit.ska_ost_osd.osd.expected import (
     CYCLE_1_FILE,
     CYCLE_1_LEGACY_OBSERVATORY_POLICY,
+    CYCLE_2_FILE,
 )
 
 
@@ -490,3 +491,28 @@ def test_get_osd_using_tmdata_raises_when_two_cycle_files_share_a_number(tmdata_
 
     with pytest.raises(ValueError, match="cycle_number 1 is in both"):
         get_osd_using_tmdata(tmdata, cycle_id=1)
+
+
+def test_get_osd_using_tmdata_raises_when_cycles_apply_a_policy_to_different_array_assemblies(
+    tmdata_with,
+):
+    """The legacy catalogue keys policies by name alone, so it can't serve a
+    policy that two cycles apply to different array assemblies."""
+    tmdata = tmdata_with(
+        {
+            "cycles/another_cycle.json": {
+                **CYCLE_2_FILE.model_dump(mode="json", by_alias=True),
+                "cycle_id": "ANOTHER_CYCLE",
+                "cycle_number": 3,
+                "telescopes": {
+                    "ska_low": {
+                        "array_assembly": "AA1",
+                        "policies": {"standard_operations": "AA2"},
+                    }
+                },
+            }
+        }
+    )
+
+    with pytest.raises(ValueError, match="policy AA2 is applied to array assembly"):
+        get_osd_using_tmdata(tmdata, telescope=Telescope.SKA_LOW)
