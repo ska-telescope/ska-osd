@@ -15,8 +15,15 @@ DOCS_PYTHON_RUNNER = uv run python3
 # Set python-test make target to run unit tests and not the component tests
 PYTHON_TEST_FILE = tests/unit/
 
-tmdata-validate: ## validate the tmdata files against the OSD storage models
-	$(PYTHON_RUNNER) osd-validate-tmdata $(TMDATA_SRC_DIR)
+OSD_VALIDATOR_VERSION ?= 8.0.0
+SKA_PYPI_INDEX ?= https://artefact.skao.int/repository/pypi-internal/simple
+
+# Validates with a released ska-ost-osd from the CAR, isolated from this checkout,
+# so the data is checked by the code that deployments read it with
+tmdata-validate: ## validate the tmdata files with a released ska-ost-osd
+	uv tool run --isolated --no-config --index $(SKA_PYPI_INDEX) \
+		--from "ska-ost-osd==$(OSD_VALIDATOR_VERSION)" \
+		osd-validate-tmdata $(TMDATA_SRC_DIR)
 
 # include your own private variables for custom configuration
 -include PrivateRules.mak
