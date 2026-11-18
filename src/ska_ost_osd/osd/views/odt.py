@@ -11,7 +11,6 @@ from ska_ost_osd.osd.models.capabilities import (
     MidBasicCapabilities,
     MidCapabilities,
 )
-from ska_ost_osd.osd.models.defaults import MidDefaults
 from ska_ost_osd.osd.repository import OSDRepository
 from ska_ost_osd.osd.views.base import ConfigurationModel
 
@@ -119,7 +118,7 @@ class LowQualityAttributeMetrics(ConfigurationModel):
     cbf: LowCBFMetrics
 
 
-def _mid_capabilities(capabilities: MidCapabilities) -> MidSubarray:
+def _mid_subarray(capabilities: MidCapabilities) -> MidSubarray:
     return MidSubarray(
         name=capabilities.policy or capabilities.array_assembly,
         receptors=capabilities.receptors.receptor_ids,
@@ -130,7 +129,7 @@ def _mid_capabilities(capabilities: MidCapabilities) -> MidSubarray:
     )
 
 
-def _low_capabilities(capabilities: LowCapabilities) -> LowSubarray:
+def _low_subarray(capabilities: LowCapabilities) -> LowSubarray:
     return LowSubarray(
         name=capabilities.policy or capabilities.array_assembly,
         receptors=capabilities.receptors.receptor_ids,
@@ -145,21 +144,21 @@ def _low_capabilities(capabilities: LowCapabilities) -> LowSubarray:
 
 
 @overload
-def get_basic_capabilities(
+def get_frequency_band(
     repository: OSDRepository, telescope: Literal[Telescope.SKA_MID]
 ) -> list[MidFrequencyBand]: ...
 
 
 @overload
-def get_basic_capabilities(
+def get_frequency_band(
     repository: OSDRepository, telescope: Literal[Telescope.SKA_LOW]
 ) -> LowFrequencyBand: ...
 
 
-def get_basic_capabilities(
+def get_frequency_band(
     repository: OSDRepository, telescope: Telescope
 ) -> list[MidFrequencyBand] | LowFrequencyBand:
-    """A telescope's basic capabilities, as the ODT reads them: Mid's receiver
+    """A telescope's frequency band, as the ODT reads it: Mid's receiver
     bands, or Low's band with its coarse channels and the channels each mode
     divides them into.
 
@@ -203,39 +202,34 @@ def get_constraints(repository: OSDRepository, telescope: Telescope) -> Constrai
     )
 
 
-@overload
-def get_defaults(
-    repository: OSDRepository, telescope: Literal[Telescope.SKA_MID]
-) -> SPFRxParameters: ...
-
-
-@overload
-def get_defaults(
-    repository: OSDRepository, telescope: Literal[Telescope.SKA_LOW]
-) -> LowQualityAttributeMetrics: ...
-
-
-def get_defaults(
-    repository: OSDRepository, telescope: Telescope
-) -> SPFRxParameters | LowQualityAttributeMetrics:
-    """A telescope's defaults, as the ODT reads them.
+def get_spfrx_defaults(repository: OSDRepository) -> SPFRxParameters:
+    """Mid's SPFRx defaults: the target SPFRx and CSP SPFRx settings.
 
     :param repository: the OSD repository to read from.
-    :param telescope: the telescope.
-    :return: Mid's SPFRx defaults, or Low's quality attribute metrics.
+    :return: Mid's SPFRx defaults.
     """
-    defaults = repository.get_defaults(telescope)
-    if isinstance(defaults, MidDefaults):
-        return SPFRxParameters.model_validate(
-            defaults.spfrx_defaults, from_attributes=True
-        )
+    return SPFRxParameters.model_validate(
+        repository.get_defaults(Telescope.SKA_MID).spfrx_defaults,
+        from_attributes=True,
+    )
+
+
+def get_quality_attribute_metrics(
+    repository: OSDRepository,
+) -> LowQualityAttributeMetrics:
+    """Low's quality attribute metrics.
+
+    :param repository: the OSD repository to read from.
+    :return: Low's quality attribute metrics.
+    """
     return LowQualityAttributeMetrics.model_validate(
-        defaults.quality_attribute_metrics, from_attributes=True
+        repository.get_defaults(Telescope.SKA_LOW).quality_attribute_metrics,
+        from_attributes=True,
     )
 
 
 @overload
-def get_capabilities(
+def get_subarray(
     repository: OSDRepository,
     telescope: Literal[Telescope.SKA_MID],
     array_assembly: str,
@@ -244,7 +238,7 @@ def get_capabilities(
 
 
 @overload
-def get_capabilities(
+def get_subarray(
     repository: OSDRepository,
     telescope: Literal[Telescope.SKA_LOW],
     array_assembly: str,
@@ -252,25 +246,25 @@ def get_capabilities(
 ) -> LowSubarray: ...
 
 
-def get_capabilities(
+def get_subarray(
     repository: OSDRepository,
     telescope: Telescope,
     array_assembly: str,
     policy_id: str | None = None,
 ) -> MidSubarray | LowSubarray:
-    """An array assembly's capabilities, with a policy's applied if one is
-    given, as the ODT reads them.
+    """One of the subarrays the ODT offers: an array assembly's capabilities,
+    with a policy's applied if one is given.
 
     :param repository: the OSD repository to read from.
     :param telescope: the telescope.
     :param array_assembly: the array assembly, e.g. ``"AA2"``.
     :param policy_id: the ID of a policy to apply, e.g. ``"AA2_SV"``.
-    :return: the capabilities, named after the policy, or else the array
+    :return: the subarray, named after the policy, or else the array
         assembly.
     :raises ArrayAssemblyNotFoundError: If there is no such array assembly.
     :raises PolicyNotFoundError: If there is no such policy.
     """
     capabilities = repository.get_capabilities(telescope, array_assembly, policy_id)
     if isinstance(capabilities, MidCapabilities):
-        return _mid_capabilities(capabilities)
-    return _low_capabilities(capabilities)
+        return _mid_subarray(capabilities)
+    return _low_subarray(capabilities)

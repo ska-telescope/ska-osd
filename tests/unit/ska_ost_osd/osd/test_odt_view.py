@@ -29,13 +29,13 @@ from tests.unit.ska_ost_osd.osd.expected import (
     ],
     ids=["mid", "low"],
 )
-def test_get_basic_capabilities(test_tmdata_repository, telescope, expected):
-    assert odt.get_basic_capabilities(test_tmdata_repository, telescope) == expected
+def test_get_frequency_band(test_tmdata_repository, telescope, expected):
+    assert odt.get_frequency_band(test_tmdata_repository, telescope) == expected
 
 
-def test_get_basic_capabilities_raises_when_files_missing(empty_tmdata_repository):
+def test_get_frequency_band_raises_when_files_missing(empty_tmdata_repository):
     with pytest.raises(FileNotFoundError):
-        odt.get_basic_capabilities(empty_tmdata_repository, Telescope.SKA_MID)
+        odt.get_frequency_band(empty_tmdata_repository, Telescope.SKA_MID)
 
 
 @pytest.mark.parametrize(
@@ -50,16 +50,15 @@ def test_get_constraints(test_tmdata_repository, telescope, expected):
     assert odt.get_constraints(test_tmdata_repository, telescope) == expected
 
 
-@pytest.mark.parametrize(
-    "telescope, expected",
-    [
-        (Telescope.SKA_MID, ODT_MID_SPFRX_DEFAULTS),
-        (Telescope.SKA_LOW, ODT_LOW_QUALITY_ATTRIBUTE_METRICS),
-    ],
-    ids=["mid", "low"],
-)
-def test_get_defaults(test_tmdata_repository, telescope, expected):
-    assert odt.get_defaults(test_tmdata_repository, telescope) == expected
+def test_get_spfrx_defaults(test_tmdata_repository):
+    assert odt.get_spfrx_defaults(test_tmdata_repository) == ODT_MID_SPFRX_DEFAULTS
+
+
+def test_get_quality_attribute_metrics(test_tmdata_repository):
+    assert (
+        odt.get_quality_attribute_metrics(test_tmdata_repository)
+        == ODT_LOW_QUALITY_ATTRIBUTE_METRICS
+    )
 
 
 @pytest.mark.parametrize(
@@ -81,24 +80,22 @@ def test_get_defaults(test_tmdata_repository, telescope, expected):
         "low AA2 with the AA2_SV policy",
     ],
 )
-def test_get_capabilities(
+def test_get_subarray(
     test_tmdata_repository, telescope, array_assembly, policy_id, expected
 ):
     assert (
-        odt.get_capabilities(
-            test_tmdata_repository, telescope, array_assembly, policy_id
-        )
+        odt.get_subarray(test_tmdata_repository, telescope, array_assembly, policy_id)
         == expected
     )
 
 
-def test_get_capabilities_raises_for_unknown_array_assembly(test_tmdata_repository):
+def test_get_subarray_raises_for_unknown_array_assembly(test_tmdata_repository):
     with pytest.raises(ArrayAssemblyNotFoundError):
-        odt.get_capabilities(test_tmdata_repository, Telescope.SKA_LOW, "AA3")
+        odt.get_subarray(test_tmdata_repository, Telescope.SKA_LOW, "AA3")
 
 
-def test_get_capabilities_raises_for_unknown_policy(test_tmdata_repository):
+def test_get_subarray_raises_for_unknown_policy(test_tmdata_repository):
     with pytest.raises(PolicyNotFoundError):
-        odt.get_capabilities(
+        odt.get_subarray(
             test_tmdata_repository, Telescope.SKA_LOW, "AA2", "NO_SUCH_POLICY"
         )

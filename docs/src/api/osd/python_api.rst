@@ -269,7 +269,7 @@ UIs, as Pydantic models. Each consumer's views and models are in its own module:
      - Returns
      - Served by ska-oso-services
      - Used by
-   * - ``odt.get_basic_capabilities(repository, telescope)``
+   * - ``odt.get_frequency_band(repository, telescope)``
      - Mid: ``list[MidFrequencyBand]``; Low: ``LowFrequencyBand``
      - ``frequency_band`` in ``GET /configuration``
      - ODT UI
@@ -277,12 +277,15 @@ UIs, as Pydantic models. Each consumer's views and models are in its own module:
      - ``Constraints``
      - ``constraints`` in ``GET /configuration``
      - ODT UI
-   * - ``odt.get_defaults(repository, telescope)``
-     - Mid: ``SPFRxParameters``; Low: ``LowQualityAttributeMetrics``
-     - ``spfrx_defaults`` and ``quality_attribute_metrics`` in
-       ``GET /configuration``
+   * - ``odt.get_spfrx_defaults(repository)``
+     - ``SPFRxParameters``
+     - Mid's ``spfrx_defaults`` in ``GET /configuration``
      - ODT UI
-   * - ``odt.get_capabilities(repository, telescope, array_assembly,
+   * - ``odt.get_quality_attribute_metrics(repository)``
+     - ``LowQualityAttributeMetrics``
+     - Low's ``quality_attribute_metrics`` in ``GET /configuration``
+     - ODT UI
+   * - ``odt.get_subarray(repository, telescope, array_assembly,
        policy_id=None)``
      - Mid: ``MidSubarray``; Low: ``LowSubarray``
      - each of the ``subarrays`` in ``GET /configuration``
@@ -306,22 +309,23 @@ choosing which array assemblies and policies to serve:
 .. code-block:: text
 
     ska_mid
-        frequency_band              get_basic_capabilities: the receiver bands,
+        frequency_band              get_frequency_band: the receiver bands,
                                     Band 5b with its sub-bands
         constraints                 get_constraints: elevation limits and
                                     avoidance angles
-        subarrays                   get_capabilities, for each array assembly
-                                    or policy
-        spfrx_defaults              get_defaults: target_spfrx and csp_spfrx
+        subarrays                   get_subarray, for each array assembly or
+                                    policy
+        spfrx_defaults              get_spfrx_defaults: target_spfrx and
+                                    csp_spfrx
     ska_low
-        frequency_band              get_basic_capabilities: the band and its
+        frequency_band              get_frequency_band: the band and its
                                     channels
         constraints                 get_constraints
-        quality_attribute_metrics   get_defaults
-        subarrays                   get_capabilities, for each array assembly
-                                    or policy
+        quality_attribute_metrics   get_quality_attribute_metrics
+        subarrays                   get_subarray, for each array assembly or
+                                    policy
 
-``get_capabilities`` returns an array assembly's capabilities, with a policy's
+``get_subarray`` returns an array assembly's capabilities, with a policy's
 applied if one is given, named after the policy or else the array assembly. Its
 fields are the ones the ODT uses: ``name``, ``receptors``,
 ``available_bandwidth_hz``, ``number_pst_beams`` and ``number_fsps``, with Mid's
@@ -333,7 +337,7 @@ capabilities.
 
     from ska_ost_osd.osd.views import odt
 
-    odt.get_capabilities(repository, Telescope.SKA_LOW, "AA2", "AA2_SV")
+    odt.get_subarray(repository, Telescope.SKA_LOW, "AA2", "AA2_SV")
 
 The models are the view's own, named and shaped as ska-oso-services' response
 models, so the response doesn't change with the OSD's domain models.
