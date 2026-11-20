@@ -52,9 +52,24 @@ tmdata-validate:
   script:
     - make tmdata-validate
 
+# Publishing is manual, and only from the default branch: tags are for software
+# releases, and other branches, including merge request pipelines, must not
+# publish data.
+# To ensure an older pipeline can't publish over a newer one:
+#   - The resource group runs no more than one publish at a time.
+#   - The environment with setting "Prevent outdated deployment jobs" will
+#     refuse a publish job from an earlier pipeline than the one that is live.
+# Both are prefixed with "tmdata" to distinguish them from any resource groups
+# or environments for the ska-ost-osd library itself.
 tmdata-publish:
-  when: manual
   needs:
     - tmdata-build
     - tmdata-validate
     - python-uv-test
+  resource_group: tmdata-$CI_COMMIT_REF_NAME
+  environment:
+    name: tmdata/$CI_COMMIT_REF_NAME
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: manual
+      allow_failure: true
