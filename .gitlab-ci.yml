@@ -69,6 +69,17 @@ tmdata-publish:
   resource_group: tmdata-$CI_COMMIT_REF_NAME
   environment:
     name: tmdata/$CI_COMMIT_REF_NAME
+  # Skips publishing if the CAR already serves this tmdata for the ref. After
+  # publishing, checks again and fails the job if the CAR doesn't serve it:
+  # make tmdata-publish exits successfully even when the upload is rejected.
+  script:
+    - |
+      if make tmdata-check-published; then
+        echo "Not publishing: the tmdata is already published"
+        exit 0
+      fi
+    - make tmdata-publish
+    - make tmdata-check-published
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: manual
