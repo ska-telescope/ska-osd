@@ -1,5 +1,5 @@
-Legacy API
-----------
+Legacy
+------
 
 .. deprecated:: 8.0.0
     ``ska_ost_osd.osd.osd``, including ``get_osd_using_tmdata``, will be removed
@@ -160,3 +160,49 @@ With ``process_templates=True``, the templates are included in the OSD data:
             }
         }
     }
+
+.. _legacy-publishing:
+
+Publishing before 8.0.0
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Before 8.0.0, the tmdata was published with releases of ska-ost-osd, under the
+release's tag, e.g. ``car:ost/ska-ost-osd?7.0.0``. Two files on ``main`` told
+clients which release to read:
+
+* `tmdata/version_mapping/latest_release.txt <https://gitlab.com/ska-telescope/ost/ska-ost-osd/-/blob/main/tmdata/version_mapping/latest_release.txt?ref_type=heads>`_:
+  the latest release, read by ``get_osd_latest_version``.
+* ``tmdata/version_mapping/cycle_gitlab_release_version_mapping.json``: the
+  releases holding each cycle's data.
+
+Clients before 8.0.0 still read them, so they stay on ``main``, pointing at 7.0.0
+and earlier.
+
+Manual tmdata Release Steps
+```````````````````````````
+
+1. Create a JIRA issue and the branch
+
+    1st: Create a new issue on the Release Management Jira Project with a summary of your release, and set it to “IN PROGRESS”.
+
+    2nd: Create and checkout a new rel-XXX-release-v-1-2-2 branch (where REL-XXX is your Jira issue.)
+
+2. Check the Current Version
+
+.. code:: bash
+
+    make show-version
+
+3. Bump the Version
+
+.. code:: bash
+
+    make bump-patch-release
+
+4. Set the Release
+
+* `For remaining release steps click here <https://developer.skao.int/en/latest/tutorial/release-management/automate-release-process.html>`_
+
+.. warning::
+
+    This is a very crucial part for OSD, without this some functionality may break and exceptions and errors will be raised.
