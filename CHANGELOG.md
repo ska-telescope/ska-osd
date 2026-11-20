@@ -7,6 +7,13 @@ This project adheres to `Semantic Versioning <http://semver.org/>`_.
 
 Unreleased
 **********
+* ``tmdata-publish`` only runs in pipelines for the ``main`` branch, only publishes
+  if the tmdata differs from what the CAR serves, and fails if the CAR doesn't serve
+  the tmdata afterwards.
+* ``tmdata-validate`` is run using a release of ska-ost-osd, set by
+  ``OSD_VALIDATOR_VERSION`` in the ``Makefile``.
+* Removed the legacy tmdata files, except ``tmdata/version_mapping``
+  for forward compatibility.
 
 8.0.0
 *****
