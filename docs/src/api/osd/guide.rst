@@ -32,19 +32,15 @@ Folder Structure
     │       │   └── <array assembly>.json
     │       ├── basic_capabilities.json
     │       └── defaults.json
-    ├── ska1_low                             (legacy)
-    │   ├── low_capabilities.json
-    │   └── low_defaults.json
-    ├── ska1_mid                             (legacy)
-    │   ├── mid_capabilities.json
-    │   └── mid_defaults.json
-    ├── subarray_templates                   (legacy)
-    │   └── subarray_template_library.json
-    └── observatory_policies.json            (legacy)
+    └── version_mapping                      (legacy)
+        ├── cycle_gitlab_release_version_mapping.json
+        └── latest_release.txt
 
-The current files are in ``cycles`` and ``telescopes``. The legacy files are
-kept for older releases of the OSD and for consumers that read them directly;
-the current code does not read them.
+The current files are in ``cycles`` and ``telescopes``. The files in
+``version_mapping`` are kept for releases of the OSD before 8.0.0, which read
+them to find the release whose tmdata to read, as described in
+:ref:`legacy-publishing`. Only the deprecated ``get_osd_latest_version`` reads
+them in the current code.
 
 Each of these files names what it describes in a field, so their file names
 don't matter:
@@ -85,11 +81,6 @@ don't matter:
      - a cycle: its proposal window and policy, and in ``telescopes``, for
        each telescope, its array assembly and the policy offered for each
        policy type
-
-.. note::
-
-    The legacy ``observatory_policies.json`` file remains at the root on main
-    for backward compatibility with the old legacy version mapper.
 
 .. _how-capabilities-are-built:
 
