@@ -3,54 +3,73 @@ Publishing Data
 
 .. contents::
 
+Files in the ``tmdata`` directory of ``main`` are published to the Central
+Artefact Repository (CAR), where consumers read them using the URI
+``car:ost/ska-ost-osd?main``. A change is served as soon as it is published:
+publishing doesn't need a release of the library, and releasing the library
+doesn't publish the tmdata.
 
-Publishing tmdata
+
+Changing the data
 ~~~~~~~~~~~~~~~~~
 
-The tmdata is published to CAR with the same version as the Python package, so a
-breaking change to the tmdata is released as a new major version. Consumers should
-read a pinned version, ``car:ost/ska-ost-osd?<version>`` (e.g. ``?8.0.0``), rather
-than ``main``.
+1. Change the files in ``tmdata`` in a merge request to ``main``. Its pipeline
+   validates them.
+2. Once it is merged, run the manual ``tmdata-publish`` job in the ``main``
+   pipeline.
 
-It is published by the manual ``tmdata-publish`` job of the GitLab pipeline, which
-runs:
 
-.. code-block:: bash
+The publish job
+~~~~~~~~~~~~~~~
 
-    # Publish TMData to artifact repository
-    make tmdata-publish
+The ``tmdata-publish`` job:
 
-View TMData Releases
+* Runs only in pipelines for ``main``. Tags are for releases of the library, and
+  merge request and other branch pipelines must not publish data.
+* Is manual, so the data is published when someone chooses to, not on every merge
+  to ``main``.
+* Needs ``tmdata-validate`` to pass. It validates the tmdata with
+  ``osd-validate-tmdata`` from a release of ska-ost-osd, set by
+  ``OSD_VALIDATOR_VERSION`` in the ``Makefile``, rather than the code in the
+  repository, so the data is checked by the library that deployments read it
+  with. To change the file schema, release and deploy the library first, then
+  update ``OSD_VALIDATOR_VERSION``, then change the data.
+* Publishes only if the tmdata differs from what the CAR serves for ``main``, so
+  running it again doesn't publish the same data twice.
+* Checks afterwards that the CAR serves the tmdata. ``make tmdata-publish`` exits
+  successfully even when the CAR rejects the upload, so this check is what fails
+  the job. If it fails, retry it in the latest ``main`` pipeline.
+
+
+Stale publishes
+~~~~~~~~~~~~~~~
+
+If publish jobs from two pipelines run close together, the earlier pipeline could
+publish after the later one, and the CAR would serve older data than ``main``
+holds. The job prevents this with:
+
+* A resource group, ``tmdata-main``, so only one publish job runs at a time.
+* An environment, ``tmdata/main``, which records the pipeline whose publish job
+  last succeeded. With "Prevent outdated deployment jobs" on, GitLab refuses a publish
+  job from an earlier pipeline.
+
+These rely on two project settings, in Settings → CI/CD → General pipelines:
+
+* **Prevent outdated deployment jobs**: on.
+* **Allow job retries for rollback deployments**: off. Retrying an old publish job
+  would publish older data than ``main`` holds.
+
+
+Rolling back
+~~~~~~~~~~~~
+
+To go back to earlier data, revert the change in a merge request and publish it,
+so that ``main`` and what the CAR serves always agree.
+
+
+Clients before 8.0.0
 ~~~~~~~~~~~~~~~~~~~~
 
-To view current TMData releases: `TMData Releases <https://gitlab.com/ska-telescope/ost/ska-ost-osd/-/blob/main/tmdata/version_mapping/latest_release.txt?ref_type=heads>`_
-
-
-Manual tmdata Release Steps
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-1. Create a JIRA issue and the branch
-
-    1st: Create a new issue on the Release Management Jira Project with a summary of your release, and set it to “IN PROGRESS”.
-
-    2nd: Create and checkout a new rel-XXX-release-v-1-2-2 branch (where REL-XXX is your Jira issue.)
-
-2. Check the Current Version
-
-.. code:: bash
-
-    make show-version
-
-3. Bump the Version
-
-.. code:: bash
-
-    make bump-patch-release
-
-4. Set the Release
-
-* `For remaining release steps click here <https://developer.skao.int/en/latest/tutorial/release-management/automate-release-process.html>`_
-
-.. warning::
-
-    This is a very crucial part for OSD, without this some functionality may break and exceptions and errors will be raised.
+Releases of ska-ost-osd before 8.0.0 read ``tmdata/version_mapping`` on ``main`` to
+find the release whose tmdata to read, as described in :ref:`legacy-publishing`.
+Leave the files in ``tmdata/version_mapping`` as they are.

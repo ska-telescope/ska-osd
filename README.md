@@ -42,9 +42,7 @@ make python-format
 
 # Publish tmdata
 
-The tmdata is published to the artefact repository with the same version as the ska-ost-osd Python package, by the manual `tmdata-publish` job of the GitLab pipeline. Consumers should read a pinned version rather than `main`.
-
-To view tmdata releases, [Click here](https://gitlab.com/ska-telescope/ost/ska-ost-osd/-/blob/main/tmdata/version_mapping/latest_release.txt?ref_type=heads).
+The tmdata on `main` is published to the Central Artefact Repository by the manual `tmdata-publish` job of the `main` pipeline, and read as `car:ost/ska-ost-osd?main`. See [Publishing Data](https://developer.skao.int/projects/ska-ost-osd/en/latest/api/osd/publishing.html).
 
 # Documentation
 
