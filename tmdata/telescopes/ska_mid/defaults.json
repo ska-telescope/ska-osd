@@ -1,8 +1,8 @@
 {
   "constraints": {
     "sun_avoidance_angle_deg": 30.0,
-    "moon_avoidance_angle_deg": 10.0,
-    "jupiter_avoidance_angle_deg": 10.0
+    "moon_avoidance_angle_deg": 90.0,
+    "jupiter_avoidance_angle_deg": 90.0
   },
   "target": {
     "dish_spfrx_params": {
